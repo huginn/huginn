@@ -6,7 +6,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 
 ![the origin of the name](doc/imgs/the-name.png)
 
-We're just getting started, but here are some of the things that you can do right now with Huginn:
+#### We're just getting started, but here are some of the things that you can do right now with Huginn:
 
 * Watch for air travel deals
 * List terms you care about and receive emails when their occurrence on Twitter changes drastically
@@ -16,6 +16,8 @@ We're just getting started, but here are some of the things that you can do righ
 * Track your location over time
 
 You run Huginn on our own server, so you always know who has your data.  You do.
+
+## Examples
 
 And now, some example screenshots.  Below them are instructions to get you started.
 
