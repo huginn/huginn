@@ -32,8 +32,10 @@ gem 'twitter-stream', '>=0.1.16'
 gem 'em-http-request'
 
 gem 'unicorn'
-gem 'backup', :require => false
-gem 'fog', '~> 1.4.0', :require => false
+
+# If you want to use the Backup gem for backups, uncomment these lines:
+# gem 'backup', :require => false
+# gem 'fog', '~> 1.4.0', :require => false
 
 group :development do
   gem 'capistrano'

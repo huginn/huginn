@@ -56,6 +56,10 @@ In order to use the WeatherAgent you need an [API key with Wunderground](http://
 
 We assume your deployment will run over SSL. This is a very good idea! However, if you wish to turn this off, you'll probably need to edit `config/initializers/devise.rb` and modify the line containing `config.rememberable_options = { :secure => true }`.  You will also need to edit `config/environments/production.rb` and modify the value of `config.force_ssl`.
 
+#### Setup Backups
+
+Checkout `config/example_backup.rb` for an example script that you can use with the Backup gem.  If you want to use it, uncomment the associated lines in your Gemfile.
+
 ## License
 
 Huginn is provided under the MIT License.
