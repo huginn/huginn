@@ -2,7 +2,7 @@
 
 ## What is Huginn?
 
-Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events.  It's a tool that makes it easy to monitor data sources and have actions take place when certain events occur.
+Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events, propogating events along a directed event flow graph.  Think of it as Yahoo! Pipes plus ITTT, on your own server.  You run Huginn on our own server, so you always know who has your data.  You do.
 
 ![the origin of the name](doc/imgs/the-name.png)
 
@@ -14,8 +14,6 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Follow your project names on Twitter and get updates when people mention them
 * Scrape websites and receive email when they change
 * Track your location over time
-
-You run Huginn on our own server, so you always know who has your data.  You do.
 
 ## Examples
 
@@ -33,11 +31,35 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ## Getting Started
 
-* Make a private fork of this repository on GitHub.
-* In your fork, edit `config/secret_token.rb` and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
-* Edit `app/models/user.rb` and change the invitation code(s) in `INVITATION_CODES`.  This controls who can signup to use your installation.
-* Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.  Run `rails s`, visit `localhost:3000`, and login with the username of `admin` and the password of `password`.
+### Quick Start
+
+If you just want to play around, you can simply checkout this repository, then do the following steps:
+
+* Edit `config/secret_token.rb` and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
+* Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.  Run `rails s`, visit `http://localhost:3000`, and login with the username of `admin` and the password of `password`.
 * Make some extra Terminal windows and run `bundle exec rails runner bin/schedule.rb` and `bundle exec rails runner bin/twitter_stream.rb`
+* Setup some Agents!
+
+### Real Setup
+
+Follow these instructions if you wish to deploy your own version of Huginn or to contribute back to the project.  GitHub doesn't make it easy to work with private forks of public repositories, so we recommend that you follow the following steps:
+
+* Make a public fork of Huginn
+* Make a private, empty GitHub repository called `huginn-private`
+* Duplicate your public fork into your new private repository (via [GitHub's instructions](https://help.github.com/articles/duplicating-a-repository)):
+
+      git clone --bare git@github.com:you/huginn.git
+      cd huginn.git
+      git push --mirror git@github.com:you/huginn-private.git
+      cd .. && rm -rf huginn.git
+
+* Checkout your new private repository.
+* Add your Huginn public fork as a remote to your new private repository (`huginn-private`):
+
+      git remote add public git@github.com:you/huginn.git
+
+* Run the steps from *Quick Start* above to configure your copy of Huginn.
+* When you want to contribute patches, do a remote push from your private repository to your public fork, then make a pull request to us.
 
 ## Deployment
 
@@ -45,6 +67,9 @@ Deployment right now is configured with Capistrano, Unicorn, and nginx.  You sho
 
 ### Required Setup
 
+In your private copy of Huginn, do the following:
+
+* Edit `app/models/user.rb` and change the invitation code(s) in `INVITATION_CODES`.  This controls who can signup to use your installation.
 * Edit `app/mailers/system_mailer.rb` and set your default from address.
 * Edit `config/unicorn/production.rb` and replace instances of *you* with the correct username for your server.
 * Edit `config/environments/production.rb` and change the value of `DOMAIN` and the `config.action_mailer.smtp_settings` setup, which is currently setup for sending email through a Google Apps account on Gmail.
