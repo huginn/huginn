@@ -1,0 +1,71 @@
+<%= form_for(@agent,
+             :as => :agent,
+             :url => @agent.new_record? ? agents_path : agent_path(@agent),
+             :method => @agent.new_record? ? "POST" : "PUT") do |f| %>
+  <% if @agent.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@agent.errors.count, "error") %> prohibited this Agent from being saved:</h2>
+      <ul>
+      <% @agent.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class='pull-right well description span6'>
+    <%= @agent.html_description unless @agent.new_record? %>
+  </div>
+
+  <div class='pull-right well event-descriptions span6 hidden'>
+  </div>
+
+  <% if @agent.new_record? %>
+    <div class="control-group type-select">
+      <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
+      <%= f.label :type, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :type, options_for_select(Agent.types.map {|type| [type.to_s.gsub(/^.*::/, ''), type.to_s] }, @agent.type), :class => 'span4' %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="control-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'span4' %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :schedule, :class => 'control-label' %>
+    <div class="controls schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
+      <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), :class => 'span4' %>
+      <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :sources, :class => 'control-label' %>
+    <div class="controls link-region" data-can-receive-events="<%= @agent.can_receive_events? %>">
+      <%= f.select(:source_ids,
+                   options_for_select((current_user.agents - [@agent]).map {|s| [s.name, s.id] },
+                                      @agent.source_ids),
+                   {}, { :multiple => true, :size => 5, :class => 'span4 multi-select' }) %>
+      <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :options, :class => 'control-label' %>
+    <div class="controls">
+      <textarea rows="10" id="agent_options" name="agent[options]" class="span8 live-json-editor">
+        <%= ((@agent.new_record? && @agent.options == {}) ? @agent.default_options : @agent.options).to_json %>
+      </textarea>
+    </div>
+  </div>
+
+  <div class='form-actions' style='clear: both'>
+    <%= f.submit :class => "btn btn-primary" %>
+  </div>
+<% end %>

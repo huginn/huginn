@@ -1,0 +1,26 @@
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+
+<h3>Recent Event Map</h3>
+
+<% events = @agent.events.where("lat IS NOT null AND lng IS NOT null").order("id desc").limit(500) %>
+<% if events.length > 0 %>
+  <div id="map_canvas" style="width:800px; height:800px"></div>
+
+  <script type="text/javascript">
+    var mapOptions = {
+      center: new google.maps.LatLng(<%= events.first.lat %>, <%= events.first.lng %>),
+      zoom:15,
+      mapTypeId:google.maps.MapTypeId.ROADMAP
+    };
+
+    var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+  </script>
+
+  <% events.each do |event| %>
+    <%= render "agents/agent_views/user_location_agent/map_marker", :event => event %>
+  <% end %>
+<% else %>
+  <p>
+    No events found.
+  </p>
+<% end %>

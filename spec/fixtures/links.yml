@@ -1,0 +1,7 @@
+jane_rain_notifier_agent_link:
+  receiver: jane_rain_notifier_agent
+  source: jane_weather_agent
+
+bob_rain_notifier_agent_link:
+  receiver: bob_rain_notifier_agent
+  source: bob_weather_agent

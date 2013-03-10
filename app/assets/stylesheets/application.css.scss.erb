@@ -1,0 +1,92 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the top of the
+ * compiled file, but it's generally better to create a new file per style scope.
+ *
+ *= require select2
+ *= require jquery.json-editor
+ *= require rickshaw
+ *= require_tree .
+ *= require_self
+ */
+
+$glyphicons-halflings-url: "<%= image_path "glyphicons-halflings.png" %>";
+$glyphicons-halflings-white-url: "<%= image_path "glyphicons-halflings-white.png" %>";
+
+@import "bootstrap";
+
+body { padding-top: 60px; }
+
+#main {
+  margin-bottom: 100px;
+}
+
+/* Rails scaffold style compatibility */
+#error_explanation {
+  @extend .alert;
+  @extend .alert-error;
+  @extend .alert-block;
+}
+
+.field_with_errors {
+  @extend .control-group.error;
+}
+
+table.events {
+  .payload {
+    color: #999;
+    font-size: 12px;
+    //text-align: center;
+    font-family: monospace;
+  }
+}
+
+.multi-select {
+  float: none !important;
+  margin-left: 0 !important;
+}
+
+#job-indicator {
+  display: none;
+}
+
+img.odin {
+  position: relative;
+  top: -32px;
+}
+
+.link-region .cannot-receive-events,
+.schedule-region .cannot-be-scheduled {
+  display: none;
+}
+
+.type-select {
+  width: 275px;
+
+  img.spinner {
+    display: none;
+    float: right;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+#show-tabs {
+  margin-top: 10px;
+  height: 400px;
+}
+
+.digraph {
+  margin-top: 20px;
+}
+
+.show-view {
+  overflow: hidden;
+}

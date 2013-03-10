@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <% if @headline %>
+      <h1><%= @headline %></h1>
+    <% end %>
+    <% @lines.each do |line| %>
+      <p>
+        <%= line %>
+      </p>
+    <% end %>
+  </body>
+</html>

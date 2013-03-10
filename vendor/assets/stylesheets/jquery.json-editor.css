@@ -1,0 +1,34 @@
+.json-editor {
+  background-color: #FFF;
+  position: relative; }
+  .json-editor .builder {
+    background-color: white;
+    overflow: auto;
+    font-size: 0.9em; }
+    .json-editor .builder .key {
+      font-weight: bold; }
+      .json-editor .builder .key .edit_field {
+        width: 80px; }
+    .json-editor .builder .val .edit_field {
+      width: 180px; }
+  .json-editor blockquote {
+    margin: 0;
+    padding: 0;
+    clear: both;
+    padding-left: 7px; }
+  .json-editor div {
+    background-color: #cfc;
+    margin: 1px;
+    padding: 2px; }
+  .json-editor .val {
+    font-style: italic; }
+  .json-editor .key a, .json-editor .val a {
+    color: black;
+    text-decoration: none; }
+  .json-editor .icon {
+    display: block;
+    float: right;
+    text-decoration: none;
+    padding-left: 5px;
+    border: 0 !important;
+    color: blue; }

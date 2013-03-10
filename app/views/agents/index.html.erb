@@ -1,0 +1,73 @@
+<div class='container'>
+  <div class='row'>
+    <div class='span12'>
+      <div class="page-header">
+        <h2>Your Agents</h2>
+      </div>
+
+      <table class='table table-striped'>
+        <tr>
+          <th>Name</th>
+          <th>Last Check</th>
+          <th>Last Event Out</th>
+          <th>Last Event In</th>
+          <th>Events</th>
+          <th>Schedule</th>
+          <th>Working?</th>
+          <th></th>
+        </tr>
+
+        <% @agents.each do |agent| %>
+            <tr>
+              <td>
+                <%= agent.name %>
+                <br/>
+                <span class='muted'><%= agent.short_type.titleize %></span>
+              </td>
+              <td>
+                <% if agent.cannot_be_scheduled? %>
+                    N/A
+                <% else %>
+                    <%= agent.last_check_at ? time_ago_in_words(agent.last_check_at) + " ago" : "never" %>
+                <% end %>
+              </td>
+              <td><%= agent.last_event_at ? time_ago_in_words(agent.last_event_at) + " ago" : "never" %></td>
+              <td>
+                <% if agent.cannot_receive_events? %>
+                    N/A
+                <% else %>
+                    <%= agent.last_receive_at ? time_ago_in_words(agent.last_receive_at) + " ago" : "never" %>
+                <% end %>
+              </td>
+              <td><%= link_to(agent.events_count || 0, events_path(:agent => agent.to_param)) %></td>
+              <td><%= (agent.schedule || "n/a").to_s.humanize.titleize %></td>
+              <td><%= working(agent) %></td>
+              <td>
+                <div class="btn-group">
+                  <%= link_to 'Show', agent_path(agent), class: "btn btn-mini" %>
+                  <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-mini" %>
+                  <%= link_to 'Delete', agent_path(agent), method: :delete, data: {confirm: 'Are you sure?'}, class: "btn btn-mini" %>
+                  <% if agent.can_be_scheduled? %>
+                      <%= link_to 'Run', run_agent_path(agent), method: :post, class: "btn btn-mini" %>
+                  <% else %>
+                      <%= link_to 'Run', "#", class: "btn btn-mini disabled" %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+
+      <%= paginate @agents, :theme => 'twitter-bootstrap' %>
+
+      <br/>
+
+      <div class="btn-group">
+        <%= link_to '<i class="icon-plus"></i> New Agent'.html_safe, new_agent_path, class: "btn" %>
+        <%= link_to '<i class="icon-refresh"></i> Run event propagation'.html_safe, propagate_agents_path, method: 'post', class: "btn" %>
+        <%= link_to '<i class="icon-random"></i> View diagram'.html_safe, diagram_agents_path, class: "btn" %>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,79 @@
+jane_website_agent:
+  type: Agents::WebsiteAgent
+  user: jane
+  schedule: "5pm"
+  name: "ZKCD"
+  options: <%= {
+                 :url => "http://trailers.apple.com/trailers/home/rss/newtrailers.rss",
+                 :expected_update_period_in_days => 2,
+                 :mode => :on_change,
+                 :extract => {
+                     :title => {:css => "item title", :text => true},
+                     :url => {:css => "item link", :text => true}
+                 }
+               }.to_yaml.inspect %>
+
+bob_website_agent:
+  type: Agents::WebsiteAgent
+  user: bob
+  schedule: "midnight"
+  name: "ZKCD"
+  options: <%= {
+                 :url => "http://xkcd.com",
+                 :expected_update_period_in_days => 2,
+                 :mode => :on_change,
+                 :extract => {
+                   :url => {:css => "#comic img", :attr => "src"},
+                   :title => {:css => "#comic img", :attr => "title"}
+                 }
+               }.to_yaml.inspect %>
+
+bob_weather_agent:
+  type: Agents::WeatherAgent
+  user: bob
+  schedule: "midnight"
+  name: "SF Weather"
+  options: <%= {
+                 :zipcode => 94102,
+                 :lat => 37.779329,
+                 :lng => -122.41915,
+               }.to_yaml.inspect %>
+
+jane_weather_agent:
+  type: Agents::WeatherAgent
+  user: jane
+  schedule: "midnight"
+  name: "SF Weather"
+  options: <%= {
+                 :zipcode => 94103,
+                 :lat => 37.779329,
+                 :lng => -122.41915,
+               }.to_yaml.inspect %>
+
+jane_rain_notifier_agent:
+  type: Agents::TriggerAgent
+  user: jane
+  name: "Jane's Rain Watcher"
+  options: <%= {
+                 :expected_receive_period_in_days => "2",
+                 :rules => [{
+                   :type => "regex",
+                   :value => "rain",
+                   :path => "conditions"
+                 }],
+                 :message => "Just so you know, it looks like '<conditions>' tomorrow in <zipcode>"
+               }.to_yaml.inspect %>
+
+bob_rain_notifier_agent:
+  type: Agents::TriggerAgent
+  user: bob
+  name: "Bob's Rain Watcher"
+  options: <%= {
+                 :expected_receive_period_in_days => "2",
+                 :rules => [{
+                   :type => "regex",
+                   :value => "rain",
+                   :path => "conditions"
+                  }],
+                 :message => "Just so you know, it looks like '<conditions>' tomorrow in <zipcode>"
+               }.to_yaml.inspect %>

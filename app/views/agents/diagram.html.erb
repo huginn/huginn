@@ -1,0 +1,27 @@
+<div class='container'>
+  <div class='row'>
+    <div class='span12'>
+      <div class="page-header">
+        <h2>Agent Event Flow</h2>
+      </div>
+      <div class="btn-group">
+        <%= link_to '<i class="icon-chevron-left"></i> Back'.html_safe, agents_path, class: "btn" %>
+      </div>
+
+      <div class='digraph'>
+        <%
+           dot_format_string = "digraph foo {"
+           @agents.each.with_index do |agent, index|
+             dot_format_string += "\"#{agent.name}\";"
+             agent.receivers.each do |receiver|
+               dot_format_string += "\"#{agent.name}\"->\"#{receiver.name}\";"
+             end
+           end
+           dot_format_string = dot_format_string + "}"
+        %>
+
+        <img src="https://chart.googleapis.com/chart?cht=gv&chl=<%= CGI::escape dot_format_string %>" />
+      </div>
+    </div>
+  </div>
+</div>

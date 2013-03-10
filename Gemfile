@@ -1,0 +1,50 @@
+source 'https://rubygems.org'
+
+gem 'rails'
+gem 'mysql2'
+gem 'devise'
+gem 'rails_admin'
+gem 'kaminari'
+gem 'bootstrap-kaminari-views'
+gem "rufus-scheduler", :require => false
+gem 'json', '>= 1.7.7'
+
+gem 'delayed_job_active_record', "~> 0.3.3" # newer was giving a strange MySQL error
+gem "daemons"
+# gem "delayed_job_web"
+
+group :assets do
+  gem 'sass-rails',   '~> 3.2.3'
+  gem 'coffee-rails', '~> 3.2.1'
+  gem 'uglifier', '>= 1.0.3'
+  gem 'select2-rails'
+  gem 'jquery-rails'
+end
+
+gem 'geokit-rails3'
+gem 'kramdown'
+gem "typhoeus"
+gem 'nokogiri'
+gem 'wunderground'
+
+gem "twitter"
+gem 'twitter-stream', '>=0.1.16'
+gem 'em-http-request'
+
+gem 'unicorn'
+gem 'backup', :require => false
+gem 'fog', '~> 1.4.0', :require => false
+
+group :development do
+  gem 'capistrano'
+  gem 'capistrano-unicorn', :require => false
+  gem 'rvm-capistrano'
+  gem 'pry'
+end
+
+group :development, :test do
+  gem 'rspec-rails'
+  gem 'rspec'
+  gem 'rr'
+  gem 'webmock', :require => false
+end

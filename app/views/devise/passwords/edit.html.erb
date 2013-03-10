@@ -1,0 +1,34 @@
+<div class='container'>
+  <div class='row'>
+    <div class='span8 offset2'>
+      <div class='well'>
+        <h2>Change your password</h2>
+
+        <%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :put, :class => 'form-horizontal' }) do |f| %>
+          <%= devise_error_messages! %>
+          <%= f.hidden_field :reset_password_token %>
+
+          <div class="control-group">
+            <%= f.label :password, "New password", :class => 'control-label' %>
+            <div class="controls">
+              <%= f.password_field :password, :class => 'span4' %>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <%= f.label :password_confirmation, "Confirm new password", :class => 'control-label' %>
+            <div class="controls">
+              <%= f.password_field :password_confirmation, :class => 'span4' %>
+            </div>
+          </div>
+
+          <div class='form-actions'>
+            <%= f.submit "Change my password", :class => "btn btn-primary" %>
+          </div>
+        <% end %>
+
+        <%= render "devise/shared/links" %>
+      </div>
+    </div>
+  </div>
+</div>

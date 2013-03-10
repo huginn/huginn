@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+bob:
+  email: "bob@example.com"
+  username: bob
+  invitation_code: <%= User::INVITATION_CODES.last %>
+
+jane:
+  email: "jane@example.com"
+  username: jane
+  invitation_code: <%= User::INVITATION_CODES.last %>

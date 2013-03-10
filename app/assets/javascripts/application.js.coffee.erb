@@ -1,0 +1,94 @@
+#= require jquery
+#= require jquery_ujs
+#= require bootstrap
+#= require select2
+#= require json2
+#= require jquery.json-editor
+#= require latlon_and_geo
+#= require ./worker-checker
+#= require_self
+
+# Place all the behaviors and hooks related to the matching controller here.
+# All this logic will automatically be available in application.js.
+# You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
+
+setupJsonEditor = ->
+  JSONEditor.prototype.ADD_IMG = '<%= image_path 'json-editor/add.png' %>'
+  JSONEditor.prototype.DELETE_IMG = '<%= image_path 'json-editor/delete.png' %>'
+  if $(".live-json-editor").length
+    window.jsonEditor = new JSONEditor($(".live-json-editor"), 400, 500)
+    window.jsonEditor.doTruncation true
+    window.jsonEditor.showFunctionButtons()
+
+hideSchedule = ->
+  $(".schedule-region select").hide()
+  $(".schedule-region .cannot-be-scheduled").show()
+
+showSchedule = ->
+  $(".schedule-region select").show()
+  $(".schedule-region .cannot-be-scheduled").hide()
+
+hideLinks = ->
+  $(".link-region .select2-container").hide()
+  $(".link-region .cannot-receive-events").show()
+
+showLinks = ->
+  $(".link-region .select2-container").show()
+  $(".link-region .cannot-receive-events").hide()
+  showEventDescriptions()
+
+showEventDescriptions = ->
+  if $("#agent_source_ids").val()
+    $.getJSON "/agents/event_descriptions", { ids: $("#agent_source_ids").val().join(",") }, (json) =>
+      if json.description_html?
+        $(".event-descriptions").show().html(json.description_html)
+      else
+        $(".event-descriptions").hide()
+  else
+    $(".event-descriptions").html("").hide()
+
+$(document).ready ->
+  setupJsonEditor()
+  $(".multi-select").select2(width: 'resolve')
+
+  if $(".top-flash").length
+    setTimeout((-> $(".top-flash").slideUp(-> $(".top-flash").remove())), 5000)
+
+  $("#agent_source_ids").on "change", showEventDescriptions
+
+  $("#agent_type").on "change", ->
+    if window.jsonEditor?
+      $(@).closest(".control-group").find(".spinner").fadeIn();
+      $("#agent_source_ids ").select2("val", {});
+      $(".event-descriptions").html("").hide()
+      $.getJSON "/agents/type_details", { type: $(@).val() }, (json) =>
+        if json.can_be_scheduled
+          showSchedule()
+        else
+          hideSchedule()
+
+        if json.can_receive_events
+          showLinks()
+        else
+          hideLinks()
+
+        $(".description").html(json.description_html) if json.description_html?
+
+        window.jsonEditor.json = json.options
+        window.jsonEditor.rebuild()
+
+        $(@).closest(".control-group").find(".spinner").stop(true, true).fadeOut();
+
+  $("#agent_type").change() if $("#agent_type").length
+
+  if $(".schedule-region")
+    if $(".schedule-region").data("can-be-scheduled") == true
+      showSchedule()
+    else
+      hideSchedule()
+
+  if $(".link-region")
+    if $(".link-region").data("can-receive-events") == true
+      showLinks()
+    else
+      hideLinks()

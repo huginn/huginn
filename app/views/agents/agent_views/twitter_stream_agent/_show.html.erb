@@ -1,0 +1,52 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "graphing" %>
+<% end %>
+
+<% grouped_events = @agent.events.order("id desc").limit(2000).group_by {|e| e.payload[:filter] || e.payload[:match] }%>
+<% if grouped_events.length > 0 %>
+  <% if @agent.options[:generate] == "events" %>
+
+    <h3>Recent Tweets</h3>
+      <% grouped_events.each do |filter, group|  %>
+      <div class="filter-group tweets">
+        <div class='filter'><%= filter %></div>
+        <% group.each do |event| %>
+          <% next unless event.payload[:text].present? %>
+          <div class='tweet'>
+            <%= event.payload[:text] %> - <%= link_to event.payload[:user][:screen_name], "http://twitter.com/#{event.payload[:user][:screen_name]}" %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+  <% else %>
+
+    <h3>Recent Tweet Trends</h3>
+    <% grouped_events.each.with_index do |(filter, group), index|  %>
+      <div class="filter-group counts">
+        <div class='filter'><%= link_to filter, "https://twitter.com/search?q=#{CGI::escape filter}", :target => "blank" %></div>
+
+        <div class="chart-container group-<%= index.to_s %>">
+          <div class="y-axis"></div>
+          <div class="chart"></div>
+          <div class="timeline"></div>
+        </div>
+
+        <script>
+          $(function() {
+            var $chart = $(".chart-container.group-<%= index.to_s %>").last();
+            var data = <%= group.select {|e| e.payload[:count].present? }.sort_by {|e| e.payload[:time] }.map {|e| { :x => e.payload[:time].to_i, :y => e.payload[:count].to_i } }.to_json.html_safe %>;
+            var name = <%= filter.to_json.html_safe %>;
+
+            renderGraph($chart, data, [], name);
+          });
+        </script>
+      </div>
+    <% end %>
+
+  <% end %>
+<% else %>
+  <p>
+    No recent tweets found.
+  </p>
+<% end %>

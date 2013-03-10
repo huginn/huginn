@@ -1,0 +1,45 @@
+<div class='container'>
+  <div class='row'>
+    <div class='span12'>
+      <div class="page-header">
+        <h2>Event from <%= @event.agent.name %></h2>
+      </div>
+
+      <p>
+        <b>Payload:</b>
+        <pre><%= PP.pp(@event.payload, "") %></pre>
+      </p>
+
+      <% if @event.lat && @event.lng %>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+
+        <p>
+          <b>Lat:</b>
+          <%= @event.lat %>
+          <br/>
+          <b>Lng:</b>
+          <%= @event.lng %>
+        </p>
+
+        <div id="map_canvas" style="width:400px; height:300px"></div>
+
+        <script type="text/javascript">
+          var mapOptions = {
+            center: new google.maps.LatLng(<%= @event.lat %>, <%= @event.lng %>),
+            zoom:15,
+            mapTypeId:google.maps.MapTypeId.ROADMAP
+          };
+
+          var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+        </script>
+
+        <%= render "map_marker", :event => @event %>
+      <% end %>
+
+      <br />
+      <div class="btn-group">
+        <%= link_to '<i class="icon-chevron-left"></i> Back'.html_safe, events_path, class: "btn" %>
+      </div>
+    </div>
+  </div>
+</div>
