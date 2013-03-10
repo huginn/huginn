@@ -2,7 +2,7 @@
 
 ## What is Huginn?
 
-Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events, propogating events along a directed event flow graph.  Think of it as Yahoo! Pipes plus ITTT, on your own server.  You run Huginn on our own server, so you always know who has your data.  You do.
+Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events, propogating events along a directed event flow graph.  Think of it as Yahoo! Pipes plus ITTT, on your own server.  You always know who has your data.  You do.
 
 ![the origin of the name](doc/imgs/the-name.png)
 
@@ -33,30 +33,30 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ### Quick Start
 
-If you just want to play around, you can simply checkout this repository, then do the following steps:
+If you just want to play around, you can simply clone this repository, then perform the following steps:
 
 * Edit `config/secret_token.rb` and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
 * Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.  Run `rails s`, visit `http://localhost:3000`, and login with the username of `admin` and the password of `password`.
 * Make some extra Terminal windows and run `bundle exec rails runner bin/schedule.rb` and `bundle exec rails runner bin/twitter_stream.rb`
 * Setup some Agents!
 
-### Real Setup
+### Real Start
 
-Follow these instructions if you wish to deploy your own version of Huginn or to contribute back to the project.  GitHub doesn't make it easy to work with private forks of public repositories, so we recommend that you follow the following steps:
+Follow these instructions if you wish to deploy your own version of Huginn or contribute back to the project.  GitHub doesn't make it easy to work with private forks of public repositories, so we recommend that you follow the following steps:
 
 * Make a public fork of Huginn
 * Make a private, empty GitHub repository called `huginn-private`
 * Duplicate your public fork into your new private repository (via [GitHub's instructions](https://help.github.com/articles/duplicating-a-repository)):
 
-      git clone --bare git@github.com:you/huginn.git
-      cd huginn.git
-      git push --mirror git@github.com:you/huginn-private.git
-      cd .. && rm -rf huginn.git
+        git clone --bare git@github.com:you/huginn.git
+        cd huginn.git
+        git push --mirror git@github.com:you/huginn-private.git
+        cd .. && rm -rf huginn.git
 
 * Checkout your new private repository.
 * Add your Huginn public fork as a remote to your new private repository (`huginn-private`):
 
-      git remote add public git@github.com:you/huginn.git
+        git remote add public git@github.com:you/huginn.git
 
 * Run the steps from *Quick Start* above to configure your copy of Huginn.
 * When you want to contribute patches, do a remote push from your private repository to your public fork, then make a pull request to us.
