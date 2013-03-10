@@ -2,7 +2,7 @@
 
 ## What is Huginn?
 
-Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.
+Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events.  It's a tool that makes it easy to monitor data sources and have actions take place when certain events occur.
 
 ![the origin of the name](doc/imgs/the-name.png)
 
