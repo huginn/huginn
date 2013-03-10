@@ -4,14 +4,19 @@
 
 Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  We're just getting started, but here are some of the things you can do with Huginn right now:
 
-
+![the origin of the name](doc/imgs/the-name.png)
 
 Control your own data, run your own data hub.
 You know where the data is and who has it.  Don't be afraid to log stuff because of where it is.
 
 Make agents that serve you.
 
+And now, some example screenshots.  Below them are instructions to get you started.
 
+![Event flow diagram](doc/imgs/diagram.png)
+![Loging your location over time](doc/imgs/my-locations.png)
+![Making a new agent](doc/imgs/new-agent.png)
+![Example list of agents](doc/imgs/your-agents.png)
 
 ## Getting Started
 
@@ -46,6 +51,10 @@ Deployment right now is configured with Capistrano, Unicorn, and nginx.  You sho
 #### Enable the WeatherAgent
 
 In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/).  Signup for one and then put it in `app/models/agents/weather_agent.rb` in the `wunderground` method.
+
+## Logging your location to the UserLocationAgent
+
+You can use [Post Location](https://github.com/cantino/post_location) on your iPhone to post your location to an instance of the UserLocationAgent.  Make a new one to see instructions.
 
 #### Enable DelayedJobWeb for handy delayed_job monitoring and control
 
