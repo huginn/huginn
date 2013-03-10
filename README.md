@@ -2,21 +2,34 @@
 
 ## What is Huginn?
 
-Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  We're just getting started, but here are some of the things you can do with Huginn right now:
+Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.
 
 ![the origin of the name](doc/imgs/the-name.png)
 
-Control your own data, run your own data hub.
-You know where the data is and who has it.  Don't be afraid to log stuff because of where it is.
+We're just getting started, but here are some of the things that you can do right now with Huginn:
 
-Make agents that serve you.
+* Watch for air travel deals
+* List terms you care about and receive emails when their occurrence on Twitter changes drastically
+* Track the weather and get an email when it's going to rain (or snow) tomorrow
+* Follow your project names on Twitter and get updates when people mention them
+* Scrape websites and receive email when they change
+* Track your location over time
+
+You run Huginn on our own server, so you always know who has your data.  You do.
 
 And now, some example screenshots.  Below them are instructions to get you started.
 
-![Event flow diagram](doc/imgs/diagram.png)
-![Loging your location over time](doc/imgs/my-locations.png)
-![Making a new agent](doc/imgs/new-agent.png)
 ![Example list of agents](doc/imgs/your-agents.png)
+
+![Event flow diagram](doc/imgs/diagram.png)
+
+![Detecting peaks in Twitter](doc/imgs/peaks.png)
+
+![Logging your location over time](doc/imgs/my-locations.png)
+
+![Making a new agent](doc/imgs/new-agent.png)
+
+![Detecting peaks in Twitter](doc/imgs/peaks.png)
 
 ## Getting Started
 

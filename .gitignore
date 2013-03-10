@@ -15,3 +15,4 @@ capybara-*.html
 rerun.txt
 pickle-email-*.html
 .idea/
+.DS_Store
