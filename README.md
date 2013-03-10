@@ -29,8 +29,6 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ![Making a new agent](doc/imgs/new-agent.png)
 
-![Detecting peaks in Twitter](doc/imgs/peaks.png)
-
 ## Getting Started
 
 * Make a private fork of this repository on GitHub.
