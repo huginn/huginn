@@ -36,9 +36,10 @@ Deployment right now is configured with Capistrano, Unicorn, and nginx.  You sho
 * After deploying with capistrano, SSH into your server, go to the deployment directory, and run `RAILS_ENV=production bundle exec rake db:seed` to generate your admin user.  Immediately login to your new Huginn installation with the username of `admin` and the password of `password` and change your email and password!
 * You'll need to run bin/schedule.rb and bin/twitter_stream.rb in a daemonized way.  I've just been using screen sessions, but please contribute something better!
 
-    RAILS_ENV=production bundle exec rails runner bin/schedule.rb
 
-    RAILS_ENV=production bundle exec rails runner bin/twitter_stream.rb
+        RAILS_ENV=production bundle exec rails runner bin/schedule.rb
+        RAILS_ENV=production bundle exec rails runner bin/twitter_stream.rb
+
 
 ### Optional Setup
 
