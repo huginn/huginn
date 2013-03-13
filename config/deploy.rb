@@ -4,8 +4,8 @@ set :application, "huginn"
 set :deploy_to, "/home/you/app"
 set :user, "you"
 set :use_sudo, false
-set :rails_env, "production" #added for delayed job
 set :scm, :git
+set :rails_env, 'production'
 set :repository, "git@github.com:you/huginn-private.git"
 set :branch, "master"
 set :deploy_via, :remote_cache
@@ -18,12 +18,9 @@ server "yourdomain.com", :app, :delayed_job, :web, :db, :primary => true
 
 set :delayed_job_server_role, :delayed_job
 
-set :rails_env, 'production'
 set :sync_backups, 3
 
 before 'deploy:restart', 'deploy:migrate'
-before 'deploy', 'rvm:install_rvm'
-before 'deploy', 'rvm:install_ruby'
 after 'deploy', 'deploy:cleanup'
 
 set :bundle_without, [:development, :test]
@@ -40,6 +37,8 @@ after "deploy:restart", "delayed_job:restart"
 # If you want to use rvm on the server:
 # set :rvm_ruby_string, '1.9.3-p286@huginn'
 # set :rvm_type, :user
+# before 'deploy', 'rvm:install_rvm'
+# before 'deploy', 'rvm:install_ruby'
 # require "rvm/capistrano"
 
 # Load Capistrano additions
