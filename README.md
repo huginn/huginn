@@ -75,7 +75,7 @@ In your private copy of Huginn, do the following:
 * Setup a place for Huginn to run.  I recommend making a dedicated user on your server for Huginn, but this is not required.  Setup nginx or Apache to proxy pass to unicorn.  There is an example nginx script in `config/nginx/production.conf`.
 * Setup a production MySQL database for your installation.
 * Edit `config/unicorn/production.rb` and replace instances of *you* with the correct username for your server.
-* Edit `config/deploy.rb` and change all instances of `you` and `yourdomain` to the appropriate values for your server setup.  If you want RVM to be used, uncomment the appropriate lines.  Then, run `cap deploy:setup` followed by `cap deploy`.  If everything goes well, this should start some unicorn workers on your server to run the Huginn web app.
+* Edit `config/deploy.rb` and change all instances of `you` and `yourdomain` to the appropriate values for your server setup.  If you want RVM to be used and installed, uncomment the appropriate lines.  Then, run `cap deploy:setup` followed by `cap deploy`.  If everything goes well, this should start some unicorn workers on your server to run the Huginn web app.
 * After deploying with capistrano, SSH into your server, go to the deployment directory, and run `RAILS_ENV=production bundle exec rake db:seed` to generate your admin user.  Immediately login to your new Huginn installation with the username of `admin` and the password of `password` and change your email and password!
 * You'll need to run bin/schedule.rb and bin/twitter_stream.rb in a daemonized way.  I've just been using screen sessions, but please contribute something better!
 
@@ -90,7 +90,7 @@ In your private copy of Huginn, do the following:
 
 In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/).  Signup for one and then put it in `app/models/agents/weather_agent.rb` in the `wunderground` method.
 
-## Logging your location to the UserLocationAgent
+#### Logging your location to the UserLocationAgent
 
 You can use [Post Location](https://github.com/cantino/post_location) on your iPhone to post your location to an instance of the UserLocationAgent.  Make a new one to see instructions.
 
