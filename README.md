@@ -63,7 +63,7 @@ Follow these instructions if you wish to deploy your own version of Huginn or co
 
 ## Deployment
 
-Deployment right now is configured with Capistrano, Unicorn, and nginx.  You should feel free to deploy in a different way, however.
+Deployment right now is configured with Capistrano, Unicorn, and nginx.  You should feel free to deploy in a different way, however, and please submit your deployment solutions back!
 
 ### Required Setup
 
@@ -71,11 +71,11 @@ In your private copy of Huginn, do the following:
 
 * Edit `app/models/user.rb` and change the invitation code(s) in `INVITATION_CODES`.  This controls who can signup to use your installation.
 * Edit `app/mailers/system_mailer.rb` and set your default from address.
-* Edit `config/unicorn/production.rb` and replace instances of *you* with the correct username for your server.
 * Edit `config/environments/production.rb` and change the value of `DOMAIN` and the `config.action_mailer.smtp_settings` setup, which is currently setup for sending email through a Google Apps account on Gmail.
 * Setup a place for Huginn to run.  I recommend making a dedicated user on your server for Huginn, but this is not required.  Setup nginx or Apache to proxy pass to unicorn.  There is an example nginx script in `config/nginx/production.conf`.
 * Setup a production MySQL database for your installation.
-* Edit `config/deploy.rb` and change all instances of `you` and `yourdomain` to the appropriate values for your server setup, then run `cap deploy:setup` followed by `cap deploy`.  If everything goes well, this should start some unicorn workers on your server to run the Huginn web app.
+* Edit `config/unicorn/production.rb` and replace instances of *you* with the correct username for your server.
+* Edit `config/deploy.rb` and change all instances of `you` and `yourdomain` to the appropriate values for your server setup.  If you want RVM to be used, uncomment the appropriate lines.  Then, run `cap deploy:setup` followed by `cap deploy`.  If everything goes well, this should start some unicorn workers on your server to run the Huginn web app.
 * After deploying with capistrano, SSH into your server, go to the deployment directory, and run `RAILS_ENV=production bundle exec rake db:seed` to generate your admin user.  Immediately login to your new Huginn installation with the username of `admin` and the password of `password` and change your email and password!
 * You'll need to run bin/schedule.rb and bin/twitter_stream.rb in a daemonized way.  I've just been using screen sessions, but please contribute something better!
 
