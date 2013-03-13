@@ -6,14 +6,10 @@ set :user, "you"
 set :use_sudo, false
 set :rails_env, "production" #added for delayed job
 set :scm, :git
-set :repository, "git@github.com:you/huginn.git"
+set :repository, "git@github.com:you/huginn-private.git"
 set :branch, "master"
 set :deploy_via, :remote_cache
 set :keep_releases, 5
-
-# If you want to use rvm on the server:
-set :rvm_ruby_string, '1.9.3-p286@huginn'
-set :rvm_type, :user
 
 set :bundle_without, [:development]
 set :unicorn_pid, "#{shared_path}/pids/unicorn.pid"
@@ -41,10 +37,14 @@ after "deploy:restart", "delayed_job:restart"
 #
 #   set :delayed_job_args, "-n 2"
 
+# If you want to use rvm on the server:
+# set :rvm_ruby_string, '1.9.3-p286@huginn'
+# set :rvm_type, :user
+# require "rvm/capistrano"
+
 # Load Capistrano additions
 Dir[File.expand_path("../../lib/capistrano/*.rb", __FILE__)].each{|f| load f }
 
-require "rvm/capistrano"
 require "bundler/capistrano"
 require "capistrano-unicorn"
 require "delayed/recipes"
