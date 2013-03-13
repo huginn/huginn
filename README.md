@@ -2,17 +2,17 @@
 
 ## What is Huginn?
 
-Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events, propogating events along a directed event flow graph.  Think of it as Yahoo! Pipes plus ITTT, on your own server.  You always know who has your data.  You do.
+Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events, propagating events along a directed event flow graph.  Think of it as Yahoo! Pipes plus IFTTT on your own server.  You always know who has your data.  You do.
 
 ![the origin of the name](doc/imgs/the-name.png)
 
-#### We're just getting started, but here are some of the things that you can do right now with Huginn:
+#### This is just getting started, but here are some of the things that you can do right now with Huginn:
 
 * Watch for air travel deals
 * List terms you care about and receive emails when their occurrence on Twitter changes drastically
 * Track the weather and get an email when it's going to rain (or snow) tomorrow
 * Follow your project names on Twitter and get updates when people mention them
-* Scrape websites and receive email when they change
+* Scrape websites and receive emails when they change
 * Track your location over time
 
 ## Examples
@@ -37,12 +37,12 @@ If you just want to play around, you can simply clone this repository, then perf
 
 * Edit `config/secret_token.rb` and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
 * Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.  Run `rails s`, visit `http://localhost:3000`, and login with the username of `admin` and the password of `password`.
-* Make some extra Terminal windows and run `bundle exec rails runner bin/schedule.rb` and `bundle exec rails runner bin/twitter_stream.rb`
+* Make some extra Terminal windows and run `bundle exec rails runner bin/schedule.rb`, `bundle exec rails runner bin/twitter_stream.rb`, and `script/delayed_job run` in separate windows.
 * Setup some Agents!
 
 ### Real Start
 
-Follow these instructions if you wish to deploy your own version of Huginn or contribute back to the project.  GitHub doesn't make it easy to work with private forks of public repositories, so we recommend that you follow the following steps:
+Follow these instructions if you wish to deploy your own version of Huginn or contribute back to the project.  GitHub doesn't make it easy to work with private forks of public repositories, so I recommend that you follow the following steps:
 
 * Make a public fork of Huginn
 * Make a private, empty GitHub repository called `huginn-private`
@@ -59,7 +59,7 @@ Follow these instructions if you wish to deploy your own version of Huginn or co
         git remote add public git@github.com:you/huginn.git
 
 * Run the steps from *Quick Start* above to configure your copy of Huginn.
-* When you want to contribute patches, do a remote push from your private repository to your public fork, then make a pull request to us.
+* When you want to contribute patches, do a remote push from your private repository to your public fork of the relevant commits, then make a pull request to this repository.
 
 ## Deployment
 
