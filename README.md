@@ -33,43 +33,14 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ## Getting Started
 
-### Quick Start
+### Pre-Configuring for Heroku
 
-If you just want to play around, you can simply clone this repository, then perform the following steps:
-
+* Update the database.yml file to have the proper postgres username
 * Edit `config/initializers/secret_token.rb` and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
-* Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.  Run `rails s`, visit `http://localhost:3000`, and login with the username of `admin` and the password of `password`.
-* Make some extra Terminal windows and run `bundle exec rails runner bin/schedule.rb`, `bundle exec rails runner bin/twitter_stream.rb`, and `script/delayed_job run` in separate windows.
+* Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development Postgres database with some example seed data.  Run `rails s`, visit `http://localhost:3000`, and login with the username of `admin` and the password of `password`.
+* Make some extra Terminal windows and run `bundle exec rails runner bin/schedule.rb`, `foreman start` in separate windows.
 * Setup some Agents!
 
-### Real Start
-
-Follow these instructions if you wish to deploy your own version of Huginn or contribute back to the project.  GitHub doesn't make it easy to work with private forks of public repositories, so I recommend that you follow the following steps:
-
-* Make a public fork of Huginn
-* Make a private, empty GitHub repository called `huginn-private`
-* Duplicate your public fork into your new private repository (via [GitHub's instructions](https://help.github.com/articles/duplicating-a-repository)):
-
-        git clone --bare git@github.com:you/huginn.git
-        cd huginn.git
-        git push --mirror git@github.com:you/huginn-private.git
-        cd .. && rm -rf huginn.git
-
-* Checkout your new private repository.
-* Add your Huginn public fork as a remote to your new private repository (`huginn-private`):
-
-        git remote add public git@github.com:you/huginn.git
-
-* Run the steps from *Quick Start* above to configure your copy of Huginn.
-* When you want to contribute patches, do a remote push from your private repository to your public fork of the relevant commits, then make a pull request to this repository.
-
-## Deployment
-
-Deployment right now is configured with Capistrano, Unicorn, and nginx.  You should feel free to deploy in a different way, however, and please submit your deployment solutions back!
-
-### Required Setup
-
-In your private copy of Huginn, do the following:
 
 * Edit `app/models/user.rb` and change the invitation code(s) in `INVITATION_CODES`.  This controls who can signup to use your installation.
 * Edit `app/mailers/system_mailer.rb` and set your default from address.
@@ -77,13 +48,17 @@ In your private copy of Huginn, do the following:
 * Setup a place for Huginn to run.  I recommend making a dedicated user on your server for Huginn, but this is not required.  Setup nginx or Apache to proxy pass to unicorn.  There is an example nginx script in `config/nginx/production.conf`.
 * Setup a production MySQL database for your installation.
 * Edit `config/unicorn/production.rb` and replace instances of *you* with the correct username for your server.
-* Edit `config/deploy.rb` and change all instances of `you` and `yourdomain` to the appropriate values for your server setup.  If you want RVM to be used and installed, uncomment the appropriate lines.  Then, run `cap deploy:setup` followed by `cap deploy`.  If everything goes well, this should start some unicorn workers on your server to run the Huginn web app.
 * After deploying with capistrano, SSH into your server, go to the deployment directory, and run `RAILS_ENV=production bundle exec rake db:seed` to generate your admin user.  Immediately login to your new Huginn installation with the username of `admin` and the password of `password` and change your email and password!
-* You'll need to run bin/schedule.rb and bin/twitter_stream.rb in a daemonized way.  I've just been using screen sessions, but please contribute something better!
+* To test that everything is working locally, you can load up foreman in a separate tab with the following command:
 
+        
 
-        RAILS_ENV=production bundle exec rails runner bin/schedule.rb
-        RAILS_ENV=production bundle exec rails runner bin/twitter_stream.rb
+### Heroku setup
+
+* Create the app on heroku
+* Create a postres database for your app
+* Deploy to heroku
+* Increase the number of active workers to at least 1
 
 
 ### Optional Setup

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rails'
-gem 'mysql2'
+gem 'pg'
 gem 'devise'
 gem 'rails_admin'
 gem 'kaminari'

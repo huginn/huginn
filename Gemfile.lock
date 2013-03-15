@@ -129,7 +129,6 @@ GEM
     multi_json (1.6.1)
     multi_xml (0.5.3)
     multipart-post (1.2.0)
-    mysql2 (0.3.11)
     nested_form (0.3.1)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
@@ -140,6 +139,7 @@ GEM
       net-ssh (>= 2.6.5)
     nokogiri (1.5.6)
     orm_adapter (0.4.0)
+    pg (0.14.1)
     polyglot (0.3.3)
     pry (0.9.12)
       coderay (~> 1.0.5)
@@ -277,8 +277,8 @@ DEPENDENCIES
   json (>= 1.7.7)
   kaminari
   kramdown
-  mysql2
   nokogiri
+  pg
   pry
   rails
   rails_admin
