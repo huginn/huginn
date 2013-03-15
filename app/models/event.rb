@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: events
+#
+#  id         :integer          not null, primary key
+#  user_id    :integer
+#  agent_id   :integer
+#  lat        :decimal(15, 10)
+#  lng        :decimal(15, 10)
+#  payload    :text
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class Event < ActiveRecord::Base
   attr_accessible :lat, :lng, :payload, :user_id, :user
 

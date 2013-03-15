@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: links
+#
+#  id          :integer          not null, primary key
+#  source_id   :integer
+#  receiver_id :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
+
 class Link < ActiveRecord::Base
   attr_accessible :source_id, :receiver_id
 

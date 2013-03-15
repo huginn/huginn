@@ -36,6 +36,8 @@ GEM
       i18n (~> 0.6)
       multi_json (~> 1.0)
     addressable (2.3.3)
+    annotate (2.5.0)
+      rake
     arel (3.0.2)
     bcrypt-ruby (3.0.1)
     bootstrap-kaminari-views (0.0.2)
@@ -263,6 +265,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  annotate
   bootstrap-kaminari-views
   capistrano
   capistrano-unicorn

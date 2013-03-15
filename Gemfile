@@ -42,6 +42,7 @@ group :development do
 end
 
 group :development, :test do
+  gem 'annotate'
   gem 'rspec-rails'
   gem 'rspec'
   gem 'rr'

@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: agents
+#
+#  id                    :integer          not null, primary key
+#  user_id               :integer
+#  options               :text
+#  type                  :string(255)
+#  name                  :string(255)
+#  schedule              :string(255)
+#  events_count          :integer
+#  last_check_at         :datetime
+#  last_receive_at       :datetime
+#  last_checked_event_id :integer
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  memory                :text
+#
+
 module Agents
   class TriggerAgent < Agent
     cannot_be_scheduled!
