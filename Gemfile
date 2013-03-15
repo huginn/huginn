@@ -34,10 +34,6 @@ gem 'em-http-request'
 
 gem 'unicorn'
 
-# If you want to use the Backup gem for backups, uncomment these lines:
-# gem 'backup', :require => false
-# gem 'fog', '~> 1.4.0', :require => false
-
 group :development do
   gem 'capistrano'
   gem 'capistrano-unicorn', :require => false

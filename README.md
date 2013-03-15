@@ -108,7 +108,7 @@ We assume your deployment will run over SSL. This is a very good idea! However, 
 
 #### Setup Backups
 
-Checkout `config/example_backup.rb` for an example script that you can use with the Backup gem.  If you want to use it, uncomment the associated lines in your Gemfile.
+Checkout `config/example_backup.rb` for an example script that you can use with the Backup gem.
 
 ## License
 

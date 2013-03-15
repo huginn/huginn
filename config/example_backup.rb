@@ -1,12 +1,14 @@
 # This file contains an example template for using the Backup gem for backing up your Huginn installation to S3.
 
 # In your crontab do something like:
-# 0 0,12 * * * /bin/bash -l -c "cd /home/you/app/current && RAILS_ENV=production bundle exec backup perform -t huginn_backup --config_file /home/you/huginn_backup.rb" 2>&1 >> /home/you/huginn_backup_log.txt
+# 0 0,12 * * * /bin/bash -l -c "RAILS_ENV=production backup perform -t huginn_backup --config_file /home/you/huginn_backup.rb" 2>&1 >> /home/you/huginn_backup_log.txt
 
 # In backups.password on your server:
 #   some password
 
 # In huginn_backup.rb on your server put an edited version of the following file.  REMEMBER TO EDIT THE FILE!
+
+# You'll also need to install the backup gem on your server, as well as the net-ssh, excon, net-scp, and fog gems.
 
 database_yml = '/home/you/app/current/config/database.yml'
 rails_env    = ENV['RAILS_ENV'] || 'production'
