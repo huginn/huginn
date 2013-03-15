@@ -1,3 +1,10 @@
+GIT
+  remote: https://github.com/wok/delayed_job
+  revision: d1f53b489a13146f6b2ac27ef26b2e2dc6ae558c
+  specs:
+    delayed_job (3.0.4)
+      activesupport (~> 3.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -56,8 +63,6 @@ GEM
     cookiejar (0.3.0)
     crack (0.3.2)
     daemons (1.1.9)
-    delayed_job (3.0.5)
-      activesupport (~> 3.0)
     delayed_job_active_record (0.3.3)
       activerecord (>= 2.1.0, < 4)
       delayed_job (~> 3.0)
@@ -263,6 +268,7 @@ DEPENDENCIES
   capistrano-unicorn
   coffee-rails (~> 3.2.1)
   daemons
+  delayed_job!
   delayed_job_active_record (~> 0.3.3)
   devise
   em-http-request
