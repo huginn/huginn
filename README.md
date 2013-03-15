@@ -33,7 +33,7 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ## Getting Started
 
-### Pre-Configuring for Heroku
+### Configuring for Heroku
 
 * Update the database.yml file to have the proper postgres username
 * Edit `config/initializers/secret_token.rb` and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
@@ -45,19 +45,10 @@ And now, some example screenshots.  Below them are instructions to get you start
 * Edit `app/models/user.rb` and change the invitation code(s) in `INVITATION_CODES`.  This controls who can signup to use your installation.
 * Edit `app/mailers/system_mailer.rb` and set your default from address.
 * Edit `config/environments/production.rb` and change the value of `DOMAIN` and the `config.action_mailer.smtp_settings` setup, which is currently setup for sending email through a Google Apps account on Gmail.
-* Setup a place for Huginn to run.  I recommend making a dedicated user on your server for Huginn, but this is not required.  Setup nginx or Apache to proxy pass to unicorn.  There is an example nginx script in `config/nginx/production.conf`.
-* Setup a production MySQL database for your installation.
-* Edit `config/unicorn/production.rb` and replace instances of *you* with the correct username for your server.
-* After deploying with capistrano, SSH into your server, go to the deployment directory, and run `RAILS_ENV=production bundle exec rake db:seed` to generate your admin user.  Immediately login to your new Huginn installation with the username of `admin` and the password of `password` and change your email and password!
-* To test that everything is working locally, you can load up foreman in a separate tab with the following command:
-
-        
-
-### Heroku setup
-
-* Create the app on heroku
-* Create a postres database for your app
+* Create the app on Heroku
+* Setup the Heroku postgres account for the app
 * Deploy to heroku
+* Run `heroku run rake db:migrate db:seed` to generate your admin user.  Immediately login to your new Huginn installation with the username of `admin` and the password of `password` and change your email and password!
 * Increase the number of active workers to at least 1
 
 
