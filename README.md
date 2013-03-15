@@ -9,11 +9,13 @@ Huginn is a system for building agents that perform automated tasks for you onli
 #### This is just getting started, but here are some of the things that you can do right now with Huginn:
 
 * Watch for air travel deals
-* List terms you care about and receive emails when their occurrence on Twitter changes drastically
+* List terms you care about and receive emails when their occurrence on Twitter changes drastically.  (For example, want to know when something interesting has happened in the world of Machine Learning?  Huginn will watch the term "machine learning" on Twitter and tell you when there is a large spike.)
 * Track the weather and get an email when it's going to rain (or snow) tomorrow
 * Follow your project names on Twitter and get updates when people mention them
 * Scrape websites and receive emails when they change
 * Track your location over time
+
+Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves.
 
 ## Examples
 
@@ -35,7 +37,7 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 If you just want to play around, you can simply clone this repository, then perform the following steps:
 
-* Edit `config/secret_token.rb` and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
+* Edit `config/initializers/secret_token.rb` and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
 * Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.  Run `rails s`, visit `http://localhost:3000`, and login with the username of `admin` and the password of `password`.
 * Make some extra Terminal windows and run `bundle exec rails runner bin/schedule.rb`, `bundle exec rails runner bin/twitter_stream.rb`, and `script/delayed_job run` in separate windows.
 * Setup some Agents!
