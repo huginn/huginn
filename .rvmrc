@@ -1,1 +1,48 @@
-rvm use 1.9.3-p374@huginn --create
+#!/usr/bin/env bash
+
+# This is an RVM Project .rvmrc file, used to automatically load the ruby
+# development environment upon cd'ing into the directory
+
+# First we specify our desired <ruby>[@<gemset>], the @gemset name is optional,
+# Only full ruby name is supported here, for short names use:
+#     echo "rvm use 2.0.0" > .rvmrc
+environment_id="ruby-2.0.0-p0@huginn"
+
+# Uncomment the following lines if you want to verify rvm version per project
+# rvmrc_rvm_version="1.17.6 (stable)" # 1.10.1 seams as a safe start
+# eval "$(echo ${rvm_version}.${rvmrc_rvm_version} | awk -F. '{print "[[ "$1*65536+$2*256+$3" -ge "$4*65536+$5*256+$6" ]]"}' )" || {
+#   echo "This .rvmrc file requires at least RVM ${rvmrc_rvm_version}, aborting loading."
+#   return 1
+# }
+
+# First we attempt to load the desired environment directly from the environment
+# file. This is very fast and efficient compared to running through the entire
+# CLI and selector. If you want feedback on which environment was used then
+# insert the word 'use' after --create as this triggers verbose mode.
+if [[ -d "${rvm_path:-$HOME/.rvm}/environments"
+  && -s "${rvm_path:-$HOME/.rvm}/environments/$environment_id" ]]
+then
+  \. "${rvm_path:-$HOME/.rvm}/environments/$environment_id"
+  [[ -s "${rvm_path:-$HOME/.rvm}/hooks/after_use" ]] &&
+    \. "${rvm_path:-$HOME/.rvm}/hooks/after_use" || true
+else
+  # If the environment file has not yet been created, use the RVM CLI to select.
+  rvm --create  "$environment_id" || {
+    echo "Failed to create RVM environment '${environment_id}'."
+    return 1
+  }
+fi
+
+# If you use bundler, this might be useful to you:
+# if [[ -s Gemfile ]] && {
+#   ! builtin command -v bundle >/dev/null ||
+#   builtin command -v bundle | GREP_OPTIONS= \grep $rvm_path/bin/bundle >/dev/null
+# }
+# then
+#   printf "%b" "The rubygem 'bundler' is not installed. Installing it now.\n"
+#   gem install bundler
+# fi
+# if [[ -s Gemfile ]] && builtin command -v bundle >/dev/null
+# then
+#   bundle install | GREP_OPTIONS= \grep -vE '^Using|Your bundle is complete'
+# fi
