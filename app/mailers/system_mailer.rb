@@ -1,5 +1,5 @@
 class SystemMailer < ActionMailer::Base
-  default from: "huginn@your-google-apps-domain.com"
+  default from: HUGINN_CONFIG[:email_from_address] 
 
   def send_message(options)
     @lines = options[:lines]

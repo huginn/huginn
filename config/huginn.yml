@@ -1,4 +1,5 @@
 secret_token: REPLACE_ME_NOW!
 invitation_codes:
   - try-huginn
+email_from_address: huginn@your-google-apps-domain.com
 
