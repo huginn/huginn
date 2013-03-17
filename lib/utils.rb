@@ -1,3 +1,5 @@
+require 'jsonpath'
+
 module Utils
   # Unindents if the indentation is 2 or more characters.
   def self.unindent(s)
@@ -13,5 +15,13 @@ module Utils
       else
         object
     end
+  end
+
+  def self.value_at(data, path)
+    values_at(data, path).first
+  end
+
+  def self.values_at(data, path)
+    JsonPath.new(path).on(data.is_a?(String) ? data : data.to_json)
   end
 end

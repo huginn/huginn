@@ -115,6 +115,8 @@ GEM
       jquery-rails
       railties (>= 3.1.0)
     json (1.7.7)
+    jsonpath (0.5.1)
+      multi_json
     kaminari (0.14.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -275,6 +277,7 @@ DEPENDENCIES
   geokit-rails3
   jquery-rails
   json (>= 1.7.7)
+  jsonpath
   kaminari
   kramdown
   mysql2

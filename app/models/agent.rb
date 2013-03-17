@@ -85,27 +85,7 @@ class Agent < ActiveRecord::Base
   end
 
   def make_message(payload, message = options[:message])
-    message.gsub(/<([^>]+)>/) { value_at(payload, $1) || "??" }
-  end
-
-  def value_at(data, path)
-    if data.is_a?(Hash)
-      path.split(".").inject(data) { |memo, segment|
-        if memo
-          if memo[segment]
-            memo[segment]
-          elsif memo[segment.to_sym]
-            memo[segment.to_sym]
-          else
-            nil
-          end
-        else
-          nil
-        end
-      }.to_s
-    else
-      data
-    end
+    message.gsub(/<([^>]+)>/) { Utils.value_at(payload, $1) || "??" }
   end
 
   def set_default_schedule

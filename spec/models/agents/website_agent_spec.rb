@@ -6,6 +6,7 @@ describe Agents::WebsiteAgent do
     @site = {
         :name => "XKCD",
         :expected_update_period_in_days => 2,
+        :type => "html",
         :url => "http://xkcd.com",
         :mode => :on_change,
         :extract => {
@@ -39,6 +40,84 @@ describe Agents::WebsiteAgent do
         @checker.options = @site
         @checker.check
       }.should raise_error(StandardError, /Got an uneven number of matches/)
+    end
+  end
+
+  describe "parsing" do
+    it "parses CSS" do
+      @checker.check
+      event = Event.last
+      event.payload[:url].should == "http://imgs.xkcd.com/comics/evolving.png"
+      event.payload[:title].should =~ /^Biologists play reverse/
+    end
+
+    describe "JSON" do
+      it "works with paths" do
+        json = {
+            :response => {
+                :version => 2,
+                :title => "hello!"
+            }
+        }
+        stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
+        site = {
+            :name => "Some JSON Response",
+            :expected_update_period_in_days => 2,
+            :type => "json",
+            :url => "http://json-site.com",
+            :mode => :on_change,
+            :extract => {
+                :version => { :path => "response.version" },
+                :title => { :path => "response.title" }
+            }
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        event.payload[:version].should == 2
+        event.payload[:title].should == "hello!"
+      end
+
+      it "can handle arrays" do
+        json = {
+            :response => {
+                :data => [
+                    { :title => "first", :version => 2 },
+                    { :title => "second", :version => 2.5 }
+                ]
+            }
+        }
+        stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
+        site = {
+            :name => "Some JSON Response",
+            :expected_update_period_in_days => 2,
+            :type => "json",
+            :url => "http://json-site.com",
+            :mode => :on_change,
+            :extract => {
+                :title => { :path => "response.data[*].title" },
+                :version => { :path => "response.data[*].version" }
+            }
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        lambda {
+          checker.check
+        }.should change { Event.count }.by(2)
+
+        event = Event.all[-1]
+        event.payload[:version].should == 2.5
+        event.payload[:title].should == "second"
+
+        event = Event.all[-2]
+        event.payload[:version].should == 2
+        event.payload[:title].should == "first"
+      end
     end
   end
 end

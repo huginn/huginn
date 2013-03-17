@@ -7,7 +7,7 @@ module Agents
     description <<-MD
       Use a PeakDetectorAgent to watch for peaks in an event stream.  When a peak is detected, the resulting Event will have a payload message of `message`.  You can include extractions in the message, for example: `I saw a bar of: <foo.bar>`
 
-      The `value_path` value is a hash path to the value of interest.  `group_by_path` is a hash path that will be used to group values, if present.
+      The `value_path` value is a [JSONPaths](http://goessner.net/articles/JsonPath/) to the value of interest.  `group_by_path` is a hash path that will be used to group values, if present.
 
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
 
@@ -106,13 +106,13 @@ module Agents
     end
 
     def group_for(event)
-      ((options[:group_by_path].present? && value_at(event.payload, options[:group_by_path])) || 'no_group').to_sym
+      ((options[:group_by_path].present? && Utils.value_at(event.payload, options[:group_by_path])) || 'no_group').to_sym
     end
 
     def remember(group, event)
       memory[:data] ||= {}
       memory[:data][group] ||= []
-      memory[:data][group] << [value_at(event.payload, options[:value_path]), event.created_at.to_i]
+      memory[:data][group] << [Utils.value_at(event.payload, options[:value_path]), event.created_at.to_i]
       cleanup group
     end
 

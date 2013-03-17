@@ -7,12 +7,15 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      The WebsiteAgent scrapes a website and creates Events based on any changes in the results.
+      The WebsiteAgent scrapes a website, XML document, or JSON feed and creates Events based on the results.
 
-      Specify the website's `url` and select a `mode` for when to create Events based on the scraped data, either `all` or `on_change`.
+      Specify a `url` and select a `mode` for when to create Events based on the scraped data, either `all` or `on_change`.
 
-      To tell the Agent how to scrape the site, specify `extract` as a hash with keys naming the extractions and values of hashes.
-      These subhashes specify how to extract with a `:css` CSS selector and either `:text => true` or `attr` pointing to an attribute name to grab.  An example:
+      The `type` value can be `xml`, `html`, or `json`.
+
+      To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
+
+      When parsing HTML or XML, these sub-hashes specify how to extract with a `:css` CSS selector and either `:text => true` or `attr` pointing to an attribute name to grab.  An example:
 
           :extract => {
             :url => { :css => "#comic img", :attr => "src" },
@@ -20,12 +23,20 @@ module Agents
             :body_text => { :css => "div.main", :text => true }
           }
 
-      Note that whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.
+      When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
+
+          :extract => {
+            :title => { :path => "results.data[*].title" },
+            :description => { :path => "results.data[*].description" }
+          }
+
+      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
 
-    event_description do <<-MD
+    event_description do
+      <<-MD
       Events will have the fields you specified.  Your options look like:
 
           #{PP.pp(options[:extract], "")}
@@ -44,6 +55,7 @@ module Agents
       {
           :expected_update_period_in_days => "2",
           :url => "http://xkcd.com",
+          :type => "html",
           :mode => :on_change,
           :extract => {
               :url => {:css => "#comic img", :attr => "src"},
@@ -60,18 +72,22 @@ module Agents
       hydra = Typhoeus::Hydra.new
       request = Typhoeus::Request.new(options[:url], :followlocation => true)
       request.on_complete do |response|
-        doc = (options[:type].to_s == "xml" || options[:url] =~ /\.(rss|xml)$/i) ? Nokogiri::XML(response.body) : Nokogiri::HTML(response.body)
+        doc = parse(response.body)
         output = {}
         options[:extract].each do |name, extraction_details|
-          output[name] = doc.css(extraction_details[:css]).map { |node|
-            if extraction_details[:attr]
-              node.attr(extraction_details[:attr])
-            elsif extraction_details[:text]
-              node.text()
-            else
-              raise StandardError, ":attr or :text is required on each of the extraction patterns."
-            end
-          }
+          if extraction_type == "json"
+            output[name] = Utils.values_at(doc, extraction_details[:path])
+          else
+            output[name] = doc.css(extraction_details[:css]).map { |node|
+              if extraction_details[:attr]
+                node.attr(extraction_details[:attr])
+              elsif extraction_details[:text]
+                node.text()
+              else
+                raise StandardError, ":attr or :text is required on HTML or XML extraction patterns"
+              end
+            }
+          end
         end
 
         num_unique_lengths = options[:extract].keys.map { |name| output[name].length }.uniq
@@ -93,6 +109,33 @@ module Agents
       end
       hydra.queue request
       hydra.run
+    end
+
+    private
+
+    def extraction_type
+      (options[:type] || begin
+        if options[:url] =~ /\.(rss|xml)$/i
+          "xml"
+        elsif options[:url] =~ /\.json$/i
+          "json"
+        else
+          "html"
+        end
+      end).to_s
+    end
+
+    def parse(data)
+      case extraction_type
+        when "xml"
+          Nokogiri::XML(data)
+        when "json"
+          JSON.parse(data)
+        when "html"
+          Nokogiri::HTML(data)
+        else
+          raise "Unknown extraction type #{extraction_type}"
+      end
     end
   end
 end
