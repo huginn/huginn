@@ -5,7 +5,9 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      The WeatherAgent created an event for the following day's weather at `zipcode`.
+      The WeatherAgent creates an event for the following day's weather at `zipcode`.
+
+      You must setup an API key for Wunderground in order to use this Agent.
     MD
 
     event_description <<-MD
