@@ -19,6 +19,8 @@ Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves.
 
 ## Examples
 
+Please checkout the [Huginn Introductory Screencast](http://vimeo.com/61976251)!
+
 And now, some example screenshots.  Below them are instructions to get you started.
 
 ![Example list of agents](doc/imgs/your-agents.png)
