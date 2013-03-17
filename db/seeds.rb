@@ -20,6 +20,7 @@ unless user.agents.where(:name => "XKCD Source").exists?
   Agent.build_for_type("Agents::WebsiteAgent", user,
                        :name => "XKCD Source",
                        :schedule => "every_1d",
+                       :type => "html",
                        :options => {
                            :url => "http://xkcd.com",
                            :mode => :on_change,
@@ -37,6 +38,7 @@ unless user.agents.where(:name => "iTunes Trailer Source").exists?
                        :options => {
                            :url => "http://trailers.apple.com/trailers/home/rss/newtrailers.rss",
                            :mode => :on_change,
+                           :type => "xml",
                            :expected_update_period_in_days => 5,
                            :extract => {
                                :title => {:css => "item title", :text => true},
