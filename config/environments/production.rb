@@ -63,6 +63,7 @@ Huginn::Application.configure do
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
   DOMAIN = 'www.yourdomain.com'
+  HUGINN_CONFIG = HashWithIndifferentAccess.new(YAML.load_file(File.join(config.root, 'config', 'huginn.yml')))
 
   config.action_mailer.default_url_options = { :host => DOMAIN }
   config.action_mailer.asset_host = DOMAIN

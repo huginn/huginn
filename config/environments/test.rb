@@ -38,6 +38,7 @@ Huginn::Application.configure do
   config.active_support.deprecation = :stderr
 
   DOMAIN = 'test.host'
+  HUGINN_CONFIG = HashWithIndifferentAccess.new(YAML.load_file(File.join(config.root, 'config', 'huginn.yml')))
 
   config.action_mailer.default_url_options = { :host => DOMAIN }
   config.action_mailer.perform_deliveries = true

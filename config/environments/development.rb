@@ -33,6 +33,7 @@ Huginn::Application.configure do
   config.assets.debug = true
 
   DOMAIN = "localhost:3000"
+  HUGINN_CONFIG = HashWithIndifferentAccess.new(YAML.load_file(File.join(config.root, 'config', 'huginn.yml')))
 
   config.action_mailer.default_url_options = { :host => DOMAIN }
   config.action_mailer.asset_host = DOMAIN
