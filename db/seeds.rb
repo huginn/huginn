@@ -31,8 +31,8 @@ unless user.agents.where(:name => "XKCD Source").exists?
                        }).save!
 end
 
-unless user.agents.where(:name => "iTunes Source").exists?
-  Agent.build_for_type("Agents::WebsiteAgent", user, :name => "iTunes Source",
+unless user.agents.where(:name => "iTunes Trailer Source").exists?
+  Agent.build_for_type("Agents::WebsiteAgent", user, :name => "iTunes Trailer Source",
                        :schedule => "every_1d",
                        :options => {
                            :url => "http://trailers.apple.com/trailers/home/rss/newtrailers.rss",
@@ -73,5 +73,5 @@ unless user.agents.where(:name => "Afternoon Digest").exists?
                        :name => "Afternoon Digest",
                        :schedule => "5pm",
                        :options => { :subject => "Your Afternoon Digest", :expected_receive_period_in_days => "7" },
-                       :source_ids => user.agents.where(:name => ["iTunes Source", "XKCD Source"]).pluck(:id)).save!
+                       :source_ids => user.agents.where(:name => ["iTunes Trailer Source", "XKCD Source"]).pluck(:id)).save!
 end
