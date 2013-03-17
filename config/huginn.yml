@@ -1,3 +1,4 @@
+secret_token: REPLACE_ME_NOW!
 invitation_codes:
   - try-huginn
 
