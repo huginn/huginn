@@ -30,7 +30,7 @@ module Agents
             :description => { :path => "results.data[*].description" }
           }
 
-      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.
+      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
@@ -94,15 +94,15 @@ module Agents
 
         raise StandardError, "Got an uneven number of matches for #{options[:name]}: #{options[:extract].inspect}" unless num_unique_lengths.length == 1
 
-        previous_payloads = events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload) if options[:mode].to_s == "on_change"
+        previous_payloads = events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options[:mode].to_s == "on_change"
         num_unique_lengths.first.times do |index|
           result = {}
           options[:extract].keys.each do |name|
             result[name] = output[name][index]
           end
 
-          if !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result))
-            Rails.logger.info "Storing new result for '#{options[:name]}': #{result.inspect}"
+          if !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result.to_json))
+            Rails.logger.info "Storing new result for '#{name}': #{result.inspect}"
             create_event :payload => result
           end
         end
