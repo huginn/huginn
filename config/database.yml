@@ -2,7 +2,7 @@ development:
   adapter: mysql2
   database: huginn_development
   username: root
-  password: password
+  password:
   socket: <%= ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>
   encoding: utf8
   reconnect: true
@@ -15,7 +15,7 @@ test:
   adapter: mysql2
   database: huginn_test
   username: root
-  password: password
+  password:
   socket: <%= ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>
   encoding: utf8
   reconnect: true

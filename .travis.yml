@@ -2,7 +2,6 @@ language: ruby
 bundler_args: --without development production
 rvm:
   - 1.9.3
-  - jruby-19mode # JRuby in 1.9 mode
 before_script:
   - mysql -e 'create database huginn_test;'
 script: "bundle exec rake"
