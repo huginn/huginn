@@ -119,3 +119,5 @@ Huginn is provided under the MIT License.
 ## Contribution
 
 Please fork, add specs, and send pull requests!
+
+[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn])
