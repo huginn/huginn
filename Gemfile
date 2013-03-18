@@ -33,7 +33,9 @@ gem "twitter"
 gem 'twitter-stream', '>=0.1.16'
 gem 'em-http-request'
 
-gem 'unicorn'
+group :production do
+  gem 'unicorn'
+end
 
 group :development do
   gem 'capistrano'
@@ -47,4 +49,5 @@ group :development, :test do
   gem 'rspec'
   gem 'rr'
   gem 'webmock', :require => false
+  gem 'rake'
 end
