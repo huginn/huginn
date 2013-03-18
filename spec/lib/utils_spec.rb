@@ -10,6 +10,12 @@ describe Utils do
     it "returns nil when the path cannot be followed" do
       Utils.value_at({ :foo => { :bar => :baz }}, "foo.bing").should be_nil
     end
+
+    it "does not eval" do
+      lambda {
+        Utils.value_at({ :foo => 2 }, "foo[?(@ > 1)]")
+      }.should raise_error(RuntimeError, /Cannot use .*? eval/)
+    end
   end
 
   describe "#values_at" do

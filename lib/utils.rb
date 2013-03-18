@@ -22,6 +22,6 @@ module Utils
   end
 
   def self.values_at(data, path)
-    JsonPath.new(path).on(data.is_a?(String) ? data : data.to_json)
+    JsonPath.new(path, :allow_eval => false).on(data.is_a?(String) ? data : data.to_json)
   end
 end
