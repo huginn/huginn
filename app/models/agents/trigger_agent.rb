@@ -7,14 +7,7 @@ module Agents
     description <<-MD
       Use a TriggerAgent to watch for a specific value in an Event payload.
 
-      The `rules` array contains hashes of `path`, `value`, and `type`.  The `path` value is a dotted path through a hash, for example `foo.bar` would return `hello` from this structure:
-
-          {
-            :foo => {
-              :bar => "hello"
-            },
-            :something => "else"
-          }
+      The `rules` array contains hashes of `path`, `value`, and `type`.  The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax.
 
       The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.
 
@@ -55,7 +48,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         match = options[:rules].all? do |rule|
-          value_at_path = value_at(event[:payload], rule[:path])
+          value_at_path = Utils.value_at(event[:payload], rule[:path])
           case rule[:type]
             when "regex"
               value_at_path.to_s =~ Regexp.new(rule[:value], Regexp::IGNORECASE)

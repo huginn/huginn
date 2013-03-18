@@ -22,9 +22,9 @@ describe Agents::PeakDetectorAgent do
       events = build_events(:keys => [:count, :filter],
                             :values => [[1, "something"], [2, "something"], [3, "else"]])
       @agent.receive events
-      @agent.memory[:data][:something].map(&:first).should == %w[1 2]
+      @agent.memory[:data][:something].map(&:first).should == [1, 2]
       @agent.memory[:data][:something].last.last.should be_within(10).of((100 - 1).hours.ago.to_i)
-      @agent.memory[:data][:else].first.first.should == "3"
+      @agent.memory[:data][:else].first.first.should == 3
       @agent.memory[:data][:else].first.last.should be_within(10).of((100 - 2).hours.ago.to_i)
     end
 
@@ -32,7 +32,7 @@ describe Agents::PeakDetectorAgent do
       @agent.options[:group_by_path] = ""
       events = build_events(:keys => [:count], :values => [[1], [2]])
       @agent.receive events
-      @agent.memory[:data][:no_group].map(&:first).should == %w[1 2]
+      @agent.memory[:data][:no_group].map(&:first).should == [1, 2]
     end
 
     it "keeps a rolling window of data" do
@@ -40,7 +40,7 @@ describe Agents::PeakDetectorAgent do
       @agent.receive build_events(:keys => [:count],
                                   :values => [1, 2, 3, 4, 5, 6, 7, 8].map {|i| [i]},
                                   :pattern => { :filter => "something" })
-      @agent.memory[:data][:something].map(&:first).should == %w[4 5 6 7 8]
+      @agent.memory[:data][:something].map(&:first).should == [4, 5, 6, 7, 8]
     end
 
     it "finds peaks" do

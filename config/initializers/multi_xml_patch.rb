@@ -15,7 +15,7 @@ module MultiXml
     end
   end
 
-  DISALLOWED_XML_TYPES = %w(symbol yaml)
+  DISALLOWED_XML_TYPES = %w(symbol yaml) unless defined?(DISALLOWED_XML_TYPES)
 
   class << self
     def parse(xml, options={})

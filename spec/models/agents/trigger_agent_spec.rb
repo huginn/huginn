@@ -120,13 +120,6 @@ describe Agents::TriggerAgent do
         @checker.receive([@event])
       }.should_not change { Event.count }
 
-
-      @event.payload = "world"
-      @checker.options[:rules].first[:path] = "anything"
-      lambda {
-        @checker.receive([@event])
-      }.should change { Event.count }.by(1)
-
       @checker.options[:rules].first[:value] = "hi"
       lambda {
         @checker.receive([@event])

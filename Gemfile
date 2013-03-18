@@ -8,6 +8,7 @@ gem 'kaminari'
 gem 'bootstrap-kaminari-views'
 gem "rufus-scheduler", :require => false
 gem 'json', '>= 1.7.7'
+gem 'jsonpath'
 
 gem 'delayed_job', :git => 'https://github.com/wok/delayed_job' # Until the YAML issues are fixed in master.
 gem 'delayed_job_active_record', "~> 0.3.3" # newer was giving a strange MySQL error
