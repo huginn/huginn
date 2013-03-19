@@ -118,6 +118,8 @@ Huginn is provided under the MIT License.
 
 ## Contribution
 
-Please fork, add specs, and send pull requests!
+Huginn is a work in progress and is hopefully just getting started.  Please get involved!  You can [add new Agents](https://github.com/cantino/huginn/wiki/Creating-a-new-agent), expand the [Wiki](https://github.com/cantino/huginn/wiki), or help us simplify and strengthen the Agent API or core application.
+
+Please fork, add specs, and send pull requests!  
 
 [![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn)
