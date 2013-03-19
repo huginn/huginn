@@ -37,7 +37,7 @@ module Agents
           }
     MD
 
-    default_schedule "midnight"
+    default_schedule "8pm"
 
     def working?
       (event = event_created_within(2.days)) && event.payload.present?
