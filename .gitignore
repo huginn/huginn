@@ -16,4 +16,3 @@ rerun.txt
 pickle-email-*.html
 .idea/
 .DS_Store
-/config/initializers/secret_token.rb
