@@ -49,7 +49,7 @@ And now, some example screenshots.  Below them are instructions to get you start
 * Setup the Heroku postgres account for the app
 * Deploy to heroku
 * Run `heroku run rake db:migrate db:seed` to generate your admin user.  Immediately login to your new Huginn installation with the username of `admin` and the password of `password` and change your email and password!
-* Increase the number of active workers to at least 1
+* Increase the number of active workers to at least 1 and increase the number of scheduler workers to 1
 
 
 ### Optional Setup
