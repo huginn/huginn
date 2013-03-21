@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130126080736) do
+ActiveRecord::Schema.define(:version => 20130124050117) do
 
   create_table "agents", :force => true do |t|
     t.integer  "user_id"
@@ -23,9 +23,9 @@ ActiveRecord::Schema.define(:version => 20130126080736) do
     t.datetime "last_check_at"
     t.datetime "last_receive_at"
     t.integer  "last_checked_event_id"
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
-    t.text     "memory",                :limit => 2147483647
+    t.datetime "created_at",            :null => false
+    t.datetime "updated_at",            :null => false
+    t.text     "memory"
   end
 
   add_index "agents", ["schedule"], :name => "index_agents_on_schedule"
@@ -51,11 +51,11 @@ ActiveRecord::Schema.define(:version => 20130126080736) do
   create_table "events", :force => true do |t|
     t.integer  "user_id"
     t.integer  "agent_id"
-    t.decimal  "lat",                            :precision => 15, :scale => 10
-    t.decimal  "lng",                            :precision => 15, :scale => 10
-    t.text     "payload",    :limit => 16777215
-    t.datetime "created_at",                                                     :null => false
-    t.datetime "updated_at",                                                     :null => false
+    t.decimal  "lat",        :precision => 15, :scale => 10
+    t.decimal  "lng",        :precision => 15, :scale => 10
+    t.text     "payload"
+    t.datetime "created_at",                                 :null => false
+    t.datetime "updated_at",                                 :null => false
   end
 
   add_index "events", ["agent_id", "created_at"], :name => "index_events_on_agent_id_and_created_at"
