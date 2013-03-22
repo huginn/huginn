@@ -7,7 +7,7 @@ module Agents
     description <<-MD
       The WeatherAgent creates an event for the following day's weather at `zipcode`.
 
-      You must setup an API key for Wunderground in order to use this Agent.
+      You must setup an [API key for Wunderground](http://www.wunderground.com/weather/api/) in order to use this Agent.
     MD
 
     event_description <<-MD
