@@ -37,6 +37,7 @@ bob_weather_agent:
                  :zipcode => 94102,
                  :lat => 37.779329,
                  :lng => -122.41915,
+                 :api_key => 'test'
                }.to_yaml.inspect %>
 
 jane_weather_agent:
@@ -48,6 +49,7 @@ jane_weather_agent:
                  :zipcode => 94103,
                  :lat => 37.779329,
                  :lng => -122.41915,
+                 :api_key => 'test'
                }.to_yaml.inspect %>
 
 jane_rain_notifier_agent:
