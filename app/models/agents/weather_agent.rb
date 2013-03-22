@@ -44,15 +44,20 @@ module Agents
     end
 
     def wunderground
-      Wunderground.new("your-api-key")
+      Wunderground.new(options[:api_key])
     end
 
     def default_options
-      { :zipcode => "94103" }
+      {
+        :api_key => "",
+        :zipcode => "94103"
+      }
+
     end
 
     def validate_options
       errors.add(:base, "zipcode is required") unless options[:zipcode].present?
+      errors.add(:base, "api_key is required") unless options[:api_key].present?
     end
 
     def check
