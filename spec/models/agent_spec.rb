@@ -8,9 +8,11 @@ describe Agent do
     end
 
     it "runs agents with the given schedule" do
-      mock.any_instance_of(Agents::WeatherAgent).async_check.twice
-      mock.any_instance_of(Agents::WebsiteAgent).async_check.once
+      weather_agent_ids = [agents(:bob_weather_agent), agents(:jane_weather_agent)].map(&:id)
+      stub(Agents::WeatherAgent).async_check(anything) {|agent_id| weather_agent_ids.delete(agent_id) }
+      stub(Agents::WebsiteAgent).async_check(agents(:bob_website_agent).id)
       Agent.run_schedule("midnight")
+      weather_agent_ids.should be_empty
     end
 
     it "groups agents by type" do
@@ -20,7 +22,7 @@ describe Agent do
     end
 
     it "only runs agents with the given schedule" do
-      do_not_allow.any_instance_of(Agents::WebsiteAgent).async_check
+      do_not_allow(Agents::WebsiteAgent).async_check
       Agent.run_schedule("blah")
     end
   end
@@ -116,19 +118,21 @@ describe Agent do
       end
     end
 
-    describe "#async_check" do
-      it "records last_check_at and calls check" do
+    describe ".async_check" do
+      it "records last_check_at and calls check on the given Agent" do
         @checker = Agents::SomethingSource.new(:name => "something")
         @checker.user = users(:bob)
         @checker.save!
 
-        @checker.options[:new] = true
-        mock(@checker).check.once
+        mock(@checker).check.once {
+          @checker.options[:new] = true
+        }
+
+        mock(Agent).find(@checker.id) { @checker }
 
         @checker.last_check_at.should be_nil
-        @checker.async_check
-        @checker.last_check_at.should be_within(2).of(Time.now)
-
+        Agents::SomethingSource.async_check(@checker.id)
+        @checker.reload.last_check_at.should be_within(2).of(Time.now)
         @checker.reload.options[:new].should be_true # Show that we save options
       end
     end
@@ -141,13 +145,13 @@ describe Agent do
 
       it "should use available events" do
         mock.any_instance_of(Agents::TriggerAgent).receive(anything).once
-        agents(:bob_weather_agent).async_check
+        Agent.async_check(agents(:bob_weather_agent).id)
         Agent.receive!
       end
 
       it "should track when events have been seen and not see them again" do
         mock.any_instance_of(Agents::TriggerAgent).receive(anything).once
-        agents(:bob_weather_agent).async_check
+        Agent.async_check(agents(:bob_weather_agent).id)
         Agent.receive!
         Agent.receive!
       end
@@ -161,8 +165,8 @@ describe Agent do
         mock.any_instance_of(Agents::TriggerAgent).receive(anything).twice { |events|
           events.map(&:user).map(&:username).uniq.length.should == 1
         }
-        agents(:bob_weather_agent).async_check
-        agents(:jane_weather_agent).async_check
+        Agent.async_check(agents(:bob_weather_agent).id)
+        Agent.async_check(agents(:jane_weather_agent).id)
         Agent.receive!
       end
     end
