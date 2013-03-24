@@ -33,6 +33,11 @@ gem "twitter"
 gem 'twitter-stream', '>=0.1.16'
 gem 'em-http-request'
 
+platforms :ruby_18 do
+  gem 'system_timer'
+  gem 'fastercsv'
+end
+
 group :production do
   gem 'unicorn'
 end
