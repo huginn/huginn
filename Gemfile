@@ -1,5 +1,10 @@
 source 'https://rubygems.org'
 
+gem "system_timer"
+gem 'execjs'
+gem 'therubyracer'
+gem 'fastercsv'
+
 gem 'rails'
 gem 'mysql2'
 gem 'devise'
