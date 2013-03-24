@@ -100,20 +100,6 @@ class Agent < ActiveRecord::Base
     @memoized_last_event_at ||= events.select(:created_at).first.try(:created_at)
   end
 
-  def async_check
-    check
-    self.last_check_at = Time.now
-    save!
-  end
-  handle_asynchronously :async_check #, :priority => 10, :run_at => Proc.new { 5.minutes.from_now }
-
-  def async_receive(event_ids)
-    receive(Event.where(:id => event_ids))
-    self.last_receive_at = Time.now
-    save!
-  end
-  handle_asynchronously :async_receive #, :priority => 10, :run_at => Proc.new { 5.minutes.from_now }
-
   def default_schedule
     self.class.default_schedule
   end
@@ -135,67 +121,93 @@ class Agent < ActiveRecord::Base
   end
 
   # Class Methods
-
-  def self.cannot_be_scheduled!
-    @cannot_be_scheduled = true
-  end
-
-  def self.cannot_be_scheduled?
-    !!@cannot_be_scheduled
-  end
-
-  def self.default_schedule(schedule = nil)
-    @default_schedule = schedule unless schedule.nil?
-    @default_schedule
-  end
-
-  def self.cannot_receive_events!
-    @cannot_receive_events = true
-  end
-
-  def self.cannot_receive_events?
-    !!@cannot_receive_events
-  end
-
-  def self.receive!
-    sql = Agent.
-            select("agents.id AS receiver_agent_id, sources.id AS source_agent_id, events.id AS event_id").
-            joins("JOIN links ON (links.receiver_id = agents.id)").
-            joins("JOIN agents AS sources ON (links.source_id = sources.id)").
-            joins("JOIN events ON (events.agent_id = sources.id)").
-            where("agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id").to_sql
-
-    agents_to_events = {}
-    Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_id, event_id|
-      agents_to_events[receiver_agent_id] ||= []
-      agents_to_events[receiver_agent_id] << event_id
+  class << self
+    def cannot_be_scheduled!
+      @cannot_be_scheduled = true
     end
 
-    event_ids = agents_to_events.values.flatten.uniq.compact
-
-    Agent.where(:id => agents_to_events.keys).each do |agent|
-      agent.update_attribute :last_checked_event_id, event_ids.max
-      agent.async_receive(agents_to_events[agent.id].uniq)
+    def cannot_be_scheduled?
+      !!@cannot_be_scheduled
     end
 
-    {
-        :agent_count => agents_to_events.keys.length,
-        :event_count => event_ids.length
-    }
-  end
-
-  def self.run_schedule(schedule)
-    types = where(:schedule => schedule).group(:type).pluck(:type)
-    types.each do |type|
-      type.constantize.bulk_check(schedule)
+    def default_schedule(schedule = nil)
+      @default_schedule = schedule unless schedule.nil?
+      @default_schedule
     end
-  end
 
-  # You can override this to define a custom bulk_check for your type of Agent.
-  def self.bulk_check(schedule)
-    raise "Call #bulk_check on the appropriate subclass of Agent" if self == Agent
-    where(:schedule => schedule).find_each do |agent|
-      agent.async_check
+    def cannot_receive_events!
+      @cannot_receive_events = true
     end
+
+    def cannot_receive_events?
+      !!@cannot_receive_events
+    end
+
+    def receive!
+      sql = Agent.
+              select("agents.id AS receiver_agent_id, sources.id AS source_agent_id, events.id AS event_id").
+              joins("JOIN links ON (links.receiver_id = agents.id)").
+              joins("JOIN agents AS sources ON (links.source_id = sources.id)").
+              joins("JOIN events ON (events.agent_id = sources.id)").
+              where("agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id").to_sql
+
+      agents_to_events = {}
+      Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_id, event_id|
+        agents_to_events[receiver_agent_id] ||= []
+        agents_to_events[receiver_agent_id] << event_id
+      end
+
+      event_ids = agents_to_events.values.flatten.uniq.compact
+
+      Agent.where(:id => agents_to_events.keys).each do |agent|
+        agent.update_attribute :last_checked_event_id, event_ids.max
+        Agent.async_receive(agent.id, agents_to_events[agent.id].uniq)
+      end
+
+      {
+          :agent_count => agents_to_events.keys.length,
+          :event_count => event_ids.length
+      }
+    end
+
+    # Given an Agent id and an array of Event ids, load the Agent, call #receive on it with the Event objects, and then
+    # save it with an updated _last_receive_at_ timestamp.
+    #
+    # This method is tagged with _handle_asynchronously_ and will be delayed and run with delayed_job.  It accepts Agent
+    # and Event ids instead of a literal ActiveRecord models because it is preferable to serialize delayed_jobs with ids.
+    def async_receive(agent_id, event_ids)
+      agent = Agent.find(agent_id)
+      agent.receive(Event.where(:id => event_ids))
+      agent.last_receive_at = Time.now
+      agent.save!
+    end
+    handle_asynchronously :async_receive
+
+    def run_schedule(schedule)
+      types = where(:schedule => schedule).group(:type).pluck(:type)
+      types.each do |type|
+        type.constantize.bulk_check(schedule)
+      end
+    end
+
+    # You can override this to define a custom bulk_check for your type of Agent.
+    def bulk_check(schedule)
+      raise "Call #bulk_check on the appropriate subclass of Agent" if self == Agent
+      where(:schedule => schedule).pluck("agents.id").each do |agent_id|
+        async_check(agent_id)
+      end
+    end
+
+    # Given an Agent id, load the Agent, call #check on it, and then save it with an updated _last_check_at_ timestamp.
+    #
+    # This method is tagged with _handle_asynchronously_ and will be delayed and run with delayed_job.  It accepts an Agent
+    # id instead of a literal Agent because it is preferable to serialize delayed_jobs with ids.
+    def async_check(agent_id)
+      agent = Agent.find(agent_id)
+      agent.check
+      agent.last_check_at = Time.now
+      agent.save!
+    end
+    handle_asynchronously :async_check
   end
 end

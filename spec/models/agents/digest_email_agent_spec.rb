@@ -23,20 +23,20 @@ describe Agents::DigestEmailAgent do
       event2.payload = "Something else you should know about"
       event2.save!
 
-      @checker.async_receive([event1.id, event2.id])
+      Agents::DigestEmailAgent.async_receive(@checker.id, [event1.id, event2.id])
       @checker.reload.memory[:queue].should == ["Something you should know about", "Something else you should know about"]
     end
   end
 
   describe "#check" do
     it "should send an email" do
-      @checker.async_check
+      Agents::DigestEmailAgent.async_check(@checker.id)
       ActionMailer::Base.deliveries.should == []
 
       @checker.memory[:queue] = ["Something you should know about", { :title => "Foo", :url => "http://google.com", :bar => 2 }, { "message" => "hi", :woah => "there" }]
       @checker.save!
 
-      @checker.async_check
+      Agents::DigestEmailAgent.async_check(@checker.id)
       ActionMailer::Base.deliveries.last.to.should == ["bob@example.com"]
       ActionMailer::Base.deliveries.last.subject.should == "something interesting"
       get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Something you should know about\n\nFoo (bar: 2 and url: http://google.com)\n\nhi (woah: there)"
