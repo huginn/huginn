@@ -61,7 +61,7 @@ module Agents
 
     def validate_options
       errors.add(:base, "zipcode is required") unless options[:zipcode].present?
-      errors.add(:base, "api_key is required") unless key_setup?
+      errors.add(:base, "api_key is required") unless options[:api_key].present?
     end
 
     def check

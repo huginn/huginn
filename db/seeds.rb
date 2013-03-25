@@ -13,7 +13,7 @@ unless user.agents.where(:name => "SF Weather Agent").exists?
   Agent.build_for_type("Agents::WeatherAgent", user,
                        :name => "SF Weather Agent",
                        :schedule => "10pm",
-                       :options => {:zipcode => "94103"}).save!
+                       :options => { :zipcode => "94103", :api_key => "your-key" }).save!
 end
 
 unless user.agents.where(:name => "XKCD Source").exists?
