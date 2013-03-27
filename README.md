@@ -92,7 +92,7 @@ In your private copy of Huginn, do the following:
 
 #### Enable the WeatherAgent
 
-In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/).  Signup for one and then put it in `app/models/agents/weather_agent.rb` in the `wunderground` method.
+In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/). Signup for one and then change value of `api_key: your-key` in your seeded WeatherAgent.
 
 #### Logging your location to the UserLocationAgent
 
