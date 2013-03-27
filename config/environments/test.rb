@@ -37,7 +37,8 @@ Huginn::Application.configure do
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
 
-  DOMAIN = 'test.host'
+  HUGINN_CONFIG = HashWithIndifferentAccess.new(YAML.load_file(File.join(config.root, 'config', 'huginn.yml')))
+  DOMAIN = HUGINN_CONFIG[:test_domain]
 
   config.action_mailer.default_url_options = { :host => DOMAIN }
   config.action_mailer.perform_deliveries = true

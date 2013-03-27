@@ -1,0 +1,16 @@
+secret_token: REPLACE_ME_NOW!
+invitation_codes:
+  - try-huginn
+email_from_address: huginn@your-google-apps-domain.com
+development_domain: localhost:3000
+test_domain: test.host
+production_domain: www.yourdomain.com
+smtp_settings:
+  address: smtp.gmail.com
+  port: 587
+  domain: your-google-apps-domain.com
+  authentication: plain
+  enable_starttls_auto: true
+  user_name: huginn@your-google-apps-domain.com
+  password: your-password
+

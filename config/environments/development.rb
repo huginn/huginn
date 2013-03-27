@@ -32,20 +32,13 @@ Huginn::Application.configure do
   # Expands the lines which load the assets
   config.assets.debug = true
 
-  DOMAIN = "localhost:3000"
+  HUGINN_CONFIG = HashWithIndifferentAccess.new(YAML.load_file(File.join(config.root, 'config', 'huginn.yml')))
+  DOMAIN = HUGINN_CONFIG[:development_domain]
 
   config.action_mailer.default_url_options = { :host => DOMAIN }
   config.action_mailer.asset_host = DOMAIN
   config.action_mailer.perform_deliveries = false # Enable when testing!
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-      address: "smtp.gmail.com",
-      port: 587,
-      domain: "your-google-apps-domain.com",
-      authentication: "plain",
-      enable_starttls_auto: true,
-      user_name: "huginn@your-google-apps-domain.com",
-      password: "your-password"
-  }
+  config.action_mailer.smtp_settings = HUGINN_CONFIG[:smtp_settings]
 end
