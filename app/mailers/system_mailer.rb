@@ -1,5 +1,5 @@
 class SystemMailer < ActionMailer::Base
-  default from: ENV['GMAIL_USERNAME']
+  default from: ENV['EMAIL_FROM_ADDRESS']
 
   def send_message(options)
     @lines = options[:lines]
