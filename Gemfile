@@ -15,6 +15,8 @@ gem 'delayed_job_active_record', "~> 0.3.3" # newer was giving a strange MySQL e
 gem "daemons"
 # gem "delayed_job_web"
 
+gem 'foreman'
+
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'

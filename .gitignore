@@ -16,3 +16,4 @@ rerun.txt
 pickle-email-*.html
 .idea/
 .DS_Store
+.env
