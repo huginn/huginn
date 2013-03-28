@@ -39,8 +39,11 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 If you just want to play around, you can simply clone this repository, then perform the following steps:
 
-* Edit `config/initializers/secret_token.rb` and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
-* Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.  Run `rails s`, visit `http://localhost:3000`, and login with the username of `admin` and the password of `password`.
+* Copy .env.example to .env `cp .env.example .env`
+* Edit the configuration options in .env
+* Edit the APP_SECRET_TOKEN environment variable and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
+* Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.
+* Run `foreman start`, visit `http://localhost:5000`, and login with the username of `admin` and the password of `password`.
 * Make some extra Terminal windows and run `bundle exec rails runner bin/schedule.rb`, `bundle exec rails runner bin/twitter_stream.rb`, and `script/delayed_job run` in separate windows.
 * Setup some Agents!
 
