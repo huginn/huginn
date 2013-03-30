@@ -1,0 +1,8 @@
+Markers
+===========
+
+Adding marker files to this directory will have the following effects:
+
+force_clean_build - Previous output from bundle install --deployment will be
+     removed and all gems will be reinstalled according to the current
+     Gemfile/Gemfile.lock.

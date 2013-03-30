@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# The pre_start_cartridge and pre_stop_cartridge hooks are *SOURCED*
+# immediately before (re)starting or stopping the specified cartridge.
+# They are able to make any desired environment variable changes as
+# well as other adjustments to the application environment.
+
+# The post_start_cartridge and post_stop_cartridge hooks are executed
+# immediately after (re)starting or stopping the specified cartridge.
+
+# Exercise caution when adding commands to these hooks.  They can
+# prevent your application from stopping cleanly or starting at all.
+# Application start and stop is subject to different timeouts
+# throughout the system.

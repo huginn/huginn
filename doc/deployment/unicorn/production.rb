@@ -1,20 +1,20 @@
-app_path = "/home/you/app/current"
+app_path = ENV['OPENSHIFT_REPO_DIR'];
 
 worker_processes 2
 preload_app true
 timeout 180
-listen '/home/you/app/shared/pids/unicorn.socket'
+listen ENV['OPENSHIFT_TMP_DIR'] + 'unicorn.socket'
 
 working_directory app_path
 
 rails_env = ENV['RAILS_ENV'] || 'production'
 
 # Log everything to one file
-stderr_path "log/unicorn.log"
-stdout_path "log/unicorn.log"
+stderr_path ENV['OPENSHIFT_REPO_DIR'] + "log/unicorn.log"
+stdout_path ENV['OPENSHIFT_REPO_DIR'] + "log/unicorn.log"
 
 # Set master PID location
-pid '/home/you/app/shared/pids/unicorn.pid'
+pid ENV['OPENSHIFT_TMP_DIR'] + 'unicorn.pid'
 
 before_fork do |server, worker|
   ActiveRecord::Base.connection.disconnect!
