@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# The pre_start_cartridge and pre_stop_cartridge hooks are *SOURCED*
+# immediately before (re)starting or stopping the specified cartridge.
+# They are able to make any desired environment variable changes as
+# well as other adjustments to the application environment.
+
+# The post_start_cartridge and post_stop_cartridge hooks are executed
+# immediately after (re)starting or stopping the specified cartridge.
+
+# Exercise caution when adding commands to these hooks.  They can
+# prevent your application from stopping cleanly or starting at all.
+# Application start and stop is subject to different timeouts
+# throughout the system.
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 4951afb... adding .openshift directory
+#
+# This is probably a terrible idea, but we'll leave this here just in case
+# we need to remember it later
+#
+<<<<<<< HEAD
+>>>>>>> adding .openshift directory
+=======
+>>>>>>> 4951afb... adding .openshift directory
+=======
+>>>>>>> ddf82d1... adding .openshift directory
+#RAILS_ENV=production bundle exec rails runner bin/twitter_stream.rb &> $OPENSHIFT_REPO_DIR/log/twitter_stream.log
+#RAILS_ENV=production bundle exec rails runner bin/schedule.rb &> $OPENSHIFT_REPO_DIR/log/schedule.log

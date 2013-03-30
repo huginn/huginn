@@ -1,0 +1,20 @@
+#!/bin/bash
+# This is a simple post deploy hook executed after your application
+# is deployed and started.  This script gets executed directly, so 
+# it could be python, php, ruby, etc.
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ddf82d1... adding .openshift directory
+
+# "cap: not found" at the moment, so we'll comment it out
+#pushd ${OPENSHIFT_REPO_DIR} > /dev/null
+#cap deploy:setup
+#cap deploy
+#popd > /dev/null
+
+<<<<<<< HEAD
+=======
+>>>>>>> 4951afb... adding .openshift directory
+=======
+>>>>>>> ddf82d1... adding .openshift directory
