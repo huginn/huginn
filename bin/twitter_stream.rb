@@ -70,7 +70,7 @@ def load_and_run(agents)
         recent_tweets.shift if recent_tweets.length > DUPLICATE_DETECTION_LENGTH
         puts status["text"]
         filter_to_agent_map.keys.each do |filter|
-          if (filter.downcase.split(SEPARATOR) - status["text"].downcase.split(SEPARATOR)).reject(&:empty) == [] # Hacky McHackerson
+          if (filter.downcase.split(SEPARATOR) - status["text"].downcase.split(SEPARATOR)).reject(&:empty?) == [] # Hacky McHackerson
             filter_to_agent_map[filter].each do |agent|
               puts " -> #{agent.name}"
               agent.process_tweet(filter, status)
