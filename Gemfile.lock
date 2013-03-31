@@ -94,6 +94,8 @@ GEM
     font-awesome-sass-rails (3.0.2.2)
       railties (>= 3.1.1)
       sass-rails (>= 3.1.1)
+    foreman (0.62.0)
+      thor (>= 0.13.6)
     geokit (1.6.5)
       multi_json
     geokit-rails3 (0.1.5)
@@ -277,6 +279,7 @@ DEPENDENCIES
   devise
   em-http-request
   fastercsv
+  foreman
   geokit-rails3
   jquery-rails
   json (>= 1.7.7)

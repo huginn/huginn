@@ -37,8 +37,6 @@ Huginn::Application.configure do
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
 
-  DOMAIN = 'test.host'
-
-  config.action_mailer.default_url_options = { :host => DOMAIN }
+  config.action_mailer.default_url_options = { :host => ENV['DOMAIN'] }
   config.action_mailer.perform_deliveries = true
 end
