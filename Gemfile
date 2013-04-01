@@ -40,14 +40,7 @@ platforms :ruby_18 do
   gem 'fastercsv'
 end
 
-group :production do
-  gem 'unicorn'
-end
-
 group :development do
-  gem 'capistrano'
-  gem 'capistrano-unicorn', :require => false
-  gem 'rvm-capistrano'
   gem 'pry'
 end
 

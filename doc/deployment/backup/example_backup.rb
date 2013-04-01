@@ -10,23 +10,17 @@
 
 # You'll also need to install the backup gem on your server, as well as the net-ssh, excon, net-scp, and fog gems.
 
-database_yml = '/home/you/app/current/config/database.yml'
-rails_env    = ENV['RAILS_ENV'] || 'production'
-
-require 'yaml'
-config = YAML.load_file(database_yml)
-
 Backup::Model.new(:huginn_backup, 'The Huginn backup configuration') do
 
   split_into_chunks_of 4000
 
   database MySQL do |database|
-    database.name               = config[rails_env]["database"]
-    database.username           = config[rails_env]["username"]
-    database.password           = config[rails_env]["password"]
-    database.host               = config[rails_env]["host"]
-    database.port               = config[rails_env]["port"]
-    database.socket             = config[rails_env]["socket"]
+    database.name               = "your-database-name"
+    database.username           = "your-database-username"
+    database.password           = "your-database-password"
+    database.host               = "your-database-host"
+    database.port               = "your-database-port"
+    database.socket             = "your-database-socket"
     database.additional_options = ['--single-transaction', '--quick', '--hex-blob', '--add-drop-table']
   end
 
