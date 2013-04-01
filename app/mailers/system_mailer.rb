@@ -1,5 +1,5 @@
 class SystemMailer < ActionMailer::Base
-  default from: ENV['EMAIL_FROM_ADDRESS']
+  default :from => ENV['EMAIL_FROM_ADDRESS'] || 'you@example.com'
 
   def send_message(options)
     @lines = options[:lines]

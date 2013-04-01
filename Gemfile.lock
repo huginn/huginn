@@ -195,7 +195,7 @@ GEM
       rspec-mocks (~> 2.13.0)
     rufus-scheduler (2.0.18)
       tzinfo (>= 0.3.23)
-    safe_yaml (0.8.4)
+    safe_yaml (0.8.6)
     sass (3.2.7)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -270,6 +270,7 @@ DEPENDENCIES
   rspec
   rspec-rails
   rufus-scheduler
+  safe_yaml (= 0.8.6)
   sass-rails (~> 3.2.3)
   select2-rails
   system_timer
