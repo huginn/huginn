@@ -1,12 +1,12 @@
 development:
-  adapter: mysql2
-  database: huginn_development
-  username: root
-  password:
-  socket: <%= ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>
-  encoding: utf8
-  reconnect: true
-  pool: 5
+  adapter: <%= ENV['DATABASE_ADAPTER'] || "mysql2" %>
+  encoding: <%= ENV['DATABASE_ENCODING'] || "utf8" %>
+  reconnect: <%= ENV['DATABASE_RECONNECT'] || "true" %>
+  database: <%= ENV['DATABASE_NAME'] || "huginn_development" %>
+  pool: <%= ENV['DATABASE_POOL'] || "5" %>
+  username: <%= ENV['DATABASE_USERNAME'] || "root" %>
+  password: <%= ENV['DATABASE_PASSWORD'] || "" %>
+  socket: <%= ENV['DATABASE_SOCKET'] || ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -22,11 +22,11 @@ test:
   pool: 5
 
 production:
-  adapter: mysql2
-  encoding: utf8
-  reconnect: true
-  database: huginn_production
-  pool: 5
-  username: root
-  password: password
-  socket: /var/run/mysqld/mysqld.sock
+  adapter: <%= ENV['DATABASE_ADAPTER'] || "mysql2" %>
+  encoding: <%= ENV['DATABASE_ENCODING'] || "utf8" %>
+  reconnect: <%= ENV['DATABASE_RECONNECT'] || "true" %>
+  database: <%= ENV['DATABASE_NAME'] || "huginn_production" %>
+  pool: <%= ENV['DATABASE_POOL'] || "5" %>
+  username: <%= ENV['DATABASE_USERNAME'] || "root" %>
+  password: <%= ENV['DATABASE_PASSWORD'] || "password" %>
+  socket: <%= ENV['DATABASE_SOCKET'] || ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>

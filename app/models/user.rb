@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :lockable
 
-  INVITATION_CODES = %w[try-huginn]
+  INVITATION_CODES = [ENV['INVITATION_CODE'] || 'try-huginn']
 
   # Virtual attribute for authenticating by either username or email
   # This is in addition to a real persisted field like 'username'

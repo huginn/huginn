@@ -38,12 +38,12 @@ Huginn::Application.configure do
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-      address: "smtp.gmail.com",
-      port: 587,
-      domain: ENV['GOOGLE_APPS_DOMAIN'],
-      authentication: "plain",
-      enable_starttls_auto: true,
-      user_name: ENV['GMAIL_USERNAME'],
-      password: ENV['GMAIL_PASSWORD']
+      address: ENV['SMTP_SERVER'] || 'smtp.gmail.com',
+      port: ENV['SMTP_PORT'] || 587,
+      domain: ENV['SMTP_DOMAIN'],
+      authentication: ENV['SMTP_AUTHENTICATION'] || 'plain',
+      enable_starttls_auto: ENV['SMTP_ENABLE_STARTTLS_AUTO'] == 'true' ? true : false,
+      user_name: ENV['SMTP_USER_NAME'],
+      password: ENV['SMTP_PASSWORD']
   }
 end
