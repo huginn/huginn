@@ -68,7 +68,7 @@ describe Agents::WebsiteAgent do
       rel.save!
       rel.check
       event = Event.last
-      event.payload[:url].should == "http://imgs.xkcd.com/about"
+      event.payload[:url].should == "http://xkcd.com/about"
     end
         
     describe "JSON" do

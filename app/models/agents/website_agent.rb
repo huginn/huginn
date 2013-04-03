@@ -99,6 +99,9 @@ module Agents
           result = {}
           options[:extract].keys.each do |name|
             result[name] = output[name][index]
+            if name.to_s == 'url'
+              result[name] = URI.join( options[:url], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
+            end
           end
 
           if !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result.to_json))
