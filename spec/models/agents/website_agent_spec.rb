@@ -51,6 +51,26 @@ describe Agents::WebsiteAgent do
       event.payload[:title].should =~ /^Biologists play reverse/
     end
 
+    it "should turn relative urls to absolute" do
+      rel_site = {
+        :name => "XKCD",
+        :expected_update_period_in_days => 2,
+        :type => "html",
+        :url => "http://xkcd.com",
+        :mode => :on_change,
+        :extract => {
+            :url => {:css => "#topLeft a", :attr => "href"},
+            :title => {:css => "#topLeft a", :text => "true"}
+        }
+      }
+      rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+      rel.user = users(:bob)
+      rel.save!
+      rel.check
+      event = Event.last
+      event.payload[:url].should == "http://imgs.xkcd.com/about"
+    end
+        
     describe "JSON" do
       it "works with paths" do
         json = {
