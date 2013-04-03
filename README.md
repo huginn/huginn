@@ -39,12 +39,9 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 If you just want to play around, you can simply clone this repository, then perform the following steps:
 
-* Copy .env.example to .env `cp .env.example .env`
-* Edit the configuration options in .env
-* Edit the APP_SECRET_TOKEN environment variable and replace `REPLACE_ME_NOW!` with the output of `rake secret`.
+* Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` variable.
 * Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.
 * Run `foreman start`, visit `http://localhost:5000`, and login with the username of `admin` and the password of `password`.
-* Make some extra Terminal windows and run `bundle exec rails runner bin/schedule.rb`, `bundle exec rails runner bin/twitter_stream.rb`, and `script/delayed_job run` in separate windows.
 * Setup some Agents!
 
 ### Real Start
@@ -70,26 +67,7 @@ Follow these instructions if you wish to deploy your own version of Huginn or co
 
 ## Deployment
 
-Deployment right now is configured with Capistrano, Unicorn, and nginx.  You should feel free to deploy in a different way, however, and please submit your deployment solutions back!
-
-### Required Setup
-
-In your private copy of Huginn, do the following:
-
-* Edit `app/models/user.rb` and change the invitation code(s) in `INVITATION_CODES`.  This controls who can signup to use your installation.
-* Edit `app/mailers/system_mailer.rb` and set your default from address.
-* Edit `config/environments/production.rb` and change the value of `DOMAIN` and the `config.action_mailer.smtp_settings` setup, which is currently setup for sending email through a Google Apps account on Gmail.
-* Setup a place for Huginn to run.  I recommend making a dedicated user on your server for Huginn, but this is not required.  Setup nginx or Apache to proxy pass to unicorn.  There is an example nginx script in `config/nginx/production.conf`.
-* Setup a production MySQL database for your installation.
-* Edit `config/unicorn/production.rb` and replace instances of *you* with the correct username for your server.
-* Edit `config/deploy.rb` and change all instances of `you` and `yourdomain` to the appropriate values for your server setup.  If you want RVM to be used and installed, uncomment the appropriate lines.  Then, run `cap deploy:setup` followed by `cap deploy`.  If everything goes well, this should start some unicorn workers on your server to run the Huginn web app.
-* After deploying with capistrano, SSH into your server, go to the deployment directory, and run `RAILS_ENV=production bundle exec rake db:seed` to generate your admin user.  Immediately login to your new Huginn installation with the username of `admin` and the password of `password` and change your email and password!
-* You'll need to run bin/schedule.rb and bin/twitter_stream.rb in a daemonized way.  I've just been using screen sessions, but please contribute something better!
-
-
-        RAILS_ENV=production bundle exec rails runner bin/schedule.rb
-        RAILS_ENV=production bundle exec rails runner bin/twitter_stream.rb
-
+Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
 ### Optional Setup
 
@@ -110,10 +88,6 @@ You can use [Post Location](https://github.com/cantino/post_location) on your iP
 #### Disable SSL
 
 We assume your deployment will run over SSL. This is a very good idea! However, if you wish to turn this off, you'll probably need to edit `config/initializers/devise.rb` and modify the line containing `config.rememberable_options = { :secure => true }`.  You will also need to edit `config/environments/production.rb` and modify the value of `config.force_ssl`.
-
-#### Setup Backups
-
-Checkout `config/example_backup.rb` for an example script that you can use with the Backup gem.
 
 ## License
 
