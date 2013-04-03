@@ -100,7 +100,7 @@ module Agents
           options[:extract].keys.each do |name|
             result[name] = output[name][index]
             if name.to_s == 'url'
-              result[name] = URI.join( options[:url], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
+              result[name] = URI.join(options[:url], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
             end
           end
 
