@@ -6,6 +6,8 @@ development:
   pool: <%= ENV['DATABASE_POOL'] || "5" %>
   username: <%= ENV['DATABASE_USERNAME'] || "root" %>
   password: <%= ENV['DATABASE_PASSWORD'] || "" %>
+  host: <%= ENV['DATABASE_HOST'] || "" %>
+  port: <%= ENV['DATABASE_PORT'] || "" %>
   socket: <%= ENV['DATABASE_SOCKET'] || ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>
 
 # Warning: The database defined as "test" will be erased and
@@ -29,4 +31,6 @@ production:
   pool: <%= ENV['DATABASE_POOL'] || "5" %>
   username: <%= ENV['DATABASE_USERNAME'] || "root" %>
   password: <%= ENV['DATABASE_PASSWORD'] || "password" %>
+  host: <%= ENV['DATABASE_HOST'] || "" %>
+  port: <%= ENV['DATABASE_PORT'] || "" %>
   socket: <%= ENV['DATABASE_SOCKET'] || ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>
