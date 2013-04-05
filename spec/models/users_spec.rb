@@ -3,14 +3,16 @@ require 'spec_helper'
 describe User do
   describe "validations" do
     describe "invitation_code" do
-      it "should be required and only be valid when set to one of the allowed values" do
-        users(:bob).should be_valid
-        users(:bob).invitation_code = ""
-        users(:bob).should_not be_valid
-        users(:bob).invitation_code = "something_fake"
-        users(:bob).should_not be_valid
-        users(:bob).invitation_code = User::INVITATION_CODES.first
-        users(:bob).should be_valid
+      it "only accepts valid invitation codes" do
+      	User::INVITATION_CODES.each do |v|
+    			should allow_value(v).for(:invitation_code)
+  			end
+      end
+
+      it "can reject invalid invitation codes" do
+      	%w['foo', 'bar'].each do |v|
+    			should_not allow_value(v).for(:invitation_code)
+  			end
       end
     end
   end

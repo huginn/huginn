@@ -48,6 +48,7 @@ end
 group :development, :test do
   gem 'rspec-rails'
   gem 'rspec'
+  gem 'shoulda-matchers'
   gem 'rr'
   gem 'webmock', :require => false
   gem 'rake'
