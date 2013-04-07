@@ -12,11 +12,8 @@ set :deploy_via, :remote_cache
 set :keep_releases, 5
 
 set :bundle_without, [:development]
-set :unicorn_pid, "#{shared_path}/pids/unicorn.pid"
 
-server "yourdomain.com", :app, :delayed_job, :web, :db, :primary => true
-
-set :delayed_job_server_role, :delayed_job
+server "yourdomain.com", :app, :web, :db, :primary => true
 
 set :sync_backups, 3
 
@@ -25,24 +22,41 @@ after 'deploy', 'deploy:cleanup'
 
 set :bundle_without, [:development, :test]
 
-after 'deploy:stop', 'delayed_job:stop'
-after 'deploy:start', 'delayed_job:start'
-after 'deploy:restart', 'delayed_job:restart'
-after 'deploy:update_code', 'deploy:symlink_env_config'
+after 'deploy:update_code', 'deploy:symlink_configs'
+after 'deploy:update', 'foreman:export'
+after 'deploy:update', 'foreman:restart'
 
 namespace :deploy do
-  desc 'Link the environment file from shared/config/.env into the new deploy directory'
-  task :symlink_env_config, :roles => :app do
+  desc 'Link the .env environment and Procfile from shared/config into the new deploy directory'
+  task :symlink_configs, :roles => :app do
     run <<-CMD
       cd #{latest_release} && ln -nfs #{shared_path}/config/.env #{latest_release}/.env
+      cd #{latest_release} && ln -nfs #{shared_path}/config/Procfile #{latest_release}/Procfile
     CMD
   end
 end
 
-# If you want to use command line options, for example to start multiple workers,
-# define a Capistrano variable delayed_job_args:
-#
-#   set :delayed_job_args, "-n 2"
+namespace :foreman do
+  desc "Export the Procfile to Ubuntu's upstart scripts"
+  task :export, :roles => :app do
+    run "cd #{latest_release} && rvmsudo bundle exec foreman export upstart /etc/init -a #{application} -u #{user} -l #{deploy_to}/upstart_logs"
+  end
+
+  desc 'Start the application services'
+  task :start, :roles => :app do
+    sudo "sudo start #{application}"
+  end
+
+  desc 'Stop the application services'
+  task :stop, :roles => :app do
+    sudo "sudo stop #{application}"
+  end
+
+  desc 'Restart the application services'
+  task :restart, :roles => :app do
+    run "sudo start #{application} || sudo restart #{application}"
+  end
+end
 
 # If you want to use rvm on your server and have it maintained by Capistrano, uncomment these lines:
 #   set :rvm_ruby_string, '1.9.3-p286@huginn'
@@ -55,6 +69,4 @@ end
 Dir[File.expand_path("../../lib/capistrano/*.rb", __FILE__)].each{|f| load f }
 
 require "bundler/capistrano"
-require "capistrano-unicorn"
-require "delayed/recipes"
 load 'deploy/assets'

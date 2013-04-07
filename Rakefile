@@ -4,6 +4,9 @@
 
 ENV['SKIP_RAILS_ADMIN_INITIALIZER'] = 'true'
 
+require 'dotenv'
+Dotenv.load
+
 require File.expand_path('../config/application', __FILE__)
 
 Huginn::Application.load_tasks
