@@ -1,3 +1,7 @@
+# This is an example Capistrano deployment script for Huginn.  It
+# assumes you're running on an Ubuntu box and want to use Foreman,
+# Upstart, and Unicorn.
+
 default_run_options[:pty] = true
 
 set :application, "huginn"
@@ -31,6 +35,9 @@ namespace :deploy do
   task :symlink_configs, :roles => :app do
     run <<-CMD
       cd #{latest_release} && ln -nfs #{shared_path}/config/.env #{latest_release}/.env
+    CMD
+
+    run <<-CMD
       cd #{latest_release} && ln -nfs #{shared_path}/config/Procfile #{latest_release}/Procfile
     CMD
   end
