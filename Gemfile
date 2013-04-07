@@ -17,6 +17,7 @@ gem "daemons"
 # gem "delayed_job_web"
 
 gem 'foreman'
+gem 'dotenv-rails', :groups => [:development, :test]
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
