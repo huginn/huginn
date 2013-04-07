@@ -66,6 +66,9 @@ GEM
       railties (~> 3.1)
       warden (~> 1.2.1)
     diff-lcs (1.2.1)
+    dotenv (0.6.0)
+    dotenv-rails (0.6.0)
+      dotenv (= 0.6.0)
     em-http-request (1.0.3)
       addressable (>= 2.2.3)
       cookiejar
@@ -259,6 +262,7 @@ DEPENDENCIES
   delayed_job!
   delayed_job_active_record (~> 0.3.3)
   devise
+  dotenv-rails
   em-http-request
   fastercsv
   foreman
