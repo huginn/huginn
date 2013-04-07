@@ -9,7 +9,7 @@ module Agents
       <<-MD
         The UserLocationAgent creates events based on WebHook POSTS that contain a `latitude` and `longitude`.  You can use the POSTLocation iOS app to post your location.
 
-        Your POST path will be `https://#{DOMAIN}/users/#{user.id}/update_location/:secret` where `:secret` is specified in your options.
+        Your POST path will be `https://#{ENV['DOMAIN']}/users/#{user.id}/update_location/:secret` where `:secret` is specified in your options.
       MD
     end
 
