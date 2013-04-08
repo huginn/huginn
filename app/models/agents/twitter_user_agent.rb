@@ -129,19 +129,6 @@ module Agents
       }
     end
 
-    # def process_tweet(filter, status)
-    #   if options[:generate] == "counts"
-    #     # Avoid memory pollution
-    #     me = Agent.find(id)
-    #     me.memory[:filter_counts] ||= {}
-    #     me.memory[:filter_counts][filter.to_sym] ||= 0
-    #     me.memory[:filter_counts][filter.to_sym] += 1
-    #     me.save!
-    #   else
-    #     create_event :payload => status.merge(:filter => filter.to_s)
-    #   end
-    # end
-
     def check
       Twitter.configure do |config|
         config.consumer_key = options[:consumer_key]
@@ -151,10 +138,8 @@ module Agents
       end
 
       since_id = memory[:since_id] || nil
-      max_id = memory[:max_id] || nil
       opts = {:count => 200, :include_rts => true, :exclude_replies => false, :include_entities => true, :contributor_details => true}
       opts.merge! :since_id => since_id unless since_id.nil?
-      opts.merge! :max_id => max_id unless max_id.nil?
 
       tweets = Twitter.user_timeline(options[:username], opts)
 
@@ -165,13 +150,6 @@ module Agents
       end
 
       save!
-      # if memory[:filter_counts] && memory[:filter_counts].length > 0
-      #   memory[:filter_counts].each do |filter, count|
-      #     create_event :payload => { :filter => filter.to_s, :count => count, :time => Time.now.to_i }
-      #   end
-      #   memory[:filter_counts] = {}
-      #   save!
-      # end
     end
   end
 end
