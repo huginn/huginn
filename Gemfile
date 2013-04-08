@@ -3,7 +3,6 @@ source 'https://rubygems.org'
 gem 'rails'
 gem 'mysql2'
 gem 'devise'
-gem 'safe_yaml', '0.8.6' # Required by rails_admin at the moment.
 gem 'rails_admin'
 gem 'kaminari'
 gem 'bootstrap-kaminari-views'
