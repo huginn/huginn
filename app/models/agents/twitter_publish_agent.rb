@@ -7,7 +7,8 @@ module Agents
     description <<-MD
       The TwitterPublishAgent publishes tweets from the events it receives.
 
-      You must set up a Twitter app and provide it's `consumer_key`, `consumer_secret`, `oauth_token` and `oauth_token_secret`, (Also shown as "Access token" on the Twitter developer's site.) along with the `username` of the Twitter user to publish as.
+      You must set up a Twitter app and provide it's `consumer_key`, `consumer_secret`, `oauth_token` and `oauth_token_secret`,
+      (Also shown as "Access token" on the Twitter developer's site.) along with the `username` of the Twitter user to publish as.
 
       The `oauth_token` and `oauth_token_secret` specified determine which user the tweet will be sent as.
 
@@ -17,7 +18,12 @@ module Agents
     MD
 
     def validate_options
-      unless options[:username].present? && options[:expected_update_period_in_days].present? && options[:consumer_key].present? && options[:consumer_secret].present? && options[:oauth_token].present? && options[:oauth_token_secret].present?
+      unless options[:username].present? &&
+        options[:expected_update_period_in_days].present? &&
+        options[:consumer_key].present? &&
+        options[:consumer_secret].present? &&
+        options[:oauth_token].present? &&
+        options[:oauth_token_secret].present?
         errors.add(:base, "expected_update_period_in_days, username, consumer_key, consumer_secret, oauth_token and oauth_token_secret are required")
       end
     end
@@ -47,9 +53,20 @@ module Agents
         tweet_text = Utils.value_at(event.payload, options[:message_path])
         begin
           publish_tweet tweet_text
-          create_event :payload => {:success => true, :published_tweet => tweet_text, :agent_id => event.agent_id, :event_id => event.id}
+          create_event :payload => {
+            :success => true,
+            :published_tweet => tweet_text,
+            :agent_id => event.agent_id,
+            :event_id => event.id
+          }
         rescue Twitter::Error => e
-          create_event :payload => {:success => false, :error => e.message, :failed_tweet => tweet_text, :agent_id => event.agent_id, :event_id => event.id}
+          create_event :payload => {
+            :success => false,
+            :error => e.message,
+            :failed_tweet => tweet_text,
+            :agent_id => event.agent_id,
+            :event_id => event.id
+          }
         end
       end
     end
