@@ -7,8 +7,9 @@ module Agents
         default_schedule "every_10m"
 
         description <<-MD
-            The TwilioAgent collects any events sent to it and send them via text message. 
-            Add more info
+            The TwilioAgent receives and collects events and send them via text message to cellphone when scheduled. Right now, it is assumed that events have `:message` key, the value of which is sent as the content of the text message.
+            Set `:receiverscell` to the number on which you would like to receive text messages.
+            `:expected_receive_period_in_days` is maximum days that you would expect to pass between events being received by this agent. 
         MD
 
         def default_options
@@ -22,7 +23,7 @@ module Agents
         end
 
         def validate_options
-            errors.add(:base, "account_sid,auth_token,senderscell,receiverscell are all required") unless options[:account_sid].present? && options[:auth_token].present? && options[:senderscell].present? && options[:receiverscell].present? && options[:expected_receive_period_in_days].present?
+            errors.add(:base, "account_sid,auth_token,senderscell,receiverscell,expected_receive_period_in_days are all required") unless options[:account_sid].present? && options[:auth_token].present? && options[:senderscell].present? && options[:receiverscell].present? && options[:expected_receive_period_in_days].present?
         end
 
         def receive(incoming_events)
