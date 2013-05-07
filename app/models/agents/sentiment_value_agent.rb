@@ -10,9 +10,10 @@ module Agents
         event_description <<-MD
             Events look like:
             {
-                :valence   => 4.5
-                :arousal   => 4.5
-                :dominance => 4.5
+                :content   => "The quick brown fox jumps over the lazy dog."
+                :valence   => 6.199999
+                :arousal   => 5.432212
+                :dominance => 4.346312
             }
         MD
 
