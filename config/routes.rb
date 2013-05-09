@@ -16,6 +16,7 @@ Huginn::Application.routes.draw do
   match "/worker_status" => "worker_status#show"
 
   post "/users/:user_id/update_location/:secret" => "user_location_updates#create"
+  post "/users/:user_id/webhooks/:agent_id/:secret" => "webhooks#create"
 
   mount RailsAdmin::Engine => '/admin', :as => 'rails_admin'
 #  match "/delayed_job" => DelayedJobWeb, :anchor => false
