@@ -60,6 +60,11 @@ class Agent < ActiveRecord::Base
     # Implement me in your subclass of Agent.
   end
 
+  def receive_webhook(params)
+    # Implement me in your subclass of Agent.
+    ["not implemented", 404]
+  end
+
   # Implement me in your subclass to decide if your Agent is working.
   def working?
     raise "Implement me in your subclass"
@@ -86,6 +91,13 @@ class Agent < ActiveRecord::Base
 
   def make_message(payload, message = options[:message])
     message.gsub(/<([^>]+)>/) { Utils.value_at(payload, $1) || "??" }
+  end
+
+  def trigger_webhook(params)
+    receive_webhook(params).tap do
+      self.last_webhook_at = Time.now
+      save!
+    end
   end
 
   def set_default_schedule
