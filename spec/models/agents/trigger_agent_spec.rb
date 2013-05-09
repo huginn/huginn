@@ -51,7 +51,7 @@ describe Agents::TriggerAgent do
 
       @checker.should_not be_working # no events have ever been received
       Agents::TriggerAgent.async_receive(@checker.id, [@event.id])
-      @checker.reload.should be_working # no events have ever been received
+      @checker.reload.should be_working # Events received
       three_days_from_now = 3.days.from_now
       stub(Time).now { three_days_from_now }
       @checker.reload.should_not be_working # too much time has passed
