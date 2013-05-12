@@ -44,7 +44,8 @@ module Agents
                     create_event :payload => {:content => content, 
                                               :valence => sent_values[0], 
                                               :arousal => sent_values[1], 
-                                              :dominance => sent_values[2]}
+                                              :dominance => sent_values[2],
+                                              :original_event => event.payload}
                 end
             end
         end
