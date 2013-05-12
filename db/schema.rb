@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130126080736) do
+ActiveRecord::Schema.define(:version => 20130509053743) do
 
   create_table "agents", :force => true do |t|
     t.integer  "user_id"
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(:version => 20130126080736) do
     t.datetime "created_at",                                  :null => false
     t.datetime "updated_at",                                  :null => false
     t.text     "memory",                :limit => 2147483647
+    t.datetime "last_webhook_at"
   end
 
   add_index "agents", ["schedule"], :name => "index_agents_on_schedule"

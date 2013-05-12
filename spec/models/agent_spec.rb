@@ -49,7 +49,7 @@ describe Agent do
     end
   end
 
-  describe "with a mock source" do
+  describe "with an example Agent" do
     class Agents::SomethingSource < Agent
       default_schedule "2pm"
 
