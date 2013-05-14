@@ -35,13 +35,13 @@ module Agents
         end
 
         def translate(text,to,access_token)
-            translate_uri = URI "http://api.microsofttranslator.com/v2/Ajax.svc/Translate"
+            translate_uri = URI 'http://api.microsofttranslator.com/v2/Ajax.svc/Translate'
             params = {
                 :text => text,
                 :to   => to
             }
             translate_uri.query = URI.encode_www_form params
-            request = Net::HTTP::Get.new translate_uri
+            request = Net::HTTP::Get.new translate_uri.request_uri
             request['Authorization'] = "Bearer" + " " + access_token
             http = Net::HTTP.new translate_uri.hostname, translate_uri.port 
             response = http.request request 
@@ -54,18 +54,24 @@ module Agents
             end
         end
 
+        def postform(uri,params)
+            req = Net::HTTP::Post.new(uri.request_uri)
+            req.form_data = params
+            Net::HTTP.start(uri.hostname, uri.port, :use_ssl => true) { |http| http.request(req) }
+        end
+
         def receive(incoming_events)
             auth_uri = URI "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
-            response = Net::HTTP.post_form auth_uri, :client_id => options[:client_id], 
-                                                     :client_secret => options[:client_secret], 
-                                                     :scope => "http://api.microsofttranslator.com", 
-                                                     :grant_type =>  "client_credentials"
+            response = postform auth_uri, :client_id => options[:client_id],
+                                          :client_secret => options[:client_secret],
+                                          :scope => "http://api.microsofttranslator.com",
+                                          :grant_type =>"client_credentials"
             access_token = JSON.parse(response.body)["access_token"]
             incoming_events.each do |event|
                 translated_event = {}
                 options[:content].each_pair do |key,value|
-                    translate_value = Utils.values_at event.payload, value 
-                    translated_event[key] = translate translate_value.first, options[:to], access_token
+                    to_be_translated = Utils.values_at event.payload, value 
+                    translated_event[key] = translate to_be_translated.first, options[:to], access_token
                 end
                 create_event :payload => translated_event
             end
