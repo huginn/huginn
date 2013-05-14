@@ -8,7 +8,7 @@ module Agents
 
         description <<-MD
             The SentimentAgent generates `good-bad` (psychological valence or happiness index), `active-passive` (arousal),
-            and  `strong-weak` (dominance) score. It will output a value between 1 and 9.
+            and  `strong-weak` (dominance) score. It will output a value between 1 and 9. It will only work on English content.
 
             Make sure the content this agent is analyzing have sufficient length to get respectable results.
 

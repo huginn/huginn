@@ -7,7 +7,7 @@ module Agents
     description <<-MD
       The TwilioAgent receives and collects events and sends them via text message when scheduled.
 
-      It is assumed that events have a `:message`, `:text`, or `:sms` key, the value of which is sent as the content of the text message.
+      It is assumed that events have a `:message`, `:text`, or `:sms` key, the value of which is sent as the content of the text message. You can use Event Formatting Agent if your event does not provide these keys.
 
       Set `receiver_cell` to the number to receive text messages and `sender_cell` to the number sending them.
 
