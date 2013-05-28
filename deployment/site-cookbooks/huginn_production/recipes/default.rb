@@ -62,7 +62,7 @@ cookbook_file "home/huginn/huginn/Gemfile" do
 end
 
 cookbook_file "home/huginn/huginn/.env" do
-  source ".env"
+  source ".env.example"
   mode "666"
   owner "huginn"
 end

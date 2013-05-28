@@ -1,3 +1,4 @@
+Make sure you have Vagrant and Virtualbox(Not necessary, if deploying to AWS) installed.
 Install librarian-chef gem
 
     gem install librarian-chef
@@ -7,7 +8,7 @@ And Vagrant plugins
     vagrant plugin install vagrant-aws
     vagrant plugin install vagrant-omnibus
 
-Move to repo directory and run
+Move to `/deployment` and run
 
     librarian-chef install
 
@@ -42,4 +43,3 @@ To terminate ec2 instance:
 Similarly, to destroy VirtualBox VM
 
     vagrant destroy vb
-
