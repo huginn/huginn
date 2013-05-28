@@ -1,0 +1,19 @@
+{
+
+"name" : "huginn_production",
+
+"chef_type" : "role",
+
+"json_class" : "Chef::Role",
+
+"description" : "Huginn Production Environment",
+
+"run_list":[
+             "recipe[git]",
+             "recipe[apt]",
+             "recipe[mysql::server]",
+             "recipe[nodejs::install_from_binary]",
+             "recipe[nginx]",
+             "recipe[huginn_production]"
+           ]
+}

@@ -1,0 +1,18 @@
+{
+
+"name" : "huginn_development",
+
+"chef_type" : "role",
+
+"json_class" : "Chef::Role",
+
+"description" : "Huginn Development Environment",
+
+"run_list":[
+             "recipe[git]",
+             "recipe[apt]",
+             "recipe[mysql::server]",
+             "recipe[nodejs::install_from_binary]",
+             "recipe[huginn_development]"
+           ]
+}

@@ -1,0 +1,63 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Every Vagrant virtual environment requires a box to build off of.
+  config.omnibus.chef_version = :latest
+  config.vm.define :vb do |vb|
+  # vagrant up vb
+    vb.vm.box = "precise32"
+    vb.vm.box_url = "http://files.vagrantup.com/precise32.box"
+    vb.vm.network :forwarded_port, host: 3000, guest: 3000
+
+    vb.vm.provision :chef_solo do |chef|
+      chef.roles_path = "roles"
+      chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
+      chef.add_role("huginn_development")
+      chef.json = {
+    "mysql"=> {
+      "server_root_password" => "",
+      "server_repl_password" => "",
+      "server_debian_password"=> ""
+    },
+    "nginx" => {
+       'init_style' => "upstart"
+    }
+    }
+    end
+  end
+
+  config.vm.define :ec2 do |ec2|
+  # vagrant plugin install vagrant-aws
+  # vagrant plugin install vagrant-omnibus   -- So as to make sure chef is installed on ec2 instance
+  # vagrant up ec2 --provider=aws
+    ec2.vm.box = "dummy"
+    ec2.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+    ec2.vm.provider :aws do |aws, override|
+      aws.access_key_id = ""
+      aws.secret_access_key = ""
+      aws.keypair_name = ""
+      aws.region = "us-east-1"
+      aws.ami = "ami-d0f89fb9"
+
+      override.ssh.username = "ubuntu"
+      override.ssh.private_key_path = ""
+    end
+    ec2.vm.provision :chef_solo do |chef|
+      chef.roles_path = "roles"
+      chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
+      chef.add_role("huginn_production")
+      chef.json = {
+    "mysql"=> {
+      "server_root_password" => "",
+      "server_repl_password" => "",
+      "server_debian_password"=> ""
+    },
+    "nginx" => {
+       'init_style' => "upstart"
+    }
+    }
+    end
+  end
+end
