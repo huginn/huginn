@@ -80,7 +80,9 @@ end
 bash "Setting huginn user with NOPASSWD option" do
   cwd "/etc/sudoers.d"
   code <<-EOH
-    echo 'huginn ALL=(ALL) NOPASSWD:ALL' >> 90-cloudimg-ubuntu
+    touch huginn
+    chmod 0440 huginn 
+    echo "huginn ALL=(ALL) NOPASSWD:ALL" >> huginn
   EOH
 end
 

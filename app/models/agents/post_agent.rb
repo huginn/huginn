@@ -30,11 +30,7 @@ module Agents
         def post_event(uri,event)
             req = Net::HTTP::Post.new(uri.request_uri)
             req.form_data = event
-            if uri.scheme == "https"
-                Net::HTTP.start(uri.hostname, uri.port, :use_ssl => true) { |http| http.request(req) }
-            else
-                Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
-            end
+            Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
         end
 
         def receive(incoming_events)
