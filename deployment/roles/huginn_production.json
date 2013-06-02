@@ -8,6 +8,17 @@
 
 "description" : "Huginn Production Environment",
 
+"default_attributes" : {
+  "mysql": {
+    "server_root_password": "",
+    "server_repl_password": "",
+    "server_debian_password": ""
+  },
+    "nginx" : {
+       "init_style" : "upstart"
+    }
+},
+
 "run_list":[
              "recipe[git]",
              "recipe[apt]",

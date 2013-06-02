@@ -43,16 +43,7 @@ Vagrant.configure("2") do |config|
       chef.roles_path = "roles"
       chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
       chef.add_role("huginn_production")
-      chef.json = {
-    "mysql"=> {
-      "server_root_password" => "",
-      "server_repl_password" => "",
-      "server_debian_password"=> ""
-    },
-    "nginx" => {
-       'init_style' => "upstart"
-    }
-    }
+    
     end
   end
 end

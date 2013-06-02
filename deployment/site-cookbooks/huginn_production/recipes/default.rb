@@ -2,7 +2,6 @@ include_recipe 'apt'
 include_recipe 'build-essential'
 
 user "huginn" do
-  action :create
   system true
   home "/home/huginn"
   password "$6$ZwO6b.6tij$SMa8UIwtESGDxB37NwHsct.gJfXWmmflNbH.oypwJ9y0KkzMkCdw7D14iK7GX9C4CWSEcpGOFUow7p01rQFu5."
@@ -13,65 +12,14 @@ end
 
 group "huginn" do
   members ["huginn"]
-  action :create
 end
 
 %w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8").each do |pkg|
-  package pkg do
-    action :install
-  end
-end
-
-git "/home/huginn/huginn" do
-  repository 'git://github.com/cantino/huginn.git'
-  reference 'master'
-  action :sync
-  user "huginn"
+  package("#{pkg}")
 end
 
 gem_package("rake")
 gem_package("bundle")
-
-cookbook_file "/etc/nginx/nginx.conf" do
-  source "nginx.conf"
-  owner "huginn"
-end
-
-directory "/home/huginn/huginn/tmp" do
-  action :create
-  owner "huginn"
-  recursive true
-end
-
-directory "/home/huginn/huginn/log" do
-  action :create
-  owner "huginn"
-  recursive true
-end
-
-cookbook_file "/home/huginn/huginn/config/unicorn.rb" do
-  source "unicorn.rb"
-  mode "644"
-  owner "huginn"
-end
-
-cookbook_file "home/huginn/huginn/Gemfile" do
-  source "Gemfile"
-  mode "644"
-  owner "huginn"
-end
-
-cookbook_file "home/huginn/huginn/.env" do
-  source ".env.example"
-  mode "666"
-  owner "huginn"
-end
-
-cookbook_file "home/huginn/huginn/Procfile" do
-  source "Procfile"
-  mode "444"
-  owner "huginn"
-end
 
 service "nginx" do
   action :start
@@ -80,24 +28,65 @@ end
 bash "Setting huginn user with NOPASSWD option" do
   cwd "/etc/sudoers.d"
   code <<-EOH
-    touch huginn
-    chmod 0440 huginn 
+    touch huginn && chmod 0440 huginn 
     echo "huginn ALL=(ALL) NOPASSWD:ALL" >> huginn
   EOH
 end
 
-bash "huginn dependencies" do
-  cwd "/home/huginn/huginn"
+deploy "/home/huginn" do
+  repo "https://github.com/cantino/huginn.git"
   user "huginn"
-  code <<-EOH
-    export LANG="en_US.UTF-8"
-    export LC_ALL="en_US.UTF-8"
-    sudo bundle install
-    sed -i s/REPLACE_ME_NOW\!/$(sudo rake secret)/ .env
-    sudo rake db:create
-    sudo rake db:migrate
-    sudo rake db:seed
-    sudo foreman export upstart /etc/init -a huginn -u huginn
-    sudo start huginn
-    EOH
+  environment "RAILS_ENV" => "production"
+  keep_releases 5
+  create_dirs_before_symlink []
+  symlinks "log" => "log"
+  symlink_before_migrate({})
+  rollback_on_error true
+  before_symlink do
+    %w(config log tmp).each do |dir|
+      directory "/home/huginn/shared/#{dir}" do
+      owner "huginn"
+      recursive true
+      end
+    end
+    directory("/home/huginn/shared/tmp/pids")
+    directory("/home/huginn/shared/tmp/sockets")
+    cookbook_file "/etc/nginx/nginx.conf" do
+      source "nginx.conf"
+      owner "huginn"
+    end
+    %w(Procfile unicorn.rb Gemfile).each do |file|
+      cookbook_file "/home/huginn/shared/config/#{file}" do
+      owner "huginn"
+      action :create_if_missing
+      end
+    end
+    cookbook_file "home/huginn/shared/config/.env" do
+    source "env.example"
+    mode "666"
+    owner "huginn"
+    action :create_if_missing
+    end
+  end
+  before_restart do
+    bash "huginn dependencies" do
+      cwd "/home/huginn/current"
+      user "huginn"
+      code <<-EOH
+      export LANG="en_US.UTF-8"
+      export LC_ALL="en_US.UTF-8"
+      ln -nfs /home/huginn/shared/config/Gemfile ./Gemfile
+      ln -nfs /home/huginn/shared/config/Procfile ./Procfile
+      ln -nfs /home/huginn/shared/config/.env ./.env
+      ln -nfs /home/huginn/shared/config/unicorn.rb ./config/unicorn.rb
+      sudo bundle install
+      sed -i s/REPLACE_ME_NOW\!/$(sudo rake secret)/ .env
+      sudo rake db:create
+      sudo rake db:migrate
+      sudo rake db:seed
+      sudo foreman export upstart /etc/init -a huginn -u huginn -l log
+      sudo start huginn
+      EOH
+    end
+  end
 end
