@@ -22,7 +22,8 @@ gem_package("rake")
 gem_package("bundle")
 
 service "nginx" do
-  action :start
+  supports :restart => true, :start => true, :stop => true, :reload => true
+  action :nothing
 end
 
 bash "Setting huginn user with NOPASSWD option" do
@@ -36,26 +37,26 @@ end
 deploy "/home/huginn" do
   repo "https://github.com/cantino/huginn.git"
   user "huginn"
+  group "huginn"
   environment "RAILS_ENV" => "production"
   keep_releases 5
   create_dirs_before_symlink []
   symlinks "log" => "log"
   symlink_before_migrate({})
   rollback_on_error true
+  notifies :enable, "service[nginx]"
+  notifies :start, "service[nginx]"
   before_symlink do
     %w(config log tmp).each do |dir|
       directory "/home/huginn/shared/#{dir}" do
       owner "huginn"
+      group "huginn"
       recursive true
       end
     end
     directory("/home/huginn/shared/tmp/pids")
     directory("/home/huginn/shared/tmp/sockets")
-    cookbook_file "/etc/nginx/nginx.conf" do
-      source "nginx.conf"
-      owner "huginn"
-    end
-    %w(Procfile unicorn.rb Gemfile).each do |file|
+    %w(Procfile unicorn.rb Gemfile nginx.conf).each do |file|
       cookbook_file "/home/huginn/shared/config/#{file}" do
       owner "huginn"
       action :create_if_missing
@@ -72,6 +73,7 @@ deploy "/home/huginn" do
     bash "huginn dependencies" do
       cwd "/home/huginn/current"
       user "huginn"
+      group "huginn"
       code <<-EOH
       export LANG="en_US.UTF-8"
       export LC_ALL="en_US.UTF-8"
@@ -79,6 +81,7 @@ deploy "/home/huginn" do
       ln -nfs /home/huginn/shared/config/Procfile ./Procfile
       ln -nfs /home/huginn/shared/config/.env ./.env
       ln -nfs /home/huginn/shared/config/unicorn.rb ./config/unicorn.rb
+      sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/ 
       sudo bundle install
       sed -i s/REPLACE_ME_NOW\!/$(sudo rake secret)/ .env
       sudo rake db:create
