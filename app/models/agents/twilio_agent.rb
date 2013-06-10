@@ -78,7 +78,6 @@ module Agents
     end
 
     def receive_webhook(params)
-      create_event :payload => params
       if memory[:pending_calls].has_key? params[:secret].to_sym
         response = Twilio::TwiML::Response.new {|r| r.Say memory[:pending_calls][params[:secret].to_sym], :voice => 'woman'}
         memory[:pending_calls].delete params[:secret].to_sym
