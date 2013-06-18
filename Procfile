@@ -1,5 +1,5 @@
 # Procfile for development:
-web: bundle exec rails server
+web: bundle exec rake db:migrate && bundle exec rails server -p $PORT
 schedule: bundle exec rails runner bin/schedule.rb
 twitter: bundle exec rails runner bin/twitter_stream.rb
 dj: bundle exec script/delayed_job run

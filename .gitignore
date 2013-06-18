@@ -20,3 +20,5 @@ pickle-email-*.html
 deployment/tmp
 deployment/cookbooks
 .vagrant
+/manifest.yml
+public/assets/

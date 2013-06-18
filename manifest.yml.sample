@@ -1,0 +1,16 @@
+---
+applications:
+- name: uniquename-huginn
+  memory: 512
+  instances: 1
+  url: ${name}.${target-base}
+  path: .
+  env:
+    APP_SECRET_TOKEN: "${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}"
+    INVITATION_CODE: "try-huginn"
+  services:
+    ${name}-huginn-mysql:
+      label: cleardb
+      provider: cleardb
+      version: n/a
+      plan: spark
