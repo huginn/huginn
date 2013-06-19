@@ -1,3 +1,4 @@
+# encoding: utf-8 
 require "weibo_2"
 
 module Agents
