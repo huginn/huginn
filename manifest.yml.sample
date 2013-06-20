@@ -1,16 +1,26 @@
 ---
+instances: 1
+env:
+  APP_SECRET_TOKEN: "${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}"
+  INVITATION_CODE: "try-huginn"
+services:
+  ${name}-huginn-mysql:
+    label: cleardb
+    provider: cleardb
+    version: n/a
+    plan: spark
+
 applications:
-- name: uniquename-huginn
-  memory: 512
-  instances: 1
-  url: ${name}.${target-base}
-  path: .
-  env:
-    APP_SECRET_TOKEN: "${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}"
-    INVITATION_CODE: "try-huginn"
-  services:
-    ${name}-huginn-mysql:
-      label: cleardb
-      provider: cleardb
-      version: n/a
-      plan: spark
+  web:
+    name: CHANGEME-huginn-web
+    url: CHANGEME-huginn.${target-base}
+    path: .
+    memory: 256M
+    command: "bundle exec rake db:migrate && bundle exec script/delayed_job start && bundle exec rails server -p $PORT"
+  schedule:
+    name: CHANGEME-huginn-schedule
+    url: none
+    path: .
+    command: "bundle exec rails runner bin/schedule.rb"
+    memory: 256M
+    depends-on: web
