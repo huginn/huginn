@@ -100,11 +100,13 @@ GEM
       rails (~> 3.0)
     haml (4.0.2)
       tilt
+    hashie (2.0.5)
     hike (1.2.1)
     http_parser.rb (0.5.3)
     httparty (0.10.2)
       multi_json (~> 1.0)
       multi_xml (>= 0.5.2)
+    httpauth (0.2.0)
     i18n (0.6.1)
     journey (1.0.4)
     jquery-rails (2.2.1)
@@ -137,6 +139,13 @@ GEM
     mysql2 (0.3.11)
     nested_form (0.3.2)
     nokogiri (1.5.9)
+    oauth2 (0.9.1)
+      faraday (~> 0.8)
+      httpauth (~> 0.1)
+      jwt (~> 0.1.4)
+      multi_json (~> 1.0)
+      multi_xml (~> 0.5)
+      rack (~> 1.2)
     orm_adapter (0.4.0)
     polyglot (0.3.3)
     pry (0.9.12)
@@ -187,6 +196,8 @@ GEM
     rdoc (3.12.2)
       json (~> 1.4)
     remotipart (1.0.5)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
     rr (1.0.4)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
@@ -253,6 +264,11 @@ GEM
     webmock (1.11.0)
       addressable (>= 2.2.7)
       crack (>= 0.3.2)
+    weibo_2 (0.1.4)
+      hashie (~> 2.0.4)
+      multi_json (~> 1.7.2)
+      oauth2 (~> 0.9.1)
+      rest-client (~> 1.6.7)
     wunderground (1.0.0)
       addressable
       httparty (> 0.6.0)
@@ -298,4 +314,5 @@ DEPENDENCIES
   typhoeus
   uglifier (>= 1.0.3)
   webmock
+  weibo_2
   wunderground

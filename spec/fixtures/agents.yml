@@ -79,3 +79,16 @@ bob_rain_notifier_agent:
                   }],
                  :message => "Just so you know, it looks like '<conditions>' tomorrow in <zipcode>"
                }.to_yaml.inspect %>
+
+bob_twitter_user_agent:
+  type: Agents::TwitterUserAgent
+  user: bob
+  name: "Bob's Twitter User Watcher"
+  options: <%= {
+      :username => "tectonic",
+      :expected_update_period_in_days => "2",
+      :consumer_key => "---",
+      :consumer_secret => "---",
+      :oauth_token => "---",
+      :oauth_token_secret => "---"
+    }.to_yaml.inspect %>
