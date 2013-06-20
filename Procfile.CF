@@ -1,0 +1,6 @@
+# Procfile for Cloud Foundry production
+web: bundle exec rails server -p $PORT
+schedule: bundle exec rails runner bin/schedule.rb
+twitter: bundle exec rails runner bin/twitter_stream.rb
+migrate_and_dj: bundle exec rake db:migrate && bundle exec script/delayed_job run
+# We're limited to 4 MySQL connections, so we only start delayed_job after db:migrate is done
