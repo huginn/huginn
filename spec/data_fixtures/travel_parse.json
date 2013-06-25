@@ -1,0 +1,19 @@
+{
+    "cost_max": null, 
+    "currency": "USD", 
+    "date_end": 1403740799, 
+    "date_start": 1372032000, 
+    "dest_codes": [
+        "CGX", 
+        "MDW", 
+        "ORD", 
+        "GYY"
+    ], 
+    "duration_max": null, 
+    "origin_codes": [
+        "PDX", 
+        "SLE"
+    ], 
+    "search_url": "http://api.adioso.com/v2/search/fares?currency=USD&date_end=1403740799&date_start=1372032000&dest_codes=CGX%2CMDW%2CORD%2CGYY&origin_codes=PDX%2CSLE", 
+    "segments_max": null
+}
