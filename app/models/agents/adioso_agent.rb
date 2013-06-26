@@ -1,12 +1,12 @@
 module Agents
-  class TravelAgent < Agent
+  class AdiosoAgent < Agent
 
   cannot_receive_events!
 
 	default_schedule "every_1d"
 
   description <<-MD
-		Travel Agent will tell you about the minimum airline prices between a pair of cities, and between a certain period of time.
+		Adioso Agent will tell you about the minimum airline prices between a pair of cities, and between a certain period of time.
     Currency is USD, Please make sure difference between `start_date` and `end_date` is less than 150 days. You will need to contact [Adioso](http://adioso.com/)
 		for `username` and `password`.
   MD
@@ -30,7 +30,7 @@ module Agents
         :to         => "Chicago",
         :username   => "xx",
         :password   => "xx",
-				:expected_update_period_in_days => "2"
+				:expected_update_period_in_days => "1"
       }
     end
 
@@ -39,17 +39,19 @@ module Agents
     end
 
     def validate_options
-			errors.add(:base, "All fields are required") unless options[:start_date].present? && options[:end_date].present? && options[:from].present? && options[:to].present? && options[:username].present? && options[:password].present? && options[:expected_update_period_in_days].present?
+			unless %w[start_date end_date from to username password expected_update_period_in_days].all? { |field| options[field.to_sym].present? }
+				errors.add(:base, "All fields are required")
+			end
 		end
 
-    def datetounixtime(date)
+    def date_to_unix_epoch(date)
       date.to_time.to_i
     end
 
     def check
       auth_options = {:basic_auth => {:username =>options[:username], :password=>options[:password]}}
       parse_response = HTTParty.get "http://api.adioso.com/v2/search/parse?q=#{URI.encode(options[:from])}+to+#{URI.encode(options[:to])}", auth_options
-      fare_request = parse_response["search_url"].gsub /(end=)(\d*)([^\d]*)(\d*)/, "\\1#{datetounixtime(options[:end_date])}\\3#{datetounixtime(options[:start_date])}"
+      fare_request = parse_response["search_url"].gsub /(end=)(\d*)([^\d]*)(\d*)/, "\\1#{date_to_unix_epoch(options[:end_date])}\\3#{date_to_unix_epoch(options[:start_date])}"
       fare = HTTParty.get fare_request, auth_options
 			unless fare["warnings"]
 				event = fare["results"].min {|a,b| a["cost"] <=> b["cost"]}

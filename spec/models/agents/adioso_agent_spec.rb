@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Agents::TravelAgent do
+describe Agents::AdiosoAgent do
 	before do
-		stub_request(:get, /parse/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/travel_parse.json")), :status => 200, :headers => {"Content-Type" => "text/json"})
-		stub_request(:get, /fares/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/travel_fare.json")), :status => 200, :headers => {"Content-Type" => "text/json"})
+		stub_request(:get, /parse/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/adioso_parse.json")), :status => 200, :headers => {"Content-Type" => "text/json"})
+		stub_request(:get, /fares/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/adioso_fare.json")),  :status => 200, :headers => {"Content-Type" => "text/json"})
 		@valid_params = {
 											:start_date => "June 25 2013",
 											:end_date   => "July 15 2013",
@@ -14,7 +14,7 @@ describe Agents::TravelAgent do
 											:expected_update_period_in_days => "2"
 										}
 
-		@checker = Agents::TravelAgent.new(:name => "somename", :options => @valid_params)
+		@checker = Agents::AdiosoAgent.new(:name => "somename", :options => @valid_params)
 		@checker.user = users(:jane)
 		@checker.save!
 	end
