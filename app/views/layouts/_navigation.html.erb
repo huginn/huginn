@@ -8,14 +8,6 @@
 <% end %>
 
 <ul class="nav pull-right">
-  <% if current_user.try(:admin?) %>
-    <li>
-      <%= link_to 'Admin', rails_admin_path %>
-    </li>
-
-    <li class='divider-vertical'></li>
-  <% end %>
-
   <% if user_signed_in? %>
     <li id='job-indicator'>
       <a href="/delayed_job">

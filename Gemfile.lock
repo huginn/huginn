@@ -41,8 +41,6 @@ GEM
     bootstrap-kaminari-views (0.0.2)
       kaminari (>= 0.13)
       rails (>= 3.1)
-    bootstrap-sass (2.3.1.0)
-      sass (~> 3.2)
     bourne (1.4.0)
       mocha (~> 0.13.2)
     builder (3.0.4)
@@ -88,9 +86,6 @@ GEM
       multipart-post (~> 1.1)
     fastercsv (1.5.5)
     ffi (1.3.1)
-    font-awesome-sass-rails (3.0.2.2)
-      railties (>= 3.1.1)
-      sass-rails (>= 3.1.1)
     foreman (0.62.0)
       thor (>= 0.13.6)
     geokit (1.6.5)
@@ -98,8 +93,6 @@ GEM
     geokit-rails3 (0.1.5)
       geokit (~> 1.5)
       rails (~> 3.0)
-    haml (4.0.2)
-      tilt
     hashie (2.0.5)
     hike (1.2.1)
     http_parser.rb (0.5.3)
@@ -112,9 +105,6 @@ GEM
     jquery-rails (2.2.1)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
-    jquery-ui-rails (3.0.1)
-      jquery-rails
-      railties (>= 3.1.0)
     json (1.7.7)
     jsonpath (0.5.1)
       multi_json
@@ -137,7 +127,6 @@ GEM
     multi_xml (0.5.3)
     multipart-post (1.2.0)
     mysql2 (0.3.11)
-    nested_form (0.3.2)
     nokogiri (1.5.9)
     oauth2 (0.9.1)
       faraday (~> 0.8)
@@ -155,9 +144,6 @@ GEM
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
-    rack-pjax (0.7.0)
-      nokogiri (~> 1.5)
-      rack (~> 1.3)
     rack-ssl (1.3.3)
       rack
     rack-test (0.6.2)
@@ -170,21 +156,6 @@ GEM
       activesupport (= 3.2.13)
       bundler (~> 1.0)
       railties (= 3.2.13)
-    rails_admin (0.4.6)
-      bootstrap-sass (~> 2.2)
-      builder (~> 3.0)
-      coffee-rails (~> 3.1)
-      font-awesome-sass-rails (~> 3.0, >= 3.0.0.1)
-      haml (~> 4.0)
-      jquery-rails (~> 2.1)
-      jquery-ui-rails (~> 3.0)
-      kaminari (~> 0.14)
-      nested_form (~> 0.3)
-      rack-pjax (~> 0.6)
-      rails (~> 3.1)
-      remotipart (~> 1.0)
-      safe_yaml (~> 0.6)
-      sass-rails (~> 3.1)
     railties (3.2.13)
       actionpack (= 3.2.13)
       activesupport (= 3.2.13)
@@ -195,7 +166,6 @@ GEM
     rake (10.0.4)
     rdoc (3.12.2)
       json (~> 1.4)
-    remotipart (1.0.5)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rr (1.0.4)
@@ -216,7 +186,6 @@ GEM
       rspec-mocks (~> 2.13.0)
     rufus-scheduler (2.0.18)
       tzinfo (>= 0.3.23)
-    safe_yaml (0.9.0)
     sass (3.2.7)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -298,7 +267,6 @@ DEPENDENCIES
   nokogiri
   pry
   rails
-  rails_admin
   rake
   rr
   rspec

@@ -4,7 +4,6 @@ gem 'rails'
 gem 'rake'
 gem 'mysql2'
 gem 'devise'
-gem 'rails_admin'
 gem 'kaminari'
 gem 'bootstrap-kaminari-views'
 gem "rufus-scheduler", :require => false
