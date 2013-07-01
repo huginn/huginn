@@ -15,7 +15,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Scrape websites and receive emails when they change
 * Track your location over time
 
-Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves.
+Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in \#huginn on Freenode IRC to discuss the project.
 
 ## Examples
 
