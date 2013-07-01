@@ -20,3 +20,4 @@ pickle-email-*.html
 deployment/tmp
 deployment/cookbooks
 .vagrant
+.*un~
