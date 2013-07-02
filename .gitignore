@@ -21,4 +21,3 @@ deployment/tmp
 deployment/cookbooks
 .vagrant
 .*un~
-/bin
