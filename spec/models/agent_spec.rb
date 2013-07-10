@@ -171,6 +171,33 @@ describe Agent do
       end
     end
 
+    describe "creating a new agent and then .receive!" do
+      before do
+        stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
+        stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
+      end
+
+      it "should not backfill events for a newly created agent" do
+        Agent.async_check(agents(:bob_weather_agent).id)
+        Agent.receive!
+        checker = Agents::TriggerAgent.new(:name => "New trigger agent", :options => {
+          :expected_receive_period_in_days => "2",
+          :rules => [{
+            :type => "regex",
+            :value => "rain",
+            :path => "conditions"
+          }],
+          :message => "Just so you know, it looks like '<conditions>' tomorrow in <zipcode>"
+        })
+        checker.user = users(:bob)
+        checker.sources << agents(:bob_weather_agent)
+        checker.save!
+        checker.sources.first.events.count.should be > 0
+        Agent.receive!
+        checker.events.count.should eq(0)
+      end
+    end
+
     describe "validations" do
       it "calls validate_options" do
         agent = Agents::SomethingSource.new(:name => "something")
