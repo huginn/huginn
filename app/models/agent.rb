@@ -26,6 +26,7 @@ class Agent < ActiveRecord::Base
   before_validation :set_default_schedule
   before_validation :unschedule_if_cannot_schedule
   before_save :unschedule_if_cannot_schedule
+  before_create :set_last_checked_event_id
 
   belongs_to :user, :inverse_of => :agents
   has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
@@ -130,6 +131,10 @@ class Agent < ActiveRecord::Base
 
   def can_receive_events?
     !cannot_receive_events?
+  end
+
+  def set_last_checked_event_id
+    self.last_checked_event_id = Event.last.id
   end
 
   # Class Methods
