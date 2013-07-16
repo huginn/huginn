@@ -64,6 +64,12 @@ describe Agent do
 
     class Agents::CannotBeScheduled < Agent
       cannot_be_scheduled!
+
+      def receive(events)
+        events.each do |event|
+          create_event :payload => { :events_received => 1 }
+        end
+      end
     end
 
     before do
@@ -109,31 +115,31 @@ describe Agent do
 
     describe "#create_event" do
       it "should use the checker's user" do
-        @checker = Agents::SomethingSource.new(:name => "something")
-        @checker.user = users(:bob)
-        @checker.save!
+        checker = Agents::SomethingSource.new(:name => "something")
+        checker.user = users(:bob)
+        checker.save!
 
-        @checker.check
-        Event.last.user.should == @checker.user
+        checker.check
+        Event.last.user.should == checker.user
       end
     end
 
     describe ".async_check" do
       it "records last_check_at and calls check on the given Agent" do
-        @checker = Agents::SomethingSource.new(:name => "something")
-        @checker.user = users(:bob)
-        @checker.save!
+        checker = Agents::SomethingSource.new(:name => "something")
+        checker.user = users(:bob)
+        checker.save!
 
-        mock(@checker).check.once {
-          @checker.options[:new] = true
+        mock(checker).check.once {
+          checker.options[:new] = true
         }
 
-        mock(Agent).find(@checker.id) { @checker }
+        mock(Agent).find(checker.id) { checker }
 
-        @checker.last_check_at.should be_nil
-        Agents::SomethingSource.async_check(@checker.id)
-        @checker.reload.last_check_at.should be_within(2).of(Time.now)
-        @checker.reload.options[:new].should be_true # Show that we save options
+        checker.last_check_at.should be_nil
+        Agents::SomethingSource.async_check(checker.id)
+        checker.reload.last_check_at.should be_within(2).of(Time.now)
+        checker.reload.options[:new].should be_true # Show that we save options
       end
     end
 
@@ -149,7 +155,7 @@ describe Agent do
         Agent.receive!
       end
 
-      it "should track when events have been seen and not see them again" do
+      it "should track when events have been seen and not received them again" do
         mock.any_instance_of(Agents::TriggerAgent).receive(anything).once
         Agent.async_check(agents(:bob_weather_agent).id)
         Agent.receive!
@@ -171,30 +177,27 @@ describe Agent do
       end
     end
 
-    describe "creating a new agent and then .receive!" do
-      before do
-        stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
-        stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
-      end
-
+    describe "creating a new agent and then calling .receive!" do
       it "should not backfill events for a newly created agent" do
-        Agent.async_check(agents(:bob_weather_agent).id)
+        Event.delete_all
+        sender = Agents::SomethingSource.new(:name => "Sending Agent")
+        sender.user = users(:bob)
+        sender.save!
+        sender.create_event :payload => {}
+        sender.create_event :payload => {}
+        sender.events.count.should == 2
+
+        receiver = Agents::CannotBeScheduled.new(:name => "Receiving Agent")
+        receiver.user = users(:bob)
+        receiver.sources << sender
+        receiver.save!
+
+        receiver.events.count.should == 0
         Agent.receive!
-        checker = Agents::TriggerAgent.new(:name => "New trigger agent", :options => {
-          :expected_receive_period_in_days => "2",
-          :rules => [{
-            :type => "regex",
-            :value => "rain",
-            :path => "conditions"
-          }],
-          :message => "Just so you know, it looks like '<conditions>' tomorrow in <zipcode>"
-        })
-        checker.user = users(:bob)
-        checker.sources << agents(:bob_weather_agent)
-        checker.save!
-        checker.sources.first.events.count.should be > 0
+        receiver.events.count.should == 0
+        sender.create_event :payload => {}
         Agent.receive!
-        checker.events.count.should eq(0)
+        receiver.events.count.should == 1
       end
     end
 
