@@ -7,10 +7,10 @@ module Agents
     description <<-MD
       The TwitterPublishAgent publishes tweets from the events it receives.
 
-      You must set up a Twitter app and provide it's `consumer_key`, `consumer_secret`, `oauth_token` and `oauth_token_secret`,
-      (Also shown as "Access token" on the Twitter developer's site.) along with the `username` of the Twitter user to publish as.
+      You [must set up a Twitter app](https://github.com/cantino/huginn/wiki/Getting-a-twitter-oauth-token) and provide it's `consumer_key`, `consumer_secret`, `oauth_token` and `oauth_token_secret`,
+      (also knows as "Access token" on the Twitter developer's site), along with the `username` of the Twitter user to publish as.
 
-      The `oauth_token` and `oauth_token_secret` specified determine which user the tweet will be sent as.
+      The `oauth_token` and `oauth_token_secret` determine which user the tweet will be sent as.
 
       You must also specify a `message_path` parameter: a [JSONPaths](http://goessner.net/articles/JsonPath/) to the value to tweet.
 

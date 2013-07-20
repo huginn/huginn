@@ -5,8 +5,10 @@ module Agents
     description <<-MD
       The TwitterStreamAgent follows the Twitter stream in real time, watching for certain keywords, or filters, that you provide.
 
-      You must provide a `twitter_username` and `twitter_password`, as well as an array of `filters`.  Multiple words in a filter
+      You must provide an oAuth `consumer_key`, `consumer_secret`, `access_key`, and `access_secret`, as well as an array of `filters`.  Multiple words in a filter
       must all show up in a tweet, but are independent of order.
+
+      To get oAuth credentials for Twitter, [follow these instructions](https://github.com/cantino/huginn/wiki/Getting-a-twitter-oauth-token).
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -46,8 +48,14 @@ module Agents
     default_schedule "11pm"
 
     def validate_options
-      unless options[:twitter_username].present? && options[:twitter_password].present? && options[:filters].present? && options[:expected_update_period_in_days].present? && options[:generate].present?
-        errors.add(:base, "expected_update_period_in_days, generate, twitter_username, twitter_password, and filters are required")
+      unless options[:consumer_key].present? &&
+             options[:consumer_secret].present? &&
+             options[:access_key].present? &&
+             options[:access_secret].present? &&
+             options[:filters].present? &&
+             options[:expected_update_period_in_days].present? &&
+             options[:generate].present?
+        errors.add(:base, "expected_update_period_in_days, generate, consumer_key, consumer_secret, access_key, access_secret, and filters are required fields")
       end
     end
 
@@ -57,8 +65,10 @@ module Agents
 
     def default_options
       {
-          :twitter_username => "---",
-          :twitter_password => "---",
+          :consumer_key => "---",
+          :consumer_secret => "---",
+          :access_key => "---",
+          :access_secret => "---",
           :filters => %w[keyword1 keyword2],
           :expected_update_period_in_days => "2",
           :generate => "events"
