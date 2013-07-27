@@ -53,7 +53,7 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 
 Follow these instructions if you wish to deploy your own version of Huginn or contribute back to the project.  GitHub doesn't make it easy to work with private forks of public repositories, so I recommend that you follow the following steps:
 
-* Make a public fork of Huginn
+* Make a public fork of Huginn. If you can't create private Github repositories, you can skip the steps below. Just follow the *Quick Start* steps above and make pull requests when you want to contribute a patch. 
 * Make a private, empty GitHub repository called `huginn-private`
 * Duplicate your public fork into your new private repository (via [GitHub's instructions](https://help.github.com/articles/duplicating-a-repository)):
 
