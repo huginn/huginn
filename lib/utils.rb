@@ -1,4 +1,5 @@
 require 'jsonpath'
+require 'cgi'
 
 module Utils
   # Unindents if the indentation is 2 or more characters.
@@ -22,6 +23,18 @@ module Utils
   end
 
   def self.values_at(data, path)
-    JsonPath.new(path, :allow_eval => false).on(data.is_a?(String) ? data : data.to_json)
+    if path =~ /\Aescape /
+      path.gsub!(/\Aescape /, '')
+      escape = true
+    else
+      escape = false
+    end
+
+    result = JsonPath.new(path, :allow_eval => false).on(data.is_a?(String) ? data : data.to_json)
+    if escape
+      result.map {|r| CGI::escape r }
+    else
+      result
+    end
   end
 end

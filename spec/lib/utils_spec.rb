@@ -24,5 +24,9 @@ describe Utils do
       Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "foo[*].bar").should == %w[baz bing]
       Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "foo[*].bar").should == %w[baz bing]
     end
+
+    it "should allow escaping" do
+      Utils.values_at({ :foo => { :bar => "escape this!?" }}, "escape $.foo.bar").should == ["escape+this%21%3F"]
+    end
   end
 end
