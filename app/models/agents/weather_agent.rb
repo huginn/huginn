@@ -14,26 +14,24 @@ module Agents
       Events look like this:
 
           {
-            :zipcode => 12345,
-            :date => { :epoch=>"1357959600", :pretty=>"10:00 PM EST on January 11, 2013" },
-            :high => { :fahrenheit=>"64", :celsius=>"18" },
-            :low => { :fahrenheit=>"52", :celsius=>"11" },
-            :conditions => "Rain Showers",
-            :icon=>"rain",
-            :icon_url => "http://icons-ak.wxug.com/i/c/k/rain.gif",
-            :skyicon => "mostlycloudy",
-            :pop => 80,
-            :qpf_allday => { :in=>0.24, :mm=>6.1 },
-            :qpf_day => { :in=>0.13, :mm=>3.3 },
-            :qpf_night => { :in=>0.03, :mm=>0.8 },
-            :snow_allday => { :in=>0, :cm=>0 },
-            :snow_day => { :in=>0, :cm=>0 },
-            :snow_night => { :in=>0, :cm=>0 },
-            :maxwind => { :mph=>15, :kph=>24, :dir=>"SSE", :degrees=>160 },
-            :avewind => { :mph=>9, :kph=>14, :dir=>"SSW", :degrees=>194 },
-            :avehumidity => 85,
-            :maxhumidity => 93,
-            :minhumidity => 63
+            "zipcode": 12345,
+            "date": {
+              "epoch": "1357959600",
+              "pretty": "10:00 PM EST on January 11, 2013"
+            },
+            "high": {
+              "fahrenheit": "64",
+              "celsius": "18"
+            },
+            "low": {
+              "fahrenheit": "52",
+              "celsius": "11"
+            },
+            "conditions": "Rain Showers",
+            "icon": "rain",
+            "icon_url": "http://icons-ak.wxug.com/i/c/k/rain.gif",
+            "skyicon": "mostlycloudy",
+            ...
           }
     MD
 

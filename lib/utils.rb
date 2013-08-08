@@ -2,9 +2,23 @@ require 'jsonpath'
 require 'cgi'
 
 module Utils
-  # Unindents if the indentation is 2 or more characters.
   def self.unindent(s)
-    s.gsub(/^#{s.scan(/^\s+/).select {|i| i.length > 1 }.min_by{|l|l.length}}/, "")
+    s = s.gsub(/\t/, '  ').chomp
+    min = ((s.split("\n").find {|l| l !~ /^\s*$/ })[/^\s+/, 0] || "").length
+    if min > 0
+      s.gsub(/^#{" " * min}/, "")
+    else
+      s
+    end
+  end
+
+  def self.pretty_print(struct, indent = true)
+    output = JSON.pretty_generate(struct)
+    if indent
+      output.gsub(/\n/i, "\n    ").tap { |a| p a }
+    else
+      output
+    end
   end
 
   def self.recursively_symbolize_keys(object)

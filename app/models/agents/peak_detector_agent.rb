@@ -17,9 +17,14 @@ module Agents
     MD
 
     event_description <<-MD
-      Events look like this:
+      Events look like:
 
-          { :message => "Your message", :peak => 6, :peak_time => 3456789242, :grouped_by => "something" }
+          {
+            "message": "Your message",
+            "peak": 6,
+            "peak_time": 3456789242,
+            "grouped_by": "something"
+          }
     MD
 
     def validate_options
@@ -69,13 +74,13 @@ module Agents
         if newest_value < second_newest_value && second_newest_value > average_value + std_multiple * standard_deviation
           memory[:peaks][group] << second_newest_time
           memory[:peaks][group].reject! { |p| p <= second_newest_time - window_duration }
-          create_event :payload => { :message => options[:message], :peak => second_newest_value, :peak_time => second_newest_time, :grouped_by => group.to_s }
+          create_event :payload => {:message => options[:message], :peak => second_newest_value, :peak_time => second_newest_time, :grouped_by => group.to_s}
         end
       end
     end
 
     def stats_for(group, options = {})
-      data = memory[:data][group].map {|d| d.first.to_f }
+      data = memory[:data][group].map { |d| d.first.to_f }
       data = data[0...(memory[:data][group].length - (options[:skip_last] || 0))]
       length = data.length.to_f
       mean = 0

@@ -44,9 +44,7 @@ module Agents
           }
     MD
 
-    event_description <<-MD
-      User defined
-    MD
+    event_description "User defined"
 
     def validate_options
       errors.add(:base, "instructions, mode, skip_agent, and skip_created_at all need to be present.") unless options[:instructions].present? and options[:mode].present? and options[:skip_agent].present? and options[:skip_created_at].present?

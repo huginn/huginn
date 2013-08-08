@@ -14,13 +14,17 @@ module Agents
     event_description <<-MD
       If flights are present then events look like:
 
-  		    { "cost" : 75.23,
-            "date" : "June 25, 2013",
-  			    "route" : "New York to Chicago" }
+          {
+            "cost": 75.23,
+            "date": "June 25, 2013",
+  			    "route": "New York to Chicago"
+          }
 
       otherwise
     
-          { "nonetodest" : "No flights found to the specified destination" }
+          {
+            "nonetodest": "No flights found to the specified destination"
+          }
     MD
 
     def default_options

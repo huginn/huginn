@@ -36,11 +36,7 @@ module Agents
     MD
 
     event_description do
-      <<-MD
-      Events will have the fields you specified.  Your options look like:
-
-          #{PP.pp(options[:extract], "")}
-      MD
+      "Events will have the fields you specified.  Your options look like:\n\n    #{Utils.pretty_print options[:extract]}"
     end
 
     default_schedule "every_12h"

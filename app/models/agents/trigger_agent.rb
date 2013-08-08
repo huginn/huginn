@@ -19,7 +19,7 @@ module Agents
     event_description <<-MD
       Events look like this:
 
-          { :message => "Your message" }
+          { "message": "Your message" }
     MD
 
     def validate_options

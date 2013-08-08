@@ -212,7 +212,7 @@ JSONEditor.prototype.showFunctionButtons = function(insider) {
     }).text('Redo')).append($('<a id="toggle_view" href="#" style="padding-right: 10px;"></a>').click(function() {
       self.toggleBuilder();
       return false;
-    }).text('Toggle View').css("float", "right"));
+    }).text('Toggle View'));
     this.container.prepend(this.functionButtons);
     this.container.height(this.container.height() + this.functionButtons.height() + 5);
   }

@@ -2,7 +2,10 @@
   <div class='row'>
     <div class='span12'>
       <div class="page-header">
-        <h2>Editing your <%= @agent.short_type %></h2>
+        <h2>
+          Editing your <%= @agent.short_type %>
+          <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
+        </h2>
       </div>
 
       <%= render 'form' %>

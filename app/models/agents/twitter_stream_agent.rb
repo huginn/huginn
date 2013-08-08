@@ -19,30 +19,33 @@ module Agents
       When in `counts` mode, TwitterStreamAgent events look like:
 
           {
-            :filter => "hello world",
-            :count => 25,
-            :time => 3456785456
+            "filter": "hello world",
+            "count": 25,
+            "time": 3456785456
           }
 
       When in `events` mode, TwitterStreamAgent events look like:
 
-          { :filter=>"selectorgadget",
+          {
+            "filter": "selectorgadget",
              ... every Tweet field, including ...
-           :text=> "something",
-           :user=>
-            { :name=>"Mr. Someone",
-              :screen_name=>"Someone",
-              :location=>"Vancouver BC Canada",
-              :description=> "...",
-              :followers_count=>486,
-              :friends_count=>1983,
-              :created_at=>"Mon Aug 29 23:38:14 +0000 2011",
-              :time_zone=>"Pacific Time (US & Canada)",
-              :statuses_count=>3807,
-              :lang=>"en" },
-           :retweet_count=>0,
-           :entities=> ...
-           :lang=>"en" }
+            "text": "something",
+            "user": {
+              "name": "Mr. Someone",
+              "screen_name": "Someone",
+              "location": "Vancouver BC Canada",
+              "description":  "...",
+              "followers_count": 486,
+              "friends_count": 1983,
+              "created_at": "Mon Aug 29 23:38:14 +0000 2011",
+              "time_zone": "Pacific Time (US & Canada)",
+              "statuses_count": 3807,
+              "lang": "en"
+            },
+            "retweet_count": 0,
+            "entities": ...
+            "lang": "en"
+          }
     MD
 
     default_schedule "11pm"
