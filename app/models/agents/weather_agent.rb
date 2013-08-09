@@ -1,11 +1,14 @@
 require 'date'
+require 'cgi'
 
 module Agents
   class WeatherAgent < Agent
     cannot_receive_events!
 
     description <<-MD
-      The WeatherAgent creates an event for the following day's weather at `zipcode`.
+      The WeatherAgent creates an event for the following day's weather at a given `location`.
+
+      The `location` can be a US zipcode, or any location that Wunderground supports.  To find one, search [wunderground.com](http://wunderground.com) and copy the location part of the URL.  For example, a result for San Francisco gives `http://www.wunderground.com/US/CA/San_Francisco.html` and London, England gives `http://www.wunderground.com/q/zmw:00000.1.03772`.  The locations in each are `US/CA/San_Francisco` and `zmw:00000.1.03772`, respectively.
 
       You must setup an [API key for Wunderground](http://www.wunderground.com/weather/api/) in order to use this Agent.
     MD
@@ -14,7 +17,7 @@ module Agents
       Events look like this:
 
           {
-            "zipcode": 12345,
+            "location": 12345,
             "date": {
               "epoch": "1357959600",
               "pretty": "10:00 PM EST on January 11, 2013"
@@ -52,21 +55,20 @@ module Agents
     def default_options
       {
         :api_key => "your-key",
-        :zipcode => "94103"
+        :location => "94103"
       }
-
     end
 
     def validate_options
-      errors.add(:base, "zipcode is required") unless options[:zipcode].present?
+      errors.add(:base, "location is required") unless options[:location].present? || options[:zipcode].present?
       errors.add(:base, "api_key is required") unless options[:api_key].present?
     end
 
     def check
       if key_setup?
-        wunderground.forecast_for(options[:zipcode])["forecast"]["simpleforecast"]["forecastday"].each do |day|
+        wunderground.forecast_for(options[:location] || options[:zipcode])["forecast"]["simpleforecast"]["forecastday"].each do |day|
           if is_tomorrow?(day)
-            create_event :payload => day.merge(:zipcode => options[:zipcode])
+            create_event :payload => day.merge(:location => options[:location] || options[:zipcode])
           end
         end
       end

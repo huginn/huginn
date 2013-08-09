@@ -34,7 +34,7 @@ bob_weather_agent:
   schedule: "midnight"
   name: "SF Weather"
   options: <%= {
-                 :zipcode => 94102,
+                 :location => 94102,
                  :lat => 37.779329,
                  :lng => -122.41915,
                  :api_key => 'test'
@@ -46,7 +46,7 @@ jane_weather_agent:
   schedule: "midnight"
   name: "SF Weather"
   options: <%= {
-                 :zipcode => 94103,
+                 :location => 94103,
                  :lat => 37.779329,
                  :lng => -122.41915,
                  :api_key => 'test'
@@ -63,7 +63,7 @@ jane_rain_notifier_agent:
                    :value => "rain",
                    :path => "conditions"
                  }],
-                 :message => "Just so you know, it looks like '<conditions>' tomorrow in <zipcode>"
+                 :message => "Just so you know, it looks like '<conditions>' tomorrow in <location>"
                }.to_yaml.inspect %>
 
 bob_rain_notifier_agent:
@@ -77,7 +77,7 @@ bob_rain_notifier_agent:
                    :value => "rain",
                    :path => "conditions"
                   }],
-                 :message => "Just so you know, it looks like '<conditions>' tomorrow in <zipcode>"
+                 :message => "Just so you know, it looks like '<conditions>' tomorrow in <location>"
                }.to_yaml.inspect %>
 
 bob_twitter_user_agent:
