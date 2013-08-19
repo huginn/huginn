@@ -24,7 +24,7 @@
     <div class="control-group type-select">
       <%= f.label :type, :class => 'control-label' %>
       <div class="controls">
-        <%= f.select :type, options_for_select(Agent.types.map {|type| [type.to_s.gsub(/^.*::/, ''), type.to_s] }, @agent.type), {}, :class => 'span4 select2' %>
+        <%= f.select :type, options_for_select(Agent.types.map(&:to_s).sort.map {|type| [type.gsub(/^.*::/, ''), type] }, @agent.type), {}, :class => 'span4 select2' %>
       </div>
     </div>
   <% end %>
