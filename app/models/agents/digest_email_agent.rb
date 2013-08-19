@@ -37,30 +37,28 @@ module Agents
 
     def check
       if self.memory[:queue] && self.memory[:queue].length > 0
-        lines = self.memory[:queue].map {|item| present(item) }
+        groups = self.memory[:queue].map { |payload| present(payload) }
         puts "Sending mail to #{user.email}..." unless Rails.env.test?
-        SystemMailer.delay.send_message(:to => user.email, :subject => options[:subject], :headline => options[:headline], :lines => lines)
+        SystemMailer.delay.send_message(:to => user.email, :subject => options[:subject], :headline => options[:headline], :groups => groups)
         self.memory[:queue] = []
       end
     end
 
-    def present(item)
-      if item.is_a?(Hash)
+    def present(payload)
+      if payload.is_a?(Hash)
+        payload = ActiveSupport::HashWithIndifferentAccess.new(payload)
         MAIN_KEYS.each do |key|
-          if item.has_key?(key)
-            return "#{item[key]}" + ((item.length > 1 && item.length < 5) ? " (#{present_hash item, key})" : "")
-          elsif item.has_key?(key.to_s)
-            return "#{item[key.to_s]}" + ((item.length > 1 && item.length < 5) ? " (#{present_hash item, key.to_s})" : "")
-          end
+          return { :title => payload[key].to_s, :entries => present_hash(payload, key) } if payload.has_key?(key)
         end
-        present_hash item
+
+        { :title => "Event", :entries => present_hash(payload) }
       else
-        item.to_s
+        { :title => payload.to_s, :entries => [] }
       end
     end
 
     def present_hash(hash, skip_key = nil)
-      hash.to_a.sort_by {|a| a.first.to_s }.map { |k, v| "#{k}: #{v}" unless [skip_key].include?(k) }.compact.to_sentence
+      hash.to_a.sort_by {|a| a.first.to_s }.map { |k, v| "#{k}: #{v}" unless k.to_s == skip_key.to_s }.compact
     end
   end
 end
