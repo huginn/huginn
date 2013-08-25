@@ -51,7 +51,7 @@ table.events {
   margin-left: 0 !important;
 }
 
-#job-indicator {
+#job-indicator, #event-indicator {
   display: none;
 }
 
@@ -84,4 +84,29 @@ img.spinner {
 
 .show-view {
   overflow: hidden;
+}
+
+// Flash
+
+.flash {
+  position: fixed;
+  width: 500px;
+  z-index: 99999;
+  top: 1px;
+  margin-left: 250px;
+
+  .alert {
+  }
+}
+
+// Logs
+
+#logs .action-icon {
+  height: 16px;
+  display: inline-block;
+  vertical-align: inherit;
+
+  &.refresh {
+    margin: 0 10px;
+  }
 }

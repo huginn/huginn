@@ -8,10 +8,6 @@
 #= require ./worker-checker
 #= require_self
 
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
-
 setupJsonEditor = ->
   JSONEditor.prototype.ADD_IMG = '<%= image_path 'json-editor/add.png' %>'
   JSONEditor.prototype.DELETE_IMG = '<%= image_path 'json-editor/delete.png' %>'
@@ -48,12 +44,43 @@ showEventDescriptions = ->
     $(".event-descriptions").html("").hide()
 
 $(document).ready ->
+  # JSON Editor
   setupJsonEditor()
+
+  # Select2 Selects
   $(".select2").select2(width: 'resolve')
 
-  if $(".top-flash").length
-    setTimeout((-> $(".top-flash").slideUp(-> $(".top-flash").remove())), 5000)
+  # Flash
+  if $(".flash").length
+    setTimeout((-> $(".flash").slideUp(-> $(".flash").remove())), 5000)
 
+  # Agent Show
+  fetchLogs = (e) ->
+    agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
+    e.preventDefault()
+    $("#logs .spinner").show()
+    $("#logs .refresh, #logs .clear").hide()
+    $.get "/agents/#{agentId}/logs", (html) =>
+      $("#logs .logs").html html
+      $("#logs .spinner").stop(true, true).fadeOut ->
+        $("#logs .refresh, #logs .clear").show()
+
+  clearLogs = (e) ->
+    if confirm("Are you sure you want to clear all logs for this Agent?")
+      agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
+      e.preventDefault()
+      $("#logs .spinner").show()
+      $("#logs .refresh, #logs .clear").hide()
+      $.post "/agents/#{agentId}/logs/clear", { "_method": "DELETE" }, (html) =>
+        $("#logs .logs").html html
+        $("#logs .spinner").stop(true, true).fadeOut ->
+          $("#logs .refresh, #logs .clear").show()
+
+  $(".agent-show #show-tabs a[href='#logs']").on "click", fetchLogs
+  $("#logs .refresh").on "click", fetchLogs
+  $("#logs .clear").on "click", clearLogs
+
+  # Editing Agents
   $("#agent_source_ids").on "change", showEventDescriptions
 
   $("#agent_type").on "change", ->

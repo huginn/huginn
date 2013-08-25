@@ -1,0 +1,15 @@
+log_for_jane_website_agent:
+  agent: jane_website_agent
+  message: "fetching some website data"
+
+log_for_bob_website_agent:
+  agent: bob_website_agent
+  message: "fetching some other website data"
+
+first_log_for_bob_weather_agent:
+  agent: bob_weather_agent
+  message: "checking the weather"
+
+second_log_for_bob_weather_agent:
+  agent: bob_weather_agent
+  message: "checking the weather again"

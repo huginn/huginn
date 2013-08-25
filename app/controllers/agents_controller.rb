@@ -9,8 +9,13 @@ class AgentsController < ApplicationController
   end
 
   def run
-    Agent.async_check(current_user.agents.find(params[:id]).id)
-    redirect_to agents_path, notice: "Agent run queued"
+    agent = current_user.agents.find(params[:id])
+    Agent.async_check(agent.id)
+    if params[:return] == "show"
+      redirect_to agent_path(agent), notice: "Agent run queued"
+    else
+      redirect_to agents_path, notice: "Agent run queued"
+    end
   end
 
   def type_details
