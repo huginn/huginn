@@ -12,10 +12,21 @@ describe EventsController do
       get :index
       assigns(:events).all? {|i| i.user.should == users(:bob) }.should be_true
     end
+
+    it "can filter by Agent" do
+      sign_in users(:bob)
+      get :index, :agent => agents(:bob_website_agent)
+      assigns(:events).length.should == agents(:bob_website_agent).events.length
+      assigns(:events).all? {|i| i.agent.should == agents(:bob_website_agent) }.should be_true
+
+      lambda {
+        get :index, :agent => agents(:jane_website_agent)
+      }.should raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 
   describe "GET show" do
-    it "only shows Agents for the current user" do
+    it "only shows Events for the current user" do
       sign_in users(:bob)
       get :show, :id => events(:bob_website_agent_event).to_param
       assigns(:event).should eq(events(:bob_website_agent_event))

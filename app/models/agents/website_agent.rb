@@ -66,29 +66,38 @@ module Agents
 
     def check
       hydra = Typhoeus::Hydra.new
+      log "Fetching #{options[:url]}"
       request = Typhoeus::Request.new(options[:url], :followlocation => true)
-      request.on_complete do |response|
+      request.on_failure do |response|
+        log "Failed: #{response.inspect}"
+      end
+      request.on_success do |response|
         doc = parse(response.body)
         output = {}
         options[:extract].each do |name, extraction_details|
-          if extraction_type == "json"
-            output[name] = Utils.values_at(doc, extraction_details[:path])
-          else
-            output[name] = doc.css(extraction_details[:css]).map { |node|
-              if extraction_details[:attr]
-                node.attr(extraction_details[:attr])
-              elsif extraction_details[:text]
-                node.text()
-              else
-                raise StandardError, ":attr or :text is required on HTML or XML extraction patterns"
-              end
-            }
-          end
+          result = if extraction_type == "json"
+                     output[name] = Utils.values_at(doc, extraction_details[:path])
+                   else
+                     output[name] = doc.css(extraction_details[:css]).map { |node|
+                       if extraction_details[:attr]
+                         node.attr(extraction_details[:attr])
+                       elsif extraction_details[:text]
+                         node.text()
+                       else
+                         log ":attr or :text is required on HTML or XML extraction patterns"
+                         return
+                       end
+                     }
+                   end
+          log "Extracting #{extraction_type} at #{extraction_details[:path] || extraction_details[:css]}: #{result}"
         end
 
         num_unique_lengths = options[:extract].keys.map { |name| output[name].length }.uniq
 
-        raise StandardError, "Got an uneven number of matches for #{options[:name]}: #{options[:extract].inspect}" unless num_unique_lengths.length == 1
+        if num_unique_lengths.length != 1
+          log "Got an uneven number of matches for #{options[:name]}: #{options[:extract].inspect}", :level => 4
+          return
+        end
 
         previous_payloads = events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options[:mode].to_s == "on_change"
         num_unique_lengths.first.times do |index|
@@ -101,7 +110,7 @@ module Agents
           end
 
           if !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result.to_json))
-            Rails.logger.info "Storing new result for '#{name}': #{result.inspect}"
+            log "Storing new result for '#{name}': #{result.inspect}"
             create_event :payload => result
           end
         end

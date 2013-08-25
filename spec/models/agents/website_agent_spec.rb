@@ -35,11 +35,10 @@ describe Agents::WebsiteAgent do
     end
 
     it "should log an error if the number of results for a set of extraction patterns differs" do
-      lambda {
-        @site[:extract][:url][:css] = "div"
-        @checker.options = @site
-        @checker.check
-      }.should raise_error(StandardError, /Got an uneven number of matches/)
+      @site[:extract][:url][:css] = "div"
+      @checker.options = @site
+      @checker.check
+      @checker.logs.first.message.should =~ /Got an uneven number of matches/
     end
   end
 

@@ -1,0 +1,19 @@
+class LogsController < ApplicationController
+  before_filter :load_agent
+
+  def index
+    @logs = @agent.logs.all
+    render :action => :index, :layout => false
+  end
+
+  def clear
+    @agent.logs.delete_all
+    index
+  end
+
+  protected
+
+  def load_agent
+    @agent = current_user.agents.find(params[:agent_id])
+  end
+end

@@ -48,7 +48,7 @@
                   <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-mini" %>
                   <%= link_to 'Delete', agent_path(agent), method: :delete, data: {confirm: 'Are you sure?'}, class: "btn btn-mini" %>
                   <% if agent.can_be_scheduled? %>
-                      <%= link_to 'Run', run_agent_path(agent), method: :post, class: "btn btn-mini" %>
+                      <%= link_to 'Run', run_agent_path(agent, :return => "index"), method: :post, class: "btn btn-mini" %>
                   <% else %>
                       <%= link_to 'Run', "#", class: "btn btn-mini disabled" %>
                   <% end %>

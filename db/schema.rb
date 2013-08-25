@@ -11,7 +11,17 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130509053743) do
+ActiveRecord::Schema.define(:version => 20130819160603) do
+
+  create_table "agent_logs", :force => true do |t|
+    t.integer  "agent_id",                         :null => false
+    t.text     "message",                          :null => false
+    t.integer  "level",             :default => 3, :null => false
+    t.integer  "inbound_event_id"
+    t.integer  "outbound_event_id"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+  end
 
   create_table "agents", :force => true do |t|
     t.integer  "user_id"
