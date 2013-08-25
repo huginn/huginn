@@ -30,6 +30,7 @@ class Agent < ActiveRecord::Base
 
   belongs_to :user, :inverse_of => :agents
   has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
+  has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
   has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
@@ -137,6 +138,10 @@ class Agent < ActiveRecord::Base
     if newest_event_id = Event.order("id desc").limit(1).pluck(:id).first
       self.last_checked_event_id = newest_event_id
     end
+  end
+
+  def log(message, options = {})
+    AgentLog.log_for_agent(self, message, options)
   end
 
   # Class Methods

@@ -11,6 +11,12 @@ Huginn::Application.routes.draw do
       get :event_descriptions
       get :diagram
     end
+
+    resources :logs, :only => [:index] do
+      collection do
+        delete :clear
+      end
+    end
   end
   resources :events, :only => [:index, :show, :destroy]
   match "/worker_status" => "worker_status#show"
