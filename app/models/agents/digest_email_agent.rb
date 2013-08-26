@@ -38,7 +38,7 @@ module Agents
     def check
       if self.memory[:queue] && self.memory[:queue].length > 0
         lines = self.memory[:queue].map {|item| present(item) }
-        puts "Sending mail to #{user.email}..." unless Rails.env.test?
+        log "Sending digest mail to #{user.email}"
         SystemMailer.delay.send_message(:to => user.email, :subject => options[:subject], :headline => options[:headline], :lines => lines)
         self.memory[:queue] = []
       end
