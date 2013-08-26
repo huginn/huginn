@@ -40,7 +40,7 @@ module Agents
     end
 
     def working?
-      (event = event_created_within(options[:expected_update_period_in_days].to_i.days)) && event.payload.present?
+      event_created_within(options[:expected_update_period_in_days]) && !recent_error_logs?
     end
 
     def validate_options

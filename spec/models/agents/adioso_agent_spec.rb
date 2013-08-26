@@ -29,7 +29,7 @@ describe Agents::AdiosoAgent do
 		it "checks if its generating events as scheduled" do
 			@checker.should_not be_working
 			@checker.check
-			@checker.should be_working
+			@checker.reload.should be_working
 			three_days_from_now = 3.days.from_now
 			stub(Time).now { three_days_from_now }
 			@checker.should_not be_working
