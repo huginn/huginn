@@ -63,7 +63,7 @@ module Agents
     end
 
     def working?
-      true
+      !recent_error_logs?
     end
 
     def value_constructor(value, payload)

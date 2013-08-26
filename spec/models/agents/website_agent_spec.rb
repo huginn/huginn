@@ -42,6 +42,24 @@ describe Agents::WebsiteAgent do
     end
   end
 
+  describe '#working?' do
+    it 'checks if events have been received within the expected receive period' do
+      @checker.should_not be_working # No events created
+      @checker.check
+      @checker.reload.should be_working # Just created events
+
+      @checker.error "oh no!"
+      @checker.reload.should_not be_working # The most recent log is an error
+
+      @checker.log "ok now"
+      @checker.reload.should be_working # The most recent log is no longer an error
+
+      two_days_from_now = 2.days.from_now
+      stub(Time).now { two_days_from_now }
+      @checker.reload.should_not be_working # Two days have passed without a new event having been created
+    end
+  end
+
   describe "parsing" do
     it "parses CSS" do
       @checker.check
