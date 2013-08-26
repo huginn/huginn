@@ -30,7 +30,7 @@ module Agents
     MD
 
     def working?
-      (event = event_created_within(2.days)) && event.payload.present?
+      event_created_within(2) && !recent_error_logs?
     end
 
     def default_options

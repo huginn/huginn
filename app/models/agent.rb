@@ -30,7 +30,9 @@ class Agent < ActiveRecord::Base
 
   belongs_to :user, :inverse_of => :agents
   has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
+  has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
   has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
+  has_one  :most_recent_log, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
   has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
@@ -72,9 +74,13 @@ class Agent < ActiveRecord::Base
     raise "Implement me in your subclass"
   end
 
-  def event_created_within(seconds)
-    last_event = events.first
-    last_event && last_event.created_at > seconds.ago && last_event
+  def event_created_within(days)
+    event = most_recent_event
+    event && event.created_at > days.to_i.days.ago && event.payload.present? && event
+  end
+
+  def recent_error_logs?
+    most_recent_log.try(:level) == 4
   end
 
   def sources_are_owned
