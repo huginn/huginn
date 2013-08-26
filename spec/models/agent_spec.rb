@@ -125,25 +125,40 @@ describe Agent do
     end
 
     describe ".async_check" do
-      it "records last_check_at and calls check on the given Agent" do
-        checker = Agents::SomethingSource.new(:name => "something")
-        checker.user = users(:bob)
-        checker.save!
+      before do
+        @checker = Agents::SomethingSource.new(:name => "something")
+        @checker.user = users(:bob)
+        @checker.save!
+      end
 
-        mock(checker).check.once {
-          checker.options[:new] = true
+      it "records last_check_at and calls check on the given Agent" do
+        mock(@checker).check.once {
+          @checker.options[:new] = true
         }
 
-        mock(Agent).find(checker.id) { checker }
+        mock(Agent).find(@checker.id) { @checker }
 
-        checker.last_check_at.should be_nil
-        Agents::SomethingSource.async_check(checker.id)
-        checker.reload.last_check_at.should be_within(2).of(Time.now)
-        checker.reload.options[:new].should be_true # Show that we save options
+        @checker.last_check_at.should be_nil
+        Agents::SomethingSource.async_check(@checker.id)
+        @checker.reload.last_check_at.should be_within(2).of(Time.now)
+        @checker.reload.options[:new].should be_true # Show that we save options
+      end
+
+      it "should log exceptions" do
+        mock(@checker).check.once {
+          raise "foo"
+        }
+        mock(Agent).find(@checker.id) { @checker }
+        lambda {
+          Agents::SomethingSource.async_check(@checker.id)
+        }.should raise_error
+        log = @checker.logs.first
+        log.message.should =~ /Exception/
+        log.level.should == 4
       end
     end
 
-    describe ".receive!" do
+    describe ".receive! and .async_receive" do
       before do
         stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
         stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
@@ -153,6 +168,19 @@ describe Agent do
         mock.any_instance_of(Agents::TriggerAgent).receive(anything).once
         Agent.async_check(agents(:bob_weather_agent).id)
         Agent.receive!
+      end
+
+      it "should log exceptions" do
+        mock.any_instance_of(Agents::TriggerAgent).receive(anything).once {
+          raise "foo"
+        }
+        Agent.async_check(agents(:bob_weather_agent).id)
+        lambda {
+          Agent.receive!
+        }.should raise_error
+        log = agents(:bob_rain_notifier_agent).logs.first
+        log.message.should =~ /Exception/
+        log.level.should == 4
       end
 
       it "should track when events have been seen and not received them again" do
