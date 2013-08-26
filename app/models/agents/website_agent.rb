@@ -69,7 +69,7 @@ module Agents
       log "Fetching #{options[:url]}"
       request = Typhoeus::Request.new(options[:url], :followlocation => true)
       request.on_failure do |response|
-        log "Failed: #{response.inspect}"
+        error "Failed: #{response.inspect}"
       end
       request.on_success do |response|
         doc = parse(response.body)
@@ -84,7 +84,7 @@ module Agents
                        elsif extraction_details[:text]
                          node.text()
                        else
-                         log ":attr or :text is required on HTML or XML extraction patterns"
+                         error ":attr or :text is required on HTML or XML extraction patterns"
                          return
                        end
                      }
@@ -95,7 +95,7 @@ module Agents
         num_unique_lengths = options[:extract].keys.map { |name| output[name].length }.uniq
 
         if num_unique_lengths.length != 1
-          log "Got an uneven number of matches for #{options[:name]}: #{options[:extract].inspect}", :level => 4
+          error "Got an uneven number of matches for #{options[:name]}: #{options[:extract].inspect}"
           return
         end
 

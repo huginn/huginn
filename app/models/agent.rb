@@ -144,6 +144,10 @@ class Agent < ActiveRecord::Base
     AgentLog.log_for_agent(self, message, options)
   end
 
+  def error(message, options = {})
+    log(message, options.merge(:level => 4))
+  end
+
   # Class Methods
   class << self
     def cannot_be_scheduled!
@@ -201,9 +205,14 @@ class Agent < ActiveRecord::Base
     # and Event ids instead of a literal ActiveRecord models because it is preferable to serialize delayed_jobs with ids.
     def async_receive(agent_id, event_ids)
       agent = Agent.find(agent_id)
-      agent.receive(Event.where(:id => event_ids))
-      agent.last_receive_at = Time.now
-      agent.save!
+      begin
+        agent.receive(Event.where(:id => event_ids))
+        agent.last_receive_at = Time.now
+        agent.save!
+      rescue => e
+        agent.error "Exception during receive: #{e.message} -- #{e.backtrace}"
+        raise
+      end
     end
     handle_asynchronously :async_receive
 
@@ -228,9 +237,14 @@ class Agent < ActiveRecord::Base
     # id instead of a literal Agent because it is preferable to serialize delayed_jobs with ids.
     def async_check(agent_id)
       agent = Agent.find(agent_id)
-      agent.check
-      agent.last_check_at = Time.now
-      agent.save!
+      begin
+        agent.check
+        agent.last_check_at = Time.now
+        agent.save!
+      rescue => e
+        agent.error "Exception during check: #{e.message} -- #{e.backtrace}"
+        raise
+      end
     end
     handle_asynchronously :async_check
   end
