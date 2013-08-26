@@ -1,6 +1,6 @@
 class AgentsController < ApplicationController
   def index
-    @agents = current_user.agents.preload(:most_recent_event, :most_recent_log).page(params[:page])
+    @agents = current_user.agents.page(params[:page])
 
     respond_to do |format|
       format.html
