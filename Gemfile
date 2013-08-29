@@ -32,6 +32,7 @@ gem 'kramdown'
 gem "typhoeus"
 gem 'nokogiri'
 gem 'wunderground'
+gem 'rturk'
 
 gem "twitter"
 gem 'twitter-stream', '>=0.1.16'

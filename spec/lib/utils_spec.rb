@@ -27,6 +27,36 @@ describe Utils do
     end
   end
 
+  describe "#interpolate_jsonpaths" do
+    it "interpolates jsonpath expressions between matching <>'s" do
+      Utils.interpolate_jsonpaths("hello <$.there.world> this <escape works>", { :there => { :world => "WORLD" }, :works => "should work" }).should == "hello WORLD this should+work"
+    end
+  end
+
+  describe "#recursively_interpolate_jsonpaths" do
+    it "interpolates all string values in a structure" do
+      struct = {
+        :int => 5,
+        :string => "this <escape $.works>",
+        :array => ["<works>", "now", "<$.there.world>"],
+        :deep => {
+          :string => "hello <there.world>",
+          :hello => :world
+        }
+      }
+      data = { :there => { :world => "WORLD" }, :works => "should work" }
+      Utils.recursively_interpolate_jsonpaths(struct, data).should == {
+        :int => 5,
+        :string => "this should+work",
+        :array => ["should work", "now", "WORLD"],
+        :deep => {
+          :string => "hello WORLD",
+          :hello => :world
+        }
+      }
+    end
+  end
+
   describe "#value_at" do
     it "returns the value at a JSON path" do
       Utils.value_at({ :foo => { :bar => :baz }}.to_json, "foo.bar").should == "baz"

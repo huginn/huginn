@@ -74,6 +74,8 @@ GEM
       http_parser.rb (>= 0.5.3)
     em-socksify (0.3.0)
       eventmachine (>= 1.0.0.beta.4)
+    erector (0.9.0)
+      treetop (>= 1.2.3)
     erubis (2.7.0)
     ethon (0.5.12)
       ffi (>= 1.3.0)
@@ -118,7 +120,7 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     method_source (0.8.1)
-    mime-types (1.23)
+    mime-types (1.24)
     mini_portile (0.5.1)
     multi_json (1.7.9)
     multi_xml (0.5.5)
@@ -182,6 +184,10 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
+    rturk (2.11.0)
+      erector
+      nokogiri
+      rest-client
     rufus-scheduler (2.0.22)
       tzinfo (>= 0.3.23)
     safe_yaml (0.9.5)
@@ -205,7 +211,7 @@ GEM
     system_timer (1.2.4)
     thor (0.18.1)
     tilt (1.4.1)
-    treetop (1.4.14)
+    treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
     twilio-ruby (3.10.0)
@@ -269,6 +275,7 @@ DEPENDENCIES
   rr
   rspec
   rspec-rails
+  rturk
   rufus-scheduler
   sass-rails (~> 3.2.3)
   select2-rails

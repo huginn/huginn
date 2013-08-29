@@ -32,6 +32,25 @@ module Utils
     end
   end
 
+  def self.interpolate_jsonpaths(value, data)
+    value.gsub(/<[^>]+>/).each { |jsonpath|
+      Utils.values_at(data, jsonpath[1..-2]).first.to_s
+    }
+  end
+
+  def self.recursively_interpolate_jsonpaths(struct, data)
+    case struct
+      when Hash
+        struct.inject({}) {|memo, (key, value)| memo[key] = recursively_interpolate_jsonpaths(value, data); memo }
+      when Array
+        struct.map {|elem| recursively_interpolate_jsonpaths(elem, data) }
+      when String
+        interpolate_jsonpaths(struct, data)
+      else
+        struct
+    end
+  end
+
   def self.value_at(data, path)
     values_at(data, path).first
   end
