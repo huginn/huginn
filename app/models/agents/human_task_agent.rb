@@ -167,18 +167,25 @@ module Agents
         log "Looking at HIT #{hit_id}.  I found #{assignments.length} assignments#{" with the statuses: #{assignments.map(&:status).to_sentence}" if assignments.length > 0}"
         if assignments.length == hit.max_assignments && assignments.all? { |assignment| assignment.status == "Submitted" }
           if options[:take_majority] == "true"
+            counts = {}
             options[:hit][:questions].each do |question|
-              counts = question[:selections].inject({}) { |memo, selection| memo[selection[:key]] = 0; memo }
+              question_counts = question[:selections].inject({}) { |memo, selection| memo[selection[:key]] = 0; memo }
               assignments.each do |assignment|
                 answers = ActiveSupport::HashWithIndifferentAccess.new(assignment.answers)
                 answer = answers[question[:key]]
-                counts[answer] += 1
+                question_counts[answer] += 1
               end
+              counts[question[:key]] = question_counts
             end
+            majority_answer = counts.inject({}) do |memo, (key, question_counts)|
+              memo[key] = question_counts.to_a.sort {|a, b| a.last <=> b.last }.last.first
+              memo
+            end
+            event = create_event :payload => { :answers => assignments.map(&:answers), :counts => counts, :majority_answer => majority_answer }
           else
             event = create_event :payload => { :answers => assignments.map(&:answers) }
-            log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => Event.find_by_id(memory[:hits][hit_id.to_sym])
           end
+          log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => Event.find_by_id(memory[:hits][hit_id.to_sym])
 
           assignments.each(&:approve!)
 

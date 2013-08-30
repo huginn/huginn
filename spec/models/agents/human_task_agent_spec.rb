@@ -12,6 +12,17 @@ describe Agents::HumanTaskAgent do
     @event.payload = { :foo => { "bar" => { :baz => "a2b" } },
                        :name => "Joe" }
     @event.id = 345
+
+    @checker.should be_valid
+  end
+
+  describe "validations" do
+    it "requires that all questions be of type 'selection' when `take_majority` is `true`" do
+      @checker.options[:take_majority] = "true"
+      @checker.should_not be_valid
+      @checker.options[:hit][:questions][1][:type] = "selection"
+      @checker.should be_valid
+    end
   end
 
   describe "when 'trigger_on' is set to 'schedule'" do
@@ -223,12 +234,51 @@ describe Agents::HumanTaskAgent do
     end
 
     describe "taking majority votes" do
-      it "should only be valid when all questions are of type 'selection'" do
-
+      before do
+        @checker.options[:take_majority] = "true"
+        @checker.options[:hit][:questions][1] = {
+          :type => "selection",
+          :key => "age_range",
+          :name => "Age Range",
+          :required => "true",
+          :question => "Please select your age range:",
+          :selections =>
+            [
+              { :key => "<50", :text => "50 years old or younger" },
+              { :key => ">50", :text => "Over 50 years old" }
+            ]
+        }
       end
 
       it "should take the majority votes of all questions" do
+        @checker.memory[:hits] = { :"JH3132836336DHG" => @event.id }
+        mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
+        assignments = [
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"sad", "age_range"=>"<50"}),
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "age_range"=>">50"}),
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "age_range"=>">50"}),
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "age_range"=>">50"})
+        ]
+        hit = FakeHit.new(:max_assignments => 4, :assignments => assignments)
+        mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
+        lambda {
+          @checker.send :review_hits
+        }.should change { Event.count }.by(1)
+
+        assignments.all? {|a| a.approved == true }.should be_true
+
+        @checker.events.last.payload[:answers].should == [
+          { :sentiment => "sad", :age_range => "<50" },
+          { :sentiment => "neutral", :age_range => ">50" },
+          { :sentiment => "happy", :age_range => ">50" },
+          { :sentiment => "happy", :age_range => ">50" }
+        ]
+
+        @checker.events.last.payload[:counts].should == { :sentiment => { :happy => 2, :sad => 1, :neutral => 1 }, :age_range => { :">50" => 3, :"<50" => 1 } }
+        @checker.events.last.payload[:majority_answer].should == { :sentiment => "happy", :age_range => ">50" }
+
+        @checker.memory[:hits].should == {}
       end
     end
   end
