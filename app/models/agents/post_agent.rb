@@ -1,6 +1,7 @@
 module Agents
   class PostAgent < Agent
     cannot_be_scheduled!
+    cannot_create_events!
 
     description <<-MD
        Post Agent receives events from other agents and send those events as the contents of a post request to a specified url. `post_url` field must specify where you would like to receive post requests and do not forget to include URI scheme (`http` or `https`)
