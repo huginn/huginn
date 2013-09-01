@@ -166,6 +166,8 @@ module Agents
 
         log "Looking at HIT #{hit_id}.  I found #{assignments.length} assignments#{" with the statuses: #{assignments.map(&:status).to_sentence}" if assignments.length > 0}"
         if assignments.length == hit.max_assignments && assignments.all? { |assignment| assignment.status == "Submitted" }
+          payload = { :answers => assignments.map(&:answers) }
+
           if options[:take_majority] == "true"
             counts = {}
             options[:hit][:questions].each do |question|
@@ -177,19 +179,42 @@ module Agents
               end
               counts[question[:key]] = question_counts
             end
+            payload[:counts] = counts
+
             majority_answer = counts.inject({}) do |memo, (key, question_counts)|
               memo[key] = question_counts.to_a.sort {|a, b| a.last <=> b.last }.last.first
               memo
             end
-            event = create_event :payload => { :answers => assignments.map(&:answers), :counts => counts, :majority_answer => majority_answer }
-          else
-            event = create_event :payload => { :answers => assignments.map(&:answers) }
+            payload[:majority_answer] = majority_answer
+
+            if all_questions_are_numeric?
+              average_answer = counts.inject({}) do |memo, (key, question_counts)|
+                sum = divisor = 0
+                question_counts.to_a.each do |num, count|
+                  sum += num.to_s.to_f * count
+                  divisor += count
+                end
+                memo[key] = sum / divisor.to_f
+                memo
+              end
+              payload[:average_answer] = average_answer
+            end
           end
+
+          event = create_event :payload => payload
           log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => Event.find_by_id(memory[:hits][hit_id.to_sym])
 
           assignments.each(&:approve!)
 
           memory[:hits].delete(hit_id.to_sym)
+        end
+      end
+    end
+
+    def all_questions_are_numeric?
+      options[:hit][:questions].all? do |question|
+        question[:selections].all? do |selection|
+          selection[:key] == selection[:key].to_f.to_s || selection[:key] == selection[:key].to_i.to_s
         end
       end
     end

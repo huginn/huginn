@@ -236,6 +236,11 @@ describe Agents::HumanTaskAgent do
     describe "taking majority votes" do
       before do
         @checker.options[:take_majority] = "true"
+        @checker.memory[:hits] = { :"JH3132836336DHG" => @event.id }
+        mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
+      end
+
+      it "should take the majority votes of all questions" do
         @checker.options[:hit][:questions][1] = {
           :type => "selection",
           :key => "age_range",
@@ -248,11 +253,7 @@ describe Agents::HumanTaskAgent do
               { :key => ">50", :text => "Over 50 years old" }
             ]
         }
-      end
 
-      it "should take the majority votes of all questions" do
-        @checker.memory[:hits] = { :"JH3132836336DHG" => @event.id }
-        mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
         assignments = [
           FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"sad", "age_range"=>"<50"}),
           FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "age_range"=>">50"}),
@@ -277,6 +278,57 @@ describe Agents::HumanTaskAgent do
 
         @checker.events.last.payload[:counts].should == { :sentiment => { :happy => 2, :sad => 1, :neutral => 1 }, :age_range => { :">50" => 3, :"<50" => 1 } }
         @checker.events.last.payload[:majority_answer].should == { :sentiment => "happy", :age_range => ">50" }
+        @checker.events.last.payload.should_not have_key(:average_answer)
+
+        @checker.memory[:hits].should == {}
+      end
+
+      it "should also provide an average answer when all questions are numeric" do
+        @checker.options[:hit][:questions] = [
+          {
+            :type => "selection",
+            :key => "rating",
+            :name => "Rating",
+            :required => "true",
+            :question => "Please select a rating:",
+            :selections =>
+              [
+                { :key => "1", :text => "One" },
+                { :key => "2", :text => "Two" },
+                { :key => "3", :text => "Three" },
+                { :key => "4", :text => "Four" },
+                { :key => "5.1", :text => "Five Point One" }
+              ]
+          }
+        ]
+
+        assignments = [
+          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"1" }),
+          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"3" }),
+          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"5.1" }),
+          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"2" }),
+          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"2" })
+        ]
+        hit = FakeHit.new(:max_assignments => 5, :assignments => assignments)
+        mock(RTurk::Hit).new("JH3132836336DHG") { hit }
+
+        lambda {
+          @checker.send :review_hits
+        }.should change { Event.count }.by(1)
+
+        assignments.all? {|a| a.approved == true }.should be_true
+
+        @checker.events.last.payload[:answers].should == [
+          { :rating => "1" },
+          { :rating => "3" },
+          { :rating => "5.1" },
+          { :rating => "2" },
+          { :rating => "2" }
+        ]
+
+        @checker.events.last.payload[:counts].should == { :rating => { :"1" => 1, :"2" => 2, :"3" => 1, :"4" => 0, :"5.1" => 1 } }
+        @checker.events.last.payload[:majority_answer].should == { :rating => "2" }
+        @checker.events.last.payload[:average_answer].should == { :rating => (1 + 2 + 2 + 3 + 5.1) / 5.0 }
 
         @checker.memory[:hits].should == {}
       end
