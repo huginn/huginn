@@ -51,10 +51,6 @@ table.events {
   margin-left: 0 !important;
 }
 
-#job-indicator, #event-indicator {
-  display: none;
-}
-
 img.odin {
   position: relative;
   top: -32px;
@@ -86,14 +82,25 @@ img.spinner {
   overflow: hidden;
 }
 
+// Navbar
+
+#job-indicator, #event-indicator {
+  display: none;
+}
+
+.navbar-search > .spinner {
+  position: absolute;
+  top: -1px;
+  right: 1px;
+}
+
 // Flash
 
 .flash {
   position: fixed;
-  width: 500px;
+  width: 210px;
   z-index: 99999;
-  top: 1px;
-  margin-left: 250px;
+  right: 20px;
 
   .alert {
   }

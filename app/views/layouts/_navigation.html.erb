@@ -9,11 +9,18 @@
 
 <ul class="nav pull-right">
   <% if user_signed_in? %>
+
+    <form class="navbar-search pull-left">
+      <input type="text" class="search-query" id='agent-navigate' autocomplete="off" placeholder="Search">
+      <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
+    </form>
+
     <li id='job-indicator'>
       <a href="/delayed_job">
         <span class="badge"><i class="icon-refresh icon-white"></i> <span class='number'>0</span></span>
       </a>
     </li>
+
     <li id='event-indicator'>
       <a href="#">
         <span class="badge"><i class="icon-random icon-white"></i> <span class='number'>0</span> new events</span>
@@ -45,3 +52,4 @@
     </ul>
   </li>
 </ul>
+

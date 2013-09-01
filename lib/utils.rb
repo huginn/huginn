@@ -51,4 +51,8 @@ module Utils
       result
     end
   end
+
+  def self.jsonify(thing)
+    thing.to_json.gsub('</', '<\/').html_safe
+  end
 end

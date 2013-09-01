@@ -54,7 +54,30 @@ $(document).ready ->
   if $(".flash").length
     setTimeout((-> $(".flash").slideUp(-> $(".flash").remove())), 5000)
 
-  # Agent Show
+  # Agent Navigation
+  $agentNavigate = $('#agent-navigate')
+  $agentNavigate.typeahead(
+    minLength: 0,
+    items: 15,
+    source: agentNames
+  ).on("change", (e) ->
+    if agentPaths[$agentNavigate.val()]
+      $('#agent-navigate').closest(".navbar-search").find(".spinner").show();
+      window.location = agentPaths[$agentNavigate.val()]
+  ).on("focus", (e) ->
+    $agentNavigate.val ''
+  ).on("blur", (e) ->
+    $agentNavigate.val ''
+  )
+
+  # Pressing '/' selects the search box.
+  $("body").on "keypress", (e) ->
+    if e.keyCode == 47 # The '/' key
+      if e.target.nodeName == "BODY"
+        e.preventDefault()
+        $agentNavigate.focus()
+
+# Agent Show
   fetchLogs = (e) ->
     agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
     e.preventDefault()
@@ -85,7 +108,7 @@ $(document).ready ->
 
   $("#agent_type").on "change", ->
     if window.jsonEditor?
-      $(".spinner").fadeIn();
+      $("#agent-spinner").fadeIn();
       $("#agent_source_ids").select2("val", {});
       $(".event-descriptions").html("").hide()
       $.getJSON "/agents/type_details", { type: $(@).val() }, (json) =>
@@ -104,7 +127,7 @@ $(document).ready ->
         window.jsonEditor.json = json.options
         window.jsonEditor.rebuild()
 
-        $(".spinner").stop(true, true).fadeOut();
+        $("#agent-spinner").stop(true, true).fadeOut();
 
   $("#agent_type").change() if $("#agent_type").length
 
