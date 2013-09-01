@@ -121,7 +121,7 @@ class Agent < ActiveRecord::Base
   end
 
   def last_event_at
-    @memoized_last_event_at ||= events.select(:created_at).first.try(:created_at)
+    @memoized_last_event_at ||= most_recent_event.try(:created_at)
   end
 
   def default_schedule
