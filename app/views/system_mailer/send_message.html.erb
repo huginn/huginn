@@ -7,10 +7,15 @@
     <% if @headline %>
       <h1><%= @headline %></h1>
     <% end %>
-    <% @lines.each do |line| %>
-      <p>
-        <%= line %>
-      </p>
+    <% @groups.each do |group| %>
+      <div style='margin-bottom: 10px;'>
+        <div><%= group[:title] %></div>
+        <% group[:entries].each do |entry| %>
+          <div style='margin-left: 10px;'>
+            <%= group[:entry] %>
+          </div>
+        <% end %>
+      </div>
     <% end %>
   </body>
 </html>
