@@ -99,9 +99,12 @@ $(document).ready ->
         $("#logs .spinner").stop(true, true).fadeOut ->
           $("#logs .refresh, #logs .clear").show()
 
-  $(".agent-show #show-tabs a[href='#logs']").on "click", fetchLogs
-  $("#logs .refresh").on "click", fetchLogs
-  $("#logs .clear").on "click", clearLogs
+  $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", fetchLogs
+  $(".agent-show #logs .clear").on "click", clearLogs
+
+  if tab = window.location.href.match(/tab=(\w+)\b/i)?[1]
+    if tab in ["details", "logs"]
+      $(".agent-show .nav-tabs li a[href='##{tab}']").click()
 
   # Editing Agents
   $("#agent_source_ids").on "change", showEventDescriptions

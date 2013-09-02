@@ -114,13 +114,23 @@ describe Agent do
     end
 
     describe "#create_event" do
-      it "should use the checker's user" do
-        checker = Agents::SomethingSource.new(:name => "something")
-        checker.user = users(:bob)
-        checker.save!
+      before do
+        @checker = Agents::SomethingSource.new(:name => "something")
+        @checker.user = users(:bob)
+        @checker.save!
+      end
 
-        checker.check
-        Event.last.user.should == checker.user
+      it "should use the checker's user" do
+        @checker.check
+        Event.last.user.should == @checker.user
+      end
+
+      it "should log an error if the Agent has been marked with 'cannot_create_events!'" do
+        mock(@checker).can_create_events? { false }
+        lambda {
+          @checker.check
+        }.should_not change { Event.count }
+        @checker.logs.first.message.should =~ /cannot create events/i
       end
     end
 
