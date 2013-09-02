@@ -8,10 +8,6 @@
 #= require ./worker-checker
 #= require_self
 
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
-
 setupJsonEditor = ->
   JSONEditor.prototype.ADD_IMG = '<%= image_path 'json-editor/add.png' %>'
   JSONEditor.prototype.DELETE_IMG = '<%= image_path 'json-editor/delete.png' %>'
@@ -48,17 +44,74 @@ showEventDescriptions = ->
     $(".event-descriptions").html("").hide()
 
 $(document).ready ->
+  # JSON Editor
   setupJsonEditor()
+
+  # Select2 Selects
   $(".select2").select2(width: 'resolve')
 
-  if $(".top-flash").length
-    setTimeout((-> $(".top-flash").slideUp(-> $(".top-flash").remove())), 5000)
+  # Flash
+  if $(".flash").length
+    setTimeout((-> $(".flash").slideUp(-> $(".flash").remove())), 5000)
 
+  # Agent Navigation
+  $agentNavigate = $('#agent-navigate')
+  $agentNavigate.typeahead(
+    minLength: 0,
+    items: 15,
+    source: agentNames
+  ).on("change", (e) ->
+    if agentPaths[$agentNavigate.val()]
+      $('#agent-navigate').closest(".navbar-search").find(".spinner").show();
+      window.location = agentPaths[$agentNavigate.val()]
+  ).on("focus", (e) ->
+    $agentNavigate.val ''
+  ).on("blur", (e) ->
+    $agentNavigate.val ''
+  )
+
+  # Pressing '/' selects the search box.
+  $("body").on "keypress", (e) ->
+    if e.keyCode == 47 # The '/' key
+      if e.target.nodeName == "BODY"
+        e.preventDefault()
+        $agentNavigate.focus()
+
+# Agent Show
+  fetchLogs = (e) ->
+    agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
+    e.preventDefault()
+    $("#logs .spinner").show()
+    $("#logs .refresh, #logs .clear").hide()
+    $.get "/agents/#{agentId}/logs", (html) =>
+      $("#logs .logs").html html
+      $("#logs .spinner").stop(true, true).fadeOut ->
+        $("#logs .refresh, #logs .clear").show()
+
+  clearLogs = (e) ->
+    if confirm("Are you sure you want to clear all logs for this Agent?")
+      agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
+      e.preventDefault()
+      $("#logs .spinner").show()
+      $("#logs .refresh, #logs .clear").hide()
+      $.post "/agents/#{agentId}/logs/clear", { "_method": "DELETE" }, (html) =>
+        $("#logs .logs").html html
+        $("#logs .spinner").stop(true, true).fadeOut ->
+          $("#logs .refresh, #logs .clear").show()
+
+  $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", fetchLogs
+  $(".agent-show #logs .clear").on "click", clearLogs
+
+  if tab = window.location.href.match(/tab=(\w+)\b/i)?[1]
+    if tab in ["details", "logs"]
+      $(".agent-show .nav-tabs li a[href='##{tab}']").click()
+
+  # Editing Agents
   $("#agent_source_ids").on "change", showEventDescriptions
 
   $("#agent_type").on "change", ->
     if window.jsonEditor?
-      $(".spinner").fadeIn();
+      $("#agent-spinner").fadeIn();
       $("#agent_source_ids").select2("val", {});
       $(".event-descriptions").html("").hide()
       $.getJSON "/agents/type_details", { type: $(@).val() }, (json) =>
@@ -77,7 +130,7 @@ $(document).ready ->
         window.jsonEditor.json = json.options
         window.jsonEditor.rebuild()
 
-        $(".spinner").stop(true, true).fadeOut();
+        $("#agent-spinner").stop(true, true).fadeOut();
 
   $("#agent_type").change() if $("#agent_type").length
 

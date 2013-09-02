@@ -3,6 +3,8 @@ module Agents
     MAIN_KEYS = %w[title message text main value].map(&:to_sym)
     default_schedule "5am"
 
+    cannot_create_events!
+
     description <<-MD
       The DigestEmailAgent collects any Events sent to it and sends them all via email when run.
       The email will be sent to your account's address and will have a `subject` and an optional `headline` before
@@ -21,7 +23,7 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago
+      last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago && !recent_error_logs?
     end
 
     def validate_options
@@ -38,7 +40,7 @@ module Agents
     def check
       if self.memory[:queue] && self.memory[:queue].length > 0
         groups = self.memory[:queue].map { |payload| present(payload) }
-        puts "Sending mail to #{user.email}..." unless Rails.env.test?
+        log "Sending digest mail to #{user.email}"
         SystemMailer.delay.send_message(:to => user.email, :subject => options[:subject], :headline => options[:headline], :groups => groups)
         self.memory[:queue] = []
       end

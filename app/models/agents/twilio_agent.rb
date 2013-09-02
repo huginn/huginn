@@ -4,6 +4,7 @@ require 'securerandom'
 module Agents
   class TwilioAgent < Agent
     cannot_be_scheduled!
+    cannot_create_events!
 
     description <<-MD
       The TwilioAgent receives and collects events and sends them via text message or gives you a call when scheduled.
@@ -58,7 +59,7 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago
+      last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago && !recent_error_logs?
     end
 
     def send_message(message)

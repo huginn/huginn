@@ -30,6 +30,9 @@ class Agent < ActiveRecord::Base
 
   belongs_to :user, :inverse_of => :agents
   has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
+  has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
+  has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
+  has_one  :most_recent_log, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
   has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
@@ -71,9 +74,13 @@ class Agent < ActiveRecord::Base
     raise "Implement me in your subclass"
   end
 
-  def event_created_within(seconds)
-    last_event = events.first
-    last_event && last_event.created_at > seconds.ago && last_event
+  def event_created_within(days)
+    event = most_recent_event
+    event && event.created_at > days.to_i.days.ago && event.payload.present? && event
+  end
+
+  def recent_error_logs?
+    most_recent_log.try(:level) == 4
   end
 
   def sources_are_owned
@@ -81,7 +88,11 @@ class Agent < ActiveRecord::Base
   end
 
   def create_event(attrs)
-    events.create!({ :user => user }.merge(attrs))
+    if can_create_events?
+      events.create!({ :user => user }.merge(attrs))
+    else
+      error "This Agent cannot create events!"
+    end
   end
 
   def validate_schedule
@@ -110,7 +121,7 @@ class Agent < ActiveRecord::Base
   end
 
   def last_event_at
-    @memoized_last_event_at ||= events.select(:created_at).first.try(:created_at)
+    @memoized_last_event_at ||= most_recent_event.try(:created_at)
   end
 
   def default_schedule
@@ -133,10 +144,26 @@ class Agent < ActiveRecord::Base
     !cannot_receive_events?
   end
 
+  def cannot_create_events?
+    self.class.cannot_create_events?
+  end
+
+  def can_create_events?
+    !cannot_create_events?
+  end
+
   def set_last_checked_event_id
     if newest_event_id = Event.order("id desc").limit(1).pluck(:id).first
       self.last_checked_event_id = newest_event_id
     end
+  end
+
+  def log(message, options = {})
+    AgentLog.log_for_agent(self, message, options)
+  end
+
+  def error(message, options = {})
+    log(message, options.merge(:level => 4))
   end
 
   # Class Methods
@@ -152,6 +179,14 @@ class Agent < ActiveRecord::Base
     def default_schedule(schedule = nil)
       @default_schedule = schedule unless schedule.nil?
       @default_schedule
+    end
+
+    def cannot_create_events!
+      @cannot_create_events = true
+    end
+
+    def cannot_create_events?
+      !!@cannot_create_events
     end
 
     def cannot_receive_events!
@@ -196,9 +231,14 @@ class Agent < ActiveRecord::Base
     # and Event ids instead of a literal ActiveRecord models because it is preferable to serialize delayed_jobs with ids.
     def async_receive(agent_id, event_ids)
       agent = Agent.find(agent_id)
-      agent.receive(Event.where(:id => event_ids))
-      agent.last_receive_at = Time.now
-      agent.save!
+      begin
+        agent.receive(Event.where(:id => event_ids))
+        agent.last_receive_at = Time.now
+        agent.save!
+      rescue => e
+        agent.error "Exception during receive: #{e.message} -- #{e.backtrace}"
+        raise
+      end
     end
     handle_asynchronously :async_receive
 
@@ -223,9 +263,14 @@ class Agent < ActiveRecord::Base
     # id instead of a literal Agent because it is preferable to serialize delayed_jobs with ids.
     def async_check(agent_id)
       agent = Agent.find(agent_id)
-      agent.check
-      agent.last_check_at = Time.now
-      agent.save!
+      begin
+        agent.check
+        agent.last_check_at = Time.now
+        agent.save!
+      rescue => e
+        agent.error "Exception during check: #{e.message} -- #{e.backtrace}"
+        raise
+      end
     end
     handle_asynchronously :async_check
   end
