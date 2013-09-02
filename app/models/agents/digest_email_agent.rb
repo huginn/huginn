@@ -3,6 +3,8 @@ module Agents
     MAIN_KEYS = %w[title message text main value].map(&:to_sym)
     default_schedule "5am"
 
+    cannot_create_events!
+
     description <<-MD
       The DigestEmailAgent collects any Events sent to it and sends them all via email when run.
       The email will be sent to your account's address and will have a `subject` and an optional `headline` before

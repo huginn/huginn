@@ -88,7 +88,11 @@ class Agent < ActiveRecord::Base
   end
 
   def create_event(attrs)
-    events.create!({ :user => user }.merge(attrs))
+    if can_create_events?
+      events.create!({ :user => user }.merge(attrs))
+    else
+      error "This Agent cannot create events!"
+    end
   end
 
   def validate_schedule
@@ -117,7 +121,7 @@ class Agent < ActiveRecord::Base
   end
 
   def last_event_at
-    @memoized_last_event_at ||= events.select(:created_at).first.try(:created_at)
+    @memoized_last_event_at ||= most_recent_event.try(:created_at)
   end
 
   def default_schedule
@@ -138,6 +142,14 @@ class Agent < ActiveRecord::Base
 
   def can_receive_events?
     !cannot_receive_events?
+  end
+
+  def cannot_create_events?
+    self.class.cannot_create_events?
+  end
+
+  def can_create_events?
+    !cannot_create_events?
   end
 
   def set_last_checked_event_id
@@ -167,6 +179,14 @@ class Agent < ActiveRecord::Base
     def default_schedule(schedule = nil)
       @default_schedule = schedule unless schedule.nil?
       @default_schedule
+    end
+
+    def cannot_create_events!
+      @cannot_create_events = true
+    end
+
+    def cannot_create_events?
+      !!@cannot_create_events
     end
 
     def cannot_receive_events!

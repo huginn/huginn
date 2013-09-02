@@ -13,7 +13,7 @@
           <% end %>
           <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>"><i class='icon-list-alt'></i> Logs</a></li>
 
-          <% if @agent.events.count > 0 %>
+          <% if @agent.can_create_events? && @agent.events.count > 0 %>
             <li><%= link_to '<i class="icon-random"></i> Events'.html_safe, events_path(:agent => @agent.to_param) %></li>
           <% end %>
           <li><%= link_to '<i class="icon-chevron-left"></i> Back'.html_safe, agents_path %></li>
@@ -29,7 +29,7 @@
                   </li>
                 <% end %>
 
-                <% if @agent.events.count > 0 %>
+                <% if @agent.can_create_events? && @agent.events.count > 0 %>
                   <li>
                     <%= link_to '<i class="icon-trash"></i> Delete all events'.html_safe, remove_events_agent_path(@agent), method: :delete, data: {confirm: 'Are you sure you want to delete ALL events for this Agent?'}, :tabindex => "-1" %>
                   </li>
@@ -70,38 +70,60 @@
               <%= @agent.short_type.titleize %>
             </p>
 
-            <p>
-              <b>Schedule:</b>
-              <%= (@agent.schedule || "n/a").humanize.titleize %>
-            </p>
+            <% if @agent.can_be_scheduled? %>
+              <p>
+                <b>Schedule:</b>
+                <%= (@agent.schedule || "n/a").humanize.titleize %>
+              </p>
 
-            <p>
-              <b>Last checked:</b>
-              <% if @agent.cannot_be_scheduled? %>
-                N/A
-              <% else %>
+              <p>
+                <b>Last checked:</b>
                 <%= @agent.last_check_at ? time_ago_in_words(@agent.last_check_at) + " ago" : "never" %>
-              <% end %>
-            </p>
+              </p>
+            <% end %>
 
-            <p>
-              <b>Last event created:</b>
-              <%= @agent.last_event_at ? time_ago_in_words(@agent.last_event_at) + " ago" : "never" %>
-            </p>
+            <% if @agent.can_create_events? %>
+              <p>
+                <b>Last event created:</b>
+                <%= @agent.last_event_at ? time_ago_in_words(@agent.last_event_at) + " ago" : "never" %>
+              </p>
+            <% end %>
 
-            <p>
-              <b>Last received event:</b>
-              <% if @agent.cannot_receive_events? %>
-                N/A
-              <% else %>
+            <% if @agent.can_receive_events? %>
+              <p>
+                <b>Last received event:</b>
                 <%= @agent.last_receive_at ? time_ago_in_words(@agent.last_receive_at) + " ago" : "never" %>
-              <% end %>
-            </p>
+              </p>
+            <% end %>
 
-            <p>
-              <b>Event count:</b>
-              <%= link_to @agent.events.count, events_path(:agent => @agent.to_param) %>
-            </p>
+            <% if @agent.can_create_events? %>
+              <p>
+                <b>Events created:</b>
+                <%= link_to @agent.events.count, events_path(:agent => @agent.to_param) %>
+              </p>
+            <% end %>
+
+            <% if @agent.can_receive_events? %>
+              <p>
+                <b>Event sources:</b>
+                <% if @agent.sources.length %>
+                  <%= @agent.sources.map { |source_agent| link_to(source_agent.name, agent_path(source_agent)) }.to_sentence.html_safe %>
+                <% else %>
+                  None
+                <% end %>
+              </p>
+            <% end %>
+
+            <% if @agent.can_create_events? %>
+              <p>
+                <b>Event receivers:</b>
+                <% if @agent.receivers.length %>
+                  <%= @agent.receivers.map { |receiver_agent| link_to(receiver_agent.name, agent_path(receiver_agent)) }.to_sentence.html_safe %>
+                <% else %>
+                  None
+                <% end %>
+              </p>
+            <% end %>
 
             <p>
               <b>Working:</b>
