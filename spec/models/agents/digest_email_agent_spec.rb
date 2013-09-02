@@ -33,13 +33,16 @@ describe Agents::DigestEmailAgent do
       Agents::DigestEmailAgent.async_check(@checker.id)
       ActionMailer::Base.deliveries.should == []
 
-      @checker.memory[:queue] = ["Something you should know about", { :title => "Foo", :url => "http://google.com", :bar => 2 }, { "message" => "hi", :woah => "there" }]
+      @checker.memory[:queue] = ["Something you should know about",
+                                 { :title => "Foo", :url => "http://google.com", :bar => 2 },
+                                 { "message" => "hi", :woah => "there" },
+                                 { "test" => 2 }]
       @checker.save!
 
       Agents::DigestEmailAgent.async_check(@checker.id)
       ActionMailer::Base.deliveries.last.to.should == ["bob@example.com"]
       ActionMailer::Base.deliveries.last.subject.should == "something interesting"
-      get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Something you should know about\n\nFoo (bar: 2 and url: http://google.com)\n\nhi (woah: there)"
+      get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Something you should know about\n\nFoo\n  bar: 2\n  url: http://google.com\n\nhi\n  woah: there\n\nEvent\n  test: 2"
       @checker.reload.memory[:queue].should == []
     end
   end
