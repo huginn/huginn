@@ -8,53 +8,71 @@
       <table class='table table-striped'>
         <tr>
           <th>Name</th>
+          <th>Schedule</th>
           <th>Last Check</th>
           <th>Last Event Out</th>
           <th>Last Event In</th>
-          <th>Events</th>
-          <th>Schedule</th>
+          <th>Events Created</th>
           <th>Working?</th>
           <th></th>
         </tr>
 
         <% @agents.each do |agent| %>
-            <tr>
-              <td>
-                <%= agent.name %>
-                <br/>
-                <span class='muted'><%= agent.short_type.titleize %></span>
-              </td>
-              <td>
-                <% if agent.cannot_be_scheduled? %>
-                    N/A
+          <tr>
+            <td>
+              <%= agent.name %>
+              <br/>
+              <span class='muted'><%= agent.short_type.titleize %></span>
+            </td>
+            <td>
+              <% if agent.can_be_scheduled? %>
+                <%= agent.schedule.to_s.humanize.titleize %>
+              <% else %>
+                <span class='not-applicable'></span>
+              <% end %>
+            </td>
+            <td>
+              <% if agent.can_be_scheduled? %>
+                <%= agent.last_check_at ? time_ago_in_words(agent.last_check_at) + " ago" : "never" %>
+              <% else %>
+                <span class='not-applicable'></span>
+              <% end %>
+            </td>
+            <td>
+              <% if agent.can_create_events? %>
+                <%= agent.last_event_at ? time_ago_in_words(agent.last_event_at) + " ago" : "never" %>
+              <% else %>
+                <span class='not-applicable'></span>
+              <% end %>
+            </td>
+            <td>
+              <% if agent.can_receive_events? %>
+                <%= agent.last_receive_at ? time_ago_in_words(agent.last_receive_at) + " ago" : "never" %>
+              <% else %>
+                <span class='not-applicable'></span>
+              <% end %>
+            </td>
+            <td>
+              <% if agent.can_create_events? %>
+                <%= link_to(agent.events_count || 0, events_path(:agent => agent.to_param)) %>
+              <% else %>
+                <span class='not-applicable'></span>
+              <% end %>
+            </td>
+            <td><%= working(agent) %></td>
+            <td>
+              <div class="btn-group">
+                <%= link_to 'Show', agent_path(agent), class: "btn btn-mini" %>
+                <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-mini" %>
+                <%= link_to 'Delete', agent_path(agent), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-mini" %>
+                <% if agent.can_be_scheduled? %>
+                  <%= link_to 'Run', run_agent_path(agent, :return => "index"), method: :post, class: "btn btn-mini" %>
                 <% else %>
-                    <%= agent.last_check_at ? time_ago_in_words(agent.last_check_at) + " ago" : "never" %>
+                  <%= link_to 'Run', "#", class: "btn btn-mini disabled" %>
                 <% end %>
-              </td>
-              <td><%= agent.last_event_at ? time_ago_in_words(agent.last_event_at) + " ago" : "never" %></td>
-              <td>
-                <% if agent.cannot_receive_events? %>
-                    N/A
-                <% else %>
-                    <%= agent.last_receive_at ? time_ago_in_words(agent.last_receive_at) + " ago" : "never" %>
-                <% end %>
-              </td>
-              <td><%= link_to(agent.events_count || 0, events_path(:agent => agent.to_param)) %></td>
-              <td><%= (agent.schedule || "n/a").to_s.humanize.titleize %></td>
-              <td><%= working(agent) %></td>
-              <td>
-                <div class="btn-group">
-                  <%= link_to 'Show', agent_path(agent), class: "btn btn-mini" %>
-                  <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-mini" %>
-                  <%= link_to 'Delete', agent_path(agent), method: :delete, data: {confirm: 'Are you sure?'}, class: "btn btn-mini" %>
-                  <% if agent.can_be_scheduled? %>
-                      <%= link_to 'Run', run_agent_path(agent, :return => "index"), method: :post, class: "btn btn-mini" %>
-                  <% else %>
-                      <%= link_to 'Run', "#", class: "btn btn-mini disabled" %>
-                  <% end %>
-                </div>
-              </td>
-            </tr>
+              </div>
+            </td>
+          </tr>
         <% end %>
       </table>
 

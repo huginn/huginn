@@ -47,8 +47,9 @@
   <div class="control-group">
     <%= f.label :sources, :class => 'control-label' %>
     <div class="controls link-region" data-can-receive-events="<%= @agent.can_receive_events? %>">
+      <% eventSources = (current_user.agents - [@agent]).find_all { |a| a.can_create_events? } %>
       <%= f.select(:source_ids,
-                   options_for_select((current_user.agents - [@agent]).map {|s| [s.name, s.id] },
+                   options_for_select(eventSources.map {|s| [s.name, s.id] },
                                       @agent.source_ids),
                    {}, { :multiple => true, :size => 5, :class => 'span4 select2' }) %>
       <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
