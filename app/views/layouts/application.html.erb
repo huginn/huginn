@@ -32,5 +32,15 @@
         </div>
       </div>
     </div>
+
+    <script>
+      var agentPaths = <%= Utils.jsonify(current_user.agents.inject({}) {|m, a| m[a.name] = agent_path(a) unless a.new_record?; m }) %>;
+      agentPaths["All Agents Index"] = <%= Utils.jsonify agents_path %>;
+      agentPaths["New Agent"] = <%= Utils.jsonify new_agent_path %>;
+      agentPaths["Account"] = <%= Utils.jsonify edit_user_registration_path %>;
+      agentPaths["Events Index"] = <%= Utils.jsonify events_path %>;
+      var agentNames = [];
+      $.each(agentPaths, function(name, v) { agentNames.push(name); });
+    </script>
   </body>
 </html>
