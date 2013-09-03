@@ -74,12 +74,21 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        formatted_event = options[:mode].to_s == "merge" ? event.payload : {}
-        options[:instructions].each_pair {|key, value| formatted_event[key] = value_constructor value, event.payload }
-        formatted_event[:agent] = Agent.find(event.agent_id).type.slice!(8..-1) unless options[:skip_agent].to_s == "true"
-        formatted_event[:created_at] = event.created_at unless options[:skip_created_at].to_s == "true"
-        create_event :payload => formatted_event
+        receive_event(event)
       end
+    end
+
+    def receive_webhook(params)
+      event = events.build({user: user}.merge(payload: params))
+      receive_event(event)
+    end
+
+    def receive_event(event)
+      formatted_event = options[:mode].to_s == "merge" ? event.payload : {}
+      options[:instructions].each_pair {|key, value| formatted_event[key] = value_constructor value, event.payload }
+      formatted_event[:agent] = Agent.find(event.agent_id).type.slice!(8..-1) unless options[:skip_agent].to_s == "true"
+      formatted_event[:created_at] = event.created_at unless options[:skip_created_at].to_s == "true"
+      create_event :payload => formatted_event
     end
   end
 end
