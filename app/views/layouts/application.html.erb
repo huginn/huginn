@@ -39,6 +39,8 @@
       agentPaths["New Agent"] = <%= Utils.jsonify new_agent_path %>;
       agentPaths["Account"] = <%= Utils.jsonify edit_user_registration_path %>;
       agentPaths["Events Index"] = <%= Utils.jsonify events_path %>;
+      agentPaths["View Agent Diagram"] = <%= Utils.jsonify diagram_agents_path %>;
+      agentPaths["Run Event Propagation"] = { url: <%= Utils.jsonify propagate_agents_path %>, method: 'POST' };
       var agentNames = [];
       $.each(agentPaths, function(name, v) { agentNames.push(name); });
     </script>

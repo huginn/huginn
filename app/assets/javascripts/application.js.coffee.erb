@@ -62,8 +62,13 @@ $(document).ready ->
     source: agentNames
   ).on("change", (e) ->
     if agentPaths[$agentNavigate.val()]
-      $('#agent-navigate').closest(".navbar-search").find(".spinner").show();
-      window.location = agentPaths[$agentNavigate.val()]
+      $('#agent-navigate').closest(".navbar-search").find(".spinner").show()
+      navigationData = agentPaths[$agentNavigate.val()]
+      if !(navigationData instanceof Object) || !navigationData.method || navigationData.method == 'GET'
+        window.location = navigationData.url || navigationData
+      else
+        $("<a href='#{navigationData.url}' data-method='#{navigationData.method}'></a>").appendTo($("body")).click()
+
   ).on("focus", (e) ->
     $agentNavigate.val ''
   ).on("blur", (e) ->
