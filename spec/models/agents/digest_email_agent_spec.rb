@@ -11,6 +11,10 @@ describe Agents::DigestEmailAgent do
     @checker.save!
   end
 
+  after do
+    ActionMailer::Base.deliveries = []
+  end
+
   describe "#receive" do
     it "queues any payloads it receives" do
       event1 = Event.new
@@ -43,7 +47,28 @@ describe Agents::DigestEmailAgent do
       ActionMailer::Base.deliveries.last.to.should == ["bob@example.com"]
       ActionMailer::Base.deliveries.last.subject.should == "something interesting"
       get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Something you should know about\n\nFoo\n  bar: 2\n  url: http://google.com\n\nhi\n  woah: there\n\nEvent\n  test: 2"
-      @checker.reload.memory[:queue].should == []
+      @checker.reload.memory[:queue].should be_empty
+    end
+
+    it "can receive complex events and send them on" do
+      stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
+      stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
+      @checker.sources << agents(:bob_weather_agent)
+
+      Agent.async_check(agents(:bob_weather_agent).id)
+
+      Agent.receive!
+      @checker.reload.memory[:queue].should_not be_empty
+
+      Agents::DigestEmailAgent.async_check(@checker.id)
+
+      plain_email_text = get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip
+      html_email_text = get_message_part(ActionMailer::Base.deliveries.last, /html/).strip
+
+      plain_email_text.should =~ /avehumidity/
+      html_email_text.should =~ /avehumidity/
+
+      @checker.reload.memory[:queue].should be_empty
     end
   end
 end
