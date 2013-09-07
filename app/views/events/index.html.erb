@@ -16,6 +16,7 @@
         </tr>
 
       <% @events.each do |event| %>
+        <% next unless event.agent %>
         <tr>
           <td><%= link_to event.agent.name, agent_path(event.agent) %></td>
           <td><%= time_ago_in_words event.created_at %> ago</td>

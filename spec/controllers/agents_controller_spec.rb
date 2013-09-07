@@ -18,6 +18,22 @@ describe AgentsController do
     end
   end
 
+  describe "POST handle_details_post" do
+    it "passes control to handle_details_post on the agent" do
+      sign_in users(:bob)
+      post :handle_details_post, :id => agents(:bob_manual_event_agent).to_param, :payload => { :foo => "bar" }
+      JSON.parse(response.body).should == { "success" => true }
+      agents(:bob_manual_event_agent).events.last.payload.should == { :foo => "bar" }
+    end
+
+    it "can only be accessed by the Agent's owner" do
+      sign_in users(:jane)
+      lambda {
+        post :handle_details_post, :id => agents(:bob_manual_event_agent).to_param, :payload => { :foo => :bar }
+      }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
   describe "GET show" do
     it "only shows Agents for the current user" do
       sign_in users(:bob)
