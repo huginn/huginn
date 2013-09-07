@@ -35,8 +35,8 @@
         <script>
           $(function() {
             var $chart = $(".chart-container.group-<%= index.to_s %>").last();
-            var data = <%= group.select {|e| e.payload[:count].present? }.sort_by {|e| e.payload[:time] }.map {|e| { :x => e.payload[:time].to_i, :y => e.payload[:count].to_i } }.to_json.html_safe %>;
-            var name = <%= filter.to_json.html_safe %>;
+            var data = <%= Utils.jsonify(group.select {|e| e.payload[:count].present? }.sort_by {|e| e.payload[:time] }.map {|e| { :x => e.payload[:time].to_i, :y => e.payload[:count].to_i } }) %>;
+            var name = <%= Utils.jsonify(filter) %>;
 
             renderGraph($chart, data, [], name);
           });
