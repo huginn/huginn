@@ -4,6 +4,7 @@ require 'securerandom'
 module Agents
   class TwilioAgent < Agent
     cannot_be_scheduled!
+    cannot_create_events!
 
     description <<-MD
       The TwilioAgent receives and collects events and sends them via text message or gives you a call when scheduled.

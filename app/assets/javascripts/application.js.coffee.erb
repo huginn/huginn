@@ -8,13 +8,14 @@
 #= require ./worker-checker
 #= require_self
 
-setupJsonEditor = ->
+window.setupJsonEditor = ($editor = $(".live-json-editor")) ->
   JSONEditor.prototype.ADD_IMG = '<%= image_path 'json-editor/add.png' %>'
   JSONEditor.prototype.DELETE_IMG = '<%= image_path 'json-editor/delete.png' %>'
-  if $(".live-json-editor").length
-    window.jsonEditor = new JSONEditor($(".live-json-editor"), 400, 500)
-    window.jsonEditor.doTruncation true
-    window.jsonEditor.showFunctionButtons()
+  if $editor.length
+    jsonEditor = new JSONEditor($editor, $editor.data('width') || 400, $editor.data('height') || 500)
+    jsonEditor.doTruncation true
+    jsonEditor.showFunctionButtons()
+    return jsonEditor
 
 hideSchedule = ->
   $(".schedule-region select").hide()
@@ -45,7 +46,7 @@ showEventDescriptions = ->
 
 $(document).ready ->
   # JSON Editor
-  setupJsonEditor()
+  window.jsonEditor = setupJsonEditor()
 
   # Select2 Selects
   $(".select2").select2(width: 'resolve')
@@ -54,7 +55,35 @@ $(document).ready ->
   if $(".flash").length
     setTimeout((-> $(".flash").slideUp(-> $(".flash").remove())), 5000)
 
-  # Agent Show
+  # Agent Navigation
+  $agentNavigate = $('#agent-navigate')
+  $agentNavigate.typeahead(
+    minLength: 0,
+    items: 15,
+    source: agentNames
+  ).on("change", (e) ->
+    if agentPaths[$agentNavigate.val()]
+      $('#agent-navigate').closest(".navbar-search").find(".spinner").show()
+      navigationData = agentPaths[$agentNavigate.val()]
+      if !(navigationData instanceof Object) || !navigationData.method || navigationData.method == 'GET'
+        window.location = navigationData.url || navigationData
+      else
+        $("<a href='#{navigationData.url}' data-method='#{navigationData.method}'></a>").appendTo($("body")).click()
+
+  ).on("focus", (e) ->
+    $agentNavigate.val ''
+  ).on("blur", (e) ->
+    $agentNavigate.val ''
+  )
+
+  # Pressing '/' selects the search box.
+  $("body").on "keypress", (e) ->
+    if e.keyCode == 47 # The '/' key
+      if e.target.nodeName == "BODY"
+        e.preventDefault()
+        $agentNavigate.focus()
+
+# Agent Show
   fetchLogs = (e) ->
     agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
     e.preventDefault()
@@ -76,16 +105,19 @@ $(document).ready ->
         $("#logs .spinner").stop(true, true).fadeOut ->
           $("#logs .refresh, #logs .clear").show()
 
-  $(".agent-show #show-tabs a[href='#logs']").on "click", fetchLogs
-  $("#logs .refresh").on "click", fetchLogs
-  $("#logs .clear").on "click", clearLogs
+  $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", fetchLogs
+  $(".agent-show #logs .clear").on "click", clearLogs
+
+  if tab = window.location.href.match(/tab=(\w+)\b/i)?[1]
+    if tab in ["details", "logs"]
+      $(".agent-show .nav-tabs li a[href='##{tab}']").click()
 
   # Editing Agents
   $("#agent_source_ids").on "change", showEventDescriptions
 
   $("#agent_type").on "change", ->
     if window.jsonEditor?
-      $(".spinner").fadeIn();
+      $("#agent-spinner").fadeIn();
       $("#agent_source_ids").select2("val", {});
       $(".event-descriptions").html("").hide()
       $.getJSON "/agents/type_details", { type: $(@).val() }, (json) =>
@@ -104,7 +136,7 @@ $(document).ready ->
         window.jsonEditor.json = json.options
         window.jsonEditor.rebuild()
 
-        $(".spinner").stop(true, true).fadeOut();
+        $("#agent-spinner").stop(true, true).fadeOut();
 
   $("#agent_type").change() if $("#agent_type").length
 
