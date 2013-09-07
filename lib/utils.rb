@@ -71,7 +71,19 @@ module Utils
     end
   end
 
-  def self.jsonify(thing)
-    thing.to_json.gsub('</', '<\/').html_safe
+  # Output JSON that is ready for inclusion into HTML.  If you simply use to_json on an object, the
+  # presence of </script> in the valid JSON can break the page and allow XSS attacks.
+  # Optionally, pass `:skip_safe => true` to not call html_safe on the output.
+  def self.jsonify(thing, options = {})
+    json = thing.to_json.gsub('</', '<\/')
+    if !options[:skip_safe]
+      json.html_safe
+    else
+      json
+    end
+  end
+
+  def self.pretty_jsonify(thing)
+    JSON.pretty_generate(thing).gsub('</', '<\/')
   end
 end

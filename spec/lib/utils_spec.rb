@@ -85,4 +85,26 @@ describe Utils do
       Utils.values_at({ :foo => { :bar => "escape this!?" }}, "escape $.foo.bar").should == ["escape+this%21%3F"]
     end
   end
+
+  describe "#jsonify" do
+    it "escapes </script> tags in the output JSON" do
+      cleaned_json = Utils.jsonify(:foo => "bar", :xss => "</script><script>alert('oh no!')</script>")
+      cleaned_json.should_not include("</script>")
+      cleaned_json.should include("<\\/script>")
+    end
+
+    it "html_safes the output unless :skip_safe is passed in" do
+      Utils.jsonify({:foo => "bar"}).should be_html_safe
+      Utils.jsonify({:foo => "bar"}, :skip_safe => false).should be_html_safe
+      Utils.jsonify({:foo => "bar"}, :skip_safe => true).should_not be_html_safe
+    end
+  end
+
+  describe "#pretty_jsonify" do
+    it "escapes </script> tags in the output JSON" do
+      cleaned_json = Utils.pretty_jsonify(:foo => "bar", :xss => "</script><script>alert('oh no!')</script>")
+      cleaned_json.should_not include("</script>")
+      cleaned_json.should include("<\\/script>")
+    end
+  end
 end

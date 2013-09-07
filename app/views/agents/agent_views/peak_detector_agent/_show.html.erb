@@ -17,9 +17,9 @@
       <script>
         $(function() {
           var $chart = $(".chart-container.group-<%= index.to_s %>").last();
-          var data = <%= data.map {|count, time| { :x => time.to_i, :y => count.to_i } }.to_json.html_safe %>;
-          var peaks = <%= ((@agent.memory[:peaks] && @agent.memory[:peaks][group_name]) || []).to_json.html_safe %>;
-          var name = <%= group_name.to_json.html_safe %>;
+          var data = <%= Utils.jsonify(data.map {|count, time| { :x => time.to_i, :y => count.to_i } }) %>;
+          var peaks = <%= Utils.jsonify((@agent.memory[:peaks] && @agent.memory[:peaks][group_name]) || []) %>;
+          var name = <%= Utils.jsonify(group_name) %>;
 
           renderGraph($chart, data, peaks, name);
         });
