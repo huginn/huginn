@@ -7,7 +7,7 @@
 
       <p>
         <b>Payload:</b>
-        <pre><%= JSON.pretty_generate @event.payload || {} %></pre>
+        <pre><%= Utils.pretty_jsonify @event.payload || {} %></pre>
       </p>
 
       <% if @event.lat && @event.lng %>
