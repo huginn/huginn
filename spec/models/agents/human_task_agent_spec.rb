@@ -17,6 +17,97 @@ describe Agents::HumanTaskAgent do
   end
 
   describe "validations" do
+    it "validates that trigger_on is 'schedule' or 'event'" do
+      @checker.options[:trigger_on] = "foo"
+      @checker.should_not be_valid
+    end
+
+    it "requires expected_receive_period_in_days when trigger_on is set to 'event'" do
+      @checker.options[:trigger_on] = "event"
+      @checker.options[:expected_receive_period_in_days] = nil
+      @checker.should_not be_valid
+      @checker.options[:expected_receive_period_in_days] = 2
+      @checker.should be_valid
+    end
+
+    it "requires a positive submission_period when trigger_on is set to 'schedule'" do
+      @checker.options[:trigger_on] = "schedule"
+      @checker.options[:submission_period] = nil
+      @checker.should_not be_valid
+      @checker.options[:submission_period] = 2
+      @checker.should be_valid
+    end
+
+    it "requires a hit.title" do
+      @checker.options[:hit][:title] = ""
+      @checker.should_not be_valid
+    end
+
+    it "requires a hit.description" do
+      @checker.options[:hit][:description] = ""
+      @checker.should_not be_valid
+    end
+
+    it "requires hit.assignments" do
+      @checker.options[:hit][:assignments] = ""
+      @checker.should_not be_valid
+      @checker.options[:hit][:assignments] = 0
+      @checker.should_not be_valid
+      @checker.options[:hit][:assignments] = "moose"
+      @checker.should_not be_valid
+      @checker.options[:hit][:assignments] = "2"
+      @checker.should be_valid
+    end
+
+    it "requires hit.questions" do
+      old_questions = @checker.options[:hit][:questions]
+      @checker.options[:hit][:questions] = nil
+      @checker.should_not be_valid
+      @checker.options[:hit][:questions] = []
+      @checker.should_not be_valid
+      @checker.options[:hit][:questions] = [old_questions[0]]
+      @checker.should be_valid
+    end
+
+    it "requires that all questions have key, name, required, type, and question" do
+      old_questions = @checker.options[:hit][:questions]
+      @checker.options[:hit][:questions].first[:key] = ""
+      @checker.should_not be_valid
+
+      @checker.options[:hit][:questions] = old_questions
+      @checker.options[:hit][:questions].first[:name] = ""
+      @checker.should_not be_valid
+
+      @checker.options[:hit][:questions] = old_questions
+      @checker.options[:hit][:questions].first[:required] = nil
+      @checker.should_not be_valid
+
+      @checker.options[:hit][:questions] = old_questions
+      @checker.options[:hit][:questions].first[:type] = ""
+      @checker.should_not be_valid
+
+      @checker.options[:hit][:questions] = old_questions
+      @checker.options[:hit][:questions].first[:question] = ""
+      @checker.should_not be_valid
+    end
+
+    it "requires that all questions of type 'selection' have a selections array with keys and text" do
+      @checker.options[:hit][:questions][0][:selections] = []
+      @checker.should_not be_valid
+      @checker.options[:hit][:questions][0][:selections] = [{}]
+      @checker.should_not be_valid
+      @checker.options[:hit][:questions][0][:selections] = [{ :key => "", :text => "" }]
+      @checker.should_not be_valid
+      @checker.options[:hit][:questions][0][:selections] = [{ :key => "", :text => "hi" }]
+      @checker.should_not be_valid
+      @checker.options[:hit][:questions][0][:selections] = [{ :key => "hi", :text => "" }]
+      @checker.should_not be_valid
+      @checker.options[:hit][:questions][0][:selections] = [{ :key => "hi", :text => "hi" }]
+      @checker.should be_valid
+      @checker.options[:hit][:questions][0][:selections] = [{ :key => "hi", :text => "hi" }, {}]
+      @checker.should_not be_valid
+    end
+
     it "requires that all questions be of type 'selection' when `take_majority` is `true`" do
       @checker.options[:take_majority] = "true"
       @checker.should_not be_valid
@@ -91,7 +182,7 @@ describe Agents::HumanTaskAgent do
 
       @checker.send :create_hit, @event
 
-      hitInterface.max_assignments.should == @checker.options[:hit][:max_assignments]
+      hitInterface.max_assignments.should == @checker.options[:hit][:assignments]
       hitInterface.reward.should == @checker.options[:hit][:reward]
       hitInterface.description.should == "Make something for Joe"
 
@@ -110,7 +201,7 @@ describe Agents::HumanTaskAgent do
       mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm)
       mock(RTurk::Hit).create(:title => "Hi").yields(hitInterface) { hitInterface }
       @checker.send :create_hit
-      hitInterface.max_assignments.should == @checker.options[:hit][:max_assignments]
+      hitInterface.max_assignments.should == @checker.options[:hit][:assignments]
       hitInterface.reward.should == @checker.options[:hit][:reward]
     end
   end

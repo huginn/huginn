@@ -19,7 +19,7 @@ module Agents
             "expected_receive_period_in_days": 2,
             "trigger_on": "event",
             "hit": {
-              "max_assignments": 1,
+              "assignments": 1,
               "title": "Sentiment evaluation",
               "description": "Please rate the sentiment of this message: '<$.message>'",
               "reward": 0.05,
@@ -58,7 +58,7 @@ module Agents
       `default`, `min_length`, and `max_length`.
 
       If all of the `questions` are of `type` _selection_, you can set `take_majority` to _true_ at the top level to
-      automatically select the majority vote for each question across all `max_assignments`.
+      automatically select the majority vote for each question across all `assignments`.  If all selections are numeric, an `average_answer` will also be generated.
 
       As with most Agents, `expected_receive_period_in_days` is required if `trigger_on` is set to `event`.
     MD
@@ -71,12 +71,27 @@ module Agents
     MD
 
     def validate_options
+      options[:hit] ||= {}
+      options[:hit][:questions] ||= []
+
       errors.add(:base, "'trigger_on' must be one of 'schedule' or 'event'") unless %w[schedule event].include?(options[:trigger_on])
+      errors.add(:base, "'hit.assignments' should specify the number of HIT assignments to create") unless options[:hit][:assignments].present? && options[:hit][:assignments].to_i > 0
+      errors.add(:base, "'hit.title' must be provided") unless options[:hit][:title].present?
+      errors.add(:base, "'hit.description' must be provided") unless options[:hit][:description].present?
+      errors.add(:base, "'hit.questions' must be provided") unless options[:hit][:questions].present? && options[:hit][:questions].length > 0
 
       if options[:trigger_on] == "event"
         errors.add(:base, "'expected_receive_period_in_days' is required when 'trigger_on' is set to 'event'") unless options[:expected_receive_period_in_days].present?
       elsif options[:trigger_on] == "schedule"
         errors.add(:base, "'submission_period' must be set to a positive number of hours when 'trigger_on' is set to 'schedule'") unless options[:submission_period].present? && options[:submission_period].to_i > 0
+      end
+
+      if options[:hit][:questions].any? { |question| [:key, :name, :required, :type, :question].any? {|k| !question[k].present? } }
+        errors.add(:base, "all questions must set 'key', 'name', 'required', 'type', and 'question'")
+      end
+
+      if options[:hit][:questions].any? { |question| question[:type] == "selection" && (!question[:selections].present? || question[:selections].length == 0 || !question[:selections].all? {|s| s[:key].present? } || !question[:selections].all? { |s| s[:text].present? })}
+        errors.add(:base, "all questions of type 'selection' must have a selections array with selections that set 'key' and 'name'")
       end
 
       if options[:take_majority] == "true" && options[:hit][:questions].any? { |question| question[:type] != "selection" }
@@ -90,7 +105,7 @@ module Agents
         :trigger_on => "event",
         :hit =>
           {
-            :max_assignments => 1,
+            :assignments => 1,
             :title => "Sentiment evaluation",
             :description => "Please rate the sentiment of this message: '<$.message>'",
             :reward => 0.05,
@@ -225,7 +240,7 @@ module Agents
       description = Utils.interpolate_jsonpaths(options[:hit][:description], payload).strip
       questions = Utils.recursively_interpolate_jsonpaths(options[:hit][:questions], payload)
       hit = RTurk::Hit.create(:title => title) do |hit|
-        hit.max_assignments = (options[:hit][:max_assignments] || 1).to_i
+        hit.max_assignments = (options[:hit][:assignments] || 1).to_i
         hit.description = description
         hit.question_form AgentQuestionForm.new(:title => title, :description => description, :questions => questions)
         hit.reward = (options[:hit][:reward] || 0.05).to_f
