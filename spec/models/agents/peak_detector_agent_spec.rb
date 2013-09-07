@@ -69,10 +69,6 @@ describe Agents::PeakDetectorAgent do
                                   :pattern => { :filter => "something" })
       @agent.memory[:peaks][:something].length.should == 2
     end
-
-    it "works on real world data" do
-      pending "need examples"
-    end
   end
 
   describe "validation" do

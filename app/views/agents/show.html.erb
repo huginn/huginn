@@ -132,12 +132,12 @@
 
             <p>
               <b>Options:</b>
-              <pre><%= JSON.pretty_generate @agent.options %></pre>
+              <pre><%= JSON.pretty_generate @agent.options || {} %></pre>
             </p>
 
             <p>
               <b>Memory:</b>
-              <pre><%= JSON.pretty_generate @agent.memory %></pre>
+              <pre><%= JSON.pretty_generate @agent.memory || {} %></pre>
             </p>
           </div>
         </div>

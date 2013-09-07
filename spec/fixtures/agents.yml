@@ -92,3 +92,8 @@ bob_twitter_user_agent:
       :oauth_token => "---",
       :oauth_token_secret => "---"
     }.to_yaml.inspect %>
+
+bob_manual_event_agent:
+  type: Agents::ManualEventAgent
+  user: bob
+  name: "Bob's event testing agent"
