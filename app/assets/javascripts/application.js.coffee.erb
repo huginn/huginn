@@ -8,13 +8,14 @@
 #= require ./worker-checker
 #= require_self
 
-setupJsonEditor = ->
+window.setupJsonEditor = ($editor = $(".live-json-editor")) ->
   JSONEditor.prototype.ADD_IMG = '<%= image_path 'json-editor/add.png' %>'
   JSONEditor.prototype.DELETE_IMG = '<%= image_path 'json-editor/delete.png' %>'
-  if $(".live-json-editor").length
-    window.jsonEditor = new JSONEditor($(".live-json-editor"), 400, 500)
-    window.jsonEditor.doTruncation true
-    window.jsonEditor.showFunctionButtons()
+  if $editor.length
+    jsonEditor = new JSONEditor($editor, $editor.data('width') || 400, $editor.data('height') || 500)
+    jsonEditor.doTruncation true
+    jsonEditor.showFunctionButtons()
+    return jsonEditor
 
 hideSchedule = ->
   $(".schedule-region select").hide()
@@ -45,7 +46,7 @@ showEventDescriptions = ->
 
 $(document).ready ->
   # JSON Editor
-  setupJsonEditor()
+  window.jsonEditor = setupJsonEditor()
 
   # Select2 Selects
   $(".select2").select2(width: 'resolve')
