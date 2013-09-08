@@ -112,6 +112,7 @@ describe Agents::HumanTaskAgent do
       @checker.options[:take_majority] = "true"
       @checker.should_not be_valid
       @checker.options[:hit][:questions][1][:type] = "selection"
+      @checker.options[:hit][:questions][1][:selections] = @checker.options[:hit][:questions][0][:selections]
       @checker.should be_valid
     end
   end
