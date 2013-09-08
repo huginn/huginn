@@ -23,6 +23,7 @@ module Agents
               "title": "Sentiment evaluation",
               "description": "Please rate the sentiment of this message: '<$.message>'",
               "reward": 0.05,
+              "lifetime_in_seconds": "3600",
               "questions": [
                 {
                   "type": "selection",
@@ -59,6 +60,8 @@ module Agents
 
       If all of the `questions` are of `type` _selection_, you can set `take_majority` to _true_ at the top level to
       automatically select the majority vote for each question across all `assignments`.  If all selections are numeric, an `average_answer` will also be generated.
+
+      `lifetime_in_seconds` is the number of seconds a HIT is left on Amazon before it's automatically closed.  The default is 1 day.
 
       As with most Agents, `expected_receive_period_in_days` is required if `trigger_on` is set to `event`.
     MD
@@ -109,6 +112,7 @@ module Agents
             :title => "Sentiment evaluation",
             :description => "Please rate the sentiment of this message: '<$.message>'",
             :reward => 0.05,
+            :lifetime_in_seconds => 24 * 60 * 60,
             :questions =>
               [
                 {
@@ -233,6 +237,7 @@ module Agents
       hit = RTurk::Hit.create(:title => title) do |hit|
         hit.max_assignments = (options[:hit][:assignments] || 1).to_i
         hit.description = description
+        hit.lifetime = (options[:hit][:lifetime_in_seconds] || 24 * 60 * 60).to_i
         hit.question_form AgentQuestionForm.new(:title => title, :description => description, :questions => questions)
         hit.reward = (options[:hit][:reward] || 0.05).to_f
         #hit.qualifications.add :approval_rate, { :gt => 80 }
