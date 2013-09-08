@@ -169,7 +169,9 @@ module Agents
     def review_hits
       reviewable_hit_ids = RTurk::GetReviewableHITs.create.hit_ids
       my_reviewed_hit_ids = reviewable_hit_ids & (memory[:hits] || {}).keys.map(&:to_s)
-      log "MTurk reports #{reviewable_hit_ids.length} HITs, of which I own [#{my_reviewed_hit_ids.to_sentence}]"
+      if reviewable_hit_ids.length > 0
+        log "MTurk reports #{reviewable_hit_ids.length} HITs, of which I own [#{my_reviewed_hit_ids.to_sentence}]"
+      end
       my_reviewed_hit_ids.each do |hit_id|
         hit = RTurk::Hit.new(hit_id)
         assignments = hit.assignments
