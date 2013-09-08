@@ -8,7 +8,7 @@ $ ->
 
         if json.pending? && json.pending > 0
           tooltipOptions = {
-            title: "#{json.pending} pending, #{json.awaiting_retry} awaiting retry, and #{json.recent_failures} recent failures"
+            title: "#{json.pending} jobs pending, #{json.awaiting_retry} awaiting retry, and #{json.recent_failures} recent failures"
             delay: 0
             placement: "bottom"
             trigger: "hover"

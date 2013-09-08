@@ -7,7 +7,7 @@ describe EventsController do
   end
 
   describe "GET index" do
-    it "only returns Agents for the current user" do
+    it "only returns Events created by Agents of the current user" do
       sign_in users(:bob)
       get :index
       assigns(:events).all? {|i| i.user.should == users(:bob) }.should be_true
@@ -33,6 +33,28 @@ describe EventsController do
 
       lambda {
         get :show, :id => events(:jane_website_agent_event).to_param
+      }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe "POST reemit" do
+    before do
+      request.env["HTTP_REFERER"] = "/events"
+      sign_in users(:bob)
+    end
+
+    it "clones and re-emits events" do
+      lambda {
+        post :reemit, :id => events(:bob_website_agent_event).to_param
+      }.should change { Event.count }.by(1)
+      Event.last.payload.should == events(:bob_website_agent_event).payload
+      Event.last.agent.should == events(:bob_website_agent_event).agent
+      Event.last.created_at.should be_within(1).of(Time.now)
+    end
+
+    it "can only re-emit Events for the current user" do
+      lambda {
+        post :reemit, :id => events(:jane_website_agent_event).to_param
       }.should raise_error(ActiveRecord::RecordNotFound)
     end
   end
