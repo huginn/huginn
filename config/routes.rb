@@ -19,7 +19,13 @@ Huginn::Application.routes.draw do
       end
     end
   end
-  resources :events, :only => [:index, :show, :destroy]
+
+  resources :events, :only => [:index, :show, :destroy] do
+    member do
+      post :reemit
+    end
+  end
+
   match "/worker_status" => "worker_status#show"
 
   post "/users/:user_id/update_location/:secret" => "user_location_updates#create"

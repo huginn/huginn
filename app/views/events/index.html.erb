@@ -24,6 +24,7 @@
           <td>
             <div class="btn-group">
               <%= link_to 'Show', event_path(event), class: "btn btn-mini" %>
+              <%= link_to 'Re-emit', reemit_event_path(event), method: :post, data: { confirm: 'Are you sure you want to duplicate this event and emit the new one now?' }, class: "btn btn-mini" %>
               <%= link_to 'Delete', event_path(event), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-mini" %>
             </div>
           </td>

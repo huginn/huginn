@@ -17,4 +17,8 @@ class Event < ActiveRecord::Base
   def symbolize_payload
     self.payload = payload.recursively_symbolize_keys if payload.is_a?(Hash)
   end
+
+  def reemit!
+    agent.create_event :payload => payload, :lat => lat, :lng => lng
+  end
 end
