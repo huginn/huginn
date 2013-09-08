@@ -144,7 +144,6 @@ module Agents
     end
 
     def check
-      setup!
       review_hits
 
       if options[:trigger_on] == "schedule" && (memory[:last_schedule] || 0) <= Time.now.to_i - options[:submission_period].to_i * 60 * 60
@@ -155,18 +154,10 @@ module Agents
 
     def receive(incoming_events)
       if options[:trigger_on] == "event"
-        setup!
-
         incoming_events.each do |event|
           create_hit event
         end
       end
-    end
-
-    # To be moved either into an initilizer or a per-agent setting.
-    def setup!
-      RTurk::logger.level = Logger::DEBUG
-      RTurk.setup(ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_ACCESS_KEY'], :sandbox => ENV['AWS_SANDBOX'] == "true") unless Rails.env.test?
     end
 
     protected
