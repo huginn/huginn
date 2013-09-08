@@ -220,6 +220,14 @@ describe Agents::HumanTaskAgent do
       def max_assignments
         @options[:max_assignments] || 1
       end
+
+      def dispose!
+        @disposed = true
+      end
+
+      def disposed?
+        @disposed
+      end
     end
 
     class FakeAssignment
@@ -309,6 +317,7 @@ describe Agents::HumanTaskAgent do
         FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
       ]
       hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
+      hit.should_not be_disposed
       mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
       lambda {
@@ -316,6 +325,7 @@ describe Agents::HumanTaskAgent do
       }.should change { Event.count }.by(1)
 
       assignments.all? {|a| a.approved == true }.should be_true
+      hit.should be_disposed
 
       @checker.events.last.payload[:answers].should == [
         {:sentiment => "neutral", :feedback => ""},

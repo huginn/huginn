@@ -169,7 +169,7 @@ module Agents
     def review_hits
       reviewable_hit_ids = RTurk::GetReviewableHITs.create.hit_ids
       my_reviewed_hit_ids = reviewable_hit_ids & (memory[:hits] || {}).keys.map(&:to_s)
-      log "MTurk reports the following HITs [#{reviewable_hit_ids.to_sentence}], of which I own [#{my_reviewed_hit_ids.to_sentence}]"
+      log "MTurk reports #{reviewable_hit_ids.length} HITs, of which I own [#{my_reviewed_hit_ids.to_sentence}]"
       my_reviewed_hit_ids.each do |hit_id|
         hit = RTurk::Hit.new(hit_id)
         assignments = hit.assignments
@@ -215,6 +215,7 @@ module Agents
           log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => Event.find_by_id(memory[:hits][hit_id.to_sym])
 
           assignments.each(&:approve!)
+          hit.dispose!
 
           memory[:hits].delete(hit_id.to_sym)
         end
