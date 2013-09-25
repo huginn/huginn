@@ -43,7 +43,7 @@ Huginn::Application.configure do
   # config.cache_store = :mem_cache_store
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
-  if ENV['ASSET_HOST']
+  if ENV['ASSET_HOST'].present?
     config.action_controller.asset_host = ENV['ASSET_HOST']
   end
 
