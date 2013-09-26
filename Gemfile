@@ -19,13 +19,11 @@ gem "daemons"
 gem 'foreman'
 gem 'dotenv-rails', :groups => [:development, :test]
 
-group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
-  gem 'uglifier', '>= 1.0.3'
-  gem 'select2-rails'
-  gem 'jquery-rails'
-end
+gem 'sass-rails',   '~> 3.2.3'
+gem 'coffee-rails', '~> 3.2.1'
+gem 'uglifier', '>= 1.0.3'
+gem 'select2-rails'
+gem 'jquery-rails'
 
 gem 'geokit-rails3'
 gem 'kramdown'
