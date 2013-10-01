@@ -133,8 +133,9 @@ $(document).ready ->
 
         $(".description").html(json.description_html) if json.description_html?
 
-        window.jsonEditor.json = json.options
-        window.jsonEditor.rebuild()
+        if $("#agent_options").hasClass("showing-default") || $("#agent_options").val().match(/\A\s*(\{\s*\}|)\s*\Z/g)
+          window.jsonEditor.json = json.options
+          window.jsonEditor.rebuild()
 
         $("#agent-spinner").stop(true, true).fadeOut();
 

@@ -501,10 +501,10 @@ JSONEditor.prototype.build = function(json, node, parent, key, root) {
 
     for(var i in json){
       var innerbq = $(document.createElement("BLOCKQUOTE"));
-      var newElem = this.editable(i.toString(), i.toString(), json, root, 'key').wrap('<span class="key"></b>').parent();
+      var newElem = this.editable(i.toString(), i.toString(), json, root, 'key').wrap('<span class="key"></span>').parent();
       innerbq.append(newElem);
       if (newElem) if (newElem.text() == "??") elem = newElem;
-      if (typeof json[i] != 'string') {
+      if (typeof json[i] != 'string' && typeof json[i] != 'number') {
         innerbq.prepend(this.braceUI(i, json));
         innerbq.prepend(this.bracketUI(i, json));
         if (this._showWipe) innerbq.prepend(this.wipeUI(i, json));

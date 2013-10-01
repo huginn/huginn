@@ -59,8 +59,8 @@
   <div class="control-group">
     <%= f.label :options, :class => 'control-label' %>
     <div class="controls">
-      <textarea rows="10" id="agent_options" name="agent[options]" class="span8 live-json-editor">
-        <%= ((@agent.new_record? && @agent.options == {}) ? @agent.default_options : @agent.options).to_json %>
+      <textarea rows="10" id="agent_options" name="agent[options]" class="span8 live-json-editor <%= (@agent.new_record? && @agent.options == {}) ? "showing-default" : "" %>">
+        <%= Utils.jsonify((@agent.new_record? && @agent.options == {}) ? @agent.default_options : @agent.options) %>
       </textarea>
     </div>
   </div>

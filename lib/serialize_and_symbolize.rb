@@ -29,7 +29,7 @@ module SerializeAndSymbolize
 
           def #{column_name}=(data)
             if data.is_a?(String)
-              self[:#{column_name}] = JSON.parse(data).recursively_symbolize_keys rescue data
+              self[:#{column_name}] = JSON.parse(data).recursively_symbolize_keys rescue {}
             elsif data.is_a?(Hash)
               self[:#{column_name}] = data.recursively_symbolize_keys
             else
