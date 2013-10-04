@@ -3,6 +3,8 @@ require "weibo_2"
 
 module Agents
   class WeiboUserAgent < Agent
+    include WeiboConcern
+
     cannot_receive_events!
 
     description <<-MD
@@ -69,11 +71,8 @@ module Agents
 
     def validate_options
       unless options[:uid].present? &&
-        options[:expected_update_period_in_days].present? &&
-        options[:app_key].present? &&
-        options[:app_secret].present? &&
-        options[:access_token].present?
-        errors.add(:base, "expected_update_period_in_days, uid, app_key, app_secret and access_token are required")
+        options[:expected_update_period_in_days].present?
+        errors.add(:base, "expected_update_period_in_days and uid are required")
       end
     end
 
@@ -92,18 +91,12 @@ module Agents
     end
 
     def check
-      WeiboOAuth2::Config.api_key = options[:app_key] # WEIBO_APP_KEY
-      WeiboOAuth2::Config.api_secret = options[:app_secret] # WEIBO_APP_SECRET
-      client = WeiboOAuth2::Client.new
-      client.get_token_from_hash :access_token => options[:access_token]
-
-
       since_id = memory[:since_id] || nil
       opts = {:uid => options[:uid].to_i}
       opts.merge! :since_id => since_id unless since_id.nil?
 
       # http://open.weibo.com/wiki/2/statuses/user_timeline/en
-      resp = client.statuses.user_timeline opts
+      resp = weibo_client.statuses.user_timeline opts
       if resp[:statuses]
 
 
