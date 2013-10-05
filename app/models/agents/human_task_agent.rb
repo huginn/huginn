@@ -105,6 +105,8 @@ module Agents
             }
           }
 
+      Resulting events will have the original `answers`, as well as the `poll` results, and a field called `best_answer` that contains the best answer as determined by the poll.
+
       # Other settings
 
       `lifetime_in_seconds` is the number of seconds a HIT is left on Amazon before it's automatically closed.  The default is 1 day.
