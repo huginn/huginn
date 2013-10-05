@@ -108,7 +108,43 @@ describe Agents::HumanTaskAgent do
       @checker.should_not be_valid
     end
 
-    it "requires that all questions be of type 'selection' when `take_majority` is `true`" do
+    it "requires that 'poll_options' be present and populated when 'combination_mode' is set to 'poll'" do
+      @checker.options[:combination_mode] = "poll"
+      @checker.should_not be_valid
+      @checker.options[:poll_options] = {}
+      @checker.should_not be_valid
+      @checker.options[:poll_options] = { :title => "Take a poll about jokes",
+                                          :instructions => "Rank these by how funny they are",
+                                          :assignments => 3,
+                                          :row_template => "<$.joke>" }
+      @checker.should be_valid
+      @checker.options[:poll_options] = { :instructions => "Rank these by how funny they are",
+                                          :assignments => 3,
+                                          :row_template => "<$.joke>" }
+      @checker.should_not be_valid
+      @checker.options[:poll_options] = { :title => "Take a poll about jokes",
+                                          :assignments => 3,
+                                          :row_template => "<$.joke>" }
+      @checker.should_not be_valid
+      @checker.options[:poll_options] = { :title => "Take a poll about jokes",
+                                          :instructions => "Rank these by how funny they are",
+                                          :row_template => "<$.joke>" }
+      @checker.should_not be_valid
+      @checker.options[:poll_options] = { :title => "Take a poll about jokes",
+                                          :instructions => "Rank these by how funny they are",
+                                          :assignments => 3}
+      @checker.should_not be_valid
+    end
+
+    it "requires that all questions be of type 'selection' when 'combination_mode' is 'take_majority'" do
+      @checker.options[:combination_mode] = "take_majority"
+      @checker.should_not be_valid
+      @checker.options[:hit][:questions][1][:type] = "selection"
+      @checker.options[:hit][:questions][1][:selections] = @checker.options[:hit][:questions][0][:selections]
+      @checker.should be_valid
+    end
+
+    it "accepts 'take_majority': 'true' for legacy support" do
       @checker.options[:take_majority] = "true"
       @checker.should_not be_valid
       @checker.options[:hit][:questions][1][:type] = "selection"
@@ -126,7 +162,7 @@ describe Agents::HumanTaskAgent do
 
     it "should check for reviewable HITs frequently" do
       mock(@checker).review_hits.twice
-      mock(@checker).create_hit.once
+      mock(@checker).create_basic_hit.once
       @checker.check
       @checker.check
     end
@@ -135,7 +171,7 @@ describe Agents::HumanTaskAgent do
       now = Time.now
       stub(Time).now { now }
       mock(@checker).review_hits.times(3)
-      mock(@checker).create_hit.twice
+      mock(@checker).create_basic_hit.twice
       @checker.check
       now += 1 * 60 * 60
       @checker.check
@@ -144,7 +180,7 @@ describe Agents::HumanTaskAgent do
     end
 
     it "should ignore events" do
-      mock(@checker).create_hit(anything).times(0)
+      mock(@checker).create_basic_hit(anything).times(0)
       @checker.receive([events(:bob_website_agent_event)])
     end
   end
@@ -155,7 +191,7 @@ describe Agents::HumanTaskAgent do
       now = Time.now
       stub(Time).now { now }
       mock(@checker).review_hits.times(3)
-      mock(@checker).create_hit.times(0)
+      mock(@checker).create_basic_hit.times(0)
       @checker.check
       now += 1 * 60 * 60
       @checker.check
@@ -164,7 +200,7 @@ describe Agents::HumanTaskAgent do
     end
 
     it "should create HITs based on events" do
-      mock(@checker).create_hit(events(:bob_website_agent_event)).times(1)
+      mock(@checker).create_basic_hit(events(:bob_website_agent_event)).times(1)
       @checker.receive([events(:bob_website_agent_event)])
     end
   end
@@ -181,7 +217,7 @@ describe Agents::HumanTaskAgent do
       mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm) { |agent_question_form_instance| question_form = agent_question_form_instance }
       mock(RTurk::Hit).create(:title => "Hi Joe").yields(hitInterface) { hitInterface }
 
-      @checker.send :create_hit, @event
+      @checker.send :create_basic_hit, @event
 
       hitInterface.max_assignments.should == @checker.options[:hit][:assignments]
       hitInterface.reward.should == @checker.options[:hit][:reward]
@@ -192,7 +228,7 @@ describe Agents::HumanTaskAgent do
       xml.should include("<Text>Make something for Joe</Text>")
       xml.should include("<DisplayName>Joe Question 1</DisplayName>")
 
-      @checker.memory[:hits][123].should == @event.id
+      @checker.memory[:hits][123][:event_id].should == @event.id
     end
 
     it "works without an event too" do
@@ -201,7 +237,7 @@ describe Agents::HumanTaskAgent do
       hitInterface.id = 123
       mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm)
       mock(RTurk::Hit).create(:title => "Hi").yields(hitInterface) { hitInterface }
-      @checker.send :create_hit
+      @checker.send :create_basic_hit
       hitInterface.max_assignments.should == @checker.options[:hit][:assignments]
       hitInterface.reward.should == @checker.options[:hit][:reward]
     end
@@ -259,8 +295,8 @@ describe Agents::HumanTaskAgent do
 
       # It knows about two HITs from two different events.
       @checker.memory[:hits] = {}
-      @checker.memory[:hits][:"JH3132836336DHG"] = @event.id
-      @checker.memory[:hits][:"JH39AA63836DHG"] = event2.id
+      @checker.memory[:hits][:"JH3132836336DHG"] = { :event_id => @event.id }
+      @checker.memory[:hits][:"JH39AA63836DHG"] = { :event_id => event2.id }
 
       hit_ids = %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345]
       mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { hit_ids } } # It sees 3 HITs.
@@ -273,7 +309,7 @@ describe Agents::HumanTaskAgent do
     end
 
     it "shouldn't do anything if an assignment isn't ready" do
-      @checker.memory[:hits] = { :"JH3132836336DHG" => @event.id }
+      @checker.memory[:hits] = { :"JH3132836336DHG" => { :event_id => @event.id } }
       mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
       assignments = [
         FakeAssignment.new(:status => "Accepted", :answers => {}),
@@ -288,11 +324,11 @@ describe Agents::HumanTaskAgent do
       @checker.send :review_hits
 
       assignments.all? {|a| a.approved == true }.should be_false
-      @checker.memory[:hits].should == { :"JH3132836336DHG" => @event.id }
+      @checker.memory[:hits].should == { :"JH3132836336DHG" => { :event_id => @event.id } }
     end
 
     it "shouldn't do anything if an assignment is missing" do
-      @checker.memory[:hits] = { :"JH3132836336DHG" => @event.id }
+      @checker.memory[:hits] = { :"JH3132836336DHG" => { :event_id => @event.id } }
       mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
       assignments = [
         FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
@@ -306,11 +342,11 @@ describe Agents::HumanTaskAgent do
       @checker.send :review_hits
 
       assignments.all? {|a| a.approved == true }.should be_false
-      @checker.memory[:hits].should == { :"JH3132836336DHG" => @event.id }
+      @checker.memory[:hits].should == { :"JH3132836336DHG" => { :event_id => @event.id } }
     end
 
     it "should create events when all assignments are ready" do
-      @checker.memory[:hits] = { :"JH3132836336DHG" => @event.id }
+      @checker.memory[:hits] = { :"JH3132836336DHG" => { :event_id => @event.id } }
       mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
       assignments = [
         FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "feedback"=>""}),
@@ -337,8 +373,8 @@ describe Agents::HumanTaskAgent do
 
     describe "taking majority votes" do
       before do
-        @checker.options[:take_majority] = "true"
-        @checker.memory[:hits] = { :"JH3132836336DHG" => @event.id }
+        @checker.options[:combination_mode] = "take_majority"
+        @checker.memory[:hits] = { :"JH3132836336DHG" => { :event_id => @event.id } }
         mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
       end
 
@@ -386,6 +422,10 @@ describe Agents::HumanTaskAgent do
       end
 
       it "should also provide an average answer when all questions are numeric" do
+        # it should accept 'take_majority': 'true' as well for legacy support.  Demonstrating that here.
+        @checker.options.delete :combination_mode
+        @checker.options[:take_majority] = "true"
+
         @checker.options[:hit][:questions] = [
           {
             :type => "selection",
@@ -433,6 +473,119 @@ describe Agents::HumanTaskAgent do
         @checker.events.last.payload[:average_answer].should == { :rating => (1 + 2 + 2 + 3 + 5.1) / 5.0 }
 
         @checker.memory[:hits].should == {}
+      end
+    end
+
+    describe "creating and reviewing polls" do
+      before do
+        @checker.options[:combination_mode] = "poll"
+        @checker.options[:poll_options] = {
+          :title => "Hi!",
+          :instructions => "hello!",
+          :assignments => 2,
+          :row_template => "This is <.sentiment>"
+        }
+        @event.save!
+        mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
+      end
+
+      it "creates a poll using the row_template, message, and correct number of assignments" do
+        @checker.memory[:hits] = { :"JH3132836336DHG" => { :event_id => @event.id } }
+
+        # Mock out the HIT's submitted assignments.
+        assignments = [
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"sad",     "feedback"=>"This is my feedback 1"}),
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "feedback"=>"This is my feedback 2"}),
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy",   "feedback"=>"This is my feedback 3"}),
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy",   "feedback"=>"This is my feedback 4"})
+        ]
+        hit = FakeHit.new(:max_assignments => 4, :assignments => assignments)
+        mock(RTurk::Hit).new("JH3132836336DHG") { hit }
+
+        @checker.memory[:hits][:"JH3132836336DHG"].should be_present
+
+        # Setup mocks for HIT creation
+
+        question_form = nil
+        hitInterface = OpenStruct.new
+        hitInterface.id = "JH39AA63836DH12345"
+        mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm) { |agent_question_form_instance| question_form = agent_question_form_instance }
+        mock(RTurk::Hit).create(:title => "Hi!").yields(hitInterface) { hitInterface }
+
+        # And finally, the test.
+
+        lambda {
+          @checker.send :review_hits
+        }.should change { Event.count }.by(0) # it does not emit an event until all poll results are in
+
+        # it approves the existing assignments
+
+        assignments.all? {|a| a.approved == true }.should be_true
+        hit.should be_disposed
+
+        # it creates a new HIT for the poll
+
+        hitInterface.max_assignments.should == @checker.options[:poll_options][:assignments]
+        hitInterface.description.should == @checker.options[:poll_options][:instructions]
+
+        xml = question_form.to_xml
+        xml.should include("<Text>This is happy</Text>")
+        xml.should include("<Text>This is neutral</Text>")
+        xml.should include("<Text>This is sad</Text>")
+
+        @checker.save
+        @checker.reload
+        @checker.memory[:hits][:"JH3132836336DHG"].should_not be_present
+        @checker.memory[:hits][:"JH39AA63836DH12345"].should be_present
+        @checker.memory[:hits][:"JH39AA63836DH12345"][:event_id].should == @event.id
+        @checker.memory[:hits][:"JH39AA63836DH12345"][:type].should == :poll
+        @checker.memory[:hits][:"JH39AA63836DH12345"][:original_hit].should == "JH3132836336DHG"
+        @checker.memory[:hits][:"JH39AA63836DH12345"][:answers].length.should == 4
+      end
+
+      it "emits an event when all poll results are in, containing the data from the best answer, plus all others" do
+        original_answers = [
+          {:sentiment => "sad",     :feedback => "This is my feedback 1"},
+          {:sentiment => "neutral", :feedback => "This is my feedback 2"},
+          {:sentiment => "happy",   :feedback => "This is my feedback 3"},
+          {:sentiment => "happy",   :feedback => "This is my feedback 4"}
+        ]
+
+        @checker.memory[:hits] = {
+          :JH39AA63836DH12345 => {
+            :type => :poll,
+            :original_hit => "JH3132836336DHG",
+            :answers => original_answers,
+            :event_id => 345
+          }
+        }
+
+        # Mock out the HIT's submitted assignments.
+        assignments = [
+          FakeAssignment.new(:status => "Submitted", :answers => {"1" => "2", "2" => "5", "3" => "3", "4" => "2"}),
+          FakeAssignment.new(:status => "Submitted", :answers => {"1" => "3", "2" => "4", "3" => "1", "4" => "4"})
+        ]
+        hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
+        mock(RTurk::Hit).new("JH39AA63836DH12345") { hit }
+
+        @checker.memory[:hits][:"JH39AA63836DH12345"].should be_present
+
+        lambda {
+          @checker.send :review_hits
+        }.should change { Event.count }.by(1)
+
+        # It emits an event
+
+        @checker.events.last.payload[:answers].should == original_answers
+        @checker.events.last.payload[:poll].should == [{:"1" => "2", :"2" => "5", :"3" => "3", :"4" => "2"}, {:"1" => "3", :"2" => "4", :"3" => "1", :"4" => "4"}]
+        @checker.events.last.payload[:best_answer].should == {:sentiment => "neutral", :feedback => "This is my feedback 2"}
+
+        # it approves the existing assignments
+
+        assignments.all? {|a| a.approved == true }.should be_true
+        hit.should be_disposed
+
+        @checker.memory[:hits].should be_empty
       end
     end
   end
