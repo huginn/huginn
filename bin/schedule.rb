@@ -11,22 +11,26 @@ end
 require 'rufus/scheduler'
 
 def run_schedule(time, mutex)
-  mutex.synchronize do
-    puts "Queuing schedule for #{time}"
-    Agent.delay.run_schedule(time)
+  ActiveRecord::Base.connection_pool.with_connection do
+    mutex.synchronize do
+      puts "Queuing schedule for #{time}"
+      Agent.delay.run_schedule(time)
+    end
   end
 end
 
 def propogate!(mutex)
-  mutex.synchronize do
-    puts "Queuing event propagation"
-    Agent.delay.receive!
+  ActiveRecord::Base.connection_pool.with_connection do
+    mutex.synchronize do
+      puts "Queuing event propagation"
+      Agent.delay.receive!
+    end
   end
 end
 
 mutex = Mutex.new
 
-scheduler = Rufus::Scheduler.start_new
+scheduler = Rufus::Scheduler.new
 
 # Schedule event propagation.
 
