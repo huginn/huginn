@@ -2,6 +2,8 @@ require "twitter"
 
 module Agents
   class TwitterUserAgent < Agent
+    include TwitterConcern
+
     cannot_receive_events!
 
     description <<-MD
@@ -39,9 +41,10 @@ module Agents
     default_schedule "every_1h"
 
     def validate_options
-      unless options[:username].present? && options[:expected_update_period_in_days].present? && options[:consumer_key].present? && options[:consumer_secret].present? && options[:oauth_token].present? && options[:oauth_token_secret].present?
-        errors.add(:base, "expected_update_period_in_days, username, consumer_key, consumer_secret, oauth_token and oauth_token_secret are required")
-      end
+      unless options[:username].present? &&
+        options[:expected_update_period_in_days].present?
+        errors.add(:base, "username and expected_update_period_in_days are required")
+      end      
     end
 
     def working?
@@ -60,13 +63,6 @@ module Agents
     end
 
     def check
-      Twitter.configure do |config|
-        config.consumer_key = options[:consumer_key]
-        config.consumer_secret = options[:consumer_secret]
-        config.oauth_token = options[:oauth_token]
-        config.oauth_token_secret = options[:oauth_token_secret]
-      end
-
       since_id = memory[:since_id] || nil
       opts = {:count => 200, :include_rts => true, :exclude_replies => false, :include_entities => true, :contributor_details => true}
       opts.merge! :since_id => since_id unless since_id.nil?
