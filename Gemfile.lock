@@ -188,8 +188,8 @@ GEM
       erector
       nokogiri
       rest-client
-    rufus-scheduler (2.0.22)
-      tzinfo (>= 0.3.23)
+    rufus-scheduler (3.0.2)
+      tzinfo
     safe_yaml (0.9.5)
     sass (3.2.9)
     sass-rails (3.2.6)
@@ -228,7 +228,7 @@ GEM
       simple_oauth (~> 0.1.4)
     typhoeus (0.6.3)
       ethon (~> 0.5.11)
-    tzinfo (0.3.37)
+    tzinfo (0.3.38)
     uglifier (2.1.2)
       execjs (>= 0.3.0)
       multi_json (~> 1.0, >= 1.0.2)
