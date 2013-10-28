@@ -2,6 +2,7 @@ require "twitter"
 
 module Agents
   class TwitterPublishAgent < Agent
+    include TwitterConcern
     cannot_be_scheduled!
 
     description <<-MD
@@ -19,13 +20,9 @@ module Agents
 
     def validate_options
       unless options[:username].present? &&
-        options[:expected_update_period_in_days].present? &&
-        options[:consumer_key].present? &&
-        options[:consumer_secret].present? &&
-        options[:oauth_token].present? &&
-        options[:oauth_token_secret].present?
-        errors.add(:base, "expected_update_period_in_days, username, consumer_key, consumer_secret, oauth_token and oauth_token_secret are required")
-      end
+        options[:expected_update_period_in_days].present?
+        errors.add(:base, "username and expected_update_period_in_days are required")
+      end      
     end
 
     def working?
@@ -72,13 +69,6 @@ module Agents
     end
 
     def publish_tweet text
-      Twitter.configure do |config|
-        config.consumer_key = options[:consumer_key]
-        config.consumer_secret = options[:consumer_secret]
-        config.oauth_token = options[:oauth_token]
-        config.oauth_token_secret = options[:oauth_token_secret]
-      end
-
       Twitter.update(text)
     end
 

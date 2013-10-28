@@ -3,6 +3,8 @@ require "weibo_2"
 
 module Agents
   class WeiboPublishAgent < Agent
+    include WeiboConcern
+
     cannot_be_scheduled!
 
     description <<-MD
@@ -19,11 +21,8 @@ module Agents
 
     def validate_options
       unless options[:uid].present? &&
-        options[:expected_update_period_in_days].present? &&
-        options[:app_key].present? &&
-        options[:app_secret].present? &&
-        options[:access_token].present?
-        errors.add(:base, "expected_update_period_in_days, uid, and access_token are required")
+        options[:expected_update_period_in_days].present?
+        errors.add(:base, "expected_update_period_in_days and uid are required")
       end
     end
 
@@ -73,12 +72,7 @@ module Agents
     end
 
     def publish_tweet text
-      WeiboOAuth2::Config.api_key = options[:app_key] # WEIBO_APP_KEY
-      WeiboOAuth2::Config.api_secret = options[:app_secret] # WEIBO_APP_SECRET
-      client = WeiboOAuth2::Client.new
-      client.get_token_from_hash :access_token => options[:access_token]
-
-      client.statuses.update text
+      weibo_client.statuses.update text
     end
 
     def unwrap_tco_urls text, tweet_json
