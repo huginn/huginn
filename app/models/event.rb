@@ -21,4 +21,8 @@ class Event < ActiveRecord::Base
   def reemit!
     agent.create_event :payload => payload, :lat => lat, :lng => lng
   end
+
+  def self.cleanup_expired!
+    Event.where("expires_at IS NOT NULL AND expires_at < ?", Time.now).delete_all
+  end
 end

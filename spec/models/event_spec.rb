@@ -16,4 +16,41 @@ describe Event do
       Event.last.created_at.should be_within(1).of(Time.now)
     end
   end
+
+  describe ".cleanup_expired!" do
+    it "removes any Events whose expired_at date is non-null and in the past" do
+      event = Event.new
+      event.agent = agents(:jane_weather_agent)
+      event.expires_at = 2.hours.from_now
+      event.save!
+
+      current_time = Time.now
+      stub(Time).now { current_time }
+
+      Event.cleanup_expired!
+      Event.find_by_id(event.id).should_not be_nil
+      current_time = 119.minutes.from_now
+      Event.cleanup_expired!
+      Event.find_by_id(event.id).should_not be_nil
+      current_time = 2.minutes.from_now
+      Event.cleanup_expired!
+      Event.find_by_id(event.id).should be_nil
+    end
+
+    it "doesn't touch Events with no expired_at" do
+      event = Event.new
+      event.agent = agents(:jane_weather_agent)
+      event.expires_at = nil
+      event.save!
+
+      current_time = Time.now
+      stub(Time).now { current_time }
+
+      Event.cleanup_expired!
+      Event.find_by_id(event.id).should_not be_nil
+      current_time = 2.days.from_now
+      Event.cleanup_expired!
+      Event.find_by_id(event.id).should_not be_nil
+    end
+  end
 end
