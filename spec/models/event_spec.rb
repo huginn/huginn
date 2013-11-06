@@ -19,10 +19,7 @@ describe Event do
 
   describe ".cleanup_expired!" do
     it "removes any Events whose expired_at date is non-null and in the past" do
-      event = Event.new
-      event.agent = agents(:jane_weather_agent)
-      event.expires_at = 2.hours.from_now
-      event.save!
+      event = agents(:jane_weather_agent).create_event :expires_at => 2.hours.from_now
 
       current_time = Time.now
       stub(Time).now { current_time }
