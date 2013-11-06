@@ -9,6 +9,8 @@ module Agents
       You must provide an oAuth `consumer_key`, `consumer_secret`, `oauth_token`, and `oauth_token_secret`, as well as an array of `filters`.  Multiple words in a filter
       must all show up in a tweet, but are independent of order.
 
+      If you provide an array instead of a filter, the first entry will be considered primary and any additional values will be treated as aliases.
+
       To get oAuth credentials for Twitter, [follow these instructions](https://github.com/cantino/huginn/wiki/Getting-a-twitter-oauth-token).
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
@@ -76,16 +78,20 @@ module Agents
     end
 
     def process_tweet(filter, status)
-      if options[:generate] == "counts"
-        # Avoid memory pollution by reloading the Agent.
-        agent = Agent.find(id)
-        agent.memory[:filter_counts] ||= {}
-        agent.memory[:filter_counts][filter.to_sym] ||= 0
-        agent.memory[:filter_counts][filter.to_sym] += 1
-        remove_unused_keys!(agent, :filter_counts)
-        agent.save!
-      else
-        create_event :payload => status.merge(:filter => filter.to_s)
+      filter = lookup_filter(filter)
+
+      if filter
+        if options[:generate] == "counts"
+          # Avoid memory pollution by reloading the Agent.
+          agent = Agent.find(id)
+          agent.memory[:filter_counts] ||= {}
+          agent.memory[:filter_counts][filter.to_sym] ||= 0
+          agent.memory[:filter_counts][filter.to_sym] += 1
+          remove_unused_keys!(agent, :filter_counts)
+          agent.save!
+        else
+          create_event :payload => status.merge(:filter => filter.to_s)
+        end
       end
     end
 
@@ -100,9 +106,21 @@ module Agents
 
     protected
 
+    def lookup_filter(filter)
+      options[:filters].each do |known_filter|
+        if known_filter == filter
+          return filter
+        elsif known_filter.is_a?(Array)
+          if known_filter.include?(filter)
+            return known_filter.first
+          end
+        end
+      end
+    end
+
     def remove_unused_keys!(agent, base)
       if agent.memory[base]
-        (agent.memory[base].keys - agent.options[:filters].map(&:to_sym)).each do |removed_key|
+        (agent.memory[base].keys - agent.options[:filters].map {|f| f.is_a?(Array) ? f.first.to_sym : f.to_sym }).each do |removed_key|
           agent.memory[base].delete(removed_key)
         end
       end

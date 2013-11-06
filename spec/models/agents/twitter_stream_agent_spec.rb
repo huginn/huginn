@@ -24,19 +24,35 @@ describe Agents::TwitterStreamAgent do
       end
 
       it 'records counts' do
-        @agent.process_tweet(:keyword1, {:text => "something", :user => {:name => "Mr. Someone"}})
-        @agent.process_tweet(:keyword2, {:text => "something", :user => {:name => "Mr. Someone"}})
-        @agent.process_tweet(:keyword1, {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword2', {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
 
         @agent.reload
         @agent.memory[:filter_counts][:keyword1].should == 2
         @agent.memory[:filter_counts][:keyword2].should == 1
       end
 
+      it 'records counts for keyword sets as well' do
+        @agent.options[:filters][0] = %w[keyword1-1 keyword1-2 keyword1-3]
+        @agent.save!
+
+        @agent.process_tweet('keyword2', {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword2', {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword1-1', {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword1-2', {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword1-3', {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword1-1', {:text => "something", :user => {:name => "Mr. Someone"}})
+
+        @agent.reload
+        @agent.memory[:filter_counts][:'keyword1-1'].should == 4 # it stores on the first keyword
+        @agent.memory[:filter_counts][:keyword2].should == 2
+      end
+
       it 'removes unused keys' do
         @agent.memory[:filter_counts] = {:keyword1 => 2, :keyword2 => 3, :keyword3 => 4}
         @agent.save!
-        @agent.process_tweet(:keyword1, {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
         @agent.reload.memory[:filter_counts].should == {:keyword1 => 3, :keyword2 => 3}
       end
     end
@@ -53,6 +69,21 @@ describe Agents::TwitterStreamAgent do
           :user => {:name => "Mr. Someone"}
         }
       end
+
+      it 'handles keyword sets too' do
+        @agent.options[:filters][0] = %w[keyword1-1 keyword1-2 keyword1-3]
+        @agent.save!
+
+        lambda {
+          @agent.process_tweet('keyword1-2', {:text => "something", :user => {:name => "Mr. Someone"}})
+        }.should change { @agent.events.count }.by(1)
+
+        @agent.events.last.payload.should == {
+          :filter => 'keyword1-1',
+          :text => "something",
+          :user => {:name => "Mr. Someone"}
+        }
+      end
     end
   end
 
@@ -64,9 +95,9 @@ describe Agents::TwitterStreamAgent do
       end
 
       it 'emits events' do
-        @agent.process_tweet(:keyword1, {:text => "something", :user => {:name => "Mr. Someone"}})
-        @agent.process_tweet(:keyword2, {:text => "something", :user => {:name => "Mr. Someone"}})
-        @agent.process_tweet(:keyword1, {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword2', {:text => "something", :user => {:name => "Mr. Someone"}})
+        @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
 
         lambda {
           @agent.reload.check
