@@ -11,9 +11,11 @@ set :use_sudo, false
 set :scm, :git
 set :rails_env, 'production'
 set :repository, "git@github.com:you/huginn-private.git"
-set :branch, "master"
+set :branch, ENV['BRANCH'] || "master"
 set :deploy_via, :remote_cache
 set :keep_releases, 5
+
+puts "    Deploying #{branch}"
 
 set :bundle_without, [:development]
 
