@@ -52,10 +52,10 @@ end
 
 def load_and_run(agents)
   agents.group_by { |agent| agent.options[:twitter_username] }.each do |twitter_username, agents|
-    filter_to_agent_map = agents.map { |agent| agent.options[:filters] }.flatten.uniq.compact.inject({}) { |m, f| m[f] = []; m }
+    filter_to_agent_map = agents.map { |agent| agent.options[:filters] }.flatten.uniq.compact.map(&:strip).inject({}) { |m, f| m[f] = []; m }
 
     agents.each do |agent|
-      agent.options[:filters].uniq.map(&:strip).each do |filter|
+      agent.options[:filters].flatten.uniq.compact.map(&:strip).each do |filter|
         filter_to_agent_map[filter] << agent
       end
     end
