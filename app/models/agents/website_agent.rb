@@ -62,7 +62,7 @@ module Agents
 
     def validate_options
       errors.add(:base, "url and expected_update_period_in_days are required") unless options[:expected_update_period_in_days].present? && options[:url].present?
-      if !options[:extract].present? && options[:type] != "json"
+      if !options[:extract].present? && extraction_type != "json"
         errors.add(:base, "extract is required for all types except json")
       end
     end
@@ -76,16 +76,15 @@ module Agents
       end
       request.on_success do |response|
         doc = parse(response.body)
-        output = {}
-        previous_payloads = events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options[:mode].to_s == "on_change"
 
-        if extraction_type == "json" && !options[:extract].present?
+        if extract_full_json?
           result = doc
-          if !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result.to_json))
+          if store_payload? result
             log "Storing new result for '#{name}': #{result.inspect}"
             create_event :payload => result
           end
         else
+          output = {}
           options[:extract].each do |name, extraction_details|
             result = if extraction_type == "json"
                        output[name] = Utils.values_at(doc, extraction_details[:path])
@@ -120,8 +119,8 @@ module Agents
               end
             end
 
-            if !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result.to_json))
-              log "Storing new result for '#{name}': #{result.inspect}"
+            if store_payload? result
+              log "Storing new parsed result for '#{name}': #{result.inspect}"
               create_event :payload => result
             end
           end
@@ -132,6 +131,18 @@ module Agents
     end
 
     private
+
+    def store_payload? result
+      !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result.to_json))
+    end
+
+    def previous_payloads
+      events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options[:mode].to_s == "on_change"
+    end
+
+    def extract_full_json?
+      (!options[:extract].present? && extraction_type == "json")
+    end
 
     def extraction_type
       (options[:type] || begin
