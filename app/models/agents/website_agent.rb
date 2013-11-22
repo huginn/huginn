@@ -61,7 +61,10 @@ module Agents
     end
 
     def validate_options
-      errors.add(:base, "url, expected_update_period_in_days, and extract are required") unless options[:expected_update_period_in_days].present? && options[:url].present? && options[:extract].present?
+      errors.add(:base, "url and expected_update_period_in_days are required") unless options[:expected_update_period_in_days].present? && options[:url].present?
+      if !options[:extract].present? && options[:type] != "json"
+        errors.add(:base, "extract is required for all types except json")
+      end
     end
 
     def check
@@ -74,44 +77,53 @@ module Agents
       request.on_success do |response|
         doc = parse(response.body)
         output = {}
-        options[:extract].each do |name, extraction_details|
-          result = if extraction_type == "json"
-                     output[name] = Utils.values_at(doc, extraction_details[:path])
-                   else
-                     output[name] = doc.css(extraction_details[:css]).map { |node|
-                       if extraction_details[:attr]
-                         node.attr(extraction_details[:attr])
-                       elsif extraction_details[:text]
-                         node.text()
-                       else
-                         error ":attr or :text is required on HTML or XML extraction patterns"
-                         return
-                       end
-                     }
-                   end
-          log "Extracting #{extraction_type} at #{extraction_details[:path] || extraction_details[:css]}: #{result}"
-        end
-
-        num_unique_lengths = options[:extract].keys.map { |name| output[name].length }.uniq
-
-        if num_unique_lengths.length != 1
-          error "Got an uneven number of matches for #{options[:name]}: #{options[:extract].inspect}"
-          return
-        end
-
         previous_payloads = events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options[:mode].to_s == "on_change"
-        num_unique_lengths.first.times do |index|
-          result = {}
-          options[:extract].keys.each do |name|
-            result[name] = output[name][index]
-            if name.to_s == 'url'
-              result[name] = URI.join(options[:url], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
-            end
-          end
 
+        if extraction_type == "json" && !options[:extract].present?
+          result = doc
           if !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result.to_json))
             log "Storing new result for '#{name}': #{result.inspect}"
             create_event :payload => result
+          end
+        else
+          options[:extract].each do |name, extraction_details|
+            result = if extraction_type == "json"
+                       output[name] = Utils.values_at(doc, extraction_details[:path])
+                     else
+                       output[name] = doc.css(extraction_details[:css]).map { |node|
+                         if extraction_details[:attr]
+                           node.attr(extraction_details[:attr])
+                         elsif extraction_details[:text]
+                           node.text()
+                         else
+                           error ":attr or :text is required on HTML or XML extraction patterns"
+                           return
+                         end
+                       }
+                     end
+            log "Extracting #{extraction_type} at #{extraction_details[:path] || extraction_details[:css]}: #{result}"
+          end
+
+          num_unique_lengths = options[:extract].keys.map { |name| output[name].length }.uniq
+
+          if num_unique_lengths.length != 1
+            error "Got an uneven number of matches for #{options[:name]}: #{options[:extract].inspect}"
+            return
+          end
+      
+          num_unique_lengths.first.times do |index|
+            result = {}
+            options[:extract].keys.each do |name|
+              result[name] = output[name][index]
+              if name.to_s == 'url'
+                result[name] = URI.join(options[:url], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
+              end
+            end
+
+            if !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result.to_json))
+              log "Storing new result for '#{name}': #{result.inspect}"
+              create_event :payload => result
+            end
           end
         end
       end
