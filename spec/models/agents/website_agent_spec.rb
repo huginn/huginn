@@ -155,6 +155,31 @@ describe Agents::WebsiteAgent do
         event.payload[:version].should == 2
         event.payload[:title].should == "first"
       end
+
+      it "stores the whole object if :extract is not specified" do
+        json = {
+            :response => {
+                :version => 2,
+                :title => "hello!"
+            }
+        }
+        stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
+        site = {
+            :name => "Some JSON Response",
+            :expected_update_period_in_days => 2,
+            :type => "json",
+            :url => "http://json-site.com",
+            :mode => :on_change
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        event.payload[:response][:version].should == 2
+        event.payload[:response][:title].should == "hello!"
+      end
     end
   end
 end
