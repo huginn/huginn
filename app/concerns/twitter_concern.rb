@@ -19,12 +19,11 @@ module TwitterConcern
     Twitter.configure do |config|
       config.consumer_key = options[:consumer_key]
       config.consumer_secret = options[:consumer_secret]
-      config.oauth_token = options[:oauth_token]
-      config.oauth_token_secret = options[:oauth_token_secret]
+      config.oauth_token = options[:oauth_token] || options[:access_key]
+      config.oauth_token_secret = options[:oauth_token_secret] || options[:access_secret]
     end
   end
 
   module ClassMethods
-
   end
 end
