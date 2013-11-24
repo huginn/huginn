@@ -17,11 +17,11 @@ require 'pp'
 def stream!(filters, options = {}, &block)
   stream = Twitter::JSONStream.connect(
     :path    => "/1/statuses/#{(filters && filters.length > 0) ? 'filter' : 'sample'}.json#{"?track=#{filters.map {|f| CGI::escape(f) }.join(",")}" if filters && filters.length > 0}",
-    :oauth => {
+    :oauth   => {
       :consumer_key    => options[:consumer_key],
       :consumer_secret => options[:consumer_secret],
-      :access_key      => options[:access_key],
-      :access_secret   => options[:access_secret]
+      :access_key      => options[:oauth_token] || options[:access_key],
+      :access_secret   => options[:oauth_token_secret] || options[:access_secret]
     },
     :ssl     => true
   )
@@ -52,15 +52,15 @@ end
 
 def load_and_run(agents)
   agents.group_by { |agent| agent.options[:twitter_username] }.each do |twitter_username, agents|
-    filter_to_agent_map = agents.map { |agent| agent.options[:filters] }.flatten.uniq.compact.inject({}) { |m, f| m[f] = []; m }
+    filter_to_agent_map = agents.map { |agent| agent.options[:filters] }.flatten.uniq.compact.map(&:strip).inject({}) { |m, f| m[f] = []; m }
 
     agents.each do |agent|
-      agent.options[:filters].uniq.map(&:strip).each do |filter|
+      agent.options[:filters].flatten.uniq.compact.map(&:strip).each do |filter|
         filter_to_agent_map[filter] << agent
       end
     end
 
-    options = agents.first.options.slice(:consumer_key, :consumer_secret, :access_key, :access_secret)
+    options = agents.first.options.slice(:consumer_key, :consumer_secret, :access_key, :oauth_token, :access_secret, :oauth_token_secret)
 
     recent_tweets = []
 

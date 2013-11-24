@@ -199,30 +199,32 @@ class Agent < ActiveRecord::Base
     end
 
     def receive!
-      sql = Agent.
-              select("agents.id AS receiver_agent_id, sources.id AS source_agent_id, events.id AS event_id").
-              joins("JOIN links ON (links.receiver_id = agents.id)").
-              joins("JOIN agents AS sources ON (links.source_id = sources.id)").
-              joins("JOIN events ON (events.agent_id = sources.id)").
-              where("agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id").to_sql
+      Agent.transaction do
+        sql = Agent.
+                select("agents.id AS receiver_agent_id, sources.id AS source_agent_id, events.id AS event_id").
+                joins("JOIN links ON (links.receiver_id = agents.id)").
+                joins("JOIN agents AS sources ON (links.source_id = sources.id)").
+                joins("JOIN events ON (events.agent_id = sources.id)").
+                where("agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id").to_sql
 
-      agents_to_events = {}
-      Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_id, event_id|
-        agents_to_events[receiver_agent_id] ||= []
-        agents_to_events[receiver_agent_id] << event_id
-      end
+        agents_to_events = {}
+        Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_id, event_id|
+          agents_to_events[receiver_agent_id] ||= []
+          agents_to_events[receiver_agent_id] << event_id
+        end
 
-      event_ids = agents_to_events.values.flatten.uniq.compact
+        event_ids = agents_to_events.values.flatten.uniq.compact
 
-      Agent.where(:id => agents_to_events.keys).each do |agent|
-        agent.update_attribute :last_checked_event_id, event_ids.max
-        Agent.async_receive(agent.id, agents_to_events[agent.id].uniq)
-      end
+        Agent.where(:id => agents_to_events.keys).each do |agent|
+          agent.update_attribute :last_checked_event_id, event_ids.max
+          Agent.async_receive(agent.id, agents_to_events[agent.id].uniq)
+        end
 
-      {
+        {
           :agent_count => agents_to_events.keys.length,
           :event_count => event_ids.length
-      }
+        }
+      end
     end
 
     # Given an Agent id and an array of Event ids, load the Agent, call #receive on it with the Event objects, and then

@@ -186,7 +186,7 @@ describe Agent do
         }
         Agent.async_check(agents(:bob_weather_agent).id)
         lambda {
-          Agent.receive!
+          Agent.async_receive(agents(:bob_rain_notifier_agent).id, [agents(:bob_weather_agent).events.last.id])
         }.should raise_error
         log = agents(:bob_rain_notifier_agent).logs.first
         log.message.should =~ /Exception/
