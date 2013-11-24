@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130819160603) do
+ActiveRecord::Schema.define(:version => 20131105063248) do
 
   create_table "agent_logs", :force => true do |t|
     t.integer  "agent_id",                         :null => false
@@ -67,9 +67,11 @@ ActiveRecord::Schema.define(:version => 20130819160603) do
     t.text     "payload",    :limit => 16777215
     t.datetime "created_at",                                                     :null => false
     t.datetime "updated_at",                                                     :null => false
+    t.datetime "expires_at"
   end
 
   add_index "events", ["agent_id", "created_at"], :name => "index_events_on_agent_id_and_created_at"
+  add_index "events", ["expires_at"], :name => "index_events_on_expires_at"
   add_index "events", ["user_id", "created_at"], :name => "index_events_on_user_id_and_created_at"
 
   create_table "links", :force => true do |t|
