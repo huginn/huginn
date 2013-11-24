@@ -36,7 +36,7 @@ describe Agents::PeakDetectorAgent do
     end
 
     it "keeps a rolling window of data" do
-      @agent.options[:window_duration] = 5.hours
+      @agent.options[:window_duration_in_days] = 5/24.0
       @agent.receive build_events(:keys => [:count],
                                   :values => [1, 2, 3, 4, 5, 6, 7, 8].map {|i| [i]},
                                   :pattern => { :filter => "something" })
@@ -47,14 +47,14 @@ describe Agents::PeakDetectorAgent do
       build_events(:keys => [:count],
                    :values => [5, 6,
                                4, 5,
-                               8, 11,
+                               4, 5,
                                15, 11, # peak
-                               8, 5,
+                               8, 50, # ignored because it's too close to the first peak
                                4, 5].map {|i| [i]},
                    :pattern => { :filter => "something" }).each.with_index do |event, index|
         lambda {
           @agent.receive([event])
-        }.should change { @agent.events.count }.by( index == 7 ? 1 : 0 )
+        }.should change { @agent.events.count }.by( index == 6 ? 1 : 0 )
       end
 
       @agent.events.last.payload[:peak].should == 15.0
@@ -62,10 +62,9 @@ describe Agents::PeakDetectorAgent do
     end
 
     it "keeps a rolling window of peaks" do
-      @agent.options[:window_duration] = 5.hours
-      @agent.options[:peak_spacing] = 1.hour
+      @agent.options[:min_peak_spacing_in_days] = 1/24.0
       @agent.receive build_events(:keys => [:count],
-                                  :values => [1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 10, 1].map {|i| [i]},
+                                  :values => [1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 10, 1].map {|i| [i]},
                                   :pattern => { :filter => "something" })
       @agent.memory[:peaks][:something].length.should == 2
     end

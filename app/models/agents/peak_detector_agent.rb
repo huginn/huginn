@@ -11,9 +11,9 @@ module Agents
 
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
 
-      You may set `window_duration` to change the default memory window length of two weeks,
-      `peak_spacing` to change the default minimum peak spacing of two days, and
-      `std_multiple` to change the default standard deviation threshold multiple of 3.
+      You may set `window_duration_in_days` to change the default memory window length of `14` days,
+      `min_peak_spacing_in_days` to change the default minimum peak spacing of `2` days (peaks closer together will be ignored), and
+      `std_multiple` to change the default standard deviation threshold multiple of `3`.
     MD
 
     event_description <<-MD
@@ -61,27 +61,22 @@ module Agents
       memory[:peaks][group] ||= []
 
       if memory[:data][group].length > 4 && (memory[:peaks][group].empty? || memory[:peaks][group].last < event.created_at.to_i - peak_spacing)
-        average_value, standard_deviation = stats_for(group, :skip_last => 2)
-        newest_value = memory[:data][group][-1].first.to_f
-        second_newest_value, second_newest_time = memory[:data][group][-2].map(&:to_f)
+        average_value, standard_deviation = stats_for(group, :skip_last => 1)
+        newest_value, newest_time = memory[:data][group][-1].map(&:to_f)
 
-        #pp({:newest_value => newest_value,
-        #    :second_newest_value => second_newest_value,
-        #    :average_value => average_value,
-        #    :standard_deviation => standard_deviation,
-        #    :threshold => average_value + std_multiple * standard_deviation })
+        #p [newest_value, average_value, average_value + std_multiple * standard_deviation, standard_deviation]
 
-        if newest_value < second_newest_value && second_newest_value > average_value + std_multiple * standard_deviation
-          memory[:peaks][group] << second_newest_time
-          memory[:peaks][group].reject! { |p| p <= second_newest_time - window_duration }
-          create_event :payload => {:message => options[:message], :peak => second_newest_value, :peak_time => second_newest_time, :grouped_by => group.to_s}
+        if newest_value > average_value + std_multiple * standard_deviation
+          memory[:peaks][group] << newest_time
+          memory[:peaks][group].reject! { |p| p <= newest_time - window_duration }
+          create_event :payload => {:message => options[:message], :peak => newest_value, :peak_time => newest_time, :grouped_by => group.to_s}
         end
       end
     end
 
     def stats_for(group, options = {})
       data = memory[:data][group].map { |d| d.first.to_f }
-      data = data[0...(memory[:data][group].length - (options[:skip_last] || 0))]
+      data = data[0...(data.length - (options[:skip_last] || 0))]
       length = data.length.to_f
       mean = 0
       mean_variance = 0
@@ -99,15 +94,23 @@ module Agents
     end
 
     def window_duration
-      (options[:window_duration].present? && options[:window_duration].to_i) || 2.weeks
+      if options[:window_duration].present? # The older option
+        options[:window_duration].to_i
+      else
+        (options[:window_duration_in_days] || 14).to_f.days
+      end
     end
 
     def std_multiple
-      (options[:std_multiple].present? && options[:std_multiple].to_i) || 3
+      (options[:std_multiple] || 3).to_f
     end
 
     def peak_spacing
-      (options[:peak_spacing].present? && options[:peak_spacing].to_i) || 2.days
+      if options[:peak_spacing].present? # The older option
+        options[:peak_spacing].to_i
+      else
+        (options[:min_peak_spacing_in_days] || 2).to_f.days
+      end
     end
 
     def group_for(event)
