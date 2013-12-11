@@ -98,6 +98,10 @@ We assume your deployment will run over SSL. This is a very good idea! However, 
 
 Huginn is provided under the MIT License.
 
+## Community
+Huginn has its own IRC channel on freenode: #huginn.
+Some of us are hanging out there, come and say hello.
+
 ## Contribution
 
 Huginn is a work in progress and is hopefully just getting started.  Please get involved!  You can [add new Agents](https://github.com/cantino/huginn/wiki/Creating-a-new-agent), expand the [Wiki](https://github.com/cantino/huginn/wiki), or help us simplify and strengthen the Agent API or core application.
