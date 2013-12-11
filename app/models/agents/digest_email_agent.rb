@@ -1,6 +1,7 @@
 module Agents
   class DigestEmailAgent < Agent
-    MAIN_KEYS = %w[title message text main value].map(&:to_sym)
+    include EmailConcern
+
     default_schedule "5am"
 
     cannot_create_events!
@@ -22,14 +23,6 @@ module Agents
       }
     end
 
-    def working?
-      last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago && !recent_error_logs?
-    end
-
-    def validate_options
-      errors.add(:base, "subject and expected_receive_period_in_days are required") unless options[:subject].present? && options[:expected_receive_period_in_days].present?
-    end
-
     def receive(incoming_events)
       incoming_events.each do |event|
         self.memory[:queue] ||= []
@@ -48,23 +41,6 @@ module Agents
         self.memory[:queue] = []
         self.memory[:events] = []
       end
-    end
-
-    def present(payload)
-      if payload.is_a?(Hash)
-        payload = ActiveSupport::HashWithIndifferentAccess.new(payload)
-        MAIN_KEYS.each do |key|
-          return { :title => payload[key].to_s, :entries => present_hash(payload, key) } if payload.has_key?(key)
-        end
-
-        { :title => "Event", :entries => present_hash(payload) }
-      else
-        { :title => payload.to_s, :entries => [] }
-      end
-    end
-
-    def present_hash(hash, skip_key = nil)
-      hash.to_a.sort_by {|a| a.first.to_s }.map { |k, v| "#{k}: #{v}" unless k.to_s == skip_key.to_s }.compact
     end
   end
 end
