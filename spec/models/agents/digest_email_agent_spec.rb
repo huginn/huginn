@@ -41,6 +41,7 @@ describe Agents::DigestEmailAgent do
                                  { :title => "Foo", :url => "http://google.com", :bar => 2 },
                                  { "message" => "hi", :woah => "there" },
                                  { "test" => 2 }]
+      @checker.memory[:events] = [1,2,3,4]
       @checker.save!
 
       Agents::DigestEmailAgent.async_check(@checker.id)

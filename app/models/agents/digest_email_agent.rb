@@ -34,15 +34,19 @@ module Agents
       incoming_events.each do |event|
         self.memory[:queue] ||= []
         self.memory[:queue] << event.payload
+        self.memory[:events] ||= []
+        self.memory[:events] << event.id
       end
     end
 
     def check
       if self.memory[:queue] && self.memory[:queue].length > 0
+        ids = self.memory[:events].join(",")
         groups = self.memory[:queue].map { |payload| present(payload) }
-        log "Sending digest mail to #{user.email}"
+        log "Sending digest mail to #{user.email} with events [#{ids}]"
         SystemMailer.delay.send_message(:to => user.email, :subject => options[:subject], :headline => options[:headline], :groups => groups)
         self.memory[:queue] = []
+        self.memory[:events] = []
       end
     end
 
