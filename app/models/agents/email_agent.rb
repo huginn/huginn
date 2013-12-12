@@ -1,12 +1,12 @@
 module Agents
-  class EventEmailAgent < Agent
+  class EmailAgent < Agent
     include EmailConcern
 
     cannot_be_scheduled!
     cannot_create_events!
 
     description <<-MD
-      The EventEmailAgent sends any events it receives via email.
+      The EmailAgent sends any events it receives via email immediately.
       The email will be sent to your account's address and will have a `subject` and an optional `headline` before
       listing the Events.  If the Events' payloads contain a `:message`, that will be highlighted, otherwise everything in
       their payloads will be shown.

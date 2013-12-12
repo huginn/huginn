@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe Agents::EventEmailAgent do
+describe Agents::EmailAgent do
   def get_message_part(mail, content_type)
     mail.body.parts.find { |p| p.content_type.match content_type }.body.raw_source
   end
 
   before do
-    @checker = Agents::EventEmailAgent.new(:name => "something", :options => { :expected_receive_period_in_days => 2, :subject => "something interesting" })
+    @checker = Agents::EmailAgent.new(:name => "something", :options => { :expected_receive_period_in_days => 2, :subject => "something interesting" })
     @checker.user = users(:bob)
     @checker.save!
   end
@@ -29,8 +29,8 @@ describe Agents::EventEmailAgent do
       event2.payload = "Something else you should know about"
       event2.save!
 
-      Agents::EventEmailAgent.async_receive(@checker.id, [event1.id])
-      Agents::EventEmailAgent.async_receive(@checker.id, [event2.id])
+      Agents::EmailAgent.async_receive(@checker.id, [event1.id])
+      Agents::EmailAgent.async_receive(@checker.id, [event2.id])
 
       ActionMailer::Base.deliveries.count.should == 2
       ActionMailer::Base.deliveries.last.to.should == ["bob@example.com"]
