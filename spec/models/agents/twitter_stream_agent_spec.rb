@@ -53,7 +53,7 @@ describe Agents::TwitterStreamAgent do
         @agent.memory[:filter_counts] = {:keyword1 => 2, :keyword2 => 3, :keyword3 => 4}
         @agent.save!
         @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
-        @agent.reload.memory[:filter_counts].should == {:keyword1 => 3, :keyword2 => 3}
+        @agent.reload.memory[:filter_counts].should == { 'keyword1' => 3, 'keyword2' => 3 }
       end
     end
 
@@ -64,9 +64,9 @@ describe Agents::TwitterStreamAgent do
         }.should change { @agent.events.count }.by(1)
 
         @agent.events.last.payload.should == {
-          :filter => 'keyword1',
-          :text => "something",
-          :user => {:name => "Mr. Someone"}
+          'filter' => 'keyword1',
+          'text' => "something",
+          'user' => { 'name' => "Mr. Someone" }
         }
       end
 
@@ -79,9 +79,9 @@ describe Agents::TwitterStreamAgent do
         }.should change { @agent.events.count }.by(1)
 
         @agent.events.last.payload.should == {
-          :filter => 'keyword1-1',
-          :text => "something",
-          :user => {:name => "Mr. Someone"}
+          'filter' => 'keyword1-1',
+          'text' => "something",
+          'user' => { 'name' => "Mr. Someone" }
         }
       end
     end

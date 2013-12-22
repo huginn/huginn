@@ -114,7 +114,7 @@ module Agents
     end
 
     def group_for(event)
-      ((options[:group_by_path].present? && Utils.value_at(event.payload, options[:group_by_path])) || 'no_group').to_sym
+      ((options[:group_by_path].present? && Utils.value_at(event.payload, options[:group_by_path])) || 'no_group')
     end
 
     def remember(group, event)

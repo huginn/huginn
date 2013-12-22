@@ -214,12 +214,12 @@ module Agents
           end
 
           event = create_event :payload => payload
-          log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => Event.find_by_id(memory[:hits][hit_id.to_sym])
+          log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => Event.find_by_id(memory[:hits][hit_id])
 
           assignments.each(&:approve!)
           hit.dispose!
 
-          memory[:hits].delete(hit_id.to_sym)
+          memory[:hits].delete(hit_id)
         end
       end
     end
@@ -268,34 +268,34 @@ module Agents
         @questions.each.with_index do |question, index|
           Question do
             QuestionIdentifier do
-              text question[:key] || "question_#{index}"
+              text question['key'] || "question_#{index}"
             end
             DisplayName do
-              text question[:name] || "Question ##{index}"
+              text question['name'] || "Question ##{index}"
             end
             IsRequired do
-              text question[:required] || 'true'
+              text question['required'] || 'true'
             end
             QuestionContent do
               Text do
-                text question[:question]
+                text question['question']
               end
             end
             AnswerSpecification do
-              if question[:type] == "selection"
+              if question['type'] == "selection"
 
                 SelectionAnswer do
                   StyleSuggestion do
                     text 'radiobutton'
                   end
                   Selections do
-                    question[:selections].each do |selection|
+                    question['selections'].each do |selection|
                       Selection do
                         SelectionIdentifier do
-                          text selection[:key]
+                          text selection['key']
                         end
                         Text do
-                          text selection[:text]
+                          text selection['text']
                         end
                       end
                     end
@@ -305,18 +305,18 @@ module Agents
               else
 
                 FreeTextAnswer do
-                  if question[:min_length].present? || question[:max_length].present?
+                  if question['min_length'].present? || question['max_length'].present?
                     Constraints do
                       lengths = {}
-                      lengths[:minLength] = question[:min_length].to_s if question[:min_length].present?
-                      lengths[:maxLength] = question[:max_length].to_s if question[:max_length].present?
+                      lengths['minLength'] = question['min_length'].to_s if question['min_length'].present?
+                      lengths['maxLength'] = question['max_length'].to_s if question['max_length'].present?
                       Length lengths
                     end
                   end
 
                   if question[:default].present?
                     DefaultText do
-                      text question[:default]
+                      text question['default']
                     end
                   end
                 end

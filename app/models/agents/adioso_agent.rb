@@ -44,7 +44,7 @@ module Agents
     end
 
     def validate_options
-			unless %w[start_date end_date from to username password expected_update_period_in_days].all? { |field| options[field.to_sym].present? }
+			unless %w[start_date end_date from to username password expected_update_period_in_days].all? { |field| options[field].present? }
 				errors.add(:base, "All fields are required")
 			end
 		end

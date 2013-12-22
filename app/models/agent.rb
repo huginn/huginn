@@ -1,14 +1,14 @@
-require 'serialize_and_symbolize'
+require 'serialize_and_normalize'
 require 'assignable_types'
 require 'markdown_class_attributes'
 require 'utils'
 
 class Agent < ActiveRecord::Base
-  include SerializeAndSymbolize
+  include SerializeAndNormalize
   include AssignableTypes
   include MarkdownClassAttributes
 
-  serialize_and_symbolize :options, :memory
+  serialize_and_normalize :options, :memory
   markdown_class_attributes :description, :event_description
 
   load_types_in "Agents"

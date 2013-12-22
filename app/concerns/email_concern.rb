@@ -1,7 +1,7 @@
 module EmailConcern
   extend ActiveSupport::Concern
 
-  MAIN_KEYS = %w[title message text main value].map(&:to_sym)
+  MAIN_KEYS = %w[title message text main value]
 
   included do
     self.validate :validate_email_options

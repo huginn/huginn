@@ -288,7 +288,7 @@ describe Agents::HumanTaskAgent do
       @checker.send :review_hits
 
       assignments.all? {|a| a.approved == true }.should be_false
-      @checker.memory[:hits].should == { :"JH3132836336DHG" => @event.id }
+      @checker.memory[:hits].should == { "JH3132836336DHG" => @event.id }
     end
 
     it "shouldn't do anything if an assignment is missing" do
@@ -306,7 +306,7 @@ describe Agents::HumanTaskAgent do
       @checker.send :review_hits
 
       assignments.all? {|a| a.approved == true }.should be_false
-      @checker.memory[:hits].should == { :"JH3132836336DHG" => @event.id }
+      @checker.memory[:hits].should == { "JH3132836336DHG" => @event.id }
     end
 
     it "should create events when all assignments are ready" do
@@ -328,8 +328,8 @@ describe Agents::HumanTaskAgent do
       hit.should be_disposed
 
       @checker.events.last.payload[:answers].should == [
-        {:sentiment => "neutral", :feedback => ""},
-        {:sentiment => "happy", :feedback => "Take 2"}
+        {'sentiment' => "neutral", 'feedback' => ""},
+        {'sentiment' => "happy", 'feedback' => "Take 2"}
       ]
 
       @checker.memory[:hits].should == {}
@@ -338,7 +338,7 @@ describe Agents::HumanTaskAgent do
     describe "taking majority votes" do
       before do
         @checker.options[:take_majority] = "true"
-        @checker.memory[:hits] = { :"JH3132836336DHG" => @event.id }
+        @checker.memory[:hits] = { "JH3132836336DHG" => @event.id }
         mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
       end
 
@@ -372,14 +372,14 @@ describe Agents::HumanTaskAgent do
         assignments.all? {|a| a.approved == true }.should be_true
 
         @checker.events.last.payload[:answers].should == [
-          { :sentiment => "sad", :age_range => "<50" },
-          { :sentiment => "neutral", :age_range => ">50" },
-          { :sentiment => "happy", :age_range => ">50" },
-          { :sentiment => "happy", :age_range => ">50" }
+          { 'sentiment' => "sad", 'age_range' => "<50" },
+          { 'sentiment' => "neutral", 'age_range' => ">50" },
+          { 'sentiment' => "happy", 'age_range' => ">50" },
+          { 'sentiment' => "happy", 'age_range' => ">50" }
         ]
 
-        @checker.events.last.payload[:counts].should == { :sentiment => { :happy => 2, :sad => 1, :neutral => 1 }, :age_range => { :">50" => 3, :"<50" => 1 } }
-        @checker.events.last.payload[:majority_answer].should == { :sentiment => "happy", :age_range => ">50" }
+        @checker.events.last.payload[:counts].should == { 'sentiment' => { 'happy' => 2, 'sad' => 1, 'neutral' => 1 }, 'age_range' => { ">50" => 3, "<50" => 1 } }
+        @checker.events.last.payload[:majority_answer].should == { 'sentiment' => "happy", 'age_range' => ">50" }
         @checker.events.last.payload.should_not have_key(:average_answer)
 
         @checker.memory[:hits].should == {}
@@ -421,16 +421,16 @@ describe Agents::HumanTaskAgent do
         assignments.all? {|a| a.approved == true }.should be_true
 
         @checker.events.last.payload[:answers].should == [
-          { :rating => "1" },
-          { :rating => "3" },
-          { :rating => "5.1" },
-          { :rating => "2" },
-          { :rating => "2" }
+          { 'rating' => "1" },
+          { 'rating' => "3" },
+          { 'rating' => "5.1" },
+          { 'rating' => "2" },
+          { 'rating' => "2" }
         ]
 
-        @checker.events.last.payload[:counts].should == { :rating => { :"1" => 1, :"2" => 2, :"3" => 1, :"4" => 0, :"5.1" => 1 } }
-        @checker.events.last.payload[:majority_answer].should == { :rating => "2" }
-        @checker.events.last.payload[:average_answer].should == { :rating => (1 + 2 + 2 + 3 + 5.1) / 5.0 }
+        @checker.events.last.payload[:counts].should == { 'rating' => { "1" => 1, "2" => 2, "3" => 1, "4" => 0, "5.1" => 1 } }
+        @checker.events.last.payload[:majority_answer].should == { 'rating' => "2" }
+        @checker.events.last.payload[:average_answer].should == { 'rating' => (1 + 2 + 2 + 3 + 5.1) / 5.0 }
 
         @checker.memory[:hits].should == {}
       end

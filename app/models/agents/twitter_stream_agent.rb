@@ -85,12 +85,12 @@ module Agents
           # Avoid memory pollution by reloading the Agent.
           agent = Agent.find(id)
           agent.memory[:filter_counts] ||= {}
-          agent.memory[:filter_counts][filter.to_sym] ||= 0
-          agent.memory[:filter_counts][filter.to_sym] += 1
+          agent.memory[:filter_counts][filter] ||= 0
+          agent.memory[:filter_counts][filter] += 1
           remove_unused_keys!(agent, :filter_counts)
           agent.save!
         else
-          create_event :payload => status.merge(:filter => filter.to_s)
+          create_event :payload => status.merge(:filter => filter)
         end
       end
     end
@@ -98,7 +98,7 @@ module Agents
     def check
       if options[:generate] == "counts" && memory[:filter_counts] && memory[:filter_counts].length > 0
         memory[:filter_counts].each do |filter, count|
-          create_event :payload => { :filter => filter.to_s, :count => count, :time => Time.now.to_i }
+          create_event :payload => { :filter => filter, :count => count, :time => Time.now.to_i }
         end
       end
       memory[:filter_counts] = {}
@@ -120,7 +120,7 @@ module Agents
 
     def remove_unused_keys!(agent, base)
       if agent.memory[base]
-        (agent.memory[base].keys - agent.options[:filters].map {|f| f.is_a?(Array) ? f.first.to_sym : f.to_sym }).each do |removed_key|
+        (agent.memory[base].keys - agent.options[:filters].map {|f| f.is_a?(Array) ? f.first.to_s : f.to_s }).each do |removed_key|
           agent.memory[base].delete(removed_key)
         end
       end
