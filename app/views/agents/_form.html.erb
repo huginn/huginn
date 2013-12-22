@@ -44,6 +44,16 @@
     </div>
   </div>
 
+
+  <div class='event-related-region' data-can-create-events="<%= @agent.can_create_events? %>">
+    <div class="control-group">
+      <%= f.label :keep_events_for, "Keep events", :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :keep_events_for, options_for_select(Agent::EVENT_RETENTION_SCHEDULES, @agent.keep_events_for), {}, :class => 'span4' %>
+      </div>
+    </div>
+  </div>
+
   <div class="control-group">
     <%= f.label :sources, :class => 'control-label' %>
     <div class="controls link-region" data-can-receive-events="<%= @agent.can_receive_events? %>">

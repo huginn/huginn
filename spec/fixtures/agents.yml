@@ -33,6 +33,7 @@ bob_weather_agent:
   user: bob
   schedule: "midnight"
   name: "SF Weather"
+  keep_events_for: 45
   options: <%= {
                  :location => 94102,
                  :lat => 37.779329,
@@ -45,6 +46,7 @@ jane_weather_agent:
   user: jane
   schedule: "midnight"
   name: "SF Weather"
+  keep_events_for: 30
   options: <%= {
                  :location => 94103,
                  :lat => 37.779329,

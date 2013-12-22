@@ -34,6 +34,12 @@ showLinks = ->
   $(".link-region .cannot-receive-events").hide()
   showEventDescriptions()
 
+hideEventCreation = ->
+  $(".event-related-region").hide()
+
+showEventCreation = ->
+  $(".event-related-region").show()
+
 showEventDescriptions = ->
   if $("#agent_source_ids").val()
     $.getJSON "/agents/event_descriptions", { ids: $("#agent_source_ids").val().join(",") }, (json) =>
@@ -131,6 +137,11 @@ $(document).ready ->
         else
           hideLinks()
 
+        if json.can_create_events
+          showEventCreation()
+        else
+          hideEventCreation()
+
         $(".description").html(json.description_html) if json.description_html?
 
         if $("#agent_options").hasClass("showing-default") || $("#agent_options").val().match(/\A\s*(\{\s*\}|)\s*\Z/g)
@@ -152,3 +163,9 @@ $(document).ready ->
       showLinks()
     else
       hideLinks()
+
+  if $(".event-related-region")
+    if $(".event-related-region").data("can-create-events") == true
+      showEventCreation()
+    else
+      hideEventCreation()

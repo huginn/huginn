@@ -303,4 +303,28 @@ describe Agent do
       end
     end
   end
+
+  describe "#create_event" do
+    describe "when the agent has keep_events_for set" do
+      before do
+        agents(:jane_weather_agent).keep_events_for.should > 0
+      end
+
+      it "sets expires_at on created events" do
+        event = agents(:jane_weather_agent).create_event :payload => "hi!"
+        event.expires_at.should be_within(5).of(agents(:jane_weather_agent).keep_events_for.days.from_now)
+      end
+    end
+
+    describe "when the agent does not have keep_events_for set" do
+      before do
+        agents(:jane_website_agent).keep_events_for.should == 0
+      end
+
+      it "does not set expires_at on created events" do
+        event = agents(:jane_website_agent).create_event :payload => "hi!"
+        event.expires_at.should be_nil
+      end
+    end
+  end
 end

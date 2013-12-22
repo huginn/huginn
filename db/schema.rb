@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131105063248) do
+ActiveRecord::Schema.define(:version => 20131222211558) do
 
   create_table "agent_logs", :force => true do |t|
     t.integer  "agent_id",                         :null => false
@@ -33,10 +33,11 @@ ActiveRecord::Schema.define(:version => 20131105063248) do
     t.datetime "last_check_at"
     t.datetime "last_receive_at"
     t.integer  "last_checked_event_id"
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
+    t.datetime "created_at",                                                 :null => false
+    t.datetime "updated_at",                                                 :null => false
     t.text     "memory",                :limit => 2147483647
     t.datetime "last_webhook_at"
+    t.integer  "keep_events_for",                             :default => 0, :null => false
   end
 
   add_index "agents", ["schedule"], :name => "index_agents_on_schedule"

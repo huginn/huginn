@@ -16,7 +16,9 @@ class Agent < ActiveRecord::Base
   SCHEDULES = %w[every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
                  midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :source_ids
+  EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
+
+  attr_accessible :options, :memory, :name, :type, :schedule, :source_ids, :keep_events_for
 
   validates_presence_of :name, :user
   validate :sources_are_owned
@@ -83,22 +85,16 @@ class Agent < ActiveRecord::Base
     most_recent_log.try(:level) == 4
   end
 
-  def sources_are_owned
-    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
-  end
-
   def create_event(attrs)
     if can_create_events?
-      events.create!({ :user => user }.merge(attrs))
+      events.create!({ :user => user, :expires_at => new_event_expiration_date }.merge(attrs))
     else
       error "This Agent cannot create events!"
     end
   end
 
-  def validate_schedule
-    unless cannot_be_scheduled?
-      errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
-    end
+  def new_event_expiration_date
+    keep_events_for > 0 ? keep_events_for.days.from_now : nil
   end
 
   def make_message(payload, message = options[:message])
@@ -110,14 +106,6 @@ class Agent < ActiveRecord::Base
       self.last_webhook_at = Time.now
       save!
     end
-  end
-
-  def set_default_schedule
-    self.schedule = default_schedule unless schedule.present? || cannot_be_scheduled?
-  end
-
-  def unschedule_if_cannot_schedule
-    self.schedule = nil if cannot_be_scheduled?
   end
 
   def last_event_at
@@ -152,12 +140,6 @@ class Agent < ActiveRecord::Base
     !cannot_create_events?
   end
 
-  def set_last_checked_event_id
-    if newest_event_id = Event.order("id desc").limit(1).pluck(:id).first
-      self.last_checked_event_id = newest_event_id
-    end
-  end
-
   def log(message, options = {})
     puts "Agent##{id}: #{message}" unless Rails.env.test?
     AgentLog.log_for_agent(self, message, options)
@@ -165,6 +147,32 @@ class Agent < ActiveRecord::Base
 
   def error(message, options = {})
     log(message, options.merge(:level => 4))
+  end
+
+  # Validations and Callbacks
+
+  def sources_are_owned
+    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
+  end
+
+  def validate_schedule
+    unless cannot_be_scheduled?
+      errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
+    end
+  end
+
+  def set_default_schedule
+    self.schedule = default_schedule unless schedule.present? || cannot_be_scheduled?
+  end
+
+  def unschedule_if_cannot_schedule
+    self.schedule = nil if cannot_be_scheduled?
+  end
+
+  def set_last_checked_event_id
+    if newest_event_id = Event.order("id desc").limit(1).pluck(:id).first
+      self.last_checked_event_id = newest_event_id
+    end
   end
 
   # Class Methods
