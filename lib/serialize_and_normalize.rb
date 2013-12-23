@@ -8,7 +8,7 @@ module SerializeAndNormalize
         normalize_name = "normalize_#{column_name}".to_sym
         validate_name = "validate_#{column_name}".to_sym
 
-        serialize column_name
+        serialize column_name, JSON
         after_initialize setup_name
         before_validation normalize_name
         before_save normalize_name
