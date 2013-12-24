@@ -54,26 +54,26 @@ module Agents
     default_schedule "11pm"
 
     def validate_options
-      unless options[:filters].present? &&
-             options[:expected_update_period_in_days].present? &&
-             options[:generate].present?
+      unless options['filters'].present? &&
+             options['expected_update_period_in_days'].present? &&
+             options['generate'].present?
         errors.add(:base, "expected_update_period_in_days, generate, and filters are required fields")
       end
     end
 
     def working?
-      event_created_within(options[:expected_update_period_in_days]) && !recent_error_logs?
+      event_created_within(options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
       {
-          :consumer_key => "---",
-          :consumer_secret => "---",
-          :oauth_token => "---",
-          :oauth_token_secret => "---",
-          :filters => %w[keyword1 keyword2],
-          :expected_update_period_in_days => "2",
-          :generate => "events"
+          'consumer_key' => "---",
+          'consumer_secret' => "---",
+          'oauth_token' => "---",
+          'oauth_token_secret' => "---",
+          'filters' => %w[keyword1 keyword2],
+          'expected_update_period_in_days' => "2",
+          'generate' => "events"
       }
     end
 
@@ -81,33 +81,33 @@ module Agents
       filter = lookup_filter(filter)
 
       if filter
-        if options[:generate] == "counts"
+        if options['generate'] == "counts"
           # Avoid memory pollution by reloading the Agent.
           agent = Agent.find(id)
-          agent.memory[:filter_counts] ||= {}
-          agent.memory[:filter_counts][filter] ||= 0
-          agent.memory[:filter_counts][filter] += 1
-          remove_unused_keys!(agent, :filter_counts)
+          agent.memory['filter_counts'] ||= {}
+          agent.memory['filter_counts'][filter] ||= 0
+          agent.memory['filter_counts'][filter] += 1
+          remove_unused_keys!(agent, 'filter_counts')
           agent.save!
         else
-          create_event :payload => status.merge(:filter => filter)
+          create_event :payload => status.merge('filter' => filter)
         end
       end
     end
 
     def check
-      if options[:generate] == "counts" && memory[:filter_counts] && memory[:filter_counts].length > 0
-        memory[:filter_counts].each do |filter, count|
-          create_event :payload => { :filter => filter, :count => count, :time => Time.now.to_i }
+      if options['generate'] == "counts" && memory['filter_counts'] && memory['filter_counts'].length > 0
+        memory['filter_counts'].each do |filter, count|
+          create_event :payload => { 'filter' => filter, 'count' => count, 'time' => Time.now.to_i }
         end
       end
-      memory[:filter_counts] = {}
+      memory['filter_counts'] = {}
     end
 
     protected
 
     def lookup_filter(filter)
-      options[:filters].each do |known_filter|
+      options['filters'].each do |known_filter|
         if known_filter == filter
           return filter
         elsif known_filter.is_a?(Array)
@@ -120,7 +120,7 @@ module Agents
 
     def remove_unused_keys!(agent, base)
       if agent.memory[base]
-        (agent.memory[base].keys - agent.options[:filters].map {|f| f.is_a?(Array) ? f.first.to_s : f.to_s }).each do |removed_key|
+        (agent.memory[base].keys - agent.options['filters'].map {|f| f.is_a?(Array) ? f.first.to_s : f.to_s }).each do |removed_key|
           agent.memory[base].delete(removed_key)
         end
       end

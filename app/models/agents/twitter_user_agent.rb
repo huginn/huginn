@@ -41,36 +41,36 @@ module Agents
     default_schedule "every_1h"
 
     def validate_options
-      unless options[:username].present? &&
-        options[:expected_update_period_in_days].present?
+      unless options['username'].present? &&
+        options['expected_update_period_in_days'].present?
         errors.add(:base, "username and expected_update_period_in_days are required")
       end      
     end
 
     def working?
-      event_created_within(options[:expected_update_period_in_days]) && !recent_error_logs?
+      event_created_within(options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
       {
-          :username => "tectonic",
-          :expected_update_period_in_days => "2",
-          :consumer_key => "---",
-          :consumer_secret => "---",
-          :oauth_token => "---",
-          :oauth_token_secret => "---"
+          'username' => "tectonic",
+          'expected_update_period_in_days' => "2",
+          'consumer_key' => "---",
+          'consumer_secret' => "---",
+          'oauth_token' => "---",
+          'oauth_token_secret' => "---"
       }
     end
 
     def check
-      since_id = memory[:since_id] || nil
+      since_id = memory['since_id'] || nil
       opts = {:count => 200, :include_rts => true, :exclude_replies => false, :include_entities => true, :contributor_details => true}
       opts.merge! :since_id => since_id unless since_id.nil?
 
-      tweets = Twitter.user_timeline(options[:username], opts)
+      tweets = Twitter.user_timeline(options['username'], opts)
 
       tweets.each do |tweet|
-        memory[:since_id] = tweet.id if !memory[:since_id] || (tweet.id > memory[:since_id])
+        memory['since_id'] = tweet.id if !memory['since_id'] || (tweet.id > memory['since_id'])
 
         create_event :payload => tweet.attrs
       end

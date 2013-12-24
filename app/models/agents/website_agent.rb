@@ -15,19 +15,19 @@ module Agents
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
-      When parsing HTML or XML, these sub-hashes specify how to extract with a `:css` CSS selector and either `:text => true` or `attr` pointing to an attribute name to grab.  An example:
+      When parsing HTML or XML, these sub-hashes specify how to extract with a `css` CSS selector and either `'text': true` or `attr` pointing to an attribute name to grab.  An example:
 
-          :extract => {
-            :url => { :css => "#comic img", :attr => "src" },
-            :title => { :css => "#comic img", :attr => "title" },
-            :body_text => { :css => "div.main", :text => true }
+          'extract': {
+            'url': { 'css': "#comic img", 'attr': "src" },
+            'title': { 'css': "#comic img", 'attr': "title" },
+            'body_text': { 'css': "div.main", 'text': true }
           }
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
-          :extract => {
-            :title => { :path => "results.data[*].title" },
-            :description => { :path => "results.data[*].description" }
+          'extract': {
+            'title': { 'path': "results.data[*].title" },
+            'description': { 'path': "results.data[*].description" }
           }
 
       Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
@@ -36,7 +36,7 @@ module Agents
     MD
 
     event_description do
-      "Events will have the fields you specified.  Your options look like:\n\n    #{Utils.pretty_print options[:extract]}"
+      "Events will have the fields you specified.  Your options look like:\n\n    #{Utils.pretty_print options['extract']}"
     end
 
     default_schedule "every_12h"
@@ -44,33 +44,33 @@ module Agents
     UNIQUENESS_LOOK_BACK = 30
 
     def working?
-      event_created_within(options[:expected_update_period_in_days]) && !recent_error_logs?
+      event_created_within(options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
       {
-          :expected_update_period_in_days => "2",
-          :url => "http://xkcd.com",
-          :type => "html",
-          :mode => :on_change,
-          :extract => {
-              :url => {:css => "#comic img", :attr => "src"},
-              :title => {:css => "#comic img", :attr => "title"}
+          'expected_update_period_in_days' => "2",
+          'url' => "http://xkcd.com",
+          'type' => "html",
+          'mode' => :on_change,
+          'extract' => {
+            'url' => {'css' => "#comic img", 'attr' => "src"},
+            'title' => {'css' => "#comic img", 'attr' => "title"}
           }
       }
     end
 
     def validate_options
-      errors.add(:base, "url and expected_update_period_in_days are required") unless options[:expected_update_period_in_days].present? && options[:url].present?
-      if !options[:extract].present? && extraction_type != "json"
+      errors.add(:base, "url and expected_update_period_in_days are required") unless options['expected_update_period_in_days'].present? && options['url'].present?
+      if !options['extract'].present? && extraction_type != "json"
         errors.add(:base, "extract is required for all types except json")
       end
     end
 
     def check
       hydra = Typhoeus::Hydra.new
-      log "Fetching #{options[:url]}"
-      request = Typhoeus::Request.new(options[:url], :followlocation => true)
+      log "Fetching #{options['url']}"
+      request = Typhoeus::Request.new(options['url'], :followlocation => true)
       request.on_failure do |response|
         error "Failed: #{response.inspect}"
       end
@@ -85,37 +85,37 @@ module Agents
           end
         else
           output = {}
-          options[:extract].each do |name, extraction_details|
+          options['extract'].each do |name, extraction_details|
             result = if extraction_type == "json"
-                       output[name] = Utils.values_at(doc, extraction_details[:path])
+                       output[name] = Utils.values_at(doc, extraction_details['path'])
                      else
-                       output[name] = doc.css(extraction_details[:css]).map { |node|
-                         if extraction_details[:attr]
-                           node.attr(extraction_details[:attr])
-                         elsif extraction_details[:text]
+                       output[name] = doc.css(extraction_details['css']).map { |node|
+                         if extraction_details['attr']
+                           node.attr(extraction_details['attr'])
+                         elsif extraction_details['text']
                            node.text()
                          else
-                           error ":attr or :text is required on HTML or XML extraction patterns"
+                           error "'attr' or 'text' is required on HTML or XML extraction patterns"
                            return
                          end
                        }
                      end
-            log "Extracting #{extraction_type} at #{extraction_details[:path] || extraction_details[:css]}: #{result}"
+            log "Extracting #{extraction_type} at #{extraction_details['path'] || extraction_details['css']}: #{result}"
           end
 
-          num_unique_lengths = options[:extract].keys.map { |name| output[name].length }.uniq
+          num_unique_lengths = options['extract'].keys.map { |name| output[name].length }.uniq
 
           if num_unique_lengths.length != 1
-            error "Got an uneven number of matches for #{options[:name]}: #{options[:extract].inspect}"
+            error "Got an uneven number of matches for #{options['name']}: #{options['extract'].inspect}"
             return
           end
       
           num_unique_lengths.first.times do |index|
             result = {}
-            options[:extract].keys.each do |name|
+            options['extract'].keys.each do |name|
               result[name] = output[name][index]
               if name.to_s == 'url'
-                result[name] = URI.join(options[:url], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
+                result[name] = URI.join(options['url'], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
               end
             end
 
@@ -133,22 +133,22 @@ module Agents
     private
 
     def store_payload? result
-      !options[:mode] || options[:mode].to_s == "all" || (options[:mode].to_s == "on_change" && !previous_payloads.include?(result.to_json))
+      !options['mode'] || options['mode'].to_s == "all" || (options['mode'].to_s == "on_change" && !previous_payloads.include?(result.to_json))
     end
 
     def previous_payloads
-      events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options[:mode].to_s == "on_change"
+      events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options['mode'].to_s == "on_change"
     end
 
     def extract_full_json?
-      (!options[:extract].present? && extraction_type == "json")
+      (!options['extract'].present? && extraction_type == "json")
     end
 
     def extraction_type
-      (options[:type] || begin
-        if options[:url] =~ /\.(rss|xml)$/i
+      (options['type'] || begin
+        if options['url'] =~ /\.(rss|xml)$/i
           "xml"
-        elsif options[:url] =~ /\.json$/i
+        elsif options['url'] =~ /\.json$/i
           "json"
         else
           "html"

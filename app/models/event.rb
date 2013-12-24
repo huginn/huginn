@@ -1,13 +1,16 @@
-require 'serialize_and_normalize'
+require 'json_with_indifferent_access'
 
 class Event < ActiveRecord::Base
-  include SerializeAndNormalize
-
   attr_accessible :lat, :lng, :payload, :user_id, :user, :expires_at
 
   acts_as_mappable
 
-  serialize_and_normalize :payload
+  serialize :payload, JSONWithIndifferentAccess
+
+  def payload=(o)
+    self[:payload] = ActiveSupport::HashWithIndifferentAccess.new(o)
+  end
+
 
   belongs_to :user
   belongs_to :agent, :counter_cache => true

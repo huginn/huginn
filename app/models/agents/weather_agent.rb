@@ -45,30 +45,30 @@ module Agents
     end
 
     def wunderground
-      Wunderground.new(options[:api_key]) if key_setup?
+      Wunderground.new(options['api_key']) if key_setup?
     end
 
     def key_setup?
-      options[:api_key] && options[:api_key] != "your-key"
+      options['api_key'] && options['api_key'] != "your-key"
     end
 
     def default_options
       {
-        :api_key => "your-key",
-        :location => "94103"
+        'api_key' => "your-key",
+        'location' => "94103"
       }
     end
 
     def validate_options
-      errors.add(:base, "location is required") unless options[:location].present? || options[:zipcode].present?
-      errors.add(:base, "api_key is required") unless options[:api_key].present?
+      errors.add(:base, "location is required") unless options['location'].present? || options['zipcode'].present?
+      errors.add(:base, "api_key is required") unless options['api_key'].present?
     end
 
     def check
       if key_setup?
-        wunderground.forecast_for(options[:location] || options[:zipcode])["forecast"]["simpleforecast"]["forecastday"].each do |day|
+        wunderground.forecast_for(options['location'] || options['zipcode'])["forecast"]["simpleforecast"]["forecastday"].each do |day|
           if is_tomorrow?(day)
-            create_event :payload => day.merge(:location => options[:location] || options[:zipcode])
+            create_event :payload => day.merge('location' => options['location'] || options['zipcode'])
           end
         end
       end

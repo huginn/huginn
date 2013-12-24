@@ -1,14 +1,12 @@
-require 'serialize_and_normalize'
+require 'json_with_indifferent_access'
 require 'assignable_types'
 require 'markdown_class_attributes'
 require 'utils'
 
 class Agent < ActiveRecord::Base
-  include SerializeAndNormalize
   include AssignableTypes
   include MarkdownClassAttributes
 
-  serialize_and_normalize :options, :memory
   markdown_class_attributes :description, :event_description
 
   load_types_in "Agents"
@@ -18,9 +16,21 @@ class Agent < ActiveRecord::Base
 
   attr_accessible :options, :memory, :name, :type, :schedule, :source_ids
 
+  serialize :options, JSONWithIndifferentAccess
+  serialize :memory, JSONWithIndifferentAccess
+
+  def options=(o)
+    self[:options] = ActiveSupport::HashWithIndifferentAccess.new(o)
+  end
+
+  def memory=(o)
+    self[:memory] = ActiveSupport::HashWithIndifferentAccess.new(o)
+  end
+
   validates_presence_of :name, :user
   validate :sources_are_owned
   validate :validate_schedule
+  validate :validate_options
 
   after_initialize :set_default_schedule
   before_validation :set_default_schedule
@@ -72,6 +82,10 @@ class Agent < ActiveRecord::Base
   # Implement me in your subclass to decide if your Agent is working.
   def working?
     raise "Implement me in your subclass"
+  end
+
+  def validate_options
+    # Implement me in your subclass to test for valid options.
   end
 
   def event_created_within(days)

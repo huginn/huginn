@@ -5,7 +5,7 @@ describe AgentsController do
     {
         :type => "Agents::WebsiteAgent",
         :name => "Something",
-        :options => agents(:bob_website_agent).options.to_json,
+        :options => agents(:bob_website_agent).options,
         :source_ids => [agents(:bob_weather_agent).id, ""]
     }.merge(options)
   end

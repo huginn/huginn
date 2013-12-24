@@ -28,22 +28,22 @@ module Agents
     MD
 
     def validate_options
-      unless options[:expected_receive_period_in_days].present? && options[:message].present? && options[:value_path].present?
+      unless options['expected_receive_period_in_days'].present? && options['message'].present? && options['value_path'].present?
         errors.add(:base, "expected_receive_period_in_days, value_path, and message are required")
       end
     end
 
     def default_options
       {
-          :expected_receive_period_in_days => "2",
-          :group_by_path => "filter",
-          :value_path => "count",
-          :message => "A peak was found"
+        'expected_receive_period_in_days' => "2",
+        'group_by_path' => "filter",
+        'value_path' => "count",
+        'message' => "A peak was found"
       }
     end
 
     def working?
-      last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def receive(incoming_events)
@@ -57,25 +57,25 @@ module Agents
     private
 
     def check_for_peak(group, event)
-      memory[:peaks] ||= {}
-      memory[:peaks][group] ||= []
+      memory['peaks'] ||= {}
+      memory['peaks'][group] ||= []
 
-      if memory[:data][group].length > 4 && (memory[:peaks][group].empty? || memory[:peaks][group].last < event.created_at.to_i - peak_spacing)
+      if memory['data'][group].length > 4 && (memory['peaks'][group].empty? || memory['peaks'][group].last < event.created_at.to_i - peak_spacing)
         average_value, standard_deviation = stats_for(group, :skip_last => 1)
-        newest_value, newest_time = memory[:data][group][-1].map(&:to_f)
+        newest_value, newest_time = memory['data'][group][-1].map(&:to_f)
 
         #p [newest_value, average_value, average_value + std_multiple * standard_deviation, standard_deviation]
 
         if newest_value > average_value + std_multiple * standard_deviation
-          memory[:peaks][group] << newest_time
-          memory[:peaks][group].reject! { |p| p <= newest_time - window_duration }
-          create_event :payload => {:message => options[:message], :peak => newest_value, :peak_time => newest_time, :grouped_by => group.to_s}
+          memory['peaks'][group] << newest_time
+          memory['peaks'][group].reject! { |p| p <= newest_time - window_duration }
+          create_event :payload => { 'message' => options['message'], 'peak' => newest_value, 'peak_time' => newest_time, 'grouped_by' => group.to_s }
         end
       end
     end
 
     def stats_for(group, options = {})
-      data = memory[:data][group].map { |d| d.first.to_f }
+      data = memory['data'][group].map { |d| d.first.to_f }
       data = data[0...(data.length - (options[:skip_last] || 0))]
       length = data.length.to_f
       mean = 0
@@ -94,39 +94,39 @@ module Agents
     end
 
     def window_duration
-      if options[:window_duration].present? # The older option
-        options[:window_duration].to_i
+      if options['window_duration'].present? # The older option
+        options['window_duration'].to_i
       else
-        (options[:window_duration_in_days] || 14).to_f.days
+        (options['window_duration_in_days'] || 14).to_f.days
       end
     end
 
     def std_multiple
-      (options[:std_multiple] || 3).to_f
+      (options['std_multiple'] || 3).to_f
     end
 
     def peak_spacing
-      if options[:peak_spacing].present? # The older option
-        options[:peak_spacing].to_i
+      if options['peak_spacing'].present? # The older option
+        options['peak_spacing'].to_i
       else
-        (options[:min_peak_spacing_in_days] || 2).to_f.days
+        (options['min_peak_spacing_in_days'] || 2).to_f.days
       end
     end
 
     def group_for(event)
-      ((options[:group_by_path].present? && Utils.value_at(event.payload, options[:group_by_path])) || 'no_group')
+      ((options['group_by_path'].present? && Utils.value_at(event.payload, options['group_by_path'])) || 'no_group')
     end
 
     def remember(group, event)
-      memory[:data] ||= {}
-      memory[:data][group] ||= []
-      memory[:data][group] << [Utils.value_at(event.payload, options[:value_path]), event.created_at.to_i]
+      memory['data'] ||= {}
+      memory['data'][group] ||= []
+      memory['data'][group] << [ Utils.value_at(event.payload, options['value_path']), event.created_at.to_i ]
       cleanup group
     end
 
     def cleanup(group)
-      newest_time = memory[:data][group].last.last
-      memory[:data][group].reject! { |value, time| time <= newest_time - window_duration }
+      newest_time = memory['data'][group].last.last
+      memory['data'][group].reject! { |value, time| time <= newest_time - window_duration }
     end
   end
 end

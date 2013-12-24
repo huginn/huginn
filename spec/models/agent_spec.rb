@@ -261,9 +261,9 @@ describe Agent do
       it "symbolizes memory before validating" do
         agent = Agents::SomethingSource.new(:name => "something")
         agent.user = users(:bob)
-        agent.memory["bad"] = :hello
+        agent.memory["bad"] = 2
         agent.save
-        agent.memory[:bad].should == :hello
+        agent.memory[:bad].should == 2
       end
 
       it "should not allow agents owned by other people" do

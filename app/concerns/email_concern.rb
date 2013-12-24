@@ -8,11 +8,11 @@ module EmailConcern
   end
 
   def validate_email_options
-    errors.add(:base, "subject and expected_receive_period_in_days are required") unless options[:subject].present? && options[:expected_receive_period_in_days].present?
+    errors.add(:base, "subject and expected_receive_period_in_days are required") unless options['subject'].present? && options['expected_receive_period_in_days'].present?
   end
 
   def working?
-    last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago && !recent_error_logs?
+    last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
   end
 
   def present(payload)
