@@ -64,8 +64,6 @@ module Agents
         average_value, standard_deviation = stats_for(group, :skip_last => 1)
         newest_value, newest_time = memory['data'][group][-1].map(&:to_f)
 
-        #p [newest_value, average_value, average_value + std_multiple * standard_deviation, standard_deviation]
-
         if newest_value > average_value + std_multiple * standard_deviation
           memory['peaks'][group] << newest_time
           memory['peaks'][group].reject! { |p| p <= newest_time - window_duration }
