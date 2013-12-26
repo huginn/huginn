@@ -5,17 +5,41 @@ class SwitchToJsonSerialization < ActiveRecord::Migration
   }
 
   def up
-    puts "This migration will update Agent and Event storage from YAML to JSON.  It should work, but please make a backup"
-    puts "before proceeding."
-    print "Continue? (y/n) "
-    STDOUT.flush
-    exit unless STDIN.gets =~ /^y/i
+    if data_exists?
+      puts "This migration will update tables to use UTF-8 encoding and will update Agent and Event storage from YAML to JSON."
+      puts "It should work, but please make a backup before proceeding!"
+      print "Continue? (y/n) "
+      STDOUT.flush
+      exit unless STDIN.gets =~ /^y/i
 
-    translate YAML, JSON
+      set_to_utf8
+      translate YAML, JSON
+    end
   end
 
   def down
-    translate JSON, YAML
+    if data_exists?
+      translate JSON, YAML
+    end
+  end
+
+  def set_to_utf8
+    if mysql?
+      %w[agent_logs agents delayed_jobs events links taggings tags users].each do |table_name|
+        quoted_table_name = ActiveRecord::Base.connection.quote_table_name(table_name)
+        execute "ALTER TABLE #{quoted_table_name} CONVERT TO CHARACTER SET utf8"
+      end
+    end
+  end
+
+  def mysql?
+    ActiveRecord::Base.connection.adapter_name =~ /mysql/i
+  end
+
+  def data_exists?
+    events = ActiveRecord::Base.connection.select_rows("SELECT count(*) FROM #{ActiveRecord::Base.connection.quote_table_name("events")}").first.first
+    agents = ActiveRecord::Base.connection.select_rows("SELECT count(*) FROM #{ActiveRecord::Base.connection.quote_table_name("agents")}").first.first
+    agents + events > 0
   end
 
   def translate(from, to)
@@ -28,6 +52,8 @@ class SwitchToJsonSerialization < ActiveRecord::Migration
         id, *field_data = row
 
         yaml_fields = field_data.map { |f| from.load(f) }.map { |f| to.dump(f) }
+
+        yaml_fields.map! {|f| f.encode('utf-8', 'binary', invalid: :replace, undef: :replace, replace: '??') }
 
         update_sql = "UPDATE #{quoted_table_name} SET #{fields.map {|f| "#{f}=?"}.join(", ")} WHERE id = ?"
 
