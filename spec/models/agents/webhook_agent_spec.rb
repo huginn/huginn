@@ -19,7 +19,7 @@ describe Agents::WebhookAgent do
         out = agent.receive_webhook({:secret => :foobar, :payload => payload})
       }.should change { Event.count }.by(1)
       out.should eq(['Event Created', 201])
-      Event.last.last.payload.should eq([{'payload' => payload}])
+      Event.last.payload.should eq([{'payload' => payload}])
     end
 
     it 'should not create event if secrets dont match' do
@@ -28,7 +28,7 @@ describe Agents::WebhookAgent do
         out = agent.receive_webhook({:secret => :bazbat, :payload => payload})
       }.should change { Event.count }.by(0)
       out.should eq(['Not Authorized', 401])
-      Event.last.last.payload.should eq([{'payload' => payload}])
+      Event.last.payload.should eq([{'payload' => payload}])
     end
   end
 end
