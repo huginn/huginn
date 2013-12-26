@@ -8,7 +8,7 @@ describe Agents::WebhookAgent do
     _agent.save!
     _agent
   end
-  let(:payload) { {:some => :info} }
+  let(:payload) { {'some' => 'info'} }
 
   after { agent.destroy }
 
@@ -28,7 +28,6 @@ describe Agents::WebhookAgent do
         out = agent.receive_webhook({:secret => :bazbat, :payload => payload})
       }.should change { Event.count }.by(0)
       out.should eq(['Not Authorized', 401])
-      Event.last.payload.should eq([{'payload' => payload}])
     end
   end
 end
