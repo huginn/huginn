@@ -19,16 +19,16 @@ describe Agents::DigestEmailAgent do
     it "queues any payloads it receives" do
       event1 = Event.new
       event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = "Something you should know about"
+      event1.payload = { :data => "Something you should know about" }
       event1.save!
 
       event2 = Event.new
       event2.agent = agents(:bob_weather_agent)
-      event2.payload = "Something else you should know about"
+      event2.payload = { :data => "Something else you should know about" }
       event2.save!
 
       Agents::DigestEmailAgent.async_receive(@checker.id, [event1.id, event2.id])
-      @checker.reload.memory[:queue].should == ["Something you should know about", "Something else you should know about"]
+      @checker.reload.memory[:queue].should == [{ 'data' => "Something you should know about" }, { 'data' => "Something else you should know about" }]
     end
   end
 
@@ -37,7 +37,7 @@ describe Agents::DigestEmailAgent do
       Agents::DigestEmailAgent.async_check(@checker.id)
       ActionMailer::Base.deliveries.should == []
 
-      @checker.memory[:queue] = ["Something you should know about",
+      @checker.memory[:queue] = [{ :data => "Something you should know about" },
                                  { :title => "Foo", :url => "http://google.com", :bar => 2 },
                                  { "message" => "hi", :woah => "there" },
                                  { "test" => 2 }]
@@ -47,7 +47,7 @@ describe Agents::DigestEmailAgent do
       Agents::DigestEmailAgent.async_check(@checker.id)
       ActionMailer::Base.deliveries.last.to.should == ["bob@example.com"]
       ActionMailer::Base.deliveries.last.subject.should == "something interesting"
-      get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Something you should know about\n\nFoo\n  bar: 2\n  url: http://google.com\n\nhi\n  woah: there\n\nEvent\n  test: 2"
+      get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Event\n  data: Something you should know about\n\nFoo\n  bar: 2\n  url: http://google.com\n\nhi\n  woah: there\n\nEvent\n  test: 2"
       @checker.reload.memory[:queue].should be_empty
     end
 

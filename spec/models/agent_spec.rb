@@ -261,9 +261,9 @@ describe Agent do
       it "symbolizes memory before validating" do
         agent = Agents::SomethingSource.new(:name => "something")
         agent.user = users(:bob)
-        agent.memory["bad"] = :hello
+        agent.memory["bad"] = 2
         agent.save
-        agent.memory[:bad].should == :hello
+        agent.memory[:bad].should == 2
       end
 
       it "should not allow agents owned by other people" do
@@ -276,6 +276,32 @@ describe Agent do
         agent.user = users(:jane)
         agent.should have(0).errors_on(:sources)
       end
+    end
+  end
+
+  describe "recent_error_logs?" do
+    it "returns true if last_error_log_at is near last_event_at" do
+      agent = Agent.new
+
+      agent.last_error_log_at = 10.minutes.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_true
+
+      agent.last_error_log_at = 11.minutes.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_true
+
+      agent.last_error_log_at = 5.minutes.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_true
+
+      agent.last_error_log_at = 15.minutes.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_false
+
+      agent.last_error_log_at = 2.days.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_false
     end
   end
 
