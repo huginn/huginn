@@ -7,17 +7,16 @@ class Event < ActiveRecord::Base
 
   serialize :payload, JSONWithIndifferentAccess
 
-  def payload=(o)
-    self[:payload] = ActiveSupport::HashWithIndifferentAccess.new(o)
-  end
-
-
   belongs_to :user
-  belongs_to :agent, :counter_cache => true
+  belongs_to :agent, :counter_cache => true, :touch => :last_event_at
 
   scope :recent, lambda { |timespan = 12.hours.ago|
     where("events.created_at > ?", timespan)
   }
+
+  def payload=(o)
+    self[:payload] = ActiveSupport::HashWithIndifferentAccess.new(o)
+  end
 
   def reemit!
     agent.create_event :payload => payload, :lat => lat, :lng => lng

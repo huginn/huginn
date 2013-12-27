@@ -67,6 +67,14 @@ describe AgentLog do
       agents(:jane_website_agent).logs.order("agent_logs.id desc").first.message.should == "message 6"
       agents(:jane_website_agent).logs.order("agent_logs.id desc").last.message.should == "message 3"
     end
+
+    it "updates Agents' last_error_log_at when an error is logged" do
+      AgentLog.log_for_agent(agents(:jane_website_agent), "some message", :level => 3, :outbound_event => events(:jane_website_agent_event))
+      agents(:jane_website_agent).reload.last_error_log_at.should be_nil
+
+      AgentLog.log_for_agent(agents(:jane_website_agent), "some message", :level => 4, :outbound_event => events(:jane_website_agent_event))
+      agents(:jane_website_agent).reload.last_error_log_at.to_i.should be_within(2).of(Time.now.to_i)
+    end
   end
 
   describe "#log_length" do

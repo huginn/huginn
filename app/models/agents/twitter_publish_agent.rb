@@ -26,7 +26,7 @@ module Agents
     end
 
     def working?
-      (event = event_created_within(options['expected_update_period_in_days'])) && event.payload['success'] == true && !recent_error_logs?
+      event_created_within?(options['expected_update_period_in_days']) && most_recent_event.payload['success'] == true && !recent_error_logs?
     end
 
     def default_options

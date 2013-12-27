@@ -14,6 +14,9 @@ class AgentLog < ActiveRecord::Base
       oldest_id_to_keep = agent.logs.limit(1).offset(log_length - 1).pluck("agent_logs.id")
       agent.logs.where("agent_logs.id < ?", oldest_id_to_keep).delete_all
     end
+
+    agent.update_column :last_error_log_at, Time.now if log.level >= 4
+
     log
   end
 
