@@ -13,7 +13,7 @@ describe Event do
       Event.last.agent.should == events(:bob_website_agent_event).agent
       Event.last.lat.should == 2
       Event.last.lng.should == 3
-      Event.last.created_at.should be_within(1).of(Time.now)
+      Event.last.created_at.to_.should be_within(2).of(Time.now.to_i)
     end
   end
 
