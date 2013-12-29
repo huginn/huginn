@@ -21,6 +21,7 @@ class Agent < ActiveRecord::Base
   attr_accessible :options, :memory, :name, :type, :schedule, :source_ids, :keep_events_for
 
   validates_presence_of :name, :user
+  validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
   validate :sources_are_owned
   validate :validate_schedule
 
@@ -29,6 +30,7 @@ class Agent < ActiveRecord::Base
   before_validation :unschedule_if_cannot_schedule
   before_save :unschedule_if_cannot_schedule
   before_create :set_last_checked_event_id
+  after_save :possibly_update_event_expirations
 
   belongs_to :user, :inverse_of => :agents
   has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
@@ -172,6 +174,18 @@ class Agent < ActiveRecord::Base
   def set_last_checked_event_id
     if newest_event_id = Event.order("id desc").limit(1).pluck(:id).first
       self.last_checked_event_id = newest_event_id
+    end
+  end
+
+  def possibly_update_event_expirations
+    update_event_expirations! if keep_events_for_changed?
+  end
+
+  def update_event_expirations!
+    if keep_events_for == 0
+      events.update_all :expires_at => nil
+    else
+      events.update_all "expires_at = DATE_ADD(`created_at`, INTERVAL #{keep_events_for.to_i} DAY)"
     end
   end
 

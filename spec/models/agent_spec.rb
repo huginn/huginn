@@ -249,7 +249,7 @@ describe Agent do
         agent.should have(0).errors_on(:base)
       end
 
-      it "symbolizes options before validating" do
+      it "makes options symbol-indifferent before validating" do
         agent = Agents::SomethingSource.new(:name => "something")
         agent.user = users(:bob)
         agent.options["bad"] = true
@@ -258,7 +258,7 @@ describe Agent do
         agent.should have(0).errors_on(:base)
       end
 
-      it "symbolizes memory before validating" do
+      it "makes memory symbol-indifferent before validating" do
         agent = Agents::SomethingSource.new(:name => "something")
         agent.user = users(:bob)
         agent.memory["bad"] = :hello
@@ -276,7 +276,85 @@ describe Agent do
         agent.user = users(:jane)
         agent.should have(0).errors_on(:sources)
       end
+
+      it "validates keep_events_for" do
+        agent = Agents::SomethingSource.new(:name => "something")
+        agent.user = users(:bob)
+        agent.should be_valid
+        agent.keep_events_for = nil
+        agent.should have(1).errors_on(:keep_events_for)
+        agent.keep_events_for = 1000
+        agent.should have(1).errors_on(:keep_events_for)
+        agent.keep_events_for = ""
+        agent.should have(1).errors_on(:keep_events_for)
+        agent.keep_events_for = 5
+        agent.should be_valid
+        agent.keep_events_for = 0
+        agent.should be_valid
+        agent.keep_events_for = 365
+        agent.should be_valid
+
+        # Rails seems to call to_i on the input. This guards against future changes to that behavior.
+        agent.keep_events_for = "drop table;"
+        agent.keep_events_for.should == 0
+      end
     end
+
+    describe "cleaning up now-expired events" do
+      before do
+        @agent = Agents::SomethingSource.new(:name => "something")
+        @agent.keep_events_for = 5
+        @agent.user = users(:bob)
+        @agent.save!
+        @event = @agent.create_event :payload => { "hello" => "world" }
+        @event.expires_at.to_i.should be_within(2).of(5.days.from_now.to_i)
+      end
+
+      describe "when keep_events_for has not changed" do
+        it "does nothing" do
+          mock(@agent).update_event_expirations!.times(0)
+
+          @agent.options[:foo] = "bar1"
+          @agent.save!
+
+          @agent.options[:foo] = "bar1"
+          @agent.keep_events_for = 5
+          @agent.save!
+        end
+      end
+
+      describe "when keep_events_for is changed" do
+        it "updates events' expires_at" do
+          lambda {
+            @agent.options[:foo] = "bar1"
+            @agent.keep_events_for = 3
+            @agent.save!
+          }.should change { @event.reload.expires_at }
+          @event.expires_at.to_i.should be_within(2).of(3.days.from_now.to_i)
+        end
+
+        it "updates events relative to their created_at" do
+          @event.update_attribute :created_at, 2.days.ago
+          @event.reload.created_at.to_i.should be_within(2).of(2.days.ago.to_i)
+
+          lambda {
+            @agent.options[:foo] = "bar2"
+            @agent.keep_events_for = 3
+            @agent.save!
+          }.should change { @event.reload.expires_at }
+          @event.expires_at.to_i.should be_within(2).of(1.days.from_now.to_i)
+        end
+
+        it "nulls out expires_at when keep_events_for is set to 0" do
+          lambda {
+            @agent.options[:foo] = "bar"
+            @agent.keep_events_for = 0
+            @agent.save!
+          }.should change { @event.reload.expires_at }.to(nil)
+        end
+      end
+    end
+
   end
 
   describe "scopes" do
