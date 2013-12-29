@@ -90,18 +90,8 @@ namespace :sync do
     end
   end
 
-  #
-  # Reads the database credentials from the local config/database.yml file
-  # +db+ the name of the environment to get the credentials for
-  # Returns username, password, database
-  #
-  def database_config(db)
-    database = YAML::load_file('config/database.yml')
-    return database["#{db}"]['username'], database["#{db}"]['password'], database["#{db}"]['database'], database["#{db}"]['host']
-  end
-
-  # Used by remote_database_config to parse the remote .env file.  Depends on the dotenv-rails gem.
-  class RemoteEnvLoader < Dotenv::Environment
+  # Used by database_config and remote_database_config to parse database configs that depend on .env files.  Depends on the dotenv-rails gem.
+  class EnvLoader < Dotenv::Environment
     def initialize(data)
       @data = data
       load
@@ -123,6 +113,23 @@ namespace :sync do
   end
 
   #
+  # Reads the database credentials from the local config/database.yml file
+  # +db+ the name of the environment to get the credentials for
+  # Returns username, password, database
+  #
+  def database_config(db)
+    local_config = File.read('config/database.yml')
+    local_env = File.read('.env')
+
+    database = nil
+    EnvLoader.new(local_env).with_loaded_env do
+      database = YAML::load(ERB.new(local_config).result)
+    end
+
+    return database["#{db}"]['username'], database["#{db}"]['password'], database["#{db}"]['database'], database["#{db}"]['host']
+  end
+
+  #
   # Reads the database credentials from the remote config/database.yml file
   # +db+ the name of the environment to get the credentials for
   # Returns username, password, database
@@ -132,7 +139,7 @@ namespace :sync do
     remote_env = capture("cat #{current_path}/.env")
 
     database = nil
-    RemoteEnvLoader.new(remote_env).with_loaded_env do
+    EnvLoader.new(remote_env).with_loaded_env do
       database = YAML::load(ERB.new(remote_config).result)
     end
 
