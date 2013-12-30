@@ -279,6 +279,32 @@ describe Agent do
     end
   end
 
+  describe "recent_error_logs?" do
+    it "returns true if last_error_log_at is near last_event_at" do
+      agent = Agent.new
+
+      agent.last_error_log_at = 10.minutes.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_true
+
+      agent.last_error_log_at = 11.minutes.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_true
+
+      agent.last_error_log_at = 5.minutes.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_true
+
+      agent.last_error_log_at = 15.minutes.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_false
+
+      agent.last_error_log_at = 2.days.ago
+      agent.last_event_at = 10.minutes.ago
+      agent.recent_error_logs?.should be_false
+    end
+  end
+
   describe "scopes" do
     describe "of_type" do
       it "should accept classes" do

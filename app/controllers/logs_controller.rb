@@ -7,7 +7,7 @@ class LogsController < ApplicationController
   end
 
   def clear
-    @agent.logs.delete_all
+    @agent.delete_logs!
     index
   end
 
