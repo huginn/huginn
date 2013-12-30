@@ -266,6 +266,48 @@ describe Agent do
         agent.memory[:bad].should == 2
       end
 
+      it "should work when assigned a hash or JSON string" do
+        agent = Agents::SomethingSource.new(:name => "something")
+        agent.memory = {}
+        agent.memory.should == {}
+        agent.memory["foo"].should be_nil
+
+        agent.memory = ""
+        agent.memory["foo"].should be_nil
+        agent.memory.should == {}
+
+        agent.memory = '{"hi": "there"}'
+        agent.memory.should == { "hi" => "there" }
+
+        agent.memory = '{invalid}'
+        agent.memory.should == { "hi" => "there" }
+        agent.should have(1).errors_on(:memory)
+
+        agent.memory = "{}"
+        agent.memory["foo"].should be_nil
+        agent.memory.should == {}
+        agent.should have(0).errors_on(:memory)
+
+        agent.options = "{}"
+        agent.options["foo"].should be_nil
+        agent.options.should == {}
+        agent.should have(0).errors_on(:options)
+
+        agent.options = '{"hi": 2}'
+        agent.options["hi"].should == 2
+        agent.should have(0).errors_on(:options)
+
+        agent.options = '{"hi": wut}'
+        agent.options["hi"].should == 2
+        agent.should have(1).errors_on(:options)
+        agent.errors_on(:options).should include("was assigned invalid JSON")
+
+        agent.options = 5
+        agent.options["hi"].should == 2
+        agent.should have(1).errors_on(:options)
+        agent.errors_on(:options).should include("cannot be set to an instance of Fixnum")
+      end
+
       it "should not allow agents owned by other people" do
         agent = Agents::SomethingSource.new(:name => "something")
         agent.user = users(:bob)

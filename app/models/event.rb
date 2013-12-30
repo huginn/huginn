@@ -1,11 +1,13 @@
-require 'json_with_indifferent_access'
+require 'json_serialized_field'
 
 class Event < ActiveRecord::Base
+  include JSONSerializedField
+
   attr_accessible :lat, :lng, :payload, :user_id, :user, :expires_at
 
   acts_as_mappable
 
-  serialize :payload, JSONWithIndifferentAccess
+  json_serialize :payload
 
   belongs_to :user
   belongs_to :agent, :counter_cache => true, :touch => :last_event_at
@@ -13,10 +15,6 @@ class Event < ActiveRecord::Base
   scope :recent, lambda { |timespan = 12.hours.ago|
     where("events.created_at > ?", timespan)
   }
-
-  def payload=(o)
-    self[:payload] = ActiveSupport::HashWithIndifferentAccess.new(o)
-  end
 
   def reemit!
     agent.create_event :payload => payload, :lat => lat, :lng => lng

@@ -1,4 +1,4 @@
-require 'json_with_indifferent_access'
+require 'json_serialized_field'
 require 'assignable_types'
 require 'markdown_class_attributes'
 require 'utils'
@@ -6,6 +6,7 @@ require 'utils'
 class Agent < ActiveRecord::Base
   include AssignableTypes
   include MarkdownClassAttributes
+  include JSONSerializedField
 
   markdown_class_attributes :description, :event_description
 
@@ -16,8 +17,7 @@ class Agent < ActiveRecord::Base
 
   attr_accessible :options, :memory, :name, :type, :schedule, :source_ids
 
-  serialize :options, JSONWithIndifferentAccess
-  serialize :memory, JSONWithIndifferentAccess
+  json_serialize :options, :memory
 
   validates_presence_of :name, :user
   validate :sources_are_owned
@@ -77,14 +77,6 @@ class Agent < ActiveRecord::Base
 
   def validate_options
     # Implement me in your subclass to test for valid options.
-  end
-
-  def options=(o)
-    self[:options] = ActiveSupport::HashWithIndifferentAccess.new(o)
-  end
-
-  def memory=(o)
-    self[:memory] = ActiveSupport::HashWithIndifferentAccess.new(o)
   end
 
   def event_created_within?(days)
