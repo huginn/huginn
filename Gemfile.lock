@@ -63,9 +63,9 @@ GEM
       railties (>= 3.2.6, < 5)
       warden (~> 1.2.3)
     diff-lcs (1.2.4)
-    dotenv (0.8.0)
-    dotenv-rails (0.8.0)
-      dotenv (= 0.8.0)
+    dotenv (0.9.0)
+    dotenv-rails (0.9.0)
+      dotenv (= 0.9.0)
     em-http-request (1.0.3)
       addressable (>= 2.2.3)
       cookiejar
