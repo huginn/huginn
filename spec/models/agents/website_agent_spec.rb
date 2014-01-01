@@ -4,15 +4,15 @@ describe Agents::WebsiteAgent do
   before do
     stub_request(:any, /xkcd/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
     @site = {
-        :name => "XKCD",
-        :expected_update_period_in_days => 2,
-        :type => "html",
-        :url => "http://xkcd.com",
-        :mode => :on_change,
-        :extract => {
-            :url => {:css => "#comic img", :attr => "src"},
-            :title => {:css => "#comic img", :attr => "title"}
-        }
+      'name' => "XKCD",
+      'expected_update_period_in_days' => 2,
+      'type' => "html",
+      'url' => "http://xkcd.com",
+      'mode' => 'on_change',
+      'extract' => {
+        'url' => {'css' => "#comic img", 'attr' => "src"},
+        'title' => {'css' => "#comic img", 'attr' => "title"}
+      }
     }
     @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @site)
     @checker.user = users(:bob)
@@ -27,7 +27,7 @@ describe Agents::WebsiteAgent do
 
     it "should always save events when in :all mode" do
       lambda {
-        @site[:mode] = :all
+        @site['mode'] = 'all'
         @checker.options = @site
         @checker.check
         @checker.check
@@ -35,7 +35,7 @@ describe Agents::WebsiteAgent do
     end
 
     it "should log an error if the number of results for a set of extraction patterns differs" do
-      @site[:extract][:url][:css] = "div"
+      @site['extract']['url']['css'] = "div"
       @checker.options = @site
       @checker.check
       @checker.logs.first.message.should =~ /Got an uneven number of matches/
@@ -68,20 +68,20 @@ describe Agents::WebsiteAgent do
     it "parses CSS" do
       @checker.check
       event = Event.last
-      event.payload[:url].should == "http://imgs.xkcd.com/comics/evolving.png"
-      event.payload[:title].should =~ /^Biologists play reverse/
+      event.payload['url'].should == "http://imgs.xkcd.com/comics/evolving.png"
+      event.payload['title'].should =~ /^Biologists play reverse/
     end
 
     it "should turn relative urls to absolute" do
       rel_site = {
-        :name => "XKCD",
-        :expected_update_period_in_days => 2,
-        :type => "html",
-        :url => "http://xkcd.com",
-        :mode => :on_change,
-        :extract => {
-            :url => {:css => "#topLeft a", :attr => "href"},
-            :title => {:css => "#topLeft a", :text => "true"}
+        'name' => "XKCD",
+        'expected_update_period_in_days' => 2,
+        'type' => "html",
+        'url' => "http://xkcd.com",
+        'mode' => :on_change,
+        'extract' => {
+          'url' => {'css' => "#topLeft a", 'attr' => "href"},
+          'title' => {'css' => "#topLeft a", 'text' => "true"}
         }
       }
       rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
@@ -89,28 +89,28 @@ describe Agents::WebsiteAgent do
       rel.save!
       rel.check
       event = Event.last
-      event.payload[:url].should == "http://xkcd.com/about"
+      event.payload['url'].should == "http://xkcd.com/about"
     end
-        
+
     describe "JSON" do
       it "works with paths" do
         json = {
-            :response => {
-                :version => 2,
-                :title => "hello!"
-            }
+          'response' => {
+            'version' => 2,
+            'title' => "hello!"
+          }
         }
         stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
         site = {
-            :name => "Some JSON Response",
-            :expected_update_period_in_days => 2,
-            :type => "json",
-            :url => "http://json-site.com",
-            :mode => :on_change,
-            :extract => {
-                :version => { :path => "response.version" },
-                :title => { :path => "response.title" }
-            }
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => 2,
+          'type' => "json",
+          'url' => "http://json-site.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'version' => {'path' => "response.version"},
+            'title' => {'path' => "response.title"}
+          }
         }
         checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
         checker.user = users(:bob)
@@ -118,30 +118,30 @@ describe Agents::WebsiteAgent do
 
         checker.check
         event = Event.last
-        event.payload[:version].should == 2
-        event.payload[:title].should == "hello!"
+        event.payload['version'].should == 2
+        event.payload['title'].should == "hello!"
       end
 
       it "can handle arrays" do
         json = {
-            :response => {
-                :data => [
-                    { :title => "first", :version => 2 },
-                    { :title => "second", :version => 2.5 }
-                ]
-            }
+          'response' => {
+            'data' => [
+              {'title' => "first", 'version' => 2},
+              {'title' => "second", 'version' => 2.5}
+            ]
+          }
         }
         stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
         site = {
-            :name => "Some JSON Response",
-            :expected_update_period_in_days => 2,
-            :type => "json",
-            :url => "http://json-site.com",
-            :mode => :on_change,
-            :extract => {
-                :title => { :path => "response.data[*].title" },
-                :version => { :path => "response.data[*].version" }
-            }
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => 2,
+          'type' => "json",
+          'url' => "http://json-site.com",
+          'mode' => 'on_change',
+          'extract' => {
+            :title => {'path' => "response.data[*].title"},
+            :version => {'path' => "response.data[*].version"}
+          }
         }
         checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
         checker.user = users(:bob)
@@ -152,28 +152,28 @@ describe Agents::WebsiteAgent do
         }.should change { Event.count }.by(2)
 
         event = Event.all[-1]
-        event.payload[:version].should == 2.5
-        event.payload[:title].should == "second"
+        event.payload['version'].should == 2.5
+        event.payload['title'].should == "second"
 
         event = Event.all[-2]
-        event.payload[:version].should == 2
-        event.payload[:title].should == "first"
+        event.payload['version'].should == 2
+        event.payload['title'].should == "first"
       end
 
       it "stores the whole object if :extract is not specified" do
         json = {
-            :response => {
-                :version => 2,
-                :title => "hello!"
-            }
+          'response' => {
+            'version' => 2,
+            'title' => "hello!"
+          }
         }
         stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
         site = {
-            :name => "Some JSON Response",
-            :expected_update_period_in_days => 2,
-            :type => "json",
-            :url => "http://json-site.com",
-            :mode => :on_change
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => 2,
+          'type' => "json",
+          'url' => "http://json-site.com",
+          'mode' => 'on_change'
         }
         checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
         checker.user = users(:bob)
@@ -181,8 +181,8 @@ describe Agents::WebsiteAgent do
 
         checker.check
         event = Event.last
-        event.payload[:response][:version].should == 2
-        event.payload[:response][:title].should == "hello!"
+        event.payload['response']['version'].should == 2
+        event.payload['response']['title'].should == "hello!"
       end
     end
   end

@@ -457,7 +457,7 @@ describe Agent do
       end
 
       it "sets expires_at on created events" do
-        event = agents(:jane_weather_agent).create_event :payload => "hi!"
+        event = agents(:jane_weather_agent).create_event :payload => { 'hi' => 'there' }
         event.expires_at.should be_within(5).of(agents(:jane_weather_agent).keep_events_for.days.from_now)
       end
     end
@@ -468,7 +468,7 @@ describe Agent do
       end
 
       it "does not set expires_at on created events" do
-        event = agents(:jane_website_agent).create_event :payload => "hi!"
+        event = agents(:jane_website_agent).create_event :payload => { 'hi' => 'there' }
         event.expires_at.should be_nil
       end
     end

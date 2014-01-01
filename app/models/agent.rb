@@ -114,18 +114,6 @@ class Agent < ActiveRecord::Base
     end
   end
 
-  def last_event_at
-    @memoized_last_event_at ||= most_recent_event.try(:created_at)
-  end
-
-  def set_default_schedule
-    self.schedule = default_schedule unless schedule.present? || cannot_be_scheduled?
-  end
-
-  def unschedule_if_cannot_schedule
-    self.schedule = nil if cannot_be_scheduled?
-  end
-
   def default_schedule
     self.class.default_schedule
   end
