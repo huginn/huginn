@@ -18,7 +18,7 @@ module Agents
           * `secret` - A token that the host will provide for authentication.
           * `expected_receive_period_in_days` - How often you expect to receive
             events this way. Used to determine if the agent is working.
-          * `payload_path` - JSONPath of the attribute of the POST body to be
+          * `payload_path` - JSONPath of the attribute in the POST body to be
             used as the Event payload.
       MD
     end
@@ -26,7 +26,7 @@ module Agents
     event_description do
       <<-MD
         The event payload is base on the value of the `payload_path` option,
-        which is set to `#{options[:payload_path]}`.
+        which is set to `#{options['payload_path']}`.
       MD
     end
 
@@ -37,8 +37,8 @@ module Agents
     end
 
     def receive_webhook(params)
-      secret = params.delete(:secret)
-      return ["Not Authorized", 401] unless secret == options[:secret]
+      secret = params.delete('secret')
+      return ["Not Authorized", 401] unless secret == options['secret']
 
       create_event(:payload => payload_for(params))
 
@@ -46,17 +46,17 @@ module Agents
     end
 
     def working?
-      event_created_within(options[:expected_receive_period_in_days]) && !recent_error_logs?
+      event_created_within(options['expected_receive_period_in_days']) && !recent_error_logs?
     end
 
     def validate_options
-      unless options[:secret].present?
-        errors.add(:base, "Must specify a :secret for 'Authenticating' requests")
+      unless options['secret'].present?
+        errors.add(:base, "Must specify a secret for 'Authenticating' requests")
       end
     end
 
     def payload_for(params)
-      Utils.values_at(params, options[:payload_path]) || {}
+      Utils.value_at(params, options['payload_path']) || {}
     end
   end
 end

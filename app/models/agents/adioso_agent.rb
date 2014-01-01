@@ -29,22 +29,22 @@ module Agents
 
     def default_options
       {
-        :start_date => Date.today.httpdate[0..15],
-        :end_date   => Date.today.plus_with_duration(100).httpdate[0..15],
-        :from       => "New York",
-        :to         => "Chicago",
-        :username   => "xx",
-        :password   => "xx",
-				:expected_update_period_in_days => "1"
+        'start_date' => Date.today.httpdate[0..15],
+        'end_date'   => Date.today.plus_with_duration(100).httpdate[0..15],
+        'from'       => "New York",
+        'to'         => "Chicago",
+        'username'   => "xx",
+        'password'   => "xx",
+				'expected_update_period_in_days' => "1"
       }
     end
 
     def working?
-      event_created_within(options[:expected_update_period_in_days]) && !recent_error_logs?
+      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def validate_options
-			unless %w[start_date end_date from to username password expected_update_period_in_days].all? { |field| options[field.to_sym].present? }
+			unless %w[start_date end_date from to username password expected_update_period_in_days].all? { |field| options[field].present? }
 				errors.add(:base, "All fields are required")
 			end
 		end
@@ -54,9 +54,9 @@ module Agents
     end
 
     def check
-      auth_options = {:basic_auth => {:username =>options[:username], :password=>options[:password]}}
-      parse_response = HTTParty.get "http://api.adioso.com/v2/search/parse?q=#{URI.encode(options[:from])}+to+#{URI.encode(options[:to])}", auth_options
-      fare_request = parse_response["search_url"].gsub /(end=)(\d*)([^\d]*)(\d*)/, "\\1#{date_to_unix_epoch(options[:end_date])}\\3#{date_to_unix_epoch(options[:start_date])}"
+      auth_options = {:basic_auth => {:username =>options[:username], :password=>options['password']}}
+      parse_response = HTTParty.get "http://api.adioso.com/v2/search/parse?q=#{URI.encode(options['from'])}+to+#{URI.encode(options['to'])}", auth_options
+      fare_request = parse_response["search_url"].gsub /(end=)(\d*)([^\d]*)(\d*)/, "\\1#{date_to_unix_epoch(options['end_date'])}\\3#{date_to_unix_epoch(options['start_date'])}"
       fare = HTTParty.get fare_request, auth_options
 
 			if fare["warnings"]
@@ -64,7 +64,7 @@ module Agents
 			else
 				event = fare["results"].min {|a,b| a["cost"] <=> b["cost"]}
 				event["date"]  = Time.at(event["date"]).to_date.httpdate[0..15]
-				event["route"] = "#{options[:from]} to #{options[:to]}" 
+				event["route"] = "#{options['from']} to #{options['to']}"
 				create_event :payload => event
 			end
     end

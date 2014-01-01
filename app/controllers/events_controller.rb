@@ -6,7 +6,7 @@ class EventsController < ApplicationController
       @agent = current_user.agents.find(params[:agent])
       @events = @agent.events.page(params[:page])
     else
-      @events = current_user.events.page(params[:page])
+      @events = current_user.events.preload(:agent).page(params[:page])
     end
 
     respond_to do |format|

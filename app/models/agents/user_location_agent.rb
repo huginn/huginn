@@ -30,15 +30,15 @@ module Agents
     MD
 
     def working?
-      event_created_within(2) && !recent_error_logs?
+      event_created_within?(2) && !recent_error_logs?
     end
 
     def default_options
-      { :secret => SecureRandom.hex(7) }
+      { 'secret' => SecureRandom.hex(7) }
     end
 
     def validate_options
-      errors.add(:base, "secret is required and must be longer than 4 characters") unless options[:secret].present? && options[:secret].length > 4
+      errors.add(:base, "secret is required and must be longer than 4 characters") unless options['secret'].present? && options['secret'].length > 4
     end
   end
 end

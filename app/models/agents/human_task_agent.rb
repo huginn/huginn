@@ -128,73 +128,73 @@ module Agents
     MD
 
     def validate_options
-      options[:hit] ||= {}
-      options[:hit][:questions] ||= []
+      options['hit'] ||= {}
+      options['hit']['questions'] ||= []
 
-      errors.add(:base, "'trigger_on' must be one of 'schedule' or 'event'") unless %w[schedule event].include?(options[:trigger_on])
-      errors.add(:base, "'hit.assignments' should specify the number of HIT assignments to create") unless options[:hit][:assignments].present? && options[:hit][:assignments].to_i > 0
-      errors.add(:base, "'hit.title' must be provided") unless options[:hit][:title].present?
-      errors.add(:base, "'hit.description' must be provided") unless options[:hit][:description].present?
-      errors.add(:base, "'hit.questions' must be provided") unless options[:hit][:questions].present? && options[:hit][:questions].length > 0
+      errors.add(:base, "'trigger_on' must be one of 'schedule' or 'event'") unless %w[schedule event].include?(options['trigger_on'])
+      errors.add(:base, "'hit.assignments' should specify the number of HIT assignments to create") unless options['hit']['assignments'].present? && options['hit']['assignments'].to_i > 0
+      errors.add(:base, "'hit.title' must be provided") unless options['hit']['title'].present?
+      errors.add(:base, "'hit.description' must be provided") unless options['hit']['description'].present?
+      errors.add(:base, "'hit.questions' must be provided") unless options['hit']['questions'].present? && options['hit']['questions'].length > 0
 
-      if options[:trigger_on] == "event"
-        errors.add(:base, "'expected_receive_period_in_days' is required when 'trigger_on' is set to 'event'") unless options[:expected_receive_period_in_days].present?
-      elsif options[:trigger_on] == "schedule"
-        errors.add(:base, "'submission_period' must be set to a positive number of hours when 'trigger_on' is set to 'schedule'") unless options[:submission_period].present? && options[:submission_period].to_i > 0
+      if options['trigger_on'] == "event"
+        errors.add(:base, "'expected_receive_period_in_days' is required when 'trigger_on' is set to 'event'") unless options['expected_receive_period_in_days'].present?
+      elsif options['trigger_on'] == "schedule"
+        errors.add(:base, "'submission_period' must be set to a positive number of hours when 'trigger_on' is set to 'schedule'") unless options['submission_period'].present? && options['submission_period'].to_i > 0
       end
 
-      if options[:hit][:questions].any? { |question| [:key, :name, :required, :type, :question].any? {|k| !question[k].present? } }
+      if options['hit']['questions'].any? { |question| %w[key name required type question].any? {|k| !question[k].present? } }
         errors.add(:base, "all questions must set 'key', 'name', 'required', 'type', and 'question'")
       end
 
-      if options[:hit][:questions].any? { |question| question[:type] == "selection" && (!question[:selections].present? || question[:selections].length == 0 || !question[:selections].all? {|s| s[:key].present? } || !question[:selections].all? { |s| s[:text].present? })}
+      if options['hit']['questions'].any? { |question| question['type'] == "selection" && (!question['selections'].present? || question['selections'].length == 0 || !question['selections'].all? {|s| s['key'].present? } || !question['selections'].all? { |s| s['text'].present? })}
         errors.add(:base, "all questions of type 'selection' must have a selections array with selections that set 'key' and 'name'")
       end
 
-      if take_majority? && options[:hit][:questions].any? { |question| question[:type] != "selection" }
+      if take_majority? && options['hit']['questions'].any? { |question| question['type'] != "selection" }
         errors.add(:base, "all questions must be of type 'selection' to use the 'take_majority' option")
       end
 
       if create_poll?
-        errors.add(:base, "poll_options is required when combination_mode is set to 'poll' and must have the keys 'title', 'instructions', 'row_template', and 'assignments'") unless options[:poll_options].is_a?(Hash) && options[:poll_options][:title].present? &&  options[:poll_options][:instructions].present? && options[:poll_options][:row_template].present? && options[:poll_options][:assignments].to_i > 0
+        errors.add(:base, "poll_options is required when combination_mode is set to 'poll' and must have the keys 'title', 'instructions', 'row_template', and 'assignments'") unless options['poll_options'].is_a?(Hash) && options['poll_options']['title'].present? && options['poll_options']['instructions'].present? && options['poll_options']['row_template'].present? && options['poll_options']['assignments'].to_i > 0
       end
     end
 
     def default_options
       {
-        :expected_receive_period_in_days => 2,
-        :trigger_on => "event",
-        :hit =>
+        'expected_receive_period_in_days' => 2,
+        'trigger_on' => "event",
+        'hit' =>
           {
-            :assignments => 1,
-            :title => "Sentiment evaluation",
-            :description => "Please rate the sentiment of this message: '<$.message>'",
-            :reward => 0.05,
-            :lifetime_in_seconds => 24 * 60 * 60,
-            :questions =>
+            'assignments' => 1,
+            'title' => "Sentiment evaluation",
+            'description' => "Please rate the sentiment of this message: '<$.message>'",
+            'reward' => 0.05,
+            'lifetime_in_seconds' => 24 * 60 * 60,
+            'questions' =>
               [
                 {
-                  :type => "selection",
-                  :key => "sentiment",
-                  :name => "Sentiment",
-                  :required => "true",
-                  :question => "Please select the best sentiment value:",
-                  :selections =>
+                  'type' => "selection",
+                  'key' => "sentiment",
+                  'name' => "Sentiment",
+                  'required' => "true",
+                  'question' => "Please select the best sentiment value:",
+                  'selections' =>
                     [
-                      { :key => "happy", :text => "Happy" },
-                      { :key => "sad", :text => "Sad" },
-                      { :key => "neutral", :text => "Neutral" }
+                      { 'key' => "happy", 'text' => "Happy" },
+                      { 'key' => "sad", 'text' => "Sad" },
+                      { 'key' => "neutral", 'text' => "Neutral" }
                     ]
                 },
                 {
-                  :type => "free_text",
-                  :key => "feedback",
-                  :name => "Have any feedback for us?",
-                  :required => "false",
-                  :question => "Feedback",
-                  :default => "Type here...",
-                  :min_length => "2",
-                  :max_length => "2000"
+                  'type' => "free_text",
+                  'key' => "feedback",
+                  'name' => "Have any feedback for us?",
+                  'required' => "false",
+                  'question' => "Feedback",
+                  'default' => "Type here...",
+                  'min_length' => "2",
+                  'max_length' => "2000"
                 }
               ]
           }
@@ -202,20 +202,20 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def check
       review_hits
 
-      if options[:trigger_on] == "schedule" && (memory[:last_schedule] || 0) <= Time.now.to_i - options[:submission_period].to_i * 60 * 60
-        memory[:last_schedule] = Time.now.to_i
+      if options['trigger_on'] == "schedule" && (memory['last_schedule'] || 0) <= Time.now.to_i - options['submission_period'].to_i * 60 * 60
+        memory['last_schedule'] = Time.now.to_i
         create_basic_hit
       end
     end
 
     def receive(incoming_events)
-      if options[:trigger_on] == "event"
+      if options['trigger_on'] == "event"
         incoming_events.each do |event|
           create_basic_hit event
         end
@@ -225,33 +225,32 @@ module Agents
     protected
 
     def take_majority?
-      options[:combination_mode] == "take_majority" || options[:take_majority] == "true"
+      options['combination_mode'] == "take_majority" || options['take_majority'] == "true"
     end
 
     def create_poll?
-      options[:combination_mode] == "poll"
+      options['combination_mode'] == "poll"
     end
 
     def event_for_hit(hit_id)
-      if memory[:hits][hit_id.to_sym].is_a?(Hash)
-        Event.find_by_id(memory[:hits][hit_id.to_sym][:event_id])
+      if memory['hits'][hit_id].is_a?(Hash)
+        Event.find_by_id(memory['hits'][hit_id]['event_id'])
       else
         nil
       end
     end
 
     def hit_type(hit_id)
-      # Fix this: the Ruby process will slowly run out of RAM by symbolizing these unique keys.
-      if memory[:hits][hit_id.to_sym].is_a?(Hash) && memory[:hits][hit_id.to_sym][:type]
-        memory[:hits][hit_id.to_sym][:type].to_sym
+      if memory['hits'][hit_id].is_a?(Hash) && memory['hits'][hit_id]['type']
+        memory['hits'][hit_id]['type']
       else
-        :user
+        'user'
       end
     end
 
     def review_hits
       reviewable_hit_ids = RTurk::GetReviewableHITs.create.hit_ids
-      my_reviewed_hit_ids = reviewable_hit_ids & (memory[:hits] || {}).keys.map(&:to_s)
+      my_reviewed_hit_ids = reviewable_hit_ids & (memory['hits'] || {}).keys
       if reviewable_hit_ids.length > 0
         log "MTurk reports #{reviewable_hit_ids.length} HITs, of which I own [#{my_reviewed_hit_ids.to_sentence}]"
       end
@@ -264,7 +263,7 @@ module Agents
         if assignments.length == hit.max_assignments && assignments.all? { |assignment| assignment.status == "Submitted" }
           inbound_event = event_for_hit(hit_id)
 
-          if hit_type(hit_id) == :poll
+          if hit_type(hit_id) == 'poll'
             # handle completed polls
 
             log "Handling a poll: #{hit_id}"
@@ -280,35 +279,35 @@ module Agents
             top_answer = scores.to_a.sort {|b, a| a.last <=> b.last }.first.first
 
             payload = {
-              :answers => memory[:hits][hit_id.to_sym][:answers],
-              :poll => assignments.map(&:answers),
-              :best_answer => memory[:hits][hit_id.to_sym][:answers][top_answer.to_i - 1]
+              'answers' => memory['hits'][hit_id]['answers'],
+              'poll' => assignments.map(&:answers),
+              'best_answer' => memory['hits'][hit_id]['answers'][top_answer.to_i - 1]
             }
 
             event = create_event :payload => payload
             log "Event emitted with answer(s) for poll", :outbound_event => event, :inbound_event => inbound_event
           else
             # handle normal completed HITs
-            payload = { :answers => assignments.map(&:answers) }
+            payload = { 'answers' => assignments.map(&:answers) }
 
             if take_majority?
               counts = {}
-              options[:hit][:questions].each do |question|
-                question_counts = question[:selections].inject({}) { |memo, selection| memo[selection[:key]] = 0; memo }
+              options['hit']['questions'].each do |question|
+                question_counts = question['selections'].inject({}) { |memo, selection| memo[selection['key']] = 0; memo }
                 assignments.each do |assignment|
                   answers = ActiveSupport::HashWithIndifferentAccess.new(assignment.answers)
-                  answer = answers[question[:key]]
+                  answer = answers[question['key']]
                   question_counts[answer] += 1
                 end
-                counts[question[:key]] = question_counts
+                counts[question['key']] = question_counts
               end
-              payload[:counts] = counts
+              payload['counts'] = counts
 
               majority_answer = counts.inject({}) do |memo, (key, question_counts)|
                 memo[key] = question_counts.to_a.sort {|a, b| a.last <=> b.last }.last.first
                 memo
               end
-              payload[:majority_answer] = majority_answer
+              payload['majority_answer'] = majority_answer
 
               if all_questions_are_numeric?
                 average_answer = counts.inject({}) do |memo, (key, question_counts)|
@@ -320,35 +319,35 @@ module Agents
                   memo[key] = sum / divisor.to_f
                   memo
                 end
-                payload[:average_answer] = average_answer
+                payload['average_answer'] = average_answer
               end
             end
 
             if create_poll?
               questions = []
-              selections = 5.times.map { |i| { :key => i+1, :text => i+1 } }.reverse
+              selections = 5.times.map { |i| { 'key' => i+1, 'text' => i+1 } }.reverse
               assignments.length.times do |index|
                 questions << {
-                  :type => "selection",
-                  :name => "Item #{index + 1}",
-                  :key => index,
-                  :required => "true",
-                  :question => Utils.interpolate_jsonpaths(options[:poll_options][:row_template], assignments[index].answers),
-                  :selections => selections
+                  'type' => "selection",
+                  'name' => "Item #{index + 1}",
+                  'key' => index,
+                  'required' => "true",
+                  'question' => Utils.interpolate_jsonpaths(options['poll_options']['row_template'], assignments[index].answers),
+                  'selections' => selections
                 }
               end
 
-              poll_hit = create_hit :title => options[:poll_options][:title],
-                                    :description => options[:poll_options][:instructions],
-                                    :questions => questions,
-                                    :assignments => options[:poll_options][:assignments],
-                                    :lifetime_in_seconds => options[:poll_options][:lifetime_in_seconds],
-                                    :reward => options[:poll_options][:reward],
-                                    :payload => inbound_event && inbound_event.payload,
-                                    :metadata => { :type => :poll,
-                                                   :original_hit => hit_id,
-                                                   :answers => assignments.map(&:answers),
-                                                   :event_id => inbound_event && inbound_event.id }
+              poll_hit = create_hit 'title' => options['poll_options']['title'],
+                                    'description' => options['poll_options']['instructions'],
+                                    'questions' => questions,
+                                    'assignments' => options['poll_options']['assignments'],
+                                    'lifetime_in_seconds' => options['poll_options']['lifetime_in_seconds'],
+                                    'reward' => options['poll_options']['reward'],
+                                    'payload' => inbound_event && inbound_event.payload,
+                                    'metadata' => { 'type' => 'poll',
+                                                    'original_hit' => hit_id,
+                                                    'answers' => assignments.map(&:answers),
+                                                    'event_id' => inbound_event && inbound_event.id }
 
               log "Poll HIT created with ID #{poll_hit.id} and URL #{poll_hit.url}.  Original HIT: #{hit_id}", :inbound_event => inbound_event
             else
@@ -360,47 +359,47 @@ module Agents
           assignments.each(&:approve!)
           hit.dispose!
 
-          memory[:hits].delete(hit_id.to_sym)
+          memory['hits'].delete(hit_id)
         end
       end
     end
 
     def all_questions_are_numeric?
-      options[:hit][:questions].all? do |question|
-        question[:selections].all? do |selection|
-          selection[:key] == selection[:key].to_f.to_s || selection[:key] == selection[:key].to_i.to_s
+      options['hit']['questions'].all? do |question|
+        question['selections'].all? do |selection|
+          selection['key'] == selection['key'].to_f.to_s || selection['key'] == selection['key'].to_i.to_s
         end
       end
     end
 
     def create_basic_hit(event = nil)
-      hit = create_hit :title => options[:hit][:title],
-                       :description => options[:hit][:description],
-                       :questions => options[:hit][:questions],
-                       :assignments => options[:hit][:assignments],
-                       :lifetime_in_seconds => options[:hit][:lifetime_in_seconds],
-                       :reward => options[:hit][:reward],
-                       :payload => event && event.payload,
-                       :metadata => { :event_id => event && event.id }
+      hit = create_hit 'title' => options['hit']['title'],
+                       'description' => options['hit']['description'],
+                       'questions' => options['hit']['questions'],
+                       'assignments' => options['hit']['assignments'],
+                       'lifetime_in_seconds' => options['hit']['lifetime_in_seconds'],
+                       'reward' => options['hit']['reward'],
+                       'payload' => event && event.payload,
+                       'metadata' => { 'event_id' => event && event.id }
 
       log "HIT created with ID #{hit.id} and URL #{hit.url}", :inbound_event => event
     end
 
     def create_hit(opts = {})
-      payload = opts[:payload] || {}
-      title = Utils.interpolate_jsonpaths(opts[:title], payload).strip
-      description = Utils.interpolate_jsonpaths(opts[:description], payload).strip
-      questions = Utils.recursively_interpolate_jsonpaths(opts[:questions], payload)
+      payload = opts['payload'] || {}
+      title = Utils.interpolate_jsonpaths(opts['title'], payload).strip
+      description = Utils.interpolate_jsonpaths(opts['description'], payload).strip
+      questions = Utils.recursively_interpolate_jsonpaths(opts['questions'], payload)
       hit = RTurk::Hit.create(:title => title) do |hit|
-        hit.max_assignments = (opts[:assignments] || 1).to_i
+        hit.max_assignments = (opts['assignments'] || 1).to_i
         hit.description = description
-        hit.lifetime = (opts[:lifetime_in_seconds] || 24 * 60 * 60).to_i
+        hit.lifetime = (opts['lifetime_in_seconds'] || 24 * 60 * 60).to_i
         hit.question_form AgentQuestionForm.new(:title => title, :description => description, :questions => questions)
-        hit.reward = (opts[:reward] || 0.05).to_f
+        hit.reward = (opts['reward'] || 0.05).to_f
         #hit.qualifications.add :approval_rate, { :gt => 80 }
       end
-      memory[:hits] ||= {}
-      memory[:hits][hit.id] = opts[:metadata] || {}
+      memory['hits'] ||= {}
+      memory['hits'][hit.id] = opts['metadata'] || {}
       hit
     end
 
@@ -422,34 +421,34 @@ module Agents
         @questions.each.with_index do |question, index|
           Question do
             QuestionIdentifier do
-              text question[:key] || "question_#{index}"
+              text question['key'] || "question_#{index}"
             end
             DisplayName do
-              text question[:name] || "Question ##{index}"
+              text question['name'] || "Question ##{index}"
             end
             IsRequired do
-              text question[:required] || 'true'
+              text question['required'] || 'true'
             end
             QuestionContent do
               Text do
-                text question[:question]
+                text question['question']
               end
             end
             AnswerSpecification do
-              if question[:type] == "selection"
+              if question['type'] == "selection"
 
                 SelectionAnswer do
                   StyleSuggestion do
                     text 'radiobutton'
                   end
                   Selections do
-                    question[:selections].each do |selection|
+                    question['selections'].each do |selection|
                       Selection do
                         SelectionIdentifier do
-                          text selection[:key]
+                          text selection['key']
                         end
                         Text do
-                          text selection[:text]
+                          text selection['text']
                         end
                       end
                     end
@@ -459,18 +458,18 @@ module Agents
               else
 
                 FreeTextAnswer do
-                  if question[:min_length].present? || question[:max_length].present?
+                  if question['min_length'].present? || question['max_length'].present?
                     Constraints do
                       lengths = {}
-                      lengths[:minLength] = question[:min_length].to_s if question[:min_length].present?
-                      lengths[:maxLength] = question[:max_length].to_s if question[:max_length].present?
+                      lengths['minLength'] = question['min_length'].to_s if question['min_length'].present?
+                      lengths['maxLength'] = question['max_length'].to_s if question['max_length'].present?
                       Length lengths
                     end
                   end
 
-                  if question[:default].present?
+                  if question['default'].present?
                     DefaultText do
-                      text question[:default]
+                      text question['default']
                     end
                   end
                 end

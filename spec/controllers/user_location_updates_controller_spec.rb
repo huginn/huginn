@@ -8,7 +8,7 @@ describe UserLocationUpdatesController do
 
   it "should create events without requiring login" do
     post :create, :user_id => users(:bob).to_param, :secret => "my_secret", :longitude => 123, :latitude => 45, :something => "else"
-    @agent.events.last.payload.should == { :longitude => "123", :latitude => "45", :something => "else" }
+    @agent.events.last.payload.should == { 'longitude' => "123", 'latitude' => "45", 'something' => "else" }
     @agent.events.last.lat.should == 45
     @agent.events.last.lng.should == 123
   end
@@ -18,7 +18,7 @@ describe UserLocationUpdatesController do
     @jane_agent.save!
 
     post :create, :user_id => users(:bob).to_param, :secret => "my_secret", :longitude => 123, :latitude => 45, :something => "else"
-    @agent.events.last.payload.should == { :longitude => "123", :latitude => "45", :something => "else" }
+    @agent.events.last.payload.should == { 'longitude' => "123", 'latitude' => "45", 'something' => "else" }
     @jane_agent.events.should be_empty
   end
 
@@ -33,7 +33,7 @@ describe UserLocationUpdatesController do
 
     lambda {
       post :create, :user_id => users(:bob).to_param, :secret => "my_secret2", :longitude => 123, :latitude => 45, :something => "else"
-      @agent2.events.last.payload.should == { :longitude => "123", :latitude => "45", :something => "else" }
+      @agent2.events.last.payload.should == { 'longitude' => "123", 'latitude' => "45", 'something' => "else" }
     }.should_not change { @agent.events.count }
   end
 end
