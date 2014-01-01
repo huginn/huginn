@@ -13,7 +13,10 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Track the weather and get an email when it's going to rain (or snow) tomorrow
 * Follow your project names on Twitter and get updates when people mention them
 * Scrape websites and receive emails when they change
+* Compose digest emails about things you care about to be sent at specific times of the day
+* Track counts of high frequency events and SMS on changes, such as the term "san francisco emergency"
 * Track your location over time
+* Create Amazon Mechanical Turk tasks as the input, or output, of events
 
 Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in \#huginn on Freenode IRC to discuss the project.
 
@@ -84,7 +87,7 @@ In order to use the WeatherAgent you need an [API key with Wunderground](http://
 
 You can use [Post Location](https://github.com/cantino/post_location) on your iPhone to post your location to an instance of the UserLocationAgent.  Make a new one to see instructions.
 
-#### Enable DelayedJobWeb for handy delayed_job monitoring and control
+#### Enable DelayedJobWeb for handy delayed\_job monitoring and control
 
 * Edit `config.ru`, uncomment the DelayedJobWeb section, and change the DelayedJobWeb username and password.
 * Uncomment `match "/delayed_job" => DelayedJobWeb, :anchor => false` in `config/routes.rb`.
@@ -109,7 +112,6 @@ Huginn is a work in progress and is hopefully just getting started.  Please get 
 Please fork, add specs, and send pull requests!
 
 [![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Code Climate](https://codeclimate.com/github/cantino/huginn.png)](https://codeclimate.com/github/cantino/huginn)
-
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
