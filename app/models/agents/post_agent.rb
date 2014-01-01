@@ -11,17 +11,17 @@ module Agents
 
     def default_options
       {
-        :post_url => "http://www.example.com",
-        :expected_receive_period_in_days => 1
+        'post_url' => "http://www.example.com",
+        'expected_receive_period_in_days' => 1
       }
     end
 
     def working?
-      last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def validate_options
-      unless options[:post_url].present? && options[:expected_receive_period_in_days].present?
+      unless options['post_url'].present? && options['expected_receive_period_in_days'].present?
         errors.add(:base, "post_url and expected_receive_period_in_days are required fields")
       end
     end

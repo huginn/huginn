@@ -44,18 +44,22 @@ describe Agents::WebsiteAgent do
 
   describe '#working?' do
     it 'checks if events have been received within the expected receive period' do
+      stubbed_time = Time.now
+      stub(Time).now { stubbed_time }
+
       @checker.should_not be_working # No events created
       @checker.check
       @checker.reload.should be_working # Just created events
 
       @checker.error "oh no!"
-      @checker.reload.should_not be_working # The most recent log is an error
+      @checker.reload.should_not be_working # There is a recent error
 
-      @checker.log "ok now"
-      @checker.reload.should be_working # The most recent log is no longer an error
+      stubbed_time = 20.minutes.from_now
+      @checker.events.delete_all
+      @checker.check
+      @checker.reload.should be_working # There is a newer event now
 
-      two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      stubbed_time = 2.days.from_now
       @checker.reload.should_not be_working # Two days have passed without a new event having been created
     end
   end

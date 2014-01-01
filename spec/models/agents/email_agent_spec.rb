@@ -21,12 +21,12 @@ describe Agents::EmailAgent do
 
       event1 = Event.new
       event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = "Something you should know about"
+      event1.payload = { :data => "Something you should know about" }
       event1.save!
 
       event2 = Event.new
       event2.agent = agents(:bob_weather_agent)
-      event2.payload = "Something else you should know about"
+      event2.payload = { :data => "Something else you should know about" }
       event2.save!
 
       Agents::EmailAgent.async_receive(@checker.id, [event1.id])
@@ -35,8 +35,8 @@ describe Agents::EmailAgent do
       ActionMailer::Base.deliveries.count.should == 2
       ActionMailer::Base.deliveries.last.to.should == ["bob@example.com"]
       ActionMailer::Base.deliveries.last.subject.should == "something interesting"
-      get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Something else you should know about"
-      get_message_part(ActionMailer::Base.deliveries.first, /plain/).strip.should == "Something you should know about"
+      get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Event\n  data: Something else you should know about"
+      get_message_part(ActionMailer::Base.deliveries.first, /plain/).strip.should == "Event\n  data: Something you should know about"
     end
 
     it "can receive complex events and send them on" do

@@ -11,7 +11,7 @@
             <li class='disabled'><a><i class='icon-picture'></i> Summary</a></li>
             <li class='active'><a href="#details" data-toggle="tab"><i class='icon-indent-left'></i> Details</a></li>
           <% end %>
-          <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>"><i class='icon-list-alt'></i> Logs</a></li>
+          <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><i class='icon-list-alt'></i> Logs</a></li>
 
           <% if @agent.can_create_events? && @agent.events.count > 0 %>
             <li><%= link_to '<i class="icon-random"></i> Events'.html_safe, events_path(:agent => @agent.to_param) %></li>

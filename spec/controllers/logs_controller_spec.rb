@@ -19,12 +19,14 @@ describe LogsController do
 
   describe "DELETE clear" do
     it "deletes all logs for a specific Agent" do
+      agents(:bob_weather_agent).last_error_log_at = 2.hours.ago
       sign_in users(:bob)
       lambda {
         delete :clear, :agent_id => agents(:bob_weather_agent).id
       }.should change { AgentLog.count }.by(-1 * agents(:bob_weather_agent).logs.count)
       assigns(:logs).length.should == 0
-      agents(:bob_weather_agent).logs.count.should == 0
+      agents(:bob_weather_agent).reload.logs.count.should == 0
+      agents(:bob_weather_agent).last_error_log_at.should be_nil
     end
 
     it "only deletes logs for an Agent owned by the current user" do

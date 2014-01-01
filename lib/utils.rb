@@ -21,17 +21,6 @@ module Utils
     end
   end
 
-  def self.recursively_symbolize_keys(object)
-    case object
-      when Hash
-        object.inject({}) {|memo, (k, v)| memo[String === k ? k.to_sym : k] = recursively_symbolize_keys(v); memo }
-      when Array
-        object.map { |item| recursively_symbolize_keys item }
-      else
-        object
-    end
-  end
-
   def self.interpolate_jsonpaths(value, data)
     value.gsub(/<[^>]+>/).each { |jsonpath|
       Utils.values_at(data, jsonpath[1..-2]).first.to_s

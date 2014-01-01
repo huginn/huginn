@@ -5,7 +5,7 @@ describe AgentsController do
     {
         :type => "Agents::WebsiteAgent",
         :name => "Something",
-        :options => agents(:bob_website_agent).options.to_json,
+        :options => agents(:bob_website_agent).options,
         :source_ids => [agents(:bob_weather_agent).id, ""]
     }.merge(options)
   end
@@ -23,7 +23,7 @@ describe AgentsController do
       sign_in users(:bob)
       post :handle_details_post, :id => agents(:bob_manual_event_agent).to_param, :payload => { :foo => "bar" }
       JSON.parse(response.body).should == { "success" => true }
-      agents(:bob_manual_event_agent).events.last.payload.should == { :foo => "bar" }
+      agents(:bob_manual_event_agent).events.last.payload.should == { 'foo' => "bar" }
     end
 
     it "can only be accessed by the Agent's owner" do

@@ -108,6 +108,7 @@ $(document).ready ->
       $("#logs .refresh, #logs .clear").hide()
       $.post "/agents/#{agentId}/logs/clear", { "_method": "DELETE" }, (html) =>
         $("#logs .logs").html html
+        $("#show-tabs li a.recent-errors").removeClass 'recent-errors'
         $("#logs .spinner").stop(true, true).fadeOut ->
           $("#logs .refresh, #logs .clear").show()
 

@@ -36,7 +36,7 @@
     <script>
       var agentPaths = {};
       <% if current_user -%>
-        var myAgents = <%= Utils.jsonify(current_user.agents.inject({}) {|m, a| m[a.name] = agent_path(a) unless a.new_record?; m }) %>;
+        var myAgents = <%= Utils.jsonify(current_user.agents.select([:name, :id, :schedule]).inject({}) {|m, a| m[a.name] = agent_path(a); m }) %>;
         $.extend(agentPaths, myAgents);
       <% end -%>
       agentPaths["All Agents Index"] = <%= Utils.jsonify agents_path %>;

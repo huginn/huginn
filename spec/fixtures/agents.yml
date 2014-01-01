@@ -11,7 +11,7 @@ jane_website_agent:
                      :title => {:css => "item title", :text => true},
                      :url => {:css => "item link", :text => true}
                  }
-               }.to_yaml.inspect %>
+               }.to_json.inspect %>
 
 bob_website_agent:
   type: Agents::WebsiteAgent
@@ -26,7 +26,7 @@ bob_website_agent:
                    :url => {:css => "#comic img", :attr => "src"},
                    :title => {:css => "#comic img", :attr => "title"}
                  }
-               }.to_yaml.inspect %>
+               }.to_json.inspect %>
 
 bob_weather_agent:
   type: Agents::WeatherAgent
@@ -39,7 +39,7 @@ bob_weather_agent:
                  :lat => 37.779329,
                  :lng => -122.41915,
                  :api_key => 'test'
-               }.to_yaml.inspect %>
+               }.to_json.inspect %>
 
 jane_weather_agent:
   type: Agents::WeatherAgent
@@ -52,7 +52,7 @@ jane_weather_agent:
                  :lat => 37.779329,
                  :lng => -122.41915,
                  :api_key => 'test'
-               }.to_yaml.inspect %>
+               }.to_json.inspect %>
 
 jane_rain_notifier_agent:
   type: Agents::TriggerAgent
@@ -66,7 +66,7 @@ jane_rain_notifier_agent:
                    :path => "conditions"
                  }],
                  :message => "Just so you know, it looks like '<conditions>' tomorrow in <location>"
-               }.to_yaml.inspect %>
+               }.to_json.inspect %>
 
 bob_rain_notifier_agent:
   type: Agents::TriggerAgent
@@ -80,7 +80,7 @@ bob_rain_notifier_agent:
                    :path => "conditions"
                   }],
                  :message => "Just so you know, it looks like '<conditions>' tomorrow in <location>"
-               }.to_yaml.inspect %>
+               }.to_json.inspect %>
 
 bob_twitter_user_agent:
   type: Agents::TwitterUserAgent
@@ -93,7 +93,7 @@ bob_twitter_user_agent:
       :consumer_secret => "---",
       :oauth_token => "---",
       :oauth_token_secret => "---"
-    }.to_yaml.inspect %>
+    }.to_json.inspect %>
 
 bob_manual_event_agent:
   type: Agents::ManualEventAgent

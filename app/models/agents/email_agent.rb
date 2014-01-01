@@ -16,16 +16,16 @@ module Agents
 
     def default_options
       {
-          :subject => "You have a notification!",
-          :headline => "Your notification:",
-          :expected_receive_period_in_days => "2"
+          'subject' => "You have a notification!",
+          'headline' => "Your notification:",
+          'expected_receive_period_in_days' => "2"
       }
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
         log "Sending digest mail to #{user.email} with event #{event.id}"
-        SystemMailer.delay.send_message(:to => user.email, :subject => options[:subject], :headline => options[:headline], :groups => [present(event.payload)])
+        SystemMailer.delay.send_message(:to => user.email, :subject => options['subject'], :headline => options['headline'], :groups => [present(event.payload)])
       end
     end
   end

@@ -1,14 +1,13 @@
-require 'serialize_and_symbolize'
+require 'json_serialized_field'
 require 'assignable_types'
 require 'markdown_class_attributes'
 require 'utils'
 
 class Agent < ActiveRecord::Base
-  include SerializeAndSymbolize
   include AssignableTypes
   include MarkdownClassAttributes
+  include JSONSerializedField
 
-  serialize_and_symbolize :options, :memory
   markdown_class_attributes :description, :event_description
 
   load_types_in "Agents"
@@ -20,10 +19,13 @@ class Agent < ActiveRecord::Base
 
   attr_accessible :options, :memory, :name, :type, :schedule, :source_ids, :keep_events_for
 
+  json_serialize :options, :memory
+
   validates_presence_of :name, :user
   validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
   validate :sources_are_owned
   validate :validate_schedule
+  validate :validate_options
 
   after_initialize :set_default_schedule
   before_validation :set_default_schedule
@@ -36,7 +38,6 @@ class Agent < ActiveRecord::Base
   has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
   has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
   has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
-  has_one  :most_recent_log, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
   has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
@@ -78,13 +79,16 @@ class Agent < ActiveRecord::Base
     raise "Implement me in your subclass"
   end
 
-  def event_created_within(days)
-    event = most_recent_event
-    event && event.created_at > days.to_i.days.ago && event.payload.present? && event
+  def validate_options
+    # Implement me in your subclass to test for valid options.
+  end
+
+  def event_created_within?(days)
+    last_event_at && last_event_at > days.to_i.days.ago
   end
 
   def recent_error_logs?
-    most_recent_log.try(:level) == 4
+    last_event_at && last_error_log_at && last_error_log_at > (last_event_at - 2.minutes)
   end
 
   def create_event(attrs)
@@ -112,6 +116,14 @@ class Agent < ActiveRecord::Base
 
   def last_event_at
     @memoized_last_event_at ||= most_recent_event.try(:created_at)
+  end
+
+  def set_default_schedule
+    self.schedule = default_schedule unless schedule.present? || cannot_be_scheduled?
+  end
+
+  def unschedule_if_cannot_schedule
+    self.schedule = nil if cannot_be_scheduled?
   end
 
   def default_schedule
@@ -179,6 +191,16 @@ class Agent < ActiveRecord::Base
 
   def possibly_update_event_expirations
     update_event_expirations! if keep_events_for_changed?
+  end
+
+  def delete_logs!
+    logs.delete_all
+    update_column :last_error_log_at, nil
+  end
+
+  def log(message, options = {})
+    puts "Agent##{id}: #{message}" unless Rails.env.test?
+    AgentLog.log_for_agent(self, message, options)
   end
 
   def update_event_expirations!

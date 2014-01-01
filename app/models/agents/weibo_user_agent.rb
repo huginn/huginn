@@ -70,29 +70,29 @@ module Agents
     default_schedule "every_1h"
 
     def validate_options
-      unless options[:uid].present? &&
-        options[:expected_update_period_in_days].present?
+      unless options['uid'].present? &&
+        options['expected_update_period_in_days'].present?
         errors.add(:base, "expected_update_period_in_days and uid are required")
       end
     end
 
     def working?
-      event_created_within(options[:expected_update_period_in_days]) && !recent_error_logs?
+      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
       {
-          :uid => "",
-          :access_token => "---",
-          :app_key => "---",
-          :app_secret => "---",
-          :expected_update_period_in_days => "2"
+        'uid' => "",
+        'access_token' => "---",
+        'app_key' => "---",
+        'app_secret' => "---",
+        'expected_update_period_in_days' => "2"
       }
     end
 
     def check
-      since_id = memory[:since_id] || nil
-      opts = {:uid => options[:uid].to_i}
+      since_id = memory['since_id'] || nil
+      opts = {:uid => options['uid'].to_i}
       opts.merge! :since_id => since_id unless since_id.nil?
 
       # http://open.weibo.com/wiki/2/statuses/user_timeline/en
@@ -101,7 +101,7 @@ module Agents
 
 
         resp[:statuses].each do |status|
-          memory[:since_id] = status.id if !memory[:since_id] || (status.id > memory[:since_id])
+          memory['since_id'] = status.id if !memory['since_id'] || (status.id > memory['since_id'])
 
           create_event :payload => status.as_json
         end

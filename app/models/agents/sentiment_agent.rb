@@ -28,31 +28,31 @@ module Agents
 
     def default_options
       {
-        :content => "$.message.text[*]",
-        :expected_receive_period_in_days => 1
+        'content' => "$.message.text[*]",
+        'expected_receive_period_in_days' => 1
       }
     end
 
     def working?
-      last_receive_at && last_receive_at > options[:expected_receive_period_in_days].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def receive(incoming_events)
       anew = self.class.sentiment_hash
       incoming_events.each do |event|
-        Utils.values_at(event.payload, options[:content]).each do |content|
+        Utils.values_at(event.payload, options['content']).each do |content|
           sent_values = sentiment_values anew, content
-          create_event :payload => { :content => content,
-                                     :valence => sent_values[0],
-                                     :arousal => sent_values[1],
-                                     :dominance => sent_values[2],
-                                     :original_event => event.payload }
+          create_event :payload => { 'content' => content,
+                                     'valence' => sent_values[0],
+                                     'arousal' => sent_values[1],
+                                     'dominance' => sent_values[2],
+                                     'original_event' => event.payload }
         end
       end
     end
 
     def validate_options
-      errors.add(:base, "content and expected_receive_period_in_days must be present") unless options[:content].present? && options[:expected_receive_period_in_days].present?
+      errors.add(:base, "content and expected_receive_period_in_days must be present") unless options['content'].present? && options['expected_receive_period_in_days'].present?
     end
 
     def self.sentiment_hash
