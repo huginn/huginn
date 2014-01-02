@@ -18,7 +18,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Track your location over time
 * Create Amazon Mechanical Turk tasks as the input, or output, of events
 
-Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in \#huginn on Freenode IRC to discuss the project.
+Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in [our IRC channel](https://kiwiirc.com/client/irc.freenode.net/?nick=huginn-user|?#huginn) (\#huginn on Freenode) to discuss the project.
 
 ## Examples
 
