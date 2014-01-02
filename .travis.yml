@@ -8,3 +8,11 @@ before_script:
   - mysql -e 'create database huginn_test;'
   - bundle exec rake db:migrate db:test:prepare
 script: "bundle exec rake"
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#huginn"
+    template:
+      - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
+      - "Change view : %{compare_url}"
+      - "Build details : %{build_url}"
