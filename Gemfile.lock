@@ -51,6 +51,12 @@ GEM
       execjs
     coffee-script-source (1.6.3)
     cookiejar (0.3.0)
+    coveralls (0.7.0)
+      multi_json (~> 1.3)
+      rest-client
+      simplecov (>= 0.7)
+      term-ansicolor
+      thor
     crack (0.4.1)
       safe_yaml (~> 0.9.0)
     daemons (1.1.9)
@@ -63,6 +69,7 @@ GEM
       railties (>= 3.2.6, < 5)
       warden (~> 1.2.3)
     diff-lcs (1.2.4)
+    docile (1.1.1)
     dotenv (0.9.0)
     dotenv-rails (0.9.0)
       dotenv (= 0.9.0)
@@ -202,6 +209,11 @@ GEM
     shoulda-matchers (2.2.0)
       activesupport (>= 3.0.0)
     simple_oauth (0.1.9)
+    simplecov (0.8.2)
+      docile (~> 1.1.0)
+      multi_json
+      simplecov-html (~> 0.8.0)
+    simplecov-html (0.8.0)
     slop (3.4.5)
     sprockets (2.2.2)
       hike (~> 1.2)
@@ -209,8 +221,11 @@ GEM
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
     system_timer (1.2.4)
+    term-ansicolor (1.2.2)
+      tins (~> 0.8)
     thor (0.18.1)
     tilt (1.4.1)
+    tins (0.13.1)
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
@@ -253,6 +268,7 @@ PLATFORMS
 DEPENDENCIES
   bootstrap-kaminari-views
   coffee-rails (~> 3.2.1)
+  coveralls
   daemons
   delayed_job!
   delayed_job_active_record (~> 0.3.3)

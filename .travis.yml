@@ -1,6 +1,8 @@
 language: ruby
 bundler_args: --without development production
 rvm:
+  - 2.0.0
+  - 2.1.0
   - 1.9.3
 before_script:
   - mysql -e 'create database huginn_test;'

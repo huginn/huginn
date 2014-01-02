@@ -53,4 +53,5 @@ group :development, :test do
   gem 'rr'
   gem 'webmock', :require => false
   gem 'rake'
+  gem 'coveralls', :require => false
 end
