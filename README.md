@@ -18,7 +18,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Track your location over time
 * Create Amazon Mechanical Turk tasks as the input, or output, of events
 
-Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in \#huginn on Freenode IRC to discuss the project.
+Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in [our IRC channel](https://kiwiirc.com/client/irc.freenode.net/?nick=huginn-user|?#huginn) (\#huginn on Freenode) to discuss the project.
 
 ## Examples
 
@@ -46,6 +46,8 @@ If you just want to play around, you can simply clone this repository, then perf
 * Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.
 * Run `foreman start`, visit [http://localhost:3000/][localhost], and login with the username of `admin` and the password of `password`.
 * Setup some Agents!
+
+Note: by default, emails are not sent in the `development` Rails environment, which is what you just setup.  If you'd like to enable emails when playing with Huginn locally, edit `config.action_mailer.perform_deliveries` in `config/environments/development.rb`.
 
 If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
 
@@ -111,7 +113,5 @@ Huginn is a work in progress and is hopefully just getting started.  Please get 
 
 Please fork, add specs, and send pull requests!
 
-[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Code Climate](https://codeclimate.com/github/cantino/huginn.png)](https://codeclimate.com/github/cantino/huginn)
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.png)](https://coveralls.io/r/cantino/huginn) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
