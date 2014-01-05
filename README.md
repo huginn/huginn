@@ -47,6 +47,8 @@ If you just want to play around, you can simply clone this repository, then perf
 * Run `foreman start`, visit [http://localhost:3000/][localhost], and login with the username of `admin` and the password of `password`.
 * Setup some Agents!
 
+Note: by default, emails are not sent in the `development` Rails environment, which is what you just setup.  If you'd like to enable emails when playing with Huginn locally, edit `config.action_mailer.perform_deliveries` in `config/environments/development.rb`.
+
 If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
 
 [localhost]: http://localhost:3000/
