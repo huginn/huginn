@@ -1,6 +1,7 @@
 jane_website_agent:
   type: Agents::WebsiteAgent
   user: jane
+  events_count: 1
   schedule: "5pm"
   name: "ZKCD"
   options: <%= {
@@ -16,6 +17,7 @@ jane_website_agent:
 bob_website_agent:
   type: Agents::WebsiteAgent
   user: bob
+  events_count: 1
   schedule: "midnight"
   name: "ZKCD"
   options: <%= {

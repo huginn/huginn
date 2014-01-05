@@ -21,6 +21,8 @@ class Event < ActiveRecord::Base
   end
 
   def self.cleanup_expired!
+    affected_agents = Event.where("expires_at IS NOT NULL AND expires_at < ?", Time.now).group("agent_id").pluck(:agent_id)
     Event.where("expires_at IS NOT NULL AND expires_at < ?", Time.now).delete_all
+    Agent.where(:id => affected_agents).update_all "events_count = (select count(*) from events where agent_id = agents.id)"
   end
 end
