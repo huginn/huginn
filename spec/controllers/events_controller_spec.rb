@@ -49,7 +49,7 @@ describe EventsController do
       }.should change { Event.count }.by(1)
       Event.last.payload.should == events(:bob_website_agent_event).payload
       Event.last.agent.should == events(:bob_website_agent_event).agent
-      Event.last.created_at.should be_within(1).of(Time.now)
+      Event.last.created_at.to_i.should be_within(2).of(Time.now.to_i)
     end
 
     it "can only re-emit Events for the current user" do

@@ -1,6 +1,7 @@
 jane_website_agent:
   type: Agents::WebsiteAgent
   user: jane
+  events_count: 1
   schedule: "5pm"
   name: "ZKCD"
   options: <%= {
@@ -16,6 +17,7 @@ jane_website_agent:
 bob_website_agent:
   type: Agents::WebsiteAgent
   user: bob
+  events_count: 1
   schedule: "midnight"
   name: "ZKCD"
   options: <%= {
@@ -33,6 +35,7 @@ bob_weather_agent:
   user: bob
   schedule: "midnight"
   name: "SF Weather"
+  keep_events_for: 45
   options: <%= {
                  :location => 94102,
                  :lat => 37.779329,
@@ -45,6 +48,7 @@ jane_weather_agent:
   user: jane
   schedule: "midnight"
   name: "SF Weather"
+  keep_events_for: 30
   options: <%= {
                  :location => 94103,
                  :lat => 37.779329,

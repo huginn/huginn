@@ -33,6 +33,7 @@ class AgentsController < ApplicationController
     render :json => {
         :can_be_scheduled => agent.can_be_scheduled?,
         :can_receive_events => agent.can_receive_events?,
+        :can_create_events => agent.can_create_events?,
         :options => agent.default_options,
         :description_html => agent.html_description
     }

@@ -6,6 +6,11 @@
       </div>
 
       <p>
+        <b>Expires in:</b>
+        <%= @event.expires_at ? time_ago_in_words(@event.expires_at) : 'never' %>
+      </p>
+
+      <p>
         <b>Payload:</b>
         <pre><%= Utils.pretty_jsonify @event.payload || {} %></pre>
       </p>

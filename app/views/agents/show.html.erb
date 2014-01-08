@@ -84,6 +84,11 @@
 
             <% if @agent.can_create_events? %>
               <p>
+                <b>Keep events:</b>
+                <%= (Agent::EVENT_RETENTION_SCHEDULES.detect {|s| s.last == @agent.keep_events_for } || [@agent.keep_events_for]).first %>
+              </p>
+
+              <p>
                 <b>Last event created:</b>
                 <%= @agent.last_event_at ? time_ago_in_words(@agent.last_event_at) + " ago" : "never" %>
               </p>
