@@ -1,3 +1,4 @@
+# A Link connects Agents in a directed Event flow from the `source` to the `receiver`.
 class Link < ActiveRecord::Base
   attr_accessible :source_id, :receiver_id
 

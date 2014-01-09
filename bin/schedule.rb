@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+# This process is used to maintain Huginn's upkeep behavior, automatically running scheduled Agents and
+# periodically propagating and expiring Events.  It's typically run via foreman and the included Procfile.
+
 unless defined?(Rails)
   puts
   puts "Please run me with rails runner, for example:"

@@ -3,6 +3,9 @@ require 'assignable_types'
 require 'markdown_class_attributes'
 require 'utils'
 
+# Agent is the core class in Huginn, representing a configurable, schedulable, reactive system with memory that can
+# be sub-classed for many different purposes.  Agents can emit Events, as well as receive them and react in many different ways.
+# The basic Agent API is detailed on the Huginn wiki: https://github.com/cantino/huginn/wiki/Creating-a-new-agent
 class Agent < ActiveRecord::Base
   include AssignableTypes
   include MarkdownClassAttributes
@@ -226,6 +229,9 @@ class Agent < ActiveRecord::Base
       !!@cannot_receive_events
     end
 
+    # Find all Agents that have received Events since the last execution of this method.  Update those Agents with
+    # their new `last_checked_event_id` and queue each of the Agents to be called with #receive using `async_receive`.
+    # This is called by bin/schedule.rb periodically.
     def receive!
       Agent.transaction do
         sql = Agent.
@@ -256,9 +262,9 @@ class Agent < ActiveRecord::Base
     end
 
     # Given an Agent id and an array of Event ids, load the Agent, call #receive on it with the Event objects, and then
-    # save it with an updated _last_receive_at_ timestamp.
+    # save it with an updated `last_receive_at` timestamp.
     #
-    # This method is tagged with _handle_asynchronously_ and will be delayed and run with delayed_job.  It accepts Agent
+    # This method is tagged with `handle_asynchronously` and will be delayed and run with delayed_job.  It accepts Agent
     # and Event ids instead of a literal ActiveRecord models because it is preferable to serialize delayed_jobs with ids.
     def async_receive(agent_id, event_ids)
       agent = Agent.find(agent_id)
@@ -273,6 +279,8 @@ class Agent < ActiveRecord::Base
     end
     handle_asynchronously :async_receive
 
+    # Given a schedule name, run `check` via `bulk_check` on all Agents with that schedule.
+    # This is called by bin/schedule.rb for each schedule in `SCHEDULES`.
     def run_schedule(schedule)
       types = where(:schedule => schedule).group(:type).pluck(:type)
       types.each do |type|
@@ -280,7 +288,8 @@ class Agent < ActiveRecord::Base
       end
     end
 
-    # You can override this to define a custom bulk_check for your type of Agent.
+    # Schedule `async_check`s for every Agent on the given schedule.  This is normally called by `run_schedule` once
+    # per type of agent, so you can override this to define custom bulk check behavior for your custom Agent type.
     def bulk_check(schedule)
       raise "Call #bulk_check on the appropriate subclass of Agent" if self == Agent
       where(:schedule => schedule).pluck("agents.id").each do |agent_id|
@@ -288,10 +297,11 @@ class Agent < ActiveRecord::Base
       end
     end
 
-    # Given an Agent id, load the Agent, call #check on it, and then save it with an updated _last_check_at_ timestamp.
+    # Given an Agent id, load the Agent, call #check on it, and then save it with an updated `last_check_at` timestamp.
     #
-    # This method is tagged with _handle_asynchronously_ and will be delayed and run with delayed_job.  It accepts an Agent
-    # id instead of a literal Agent because it is preferable to serialize delayed_jobs with ids.
+    # This method is tagged with `handle_asynchronously` and will be delayed and run with delayed_job.  It accepts an Agent
+    # id instead of a literal Agent because it is preferable to serialize delayed_jobs with ids, instead of with the full
+    # Agents.
     def async_check(agent_id)
       agent = Agent.find(agent_id)
       begin

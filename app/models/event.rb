@@ -1,5 +1,8 @@
 require 'json_serialized_field'
 
+# Events are how Huginn Agents communicate and log information about the world.  Events can be emitted and received by
+# Agents.  They contain a serialized `payload` of arbitrary JSON data, as well as optional `lat`, `lng`, and `expires_at`
+# fields.
 class Event < ActiveRecord::Base
   include JSONSerializedField
 
@@ -16,10 +19,13 @@ class Event < ActiveRecord::Base
     where("events.created_at > ?", timespan)
   }
 
+  # Emit this event again, as a new Event.
   def reemit!
     agent.create_event :payload => payload, :lat => lat, :lng => lng
   end
 
+  # Look for Events whose `expires_at` is present and in the past.  Remove those events and then update affected Agents'
+  # `events_counts` cache columns.  This method is called by bin/schedule.rb periodically.
   def self.cleanup_expired!
     affected_agents = Event.where("expires_at IS NOT NULL AND expires_at < ?", Time.now).group("agent_id").pluck(:agent_id)
     Event.where("expires_at IS NOT NULL AND expires_at < ?", Time.now).delete_all

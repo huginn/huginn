@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+# If you're using the backup gem, described on the Huginn wiki and at doc/deployment/backup, then you can use this
+# utility to decrypt backups.
+
 in_file = ARGV.shift
 out_file = ARGV.shift || "decrypted_backup.tar"
 
