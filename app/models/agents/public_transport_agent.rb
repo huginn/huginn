@@ -4,21 +4,17 @@ module Agents
   class PublicTransportAgent < Agent
     cannot_receive_events!
     description <<-MD
-      The Public Transport Agent monitors if any bus is expected to arrive at a particular stop in 5 minutes or less.
-      You must specify 5 things for it too work correctly. Your state, city, route, stop and destination. All these things
-      should be in the language that nextbus understands. For details check out http://www.nextbus.com/predictor/stopSelector.jsp?a=sf-muni and http://www.apihub.com/nextbus/api/nextbus-api/docs/reference.
-
       Specify the following user settings:
         - stops (array)
         - agency (string)
         - alert_window_in_minutes (integer)
 
-      This Agent generates Events based on NextBus GPS transit predictions.  First, select an agency by visiting http://www.nextbus.com/predictor/agencySelector.jsp and finding your transit system.  Once you find it, copy the part of the URL after `?a=`.  For example, for the San Francisco MUNI system, you would end up on http://www.nextbus.com/predictor/stopSelector.jsp?a=sf-muni and copy "sf-muni".  Put that into this Agent's agency setting.
+        This Agent generates Events based on NextBus GPS transit predictions.  First, select an agency by visiting http://www.nextbus.com/predictor/agencySelector.jsp and finding your transit system.  Once you find it, copy the part of the URL after `?a=`.  For example, for the San Francisco MUNI system, you would end up on http://www.nextbus.com/predictor/stopSelector.jsp?a=sf-muni and copy "sf-muni".  Put that into this Agent's agency setting.
 
       Next, find the stop tags that you care about.  To find the tags for the sf-muni system, for the N route, visit this URL:
       http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=sf-muni&r=N
 
-      The tags are listed as tag="1234".  Copy that number and add the route before it, separated by a pipe (|) symbol.  Once you have one or more tags from that page, add them to this Agent's stop list.  E.g,
+      The tags are listed as tag="1234". Copy that number and add the route before it, separated by a pipe '&#124;' symbol.  Once you have one or more tags from that page, add them to this Agent's stop list.  E.g,
 
           agency: "sf-muni"
           stops: ["N|5221", "N|5215"]
@@ -31,12 +27,7 @@ module Agents
 
     alert_window_in_minutes: 5
 
-having the agent's default check period be every minute, and creating an Event in #check whenever a new tripTag (supplied by the predictionsForMultiStops API) shows up within alert_window_in_minutes from the stop.  Do not create events for the same tripTag more than once per stop.  I'd do this by keeping a list of [stop tag, tripTag, timestamp] tuples in memory and checking to make sure one doesn't already exist before making a new Event.  This memory should get cleaned up when timestamp is older than an hour (or something) so that it doesn't fill up all of the Agent's memory.
-
-The NextBusAgent doesn't need to receive Events.
-
-It needs to fetch XML from one URL, store a list of timestamps in memory, and make Events.
-
+ This memory should get cleaned up when timestamp is older than an hour (or something) so that it doesn't fill up all of the Agent's memory.
     MD
 
 
