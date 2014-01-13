@@ -7,13 +7,11 @@ module Agents
       The Public Transport Agent monitors if any bus is expected to arrive at a particular stop in 5 minutes or less.
       You must specify 5 things for it too work correctly. Your state, city, route, stop and destination. All these things
       should be in the language that nextbus understands. For details check out http://www.nextbus.com/predictor/stopSelector.jsp?a=sf-muni and http://www.apihub.com/nextbus/api/nextbus-api/docs/reference.
-        
+
       Specify the following user settings:
         - stops (array)
         - agency (string)
         - alert_window_in_minutes (integer)
-
-
 
       This Agent generates Events based on NextBus GPS transit predictions.  First, select an agency by visiting http://www.nextbus.com/predictor/agencySelector.jsp and finding your transit system.  Once you find it, copy the part of the URL after `?a=`.  For example, for the San Francisco MUNI system, you would end up on http://www.nextbus.com/predictor/stopSelector.jsp?a=sf-muni and copy "sf-muni".  Put that into this Agent's agency setting.
 
@@ -32,14 +30,12 @@ module Agents
       Finally, set the arrival window that you're interested in.  E.g., 5 minutes.  Events will be created by the agent anytime a new train or bus comes into that time window.
 
     alert_window_in_minutes: 5
-    
-    
+
 having the agent's default check period be every minute, and creating an Event in #check whenever a new tripTag (supplied by the predictionsForMultiStops API) shows up within alert_window_in_minutes from the stop.  Do not create events for the same tripTag more than once per stop.  I'd do this by keeping a list of [stop tag, tripTag, timestamp] tuples in memory and checking to make sure one doesn't already exist before making a new Event.  This memory should get cleaned up when timestamp is older than an hour (or something) so that it doesn't fill up all of the Agent's memory.
 
 The NextBusAgent doesn't need to receive Events.
 
 It needs to fetch XML from one URL, store a list of timestamps in memory, and make Events.
-
 
     MD
 
@@ -50,7 +46,7 @@ It needs to fetch XML from one URL, store a list of timestamps in memory, and ma
     Events look like this:
       { "routeTitle":"N-Judah",
         "stopTag":"5215",
-        "prediction": 
+        "prediction":
            {"epochTime":"1389622846689",
             "seconds":"3454","minutes":"57","isDeparture":"false",
             "affectedByLayover":"true","dirTag":"N__OB4KJU","vehicle":"1489",
@@ -66,31 +62,23 @@ It needs to fetch XML from one URL, store a list of timestamps in memory, and ma
       @session.headers['User-Agent'] = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_4; en-US) AppleWebKit/534.12 (KHTML, like Gecko) Chrome/9.0.584.0 Safari/534.12"
       @session
     end
-    def check_me
-      binding.pry
-    end
+
     def check_url
-
       stop_query = URI.encode(options["stops"].collect{|a| "&stops=#{a}"}.join)
-
-      u  = "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=#{options["agency"]}#{stop_query}"
-      log "Fetching #{u}"
-      u
+      "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=#{options["agency"]}#{stop_query}"
     end
+
     def stops
       options["stops"].collect{|a| a.split("|").last}
     end
     def check
-      puts "*************************\n\n\n\nI get called!!!\n\n\n\n**************************************"
       page = session.get(check_url)
       page = Nokogiri::XML page.body
       predictions = page.css("//prediction")
-      puts "predictions #{predictions.to_xml}"
-      puts "minutes #{predictions.collect{|a| a["minutes"]}.join(",")}"
       predictions.each do |pr|
         parent = pr.parent.parent
         vals = {routeTitle: parent["routeTitle"], stopTag: parent["stopTag"]}
-        if pr["minutes"] && pr["minutes"].to_i < 60
+        if pr["minutes"] && pr["minutes"].to_i < options["alert_window_in_minutes"].to_i
           vals = vals.merge Hash.from_xml(pr.to_xml)
           if not_already_in_memory?(vals)
             create_event(:payload => vals)
