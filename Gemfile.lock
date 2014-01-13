@@ -138,6 +138,7 @@ GEM
       multi_xml (~> 0.5)
       rack (~> 1.2)
     orm_adapter (0.4.0)
+    patron (0.4.18)
     polyglot (0.3.3)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
@@ -280,6 +281,7 @@ DEPENDENCIES
   kramdown
   mysql2
   nokogiri
+  patron
   pry
   rails
   rake
