@@ -46,14 +46,6 @@ module Agents
             }
       }
     MD
-    def session
-      @session ||= Patron::Session.new
-      @session.connect_timeout = 10
-      @session.timeout = 60
-      @session.headers['Accept-Language'] = 'en-us,en;q=0.5'
-      @session.headers['User-Agent'] = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_4; en-US) AppleWebKit/534.12 (KHTML, like Gecko) Chrome/9.0.584.0 Safari/534.12"
-      @session
-    end
 
     def check_url
       stop_query = URI.encode(options["stops"].collect{|a| "&stops=#{a}"}.join)
@@ -76,8 +68,10 @@ module Agents
             vals = vals.merge Hash.from_xml(pr.to_xml)
             if not_already_in_memory?(vals)
               create_event(:payload => vals)
+              log "creating event..."
               update_memory(vals)
             else
+              log "not creating event since already in memory"
             end
           end
         end
@@ -91,14 +85,14 @@ module Agents
     end
     def cleanup_old_memory
       self.memory["existing_routes"] ||= []
-      self.memory["existing_routes"].reject!{|h| h["currentTime"] <= (Time.now - 2.hours)}
+      self.memory["existing_routes"].reject!{|h| h["currentTime"].to_time <= (Time.now - 2.hours)}
     end
     def add_to_memory(vals)
       self.memory["existing_routes"] ||= []
-      self.memory["existing_routes"] << {stopTag: vals["stopTag"], tripTag: vals["prediction"]["tripTag"], epochTime: vals["prediction"]["epochTime"], currentTime: Time.now}
+      self.memory["existing_routes"] << {"stopTag" => vals["stopTag"], "tripTag" => vals["prediction"]["tripTag"], "epochTime" => vals["prediction"]["epochTime"], "currentTime" => Time.now}
     end
     def not_already_in_memory?(vals)
-      m = self.memory["existing_routes"]
+      m = self.memory["existing_routes"] || []
       m.select{|h| h['stopTag'] == vals["stopTag"] &&
                 h['tripTag'] == vals["prediction"]["tripTag"] &&
                 h['epochTime'] == vals["prediction"]["epochTime"]
