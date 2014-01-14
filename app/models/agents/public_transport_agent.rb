@@ -76,7 +76,7 @@ module Agents
             vals = vals.merge Hash.from_xml(pr.to_xml)
             if not_already_in_memory?(vals)
               create_event(:payload => vals)
-              add_to_memory(vals)
+              update_memory(vals)
             else
             end
           end
@@ -85,15 +85,23 @@ module Agents
       hydra.queue request
       hydra.run
     end
+    def update_memory(vals)
+      add_to_memory(vals)
+      cleanup_old_memory
+    end
+    def cleanup_old_memory
+      self.memory["existing_routes"] ||= []
+      self.memory["existing_routes"].reject!{|h| h["currentTime"] <= (Time.now - 2.hours)}
+    end
     def add_to_memory(vals)
       self.memory["existing_routes"] ||= []
       self.memory["existing_routes"] << {stopTag: vals["stopTag"], tripTag: vals["prediction"]["tripTag"], epochTime: vals["prediction"]["epochTime"], currentTime: Time.now}
     end
     def not_already_in_memory?(vals)
       m = self.memory["existing_routes"]
-      m.select{|h| h[:stopTag] == vals["stopTag"] &&
-                h[:tripTag] == vals["prediction"]["tripTag"] &&
-                h[:epochTime] == vals["prediction"]["epochTime"]
+      m.select{|h| h['stopTag'] == vals["stopTag"] &&
+                h['tripTag'] == vals["prediction"]["tripTag"] &&
+                h['epochTime'] == vals["prediction"]["epochTime"]
               }.count == 0
     end
     def default_options
