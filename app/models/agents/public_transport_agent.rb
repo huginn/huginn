@@ -64,21 +64,26 @@ module Agents
       options["stops"].collect{|a| a.split("|").last}
     end
     def check
-      page = session.get(check_url)
-      page = Nokogiri::XML page.body
-      predictions = page.css("//prediction")
-      predictions.each do |pr|
-        parent = pr.parent.parent
-        vals = {routeTitle: parent["routeTitle"], stopTag: parent["stopTag"]}
-        if pr["minutes"] && pr["minutes"].to_i < options["alert_window_in_minutes"].to_i
-          vals = vals.merge Hash.from_xml(pr.to_xml)
-          if not_already_in_memory?(vals)
-            create_event(:payload => vals)
-            add_to_memory(vals)
-          else
+      hydra = Typhoeus::Hydra.new
+      request = Typhoeus::Request.new(check_url, :followlocation => true)
+      request.on_success do |response|
+        page = Nokogiri::XML response.body
+        predictions = page.css("//prediction")
+        predictions.each do |pr|
+          parent = pr.parent.parent
+          vals = {routeTitle: parent["routeTitle"], stopTag: parent["stopTag"]}
+          if pr["minutes"] && pr["minutes"].to_i < options["alert_window_in_minutes"].to_i
+            vals = vals.merge Hash.from_xml(pr.to_xml)
+            if not_already_in_memory?(vals)
+              create_event(:payload => vals)
+              add_to_memory(vals)
+            else
+            end
           end
         end
       end
+      hydra.queue request
+      hydra.run
     end
     def add_to_memory(vals)
       self.memory["existing_routes"] ||= []
