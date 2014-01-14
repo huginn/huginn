@@ -63,7 +63,7 @@ module Agents
         predictions = page.css("//prediction")
         predictions.each do |pr|
           parent = pr.parent.parent
-          vals = {routeTitle: parent["routeTitle"], stopTag: parent["stopTag"]}
+          vals = {"routeTitle" => parent["routeTitle"], "stopTag" => parent["stopTag"]}
           if pr["minutes"] && pr["minutes"].to_i < options["alert_window_in_minutes"].to_i
             vals = vals.merge Hash.from_xml(pr.to_xml)
             if not_already_in_memory?(vals)
