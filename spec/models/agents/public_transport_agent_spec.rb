@@ -1,6 +1,4 @@
-
 require 'spec_helper'
-require 'pry'
 describe Agents::PublicTransportAgent do
   before do
     valid_params = {
