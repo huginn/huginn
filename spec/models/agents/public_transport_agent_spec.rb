@@ -33,6 +33,12 @@ describe Agents::PublicTransportAgent do
       lambda { @agent.check }.should change {@agent.events.count}.by(4)
       lambda { @agent.check }.should_not change {@agent.events.count}
     end
+    it "should reset memory after 2 hours" do
+      lambda { @agent.check }.should change {@agent.events.count}.by(4)
+      stub(Time).now {"2014-01-14 20:21:30 +0500".to_time + 3.hours}
+      @agent.cleanup_old_memory
+      lambda { @agent.check }.should change {@agent.events.count}.by(4)
+    end
   end
   describe "validation" do
     it "should validate presence of stops" do
