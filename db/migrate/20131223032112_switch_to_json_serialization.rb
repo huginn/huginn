@@ -47,20 +47,30 @@ class SwitchToJsonSerialization < ActiveRecord::Migration
       quoted_table_name = ActiveRecord::Base.connection.quote_table_name(table)
       fields = fields.map { |f| ActiveRecord::Base.connection.quote_column_name(f) }
 
-      rows = ActiveRecord::Base.connection.select_rows("SELECT id, #{fields.join(", ")} FROM #{quoted_table_name}")
-      rows.each do |row|
-        id, *field_data = row
+      page_start = 0
+      page_size = 1000
+      page_end = page_start + page_size
 
-        yaml_fields = field_data.map { |f| from.load(f) }.map { |f| to.dump(f) }
+      begin
+        rows = ActiveRecord::Base.connection.select_rows("SELECT id, #{fields.join(", ")} FROM #{quoted_table_name} WHERE id >= #{page_start} AND id < #{page_end}")
+        puts "Grabbing rows of #{table} from #{page_start} to #{page_end}"
+        rows.each do |row|
+          id, *field_data = row
 
-        yaml_fields.map! {|f| f.encode('utf-8', 'binary', invalid: :replace, undef: :replace, replace: '??') }
+          yaml_fields = field_data.map { |f| from.load(f) }.map { |f| to.dump(f) }
 
-        update_sql = "UPDATE #{quoted_table_name} SET #{fields.map {|f| "#{f}=?"}.join(", ")} WHERE id = ?"
+          yaml_fields.map! {|f| f.encode('utf-8', 'binary', invalid: :replace, undef: :replace, replace: '??') }
 
-        sanitized_update_sql = ActiveRecord::Base.send :sanitize_sql_array, [update_sql, *yaml_fields, id]
+          update_sql = "UPDATE #{quoted_table_name} SET #{fields.map {|f| "#{f}=?"}.join(", ")} WHERE id = ?"
 
-        ActiveRecord::Base.connection.execute sanitized_update_sql
-      end
+          sanitized_update_sql = ActiveRecord::Base.send :sanitize_sql_array, [update_sql, *yaml_fields, id]
+
+          ActiveRecord::Base.connection.execute sanitized_update_sql
+        end
+        page_start += page_size
+        page_end += page_size
+
+      end until rows.count == 0
     end
 
   end
