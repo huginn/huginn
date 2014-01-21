@@ -73,7 +73,7 @@ module Agents
       hydra = Typhoeus::Hydra.new
       log "Fetching #{options['url']}"
       request_opts = {:followlocation => true}
-      if !options['basic_auth'].blank?
+      if options['basic_auth'].present?
         request_opts[:userpwd] = options['basic_auth']
       end
       request = Typhoeus::Request.new(options['url'], request_opts)
