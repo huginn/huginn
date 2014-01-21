@@ -32,6 +32,8 @@ module Agents
 
       Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
 
+      Can be configured to use HTTP basic auth by including the `basic_auth` parameter with `username:password`.
+
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
 
@@ -70,7 +72,11 @@ module Agents
     def check
       hydra = Typhoeus::Hydra.new
       log "Fetching #{options['url']}"
-      request = Typhoeus::Request.new(options['url'], :followlocation => true)
+      request_opts = {:followlocation => true}
+      if !options['basic_auth'].blank?
+        request_opts[:userpwd] = options['basic_auth']
+      end
+      request = Typhoeus::Request.new(options['url'], request_opts)
       request.on_failure do |response|
         error "Failed: #{response.inspect}"
       end
