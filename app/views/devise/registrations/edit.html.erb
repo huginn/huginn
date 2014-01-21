@@ -1,3 +1,4 @@
+hello doctor
 <div class='container'>
   <div class='row'>
     <div class='span8 offset2'>
@@ -47,6 +48,12 @@
 
           <div class='form-actions'>
             <%= f.submit "Update", :class => "btn btn-primary" %>
+          </div>
+          now the new stuff
+          <div class="control-group">
+            <%= f.fields_for(:user_credentials) do |uc| %>
+              <%= render 'user_credentials_fields', :f => uc %>
+            <% end %>
           </div>
         <% end %>
 
