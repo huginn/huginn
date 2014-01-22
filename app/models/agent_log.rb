@@ -24,6 +24,6 @@ class AgentLog < ActiveRecord::Base
   end
 
   def self.log_length
-    ENV['AGENT_LOG_LENGTH'].present? ? ENV['AGENT_LOG_LENGTH'].to_i : 100
+    ENV['AGENT_LOG_LENGTH'].present? ? ENV['AGENT_LOG_LENGTH'].to_i : 200
   end
 end
