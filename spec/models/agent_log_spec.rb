@@ -78,8 +78,8 @@ describe AgentLog do
   end
 
   describe "#log_length" do
-    it "defaults to 100" do
-      AgentLog.log_length.should == 100
+    it "defaults to 200" do
+      AgentLog.log_length.should == 200
     end
   end
 end
