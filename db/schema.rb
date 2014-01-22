@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131227000021) do
+ActiveRecord::Schema.define(:version => 20140121075418) do
 
   create_table "agent_logs", :force => true do |t|
     t.integer  "agent_id",                         :null => false
@@ -37,9 +37,9 @@ ActiveRecord::Schema.define(:version => 20131227000021) do
     t.datetime "updated_at",                                                 :null => false
     t.text     "memory",                :limit => 2147483647
     t.datetime "last_webhook_at"
+    t.integer  "keep_events_for",                             :default => 0, :null => false
     t.datetime "last_event_at"
     t.datetime "last_error_log_at"
-    t.integer  "keep_events_for",                             :default => 0, :null => false
   end
 
   add_index "agents", ["schedule"], :name => "index_agents_on_schedule"
@@ -87,18 +87,15 @@ ActiveRecord::Schema.define(:version => 20131227000021) do
   add_index "links", ["receiver_id", "source_id"], :name => "index_links_on_receiver_id_and_source_id"
   add_index "links", ["source_id", "receiver_id"], :name => "index_links_on_source_id_and_receiver_id"
 
-  create_table "rails_admin_histories", :force => true do |t|
-    t.text     "message"
-    t.string   "username"
-    t.integer  "item"
-    t.string   "table"
-    t.integer  "month",      :limit => 2
-    t.integer  "year",       :limit => 8
-    t.datetime "created_at",              :null => false
-    t.datetime "updated_at",              :null => false
+  create_table "user_credentials", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "credential_name"
+    t.string   "credential_value"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
   end
 
-  add_index "rails_admin_histories", ["item", "table", "month", "year"], :name => "index_rails_admin_histories"
+  add_index "user_credentials", ["user_id", "credential_name"], :name => "index_user_credentials_on_user_id_and_credential_name", :unique => true
 
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "",    :null => false
