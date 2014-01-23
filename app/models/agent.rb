@@ -59,6 +59,10 @@ class Agent < ActiveRecord::Base
     where(:type => type)
   }
 
+  def credential(name)
+    user.user_credentials.where(:credential_name => name).limit(1).first.credential_value rescue nil
+  end
+
   def check
     # Implement me in your subclass of Agent.
   end
