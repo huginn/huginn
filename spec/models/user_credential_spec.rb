@@ -1,4 +1,3 @@
-require 'pry'
 require 'spec_helper'
 
 describe UserCredential do
