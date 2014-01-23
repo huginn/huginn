@@ -52,6 +52,5 @@ group :development, :test do
   gem 'shoulda-matchers'
   gem 'rr'
   gem 'webmock', :require => false
-  gem 'rake'
   gem 'coveralls', :require => false
 end
