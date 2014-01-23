@@ -23,7 +23,7 @@ class User < ActiveRecord::Base
   validates_inclusion_of :invitation_code, :on => :create, :in => INVITATION_CODES, :message => "is not valid"
 
   has_many :user_credentials, :dependent => :destroy
-  accepts_nested_attributes_for :user_credentials, :reject_if => lambda { |attrs| attrs[:name].blank? },
+  accepts_nested_attributes_for :user_credentials,
                                 :allow_destroy => true
   attr_accessible :user_credentials_attributes
   has_many :events, :order => "events.created_at desc", :dependent => :delete_all, :inverse_of => :user
