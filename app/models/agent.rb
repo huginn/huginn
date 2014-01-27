@@ -60,7 +60,7 @@ class Agent < ActiveRecord::Base
   }
 
   def credential(name)
-    user.user_credentials.where(:credential_name => name).limit(1).first.credential_value rescue nil
+    user.user_credentials.where(:credential_name => name).first.try(:credential_value) || nil
   end
 
   def check
