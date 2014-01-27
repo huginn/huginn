@@ -118,6 +118,7 @@ GEM
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
     kramdown (1.1.0)
+    libv8 (3.16.14.3)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -168,6 +169,7 @@ GEM
     rake (10.1.0)
     rdoc (3.12.2)
       json (~> 1.4)
+    ref (1.0.5)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rr (1.1.2)
@@ -218,6 +220,9 @@ GEM
     system_timer (1.2.4)
     term-ansicolor (1.2.2)
       tins (~> 0.8)
+    therubyracer (0.12.0)
+      libv8 (~> 3.16.14.0)
+      ref
     thor (0.18.1)
     tilt (1.4.1)
     tins (0.13.1)
@@ -292,6 +297,7 @@ DEPENDENCIES
   select2-rails
   shoulda-matchers
   system_timer
+  therubyracer
   twilio-ruby
   twitter
   twitter-stream (>= 0.1.16)
