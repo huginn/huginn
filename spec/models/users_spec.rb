@@ -16,4 +16,12 @@ describe User do
       end
     end
   end
+
+  describe "nested attributes" do
+    it { should accept_nested_attributes_for(:user_credentials).allow_destroy(true) }
+  end
+
+  describe "mass assignment" do
+    it {should allow_mass_assignment_of :user_credentials_attributes}
+  end
 end
