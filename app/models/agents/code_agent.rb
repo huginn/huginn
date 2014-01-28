@@ -56,37 +56,24 @@ module Agents
       true
     end
 
-    def execute_js
-      context = V8::Context.new
-      context.eval(example_js)
-      context.eval(options['code']) # should override the run function.
-      context["create_event"] = lambda {|x,y| puts x; puts y; create_event payload: JSON.parse(y)}
-      a, m, e, o = [self.attributes.to_json, self.memory.to_json, self.events.to_json, self.options.to_json]
-      string = "a = new Agent('#{m}','#{e}','#{o}','#{a}');"
-      context.eval(string)
-      context.eval("a.run();")
-    end
-    def check
+    def execute_js(incoming_events)
       context = V8::Context.new
       context.eval(example_js)
       context["create_event"] = lambda {|x,y| puts x; puts y; create_event payload: JSON.parse(y)}
       context.eval(options['code']) # should override the run function.
-      a, m, e, o = [self.attributes.to_json, self.memory.to_json, "".to_json, self.options.to_json]
-      string = "a = new Agent('#{m}','#{e}','#{o}','#{a}');"
-      context.eval(string)
-      context.eval("a.run();")
-    end
-
-    def receive(incoming_events)
-      context = V8::Context.new
-      context.eval(example_js)
-      context.eval(options['code']) # should override the run function.
-      context["create_event"] = lambda {|x,y| puts x; puts y; create_event payload: JSON.parse(y)}
       a, m, e, o = [self.attributes.to_json, self.memory.to_json, incoming_events.to_json, self.options.to_json]
       string = "a = new Agent('#{m}','#{e}','#{o}','#{a}');"
       context.eval(string)
       context.eval("a.run();")
     end
+    def check
+      execute_js("")
+    end
+
+    def receive(incoming_events)
+      execute_js(incoming_events)
+    end
+
     def default_options
     js_code = "Agent.prototype.run = function(){ var pd = JSON.stringify({memory: this.memory, events: this.events, options: this.options});create_event(pd); }"
     {
