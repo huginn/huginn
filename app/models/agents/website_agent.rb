@@ -32,7 +32,9 @@ module Agents
 
       Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
 
-      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent (only used to set the "working" status).
+
+      Set `uniqueness_look_back` (defaults to 10000) to limit the number of events checked for uniqueness (typically for performance).
     MD
 
     event_description do
@@ -41,7 +43,7 @@ module Agents
 
     default_schedule "every_12h"
 
-    UNIQUENESS_LOOK_BACK = 30
+    UNIQUENESS_LOOK_BACK = 10000
 
     def working?
       event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
@@ -152,7 +154,8 @@ module Agents
     end
 
     def previous_payloads
-      events.order("id desc").limit(UNIQUENESS_LOOK_BACK) if options['mode'].to_s == "on_change"
+      look_back = options['uniqueness_look_back'] ? options['uniqueness_look_back'].to_i : UNIQUENESS_LOOK_BACK
+      events.order("id desc").limit(look_back) if options['mode'].to_s == "on_change"
     end
 
     def extract_full_json?
