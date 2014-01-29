@@ -82,10 +82,11 @@ module Agents
       end
       request.on_success do |response|
         doc = parse(response.body)
+        old_events = previous_payloads
 
         if extract_full_json?
           result = doc
-          if store_payload? result
+          if store_payload? old_events, result
             log "Storing new result for '#{name}': #{result.inspect}"
             create_event :payload => result
           end
@@ -115,7 +116,7 @@ module Agents
             error "Got an uneven number of matches for #{options['name']}: #{options['extract'].inspect}"
             return
           end
-      
+
           num_unique_lengths.first.times do |index|
             result = {}
             options['extract'].keys.each do |name|
@@ -125,7 +126,7 @@ module Agents
               end
             end
 
-            if store_payload? result
+            if store_payload? old_events, result
               log "Storing new parsed result for '#{name}': #{result.inspect}"
               create_event :payload => result
             end
@@ -138,12 +139,26 @@ module Agents
 
     private
 
-    def store_payload? result
-      !options['mode'] || options['mode'].to_s == "all" || (options['mode'].to_s == "on_change" && !previous_payloads.include?(result.to_json))
+    def store_payload?(old_events, result)
+      if !options['mode']
+        return true
+      elsif options['mode'].to_s == "all"
+        return true
+      elsif options['mode'].to_s == "on_change"
+        old_events.each do |old_event|
+          if old_event.payload.to_json == result.to_json
+            old_event.expires_at = new_event_expiration_date
+            old_event.save
+            return false
+         end
+        end
+        return true
+      end
+      raise "Illegal options[mode]: " + options['mode'].to_s
     end
 
     def previous_payloads
-      events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options['mode'].to_s == "on_change"
+      events.order("id desc").limit(UNIQUENESS_LOOK_BACK) if options['mode'].to_s == "on_change"
     end
 
     def extract_full_json?
