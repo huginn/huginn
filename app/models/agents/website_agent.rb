@@ -34,7 +34,9 @@ module Agents
 
       Can be configured to use HTTP basic auth by including the `basic_auth` parameter with `username:password`.
 
-      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent (only used to set the "working" status).
+
+      Set `uniqueness_look_back` (defaults to 10000) to limit the number of events checked for uniqueness (typically for performance).
     MD
 
     event_description do
@@ -43,7 +45,7 @@ module Agents
 
     default_schedule "every_12h"
 
-    UNIQUENESS_LOOK_BACK = 30
+    UNIQUENESS_LOOK_BACK = 10000
 
     def working?
       event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
@@ -82,10 +84,11 @@ module Agents
       end
       request.on_success do |response|
         doc = parse(response.body)
+        old_events = previous_payloads
 
         if extract_full_json?
           result = doc
-          if store_payload? result
+          if store_payload? old_events, result
             log "Storing new result for '#{name}': #{result.inspect}"
             create_event :payload => result
           end
@@ -125,7 +128,7 @@ module Agents
               end
             end
 
-            if store_payload? result
+            if store_payload? old_events, result
               log "Storing new parsed result for '#{name}': #{result.inspect}"
               create_event :payload => result
             end
@@ -138,12 +141,27 @@ module Agents
 
     private
 
-    def store_payload? result
-      !options['mode'] || options['mode'].to_s == "all" || (options['mode'].to_s == "on_change" && !previous_payloads.include?(result.to_json))
+    def store_payload?(old_events, result)
+      if !options['mode']
+        return true
+      elsif options['mode'].to_s == "all"
+        return true
+      elsif options['mode'].to_s == "on_change"
+        old_events.each do |old_event|
+          if old_event.payload.to_json == result.to_json
+            old_event.expires_at = new_event_expiration_date
+            old_event.save
+            return false
+         end
+        end
+        return true
+      end
+      raise "Illegal options[mode]: " + options['mode'].to_s
     end
 
     def previous_payloads
-      events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options['mode'].to_s == "on_change"
+      look_back = options['uniqueness_look_back'] ? options['uniqueness_look_back'].to_i : UNIQUENESS_LOOK_BACK
+      events.order("id desc").limit(look_back) if options['mode'].to_s == "on_change"
     end
 
     def extract_full_json?

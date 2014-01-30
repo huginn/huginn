@@ -15,15 +15,19 @@ describe Agents::WebsiteAgent do
           'title' => {'css' => "#comic img", 'attr' => "title"}
         }
       }
-      @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @site)
+      @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @site, :keep_events_for => 2)
       @checker.user = users(:bob)
       @checker.save!
     end
 
     describe "#check" do
-      it "should check for changes" do
+      it "should check for changes (and update Event.expires_at)" do
         lambda { @checker.check }.should change { Event.count }.by(1)
+        event = Event.last
+        sleep 2
         lambda { @checker.check }.should_not change { Event.count }
+        update_event = Event.last
+        update_event.expires_at.should_not == event.expires_at
       end
 
       it "should always save events when in :all mode" do
@@ -33,6 +37,30 @@ describe Agents::WebsiteAgent do
           @checker.check
           @checker.check
         }.should change { Event.count }.by(2)
+      end
+
+      it "should take uniqueness_look_back into account during deduplication" do
+        @site['mode'] = 'all'
+        @checker.options = @site
+        @checker.check
+        @checker.check
+        event = Event.last
+        event.payload = "{}"
+        event.save
+
+        lambda {
+          @site['mode'] = 'on_change'
+          @site['uniqueness_look_back'] = 2
+          @checker.options = @site
+          @checker.check
+        }.should_not change { Event.count }
+
+        lambda {
+          @site['mode'] = 'on_change'
+          @site['uniqueness_look_back'] = 1
+          @checker.options = @site
+          @checker.check
+        }.should change { Event.count }.by(1)
       end
 
       it "should log an error if the number of results for a set of extraction patterns differs" do
