@@ -67,19 +67,7 @@ module Agents
       end
       true
     end
-    def setter_and_getter_memory(incoming_events = "")
-      context = V8::Context.new
-      context.eval(example_js)
-      context["create_event"] = lambda {|x,y| puts x; puts y; create_event payload: JSON.parse(y)}
-      context["access_memory"] = lambda {|a, x, y| x && y ? (memory[x] = y; memory.to_json) : memory.to_json }
 
-      context.eval(options['code']) # should override the run function.
-      a, e, o = [self.attributes.to_json, incoming_events.to_json, self.options.to_json]
-      string = "a = new Agent('#{e}','#{o}','#{a}');"
-      context.eval(string)
-      binding.pry
-      context.eval("a.memory()")
-    end
     def execute_js(incoming_events)
       context = V8::Context.new
       context.eval(example_js)
@@ -90,9 +78,9 @@ module Agents
       a, e, o = [self.attributes.to_json, incoming_events.to_json, self.options.to_json]
       string = "a = new Agent('#{e}','#{o}','#{a}');"
       context.eval(string)
-      context.eval("a.memory('5','6')") # set memory for testing
       context.eval("a.run();")
     end
+
     def check
       execute_js("")
     end
