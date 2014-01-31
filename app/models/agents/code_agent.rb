@@ -29,7 +29,7 @@ module Agents
       We will yield control to your implementation in the following way:
 
           context.eval(js_code); //this is the code that declares the class Agent, and provides a global create_event method.
-          context.eval("a = new Agent(memory, events, options, agent)")
+          context.eval("a = new Agent(events, options, agent)")
           context.eval(options['code'])
           context.eval("a.run();")
 
@@ -38,22 +38,18 @@ module Agents
     MD
     def example_js
     <<-H
-    function Agent(m, e, o, agent){
-    this.memory = JSON.parse(m);
+    function Agent(e, o, agent){
     this.events = JSON.parse(e);
     this.options = JSON.parse(o);
     this.agent = JSON.parse(agent);
     }
-    Agent.prototype.print_memory = function(){
-      return JSON.stringify(this.memory);
-    }
-    Agent.prototype.memry = function(key,value){
+    Agent.prototype.memory = function(key,value){
       if (typeof(key) != "undefined" && typeof(value) != "undefined") {
-        this.memory = JSON.parse(access_memory(JSON.stringify(key), JSON.stringify(value)));
-        return JSON.stringify(this.memory);
+        var mem = JSON.parse(access_memory(JSON.stringify(key), JSON.stringify(value)));
+        return JSON.stringify(mem);
       } else {
-        this.memory = JSON.parse(access_memory());
-        return JSON.stringify(this.memory);
+        var mem = JSON.parse(access_memory());
+        return JSON.stringify(mem);
       }
     }
     Agent.prototype.run = function(){
@@ -78,20 +74,23 @@ module Agents
       context["access_memory"] = lambda {|a, x, y| x && y ? (memory[x] = y; memory.to_json) : memory.to_json }
 
       context.eval(options['code']) # should override the run function.
-      a, m, e, o = [self.attributes.to_json, self.memory.to_json, incoming_events.to_json, self.options.to_json]
-      string = "a = new Agent('#{m}','#{e}','#{o}','#{a}');"
+      a, e, o = [self.attributes.to_json, incoming_events.to_json, self.options.to_json]
+      string = "a = new Agent('#{e}','#{o}','#{a}');"
       context.eval(string)
-      context.eval("a.memry()")    
+      binding.pry
+      context.eval("a.memory()")
     end
     def execute_js(incoming_events)
       context = V8::Context.new
       context.eval(example_js)
       context["create_event"] = lambda {|x,y| puts x; puts y; create_event payload: JSON.parse(y)}
+      context["access_memory"] = lambda {|a, x, y| x && y ? (memory[x] = y; memory.to_json) : memory.to_json }
 
       context.eval(options['code']) # should override the run function.
-      a, m, e, o = [self.attributes.to_json, self.memory.to_json, incoming_events.to_json, self.options.to_json]
-      string = "a = new Agent('#{m}','#{e}','#{o}','#{a}');"
+      a, e, o = [self.attributes.to_json, incoming_events.to_json, self.options.to_json]
+      string = "a = new Agent('#{e}','#{o}','#{a}');"
       context.eval(string)
+      context.eval("a.memory('5','6')") # set memory for testing
       context.eval("a.run();")
     end
     def check
@@ -103,7 +102,7 @@ module Agents
     end
 
     def default_options
-      js_code = "Agent.prototype.run = function(){ var pd = JSON.stringify({memory: this.memory, events: this.events, options: this.options});create_event(pd); }"
+      js_code = "Agent.prototype.run = function(){ var pd = JSON.stringify({memory: this.memory(), events: this.events, options: this.options});create_event(pd); }"
       {
         "code" => js_code,
         'expected_receive_period_in_days' => "2"
