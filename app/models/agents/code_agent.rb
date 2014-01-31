@@ -45,7 +45,16 @@ module Agents
     this.agent = JSON.parse(agent);
     }
     Agent.prototype.print_memory = function(){
-      return this.memory;
+      return JSON.stringify(this.memory);
+    }
+    Agent.prototype.memry = function(key,value){
+      if (typeof(key) != "undefined" && typeof(value) != "undefined") {
+        this.memory = JSON.parse(access_memory(JSON.stringify(key), JSON.stringify(value)));
+        return JSON.stringify(this.memory);
+      } else {
+        this.memory = JSON.parse(access_memory());
+        return JSON.stringify(this.memory);
+      }
     }
     Agent.prototype.run = function(){
     }
@@ -53,13 +62,32 @@ module Agents
     end
 
     def working?
+      return false if recent_error_logs?
+      if options['expected_update_period_in_days'].present?
+        return false unless event_created_within?(options['expected_update_period_in_days'])
+      end
+      if options['expected_receive_period_in_days'].present?
+        return false unless last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago
+      end
       true
     end
+    def setter_and_getter_memory(incoming_events = "")
+      context = V8::Context.new
+      context.eval(example_js)
+      context["create_event"] = lambda {|x,y| puts x; puts y; create_event payload: JSON.parse(y)}
+      context["access_memory"] = lambda {|a, x, y| x && y ? (memory[x] = y; memory.to_json) : memory.to_json }
 
+      context.eval(options['code']) # should override the run function.
+      a, m, e, o = [self.attributes.to_json, self.memory.to_json, incoming_events.to_json, self.options.to_json]
+      string = "a = new Agent('#{m}','#{e}','#{o}','#{a}');"
+      context.eval(string)
+      context.eval("a.memry()")    
+    end
     def execute_js(incoming_events)
       context = V8::Context.new
       context.eval(example_js)
       context["create_event"] = lambda {|x,y| puts x; puts y; create_event payload: JSON.parse(y)}
+
       context.eval(options['code']) # should override the run function.
       a, m, e, o = [self.attributes.to_json, self.memory.to_json, incoming_events.to_json, self.options.to_json]
       string = "a = new Agent('#{m}','#{e}','#{o}','#{a}');"
@@ -75,10 +103,11 @@ module Agents
     end
 
     def default_options
-    js_code = "Agent.prototype.run = function(){ var pd = JSON.stringify({memory: this.memory, events: this.events, options: this.options});create_event(pd); }"
-    {
-      code: js_code
-    }
+      js_code = "Agent.prototype.run = function(){ var pd = JSON.stringify({memory: this.memory, events: this.events, options: this.options});create_event(pd); }"
+      {
+        "code" => js_code,
+        'expected_receive_period_in_days' => "2"
+      }
     end
   end
 end
