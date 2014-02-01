@@ -27,6 +27,16 @@ describe Agent do
     end
   end
 
+  describe "credential" do
+    it "should return the value of the credential when credential is present" do
+      agents(:bob_weather_agent).credential("aws_secret").should == user_credentials(:bob_aws_secret).credential_value
+    end
+
+    it "should return nil when credential is not present" do
+      agents(:bob_weather_agent).credential("non_existing_credential").should == nil
+    end
+  end
+
   describe "changes to type" do
     it "validates types" do
       source = Agent.new

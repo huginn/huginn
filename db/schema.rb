@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131227000021) do
+ActiveRecord::Schema.define(:version => 20140121075418) do
 
   create_table "agent_logs", :force => true do |t|
     t.integer  "agent_id",                         :null => false
@@ -86,6 +86,16 @@ ActiveRecord::Schema.define(:version => 20131227000021) do
 
   add_index "links", ["receiver_id", "source_id"], :name => "index_links_on_receiver_id_and_source_id"
   add_index "links", ["source_id", "receiver_id"], :name => "index_links_on_source_id_and_receiver_id"
+
+  create_table "user_credentials", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "credential_name"
+    t.string   "credential_value"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  add_index "user_credentials", ["user_id", "credential_name"], :name => "index_user_credentials_on_user_id_and_credential_name", :unique => true
 
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "",    :null => false
