@@ -48,12 +48,6 @@
           <div class='form-actions'>
             <%= f.submit "Update", :class => "btn btn-primary" %>
           </div>
-          <div class="control-group">
-            <%= f.fields_for(:user_credentials) do |uc| %>
-              <%= render 'user_credential_fields', :f => uc %>
-            <% end %>
-          </div>
-          <p><%= link_to_add_fields "Add A Credential", f, :association => :user_credentials %></p>
         <% end %>
 
         <h3>Cancel my account</h3>

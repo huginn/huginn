@@ -1,9 +1,9 @@
 class CreateUserCredentials < ActiveRecord::Migration
   def change
     create_table :user_credentials do |t|
-      t.integer :user_id
-      t.string :credential_name
-      t.string :credential_value
+      t.integer :user_id,         :null => false
+      t.string :credential_name,  :null => false
+      t.text :credential_value,   :null => false
 
       t.timestamps
     end

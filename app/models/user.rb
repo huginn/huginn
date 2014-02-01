@@ -22,10 +22,7 @@ class User < ActiveRecord::Base
   validates_format_of :username, :with => /\A[a-zA-Z0-9_-]{3,15}\Z/, :message => "can only contain letters, numbers, underscores, and dashes, and must be between 3 and 15 characters in length."
   validates_inclusion_of :invitation_code, :on => :create, :in => INVITATION_CODES, :message => "is not valid"
 
-  has_many :user_credentials, :dependent => :destroy
-  accepts_nested_attributes_for :user_credentials,
-                                :allow_destroy => true
-  attr_accessible :user_credentials_attributes
+  has_many :user_credentials, :dependent => :destroy, :inverse_of => :user
   has_many :events, :order => "events.created_at desc", :dependent => :delete_all, :inverse_of => :user
   has_many :agents, :order => "agents.created_at desc", :dependent => :destroy, :inverse_of => :user
   has_many :logs, :through => :agents, :class_name => "AgentLog"

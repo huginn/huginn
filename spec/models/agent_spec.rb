@@ -35,6 +35,15 @@ describe Agent do
     it "should return nil when credential is not present" do
       agents(:bob_weather_agent).credential("non_existing_credential").should == nil
     end
+
+    it "should memoize the load" do
+      mock.any_instance_of(UserCredential).credential_value.twice { "foo" }
+      agents(:bob_weather_agent).credential("aws_secret").should == "foo"
+      agents(:bob_weather_agent).credential("aws_secret").should == "foo"
+      agents(:bob_weather_agent).reload
+      agents(:bob_weather_agent).credential("aws_secret").should == "foo"
+      agents(:bob_weather_agent).credential("aws_secret").should == "foo"
+    end
   end
 
   describe "changes to type" do

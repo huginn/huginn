@@ -59,10 +59,6 @@ class Agent < ActiveRecord::Base
     where(:type => type)
   }
 
-  def credential(name)
-    user.user_credentials.where(:credential_name => name).first.try(:credential_value) || nil
-  end
-
   def check
     # Implement me in your subclass of Agent.
   end
@@ -104,6 +100,20 @@ class Agent < ActiveRecord::Base
     else
       error "This Agent cannot create events!"
     end
+  end
+
+  def credential(name)
+    @credential_cache ||= {}
+    if @credential_cache.has_key?(name)
+      @credential_cache[name]
+    else
+      @credential_cache[name] = user.user_credentials.where(:credential_name => name).first.try(:credential_value)
+    end
+  end
+
+  def reload
+    @credential_cache = {}
+    super
   end
 
   def new_event_expiration_date
