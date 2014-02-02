@@ -31,6 +31,11 @@ GEM
     addressable (2.3.5)
     arel (3.0.3)
     bcrypt-ruby (3.1.1)
+    better_errors (1.1.0)
+      coderay (>= 1.0.0)
+      erubis (>= 2.6.6)
+    binding_of_caller (0.7.2)
+      debug_inspector (>= 0.0.1)
     bootstrap-kaminari-views (0.0.2)
       kaminari (>= 0.13)
       rails (>= 3.1)
@@ -53,6 +58,7 @@ GEM
     crack (0.4.1)
       safe_yaml (~> 0.9.0)
     daemons (1.1.9)
+    debug_inspector (0.0.2)
     delayed_job (4.0.0)
       activesupport (>= 3.0, < 4.1)
     delayed_job_active_record (4.0.0)
@@ -266,6 +272,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  better_errors
+  binding_of_caller
   bootstrap-kaminari-views
   coffee-rails (~> 3.2.1)
   coveralls

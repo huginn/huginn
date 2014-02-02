@@ -3,7 +3,7 @@
 <% end %>
 
 <% if @agent.memory[:data] && @agent.memory[:data].length > 0 %>
-  <h3>Recent Tweet Trends</h3>
+  <h3>Recent Trends</h3>
   <% @agent.memory[:data].each.with_index do |(group_name, data), index| %>
     <div class="filter-group counts">
       <div class='filter'><%= link_to group_name.to_s, "https://twitter.com/search?q=#{CGI::escape group_name.to_s}", :target => "blank" %></div>
