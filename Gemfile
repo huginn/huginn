@@ -30,6 +30,7 @@ gem 'kramdown'
 gem "typhoeus"
 gem 'nokogiri'
 gem 'wunderground'
+gem 'forecast_io'
 gem 'rturk'
 
 gem "twitter"
