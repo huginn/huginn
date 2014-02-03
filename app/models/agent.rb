@@ -77,6 +77,10 @@ class Agent < ActiveRecord::Base
     ["not implemented", 404]
   end
 
+  def em_start
+    # implement me in your subclass of Agent if continuous.
+  end
+
   # Implement me in your subclass to decide if your Agent is working.
   def working?
     raise "Implement me in your subclass"
@@ -153,6 +157,10 @@ class Agent < ActiveRecord::Base
     !cannot_create_events?
   end
 
+  def continuous?
+    self.class.continuous?
+  end
+
   def log(message, options = {})
     puts "Agent##{id}: #{message}" unless Rails.env.test?
     AgentLog.log_for_agent(self, message, options)
@@ -227,6 +235,14 @@ class Agent < ActiveRecord::Base
 
     def cannot_receive_events?
       !!@cannot_receive_events
+    end
+
+    def continuous!
+      @continuous = true
+    end
+
+    def continuous?
+      !!@continuous
     end
 
     # Find all Agents that have received Events since the last execution of this method.  Update those Agents with

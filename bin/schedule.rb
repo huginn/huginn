@@ -12,6 +12,8 @@ unless defined?(Rails)
 end
 
 require 'rufus/scheduler'
+require 'eventmachine'
+require 'set'
 
 class HuginnScheduler
   attr_accessor :mutex
@@ -86,6 +88,20 @@ class HuginnScheduler
         end
       end
     end
+
+    active_agents = Set.new
+    EM.run do
+        EM.add_periodic_timer(10) {
+            Agent.find_each do |agent|
+                   if agent.continuous? 
+                     if active_agents.add? agent
+                       puts "Starting continuous agent"
+                       agent.em_start
+                     end
+                   end
+                 end
+          }
+      end
 
     rufus_scheduler.join
   end
