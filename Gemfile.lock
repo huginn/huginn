@@ -40,6 +40,7 @@ GEM
       kaminari (>= 0.13)
       rails (>= 3.1)
     builder (3.0.4)
+    cobravsmongoose (0.0.2)
     coderay (1.0.9)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
@@ -270,6 +271,7 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   bootstrap-kaminari-views
+  cobravsmongoose
   coffee-rails (~> 3.2.1)
   coveralls
   daemons
