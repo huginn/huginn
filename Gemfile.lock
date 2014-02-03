@@ -95,6 +95,10 @@ GEM
       multipart-post (~> 1.1)
     fastercsv (1.5.5)
     ffi (1.9.0)
+    forecast_io (2.0.0)
+      faraday
+      hashie
+      multi_json
     foreman (0.63.0)
       dotenv (>= 0.7)
       thor (>= 0.13.6)
@@ -279,6 +283,7 @@ DEPENDENCIES
   dotenv-rails
   em-http-request
   fastercsv
+  forecast_io
   foreman
   geokit-rails3
   jquery-rails
