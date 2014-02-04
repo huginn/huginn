@@ -12,17 +12,10 @@ module Agents
       You can create events based on your own logic.
       Specifically, you have the following class, lets say, present is a string "js_code".
 
-          function Agent(m, e, o, agent){
-          this.memory = JSON.parse(m);
+          function Agent(e, o, agent){
           this.events = JSON.parse(e);
           this.options = JSON.parse(o);
           this.agent = JSON.parse(agent);
-          }
-          Agent.prototype.run = function(){
-            //Implement me
-            // Example create a new event with the following code:
-            //var new_event = JSON.stringify({key1: "val1", key2: "val2"});
-            //create_event(pd);
           }
           Agent.prototype.check = function(){
             // Implement me
@@ -61,8 +54,6 @@ module Agents
         var mem = JSON.parse(access_memory());
         return JSON.stringify(mem);
       }
-    }
-    Agent.prototype.run = function(){
     }
     Agent.prototype.check = function(){
     }
@@ -106,10 +97,11 @@ module Agents
     end
 
     def default_options
-      js_code = "Agent.prototype.run = function(){ var pd = JSON.stringify({memory: this.memory(), events: this.events, options: this.options});create_event(pd); };Agent.prototype.check = function(){ var pd = JSON.stringify({memory: this.memory(), events: this.events, options: this.options});create_event(pd); };Agent.prototype.receive = function(){ var pd = JSON.stringify({memory: this.memory(), events: this.events, options: this.options});create_event(pd); }"
+      js_code = "Agent.prototype.check = function(){ var pd = JSON.stringify({memory: this.memory(), events: this.events, options: this.options});create_event(pd); };Agent.prototype.receive = function(){ var pd = JSON.stringify({memory: this.memory(), events: this.events, options: this.options});create_event(pd); }"
       {
         "code" => js_code,
-        'expected_receive_period_in_days' => "2"
+        'expected_receive_period_in_days' => "2",
+        'expected_update_period_in_days' => "2"
       }
     end
   end
