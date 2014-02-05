@@ -1,0 +1,44 @@
+<div class='container'>
+  <div class='row'>
+    <div class='span12'>
+      <div class="page-header">
+        <h2>
+          Your Credentials
+        </h2>
+      </div>
+
+      <blockquote>
+        Credentials are used to store values used by many Agents. Examples might include "twitter_consumer_secret",
+        "user_full_name", or "user_birthday".
+      </blockquote>
+
+      <table class='table table-striped'>
+        <tr>
+          <th>Name</th>
+          <th>Value</th>
+        </tr>
+
+        <% @user_credentials.each do |user_credential| %>
+          <tr>
+            <td><%= user_credential.credential_name %></td>
+            <td>
+              <%= truncate user_credential.credential_value %>
+              <div class="btn-group" style="float: right">
+                <%= link_to 'Edit', edit_user_credential_path(user_credential), class: "btn btn-mini" %>
+                <%= link_to 'Delete', user_credential_path(user_credential), method: :delete, data: {confirm: 'Are you sure?'}, class: "btn btn-mini" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+
+      <%= paginate @user_credentials, :theme => 'twitter-bootstrap' %>
+
+      <br/>
+
+      <div class="btn-group">
+        <%= link_to '<i class="icon-plus"></i> New Credential'.html_safe, new_user_credential_path, class: "btn" %>
+      </div>
+    </div>
+  </div>
+</div>

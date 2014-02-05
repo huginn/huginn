@@ -102,6 +102,20 @@ class Agent < ActiveRecord::Base
     end
   end
 
+  def credential(name)
+    @credential_cache ||= {}
+    if @credential_cache.has_key?(name)
+      @credential_cache[name]
+    else
+      @credential_cache[name] = user.user_credentials.where(:credential_name => name).first.try(:credential_value)
+    end
+  end
+
+  def reload
+    @credential_cache = {}
+    super
+  end
+
   def new_event_expiration_date
     keep_events_for > 0 ? keep_events_for.days.from_now : nil
   end
