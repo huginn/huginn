@@ -33,7 +33,7 @@ gem 'wunderground'
 gem 'rturk'
 
 gem "twitter"
-gem 'twitter-stream', '>=0.1.16'
+gem 'twitter-stream'
 gem 'em-http-request'
 gem 'weibo_2'
 
@@ -58,3 +58,4 @@ group :development, :test do
 end
 
 gem 'rails4_upgrade'
+gem 'protected_attributes'
