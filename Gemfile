@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails'
+gem 'rails', '~> 4.0.2'
 gem 'rake'
 gem 'mysql2'
 gem 'devise'
@@ -19,13 +19,13 @@ gem "daemons"
 gem 'foreman'
 gem 'dotenv-rails', :groups => [:development, :test]
 
-gem 'sass-rails',   '~> 3.2.3'
-gem 'coffee-rails', '~> 3.2.1'
+gem 'sass-rails'
+gem 'coffee-rails'
 gem 'uglifier', '>= 1.0.3'
 gem 'select2-rails'
 gem 'jquery-rails'
 
-gem 'geokit-rails3'
+gem 'geokit-rails'
 gem 'kramdown'
 gem "typhoeus"
 gem 'nokogiri'
@@ -33,7 +33,7 @@ gem 'wunderground'
 gem 'rturk'
 
 gem "twitter"
-gem 'twitter-stream', '>=0.1.16'
+gem 'twitter-stream'
 gem 'em-http-request'
 gem 'weibo_2'
 
@@ -56,3 +56,6 @@ group :development, :test do
   gem 'webmock', :require => false
   gem 'coveralls', :require => false
 end
+
+gem 'rails4_upgrade'
+gem 'protected_attributes'
