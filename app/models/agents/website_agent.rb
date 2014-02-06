@@ -79,18 +79,18 @@ module Agents
       end
       # Check integer variables:      
       if options['expected_update_period_in_days'].present?
-	      begin
-	      	Integer(options['expected_update_period_in_days'])
-	      rescue
-	      	errors.add(:base, "Invalid expected_update_period_in_days format")
-	      end
-	  end
+        begin
+          Integer(options['expected_update_period_in_days'])
+          rescue
+          errors.add(:base, "Invalid expected_update_period_in_days format")
+        end
+      end
       if options['uniqueness_look_back'].present?
-	      begin
-	      	Integer(options['uniqueness_look_back'])
-	      rescue
-	      	errors.add(:base, "Invalid uniqueness_look_back format")
-	      end      
+        begin
+          Integer(options['uniqueness_look_back'])
+          rescue
+          errors.add(:base, "Invalid uniqueness_look_back format")
+        end      
       end
     end
 
@@ -185,13 +185,13 @@ module Agents
 
     def previous_payloads(num_events)
       if options['uniqueness_look_back'].present?
-	      look_back = options['uniqueness_look_back'].to_i
+        look_back = options['uniqueness_look_back'].to_i
       else
-      	# Larger of UNIQUENESS_FACTOR*num_events and UNIQUENESS_LOOK_BACK
-	    look_back = UNIQUENESS_FACTOR*num_events
-	    if look_back < UNIQUENESS_LOOK_BACK
-	    	look_back = UNIQUENESS_LOOK_BACK
-	    end
+        # Larger of UNIQUENESS_FACTOR*num_events and UNIQUENESS_LOOK_BACK
+        look_back = UNIQUENESS_FACTOR*num_events
+        if look_back < UNIQUENESS_LOOK_BACK
+          look_back = UNIQUENESS_LOOK_BACK
+        end
       end
       events.order("id desc").limit(look_back) if options['mode'].to_s == "on_change"
     end
