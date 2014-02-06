@@ -28,7 +28,7 @@ Huginn::Application.routes.draw do
 
   resources :user_credentials, :except => :show
 
-  match "/worker_status" => "worker_status#show"
+  get "/worker_status" => "worker_status#show"
 
   post "/users/:user_id/update_location/:secret" => "user_location_updates#create"
   post "/users/:user_id/webhooks/:agent_id/:secret" => "webhooks#create"
@@ -36,6 +36,6 @@ Huginn::Application.routes.draw do
 #  match "/delayed_job" => DelayedJobWeb, :anchor => false
   devise_for :users, :sign_out_via => [ :post, :delete ]
 
-  match "/about" => "home#about"
+  get "/about" => "home#about"
   root :to => "home#index"
 end
