@@ -37,6 +37,8 @@ gem 'twitter-stream', '>=0.1.16'
 gem 'em-http-request'
 gem 'weibo_2'
 
+gem 'therubyracer'
+
 platforms :ruby_18 do
   gem 'system_timer'
   gem 'fastercsv'
