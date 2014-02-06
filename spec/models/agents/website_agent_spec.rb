@@ -21,6 +21,18 @@ describe Agents::WebsiteAgent do
     end
 
     describe "#check" do
+    
+      it "should validate the integer fields" do
+        @checker.options['expected_update_period_in_days'] = "nonsense"
+        lambda { @checker.save! }.should raise_error;
+        @checker.options['expected_update_period_in_days'] = "2"
+        @checker.options['uniqueness_look_back'] = "nonsense"
+        lambda { @checker.save! }.should raise_error;
+        @checker.options['mode'] = "nonsense"
+        lambda { @checker.save! }.should raise_error;
+        @checker.options = @site
+      end
+    
       it "should check for changes (and update Event.expires_at)" do
         lambda { @checker.check }.should change { Event.count }.by(1)
         event = Event.last
@@ -107,7 +119,7 @@ describe Agents::WebsiteAgent do
           'expected_update_period_in_days' => 2,
           'type' => "html",
           'url' => "http://xkcd.com",
-          'mode' => :on_change,
+          'mode' => "on_change",
           'extract' => {
             'url' => {'css' => "#topLeft a", 'attr' => "href"},
             'title' => {'css' => "#topLeft a", 'text' => "true"}
