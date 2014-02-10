@@ -18,9 +18,17 @@
   </div>
 
   <div class="control-group">
+    <%= f.label :mode, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :mode, options_for_select(UserCredential::MODES.map {|s| [s.classify, s] }, @user_credential.mode), {}, :class => 'span4' %>
+    </div>
+  </div>
+
+  <div class="control-group">
     <%= f.label :credential_value, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_area :credential_value, :class => 'span8', :rows => 10 %>
+      <div id="ace-credential-value"></div>
     </div>
   </div>
 
@@ -28,3 +36,5 @@
     <%= f.submit "Save Credential", :class => "btn btn-primary" %>
   </div>
 <% end %>
+
+<%= javascript_include_tag "user_credentials" %>

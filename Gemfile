@@ -24,6 +24,7 @@ gem 'coffee-rails', '~> 3.2.1'
 gem 'uglifier', '>= 1.0.3'
 gem 'select2-rails'
 gem 'jquery-rails'
+gem 'ace-rails-ap'
 
 gem 'geokit-rails3'
 gem 'kramdown'
