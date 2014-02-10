@@ -8,10 +8,11 @@ module Agents
     description <<-MD
       The TwitterPublishAgent publishes tweets from the events it receives.
 
-      You [must set up a Twitter app](https://github.com/cantino/huginn/wiki/Getting-a-twitter-oauth-token) and provide it's `consumer_key`, `consumer_secret`, `oauth_token` and `oauth_token_secret`,
-      (also knows as "Access token" on the Twitter developer's site), along with the `username` of the Twitter user to publish as.
+      Twitter credentials must be supplied as either [credentials](/user_credentials) called
+      `twitter_consumer_key`, `twitter_consumer_secret`, `twitter_oauth_token`, and `twitter_oauth_token_secret`,
+      or as options to this Agent called `consumer_key`, `consumer_secret`, `oauth_token`, and `oauth_token_secret`.
 
-      The `oauth_token` and `oauth_token_secret` determine which user the tweet will be sent as.
+      To get oAuth credentials for Twitter, [follow these instructions](https://github.com/cantino/huginn/wiki/Getting-a-twitter-oauth-token).
 
       You must also specify a `message_path` parameter: a [JSONPaths](http://goessner.net/articles/JsonPath/) to the value to tweet.
 
@@ -19,10 +20,7 @@ module Agents
     MD
 
     def validate_options
-      unless options['username'].present? &&
-        options['expected_update_period_in_days'].present?
-        errors.add(:base, "username and expected_update_period_in_days are required")
-      end      
+      errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
     end
 
     def working?
@@ -31,12 +29,7 @@ module Agents
 
     def default_options
       {
-        'username' => "",
         'expected_update_period_in_days' => "10",
-        'consumer_key' => "---",
-        'consumer_secret' => "---",
-        'oauth_token' => "---",
-        'oauth_token_secret' => "---",
         'message_path' => "text"
       }
     end
@@ -68,9 +61,8 @@ module Agents
       end
     end
 
-    def publish_tweet text
+    def publish_tweet(text)
       Twitter.update(text)
     end
-
   end
 end

@@ -26,6 +26,8 @@ Huginn::Application.routes.draw do
     end
   end
 
+  resources :user_credentials, :except => :show
+
   match "/worker_status" => "worker_status#show"
 
   post "/users/:user_id/update_location/:secret" => "user_location_updates#create"
