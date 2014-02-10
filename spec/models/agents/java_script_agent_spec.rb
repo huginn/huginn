@@ -22,6 +22,14 @@ describe Agents::JavaScriptAgent do
       @agent.options.delete('code')
       @agent.should_not be_valid
     end
+
+    it "accepts a credential, but it must exist" do
+      @agent.should be_valid
+      @agent.options['code'] = 'credential:foo'
+      @agent.should_not be_valid
+      users(:jane).user_credentials.create! :credential_name => "foo", :credential_value => "bar"
+      @agent.reload.should be_valid
+    end
   end
 
   describe "#working?" do
@@ -55,7 +63,7 @@ describe Agents::JavaScriptAgent do
   describe "executing code" do
     it "works by default" do
       @agent.options = @agent.default_options
-      @agent.options['make_event'] = true;
+      @agent.options['make_event'] = true
       @agent.save!
 
       lambda {
@@ -64,6 +72,26 @@ describe Agents::JavaScriptAgent do
           @agent.check
         }.should_not change { AgentLog.count }
       }.should change { Event.count }.by(2)
+    end
+
+
+    describe "using credentials as code" do
+      before do
+        @agent.user.user_credentials.create :credential_name => 'code-foo', :credential_value => 'Agent.check = function() { this.log("ran it"); };'
+        @agent.options['code'] = 'credential:code-foo'
+        @agent.save!
+      end
+
+      it "accepts credentials" do
+        @agent.check
+        AgentLog.last.message.should == "ran it"
+      end
+
+      it "logs an error when the credential goes away" do
+        @agent.user.user_credentials.delete_all
+        @agent.reload.check
+        AgentLog.last.message.should == "Unable to find credential"
+      end
     end
 
     describe "error handling" do

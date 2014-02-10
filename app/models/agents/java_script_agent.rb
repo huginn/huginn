@@ -21,11 +21,15 @@ module Agents
       * `this.options(key)`
       * `this.log(message)`
       * `this.error(message)`
-
     MD
 
     def validate_options
-      errors.add(:base, "The 'code' option is required") unless options['code'].present?
+      cred_name = credential_referenced_by_code
+      if cred_name
+        errors.add(:base, "The credential '#{cred_name}' referenced by code cannot be found") unless credential(cred_name).present?
+      else
+        errors.add(:base, "The 'code' option is required") unless options['code'].present?
+      end
     end
 
     def working?
@@ -99,8 +103,21 @@ module Agents
         end
       end
 
-      context.eval(options['code'])
+      context.eval(code)
       context.eval("Agent.#{js_function}();")
+    end
+
+    def code
+      cred = credential_referenced_by_code
+      if cred
+        credential(cred) || 'Agent.check = function() { this.error("Unable to find credential"); };'
+      else
+        options['code']
+      end
+    end
+
+    def credential_referenced_by_code
+      options['code'] =~ /\Acredential:(.*)\Z/ && $1
     end
 
     def setup_javascript
