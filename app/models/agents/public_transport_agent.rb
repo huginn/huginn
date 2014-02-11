@@ -3,6 +3,9 @@ require 'cgi'
 module Agents
   class PublicTransportAgent < Agent
     cannot_receive_events!
+
+    default_schedule "every_2m"
+
     description <<-MD
       Specify the following user settings:
 
@@ -27,12 +30,7 @@ module Agents
       Finally, set the arrival window that you're interested in.  E.g., 5 minutes.  Events will be created by the agent anytime a new train or bus comes into that time window.
 
           alert_window_in_minutes: 5
-
-      This memory should get cleaned up when timestamp is older than an hour (or something) so that it doesn't fill up all of the Agent's memory.
     MD
-
-
-    default_schedule "every_2m"
 
     event_description <<-MD
     Events look like this:
@@ -55,6 +53,7 @@ module Agents
     def stops
       options["stops"].collect{|a| a.split("|").last}
     end
+
     def check
       hydra = Typhoeus::Hydra.new
       request = Typhoeus::Request.new(check_url, :followlocation => true)
@@ -79,18 +78,22 @@ module Agents
       hydra.queue request
       hydra.run
     end
+
     def update_memory(vals)
       add_to_memory(vals)
       cleanup_old_memory
     end
+
     def cleanup_old_memory
       self.memory["existing_routes"] ||= []
       self.memory["existing_routes"].reject!{|h| h["currentTime"].to_time <= (Time.now - 2.hours)}
     end
+
     def add_to_memory(vals)
       self.memory["existing_routes"] ||= []
       self.memory["existing_routes"] << {"stopTag" => vals["stopTag"], "tripTag" => vals["prediction"]["tripTag"], "epochTime" => vals["prediction"]["epochTime"], "currentTime" => Time.now}
     end
+
     def not_already_in_memory?(vals)
       m = self.memory["existing_routes"] || []
       m.select{|h| h['stopTag'] == vals["stopTag"] &&
@@ -98,6 +101,7 @@ module Agents
                 h['epochTime'] == vals["prediction"]["epochTime"]
               }.count == 0
     end
+
     def default_options
       {
         agency: "sf-muni",
@@ -111,6 +115,7 @@ module Agents
       errors.add(:base, 'alert_window_in_minutes is required') unless options['alert_window_in_minutes'].present?
       errors.add(:base, 'stops are required') unless options['stops'].present?
     end
+
     def working?
       event_created_within?(2) && !recent_error_logs?
     end
