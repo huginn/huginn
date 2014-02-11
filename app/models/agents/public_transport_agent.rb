@@ -23,6 +23,8 @@ module Agents
           agency: "sf-muni"
           stops: ["N|5221", "N|5215"]
 
+      Remember to pick the appropriate stop, which will have different tags for in-bound and out-bound.
+
       This Agent will generate predictions by requesting a URL similar to the following:
 
       [http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=sf-muni&stops=N&#124;5221&stops=N&#124;5215](http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=sf-muni&stops=N&#124;5221&stops=N&#124;5215)

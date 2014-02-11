@@ -15,6 +15,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Scrape websites and receive emails when they change
 * Compose digest emails about things you care about to be sent at specific times of the day
 * Track counts of high frequency events and SMS on changes, such as the term "san francisco emergency"
+* Watch public transit
 * Track your location over time
 * Create Amazon Mechanical Turk tasks as the input, or output, of events
 
