@@ -256,5 +256,4 @@ describe Agents::WebsiteAgent do
       end
     end
   end
-
 end
