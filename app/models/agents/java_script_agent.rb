@@ -8,7 +8,7 @@ module Agents
     description <<-MD
       This Agent allows you to write code in JavaScript that can create and receive events.  If other Agents aren't meeting your needs, try this one!
 
-      At the moment, all code should be written in the `code` option.  In the future, a full editor will be provided.
+      You can put code in the `code` option, or put your code in a Credential and reference it from `code` with `credential:<name>` (recommended).
 
       You can implement `Agent.check` and `Agent.receive` as you see fit.  The following methods will be available on Agent in the JavaScript environment:
 
