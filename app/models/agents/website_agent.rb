@@ -57,7 +57,7 @@ module Agents
           'expected_update_period_in_days' => "2",
           'url' => "http://xkcd.com",
           'type' => "html",
-          'mode' => :on_change,
+          'mode' => "on_change",
           'extract' => {
             'url' => {'css' => "#comic img", 'attr' => "src"},
             'title' => {'css' => "#comic img", 'attr' => "title"}
@@ -187,7 +187,7 @@ module Agents
           look_back = UNIQUENESS_LOOK_BACK
         end
       end
-      events.order("id desc").limit(look_back) if options['mode'].to_s == "on_change"
+      events.order("id desc").limit(look_back) if options['mode'].present? && options['mode'].to_s == "on_change"
     end
 
     def extract_full_json?
