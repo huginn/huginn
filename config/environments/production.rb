@@ -48,7 +48,7 @@ Huginn::Application.configure do
   end
 
   # Precompile additional assets (application.js.coffee.erb, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w( graphing.js )
+  config.assets.precompile += %w( graphing.js user_credentials.js )
 
   # Enable threaded mode
   # config.threadsafe!

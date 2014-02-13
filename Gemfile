@@ -24,6 +24,7 @@ gem 'coffee-rails', '~> 3.2.1'
 gem 'uglifier', '>= 1.0.3'
 gem 'select2-rails'
 gem 'jquery-rails'
+gem 'ace-rails-ap'
 
 gem 'geokit-rails3'
 gem 'kramdown'
@@ -36,6 +37,8 @@ gem "twitter"
 gem 'twitter-stream', '>=0.1.16'
 gem 'em-http-request'
 gem 'weibo_2'
+
+gem 'therubyracer'
 
 platforms :ruby_18 do
   gem 'system_timer'

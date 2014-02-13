@@ -25,6 +25,12 @@ describe Agent do
       do_not_allow(Agents::WebsiteAgent).async_check
       Agent.run_schedule("blah")
     end
+
+    it "will not run the 'never' schedule" do
+      agents(:bob_weather_agent).update_attribute 'schedule', 'never'
+      do_not_allow(Agents::WebsiteAgent).async_check
+      Agent.run_schedule("never")
+    end
   end
 
   describe "credential" do
