@@ -34,7 +34,9 @@ module Agents
 
       Can be configured to use HTTP basic auth by including the `basic_auth` parameter with `username:password`.
 
-      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent (only used to set the "working" status).
+
+      Set `uniqueness_look_back` (defaults to the larger of 200, 3x the number of received events) to limit the number of events checked for uniqueness (typically for performance).
     MD
 
     event_description do
@@ -43,7 +45,8 @@ module Agents
 
     default_schedule "every_12h"
 
-    UNIQUENESS_LOOK_BACK = 30
+    UNIQUENESS_LOOK_BACK = 200
+    UNIQUENESS_FACTOR = 3
 
     def working?
       event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
@@ -63,9 +66,31 @@ module Agents
     end
 
     def validate_options
+      # Check required fields are present
       errors.add(:base, "url and expected_update_period_in_days are required") unless options['expected_update_period_in_days'].present? && options['url'].present?
       if !options['extract'].present? && extraction_type != "json"
         errors.add(:base, "extract is required for all types except json")
+      end
+      # Check options:
+      if options['mode'].present?
+        if options['mode'] != "on_change" && options['mode'] != "all"
+          errors.add(:base, "mode should be all or on_change")
+        end
+      end
+      # Check integer variables:      
+      if options['expected_update_period_in_days'].present?
+        begin
+          Integer(options['expected_update_period_in_days'])
+          rescue
+          errors.add(:base, "Invalid expected_update_period_in_days format")
+        end
+      end
+      if options['uniqueness_look_back'].present?
+        begin
+          Integer(options['uniqueness_look_back'])
+          rescue
+          errors.add(:base, "Invalid uniqueness_look_back format")
+        end      
       end
     end
 
@@ -84,8 +109,9 @@ module Agents
         doc = parse(response.body)
 
         if extract_full_json?
+          old_events = previous_payloads 1
           result = doc
-          if store_payload? result
+          if store_payload? old_events, result
             log "Storing new result for '#{name}': #{result.inspect}"
             create_event :payload => result
           end
@@ -116,6 +142,7 @@ module Agents
             return
           end
       
+          old_events = previous_payloads num_unique_lengths.first
           num_unique_lengths.first.times do |index|
             result = {}
             options['extract'].keys.each do |name|
@@ -125,7 +152,7 @@ module Agents
               end
             end
 
-            if store_payload? result
+            if store_payload? old_events, result
               log "Storing new parsed result for '#{name}': #{result.inspect}"
               create_event :payload => result
             end
@@ -138,12 +165,35 @@ module Agents
 
     private
 
-    def store_payload? result
-      !options['mode'] || options['mode'].to_s == "all" || (options['mode'].to_s == "on_change" && !previous_payloads.include?(result.to_json))
+    def store_payload?(old_events, result)
+      if !options['mode']
+        return true
+      elsif options['mode'].to_s == "all"
+        return true
+      elsif options['mode'].to_s == "on_change"
+        old_events.each do |old_event|
+          if old_event.payload.to_json == result.to_json
+            old_event.expires_at = new_event_expiration_date
+            old_event.save
+            return false
+         end
+        end
+        return true
+      end
+      raise "Illegal options[mode]: " + options['mode'].to_s
     end
 
-    def previous_payloads
-      events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options['mode'].to_s == "on_change"
+    def previous_payloads(num_events)
+      if options['uniqueness_look_back'].present?
+        look_back = options['uniqueness_look_back'].to_i
+      else
+        # Larger of UNIQUENESS_FACTOR*num_events and UNIQUENESS_LOOK_BACK
+        look_back = UNIQUENESS_FACTOR*num_events
+        if look_back < UNIQUENESS_LOOK_BACK
+          look_back = UNIQUENESS_LOOK_BACK
+        end
+      end
+      events.order("id desc").limit(look_back) if options['mode'].to_s == "on_change"
     end
 
     def extract_full_json?
