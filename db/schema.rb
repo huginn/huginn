@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140210062747) do
+ActiveRecord::Schema.define(:version => 20140213053001) do
 
   create_table "agent_logs", :force => true do |t|
     t.integer  "agent_id",                                             :null => false
@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(:version => 20140210062747) do
     t.integer  "events_count"
     t.datetime "last_check_at"
     t.datetime "last_receive_at"
-    t.integer  "last_checked_event_id"
+    t.integer  "last_checked_event_id",                       :default => 0
     t.datetime "created_at",                                                 :null => false
     t.datetime "updated_at",                                                 :null => false
     t.text     "memory",                :limit => 2147483647
@@ -88,8 +88,9 @@ ActiveRecord::Schema.define(:version => 20140210062747) do
   create_table "links", :force => true do |t|
     t.integer  "source_id"
     t.integer  "receiver_id"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
+    t.integer  "event_id_at_creation", :default => 0, :null => false
   end
 
   add_index "links", ["receiver_id", "source_id"], :name => "index_links_on_receiver_id_and_source_id"

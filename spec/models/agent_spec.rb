@@ -221,8 +221,13 @@ describe Agent do
       it "should track when events have been seen and not received them again" do
         mock.any_instance_of(Agents::TriggerAgent).receive(anything).once
         Agent.async_check(agents(:bob_weather_agent).id)
-        Agent.receive!
-        Agent.receive!
+        lambda {
+          Agent.receive!
+        }.should change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+
+        lambda {
+          Agent.receive!
+        }.should_not change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
       end
 
       it "should not run consumers that have nothing to do" do
@@ -237,6 +242,39 @@ describe Agent do
         Agent.async_check(agents(:bob_weather_agent).id)
         Agent.async_check(agents(:jane_weather_agent).id)
         Agent.receive!
+      end
+
+      it "should ignore events that were created before a particular Link" do
+        agent2 = Agents::SomethingSource.new(:name => "something")
+        agent2.user = users(:bob)
+        agent2.save!
+        agent2.check
+
+        mock.any_instance_of(Agents::TriggerAgent).receive(anything).twice
+        agents(:bob_weather_agent).check # bob_weather_agent makes an event
+
+        lambda {
+          Agent.receive! # event gets propagated
+        }.should change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+
+        # This agent creates a few events before we link to it, but after our last check.
+        agent2.check
+        agent2.check
+
+        # Now we link to it.
+        agents(:bob_rain_notifier_agent).sources << agent2
+        agent2.links_as_source.first.event_id_at_creation.should == agent2.events.reorder("events.id desc").first.id
+
+        lambda {
+          Agent.receive! # but we don't receive those events because they're too old
+        }.should_not change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+
+        # Now a new event is created by agent2
+        agent2.check
+
+        lambda {
+          Agent.receive! # and we receive it
+        }.should change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
       end
     end
 
