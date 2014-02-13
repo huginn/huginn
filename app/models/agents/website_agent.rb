@@ -6,6 +6,11 @@ module Agents
   class WebsiteAgent < Agent
     cannot_receive_events!
 
+    default_schedule "every_12h"
+
+    UNIQUENESS_LOOK_BACK = 200
+    UNIQUENESS_FACTOR = 3
+
     description <<-MD
       The WebsiteAgent scrapes a website, XML document, or JSON feed and creates Events based on the results.
 
@@ -34,16 +39,14 @@ module Agents
 
       Can be configured to use HTTP basic auth by including the `basic_auth` parameter with `username:password`.
 
-      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.  This is only used to set the "working" status.
+
+      Set `uniqueness_look_back` to limit the number of events checked for uniqueness (typically for performance).  This defaults to the larger of #{UNIQUENESS_LOOK_BACK} or #{UNIQUENESS_FACTOR}x the number of detected received results.
     MD
 
     event_description do
       "Events will have the fields you specified.  Your options look like:\n\n    #{Utils.pretty_print options['extract']}"
     end
-
-    default_schedule "every_12h"
-
-    UNIQUENESS_LOOK_BACK = 30
 
     def working?
       event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
@@ -54,7 +57,7 @@ module Agents
           'expected_update_period_in_days' => "2",
           'url' => "http://xkcd.com",
           'type' => "html",
-          'mode' => :on_change,
+          'mode' => "on_change",
           'extract' => {
             'url' => {'css' => "#comic img", 'attr' => "src"},
             'title' => {'css' => "#comic img", 'attr' => "title"}
@@ -63,31 +66,44 @@ module Agents
     end
 
     def validate_options
+      # Check for required fields
       errors.add(:base, "url and expected_update_period_in_days are required") unless options['expected_update_period_in_days'].present? && options['url'].present?
       if !options['extract'].present? && extraction_type != "json"
         errors.add(:base, "extract is required for all types except json")
+      end
+
+      # Check for optional fields
+      if options['mode'].present?
+        errors.add(:base, "mode must be set to on_change or all") unless %w[on_change all].include?(options['mode'])
+      end
+
+      if options['expected_update_period_in_days'].present?
+        errors.add(:base, "Invalid expected_update_period_in_days format") unless is_positive_integer?(options['expected_update_period_in_days'])
+      end
+
+      if options['uniqueness_look_back'].present?
+        errors.add(:base, "Invalid uniqueness_look_back format") unless is_positive_integer?(options['uniqueness_look_back'])
       end
     end
 
     def check
       hydra = Typhoeus::Hydra.new
       log "Fetching #{options['url']}"
-      request_opts = {:followlocation => true}
-      if options['basic_auth'].present?
-        request_opts[:userpwd] = options['basic_auth']
-      end
+      request_opts = { :followlocation => true }
+      request_opts[:userpwd] = options['basic_auth'] if options['basic_auth'].present?
       request = Typhoeus::Request.new(options['url'], request_opts)
+
       request.on_failure do |response|
         error "Failed: #{response.inspect}"
       end
+
       request.on_success do |response|
         doc = parse(response.body)
 
         if extract_full_json?
-          result = doc
-          if store_payload? result
-            log "Storing new result for '#{name}': #{result.inspect}"
-            create_event :payload => result
+          if store_payload!(previous_payloads(1), doc)
+            log "Storing new result for '#{name}': #{doc.inspect}"
+            create_event :payload => doc
           end
         else
           output = {}
@@ -116,6 +132,7 @@ module Agents
             return
           end
       
+          old_events = previous_payloads num_unique_lengths.first
           num_unique_lengths.first.times do |index|
             result = {}
             options['extract'].keys.each do |name|
@@ -125,7 +142,7 @@ module Agents
               end
             end
 
-            if store_payload? result
+            if store_payload!(old_events, result)
               log "Storing new parsed result for '#{name}': #{result.inspect}"
               create_event :payload => result
             end
@@ -138,16 +155,43 @@ module Agents
 
     private
 
-    def store_payload? result
-      !options['mode'] || options['mode'].to_s == "all" || (options['mode'].to_s == "on_change" && !previous_payloads.include?(result.to_json))
+    # This method returns true if the result should be stored as a new event.
+    # If mode is set to 'on_change', this method may return false and update an existing
+    # event to expire further in the future.
+    def store_payload!(old_events, result)
+      if !options['mode'].present?
+        return true
+      elsif options['mode'].to_s == "all"
+        return true
+      elsif options['mode'].to_s == "on_change"
+        result_json = result.to_json
+        old_events.each do |old_event|
+          if old_event.payload.to_json == result_json
+            old_event.expires_at = new_event_expiration_date
+            old_event.save!
+            return false
+         end
+        end
+        return true
+      end
+      raise "Illegal options[mode]: " + options['mode'].to_s
     end
 
-    def previous_payloads
-      events.order("id desc").limit(UNIQUENESS_LOOK_BACK).pluck(:payload).map(&:to_json) if options['mode'].to_s == "on_change"
+    def previous_payloads(num_events)
+      if options['uniqueness_look_back'].present?
+        look_back = options['uniqueness_look_back'].to_i
+      else
+        # Larger of UNIQUENESS_FACTOR * num_events and UNIQUENESS_LOOK_BACK
+        look_back = UNIQUENESS_FACTOR * num_events
+        if look_back < UNIQUENESS_LOOK_BACK
+          look_back = UNIQUENESS_LOOK_BACK
+        end
+      end
+      events.order("id desc").limit(look_back) if options['mode'].present? && options['mode'].to_s == "on_change"
     end
 
     def extract_full_json?
-      (!options['extract'].present? && extraction_type == "json")
+      !options['extract'].present? && extraction_type == "json"
     end
 
     def extraction_type
@@ -172,6 +216,14 @@ module Agents
           Nokogiri::HTML(data)
         else
           raise "Unknown extraction type #{extraction_type}"
+      end
+    end
+
+    def is_positive_integer?(value)
+      begin
+        Integer(value) >= 0
+      rescue
+        false
       end
     end
   end
