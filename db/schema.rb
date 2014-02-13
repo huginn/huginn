@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(:version => 20140213053001) do
     t.integer  "events_count"
     t.datetime "last_check_at"
     t.datetime "last_receive_at"
-    t.integer  "last_checked_event_id",                       :default => 0
+    t.integer  "last_checked_event_id"
     t.datetime "created_at",                                                 :null => false
     t.datetime "updated_at",                                                 :null => false
     t.text     "memory",                :limit => 2147483647
