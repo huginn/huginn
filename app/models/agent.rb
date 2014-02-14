@@ -252,7 +252,7 @@ class Agent < ActiveRecord::Base
                 select("agents.id AS receiver_agent_id, sources.id AS source_agent_id, events.id AS event_id").
                 joins("JOIN links ON (links.receiver_id = agents.id)").
                 joins("JOIN agents AS sources ON (links.source_id = sources.id)").
-                joins("JOIN events ON (events.agent_id = sources.id)").
+                joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)").
                 where("agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id").to_sql
 
         agents_to_events = {}
