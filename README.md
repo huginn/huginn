@@ -16,10 +16,13 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Compose digest emails about things you care about to be sent at specific times of the day
 * Track counts of high frequency events and SMS on changes, such as the term "san francisco emergency"
 * Watch public transit
+* Run arbitrary JavaScript Agents on the server
 * Track your location over time
 * Create Amazon Mechanical Turk tasks as the input, or output, of events
 
 Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in [our IRC channel](https://kiwiirc.com/client/irc.freenode.net/?nick=huginn-user|?#huginn) (\#huginn on Freenode) to discuss the project.
+
+Want to help with Huginn?  Try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
 
 ## Examples
 
