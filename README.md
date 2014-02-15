@@ -22,6 +22,8 @@ Huginn is a system for building agents that perform automated tasks for you onli
 
 Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in [our IRC channel](https://kiwiirc.com/client/irc.freenode.net/?nick=huginn-user|?#huginn) (\#huginn on Freenode) to discuss the project.
 
+## We need your help!
+
 Want to help with Huginn?  Try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
 
 ## Examples
