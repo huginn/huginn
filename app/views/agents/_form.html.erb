@@ -42,6 +42,7 @@
       <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'span4' %>
       <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
     </div>
+  </div>
 
   <div class='event-related-region' data-can-create-events="<%= @agent.can_create_events? %>">
     <div class="control-group">
