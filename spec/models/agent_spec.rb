@@ -302,6 +302,61 @@ describe Agent do
       end
     end
 
+    describe "creating agents with propagate_immediately = true" do
+      it "should schedule subagent events immediately" do
+        Event.delete_all
+        sender = Agents::SomethingSource.new(:name => "Sending Agent")
+        sender.user = users(:bob)
+        sender.save!
+
+        receiver = Agents::CannotBeScheduled.new(
+           :name => "Receiving Agent",
+        )
+        receiver.propagate_immediately = true
+        receiver.user = users(:bob)
+        receiver.sources << sender
+        receiver.save!
+
+        sender.create_event :payload => {"message" => "new payload"}
+        sender.events.count.should == 1
+        receiver.events.count.should == 1
+        #should be true without calling Agent.receive!
+      end
+
+      it "should only schedule receiving agents that are set to propagate_immediately" do
+        Event.delete_all
+        sender = Agents::SomethingSource.new(:name => "Sending Agent")
+        sender.user = users(:bob)
+        sender.save!
+
+        im_receiver = Agents::CannotBeScheduled.new(
+           :name => "Immediate Receiving Agent",
+        )
+        im_receiver.propagate_immediately = true
+        im_receiver.user = users(:bob)
+        im_receiver.sources << sender
+
+        im_receiver.save!
+        slow_receiver = Agents::CannotBeScheduled.new(
+           :name => "Slow Receiving Agent",
+        )
+        slow_receiver.user = users(:bob)
+        slow_receiver.sources << sender
+        slow_receiver.save!
+
+        sender.create_event :payload => {"message" => "new payload"}
+        sender.events.count.should == 1
+        im_receiver.events.count.should == 1
+        #we should get the quick one
+        #but not the slow one
+        slow_receiver.events.count.should == 0
+        Agent.receive!
+        #now we should have one in both
+        im_receiver.events.count.should == 1
+        slow_receiver.events.count.should == 1
+      end
+    end
+
     describe "validations" do
       it "calls validate_options" do
         agent = Agents::SomethingSource.new(:name => "something")

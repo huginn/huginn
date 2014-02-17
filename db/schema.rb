@@ -11,21 +11,21 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140213053001) do
+ActiveRecord::Schema.define(:version => 20140216201250) do
 
   create_table "agent_logs", :force => true do |t|
-    t.integer  "agent_id",                                             :null => false
-    t.text     "message",           :limit => 16777215,                :null => false
-    t.integer  "level",                                 :default => 3, :null => false
+    t.integer  "agent_id",                         :null => false
+    t.text     "message",                          :null => false
+    t.integer  "level",             :default => 3, :null => false
     t.integer  "inbound_event_id"
     t.integer  "outbound_event_id"
-    t.datetime "created_at",                                           :null => false
-    t.datetime "updated_at",                                           :null => false
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
   end
 
   create_table "agents", :force => true do |t|
     t.integer  "user_id"
-    t.text     "options",               :limit => 16777215
+    t.text     "options"
     t.string   "type"
     t.string   "name"
     t.string   "schedule"
@@ -33,32 +33,25 @@ ActiveRecord::Schema.define(:version => 20140213053001) do
     t.datetime "last_check_at"
     t.datetime "last_receive_at"
     t.integer  "last_checked_event_id"
-    t.datetime "created_at",                                                 :null => false
-    t.datetime "updated_at",                                                 :null => false
+    t.datetime "created_at",                                                     :null => false
+    t.datetime "updated_at",                                                     :null => false
     t.text     "memory",                :limit => 2147483647
     t.datetime "last_webhook_at"
+    t.integer  "keep_events_for",                             :default => 0,     :null => false
     t.datetime "last_event_at"
     t.datetime "last_error_log_at"
-    t.integer  "keep_events_for",                             :default => 0, :null => false
+    t.boolean  "propagate_immediately",                       :default => false, :null => false
   end
 
   add_index "agents", ["schedule"], :name => "index_agents_on_schedule"
   add_index "agents", ["type"], :name => "index_agents_on_type"
   add_index "agents", ["user_id", "created_at"], :name => "index_agents_on_user_id_and_created_at"
 
-  create_table "contacts", :force => true do |t|
-    t.text     "message"
-    t.string   "name"
-    t.string   "email"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",                       :default => 0
     t.integer  "attempts",                       :default => 0
     t.text     "handler",    :limit => 16777215
-    t.text     "last_error", :limit => 16777215
+    t.text     "last_error"
     t.datetime "run_at"
     t.datetime "locked_at"
     t.datetime "failed_at"
@@ -73,11 +66,11 @@ ActiveRecord::Schema.define(:version => 20140213053001) do
   create_table "events", :force => true do |t|
     t.integer  "user_id"
     t.integer  "agent_id"
-    t.decimal  "lat",                              :precision => 15, :scale => 10
-    t.decimal  "lng",                              :precision => 15, :scale => 10
-    t.text     "payload",    :limit => 2147483647
-    t.datetime "created_at",                                                       :null => false
-    t.datetime "updated_at",                                                       :null => false
+    t.decimal  "lat",                            :precision => 15, :scale => 10
+    t.decimal  "lng",                            :precision => 15, :scale => 10
+    t.text     "payload",    :limit => 16777215
+    t.datetime "created_at",                                                     :null => false
+    t.datetime "updated_at",                                                     :null => false
     t.datetime "expires_at"
   end
 

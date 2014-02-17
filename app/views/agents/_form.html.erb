@@ -42,7 +42,6 @@
       <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'span4' %>
       <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
     </div>
-  </div>
 
   <div class='event-related-region' data-can-create-events="<%= @agent.can_create_events? %>">
     <div class="control-group">
@@ -62,6 +61,7 @@
                                       @agent.source_ids),
                    {}, { :multiple => true, :size => 5, :class => 'span4 select2' }) %>
       <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
+      <span class="propagate-immediately"><br><%= f.check_box :propagate_immediately %> <%= f.label "Propagate immediately", :class => 'control-label' %></span>
     </div>
   </div>
 
