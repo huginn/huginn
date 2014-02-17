@@ -6,8 +6,7 @@ require 'json_serialized_field'
 class Event < ActiveRecord::Base
   include JSONSerializedField
 
-  attr_accessor :propagate_immediately
-  attr_accessible :lat, :lng, :payload, :user_id, :user, :expires_at, :propagate_immediately
+  attr_accessible :lat, :lng, :payload, :user_id, :user, :expires_at
 
   acts_as_mappable
 
