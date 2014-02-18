@@ -69,7 +69,7 @@ module Agents
       opts = {:count => 200, :include_rts => true, :exclude_replies => false, :include_entities => true, :contributor_details => true}
       opts.merge! :since_id => since_id unless since_id.nil?
 
-      tweets = Twitter.user_timeline(options['username'], opts)
+      tweets = twitter.user_timeline(options['username'], opts)
 
       tweets.each do |tweet|
         memory['since_id'] = tweet.id if !memory['since_id'] || (tweet.id > memory['since_id'])
