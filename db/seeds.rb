@@ -23,7 +23,7 @@ unless user.agents.where(:name => "XKCD Source").exists?
                        :type => "html",
                        :options => {
                            :url => "http://xkcd.com",
-                           :mode => :on_change,
+                           :mode => "on_change",
                            :expected_update_period_in_days => 5,
                            :extract => {
                                :url => {:css => "#comic img", :attr => "src"},
@@ -37,7 +37,7 @@ unless user.agents.where(:name => "iTunes Trailer Source").exists?
                        :schedule => "every_1d",
                        :options => {
                            :url => "http://trailers.apple.com/trailers/home/rss/newtrailers.rss",
-                           :mode => :on_change,
+                           :mode => "on_change",
                            :type => "xml",
                            :expected_update_period_in_days => 5,
                            :extract => {
