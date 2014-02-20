@@ -91,17 +91,24 @@ class HuginnScheduler
 
     active_agents = Set.new
     EM.run do
-        EM.add_periodic_timer(10) {
-            Agent.find_each do |agent|
-                   if agent.continuous? 
-                     if active_agents.add? agent
-                       puts "Starting continuous agent"
-                       agent.em_start
-                     end
-                   end
-                 end
-          }
-      end
+      EM.add_periodic_timer(10) {
+        inactive_agents = Set.new(active_agents)
+        Agent.find_each do |agent|
+          inactive_agents.delete agent
+          if agent.continuous? 
+            if active_agents.add? agent
+              puts "Starting continuous agent"
+              agent.em_start
+            end
+          end
+        end
+        inactive_agents.each do |agent|
+          puts "Stopping continuous agent"
+          agent.em_stop 
+          active_agents.delete agent
+        end
+      }
+    end
 
     rufus_scheduler.join
   end

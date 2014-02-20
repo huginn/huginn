@@ -25,30 +25,49 @@ module Agents
       t = Time.now
       http = EM::HttpRequest.new(options['url']).get
       http.errback {
-          if Time.now - t > 0.1
-            em_start
-          else
-            EM.add_timer(1) {
-                em_start
+          error "Failed: #{http.error}"
+          if !@destroyed
+            pp "errback again "+name
+            if Time.now - t > 0.1
+              em_start
+            else
+              EM.add_timer(1) {
+                  em_start
               }
+            end
           end
         }
       http.callback {
-          puts http.response
-          if options['type'] == "json"
-            pld = JSON.parse(http.response)
-          else
-            pld = CobraVsMongoose.xml_to_hash(http.response)
-          end
-          create_event :payload => pld
-          if Time.now - t > 0.1
-            em_start
-          else
-            EM.add_timer(1) {
-                em_start
+          if !@destroyed
+            pp "callback again"+name
+            puts http.response
+            if http.response_header.status == 200
+              begin
+                if options['type'] == "json"
+                  pld = JSON.parse(http.response)
+                else
+                  pld = CobraVsMongoose.xml_to_hash(http.response)
+                end
+                create_event :payload => pld
+              rescue
+                error "Parsing error"
+              end
+            else
+              error "Failed #{http.response_header.status}: #{http.response_header}"
+            end
+            if Time.now - t > 0.1
+              em_start
+            else
+              EM.add_timer(1) {
+                  em_start
               }
+            end
           end
         }
+    end
+
+    def em_stop
+      @destroyed = true
     end
 
     def working?

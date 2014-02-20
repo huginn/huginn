@@ -81,6 +81,10 @@ class Agent < ActiveRecord::Base
     # implement me in your subclass of Agent if continuous.
   end
 
+  def em_stop
+    # implement me in your subclass of Agent if continuous.
+  end
+
   # Implement me in your subclass to decide if your Agent is working.
   def working?
     raise "Implement me in your subclass"
