@@ -33,8 +33,8 @@ gem 'nokogiri'
 gem 'wunderground'
 gem 'rturk'
 
-gem "twitter"
-gem 'twitter-stream', '>=0.1.16'
+gem "twitter", '~> 5.7.1'
+gem 'twitter-stream', :git => 'https://github.com/cantino/twitter-stream', :branch => 'master'
 gem 'em-http-request'
 gem 'weibo_2'
 
