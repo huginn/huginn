@@ -36,7 +36,7 @@ gem "twitter"
 gem 'twitter-stream', '>=0.1.16'
 gem 'em-http-request'
 gem 'weibo_2'
-gem 'cobravsmongoose'
+gem 'badgerfish'
 
 platforms :ruby_18 do
   gem 'system_timer'

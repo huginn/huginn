@@ -1,5 +1,5 @@
 require 'em-http'
-require 'cobravsmongoose'
+require 'badgerfish'
 require 'json'
 
 module Agents
@@ -46,7 +46,7 @@ module Agents
                 if options['type'] == "json"
                   pld = JSON.parse(http.response)
                 else
-                  pld = CobraVsMongoose.xml_to_hash(http.response)
+                  pld = Badgerfish::Parser.new.load(http.response)
                 end
                 create_event :payload => pld
               rescue

@@ -30,6 +30,8 @@ GEM
       multi_json (~> 1.0)
     addressable (2.3.5)
     arel (3.0.3)
+    badgerfish (0.0.3)
+      ox (~> 2.0.8)
     bcrypt-ruby (3.1.1)
     better_errors (1.1.0)
       coderay (>= 1.0.0)
@@ -40,7 +42,6 @@ GEM
       kaminari (>= 0.13)
       rails (>= 3.1)
     builder (3.0.4)
-    cobravsmongoose (0.0.2)
     coderay (1.0.9)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
@@ -145,6 +146,7 @@ GEM
       multi_xml (~> 0.5)
       rack (~> 1.2)
     orm_adapter (0.4.0)
+    ox (2.0.12)
     polyglot (0.3.3)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
@@ -268,10 +270,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  badgerfish
   better_errors
   binding_of_caller
   bootstrap-kaminari-views
-  cobravsmongoose
   coffee-rails (~> 3.2.1)
   coveralls
   daemons
