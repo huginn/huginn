@@ -98,8 +98,7 @@ class Agent < ActiveRecord::Base
     if can_create_events?
       events.create!({ 
          :user => user, 
-         :expires_at => new_event_expiration_date, 
-         :propagate_immediately => propagate_immediately
+         :expires_at => new_event_expiration_date
       }.merge(attrs))
     else
       error "This Agent cannot create events!"
