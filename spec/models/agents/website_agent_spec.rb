@@ -32,7 +32,17 @@ describe Agents::WebsiteAgent do
         lambda { @checker.save! }.should raise_error;
         @checker.options = @site
       end
-    
+
+      it "should validate the force_encoding option" do
+        @checker.options['force_encoding'] = 'UTF-8'
+        lambda { @checker.save! }.should_not raise_error;
+        @checker.options['force_encoding'] = ['UTF-8']
+        lambda { @checker.save! }.should raise_error;
+        @checker.options['force_encoding'] = 'UTF-42'
+        lambda { @checker.save! }.should raise_error;
+        @checker.options = @site
+      end
+
       it "should check for changes (and update Event.expires_at)" do
         lambda { @checker.check }.should change { Event.count }.by(1)
         event = Event.last
@@ -80,6 +90,62 @@ describe Agents::WebsiteAgent do
         @checker.options = @site
         @checker.check
         @checker.logs.first.message.should =~ /Got an uneven number of matches/
+      end
+    end
+
+    describe 'encoding' do
+      it 'should be forced with force_encoding option' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /no-encoding/).to_return(:body => {
+            :value => huginn,
+          }.to_json.encode(Encoding::EUC_JP), :headers => {
+            'Content-Type' => 'application/json',
+          }, :status => 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => 2,
+          'type' => "json",
+          'url' => "http://no-encoding.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+          'force_encoding' => 'EUC-JP',
+        }
+        checker = Agents::WebsiteAgent.new(:name => "No Encoding Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        event.payload['value'].should == huginn
+      end
+
+      it 'should be overridden with force_encoding option' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /wrong-encoding/).to_return(:body => {
+            :value => huginn,
+          }.to_json.encode(Encoding::EUC_JP), :headers => {
+            'Content-Type' => 'application/json; UTF-8',
+          }, :status => 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => 2,
+          'type' => "json",
+          'url' => "http://wrong-encoding.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+          'force_encoding' => 'EUC-JP',
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Wrong Encoding Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        event.payload['value'].should == huginn
       end
     end
 
