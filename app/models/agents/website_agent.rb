@@ -20,7 +20,7 @@ module Agents
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
-      When parsing HTML or XML, these sub-hashes specify how to extract with a `css` CSS selector and either `'text': true` or `attr` pointing to an attribute name to grab.  An example:
+      When parsing HTML or XML, these sub-hashes specify how to extract with either a `css` CSS selector or a `xpath` XPath expression and either `'text': true` or `attr` pointing to an attribute name to grab.  An example:
 
           'extract': {
             'url': { 'css': "#comic img", 'attr': "src" },
@@ -109,21 +109,36 @@ module Agents
         else
           output = {}
           options['extract'].each do |name, extraction_details|
-            result = if extraction_type == "json"
-                       output[name] = Utils.values_at(doc, extraction_details['path'])
-                     else
-                       output[name] = doc.css(extraction_details['css']).map { |node|
-                         if extraction_details['attr']
-                           node.attr(extraction_details['attr'])
-                         elsif extraction_details['text']
-                           node.text()
-                         else
-                           error "'attr' or 'text' is required on HTML or XML extraction patterns"
-                           return
-                         end
-                       }
-                     end
-            log "Extracting #{extraction_type} at #{extraction_details['path'] || extraction_details['css']}: #{result}"
+            if extraction_type == "json"
+              result = Utils.values_at(doc, extraction_details['path'])
+              log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
+            else
+              case
+              when css = extraction_details['css']
+                nodes = doc.css(css)
+              when xpath = extraction_details['xpath']
+                nodes = doc.xpath(xpath)
+              else
+                error "'css' or 'xpath' is required for HTML or XML extraction"
+                return
+              end
+              unless Nokogiri::XML::NodeSet === nodes
+                error "The result of HTML/XML extraction was not a NodeSet"
+                return
+              end
+              result = nodes.map { |node|
+                if extraction_details['attr']
+                  node.attr(extraction_details['attr'])
+                elsif extraction_details['text']
+                  node.text()
+                else
+                  error "'attr' or 'text' is required on HTML or XML extraction patterns"
+                  return
+                end
+              }
+              log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
+            end
+            output[name] = result
           end
 
           num_unique_lengths = options['extract'].keys.map { |name| output[name].length }.uniq
