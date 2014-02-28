@@ -25,7 +25,7 @@ module Agents
       Events look like this:
 
           {
-            "location": 12345,
+            "location": "12345",
             "date": {
               "epoch": "1357959600",
               "pretty": "10:00 PM EST on January 11, 2013"
@@ -53,7 +53,7 @@ module Agents
     end
 
     def key_setup?
-      options['api_key'] && options['api_key'] != "your-key"
+      options['api_key'].present? && options['api_key'] != "your-key"
     end
 
     def default_options
@@ -61,16 +61,24 @@ module Agents
         'service' => 'wunderground',
         'api_key' => 'your-key',
         'location' => '94103',
-        'which_day' => '0'
+        'which_day' => '1'
       }
     end
 
+    def service
+      options["service"].presence || "wunderground"
+    end
+
+    def which_day
+      (options["which_day"].presence || 1).to_i
+    end
+
     def validate_options
-      errors.add(:base, "service is required") unless options['service'].present?
-      errors.add(:base, "service must be set to 'forecastio' or 'wunderground'") unless ["forecastio", "wunderground"].include?(options['service'])
+      errors.add(:base, "service is required") unless service.present?
+      errors.add(:base, "service must be set to 'forecastio' or 'wunderground'") unless ["forecastio", "wunderground"].include?(service)
       errors.add(:base, "location is required") unless options['location'].present?
-      errors.add(:base, "api_key is required") unless options['api_key'].present?
-      errors.add(:base, "which_day selection is required") unless options['which_day'].present?
+      errors.add(:base, "api_key is required") unless key_setup?
+      errors.add(:base, "which_day selection is required") unless which_day.present?
     end
 
     def wunderground
@@ -80,18 +88,18 @@ module Agents
 
     def forecastio
       ForecastIO.api_key = options['api_key'] if key_setup?
-      data = ForecastIO.forecast(options['location'].split(',')[0],options['location'].split(',')[1])['daily']['data']
+      data = ForecastIO.forecast(options['location'].split(',')[0], options['location'].split(',')[1])['daily']['data']
       return data
     end
 
     def model(data,service,which_day)
       day = Hash.new
       if service == "wunderground"
-        day =  data[which_day.to_i]
+        day =  data[which_day]
       elsif service == "forecastio"
         data.each do |value|
           timestamp = Time.at(value.time)
-          if (timestamp.to_date - Time.now.to_date).to_i == which_day.to_i
+          if (timestamp.to_date - Time.now.to_date).to_i == which_day
             day = {
               'date' => {
                 'epoch' => value.time.to_s,
@@ -158,10 +166,10 @@ module Agents
 
     def check
       if key_setup?
-        if options['service'] == 'forecastio'
-          weather = model(forecastio,options['service'],options['which_day'])
-        elsif options['service'] == 'wunderground'
-          weather = model(wunderground,options['service'],options['which_day'])
+        if service == 'forecastio'
+          weather = model(forecastio, service, which_day)
+        elsif service == 'wunderground'
+          weather = model(wunderground, service, which_day)
         end
         create_event :payload => weather
       end
