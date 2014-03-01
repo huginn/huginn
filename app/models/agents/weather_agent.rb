@@ -82,22 +82,22 @@ module Agents
     end
 
     def wunderground
-      data = Wunderground.new(options['api_key']).forecast_for(options['location'])['forecast']['simpleforecast']['forecastday'] if key_setup?
-      return data
+      Wunderground.new(options['api_key']).forecast_for(options['location'])['forecast']['simpleforecast']['forecastday'] if key_setup?
     end
 
     def forecastio
-      ForecastIO.api_key = options['api_key'] if key_setup?
-      data = ForecastIO.forecast(options['location'].split(',')[0], options['location'].split(',')[1])['daily']['data']
-      return data
+      if key_setup?
+        ForecastIO.api_key = options['api_key']
+        lat, lng = options['location'].split(',')
+        ForecastIO.forecast(lat,lng)['daily']['data']
+      end
     end
 
-    def model(data,service,which_day)
-      day = Hash.new
+    def model(service,which_day)
       if service == "wunderground"
-        day =  data[which_day]
+        wunderground[which_day]
       elsif service == "forecastio"
-        data.each do |value|
+        forecastio.each do |value|
           timestamp = Time.at(value.time)
           if (timestamp.to_date - Time.now.to_date).to_i == which_day
             day = {
@@ -158,20 +158,15 @@ module Agents
               'pressure' => value.pressure.to_s,
               'ozone' => value.ozone.to_s
             }
-              end
-            end
+            return day
+          end    
+        end
       end
-      return day.merge('location' => options['location'])
     end
 
     def check
       if key_setup?
-        if service == 'forecastio'
-          weather = model(forecastio, service, which_day)
-        elsif service == 'wunderground'
-          weather = model(wunderground, service, which_day)
-        end
-        create_event :payload => weather
+        create_event :payload => model(service, which_day).merge('location' => options['location'])
       end
     end
 
