@@ -26,9 +26,9 @@ Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, 
 
 Want to help with Huginn?  Try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
 
-### Do you need help?
+### Need help?
 
-You can get support for Huginn setup, deployment or any other issue at [CodersClan](http://www.codersclan.net/?repo_id=329)!
+You can get hands-on support for Huginn setup, deployment and other issues at  [CodersClan](http://www.codersclan.net/?repo_id=329).
 
 <a href="http://codersclan.net/?repo_id=329&source=big"><img src="http://www.codersclan.net/gs_button/?repo_id=329" width="200"></a>
 
