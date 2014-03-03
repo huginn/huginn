@@ -49,7 +49,7 @@ module Agents
         register_growl
         message = (event.payload['message'] || event.payload['text']).to_s
         subject = event.payload['subject'].to_s
-        if message != "" && subject != ""
+        if message.present? && subject.present?
           log "Sending Growl notification '#{subject}': '#{message}' to #{options['growlserver']} with event #{event.id}"
           notify_growl(subject,message)
         else
