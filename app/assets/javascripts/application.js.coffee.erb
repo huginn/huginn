@@ -27,10 +27,12 @@ showSchedule = ->
 
 hideLinks = ->
   $(".link-region .select2-container").hide()
+  $(".link-region .propagate-immediately").hide()
   $(".link-region .cannot-receive-events").show()
 
 showLinks = ->
   $(".link-region .select2-container").show()
+  $(".link-region .propagate-immediately").show()
   $(".link-region .cannot-receive-events").hide()
   showEventDescriptions()
 
