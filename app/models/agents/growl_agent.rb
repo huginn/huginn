@@ -2,6 +2,7 @@ require 'ruby-growl'
 
 module Agents
   class GrowlAgent < Agent
+    attr_reader :growler
 
     cannot_be_scheduled!
     cannot_create_events!
@@ -45,8 +46,8 @@ module Agents
     end
 
     def receive(incoming_events)
+      register_growl
       incoming_events.each do |event|
-        register_growl
         message = (event.payload['message'] || event.payload['text']).to_s
         subject = event.payload['subject'].to_s
         if message.present? && subject.present?
