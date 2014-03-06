@@ -10,6 +10,7 @@ gem "rufus-scheduler", :require => false
 gem 'json', '>= 1.7.7'
 gem 'jsonpath'
 gem 'twilio-ruby'
+gem 'ruby-growl'
 
 gem 'delayed_job'
 gem 'delayed_job_active_record'#, "~> 0.3.3" # newer was giving a strange MySQL error
