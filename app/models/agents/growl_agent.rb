@@ -17,10 +17,10 @@ module Agents
 
     def default_options
       {
-          'growlserver' => 'localhost',
-          'growlpassword' => '',
-          'growlappname' => 'HuginnGrowl',
-          'growlnotificationname' => 'Notification',
+          'growl_server' => 'localhost',
+          'growl_password' => '',
+          'growl_app_name' => 'HuginnGrowl',
+          'growl_notification_name' => 'Notification',
           'expected_receive_period_in_days' => "2"
       }
     end
@@ -30,19 +30,19 @@ module Agents
     end
 
     def validate_options
-      unless options['growlserver'].present? && options['expected_receive_period_in_days'].present?
-        errors.add(:base, "growlserver and expected_receive_period_in_days are required fields")
+      unless options['growl_server'].present? && options['expected_receive_period_in_days'].present?
+        errors.add(:base, "growl_server and expected_receive_period_in_days are required fields")
       end
     end
     
     def register_growl
-      @growler = Growl.new options['growlserver'], options['growlappname'], "GNTP"
-      @growler.password = options['growlpassword']
-      @growler.add_notification options['growlnotificationname']
+      @growler = Growl.new options['growl_server'], options['growl_app_name'], "GNTP"
+      @growler.password = options['growl_password']
+      @growler.add_notification options['growl_notification_name']
     end
     
     def notify_growl(subject, message)
-      @growler.notify(options['growlnotificationname'],subject,message)
+      @growler.notify(options['growl_notification_name'],subject,message)
     end
 
     def receive(incoming_events)
@@ -51,7 +51,7 @@ module Agents
         message = (event.payload['message'] || event.payload['text']).to_s
         subject = event.payload['subject'].to_s
         if message.present? && subject.present?
-          log "Sending Growl notification '#{subject}': '#{message}' to #{options['growlserver']} with event #{event.id}"
+          log "Sending Growl notification '#{subject}': '#{message}' to #{options['growl_server']} with event #{event.id}"
           notify_growl(subject,message)
         else
           log "Event #{event.id} not sent, message and subject expected"

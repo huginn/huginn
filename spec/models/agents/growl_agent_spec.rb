@@ -3,10 +3,10 @@ require 'spec_helper'
 describe Agents::GrowlAgent do
   before do
     @checker = Agents::GrowlAgent.new(:name => 'a growl agent',
-                                      :options => { :growlserver => 'localhost',
-                                                    :growlappname => 'HuginnGrowlApp',
-                                                    :growlpassword => 'mypassword',
-                                                    :growlnotificationname => 'Notification',
+                                      :options => { :growl_server => 'localhost',
+                                                    :growl_app_name => 'HuginnGrowlApp',
+                                                    :growl_password => 'mypassword',
+                                                    :growl_notification_name => 'Notification',
                                                     :expected_receive_period_in_days => '1' })
     @checker.user = users(:bob)
     @checker.save!
@@ -35,8 +35,8 @@ describe Agents::GrowlAgent do
       @checker.should be_valid
     end
 
-    it "should validate presence of of growlserver" do
-      @checker.options[:growlserver] = ""
+    it "should validate presence of of growl_server" do
+      @checker.options[:growl_server] = ""
       @checker.should_not be_valid
     end
 
@@ -49,15 +49,18 @@ describe Agents::GrowlAgent do
   describe "register_growl" do
     it "should set the password for the Growl connection from the agent options" do
       @checker.register_growl
-      @checker.growler.password.should eql(@checker.options[:growlpassword])
+      @checker.growler.password.should eql(@checker.options[:growl_password])
     end
 
     it "should add a notification to the Growl connection" do
+      called = false
       any_instance_of(Growl) do |obj|
-        mock(obj).add_notification(@checker.options[:growlnotificationname])
+        called = true
+        mock(obj).add_notification(@checker.options[:growl_notification_name])
       end
       
       @checker.register_growl
+      called.should be_true
     end
   end
   
@@ -69,10 +72,13 @@ describe Agents::GrowlAgent do
     it "should call Growl.notify with the correct notification name, subject, and message" do
       message = "message"
       subject = "subject"
+      called = false
       any_instance_of(Growl) do |obj|
-        mock(obj).notify(@checker.options[:growlnotificationname],subject,message)
+        called = true
+        mock(obj).notify(@checker.options[:growl_notification_name],subject,message)
       end
       @checker.notify_growl(subject,message)
+      called.should be_true
     end
   end
   
@@ -93,7 +99,7 @@ describe Agents::GrowlAgent do
     it "should call notify_growl one time for each event received" do
       events = generate_events_array
       events.each do |event|
-        mock.proxy(@checker).notify_growl(event.payload['subject'],event.payload['message'])
+        mock.proxy(@checker).notify_growl(event.payload['subject'], event.payload['message'])
       end
       @checker.receive(events)
     end
