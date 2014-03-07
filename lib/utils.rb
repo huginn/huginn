@@ -52,7 +52,7 @@ module Utils
       escape = false
     end
 
-    result = JsonPath.new(path, :allow_eval => false).on(data.is_a?(String) ? data : data.to_json)
+    result = JsonPath.new(path, :allow_eval => ENV['ALLOW_EVAL'] == "true" || false).on(data.is_a?(String) ? data : data.to_json)
     if escape
       result.map {|r| CGI::escape r }
     else
