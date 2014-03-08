@@ -58,7 +58,7 @@ class HuginnScheduler
 
     # Schedule event cleanup.
 
-    rufus_scheduler.cron "0 0 * * * America/Los_Angeles" do
+    rufus_scheduler.cron "59 23 * * * America/Los_Angeles" do
       cleanup_expired_events!
     end
 
@@ -74,15 +74,29 @@ class HuginnScheduler
 
     # Times are assumed to be in PST for now.  Can store a user#timezone later.
     24.times do |hour|
-      rufus_scheduler.cron "0 #{hour} * * * America/Los_Angeles" do
-        if hour == 0
-          run_schedule "midnight"
-        elsif hour < 12
-          run_schedule "#{hour}am"
-        elsif hour == 12
-          run_schedule "noon"
-        else
-          run_schedule "#{hour - 12}pm"
+      begin
+        rufus_scheduler.cron "0 #{hour} * * * America/Los_Angeles" do
+          if hour == 0
+            run_schedule "midnight"
+          elsif hour < 12
+            run_schedule "#{hour}am"
+          elsif hour == 12
+            run_schedule "noon"
+          else
+            run_schedule "#{hour - 12}pm"
+          end
+        end
+      rescue ::TZInfo::PeriodNotFound
+        rufus_scheduler.cron "0 #{hour+1} * * * America/Los_Angeles" do
+          if hour == 0
+            run_schedule "midnight"
+          elsif hour < 12
+            run_schedule "#{hour}am"
+          elsif hour == 12
+            run_schedule "noon"
+          else
+            run_schedule "#{hour - 12}pm"
+          end
         end
       end
     end
