@@ -17,28 +17,28 @@ module Agents
       Assuming you're using the iOS application, events look like this:
 
           {
-            :latitude => "37.12345",
-            :longitude => "-122.12345",
-            :timestamp => "123456789.0",
-            :altitude => "22.0",
-            :horizontal_accuracy => "5.0",
-            :vertical_accuracy => "3.0",
-            :speed => "0.52595",
-            :course => "72.0703",
-            :device_token => "..."
+            "latitude": "37.12345",
+            "longitude": "-122.12345",
+            "timestamp": "123456789.0",
+            "altitude": "22.0",
+            "horizontal_accuracy": "5.0",
+            "vertical_accuracy": "3.0",
+            "speed": "0.52595",
+            "course": "72.0703",
+            "device_token": "..."
           }
     MD
 
     def working?
-      (event = event_created_within(2.days)) && event.payload.present?
+      event_created_within?(2) && !recent_error_logs?
     end
 
     def default_options
-      { :secret => SecureRandom.hex(7) }
+      { 'secret' => SecureRandom.hex(7) }
     end
 
     def validate_options
-      errors.add(:base, "secret is required and must be longer than 4 characters") unless options[:secret].present? && options[:secret].length > 4
+      errors.add(:base, "secret is required and must be longer than 4 characters") unless options['secret'].present? && options['secret'].length > 4
     end
   end
 end

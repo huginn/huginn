@@ -3,7 +3,7 @@
 <% end %>
 
 <% if @agent.memory[:data] && @agent.memory[:data].length > 0 %>
-  <h3>Recent Tweet Trends</h3>
+  <h3>Recent Trends</h3>
   <% @agent.memory[:data].each.with_index do |(group_name, data), index| %>
     <div class="filter-group counts">
       <div class='filter'><%= link_to group_name.to_s, "https://twitter.com/search?q=#{CGI::escape group_name.to_s}", :target => "blank" %></div>
@@ -17,9 +17,9 @@
       <script>
         $(function() {
           var $chart = $(".chart-container.group-<%= index.to_s %>").last();
-          var data = <%= data.map {|count, time| { :x => time.to_i, :y => count.to_i } }.to_json.html_safe %>;
-          var peaks = <%= ((@agent.memory[:peaks] && @agent.memory[:peaks][group_name]) || []).to_json.html_safe %>;
-          var name = <%= group_name.to_json.html_safe %>;
+          var data = <%= Utils.jsonify(data.map {|count, time| { :x => time.to_i, :y => count.to_i } }) %>;
+          var peaks = <%= Utils.jsonify((@agent.memory[:peaks] && @agent.memory[:peaks][group_name]) || []) %>;
+          var name = <%= Utils.jsonify(group_name) %>;
 
           renderGraph($chart, data, peaks, name);
         });

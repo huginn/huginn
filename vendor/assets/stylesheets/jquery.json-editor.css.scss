@@ -52,8 +52,12 @@
     display: block;
     float: right;
     text-decoration: none;
-    padding-left: 5px;
+    padding: 0 5px;
     border: 0 !important;
     color: blue;
+
+    &:hover {
+      background-color: #bbb;
+    }
   }
 }

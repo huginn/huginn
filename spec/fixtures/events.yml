@@ -1,9 +1,9 @@
 bob_website_agent_event:
   user: bob
   agent: bob_website_agent
-  payload: <%= [{ :title => "foo", :url => "http://foo.com" }].to_yaml.inspect %>
+  payload: <%= { :title => "foo", :url => "http://foo.com" }.to_json.inspect %>
 
 jane_website_agent_event:
   user: jane
   agent: jane_website_agent
-  payload: <%= [{ :title => "foo", :url => "http://foo.com" }].to_yaml.inspect %>
+  payload: <%= { :title => "foo", :url => "http://foo.com" }.to_json.inspect %>

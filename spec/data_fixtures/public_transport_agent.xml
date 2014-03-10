@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<body copyright="All data copyright San Francisco Muni 2014.">
+<predictions agencyTitle="San Francisco Muni" routeTitle="N-Judah" routeTag="N" stopTitle="Judah St &amp; La Playa St" stopTag="5221">
+  <direction title="Outbound to Ocean Beach">
+  <prediction epochTime="1389707083293" seconds="1668" minutes="27" isDeparture="false" affectedByLayover="true" dirTag="N__OB3" vehicle="1443" block="9705" tripTag="5840326"/>
+  <prediction epochTime="1389708835605" seconds="3420" minutes="57" isDeparture="false" affectedByLayover="true" dirTag="N__OB3" vehicle="1518" block="9708" tripTag="5840327"/>
+  <prediction epochTime="1389709795605" seconds="4380" minutes="73" isDeparture="false" affectedByLayover="true" dirTag="N__OB3" vehicle="1404" block="9710" tripTag="5840328"/>
+  </direction>
+  <direction title="Outbound to Ocean Beach via Downtown">
+  <prediction epochTime="1389706393991" seconds="978" minutes="16" isDeparture="false" dirTag="N__OB4KJU" vehicle="1543" vehiclesInConsist="2" block="9703" tripTag="5840324"/>
+  <prediction epochTime="1389706512784" seconds="1097" minutes="18" isDeparture="false" dirTag="N__OB4KJU" vehicle="1476" vehiclesInConsist="2" block="9704" tripTag="5840083"/>
+  <prediction epochTime="1389707746994" seconds="2331" minutes="38" isDeparture="false" dirTag="N__OB4KJU" vehicle="1507" block="9706" tripTag="5840084"/>
+  <prediction epochTime="1389708458668" seconds="3043" minutes="50" isDeparture="false" affectedByLayover="true" dirTag="N__OB4KJU" vehicle="1489" block="9707" tripTag="5840085"/>
+  <prediction epochTime="1389709358668" seconds="3943" minutes="65" isDeparture="false" affectedByLayover="true" dirTag="N__OB4KJU" vehicle="1463" block="9709" tripTag="5840086"/>
+  </direction>
+<message text="No Elevator at
+Van Ness Station"/>
+</predictions>
+<predictions agencyTitle="San Francisco Muni" routeTitle="N-Judah" routeTag="N" stopTitle="Judah St &amp; 46th Ave" stopTag="5215">
+  <direction title="Outbound to Ocean Beach">
+  <prediction epochTime="1389706981164" seconds="1566" minutes="26" isDeparture="false" affectedByLayover="true" dirTag="N__OB3" vehicle="1443" block="9705" tripTag="5840326"/>
+  <prediction epochTime="1389708733476" seconds="3318" minutes="55" isDeparture="false" affectedByLayover="true" dirTag="N__OB3" vehicle="1518" block="9708" tripTag="5840327"/>
+  <prediction epochTime="1389709693476" seconds="4278" minutes="71" isDeparture="false" affectedByLayover="true" dirTag="N__OB3" vehicle="1404" block="9710" tripTag="5840328"/>
+  </direction>
+  <direction title="Outbound to Ocean Beach via Downtown">
+  <prediction epochTime="1389706282012" seconds="866" minutes="14" isDeparture="false" dirTag="N__OB4KJU" vehicle="1543" vehiclesInConsist="2" block="9703" tripTag="5840324"/>
+  <prediction epochTime="1389706400805" seconds="985" minutes="16" isDeparture="false" dirTag="N__OB4KJU" vehicle="1476" vehiclesInConsist="2" block="9704" tripTag="5840083"/>
+  <prediction epochTime="1389707635015" seconds="2219" minutes="36" isDeparture="false" dirTag="N__OB4KJU" vehicle="1507" block="9706" tripTag="5840084"/>
+  <prediction epochTime="1389708346689" seconds="2931" minutes="48" isDeparture="false" affectedByLayover="true" dirTag="N__OB4KJU" vehicle="1489" block="9707" tripTag="5840085"/>
+  <prediction epochTime="1389709246689" seconds="3831" minutes="63" isDeparture="false" affectedByLayover="true" dirTag="N__OB4KJU" vehicle="1463" block="9709" tripTag="5840086"/>
+  </direction>
+<message text="No Elevator at
+Van Ness Station"/>
+</predictions>
+</body>

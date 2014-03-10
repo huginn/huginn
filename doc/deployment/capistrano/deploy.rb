@@ -11,9 +11,11 @@ set :use_sudo, false
 set :scm, :git
 set :rails_env, 'production'
 set :repository, "git@github.com:you/huginn-private.git"
-set :branch, "master"
+set :branch, ENV['BRANCH'] || "master"
 set :deploy_via, :remote_cache
 set :keep_releases, 5
+
+puts "    Deploying #{branch}"
 
 set :bundle_without, [:development]
 
@@ -66,7 +68,7 @@ namespace :foreman do
 end
 
 # If you want to use rvm on your server and have it maintained by Capistrano, uncomment these lines:
-#   set :rvm_ruby_string, '1.9.3-p286@huginn'
+#   set :rvm_ruby_string, '2.0.0@huginn'
 #   set :rvm_type, :user
 #   before 'deploy', 'rvm:install_rvm'
 #   before 'deploy', 'rvm:install_ruby'

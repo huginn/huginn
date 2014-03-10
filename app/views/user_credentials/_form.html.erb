@@ -1,0 +1,40 @@
+<%= form_for(@user_credential, :method => @user_credential.new_record? ? "POST" : "PUT") do |f| %>
+  <% if @user_credential.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user_credential.errors.count, "error") %> prohibited this Credential from being saved:</h2>
+      <ul>
+      <% @user_credential.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="control-group">
+    <%= f.label :credential_name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :credential_name, :class => 'span4' %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :mode, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :mode, options_for_select(UserCredential::MODES.map {|s| [s.classify, s] }, @user_credential.mode), {}, :class => 'span4' %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :credential_value, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_area :credential_value, :class => 'span8', :rows => 10 %>
+      <div id="ace-credential-value"></div>
+    </div>
+  </div>
+
+  <div class='form-actions' style='clear: both'>
+    <%= f.submit "Save Credential", :class => "btn btn-primary" %>
+  </div>
+<% end %>
+
+<%= javascript_include_tag "user_credentials" %>

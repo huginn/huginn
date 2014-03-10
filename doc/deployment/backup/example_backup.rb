@@ -55,6 +55,6 @@ Backup::Model.new(:huginn_backup, 'The Huginn backup configuration') do
     mail.password             = 'password'
     mail.port                 =  587
     mail.authentication       = "plain"
-    mail.enable_starttls_auto = true
+    mail.encryption           = :starttls
   end
 end

@@ -8,9 +8,24 @@ class AgentsController < ApplicationController
     end
   end
 
+  def handle_details_post
+    @agent = current_user.agents.find(params[:id])
+    if @agent.respond_to?(:handle_details_post)
+      render :json => @agent.handle_details_post(params) || {}
+    else
+      @agent.error "#handle_details_post called on an instance of #{@agent.class} that does not define it."
+      head 500
+    end
+  end
+
   def run
-    Agent.async_check(current_user.agents.find(params[:id]).id)
-    redirect_to agents_path, notice: "Agent run queued"
+    agent = current_user.agents.find(params[:id])
+    Agent.async_check(agent.id)
+    if params[:return] == "show"
+      redirect_to agent_path(agent), notice: "Agent run queued"
+    else
+      redirect_to agents_path, notice: "Agent run queued"
+    end
   end
 
   def type_details
@@ -18,6 +33,7 @@ class AgentsController < ApplicationController
     render :json => {
         :can_be_scheduled => agent.can_be_scheduled?,
         :can_receive_events => agent.can_receive_events?,
+        :can_create_events => agent.can_create_events?,
         :options => agent.default_options,
         :description_html => agent.html_description
     }

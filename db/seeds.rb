@@ -13,7 +13,7 @@ unless user.agents.where(:name => "SF Weather Agent").exists?
   Agent.build_for_type("Agents::WeatherAgent", user,
                        :name => "SF Weather Agent",
                        :schedule => "10pm",
-                       :options => { :zipcode => "94103", :api_key => "your-key" }).save!
+                       :options => { :location => "94103", :api_key => "your-key" }).save!
 end
 
 unless user.agents.where(:name => "XKCD Source").exists?
@@ -23,7 +23,7 @@ unless user.agents.where(:name => "XKCD Source").exists?
                        :type => "html",
                        :options => {
                            :url => "http://xkcd.com",
-                           :mode => :on_change,
+                           :mode => "on_change",
                            :expected_update_period_in_days => 5,
                            :extract => {
                                :url => {:css => "#comic img", :attr => "src"},
@@ -37,7 +37,7 @@ unless user.agents.where(:name => "iTunes Trailer Source").exists?
                        :schedule => "every_1d",
                        :options => {
                            :url => "http://trailers.apple.com/trailers/home/rss/newtrailers.rss",
-                           :mode => :on_change,
+                           :mode => "on_change",
                            :type => "xml",
                            :expected_update_period_in_days => 5,
                            :extract => {
@@ -58,7 +58,7 @@ unless user.agents.where(:name => "Rain Notifier").exists?
                                           :value => "rain|storm",
                                           :path => "conditions"
                                       }],
-                           :message => "Just so you know, it looks like '<conditions>' tomorrow in <zipcode>"
+                           :message => "Just so you know, it looks like '<conditions>' tomorrow in <location>"
                        }).save!
 end
 

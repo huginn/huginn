@@ -1,3 +1,6 @@
+# Contacts are used only for the contact form on the Huginn website.  If you host a public Huginn instance, you can use
+# these to receive messages from visitors.
+
 class Contact < ActiveRecord::Base
   attr_accessible :email, :message, :name
 

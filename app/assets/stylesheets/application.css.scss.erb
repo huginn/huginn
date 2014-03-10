@@ -46,13 +46,9 @@ table.events {
   }
 }
 
-.multi-select {
+.select2 {
   float: none !important;
   margin-left: 0 !important;
-}
-
-#job-indicator {
-  display: none;
 }
 
 img.odin {
@@ -65,13 +61,8 @@ img.odin {
   display: none;
 }
 
-.type-select {
-  width: 275px;
-
-  img.spinner {
-    display: none;
-    float: right;
-  }
+img.spinner {
+  display: none;
 }
 
 .hidden {
@@ -89,4 +80,57 @@ img.odin {
 
 .show-view {
   overflow: hidden;
+}
+
+span.not-applicable:after {
+  color: #bbbbbb;
+  content: "n/a";
+}
+
+// Navbar
+
+#job-indicator, #event-indicator {
+  display: none;
+}
+
+.navbar-search > .spinner {
+  position: absolute;
+  top: -1px;
+  right: 1px;
+}
+
+// Flash
+
+.flash {
+  position: fixed;
+  width: 210px;
+  z-index: 99999;
+  right: 20px;
+
+  .alert {
+  }
+}
+
+// Logs
+
+#logs .action-icon {
+  height: 16px;
+  display: inline-block;
+  vertical-align: inherit;
+
+  &.refresh {
+    margin: 0 10px;
+  }
+}
+
+#show-tabs li a.recent-errors {
+  font-weight: bold;
+}
+
+// Credentials
+
+#ace-credential-value {
+  position: relative;
+  width: 940px;
+  height: 400px;
 }

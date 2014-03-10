@@ -2,9 +2,10 @@
   <div class='row'>
     <div class="span5 offset2">
       <h1>Your agents are standing by</h1>
-      <p>Know the world around you</p>
+      <p>Huginn monitors the world and acts on your behalf.</p>
 
-      <%= link_to "Signup", new_user_registration_path, :class => "btn btn-primary btn-large center" %>
+      <%= link_to "Login", new_user_session_path, :class => "btn btn-large" %>
+      <%= link_to "Signup", new_user_registration_path, :class => "btn btn-primary btn-large" %>
     </div>
     <div class="span3">
       <%= image_tag 'odin.jpg', :class => 'img-rounded', :title => "Wägner, Wilhelm. 1882. Nordisch-germanische Götter und Helden. Otto Spamer, Leipzig & Berlin. Page 7." %>

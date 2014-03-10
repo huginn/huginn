@@ -53,7 +53,7 @@ describe Agents::SentimentAgent do
         it "checks if content key is working fine" do
             @checker.receive([@event])
             Event.last.payload[:content].should == "value1"
-            Event.last.payload[:original_event].should == {:message => "value1"}
+            Event.last.payload[:original_event].should == { 'message' => "value1" }
         end
         it "should handle multiple events" do
             event1 = Event.new

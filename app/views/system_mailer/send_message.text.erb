@@ -1,5 +1,7 @@
 <% if @headline %><%= @headline %>
 
-<% end %><% @lines.each do |line| %><%= line %>
+<% end %><% @groups.each do |group| %><%= group[:title] %>
+<% group[:entries].each do |entry| %>  <%= entry %>
+<% end %>
 
 <% end %>

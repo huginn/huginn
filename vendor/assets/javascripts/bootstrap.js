@@ -2023,3 +2023,15 @@
 
 
 }(window.jQuery);
+
+
+// This code taken from:
+//  twbs/bootstrap#5067 (comment)
+//
+// It fixes a problem that may be present on certain Android (and other) browsers whereby pop-up menus like Huginn's Account one on the menu bar do not
+// open on touch.
+//
+// The problem and fix is also summarised in this blog post.
+//   http://alittlecode.com/fix-twitter-bootstraps-dropdown-menus-in-touch-screens/
+
+$('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });

@@ -13,9 +13,18 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Track the weather and get an email when it's going to rain (or snow) tomorrow
 * Follow your project names on Twitter and get updates when people mention them
 * Scrape websites and receive emails when they change
+* Compose digest emails about things you care about to be sent at specific times of the day
+* Track counts of high frequency events and SMS on changes, such as the term "san francisco emergency"
+* Watch public transit
+* Run arbitrary JavaScript Agents on the server
 * Track your location over time
+* Create Amazon Mechanical Turk tasks as the input, or output, of events
 
-Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in \#huginn on Freenode IRC to discuss the project.
+Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in [our IRC channel](https://kiwiirc.com/client/irc.freenode.net/?nick=huginn-user|?#huginn) (\#huginn on Freenode) to discuss the project.
+
+### We need your help!
+
+Want to help with Huginn?  Try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
 
 ## Examples
 
@@ -44,6 +53,8 @@ If you just want to play around, you can simply clone this repository, then perf
 * Run `foreman start`, visit [http://localhost:3000/][localhost], and login with the username of `admin` and the password of `password`.
 * Setup some Agents!
 
+Note: by default, emails are not sent in the `development` Rails environment, which is what you just setup.  If you'd like to enable emails when playing with Huginn locally, edit `config.action_mailer.perform_deliveries` in `config/environments/development.rb`.
+
 If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
 
 [localhost]: http://localhost:3000/
@@ -53,7 +64,7 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 
 Follow these instructions if you wish to deploy your own version of Huginn or contribute back to the project.  GitHub doesn't make it easy to work with private forks of public repositories, so I recommend that you follow the following steps:
 
-* Make a public fork of Huginn
+* Make a public fork of Huginn. If you can't create private Github repositories, you can skip the steps below. Just follow the *Quick Start* steps above and make pull requests when you want to contribute a patch. 
 * Make a private, empty GitHub repository called `huginn-private`
 * Duplicate your public fork into your new private repository (via [GitHub's instructions](https://help.github.com/articles/duplicating-a-repository)):
 
@@ -84,7 +95,7 @@ In order to use the WeatherAgent you need an [API key with Wunderground](http://
 
 You can use [Post Location](https://github.com/cantino/post_location) on your iPhone to post your location to an instance of the UserLocationAgent.  Make a new one to see instructions.
 
-#### Enable DelayedJobWeb for handy delayed_job monitoring and control
+#### Enable DelayedJobWeb for handy delayed\_job monitoring and control
 
 * Edit `config.ru`, uncomment the DelayedJobWeb section, and change the DelayedJobWeb username and password.
 * Uncomment `match "/delayed_job" => DelayedJobWeb, :anchor => false` in `config/routes.rb`.
@@ -98,10 +109,15 @@ We assume your deployment will run over SSL. This is a very good idea! However, 
 
 Huginn is provided under the MIT License.
 
+## Community
+Huginn has its own IRC channel on freenode: #huginn.
+Some of us are hanging out there, come and say hello.
+
 ## Contribution
 
 Huginn is a work in progress and is hopefully just getting started.  Please get involved!  You can [add new Agents](https://github.com/cantino/huginn/wiki/Creating-a-new-agent), expand the [Wiki](https://github.com/cantino/huginn/wiki), or help us simplify and strengthen the Agent API or core application.
 
 Please fork, add specs, and send pull requests!
 
-[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Code Climate](https://codeclimate.com/github/cantino/huginn.png)](https://codeclimate.com/github/cantino/huginn)
+[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.png)](https://coveralls.io/r/cantino/huginn) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+

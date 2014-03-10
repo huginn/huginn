@@ -43,10 +43,12 @@ Huginn::Application.configure do
   # config.cache_store = :mem_cache_store
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
-  # config.action_controller.asset_host = "http://assets.example.com"
+  if ENV['ASSET_HOST'].present?
+    config.action_controller.asset_host = ENV['ASSET_HOST']
+  end
 
   # Precompile additional assets (application.js.coffee.erb, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w( graphing.js )
+  config.assets.precompile += %w( graphing.js user_credentials.js )
 
   # Enable threaded mode
   # config.threadsafe!
@@ -64,16 +66,11 @@ Huginn::Application.configure do
 
   config.action_mailer.default_url_options = { :host => ENV['DOMAIN'] }
   config.action_mailer.asset_host = ENV['DOMAIN']
+  if ENV['ASSET_HOST']
+    config.action_mailer.asset_host = ENV['ASSET_HOST']
+  end
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-      address: ENV['SMTP_SERVER'] || 'smtp.gmail.com',
-      port: ENV['SMTP_PORT'] || 587,
-      domain: ENV['SMTP_DOMAIN'],
-      authentication: ENV['SMTP_AUTHENTICATION'] || 'plain',
-      enable_starttls_auto: ENV['SMTP_ENABLE_STARTTLS_AUTO'] == 'true' ? true : false,
-      user_name: ENV['SMTP_USER_NAME'],
-      password: ENV['SMTP_PASSWORD']
-  }
+  # smtp_settings moved to config/initializers/action_mailer.rb
 end

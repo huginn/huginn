@@ -8,17 +8,14 @@
 #= require ./worker-checker
 #= require_self
 
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
-
-setupJsonEditor = ->
+window.setupJsonEditor = ($editor = $(".live-json-editor")) ->
   JSONEditor.prototype.ADD_IMG = '<%= image_path 'json-editor/add.png' %>'
   JSONEditor.prototype.DELETE_IMG = '<%= image_path 'json-editor/delete.png' %>'
-  if $(".live-json-editor").length
-    window.jsonEditor = new JSONEditor($(".live-json-editor"), 400, 500)
-    window.jsonEditor.doTruncation true
-    window.jsonEditor.showFunctionButtons()
+  if $editor.length
+    jsonEditor = new JSONEditor($editor, $editor.data('width') || 400, $editor.data('height') || 500)
+    jsonEditor.doTruncation true
+    jsonEditor.showFunctionButtons()
+    return jsonEditor
 
 hideSchedule = ->
   $(".schedule-region select").hide()
@@ -30,12 +27,20 @@ showSchedule = ->
 
 hideLinks = ->
   $(".link-region .select2-container").hide()
+  $(".link-region .propagate-immediately").hide()
   $(".link-region .cannot-receive-events").show()
 
 showLinks = ->
   $(".link-region .select2-container").show()
+  $(".link-region .propagate-immediately").show()
   $(".link-region .cannot-receive-events").hide()
   showEventDescriptions()
+
+hideEventCreation = ->
+  $(".event-related-region").hide()
+
+showEventCreation = ->
+  $(".event-related-region").show()
 
 showEventDescriptions = ->
   if $("#agent_source_ids").val()
@@ -48,18 +53,81 @@ showEventDescriptions = ->
     $(".event-descriptions").html("").hide()
 
 $(document).ready ->
-  setupJsonEditor()
-  $(".multi-select").select2(width: 'resolve')
+  # JSON Editor
+  window.jsonEditor = setupJsonEditor()
 
-  if $(".top-flash").length
-    setTimeout((-> $(".top-flash").slideUp(-> $(".top-flash").remove())), 5000)
+  # Select2 Selects
+  $(".select2").select2(width: 'resolve')
 
+  # Flash
+  if $(".flash").length
+    setTimeout((-> $(".flash").slideUp(-> $(".flash").remove())), 5000)
+
+  # Agent Navigation
+  $agentNavigate = $('#agent-navigate')
+  $agentNavigate.typeahead(
+    minLength: 0,
+    items: 15,
+    source: agentNames
+  ).on("change", (e) ->
+    if agentPaths[$agentNavigate.val()]
+      $('#agent-navigate').closest(".navbar-search").find(".spinner").show()
+      navigationData = agentPaths[$agentNavigate.val()]
+      if !(navigationData instanceof Object) || !navigationData.method || navigationData.method == 'GET'
+        window.location = navigationData.url || navigationData
+      else
+        $("<a href='#{navigationData.url}' data-method='#{navigationData.method}'></a>").appendTo($("body")).click()
+
+  ).on("focus", (e) ->
+    $agentNavigate.val ''
+  ).on("blur", (e) ->
+    $agentNavigate.val ''
+  )
+
+  # Pressing '/' selects the search box.
+  $("body").on "keypress", (e) ->
+    if e.keyCode == 47 # The '/' key
+      if e.target.nodeName == "BODY"
+        e.preventDefault()
+        $agentNavigate.focus()
+
+# Agent Show
+  fetchLogs = (e) ->
+    agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
+    e.preventDefault()
+    $("#logs .spinner").show()
+    $("#logs .refresh, #logs .clear").hide()
+    $.get "/agents/#{agentId}/logs", (html) =>
+      $("#logs .logs").html html
+      $("#logs .spinner").stop(true, true).fadeOut ->
+        $("#logs .refresh, #logs .clear").show()
+
+  clearLogs = (e) ->
+    if confirm("Are you sure you want to clear all logs for this Agent?")
+      agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
+      e.preventDefault()
+      $("#logs .spinner").show()
+      $("#logs .refresh, #logs .clear").hide()
+      $.post "/agents/#{agentId}/logs/clear", { "_method": "DELETE" }, (html) =>
+        $("#logs .logs").html html
+        $("#show-tabs li a.recent-errors").removeClass 'recent-errors'
+        $("#logs .spinner").stop(true, true).fadeOut ->
+          $("#logs .refresh, #logs .clear").show()
+
+  $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", fetchLogs
+  $(".agent-show #logs .clear").on "click", clearLogs
+
+  if tab = window.location.href.match(/tab=(\w+)\b/i)?[1]
+    if tab in ["details", "logs"]
+      $(".agent-show .nav-tabs li a[href='##{tab}']").click()
+
+  # Editing Agents
   $("#agent_source_ids").on "change", showEventDescriptions
 
   $("#agent_type").on "change", ->
     if window.jsonEditor?
-      $(@).closest(".control-group").find(".spinner").fadeIn();
-      $("#agent_source_ids ").select2("val", {});
+      $("#agent-spinner").fadeIn();
+      $("#agent_source_ids").select2("val", {});
       $(".event-descriptions").html("").hide()
       $.getJSON "/agents/type_details", { type: $(@).val() }, (json) =>
         if json.can_be_scheduled
@@ -72,12 +140,18 @@ $(document).ready ->
         else
           hideLinks()
 
+        if json.can_create_events
+          showEventCreation()
+        else
+          hideEventCreation()
+
         $(".description").html(json.description_html) if json.description_html?
 
-        window.jsonEditor.json = json.options
-        window.jsonEditor.rebuild()
+        if $("#agent_options").hasClass("showing-default") || $("#agent_options").val().match(/\A\s*(\{\s*\}|)\s*\Z/g)
+          window.jsonEditor.json = json.options
+          window.jsonEditor.rebuild()
 
-        $(@).closest(".control-group").find(".spinner").stop(true, true).fadeOut();
+        $("#agent-spinner").stop(true, true).fadeOut();
 
   $("#agent_type").change() if $("#agent_type").length
 
@@ -92,3 +166,9 @@ $(document).ready ->
       showLinks()
     else
       hideLinks()
+
+  if $(".event-related-region")
+    if $(".event-related-region").data("can-create-events") == true
+      showEventCreation()
+    else
+      hideEventCreation()
