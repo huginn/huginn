@@ -27,7 +27,7 @@ module Agents
     default_schedule "every_2m"
 
     def working?
-      event_created_within?(2)
+      event_created_within?(2) && !recent_error_logs?
     end
 
     def default_options
@@ -35,11 +35,9 @@ module Agents
     end
 
     def timestamp
-      Time.now.getutc.to_i
-    end
-
-    def validate_options
-
+      {
+       "date" => Time.now.getutc.to_i
+      }
     end
 
     def bitstamp
@@ -56,8 +54,7 @@ module Agents
     end
 
     def check
-      
-      create_event :payload => { 'date' => timestamp }.merge(bitstamp)
+      create_event :payload => timestamp.merge(bitstamp)
     end
   end
 end
