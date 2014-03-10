@@ -39,6 +39,8 @@ gem 'twitter-stream', :git => 'https://github.com/cantino/twitter-stream', :bran
 gem 'em-http-request'
 gem 'weibo_2'
 
+gem 'bitstamp'
+
 gem 'therubyracer'
 
 platforms :ruby_18 do
