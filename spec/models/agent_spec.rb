@@ -502,7 +502,7 @@ describe Agent do
             @agent.keep_events_for = 3
             @agent.save!
           }.should change { @event.reload.expires_at }
-          @event.expires_at.to_i.should be_within(2).of(1.days.from_now.to_i)
+          @event.expires_at.to_i.should be_within(60 * 61).of(1.days.from_now.to_i) # The larger time is to deal with daylight savings
         end
 
         it "nulls out expires_at when keep_events_for is set to 0" do
