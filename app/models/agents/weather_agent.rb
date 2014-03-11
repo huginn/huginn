@@ -73,22 +73,26 @@ module Agents
       (options["which_day"].presence || 1).to_i
     end
 
+    def location
+      options["location"].presence || options["zipcode"]
+    end
+
     def validate_options
       errors.add(:base, "service is required") unless service.present?
       errors.add(:base, "service must be set to 'forecastio' or 'wunderground'") unless ["forecastio", "wunderground"].include?(service)
-      errors.add(:base, "location is required") unless options['location'].present?
+      errors.add(:base, "location is required") unless location.present?
       errors.add(:base, "api_key is required") unless key_setup?
       errors.add(:base, "which_day selection is required") unless which_day.present?
     end
 
     def wunderground
-      Wunderground.new(options['api_key']).forecast_for(options['location'])['forecast']['simpleforecast']['forecastday'] if key_setup?
+      Wunderground.new(options['api_key']).forecast_for(location)['forecast']['simpleforecast']['forecastday'] if key_setup?
     end
 
     def forecastio
       if key_setup?
         ForecastIO.api_key = options['api_key']
-        lat, lng = options['location'].split(',')
+        lat, lng = location.split(',')
         ForecastIO.forecast(lat,lng)['daily']['data']
       end
     end
@@ -166,7 +170,7 @@ module Agents
 
     def check
       if key_setup?
-        create_event :payload => model(service, which_day).merge('location' => options['location'])
+        create_event :payload => model(service, which_day).merge('location' => location)
       end
     end
 
