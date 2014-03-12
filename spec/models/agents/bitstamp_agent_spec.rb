@@ -26,5 +26,4 @@ describe Agents::BitstampAgent do
       @checker.should_not be_working
     end
   end
-
 end
