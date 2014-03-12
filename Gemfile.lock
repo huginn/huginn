@@ -48,6 +48,11 @@ GEM
       erubis (>= 2.6.6)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
+    bitstamp (0.3.0)
+      activemodel (>= 3.1)
+      activesupport (>= 3.1)
+      curb (> 0.8.1)
+      ruby-hmac (= 0.4.0)
     bootstrap-kaminari-views (0.0.2)
       kaminari (>= 0.13)
       rails (>= 3.1)
@@ -70,6 +75,7 @@ GEM
       thor
     crack (0.4.1)
       safe_yaml (~> 0.9.0)
+    curb (0.8.5)
     daemons (1.1.9)
     debug_inspector (0.0.2)
     delayed_job (4.0.0)
@@ -221,6 +227,7 @@ GEM
       rest-client
     ruby-growl (4.1)
       uuid (~> 2.3, >= 2.3.5)
+    ruby-hmac (0.4.0)
     rufus-scheduler (3.0.2)
       tzinfo
     safe_yaml (0.9.5)
@@ -306,6 +313,7 @@ DEPENDENCIES
   ace-rails-ap
   better_errors
   binding_of_caller
+  bitstamp
   bootstrap-kaminari-views
   coffee-rails (~> 3.2.1)
   coveralls
