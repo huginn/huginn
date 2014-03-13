@@ -21,6 +21,7 @@ test:
   socket: <%= ENV['DATABASE_SOCKET'] || ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>
   encoding: <%= ENV['DATABASE_ENCODING'] || "utf8" %>
   reconnect: <%= ENV['DATABASE_RECONNECT'] || "true" %>
+  port: <%= ENV['DATABASE_PORT'] || "" %>
   pool: <%= ENV['DATABASE_POOL'] || "5" %>
 
 production:

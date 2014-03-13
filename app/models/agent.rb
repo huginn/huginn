@@ -128,8 +128,7 @@ class Agent < ActiveRecord::Base
     if keep_events_for == 0
       events.update_all :expires_at => nil
     else
-      #events.update_all "expires_at = DATE_ADD(`created_at`, INTERVAL #{keep_events_for.to_i} DAY)"
-      events.update_all "expires_at = " + rdbms_date_add("created_at","DAY",keep_events_for.to_i) 
+      events.update_all "expires_at = " + rdbms_date_add("created_at", "DAY", keep_events_for.to_i) 
     end
   end
 

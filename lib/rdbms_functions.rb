@@ -2,7 +2,7 @@ module RDBMSFunctions
   def rdbms_date_add(source, unit, amount)
     adapter_type = connection.adapter_name.downcase.to_sym
     case adapter_type
-      when :mysql
+      when :mysql, :mysql2
         "DATE_ADD(`#{source}`, INTERVAL #{amount} #{unit})"
       when :postgresql    
         "(#{source} + INTERVAL '#{amount} #{unit}')"
