@@ -21,3 +21,5 @@ deployment/tmp
 deployment/cookbooks
 .vagrant
 .*un~
+.ruby-gemset
+.ruby-version
