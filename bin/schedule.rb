@@ -90,10 +90,9 @@ class HuginnScheduler
 
     # Schedule repeating events.
 
-    %w[10s 2m 5m 10m 30m 1h 2h 5h 12h 1d 2d 7d].each do |schedule|
+    %w[2m 5m 10m 30m 1h 2h 5h 12h 1d 2d 7d].each do |schedule|
       rufus_scheduler.every schedule do
         run_schedule "every_#{schedule}"
-        schedule_future_events!
       end
     end
 
