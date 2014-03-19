@@ -15,7 +15,7 @@ class Agent < ActiveRecord::Base
 
   load_types_in "Agents"
 
-  SCHEDULES = %w[every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
+  SCHEDULES = %w[every_10s every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
                  midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm never]
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
@@ -39,6 +39,7 @@ class Agent < ActiveRecord::Base
 
   belongs_to :user, :inverse_of => :agents
   has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
+  has_many :pending_events, :dependent => :delete_all, :inverse_of => :agent, :order => "pending_events.id desc"
   has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
   has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
   has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
@@ -99,6 +100,17 @@ class Agent < ActiveRecord::Base
       events.create!({ 
          :user => user, 
          :expires_at => new_event_expiration_date
+      }.merge(attrs))
+    else
+      error "This Agent cannot create events!"
+    end
+  end
+
+  def queue_event(attrs)
+    if can_create_events?
+      pending_events.create!({ 
+         :user => user, 
+         :scheduled => false
       }.merge(attrs))
     else
       error "This Agent cannot create events!"

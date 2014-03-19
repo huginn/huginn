@@ -15,6 +15,7 @@ require 'rufus/scheduler'
 
 class HuginnScheduler
   attr_accessor :mutex
+  attr_accessor :rufus_scheduler
 
   def run_schedule(time)
     with_mutex do
@@ -37,6 +38,31 @@ class HuginnScheduler
     end
   end
 
+  def schedule_future_events!
+     with_mutex do
+        puts "Scheduling future events"
+        PendingEvent.unscheduled.each do |s|
+           puts "Scheduling future event at "+s.emits_at.strftime("%c %z")
+           if Time.now > s.emits_at
+              #we missed it!
+              s.emit!
+           else
+              rufus_scheduler.at s.emits_at.strftime("%c %z") do
+                 puts "Running scheduled future event"
+                 s.emit!
+              end
+              s.scheduled!
+           end
+        end
+     end
+  end
+
+  def run_pending_events!
+    with_mutex do
+      puts "Running pending events"
+    end
+  end
+
   def with_mutex
     ActiveRecord::Base.connection_pool.with_connection do
       mutex.synchronize do
@@ -47,13 +73,13 @@ class HuginnScheduler
 
   def run!
     self.mutex = Mutex.new
-
-    rufus_scheduler = Rufus::Scheduler.new
+    self.rufus_scheduler = Rufus::Scheduler.new
 
     # Schedule event propagation.
 
     rufus_scheduler.every '1m' do
       propagate!
+      schedule_future_events!
     end
 
     # Schedule event cleanup.
@@ -64,9 +90,10 @@ class HuginnScheduler
 
     # Schedule repeating events.
 
-    %w[2m 5m 10m 30m 1h 2h 5h 12h 1d 2d 7d].each do |schedule|
+    %w[10s 2m 5m 10m 30m 1h 2h 5h 12h 1d 2d 7d].each do |schedule|
       rufus_scheduler.every schedule do
         run_schedule "every_#{schedule}"
+        schedule_future_events!
       end
     end
 
