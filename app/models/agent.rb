@@ -266,8 +266,8 @@ class Agent < ActiveRecord::Base
 
         agents_to_events = {}
         Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_id, event_id|
-          agents_to_events[receiver_agent_id] ||= []
-          agents_to_events[receiver_agent_id] << event_id
+          agents_to_events[receiver_agent_id.to_i] ||= []
+          agents_to_events[receiver_agent_id.to_i] << event_id
         end
 
         event_ids = agents_to_events.values.flatten.uniq.compact
