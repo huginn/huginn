@@ -10,6 +10,7 @@ class Agent < ActiveRecord::Base
   include AssignableTypes
   include MarkdownClassAttributes
   include JSONSerializedField
+  include RDBMSFunctions
 
   markdown_class_attributes :description, :event_description
 
@@ -127,7 +128,7 @@ class Agent < ActiveRecord::Base
     if keep_events_for == 0
       events.update_all :expires_at => nil
     else
-      events.update_all "expires_at = DATE_ADD(`created_at`, INTERVAL #{keep_events_for.to_i} DAY)"
+      events.update_all "expires_at = " + rdbms_date_add("created_at", "DAY", keep_events_for.to_i) 
     end
   end
 
@@ -265,8 +266,8 @@ class Agent < ActiveRecord::Base
 
         agents_to_events = {}
         Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_id, event_id|
-          agents_to_events[receiver_agent_id] ||= []
-          agents_to_events[receiver_agent_id] << event_id
+          agents_to_events[receiver_agent_id.to_i] ||= []
+          agents_to_events[receiver_agent_id.to_i] << event_id
         end
 
         event_ids = agents_to_events.values.flatten.uniq.compact
