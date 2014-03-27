@@ -40,6 +40,7 @@ class Agent < ActiveRecord::Base
 
   belongs_to :user, :inverse_of => :agents
   has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
+  has_many :pending_events, :dependent => :delete_all, :inverse_of => :agent, :order => "pending_events.id desc"
   has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
   has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
   has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
@@ -100,6 +101,17 @@ class Agent < ActiveRecord::Base
       events.create!({ 
          :user => user, 
          :expires_at => new_event_expiration_date
+      }.merge(attrs))
+    else
+      error "This Agent cannot create events!"
+    end
+  end
+
+  def queue_event(attrs)
+    if can_create_events?
+      pending_events.create!({ 
+         :user => user, 
+         :scheduled => false
       }.merge(attrs))
     else
       error "This Agent cannot create events!"
