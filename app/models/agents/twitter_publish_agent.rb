@@ -43,10 +43,11 @@ module Agents
       incoming_events.each do |event|
         tweet_text = Utils.value_at(event.payload, options['message_path'])
         begin
-          publish_tweet tweet_text
+          tweet = publish_tweet tweet_text
           create_event :payload => {
             'success' => true,
             'published_tweet' => tweet_text,
+            'tweet_id' => tweet.id,
             'agent_id' => event.agent_id,
             'event_id' => event.id
           }
