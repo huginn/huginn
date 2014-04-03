@@ -4,6 +4,7 @@
 
       <div class="tabbable tabs-left">
         <ul class="nav nav-tabs" id="show-tabs">
+          <li><%= link_to '<i class="icon-chevron-left"></i> Agents'.html_safe, agents_path %></li>
           <% if agent_show_view(@agent).present? %>
             <li class='active'><a href="#summary" data-toggle="tab"><i class='icon-picture'></i> Summary</a></li>
             <li><a href="#details" data-toggle="tab"><i class='icon-indent-left'></i> Details</a></li>
@@ -13,30 +14,40 @@
           <% end %>
           <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><i class='icon-list-alt'></i> Logs</a></li>
 
-          <% if @agent.can_create_events? && @agent.events.count > 0 %>
-            <li><%= link_to '<i class="icon-random"></i> Events'.html_safe, events_path(:agent => @agent.to_param) %></li>
+          <% if @agent.can_create_events? %>
+            <% if @agent.events.count > 0 %>
+              <li><%= link_to '<i class="icon-random"></i> Events'.html_safe, events_path(:agent => @agent.to_param) %></li>
+            <% else %>
+              <li class='disabled'><a><i class='icon-random'></i> Events</a></li>
+            <% end %>
           <% end %>
-          <li><%= link_to '<i class="icon-chevron-left"></i> Back'.html_safe, agents_path %></li>
-          <li><%= link_to '<i class="icon-pencil"></i> Edit'.html_safe, edit_agent_path(@agent) %></li>
 
-          <% if @agent.can_be_scheduled? || @agent.events.count > 0 %>
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#">Actions <b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                <% if @agent.can_be_scheduled? %>
-                  <li>
-                    <%= link_to '<i class="icon-refresh"></i> Run'.html_safe, run_agent_path(@agent, :return => "show"), method: :post, :tabindex => "-1" %>
-                  </li>
-                <% end %>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-th-list"></i> Actions <b class="caret"></b></a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+              <% if @agent.can_be_scheduled? && !@agent.disabled? %>
+                <li>
+                  <%= link_to '<i class="icon-refresh"></i> Run'.html_safe, run_agent_path(@agent, :return => "show"), method: :post, :tabindex => "-1" %>
+                </li>
+              <% end %>
 
-                <% if @agent.can_create_events? && @agent.events.count > 0 %>
-                  <li>
-                    <%= link_to '<i class="icon-trash"></i> Delete all events'.html_safe, remove_events_agent_path(@agent), method: :delete, data: {confirm: 'Are you sure you want to delete ALL events for this Agent?'}, :tabindex => "-1" %>
-                  </li>
+              <li><%= link_to '<i class="icon-pencil"></i> Edit'.html_safe, edit_agent_path(@agent) %></li>
+
+              <li>
+                <% if !@agent.disabled? %>
+                  <%= link_to '<i class="icon-pause"></i> Disable agent'.html_safe, disable_agent_path(@agent, :disable => "true", :return => "show"), method: :post %>
+                <% else %>
+                  <%= link_to '<i class="icon-play"></i> Enable agent'.html_safe, disable_agent_path(@agent, :disable => "false", :return => "show"), method: :post %>
                 <% end %>
-              </ul>
-            </li>
-          <% end %>
+              </li>
+
+              <% if @agent.can_create_events? && @agent.events.count > 0 %>
+                <li>
+                  <%= link_to '<i class="icon-trash"></i> Delete all events'.html_safe, remove_events_agent_path(@agent), method: :delete, data: {confirm: 'Are you sure you want to delete ALL events for this Agent?'}, :tabindex => "-1" %>
+                </li>
+              <% end %>
+            </ul>
+          </li>
         </ul>
 
         <div class="tab-content">
