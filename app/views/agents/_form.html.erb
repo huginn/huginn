@@ -37,6 +37,13 @@
   </div>
 
   <div class="control-group">
+    <%= f.label :disable_agent, :class => 'control-label' %>
+    <div class="controls disabled-region">
+      <%= f.check_box :disabled %>
+    </div>
+  </div>
+
+  <div class="control-group">
     <%= f.label :schedule, :class => 'control-label' %>
     <div class="controls schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
       <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'span4' %>
@@ -64,7 +71,7 @@
       <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
       <span class="propagate-immediately"><br>
          <%= f.label :propagate_immediately, :class => 'control-label' do %>Propagate immediately
-            <%= f.check_box :propagate_immediately %> 
+            <%= f.check_box :propagate_immediately %>
          <% end %>
       </span>
     </div>
