@@ -27,6 +27,7 @@ describe Agents::MavenlinkPostAgent do
   end
 
   before do
+    Mavenlink.oauth_token = 'test'
     Mavenlink.adapter = [:test, stubbed_request]
   end
 
