@@ -34,6 +34,7 @@ gem 'nokogiri'
 gem 'wunderground'
 gem 'forecast_io'
 gem 'rturk'
+gem 'mavenlink', github: 'einzige/mavenlink_gem'
 
 gem "twitter", '~> 5.7.1'
 gem 'twitter-stream', :git => 'https://github.com/cantino/twitter-stream', :branch => 'master'
