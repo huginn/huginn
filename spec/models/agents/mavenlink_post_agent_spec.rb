@@ -41,6 +41,14 @@ describe Agents::MavenlinkPostAgent do
       it 'stores payload data' do
         subject.most_recent_event(true).payload.should include({'id' => '7', 'message' => 'Some post'})
       end
+
+      context 'already imported data' do
+        before { subject.check }
+
+        it 'does not create same events multiple times' do
+          expect { subject.check }.not_to change { subject.most_recent_event(true) }
+        end
+      end
     end
 
     context 'no new posts' do
