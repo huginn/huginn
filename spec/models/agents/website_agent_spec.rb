@@ -11,8 +11,9 @@ describe Agents::WebsiteAgent do
         'url' => "http://xkcd.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => {'css' => "#comic img", 'attr' => "src"},
-          'title' => {'css' => "#comic img", 'attr' => "title"}
+          'url' => { 'css' => "#comic img", 'attr' => "src" },
+          'title' => { 'css' => "#comic img", 'attr' => "alt" },
+          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
         }
       }
       @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @site, :keep_events_for => 2)
@@ -21,7 +22,6 @@ describe Agents::WebsiteAgent do
     end
 
     describe "#check" do
-    
       it "should validate the integer fields" do
         @checker.options['expected_update_period_in_days'] = "nonsense"
         lambda { @checker.save! }.should raise_error;
@@ -110,7 +110,8 @@ describe Agents::WebsiteAgent do
         @checker.check
         event = Event.last
         event.payload['url'].should == "http://imgs.xkcd.com/comics/evolving.png"
-        event.payload['title'].should =~ /^Biologists play reverse/
+        event.payload['title'].should == "Evolving"
+        event.payload['hovertext'].should =~ /^Biologists play reverse/
       end
 
       it "should turn relative urls to absolute" do
@@ -239,8 +240,9 @@ describe Agents::WebsiteAgent do
         'url' => "http://www.example.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => {'css' => "#comic img", 'attr' => "src"},
-          'title' => {'css' => "#comic img", 'attr' => "title"}
+          'url' => { 'css' => "#comic img", 'attr' => "src" },
+          'title' => { 'css' => "#comic img", 'attr' => "alt" },
+          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
         },
         'basic_auth' => "user:pass"
       }
