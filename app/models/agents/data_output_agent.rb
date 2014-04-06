@@ -8,7 +8,7 @@ module Agents
 
         This Agent will output data at:
 
-        `https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret.xml`
+        `https://#{ENV['DOMAIN']}/users/#{user.id}/webhooks/#{id || '<id>'}/:secret.xml`
 
         where `:secret` is one of the allowed secrets specified in your options and the extension can be `xml` or `json`.
 
@@ -89,9 +89,8 @@ module Agents
             'title' => feed_title,
             'description' => feed_description,
             'pubDate' => Time.now,
+            'items' => items
           }
-
-          content['items'] = items
 
           return [content, 200]
         else
