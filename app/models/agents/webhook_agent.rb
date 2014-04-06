@@ -36,9 +36,9 @@ module Agents
         "payload_path" => "payload"}
     end
 
-    def receive_webhook(params)
+    def receive_webhook(params, method, format)
       secret = params.delete('secret')
-      return ["Not Authorized", 401] unless secret == options['secret']
+      return ["Not Authorized", 401] unless secret == options['secret'] && method == "post"
 
       create_event(:payload => payload_for(params))
 

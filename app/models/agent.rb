@@ -73,7 +73,7 @@ class Agent < ActiveRecord::Base
     # Implement me in your subclass of Agent.
   end
 
-  def receive_webhook(params)
+  def receive_webhook(params, method, format)
     # Implement me in your subclass of Agent.
     ["not implemented", 404]
   end
@@ -136,8 +136,8 @@ class Agent < ActiveRecord::Base
     message.gsub(/<([^>]+)>/) { Utils.value_at(payload, $1) || "??" }
   end
 
-  def trigger_webhook(params)
-    receive_webhook(params).tap do
+  def trigger_webhook(params, method, format)
+    receive_webhook(params, method, format).tap do
       self.last_webhook_at = Time.now
       save!
     end

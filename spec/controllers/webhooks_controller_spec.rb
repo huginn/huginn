@@ -5,10 +5,12 @@ describe WebhooksController do
     cannot_receive_events!
     cannot_be_scheduled!
 
-    def receive_webhook(params)
+    def receive_webhook(params, method, format)
       if params.delete(:secret) == options[:secret]
         memory[:webhook_values] = params
-        ["success", 200]
+        memory[:webhook_format] = format
+        memory[:webhook_method] = method
+        ["success", 200, memory['content_type']]
       else
         ["failure", 404]
       end
@@ -24,31 +26,72 @@ describe WebhooksController do
 
   it "should not require login to trigger a webhook" do
     @agent.last_webhook_at.should be_nil
-    post :create, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
+    post :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
     @agent.reload.last_webhook_at.should be_within(2).of(Time.now)
     response.body.should == "success"
     response.should be_success
   end
 
   it "should call receive_webhook" do
-    post :create, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
-    @agent.reload.memory[:webhook_values].should == { 'key' => "value", 'another_key' => "5" }
+    post :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
+    @agent.reload
+    @agent.memory[:webhook_values].should == { 'key' => "value", 'another_key' => "5" }
+    @agent.memory[:webhook_format].should == "text/html"
+    @agent.memory[:webhook_method].should == "post"
     response.body.should == "success"
+    response.headers['Content-Type'].should == 'text/plain; charset=utf-8'
     response.should be_success
 
-    post :create, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "not_my_secret", :no => "go"
+    post :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "not_my_secret", :no => "go"
     @agent.reload.memory[:webhook_values].should_not == { 'no' => "go" }
     response.body.should == "failure"
     response.should be_missing
   end
 
+  it "should accept gets" do
+    get :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
+    @agent.reload
+    @agent.memory[:webhook_values].should == { 'key' => "value", 'another_key' => "5" }
+    @agent.memory[:webhook_format].should == "text/html"
+    @agent.memory[:webhook_method].should == "get"
+    response.body.should == "success"
+    response.should be_success
+  end
+
+  it "should pass through the received format" do
+    get :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5", :format => :json
+    @agent.reload
+    @agent.memory[:webhook_values].should == { 'key' => "value", 'another_key' => "5" }
+    @agent.memory[:webhook_format].should == "application/json"
+    @agent.memory[:webhook_method].should == "get"
+
+    post :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5", :format => :xml
+    @agent.reload
+    @agent.memory[:webhook_values].should == { 'key' => "value", 'another_key' => "5" }
+    @agent.memory[:webhook_format].should == "application/xml"
+    @agent.memory[:webhook_method].should == "post"
+
+    put :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5", :format => :atom
+    @agent.reload
+    @agent.memory[:webhook_values].should == { 'key' => "value", 'another_key' => "5" }
+    @agent.memory[:webhook_format].should == "application/atom+xml"
+    @agent.memory[:webhook_method].should == "put"
+  end
+
+  it "can accept a content-type to return" do
+    @agent.memory['content_type'] = 'application/json'
+    @agent.save!
+    get :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
+    response.headers['Content-Type'].should == 'application/json; charset=utf-8'
+  end
+
   it "should fail on incorrect users" do
-    post :create, :user_id => users(:jane).to_param, :agent_id => @agent.id, :secret => "my_secret", :no => "go"
+    post :handle_request, :user_id => users(:jane).to_param, :agent_id => @agent.id, :secret => "my_secret", :no => "go"
     response.should be_missing
   end
 
   it "should fail on incorrect agents" do
-    post :create, :user_id => users(:bob).to_param, :agent_id => 454545, :secret => "my_secret", :no => "go"
+    post :handle_request, :user_id => users(:bob).to_param, :agent_id => 454545, :secret => "my_secret", :no => "go"
     response.should be_missing
   end
 end

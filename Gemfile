@@ -48,12 +48,12 @@ platforms :ruby_18 do
 end
 
 group :development do
-  gem 'pry'
   gem 'binding_of_caller'
   gem 'better_errors'
 end
 
 group :development, :test do
+  gem 'pry'
   gem 'rspec-rails'
   gem 'rspec'
   gem 'shoulda-matchers'
