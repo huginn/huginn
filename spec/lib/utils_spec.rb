@@ -28,8 +28,15 @@ describe Utils do
   end
 
   describe "#interpolate_jsonpaths" do
+    let(:payload) { { :there => { :world => "WORLD" }, :works => "should work" } }
+
     it "interpolates jsonpath expressions between matching <>'s" do
-      Utils.interpolate_jsonpaths("hello <$.there.world> this <escape works>", { :there => { :world => "WORLD" }, :works => "should work" }).should == "hello WORLD this should+work"
+      Utils.interpolate_jsonpaths("hello <$.there.world> this <escape works>", payload).should == "hello WORLD this should+work"
+    end
+
+    it "optionally supports treating values that start with '$' as raw JSONPath" do
+      Utils.interpolate_jsonpaths("$.there.world", payload).should == "$.there.world"
+      Utils.interpolate_jsonpaths("$.there.world", payload, :leading_dollarsign_is_jsonpath => true).should == "WORLD"
     end
   end
 
