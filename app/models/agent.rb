@@ -73,7 +73,7 @@ class Agent < ActiveRecord::Base
     # Implement me in your subclass of Agent.
   end
 
-  def receive_webhook(params, method, format)
+  def receive_web_request(params, method, format)
     # Implement me in your subclass of Agent.
     ["not implemented", 404]
   end
@@ -136,10 +136,18 @@ class Agent < ActiveRecord::Base
     message.gsub(/<([^>]+)>/) { Utils.value_at(payload, $1) || "??" }
   end
 
-  def trigger_webhook(params, method, format)
-    receive_webhook(params, method, format).tap do
-      self.last_webhook_at = Time.now
-      save!
+  def trigger_web_request(params, method, format)
+    if respond_to?(:receive_webhook)
+      Rails.logger.warn "DEPRECATED: The .receive_webhook method is deprecated, please switch your Agent to use .receive_web_request."
+      receive_webhook(params).tap do
+        self.last_web_request_at = Time.now
+        save!
+      end
+    else
+      receive_web_request(params, method, format).tap do
+        self.last_web_request_at = Time.now
+        save!
+      end
     end
   end
 

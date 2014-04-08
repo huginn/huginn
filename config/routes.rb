@@ -31,7 +31,9 @@ Huginn::Application.routes.draw do
   match "/worker_status" => "worker_status#show"
 
   post "/users/:user_id/update_location/:secret" => "user_location_updates#create"
-  match "/users/:user_id/webhooks/:agent_id/:secret" => "webhooks#handle_request", :as => :webhooks
+
+  match "/users/:user_id/web_requests/:agent_id/:secret" => "web_requests#handle_request", :as => :web_requests
+  post "/users/:user_id/webhooks/:agent_id/:secret" => "web_requests#handle_request" # legacy
 
 #  match "/delayed_job" => DelayedJobWeb, :anchor => false
   devise_for :users, :sign_out_via => [ :post, :delete ]

@@ -514,7 +514,55 @@ describe Agent do
         end
       end
     end
+  end
 
+  describe ".trigger_web_request" do
+    class Agents::WebRequestReceiver < Agent
+      cannot_be_scheduled!
+    end
+
+    before do
+      stub(Agents::WebRequestReceiver).valid_type?("Agents::WebRequestReceiver") { true }
+    end
+
+    context "when .receive_web_request is defined" do
+      before do
+        @agent = Agents::WebRequestReceiver.new(:name => "something")
+        @agent.user = users(:bob)
+        @agent.save!
+
+        def @agent.receive_web_request(params, method, format)
+          memory['last_request'] = [params, method, format]
+          ['Ok!', 200]
+        end
+      end
+
+      it "calls the .receive_web_request hook, updates last_web_request_at, and saves" do
+        @agent.trigger_web_request({ :some_param => "some_value" }, "post", "text/html")
+        @agent.reload.memory['last_request'].should == [ { "some_param" => "some_value" }, "post", "text/html" ]
+        @agent.last_web_request_at.to_i.should be_within(1).of(Time.now.to_i)
+      end
+    end
+
+    context "when .receive_webhook is defined" do
+      before do
+        @agent = Agents::WebRequestReceiver.new(:name => "something")
+        @agent.user = users(:bob)
+        @agent.save!
+
+        def @agent.receive_webhook(params)
+          memory['last_webhook_request'] = params
+          ['Ok!', 200]
+        end
+      end
+
+      it "outputs a deprecation warning and calls .receive_webhook with the params" do
+        mock(Rails.logger).warn("DEPRECATED: The .receive_webhook method is deprecated, please switch your Agent to use .receive_web_request.")
+        @agent.trigger_web_request({ :some_param => "some_value" }, "post", "text/html")
+        @agent.reload.memory['last_webhook_request'].should == { "some_param" => "some_value" }
+        @agent.last_web_request_at.to_i.should be_within(1).of(Time.now.to_i)
+      end
+    end
   end
 
   describe "recent_error_logs?" do

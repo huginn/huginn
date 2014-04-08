@@ -8,7 +8,7 @@ module Agents
 
         This Agent will output data at:
 
-        `https://#{ENV['DOMAIN']}/users/#{user.id}/webhooks/#{id || '<id>'}/:secret.xml`
+        `https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret.xml`
 
         where `:secret` is one of the allowed secrets specified in your options and the extension can be `xml` or `json`.
 
@@ -75,7 +75,7 @@ module Agents
       options['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
     end
 
-    def receive_webhook(params, method, format)
+    def receive_web_request(params, method, format)
       if options['secrets'].include?(params['secret'])
         items = received_events.order('id desc').limit(events_to_show).map do |event|
           interpolated = Utils.recursively_interpolate_jsonpaths(options['template']['item'], event.payload, :leading_dollarsign_is_jsonpath => true)

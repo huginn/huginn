@@ -62,7 +62,7 @@ describe Agents::DataOutputAgent do
     end
   end
 
-  describe "#receive_webhook" do
+  describe "#receive_web_request" do
     before do
       current_time = Time.now
       stub(Time).now { current_time }
@@ -70,15 +70,15 @@ describe Agents::DataOutputAgent do
     end
 
     it "requires a valid secret" do
-      content, status, content_type = agent.receive_webhook({ 'secret' => 'fake' }, 'get', 'text/xml')
+      content, status, content_type = agent.receive_web_request({ 'secret' => 'fake' }, 'get', 'text/xml')
       status.should == 401
       content.should == "Not Authorized"
 
-      content, status, content_type = agent.receive_webhook({ 'secret' => 'fake' }, 'get', 'application/json')
+      content, status, content_type = agent.receive_web_request({ 'secret' => 'fake' }, 'get', 'application/json')
       status.should == 401
       content.should == { :error => "Not Authorized" }
 
-      content, status, content_type = agent.receive_webhook({ 'secret' => 'secret1' }, 'get', 'application/json')
+      content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'application/json')
       status.should == 200
     end
 
@@ -100,7 +100,7 @@ describe Agents::DataOutputAgent do
       end
 
       it "can output RSS" do
-        content, status, content_type = agent.receive_webhook({ 'secret' => 'secret1' }, 'get', 'text/xml')
+        content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         status.should == 200
         content_type.should == 'text/xml'
         content.gsub(/\s+/, '').should == Utils.unindent(<<-XML).gsub(/\s+/, '')
@@ -137,7 +137,7 @@ describe Agents::DataOutputAgent do
       it "can output JSON" do
         agent.options['template']['item']['foo'] = "hi"
 
-        content, status, content_type = agent.receive_webhook({ 'secret' => 'secret2' }, 'get', 'application/json')
+        content, status, content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
         status.should == 200
 
         content.should == {

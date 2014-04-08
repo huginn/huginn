@@ -1,6 +1,7 @@
 module Agents
   class WebhookAgent < Agent
     cannot_be_scheduled!
+    cannot_receive_events!
 
     description  do
         <<-MD
@@ -8,7 +9,7 @@ module Agents
 
         In order to create events with this agent, make a POST request to:
         ```
-           https://#{ENV['DOMAIN']}/users/#{user.id}/webhooks/#{id || '<id>'}/:secret
+           https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret
         ``` where `:secret` is specified in your options.
 
         The
@@ -36,9 +37,10 @@ module Agents
         "payload_path" => "payload"}
     end
 
-    def receive_webhook(params, method, format)
+    def receive_web_request(params, method, format)
       secret = params.delete('secret')
-      return ["Not Authorized", 401] unless secret == options['secret'] && method == "post"
+      return ["Please use POST requests only", 401] unless method == "post"
+      return ["Not Authorized", 401] unless secret == options['secret']
 
       create_event(:payload => payload_for(params))
 
