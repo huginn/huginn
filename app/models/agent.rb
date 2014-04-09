@@ -21,7 +21,7 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :source_ids, :keep_events_for, :propagate_immediately
+  attr_accessible :options, :memory, :name, :type, :schedule, :disabled, :source_ids, :keep_events_for, :propagate_immediately
 
   json_serialize :options, :memory
 
@@ -97,8 +97,8 @@ class Agent < ActiveRecord::Base
 
   def create_event(attrs)
     if can_create_events?
-      events.create!({ 
-         :user => user, 
+      events.create!({
+         :user => user,
          :expires_at => new_event_expiration_date
       }.merge(attrs))
     else
@@ -128,7 +128,7 @@ class Agent < ActiveRecord::Base
     if keep_events_for == 0
       events.update_all :expires_at => nil
     else
-      events.update_all "expires_at = " + rdbms_date_add("created_at", "DAY", keep_events_for.to_i) 
+      events.update_all "expires_at = " + rdbms_date_add("created_at", "DAY", keep_events_for.to_i)
     end
   end
 
@@ -257,11 +257,11 @@ class Agent < ActiveRecord::Base
                 joins("JOIN links ON (links.receiver_id = agents.id)").
                 joins("JOIN agents AS sources ON (links.source_id = sources.id)").
                 joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)").
-                where("agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id")
+                where("NOT agents.disabled AND (agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id)")
         if options[:only_receivers].present?
           scope = scope.where("agents.id in (?)", options[:only_receivers])
         end
- 
+
         sql = scope.to_sql()
 
         agents_to_events = {}
@@ -292,6 +292,7 @@ class Agent < ActiveRecord::Base
     def async_receive(agent_id, event_ids)
       agent = Agent.find(agent_id)
       begin
+        return if agent.disabled?
         agent.receive(Event.where(:id => event_ids))
         agent.last_receive_at = Time.now
         agent.save!
@@ -316,7 +317,8 @@ class Agent < ActiveRecord::Base
     # per type of agent, so you can override this to define custom bulk check behavior for your custom Agent type.
     def bulk_check(schedule)
       raise "Call #bulk_check on the appropriate subclass of Agent" if self == Agent
-      where(:schedule => schedule).pluck("agents.id").each do |agent_id|
+      where(:schedule => schedule).pluck("agents.id", "agents.disabled").each do |agent_id, agent_disabled|
+        return if agent_disabled
         async_check(agent_id)
       end
     end
@@ -329,6 +331,7 @@ class Agent < ActiveRecord::Base
     def async_check(agent_id)
       agent = Agent.find(agent_id)
       begin
+        return if agent.disabled?
         agent.check
         agent.last_check_at = Time.now
         agent.save!
