@@ -22,7 +22,10 @@ describe Agents::TwitterPublishAgent do
     @event.save!
 
     @sent_messages = []
-    stub.any_instance_of(Agents::TwitterPublishAgent).publish_tweet { |message| @sent_messages << message}
+    stub.any_instance_of(Agents::TwitterPublishAgent).publish_tweet { |message|
+      @sent_messages << message
+      OpenStruct.new(:id => 454209588376502272)
+    }
   end
 
   describe '#receive' do
