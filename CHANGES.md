@@ -1,5 +1,6 @@
 # Changes
 
+* 0.4 (April 10, 2014) - WebHooksController has been renamed to WebRequestsController and all HTTP verbs are now accepted and passed through to Agents' #receive_web_request method. The new DataOutputAgent returns JSON or RSS feeds of incoming Events via external web request.
 * 0.31 (Jan 2, 2014)   - Agents now have an optional keep\_events\_for option that is propagated to created events' expires\_at field, and they update their events' expires\_at fields on change.
 * 0.3 (Jan 1, 2014)    - Remove symbolization of memory, options, and payloads; convert memory, options, and payloads to JSON from YAML.  Migration will perform conversion and adjust tables to be UTF-8.  Recommend making a DB backup before migrating.
 * 0.2 (Nov 6, 2013)    - PeakDetectorAgent now uses `window_duration_in_days` and `min_peak_spacing_in_days`.  Additionally, peaks trigger when the time series rises over the standard deviation multiple, not after it starts to fall.

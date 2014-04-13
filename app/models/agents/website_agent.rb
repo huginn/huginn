@@ -59,8 +59,9 @@ module Agents
           'type' => "html",
           'mode' => "on_change",
           'extract' => {
-            'url' => {'css' => "#comic img", 'attr' => "src"},
-            'title' => {'css' => "#comic img", 'attr' => "title"}
+            'url' => { 'css' => "#comic img", 'attr' => "src" },
+            'title' => { 'css' => "#comic img", 'attr' => "alt" },
+            'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
           }
       }
     end

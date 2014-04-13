@@ -32,7 +32,8 @@ unless user.agents.where(:name => "XKCD Source").exists?
                            'expected_update_period_in_days' => 5,
                            'extract' => {
                                'url' => { 'css' => "#comic img", 'attr' => "src" },
-                               'title' => { 'css' => "#comic img", 'attr' => "title" }
+                               'title' => { 'css' => "#comic img", 'attr' => "alt" },
+                               'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
                            }
                        }).save!
 end
