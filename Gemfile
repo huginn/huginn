@@ -15,6 +15,8 @@ gem 'ruby-growl'
 gem 'delayed_job'
 gem 'delayed_job_active_record'#, "~> 0.3.3" # newer was giving a strange MySQL error
 gem "daemons"
+
+# To enable DelayedJobWeb, see the 'Enable DelayedJobWeb' section of the README.
 # gem "delayed_job_web"
 
 gem 'foreman'

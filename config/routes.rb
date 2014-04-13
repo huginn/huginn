@@ -33,7 +33,9 @@ Huginn::Application.routes.draw do
   post "/users/:user_id/update_location/:secret" => "user_location_updates#create"
   post "/users/:user_id/webhooks/:agent_id/:secret" => "webhooks#create"
 
+# To enable DelayedJobWeb, see the 'Enable DelayedJobWeb' section of the README.
 #  match "/delayed_job" => DelayedJobWeb, :anchor => false
+
   devise_for :users, :sign_out_via => [ :post, :delete ]
 
   match "/about" => "home#about"
