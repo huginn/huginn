@@ -71,6 +71,10 @@ module Agents
       options['template']['title'].presence || "#{name} Event Feed"
     end
 
+    def feed_link
+      options['template']['link'].presence || "https://#{ENV['DOMAIN']}"
+    end
+
     def feed_description
       options['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
     end
@@ -100,6 +104,7 @@ module Agents
             <channel>
              <title>#{feed_title.encode(:xml => :text)}</title>
              <description>#{feed_description.encode(:xml => :text)}</description>
+             <link>#{feed_link.encode(:xml => :text)}</link>
              <lastBuildDate>#{Time.now.rfc2822.to_s.encode(:xml => :text)}</lastBuildDate>
              <pubDate>#{Time.now.rfc2822.to_s.encode(:xml => :text)}</pubDate>
              <ttl>#{feed_ttl}</ttl>
