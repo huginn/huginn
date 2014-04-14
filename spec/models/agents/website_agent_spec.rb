@@ -114,6 +114,19 @@ describe Agents::WebsiteAgent do
         event.payload['hovertext'].should =~ /^Biologists play reverse/
       end
 
+      it "parses XPath" do
+        @site['extract'].each { |key, value|
+          value.delete('css')
+          value['xpath'] = "//*[@id='comic']//img"
+        }
+        @checker.options = @site
+        @checker.check
+        event = Event.last
+        event.payload['url'].should == "http://imgs.xkcd.com/comics/evolving.png"
+        event.payload['title'].should == "Evolving"
+        event.payload['hovertext'].should =~ /^Biologists play reverse/
+      end
+
       it "should turn relative urls to absolute" do
         rel_site = {
           'name' => "XKCD",
