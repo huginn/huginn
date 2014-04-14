@@ -115,7 +115,7 @@ module Agents
 
       request.on_success do |response|
         body = response.body
-        if encoding = options['force_encoding']
+        if (encoding = options['force_encoding']).present?
           body = body.encode(Encoding::UTF_8, encoding)
         end
         doc = parse(body)
