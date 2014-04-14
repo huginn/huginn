@@ -82,7 +82,7 @@ module Agents
     end
 
     def check
-      transaction do |found|
+      saving_entries do |found|
         each_entry { |filename, mtime|
           found[filename, mtime]
         }
@@ -177,14 +177,14 @@ module Agents
       @base_uri ||= URI(options['url'])
     end
 
-    def transaction
+    def saving_entries
       known_entries = memory['known_entries'] || {}
       found_entries = {}
       new_files = []
 
       yield proc { |filename, mtime|
         found_entries[filename] = misotime = mtime.utc.iso8601
-        unless prev = known_entries[filename] and misotime <= prev
+        unless (prev = known_entries[filename]) && misotime <= prev
           new_files << filename
         end
       }
