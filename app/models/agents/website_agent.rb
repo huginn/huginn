@@ -42,6 +42,8 @@ module Agents
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.  This is only used to set the "working" status.
 
       Set `uniqueness_look_back` to limit the number of events checked for uniqueness (typically for performance).  This defaults to the larger of #{UNIQUENESS_LOOK_BACK} or #{UNIQUENESS_FACTOR}x the number of detected received results.
+
+      Set `force_encoding` to an encoding name if the website does not return a Content-Type header with a proper charset.
     MD
 
     event_description do
@@ -85,6 +87,19 @@ module Agents
       if options['uniqueness_look_back'].present?
         errors.add(:base, "Invalid uniqueness_look_back format") unless is_positive_integer?(options['uniqueness_look_back'])
       end
+
+      if (encoding = options['force_encoding']).present?
+        case encoding
+        when String
+          begin
+            Encoding.find(encoding)
+          rescue ArgumentError
+            errors.add(:base, "Unknown encoding: #{encoding.inspect}")
+          end
+        else
+          errors.add(:base, "force_encoding must be a string")
+        end
+      end
     end
 
     def check
@@ -99,7 +114,11 @@ module Agents
       end
 
       request.on_success do |response|
-        doc = parse(response.body)
+        body = response.body
+        if (encoding = options['force_encoding']).present?
+          body = body.encode(Encoding::UTF_8, encoding)
+        end
+        doc = parse(body)
 
         if extract_full_json?
           if store_payload!(previous_payloads(1), doc)
