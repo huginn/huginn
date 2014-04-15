@@ -49,43 +49,28 @@ And now, some example screenshots.  Below them are instructions to get you start
 If you just want to play around, you can simply clone this repository, then perform the following steps:
 
 * Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` variable.
-* Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example seed data.
+* Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example Agents.
 * Run `foreman start`, visit [http://localhost:3000/][localhost], and login with the username of `admin` and the password of `password`.
 * Setup some Agents!
+* Read the [wiki][wiki] for usage examples and to get started making new Agents.
 
 Note: by default, emails are not sent in the `development` Rails environment, which is what you just setup.  If you'd like to enable emails when playing with Huginn locally, edit `config.action_mailer.perform_deliveries` in `config/environments/development.rb`.
 
 If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
 
 [localhost]: http://localhost:3000/
+[wiki]: https://github.com/cantino/huginn/wiki
 [novice-setup-guide]: https://github.com/cantino/huginn/wiki/Novice-setup-guide
-
-### Real Start
-
-Follow these instructions if you wish to deploy your own version of Huginn or contribute back to the project.  GitHub doesn't make it easy to work with private forks of public repositories, so I recommend that you follow the following steps:
-
-* Make a public fork of Huginn. If you can't create private GitHub repositories, you can skip the steps below. Just follow the *Quick Start* steps above and make pull requests when you want to contribute a patch. 
-* Make a private, empty GitHub repository called `huginn-private`
-* Duplicate your public fork into your new private repository (via [GitHub's instructions](https://help.github.com/articles/duplicating-a-repository)):
-
-        git clone --bare git@github.com:you/huginn.git
-        cd huginn.git
-        git push --mirror git@github.com:you/huginn-private.git
-        cd .. && rm -rf huginn.git
-
-* Checkout your new private repository.
-* Add your Huginn public fork as a remote to your new private repository (`huginn-private`):
-
-        git remote add public git@github.com:you/huginn.git
-
-* Run the steps from *Quick Start* above to configure your copy of Huginn.
-* When you want to contribute patches, do a remote push from your private repository to your public fork of the relevant commits, then make a pull request to this repository.
 
 ## Deployment
 
 Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
 ### Optional Setup
+
+#### Setup for private development
+
+See [private development instructions](https://github.com/cantino/huginn/wiki/Private-development-instructions) on the wiki.
 
 #### Enable the WeatherAgent
 
