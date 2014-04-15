@@ -80,7 +80,7 @@ class Agent < ActiveRecord::Base
 
   # Implement me in your subclass to decide if your Agent is working.
   def working?
-    raise "Implement me in your subclass"
+    raise NotImplementedError, 'Implement me in your subclass'
   end
 
   def validate_options

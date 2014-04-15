@@ -1,4 +1,14 @@
 GIT
+  remote: git://github.com/einzige/mavenlink_gem.git
+  revision: e20efdf30aa846a6656edcfd8d6092faf489c5c0
+  specs:
+    mavenlink (0.0.1)
+      activemodel
+      activesupport (>= 3.0.0)
+      brainstem-adaptor (>= 0.0.3)
+      faraday
+
+GIT
   remote: https://github.com/cantino/twitter-stream
   revision: fde6bed2b62ca487d49e4a57381bbfca6e33361b
   branch: master
@@ -51,6 +61,8 @@ GEM
     bootstrap-kaminari-views (0.0.2)
       kaminari (>= 0.13)
       rails (>= 3.1)
+    brainstem-adaptor (0.0.3)
+      activesupport (>= 3.0.0)
     buftok (0.2.0)
     builder (3.0.4)
     coderay (1.0.9)
@@ -328,6 +340,7 @@ DEPENDENCIES
   jsonpath
   kaminari
   kramdown
+  mavenlink!
   mysql2
   nokogiri
   pry
