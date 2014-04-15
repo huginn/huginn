@@ -125,6 +125,27 @@ describe Agents::EventFormattingAgent do
       @checker.should_not be_valid
     end
 
+    it "should validate type of matchers" do
+      @checker.options[:matchers] = ""
+      @checker.should_not be_valid
+      @checker.options[:matchers] = {}
+      @checker.should_not be_valid
+    end
+
+    it "should validate the contents of matchers" do
+      @checker.options[:matchers] = [
+        {}
+      ]
+      @checker.options[:matchers] = [
+        { :regexp => "(not closed", :path => "text" }
+      ]
+      @checker.should_not be_valid
+      @checker.options[:matchers] = [
+        { :regexp => "(closed)", :path => "text", :to => "foo" }
+      ]
+      @checker.should be_valid
+    end
+
     it "should validate presence of mode" do
       @checker.options[:mode] = ""
       @checker.should_not be_valid
