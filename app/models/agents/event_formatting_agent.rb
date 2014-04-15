@@ -82,43 +82,7 @@ module Agents
     def validate_options
       errors.add(:base, "instructions, mode, skip_agent, and skip_created_at all need to be present.") unless options['instructions'].present? and options['mode'].present? and options['skip_agent'].present? and options['skip_created_at'].present?
 
-      case matchers = options['matchers']
-      when nil
-      when Array
-        matchers.each do |matcher|
-          unless Hash === matcher
-            errors.add(:base, "each matcher must be a hash")
-            next
-          end
-
-          regexp, path, to = matcher.values_at(*%w[regexp path to])
-
-          case regexp
-          when String
-            begin
-              Regexp.new(regexp)
-            rescue
-              errors.add(:base, "bad regexp found in matchers: #{regexp}")
-            end
-          else
-            errors.add(:base, "regexp is mandatory for a matcher and must be a string")
-          end
-
-          case path
-          when String
-          else
-            errors.add(:base, "path is mandatory for a matcher and must be a string")
-          end
-
-          case to
-          when nil, String
-          else
-            errors.add(:base, "to must be a string if present in a matcher")
-          end
-        end
-      else
-        errors.add(:base, "matchers must be an array if present")
-      end
+      validate_matchers
     end
 
     def default_options
@@ -149,6 +113,40 @@ module Agents
       end
     end
 
+    private
+
+    def validate_matchers
+      matchers = options['matchers'] or return
+
+      unless matchers.is_a?(Array)
+        errors.add(:base, "matchers must be an array if present")
+        return
+      end
+
+      matchers.each do |matcher|
+        unless matcher.is_a?(Hash)
+          errors.add(:base, "each matcher must be a hash")
+          next
+        end
+
+        regexp, path, to = matcher.values_at(*%w[regexp path to])
+
+        if regexp.present?
+          begin
+            Regexp.new(regexp)
+          rescue
+            errors.add(:base, "bad regexp found in matchers: #{regexp}")
+          end
+        else
+          errors.add(:base, "regexp is mandatory for a matcher and must be a string")
+        end
+
+        errors.add(:base, "path is mandatory for a matcher and must be a string") if !path.present?
+
+        errors.add(:base, "to must be a string if present in a matcher") if to.present? && !to.is_a?(String)
+      end
+    end
+
     def perform_matching(payload)
       matchers.inject(payload.dup) { |hash, matcher|
         matcher[hash]
@@ -164,7 +162,7 @@ module Agents
             proc { |hash|
               mhash = {}
               value = Utils.value_at(hash, path)
-              if String === value and m = re.match(value)
+              if value.is_a?(String) && (m = re.match(value))
                 m.to_a.each_with_index { |s, i|
                   mhash[i.to_s] = s
                 }
