@@ -136,6 +136,7 @@ describe Agents::EventFormattingAgent do
       @checker.options[:matchers] = [
         {}
       ]
+      @checker.should_not be_valid
       @checker.options[:matchers] = [
         { :regexp => "(not closed", :path => "text" }
       ]
