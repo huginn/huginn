@@ -317,8 +317,7 @@ class Agent < ActiveRecord::Base
     # per type of agent, so you can override this to define custom bulk check behavior for your custom Agent type.
     def bulk_check(schedule)
       raise "Call #bulk_check on the appropriate subclass of Agent" if self == Agent
-      where(:schedule => schedule).pluck("agents.id", "agents.disabled").each do |agent_id, agent_disabled|
-        return if agent_disabled
+      where("agents.schedule = ? and disabled = false", schedule).pluck("agents.id").each do |agent_id|
         async_check(agent_id)
       end
     end
