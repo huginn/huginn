@@ -47,11 +47,6 @@ gem 'weibo_2', '~> 0.1.4'
 
 gem 'therubyracer', '~> 0.12.1'
 
-platforms :ruby_18 do
-  gem 'system_timer'
-  gem 'fastercsv'
-end
-
 group :development do
   gem 'binding_of_caller'
   gem 'better_errors'
@@ -64,6 +59,6 @@ group :development, :test do
   gem 'rspec'
   gem 'shoulda-matchers'
   gem 'rr'
-  gem 'webmock', :require => false
-  gem 'coveralls', :require => false
+  gem 'webmock', require: false
+  gem 'coveralls', require: false
 end
