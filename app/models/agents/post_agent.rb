@@ -27,7 +27,8 @@ module Agents
     end
 
     def post_event(uri, event)
-      req = Net::HTTP::Post.new(uri.request_uri)
+      headers = options['headers']
+      req = Net::HTTP::Post.new(uri.request_uri, headers)
       req.form_data = event
       Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
     end
