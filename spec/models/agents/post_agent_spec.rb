@@ -67,5 +67,13 @@ describe Agents::PostAgent do
       @checker.options[:expected_receive_period_in_days] = ""
       @checker.should_not be_valid
     end
+
+    it "should validate type of headers is Hash" do
+      @checker.options[:headers] = [1,2,3]
+      @checker.should_not be_valid
+
+      @checker.options[:headers] = "somevalue"
+      @checker.should_not be_valid
+    end
   end
 end
