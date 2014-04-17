@@ -19,8 +19,7 @@
            end
            dot_format_string = dot_format_string + "}"
         %>
-
-        <img src="https://chart.googleapis.com/chart?cht=gv&chl=<%= CGI::escape dot_format_string %>" />
+        <%= render_dot(dot_format_string) %>
       </div>
     </div>
   </div>
