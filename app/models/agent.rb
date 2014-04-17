@@ -83,10 +83,6 @@ class Agent < ActiveRecord::Base
     raise "Implement me in your subclass"
   end
 
-  def validate_options
-    # Implement me in your subclass to test for valid options.
-  end
-
   def event_created_within?(days)
     last_event_at && last_event_at > days.to_i.days.ago
   end
@@ -193,17 +189,7 @@ class Agent < ActiveRecord::Base
     update_column :last_error_log_at, nil
   end
 
-  # Validations and Callbacks
-
-  def sources_are_owned
-    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
-  end
-
-  def validate_schedule
-    unless cannot_be_scheduled?
-      errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
-    end
-  end
+  # Callbacks
 
   def set_default_schedule
     self.schedule = default_schedule unless schedule.present? || cannot_be_scheduled?
@@ -221,6 +207,24 @@ class Agent < ActiveRecord::Base
 
   def possibly_update_event_expirations
     update_event_expirations! if keep_events_for_changed?
+  end
+  
+  #Validation Methods
+  
+  private
+  
+  def sources_are_owned
+    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
+  end
+  
+  def validate_schedule
+    unless cannot_be_scheduled?
+      errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
+    end
+  end
+  
+  def validate_options
+    # Implement me in your subclass to test for valid options.
   end
 
   # Class Methods
