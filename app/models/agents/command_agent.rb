@@ -1,11 +1,14 @@
 module Agents
   class CommandAgent < Agent
     
+    require 'open3'
+
 
     default_schedule "midnight"
 
 
     description <<-MD
+
       The CommandAgent can execute commands on your local system, returning the output.
 
       `command` specifies the command to be executed, and `path` will tell CommandAgent in what directory to run this command.
@@ -14,7 +17,9 @@ module Agents
 
       CommandAgent can also act upon recieveing events. These events may contain their own path and command arguments. If they do not, CommandAgent will use the configured options. For this reason, please specify defaults even if you are planning to have this Agent respond to events.
 
-      The resulting event will contain the `command` which was executed, the `path` it was executed under, the `exit_status` of the command, and the actual `output`. CommandAgent will not log an error if the `exit_status` implies that something went wrong.
+      The resulting event will contain the `command` which was executed, the `path` it was executed under, the `exit_status` of the command, the `errors`, and the actual `output`. CommandAgent will not log an error if the result implies that something went wrong.
+
+      *Warning*: Misuse of this Agent can pose a security threat.
 
     MD
 
@@ -25,7 +30,8 @@ module Agents
         'command' => 'pwd',
         'path' => '/home/Huginn',
         'exit_status' => '0',
-        'output' => '/home' 
+        'errors' => '',
+        'output' => '/home/Huginn' 
       }
     MD
 
@@ -55,18 +61,25 @@ module Agents
       path = opts['path'] || options['path']
 
       result = nil
-      proc_stat = nil
+      errors = nil
+      exit_status = nil
+
       Dir.chdir(path){
-        result = `#{command}`
-        proc_stat = $?
+        begin
+          stdin, stdout, stderr, wait_thr = Open3.popen3(command)
+          exit_status = wait_thr.value.to_i
+          result = stdout.gets(nil)
+          errors = stderr.gets(nil)
+        rescue Exception => e
+          errors = e.to_s
+        end
       }
 
-      exit_status = -404 # should never happen, but $? is global
-      exit_status = proc_stat.to_i if(proc_stat.is_a?(Process::Status))
+      result.chomp! if result.is_a?(String)
+      result = '' if result.nil?
+      errors = '' if errors.nil?
 
-      result.chomp! if !result.nil?
-
-      vals = {"command" => command, "path" => path, "exit_status" => exit_status, "output" => result}
+      vals = {"command" => command, "path" => path, "exit_status" => exit_status, "errors" => errors, "output" => result}
       evnt = create_event :payload => vals
 
       log("Ran '#{command}' under '#{path}'", :outbound_event => evnt)
