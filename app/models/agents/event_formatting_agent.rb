@@ -12,6 +12,10 @@ module Agents
               "celsius": "18",
               "fahreinheit": "64"
             },
+            "date": {
+              "epoch": "1357959600",
+              "pretty": "10:00 PM EST on January 11, 2013"
+            },
             "conditions": "Rain showers",
             "data": "This is some data"
           }
@@ -33,6 +37,33 @@ module Agents
             "subject": "This is some data"
           }
 
+      In `matchers` setting you can perform regular expression matching against contents of events and expand the match data for use in `instructions` setting.  Here is an example:
+
+          {
+            "matchers": [
+              {
+                "path": "$.date.pretty",
+                "regexp": "\\A(?<time>\\d\\d:\\d\\d [AP]M [A-Z]+)",
+                "to": "pretty_date",
+              }
+            ]
+          }
+
+      This virtually merges the following hash into the original event hash:
+
+          "pretty_date": {
+            "time": "10:00 PM EST",
+            "0": "10:00 PM EST on January 11, 2013"
+            "1": "10:00 PM EST",
+          }
+
+      So you can use it in `instructions` like this:
+
+          "instructions": {
+            "message": "Today's conditions look like <$.conditions> with a high temperature of <$.high.celsius> degrees Celsius according to the forecast at <$.pretty_date.time>.",
+            "subject": "$.data"
+          }
+
       If you want to retain original contents of events and only add new keys, then set `mode` to `merge`, otherwise set it to `clean`.
 
       By default, the output event will have `agent` and `created_at` fields added as well, reflecting the original Agent type and Event creation time.  You can skip these outputs by setting `skip_agent` and `skip_created_at` to `true`.
@@ -46,8 +77,12 @@ module Agents
 
     event_description "User defined"
 
+    after_save :clear_matchers
+
     def validate_options
       errors.add(:base, "instructions, mode, skip_agent, and skip_created_at all need to be present.") unless options['instructions'].present? and options['mode'].present? and options['skip_agent'].present? and options['skip_created_at'].present?
+
+      validate_matchers
     end
 
     def default_options
@@ -56,6 +91,7 @@ module Agents
           'message' =>  "You received a text <$.text> from <$.fields.from>",
           'some_other_field' => "Looks like the weather is going to be <$.fields.weather>"
         },
+        'matchers' => [],
         'mode' => "clean",
         'skip_agent' => "false",
         'skip_created_at' => "false"
@@ -68,12 +104,92 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        formatted_event = options['mode'].to_s == "merge" ? event.payload : {}
-        options['instructions'].each_pair {|key, value| formatted_event[key] = Utils.interpolate_jsonpaths(value, event.payload) }
+        formatted_event = options['mode'].to_s == "merge" ? event.payload.dup : {}
+        payload = perform_matching(event.payload)
+        options['instructions'].each_pair {|key, value| formatted_event[key] = Utils.interpolate_jsonpaths(value, payload) }
         formatted_event['agent'] = Agent.find(event.agent_id).type.slice!(8..-1) unless options['skip_agent'].to_s == "true"
         formatted_event['created_at'] = event.created_at unless options['skip_created_at'].to_s == "true"
         create_event :payload => formatted_event
       end
+    end
+
+    private
+
+    def validate_matchers
+      matchers = options['matchers'] or return
+
+      unless matchers.is_a?(Array)
+        errors.add(:base, "matchers must be an array if present")
+        return
+      end
+
+      matchers.each do |matcher|
+        unless matcher.is_a?(Hash)
+          errors.add(:base, "each matcher must be a hash")
+          next
+        end
+
+        regexp, path, to = matcher.values_at(*%w[regexp path to])
+
+        if regexp.present?
+          begin
+            Regexp.new(regexp)
+          rescue
+            errors.add(:base, "bad regexp found in matchers: #{regexp}")
+          end
+        else
+          errors.add(:base, "regexp is mandatory for a matcher and must be a string")
+        end
+
+        errors.add(:base, "path is mandatory for a matcher and must be a string") if !path.present?
+
+        errors.add(:base, "to must be a string if present in a matcher") if to.present? && !to.is_a?(String)
+      end
+    end
+
+    def perform_matching(payload)
+      matchers.inject(payload.dup) { |hash, matcher|
+        matcher[hash]
+      }
+    end
+
+    def matchers
+      @matchers ||=
+        if matchers = options['matchers']
+          matchers.map { |matcher|
+            regexp, path, to = matcher.values_at(*%w[regexp path to])
+            re = Regexp.new(regexp)
+            proc { |hash|
+              mhash = {}
+              value = Utils.value_at(hash, path)
+              if value.is_a?(String) && (m = re.match(value))
+                m.to_a.each_with_index { |s, i|
+                  mhash[i.to_s] = s
+                }
+                m.names.each do |name|
+                  mhash[name] = m[name]
+                end if m.respond_to?(:names)
+              end
+              if to
+                case value = hash[to]
+                when Hash
+                  value.update(mhash)
+                else
+                  hash[to] = mhash
+                end
+              else
+                hash.update(mhash)
+              end
+              hash
+            }
+          }
+        else
+          []
+        end
+    end
+
+    def clear_matchers
+      @matchers = nil
     end
   end
 end

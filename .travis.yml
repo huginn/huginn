@@ -4,6 +4,8 @@ rvm:
   - 2.0.0
   - 2.1.1
   - 1.9.3
+before_install:
+  - travis_retry gem install bundler  
 before_script:
   - mysql -e 'create database huginn_test;'
   - bundle exec rake db:migrate db:test:prepare
