@@ -44,6 +44,7 @@ gem 'twitter', '~> 5.7.1'
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'em-http-request', '~> 1.1.2'
 gem 'weibo_2', '~> 0.1.4'
+gem 'hipchat', '~> 1.1.0'
 
 gem 'therubyracer', '~> 0.12.1'
 
