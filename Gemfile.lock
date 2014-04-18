@@ -121,6 +121,8 @@ GEM
       rails (~> 3.0)
     hashie (2.0.5)
     hike (1.2.3)
+    hipchat (1.1.0)
+      httparty
     http (0.5.0)
       http_parser.rb
     http_parser.rb (0.6.0)
@@ -318,6 +320,7 @@ DEPENDENCIES
   foreman (~> 0.63.0)
   geokit (~> 1.6.7)
   geokit-rails3 (~> 0.1.5)
+  hipchat (~> 1.1.0)
   jquery-rails (~> 3.0.4)
   json (>= 1.7.7)
   jsonpath (~> 0.5.3)
