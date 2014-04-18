@@ -44,19 +44,24 @@ describe Agents::BasecampAgent do
   end
 
   describe "helpers" do
-    it "should generate a correct auth hash" do
-      @checker.send(:auth_options).should == {:basic_auth=>{:username=>"user", :password=>"pass"}}
+    it "should generate a correct request options hash" do
+      @checker.send(:request_options).should == {:basic_auth=>{:username=>"user", :password=>"pass"}, :headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
     end
 
-    it "should not provide the since attribute on first run" do
+    it "should generate the currect request url" do
       @checker.send(:request_url).should == "https://basecamp.com/12345/api/v1/projects/6789/events.json"
+    end
+
+
+    it "should not provide the since attribute on first run" do
+      @checker.send(:query_parameters).should == {}
     end
 
     it "should provide the since attribute after the first run" do
       time = (Time.now-1.minute).iso8601
       @checker.memory[:last_run] = time
       @checker.save
-      @checker.reload.send(:request_url).should == "https://basecamp.com/12345/api/v1/projects/6789/events.json?since=#{time}"
+      @checker.reload.send(:query_parameters).should == {:query => {:since => time}}
     end
   end
   describe "#check" do

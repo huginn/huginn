@@ -64,8 +64,7 @@ module Agents
     end
 
     def check
-      log "Requesting events from #{request_url}"
-      reponse = HTTParty.get request_url, auth_options.merge(:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"})
+      reponse = HTTParty.get request_url, request_options.merge(query_parameters)
       memory[:last_run] = Time.now.utc.iso8601
       if last_check_at != nil
         JSON.parse(reponse.body).each do |event|
@@ -76,17 +75,16 @@ module Agents
     end
 
   private
-    def first_run?
-      memory[:first_run].nil?
-    end
-
     def request_url
-      since = memory[:last_run] ? "?since=#{memory[:last_run]}" : ''
-      "https://basecamp.com/#{URI.encode(options[:user_id].to_s)}/api/v1/projects/#{URI.encode(options[:project_id].to_s)}/events.json#{since}"
+      "https://basecamp.com/#{URI.encode(options[:user_id].to_s)}/api/v1/projects/#{URI.encode(options[:project_id].to_s)}/events.json"
     end
 
-    def auth_options
-      {:basic_auth => {:username =>options[:username], :password=>options[:password]}}
+    def request_options
+      {:basic_auth => {:username =>options[:username], :password=>options[:password]}, :headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
+    end
+
+    def query_parameters
+      memory[:last_run].present? ? { :query => {:since => memory[:last_run]} } : {}
     end
   end
 end
