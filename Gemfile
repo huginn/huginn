@@ -1,12 +1,14 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.17'
+gem 'protected_attributes', '~>1.0.7'
+
+gem 'rails', '4.1.0'
 gem 'mysql2', '~> 0.3.13'
-gem 'devise', '~> 3.0.0'
+gem 'devise', '~> 3.2.4'
 gem 'kaminari', '~> 0.14.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.2'
 gem 'rufus-scheduler', '~> 3.0.7', require: false
-gem 'json', '>= 1.7.7'
+gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.3'
 gem 'twilio-ruby', '~> 3.10.0'
 gem 'ruby-growl', '~> 4.1.0'
@@ -20,17 +22,17 @@ gem 'daemons', '~> 1.1.9'
 
 gem 'foreman', '~> 0.63.0'
 
-gem 'sass-rails',   '~> 3.2.3'
-gem 'coffee-rails', '~> 3.2.1'
-gem 'uglifier', '>= 1.0.3'
-gem 'select2-rails', '~> 3.4.3'
+gem 'sass-rails',   '~> 4.0.0'
+gem 'coffee-rails', '~> 4.0.0'
+gem 'uglifier', '>= 1.3.0'
+gem 'select2-rails', '~> 3.5.4'
 gem 'jquery-rails', '~> 3.0.4'
 gem 'ace-rails-ap', '~> 2.0.1'
 
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
 # in its own Gemfile.
 gem 'geokit', '~> 1.6.7'
-gem 'geokit-rails3', '~> 0.1.5'
+gem 'geokit-rails', '~> 2.0.0'
 
 gem 'kramdown', '~> 1.1.0'
 gem 'typhoeus', '~> 0.6.3'
@@ -60,6 +62,7 @@ group :development, :test do
   gem 'rspec'
   gem 'shoulda-matchers'
   gem 'rr'
+  gem 'delorean'
   gem 'webmock', require: false
   gem 'coveralls', require: false
 end
