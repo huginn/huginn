@@ -154,37 +154,52 @@ module Agents
     end
 
     def extract_output(doc)
+      if extraction_type == 'json'
+        extract_from_json doc
+      elsif extraction_type == 'html-node-based'
+        extract_html_nodes doc
+      else
+        extract_whole_body doc
+      end
+    end
+
+    def extract_from_json(doc)
       output = {}
       options['extract'].each do |name, extraction_details|
-        if extraction_type == "json"
-          result = Utils.values_at(doc, extraction_details['path'])
-          log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
+        result = Utils.values_at(doc, extraction_details['path'])
+        log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
+        output[name] = result
+      end
+      output
+    end
+
+    def extract_whole_body doc
+      output = {}
+      options['extract'].each do |name, extraction_details|
+        case
+        when css = extraction_details['css']
+          nodes = doc.css(css)
+        when xpath = extraction_details['xpath']
+          nodes = doc.xpath(xpath)
         else
-          case
-          when css = extraction_details['css']
-            nodes = doc.css(css)
-          when xpath = extraction_details['xpath']
-            nodes = doc.xpath(xpath)
-          else
-            error "'css' or 'xpath' is required for HTML or XML extraction"
-            return
-          end
-          unless Nokogiri::XML::NodeSet === nodes
-            error "The result of HTML/XML extraction was not a NodeSet"
-            return
-          end
-          result = nodes.map { |node|
-            if extraction_details['attr']
-              node.attr(extraction_details['attr'])
-            elsif extraction_details['text']
-              node.text()
-            else
-              error "'attr' or 'text' is required on HTML or XML extraction patterns"
-              return
-            end
-          }
-          log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
+          error "'css' or 'xpath' is required for HTML or XML extraction"
+          return
         end
+        unless Nokogiri::XML::NodeSet === nodes
+          error "The result of HTML/XML extraction was not a NodeSet"
+          return
+        end
+        result = nodes.map { |node|
+          if extraction_details['attr']
+            node.attr(extraction_details['attr'])
+          elsif extraction_details['text']
+            node.text()
+          else
+            error "'attr' or 'text' is required on HTML or XML extraction patterns"
+            return
+          end
+        }
+        log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
         output[name] = result
       end
       output
@@ -262,6 +277,8 @@ module Agents
           "xml"
         elsif options['url'] =~ /\.json$/i
           "json"
+        elsif options['extract'] && options['extract']['_root']
+          "html-node-based"
         else
           "html"
         end
@@ -275,6 +292,8 @@ module Agents
         when "json"
           JSON.parse(data)
         when "html"
+          Nokogiri::HTML(data)
+        when "html-node-based"
           Nokogiri::HTML(data)
         else
           raise "Unknown extraction type #{extraction_type}"
