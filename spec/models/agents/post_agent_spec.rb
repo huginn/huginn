@@ -5,8 +5,11 @@ describe Agents::PostAgent do
     @valid_params = {
       :name => "somename",
       :options => {
-        :post_url => "http://www.example.com",
-        :expected_receive_period_in_days => 1
+        'post_url' => "http://www.example.com",
+        'expected_receive_period_in_days' => 1,
+        'payload' => {
+          'default' => 'value'
+        }
       }
     }
 
@@ -17,28 +20,42 @@ describe Agents::PostAgent do
     @event = Event.new
     @event.agent = agents(:jane_weather_agent)
     @event.payload = {
-      :somekey => "somevalue",
-      :someotherkey => {
-        :somekey => "value"
+      'somekey' => 'somevalue',
+      'someotherkey' => {
+        'somekey' => 'value'
       }
     }
 
     @sent_messages = []
-    stub.any_instance_of(Agents::PostAgent).post_event { |uri, event| @sent_messages << event }
+    stub.any_instance_of(Agents::PostAgent).post_data { |event| @sent_messages << event }
   end
 
   describe "#receive" do
-    it "checks if it can handle multiple events" do
+    it "can handle multiple events and merge the payloads with options['payload']" do
       event1 = Event.new
       event1.agent = agents(:bob_weather_agent)
       event1.payload = {
-        :xyz => "value1",
-        :message => "value2"
+        'xyz' => 'value1',
+        'message' => 'value2',
+        'default' => 'value2'
       }
 
       lambda {
         @checker.receive([@event, event1])
       }.should change { @sent_messages.length }.by(2)
+
+      @sent_messages[0].should == @event.payload.merge('default' => 'value')
+      @sent_messages[1].should == event1.payload
+    end
+  end
+
+  describe "#check" do
+    it "sends options['payload']" do
+      lambda {
+        @checker.check
+      }.should change { @sent_messages.length }.by(1)
+
+      @sent_messages[0].should == @checker.options['payload']
     end
   end
 
@@ -66,6 +83,20 @@ describe Agents::PostAgent do
     it "should validate presence of expected_receive_period_in_days" do
       @checker.options[:expected_receive_period_in_days] = ""
       @checker.should_not be_valid
+    end
+
+    it "should validate payload as a hash, if present" do
+      @checker.options[:payload] = ""
+      @checker.should be_valid
+
+      @checker.options[:payload] = "hello"
+      @checker.should_not be_valid
+
+      @checker.options[:payload] = ["foo", "bar"]
+      @checker.should_not be_valid
+
+      @checker.options[:payload] = { 'this' => 'that' }
+      @checker.should be_valid
     end
   end
 end

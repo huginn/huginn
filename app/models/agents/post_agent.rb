@@ -1,10 +1,11 @@
 module Agents
   class PostAgent < Agent
-    cannot_be_scheduled!
     cannot_create_events!
 
+    default_schedule "never"
+
     description <<-MD
-       Post Agent receives events from other agents and send those events as the contents of a post request to a specified url. `post_url` field must specify where you would like to receive post requests and do not forget to include URI scheme (`http` or `https`)
+      A PostAgent receives events from other agents (or runs periodically), merges those events with the contents of `payload`, and sends the results as POST requests to a specified url. The `post_url` field must specify where you would like to send requests.  Please include the URI scheme (`http` or `https`).
     MD
 
     event_description "Does not produce events."
@@ -12,7 +13,10 @@ module Agents
     def default_options
       {
         'post_url' => "http://www.example.com",
-        'expected_receive_period_in_days' => 1
+        'expected_receive_period_in_days' => 1,
+        'payload' => {
+          'key' => 'value'
+        }
       }
     end
 
@@ -24,19 +28,29 @@ module Agents
       unless options['post_url'].present? && options['expected_receive_period_in_days'].present?
         errors.add(:base, "post_url and expected_receive_period_in_days are required fields")
       end
-    end
 
-    def post_event(uri, event)
-      req = Net::HTTP::Post.new(uri.request_uri)
-      req.form_data = event
-      Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
+      if options['payload'].present? && !options['payload'].is_a?(Hash)
+        errors.add(:base, "if provided, payload must be a hash")
+      end
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        uri = URI options[:post_url]
-        post_event uri, event.payload
+        post_data (options['payload'].presence || {}).merge(event.payload)
       end
+    end
+
+    def check
+      post_data options['payload'].presence || {}
+    end
+
+    private
+
+    def post_data(data)
+      uri = URI.new(options[:post_url])
+      req = Net::HTTP::Post.new(uri.request_uri)
+      req.form_data = data
+      Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
     end
   end
 end
