@@ -5,6 +5,7 @@ describe Agents::PushoverAgent do
     @checker = Agents::PushoverAgent.new(:name => 'Some Name',
                                        :options => { :token => 'x',
                                                 :user => 'x',
+                                                :message => 'Some Message',
                                                 :device => 'Some Device',
                                                 :title => 'Some Message Title',
                                                 :url => 'http://someurl.com',
@@ -44,6 +45,26 @@ describe Agents::PushoverAgent do
       @sent_notifications[0]['message'].should == 'Looks like its going to rain'
       @sent_notifications[1]['message'].should == 'Some message'
       @sent_notifications[2]['message'].should == 'Some other message'
+    end
+
+    it 'should make sure event message overrides default message' do
+      event = Event.new
+      event.agent = agents(:bob_rain_notifier_agent)
+      event.payload = { :message => 'Some new message'}
+      event.save!
+
+      @checker.receive([event])
+      @sent_notifications[0]['message'].should == 'Some new message'
+    end
+
+    it 'should make sure event text overrides default message' do
+      event = Event.new
+      event.agent = agents(:bob_rain_notifier_agent)
+      event.payload = { :text => 'Some new text'}
+      event.save!
+
+      @checker.receive([event])
+      @sent_notifications[0]['message'].should == 'Some new text'
     end
 
     it 'should make sure event title overrides default title' do
@@ -155,6 +176,11 @@ describe Agents::PushoverAgent do
 
     it "should validate presence of user" do
       @checker.options[:user] = ""
+      @checker.should_not be_valid
+    end
+
+    it "should validate presence of message" do
+      @checker.options[:message] = ""
       @checker.should_not be_valid
     end
 

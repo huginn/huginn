@@ -3,14 +3,14 @@ module Agents
     cannot_be_scheduled!
     cannot_create_events!
 
-    @@api_url = 'https://api.pushover.net/1/messages.json'
+    API_URL = 'https://api.pushover.net/1/messages.json'
 
     description <<-MD
       The PushoverAgent receives and collects events and sends them via push notification to a user/group.
 
       **You need a Pushover API Token:** [https://pushover.net/apps/build](https://pushover.net/apps/build)
       
-      **Your event must provide** a `message` or `text` key that will contain the body of the notification. Pushover API has a `512` Character Limit including `title`. `message` will be truncated.
+      **You must provide** a `message` or `text` key that will contain the body of the notification. This can come from an event or be set as a default. Pushover API has a `512` Character Limit including `title`. `message` will be truncated.
 
       * `token`: your application's API token
       * `user`: the user or group key (not e-mail address).
@@ -37,6 +37,7 @@ module Agents
       {
         'token' => 'vKxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         'user' => 'Fjxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        'message' => 'a default message',
         'device' => '',
         'title' => '',
         'url' => '',
@@ -50,15 +51,15 @@ module Agents
     end
 
     def validate_options
-      unless options['token'].present? && options['user'].present? && options['expected_receive_period_in_days'].present?
-        errors.add(:base, 'token, user, and expected_receive_period_in_days are all required.')
+      unless options['token'].present? && options['user'].present? && options['message'].present? && options['expected_receive_period_in_days'].present?
+        errors.add(:base, 'token, user, message, and expected_receive_period_in_days are all required.')
       end
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        message = (event.payload['message'] || event.payload['text']).to_s
-        if message != ""
+        message = (event.payload['message'] || event.payload['text'] || options['message']).to_s
+        if message.present?
             post_params = {
               'token' => options['token'],
               'user' => options['user'],
@@ -98,7 +99,7 @@ module Agents
     end
 
     def send_notification(post_params)
-      response = HTTParty.post(@@api_url, :query => post_params)
+      response = HTTParty.post(API_URL, :query => post_params)
       puts response
     end
 
