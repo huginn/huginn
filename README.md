@@ -26,6 +26,13 @@ Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, 
 
 Want to help with Huginn?  Try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
 
+### Need help?
+
+You can get hands-on support for Huginn setup, deployment and other issues at  [CodersClan](http://www.codersclan.net/?repo_id=329).
+
+<a href="http://codersclan.net/?repo_id=329&source=big"><img src="http://www.codersclan.net/gs_button/?repo_id=329" width="200"></a>
+
+
 ## Examples
 
 Please checkout the [Huginn Introductory Screencast](http://vimeo.com/61976251)!
@@ -105,4 +112,5 @@ Huginn is a work in progress and is hopefully just getting started.  Please get 
 Please fork, add specs, and send pull requests!
 
 [![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.png)](https://coveralls.io/r/cantino/huginn) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+<a href="http://codersclan.net/?repo_id=329&source=small"><img src="http://www.codersclan.net/gs_button/?repo_id=329&size=small" width="69"></a>
 
