@@ -47,7 +47,7 @@ module Agents
     private
 
     def post_data(data)
-      uri = URI.new(options[:post_url])
+      uri = URI options[:post_url]
       req = Net::HTTP::Post.new(uri.request_uri)
       req.form_data = data
       Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
