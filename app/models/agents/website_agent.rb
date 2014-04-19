@@ -114,91 +114,104 @@ module Agents
 
       if options['url'].kind_of?(Array)
         options['url'].each do |url|
-           requests.push(Typhoeus::Request.new(url, request_opts))
+          requests.push(Typhoeus::Request.new(url, request_opts))
         end
       else
         requests.push(Typhoeus::Request.new(options['url'], request_opts))
       end
-
+      
       requests.each do |request|
-        request.on_failure do |response|
-          error "Failed: #{response.inspect}"
-        end
+         request.on_failure do |response|
+           error "Failed: #{response.inspect}"
+         end
 
         request.on_success do |response|
-          body = response.body
-          if (encoding = options['force_encoding']).present?
-            body = body.encode(Encoding::UTF_8, encoding)
-          end
-          doc = parse(body)
+          handle_success response
+        end
+        
+        hydra.queue request
+      end
+      hydra.run
+    end
 
-          if extract_full_json?
-            if store_payload!(previous_payloads(1), doc)
-              log "Storing new result for '#{name}': #{doc.inspect}"
-              create_event :payload => doc
-            end
+    def handle_success(response)
+      body = response.body
+      if (encoding = options['force_encoding']).present?
+        body = body.encode(Encoding::UTF_8, encoding)
+      end
+      doc = parse(body)
+
+      if extract_full_json?
+        if store_payload!(previous_payloads(1), doc)
+          log "Storing new result for '#{name}': #{doc.inspect}"
+          create_event :payload => doc
+        end
+      else
+        output = extract_output(doc)
+        return unless output
+        generate_events_from_output output
+      end
+    end
+
+    def extract_output(doc)
+      output = {}
+      options['extract'].each do |name, extraction_details|
+        if extraction_type == "json"
+          result = Utils.values_at(doc, extraction_details['path'])
+          log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
+        else
+          case
+          when css = extraction_details['css']
+            nodes = doc.css(css)
+          when xpath = extraction_details['xpath']
+            nodes = doc.xpath(xpath)
           else
-            output = {}
-            options['extract'].each do |name, extraction_details|
-              if extraction_type == "json"
-                result = Utils.values_at(doc, extraction_details['path'])
-                log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
-              else
-                case
-                when css = extraction_details['css']
-                  nodes = doc.css(css)
-                when xpath = extraction_details['xpath']
-                  nodes = doc.xpath(xpath)
-                else
-                  error "'css' or 'xpath' is required for HTML or XML extraction"
-                  return
-                end
-                unless Nokogiri::XML::NodeSet === nodes
-                  error "The result of HTML/XML extraction was not a NodeSet"
-                  return
-                end
-                result = nodes.map { |node|
-                  if extraction_details['attr']
-                    node.attr(extraction_details['attr'])
-                  elsif extraction_details['text']
-                    node.text()
-                  else
-                    error "'attr' or 'text' is required on HTML or XML extraction patterns"
-                    return
-                  end
-                }
-                log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
-              end
-              output[name] = result
-            end
-
-            num_unique_lengths = options['extract'].keys.map { |name| output[name].length }.uniq
-
-            if num_unique_lengths.length != 1
-              error "Got an uneven number of matches for #{options['name']}: #{options['extract'].inspect}"
+            error "'css' or 'xpath' is required for HTML or XML extraction"
+            return
+          end
+          unless Nokogiri::XML::NodeSet === nodes
+            error "The result of HTML/XML extraction was not a NodeSet"
+            return
+          end
+          result = nodes.map { |node|
+            if extraction_details['attr']
+              node.attr(extraction_details['attr'])
+            elsif extraction_details['text']
+              node.text()
+            else
+              error "'attr' or 'text' is required on HTML or XML extraction patterns"
               return
             end
-        
-            old_events = previous_payloads num_unique_lengths.first
-            num_unique_lengths.first.times do |index|
-              result = {}
-              options['extract'].keys.each do |name|
-                result[name] = output[name][index]
-                if name.to_s == 'url'
-                  result[name] = URI.join(options['url'], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
-                end
-              end
+          }
+          log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
+        end
+        output[name] = result
+      end
+      output
+    end
 
-              if store_payload!(old_events, result)
-                log "Storing new parsed result for '#{name}': #{result.inspect}"
-                create_event :payload => result
-              end
-            end
+    def generate_events_from_output(output)
+      num_unique_lengths = options['extract'].keys.map { |name| output[name].length }.uniq
+
+      if num_unique_lengths.length != 1
+        error "Got an uneven number of matches for #{options['name']}: #{options['extract'].inspect}"
+        return
+      end
+
+      old_events = previous_payloads num_unique_lengths.first
+      num_unique_lengths.first.times do |index|
+        result = {}
+        options['extract'].keys.each do |name|
+          result[name] = output[name][index]
+          if name.to_s == 'url'
+            result[name] = URI.join(options['url'], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
           end
         end
 
-        hydra.queue request
-        hydra.run
+        if store_payload!(old_events, result)
+          log "Storing new parsed result for '#{name}': #{result.inspect}"
+          create_event :payload => result
+        end
       end
     end
 
