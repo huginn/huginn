@@ -179,11 +179,6 @@ describe Agents::PushoverAgent do
       @checker.should_not be_valid
     end
 
-    it "should validate presence of message" do
-      @checker.options[:message] = ""
-      @checker.should_not be_valid
-    end
-
     it "should validate presence of expected_receive_period_in_days" do
       @checker.options[:expected_receive_period_in_days] = ""
       @checker.should_not be_valid

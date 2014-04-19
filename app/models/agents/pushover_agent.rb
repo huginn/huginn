@@ -51,8 +51,8 @@ module Agents
     end
 
     def validate_options
-      unless options['token'].present? && options['user'].present? && options['message'].present? && options['expected_receive_period_in_days'].present?
-        errors.add(:base, 'token, user, message, and expected_receive_period_in_days are all required.')
+      unless options['token'].present? && options['user'].present? && options['expected_receive_period_in_days'].present?
+        errors.add(:base, 'token, user, and expected_receive_period_in_days are all required.')
       end
     end
 
