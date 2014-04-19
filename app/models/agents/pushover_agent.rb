@@ -35,8 +35,8 @@ module Agents
 
     def default_options
       {
-        'token' => 'vKxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        'user' => 'Fjxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        'token' => '',
+        'user' => '',
         'message' => 'a default message',
         'device' => '',
         'title' => '',
