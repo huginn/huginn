@@ -16,6 +16,8 @@ module Agents
 
       Specify a `url` and select a `mode` for when to create Events based on the scraped data, either `all` or `on_change`.
 
+      `url` can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape)
+
       The `type` value can be `xml`, `html`, or `json`.
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
