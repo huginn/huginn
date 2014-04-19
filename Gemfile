@@ -3,9 +3,9 @@ source 'https://rubygems.org'
 gem 'protected_attributes', '~>1.0.7'
 
 gem 'rails', '4.1.0'
-gem 'mysql2', '~> 0.3.13'
+gem 'mysql2', '~> 0.3.15'
 gem 'devise', '~> 3.2.4'
-gem 'kaminari', '~> 0.14.1'
+gem 'kaminari', '~> 0.15.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.2'
 gem 'rufus-scheduler', '~> 3.0.7', require: false
 gem 'json', '~> 1.8.1'
@@ -26,19 +26,19 @@ gem 'sass-rails',   '~> 4.0.0'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'uglifier', '>= 1.3.0'
 gem 'select2-rails', '~> 3.5.4'
-gem 'jquery-rails', '~> 3.0.4'
+gem 'jquery-rails', '~> 3.1.0'
 gem 'ace-rails-ap', '~> 2.0.1'
 
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
 # in its own Gemfile.
-gem 'geokit', '~> 1.6.7'
-gem 'geokit-rails', '~> 2.0.0'
+gem 'geokit', '~> 1.8.4'
+gem 'geokit-rails', '~> 2.0.1'
 
-gem 'kramdown', '~> 1.1.0'
+gem 'kramdown', '~> 1.3.3'
 gem 'typhoeus', '~> 0.6.3'
-gem 'nokogiri', '~> 1.6.0'
+gem 'nokogiri', '~> 1.6.1'
 
-gem 'wunderground', '~> 1.1.0'
+gem 'wunderground', '~> 1.2.0'
 gem 'forecast_io', '~> 2.0.0'
 gem 'rturk', '~> 2.11.0'
 
