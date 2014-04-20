@@ -152,6 +152,12 @@ describe Agents::PostAgent do
       uri.request_uri.should == "/a/path?existing_param=existing_value&some_param=some_value&another_param=another_value"
     end
 
+    it "works fine with urls that do not have a query" do
+      @checker.options['post_url'] = "http://example.com/a/path"
+      uri = @checker.generate_uri("some_param" => "some_value", "another_param" => "another_value")
+      uri.request_uri.should == "/a/path?some_param=some_value&another_param=another_value"
+    end
+
     it "just returns the post_uri when no params are given" do
       @checker.options['post_url'] = "http://example.com/a/path?existing_param=existing_value"
       uri = @checker.generate_uri

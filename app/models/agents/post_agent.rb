@@ -57,7 +57,7 @@ module Agents
 
     def generate_uri(params = nil)
       uri = URI options[:post_url]
-      uri.query = URI.encode_www_form(Hash[URI.decode_www_form(uri.query)].merge(params)) if params
+      uri.query = URI.encode_www_form(Hash[URI.decode_www_form(uri.query || '')].merge(params)) if params
       uri
     end
 
