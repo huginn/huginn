@@ -143,6 +143,23 @@ describe Agents::PostAgent do
       @checker.options['payload'] = { 'this' => 'that' }
       @checker.should be_valid
     end
+
+    it "requires headers to be a hash, if present" do
+      @checker.options['headers'] = [1,2,3]
+      @checker.should_not be_valid
+
+      @checker.options['headers'] = "hello world"
+      @checker.should_not be_valid
+
+      @checker.options['headers'] = ""
+      @checker.should be_valid
+
+      @checker.options['headers'] = {}
+      @checker.should be_valid
+
+      @checker.options['headers'] = { "Authorization" => "foo bar" }
+      @checker.should be_valid
+    end
   end
 
   describe "#generate_uri" do
