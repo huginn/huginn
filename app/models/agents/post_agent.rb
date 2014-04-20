@@ -8,6 +8,8 @@ module Agents
       A PostAgent receives events from other agents (or runs periodically), merges those events with the contents of `payload`, and sends the results as POST (or GET) requests to a specified url.
 
       The `post_url` field must specify where you would like to send requests. Please include the URI scheme (`http` or `https`).
+
+      The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
     MD
 
     event_description "Does not produce events."
@@ -19,7 +21,8 @@ module Agents
         'method' => 'post',
         'payload' => {
           'key' => 'value'
-        }
+        },
+        'headers' => {}
       }
     end
 
@@ -29,6 +32,10 @@ module Agents
 
     def method
       (options['method'].presence || 'post').to_s.downcase
+    end
+
+    def headers
+      options['headers'].presence || {}
     end
 
     def validate_options
@@ -42,6 +49,10 @@ module Agents
 
       unless %w[post get].include?(method)
         errors.add(:base, "method must be 'post' or 'get'")
+      end
+
+      unless headers.is_a?(Hash)
+        errors.add(:base, "if provided, headers must be a hash")
       end
     end
 
@@ -75,14 +86,14 @@ module Agents
 
     def post_data(data)
       uri = generate_uri
-      req = Net::HTTP::Post.new(uri.request_uri)
+      req = Net::HTTP::Post.new(uri.request_uri, headers)
       req.form_data = data
       Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
     end
 
     def get_data(data)
       uri = generate_uri(data)
-      req = Net::HTTP::Get.new(uri.request_uri)
+      req = Net::HTTP::Get.new(uri.request_uri, headers)
       Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
     end
   end
