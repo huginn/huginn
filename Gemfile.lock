@@ -267,7 +267,7 @@ GEM
       builder (>= 2.1.2)
       jwt (>= 0.1.2)
       multi_json (>= 1.3.0)
-    twitter (5.7.1)
+    twitter (5.8.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
       equalizer (~> 0.0.9)
@@ -345,7 +345,7 @@ DEPENDENCIES
   shoulda-matchers
   therubyracer (~> 0.12.1)
   twilio-ruby (~> 3.11.5)
-  twitter (~> 5.7.1)
+  twitter (~> 5.8.0)
   twitter-stream!
   typhoeus (~> 0.6.3)
   uglifier (>= 1.3.0)
