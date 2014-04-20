@@ -16,7 +16,7 @@ group "huginn" do
   action :create
 end
 
-%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl").each do |pkg|
+%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libmysqlclient-dev").each do |pkg|
   package pkg do
     action :install
   end
@@ -49,9 +49,9 @@ bash "huginn dependencies" do
     export LC_ALL="en_US.UTF-8"
     sudo bundle install
     sed s/REPLACE_ME_NOW\!/$(sudo rake secret)/ .env.example > .env
-    sudo rake db:create
-    sudo rake db:migrate
-    sudo rake db:seed
+    sudo bundle exec rake db:create
+    sudo bundle exec rake db:migrate
+    sudo bundle exec rake db:seed
     EOH
 end
 
