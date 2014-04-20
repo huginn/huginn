@@ -14,7 +14,7 @@ group "huginn" do
   members ["huginn"]
 end
 
-%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8").each do |pkg|
+%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8" "libmysqlclient-dev").each do |pkg|
   package("#{pkg}")
 end
 
@@ -84,9 +84,9 @@ deploy "/home/huginn" do
       sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/ 
       sudo bundle install
       sed -i s/REPLACE_ME_NOW\!/$(sudo rake secret)/ .env
-      sudo rake db:create
-      sudo rake db:migrate
-      sudo rake db:seed
+      sudo bundle exec rake db:create
+      sudo bundle exec rake db:migrate
+      sudo bundle exec rake db:seed
       sudo foreman export upstart /etc/init -a huginn -u huginn -l log
       sudo start huginn
       EOH
