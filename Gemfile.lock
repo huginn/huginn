@@ -215,7 +215,7 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
-    rturk (2.11.3)
+    rturk (2.12.1)
       erector
       nokogiri
       rest-client
@@ -263,7 +263,7 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
-    twilio-ruby (3.10.1)
+    twilio-ruby (3.11.5)
       builder (>= 2.1.2)
       jwt (>= 0.1.2)
       multi_json (>= 1.3.0)
@@ -289,7 +289,7 @@ GEM
       macaddr (~> 1.0)
     warden (1.2.3)
       rack (>= 1.0)
-    webmock (1.13.0)
+    webmock (1.17.4)
       addressable (>= 2.2.7)
       crack (>= 0.3.2)
     weibo_2 (0.1.6)
@@ -337,14 +337,14 @@ DEPENDENCIES
   rr
   rspec
   rspec-rails
-  rturk (~> 2.11.0)
+  rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
   rufus-scheduler (~> 3.0.7)
   sass-rails (~> 4.0.0)
   select2-rails (~> 3.5.4)
   shoulda-matchers
   therubyracer (~> 0.12.1)
-  twilio-ruby (~> 3.10.0)
+  twilio-ruby (~> 3.11.5)
   twitter (~> 5.7.1)
   twitter-stream!
   typhoeus (~> 0.6.3)

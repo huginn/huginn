@@ -10,7 +10,7 @@ gem 'bootstrap-kaminari-views', '~> 0.0.2'
 gem 'rufus-scheduler', '~> 3.0.7', require: false
 gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.3'
-gem 'twilio-ruby', '~> 3.10.0'
+gem 'twilio-ruby', '~> 3.11.5'
 gem 'ruby-growl', '~> 4.1.0'
 
 gem 'delayed_job', '~> 4.0.0'
@@ -40,7 +40,7 @@ gem 'nokogiri', '~> 1.6.1'
 
 gem 'wunderground', '~> 1.2.0'
 gem 'forecast_io', '~> 2.0.0'
-gem 'rturk', '~> 2.11.0'
+gem 'rturk', '~> 2.12.1'
 
 gem 'twitter', '~> 5.7.1'
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
