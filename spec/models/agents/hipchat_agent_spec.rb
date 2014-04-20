@@ -62,7 +62,7 @@ describe Agents::HipchatAgent do
     end
 
     it "should merge all options" do
-      @checker.send(:merge_options, @event).should == {
+      @checker.send(:merge_options, @event).deep_symbolize_keys.should == {
         :room_name => "test",
         :username => "Huggin user",
         :message => "Looks like its going to rain",
