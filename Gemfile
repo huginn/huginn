@@ -63,3 +63,7 @@ group :development, :test do
   gem 'webmock', require: false
   gem 'coveralls', require: false
 end
+
+group :production do
+  gem 'unicorn'
+end
