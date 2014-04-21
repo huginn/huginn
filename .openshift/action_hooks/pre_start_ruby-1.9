@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# The pre_start_cartridge and pre_stop_cartridge hooks are *SOURCED*
+# immediately before (re)starting or stopping the specified cartridge.
+# They are able to make any desired environment variable changes as
+# well as other adjustments to the application environment.
+
+# The post_start_cartridge and post_stop_cartridge hooks are executed
+# immediately after (re)starting or stopping the specified cartridge.
+
+# Exercise caution when adding commands to these hooks.  They can
+# prevent your application from stopping cleanly or starting at all.
+# Application start and stop is subject to different timeouts
+# throughout the system.
+
+if [ -f ${OPENSHIFT_REPO_DIR}/.env ]
+then
+    echo "  Loading .env file"
+    while read -r line; do
+        if [[ $line =~ ^\s*(#|$) ]]
+        then 
+            continue
+        else
+            export "$line"
+        fi
+    done < ${OPENSHIFT_REPO_DIR}/.env
+else
+    cat <<EOM
+***
+*
+*  WARNING: No .env file found. Things like email probably won't work.
+*           You should consider making one. See .env.example.openshift.
+*
+***
+EOM
+fi

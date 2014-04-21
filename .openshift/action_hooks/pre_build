@@ -1,0 +1,22 @@
+#!/bin/bash
+# This is a simple script and will be executed on your CI system if
+# available.  Otherwise it will execute while your application is stopped
+# before the build step.  This script gets executed directly, so it
+# could be python, php, ruby, etc.
+
+STORED_ASSETS="${OPENSHIFT_DATA_DIR}/assets"
+LIVE_ASSETS="${OPENSHIFT_REPO_DIR}/public/assets"
+
+# Ensure our stored assets directory exists
+if [ ! -d "${STORED_ASSETS}" ]; then
+  echo "  Creating permanent assets directory"
+  mkdir "${STORED_ASSETS}"
+fi
+
+# Create symlink to stored assets unless we're uploading our own assets
+if [ -d "${LIVE_ASSETS}" ]; then
+  echo "  WARNING: Assets included in git repository, not using stored assets"
+else
+  echo "  Restoring stored assets"
+  ln -s "${STORED_ASSETS}" "${LIVE_ASSETS}"
+fi
