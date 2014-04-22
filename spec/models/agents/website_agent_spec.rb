@@ -91,6 +91,30 @@ describe Agents::WebsiteAgent do
         @checker.check
         @checker.logs.first.message.should =~ /Got an uneven number of matches/
       end
+
+      it "should accept an array for url" do
+        @site['url'] = ["http://xkcd.com/1/", "http://xkcd.com/2/"]
+        @checker.options = @site
+        lambda { @checker.save! }.should_not raise_error;
+        lambda { @checker.check }.should_not raise_error;
+      end
+
+      it "should parse events from all urls in array" do
+        lambda {
+          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @site['mode'] = 'all'
+          @checker.options = @site
+          @checker.check
+        }.should change { Event.count }.by(2)
+      end
+
+      it "should follow unique rules when parsing array of urls" do
+        lambda {
+          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @checker.options = @site
+          @checker.check
+        }.should change { Event.count }.by(1)
+      end
     end
 
     describe 'encoding' do
