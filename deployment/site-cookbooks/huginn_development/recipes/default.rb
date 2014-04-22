@@ -16,10 +16,17 @@ group "huginn" do
   action :create
 end
 
-%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libmysqlclient-dev").each do |pkg|
+%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libmysqlclient-dev" "rubygems").each do |pkg|
   package pkg do
     action :install
   end
+end
+
+bash "Setting default ruby version to 1.9" do
+  code <<-EOH
+    update-alternatives --set ruby /usr/bin/ruby1.9.1
+    update-alternatives --set gem /usr/bin/gem1.9.1
+  EOH
 end
 
 git "/home/huginn/huginn" do
@@ -59,6 +66,6 @@ bash "huginn has been installed and will start in a minute" do
   user "huginn"
   cwd "/home/huginn/huginn"
   code <<-EOH
-    sudo foreman start
+    sudo nohup foreman start &
     EOH
 end
