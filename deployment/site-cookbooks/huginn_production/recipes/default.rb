@@ -14,7 +14,7 @@ group "huginn" do
   members ["huginn"]
 end
 
-%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8" "libmysqlclient-dev" "libffi-dev").each do |pkg|
+%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8" "libmysqlclient-dev" "libffi-dev", "libssl-dev").each do |pkg|
   package("#{pkg}")
 end
 
