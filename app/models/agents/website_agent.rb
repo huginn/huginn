@@ -209,8 +209,8 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        url_to_scrape = Utils.value_at(event['payload'], 'url')
-        check_url(url_to_scrape)
+        url_to_scrape = event.payload['url']
+        check_url(url_to_scrape) if url_to_scrape =~ /^https?:\/\//i
       end
     end
 
