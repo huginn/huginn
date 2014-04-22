@@ -54,30 +54,28 @@ module Agents
           rule_values = rule['value']
           rule_values = [rule_values] unless rule_values.is_a?(Array)
 
-          match_found = false
-          rule_values.each do |rule_value|
-            match_found ||= case rule['type']
-              when "regex"
-                value_at_path.to_s =~ Regexp.new(rule_value, Regexp::IGNORECASE)
-              when "!regex"
-                value_at_path.to_s !~ Regexp.new(rule_value, Regexp::IGNORECASE)
-              when "field>value"
-                value_at_path.to_f > rule_value.to_f
-              when "field>=value"
-                value_at_path.to_f >= rule_value.to_f
-              when "field<value"
-                value_at_path.to_f < rule_value.to_f
-              when "field<=value"
-                value_at_path.to_f <= rule_value.to_f
-              when "field==value"
-                value_at_path.to_s == rule_value.to_s
-              when "field!=value"
-                value_at_path.to_s != rule_value.to_s
-              else
-                raise "Invalid type of #{rule['type']} in TriggerAgent##{id}"
+          match_found = rule_values.any? do |rule_value|
+            case rule['type']
+            when "regex"
+              value_at_path.to_s =~ Regexp.new(rule_value, Regexp::IGNORECASE)
+            when "!regex"
+              value_at_path.to_s !~ Regexp.new(rule_value, Regexp::IGNORECASE)
+            when "field>value"
+              value_at_path.to_f > rule_value.to_f
+            when "field>=value"
+              value_at_path.to_f >= rule_value.to_f
+            when "field<value"
+              value_at_path.to_f < rule_value.to_f
+            when "field<=value"
+              value_at_path.to_f <= rule_value.to_f
+            when "field==value"
+              value_at_path.to_s == rule_value.to_s
+            when "field!=value"
+              value_at_path.to_s != rule_value.to_s
+            else
+              raise "Invalid type of #{rule['type']} in TriggerAgent##{id}"
             end
           end
-          match_found
         end
 
         if match
