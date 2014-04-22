@@ -361,4 +361,53 @@ describe Agents::WebsiteAgent do
       end
     end
   end
+
+  describe "parent/child extraction mode" do
+    before do
+      stub_request(:any, /bensbargains/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/bensbargains.html")), :status => 200)
+      @site = {
+        'name' => "Bens Bargains",
+        'expected_update_period_in_days' => 1,
+        'url' => "http://bensbargains.net/",
+        'mode' => 'on_change',
+        'extract' => {
+          '_root' => { 'css' => '#content-wrap article.deal', 'only_if_contains' => [
+                                                                       { 'css' => '.deal-hotness-very-hot' },
+                                                                       { 'css' => '.deal-hotness-sizzling' }
+                                                                      ] },
+          'title' => { 'css' => ".deal-title", 'text' => true },
+          'price' => { 'css' => ".deal-price", 'text' => true }
+        }
+      }
+      @checker = Agents::WebsiteAgent.new(:name => "bensbargains", :options => @site, :keep_events_for => 2)
+      @checker.user = users(:bob)
+      @checker.save!
+      @checker.check
+
+      @events = @checker.events
+    end
+
+    it 'should have extraction_type == "html-node-based"' do
+      @checker.send(:extraction_type).should == 'html-node-based'
+    end
+
+    it 'should extract all elements matching any condition in "only_if_contains"' do
+      # 3 matches for .deal-hotness-very-hot
+      # 5 matches for .deal-hotness-sizzling
+      @events.length.should == 5 + 3
+    end
+
+    it 'should extract data relative to the "_root" selector' do
+      expected_titles = ["Buy One Get Two Free Clearance Items + FS at Saks Fifth Avenue",
+                         "Stanley 2-in-1 Mobile Workshop $23 at Amazon",
+                         "50% off in Sale + Extra 33% off + Free Shipping at Sunglass Hut",
+                         "Arrow Precision Inferno Fury Crossbow Kit $150 at Amazon",
+                         "Up to 50% off Select Garage Storage Items at Home Depot",
+                         "Samsung Gear 2 Neo Smartwatch $157 at AT&T Wireless",
+                         "Bushnell Bear Grylls SolarWrap $35 at Amazon",
+                         "Samsung Galaxy Note 3 No Contract Smart Phone $250 at AT&T Wireless"]
+      actual_titles = @events.map { |e| e.payload['title'] }
+      actual_titles.should == expected_titles
+    end
+  end
 end

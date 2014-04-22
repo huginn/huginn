@@ -18,7 +18,7 @@ module Agents
 
       `url` can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape)
 
-      The `type` value can be `xml`, `html`, or `json`.
+      The `type` value can be `xml`, `html`, `html-node-based`, or `json`.
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
@@ -29,6 +29,17 @@ module Agents
             'title': { 'css': "#comic img", 'attr': "title" },
             'body_text': { 'css': "div.main", 'text': true }
           }
+
+      Alternately, specify a `_root` selector to anchor all other extractors. If a `_root` extractor is defined, all other selectors will be executed in the context of the root and will be grouped correctly. Additionally, the `_root` extractor accepts an `only_if_contains` parameter, which only returns nodes which have a child that exists within `only_if_contains`. This allows the agent to omit results that aren't desired, without actually having the selection criteria in the returned data. An example (relevant for the frontpage of bensbargains.net):
+
+          'extract': {
+            '_root': { 'css' => '#content-wrap article.deal',
+                       'only_if_contains' => [{ 'css' => '.deal-hotness-very-hot' },
+                                              { 'css' => '.deal-hotness-sizzling' }]
+                     },
+            'title': { 'css' => ".deal-title", 'text' => true },
+            'price': { 'css' => ".deal-price", 'text' => true }
+
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
@@ -77,6 +88,10 @@ module Agents
         errors.add(:base, "extract is required for all types except json")
       end
 
+      if extraction_type == "html-node-based" && (!options['extract'].present? || !options['extract']['_root'].present?)
+        errors.add(:base, "extract[_root] is required for html-node-based extraction")
+      end
+
       # Check for optional fields
       if options['mode'].present?
         errors.add(:base, "mode must be set to on_change or all") unless %w[on_change all].include?(options['mode'])
@@ -114,91 +129,133 @@ module Agents
 
       if options['url'].kind_of?(Array)
         options['url'].each do |url|
-           requests.push(Typhoeus::Request.new(url, request_opts))
+          requests.push(Typhoeus::Request.new(url, request_opts))
         end
       else
         requests.push(Typhoeus::Request.new(options['url'], request_opts))
       end
-
+      
       requests.each do |request|
-        request.on_failure do |response|
-          error "Failed: #{response.inspect}"
-        end
+         request.on_failure do |response|
+           error "Failed: #{response.inspect}"
+         end
 
         request.on_success do |response|
-          body = response.body
-          if (encoding = options['force_encoding']).present?
-            body = body.encode(Encoding::UTF_8, encoding)
-          end
-          doc = parse(body)
-
-          if extract_full_json?
-            if store_payload!(previous_payloads(1), doc)
-              log "Storing new result for '#{name}': #{doc.inspect}"
-              create_event :payload => doc
-            end
-          else
-            output = {}
-            options['extract'].each do |name, extraction_details|
-              if extraction_type == "json"
-                result = Utils.values_at(doc, extraction_details['path'])
-                log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
-              else
-                case
-                when css = extraction_details['css']
-                  nodes = doc.css(css)
-                when xpath = extraction_details['xpath']
-                  nodes = doc.xpath(xpath)
-                else
-                  error "'css' or 'xpath' is required for HTML or XML extraction"
-                  return
-                end
-                unless Nokogiri::XML::NodeSet === nodes
-                  error "The result of HTML/XML extraction was not a NodeSet"
-                  return
-                end
-                result = nodes.map { |node|
-                  if extraction_details['attr']
-                    node.attr(extraction_details['attr'])
-                  elsif extraction_details['text']
-                    node.text()
-                  else
-                    error "'attr' or 'text' is required on HTML or XML extraction patterns"
-                    return
-                  end
-                }
-                log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
-              end
-              output[name] = result
-            end
-
-            num_unique_lengths = options['extract'].keys.map { |name| output[name].length }.uniq
-
-            if num_unique_lengths.length != 1
-              error "Got an uneven number of matches for #{options['name']}: #{options['extract'].inspect}"
-              return
-            end
+          handle_success response
+        end
         
-            old_events = previous_payloads num_unique_lengths.first
-            num_unique_lengths.first.times do |index|
-              result = {}
-              options['extract'].keys.each do |name|
-                result[name] = output[name][index]
-                if name.to_s == 'url'
-                  result[name] = URI.join(options['url'], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
-                end
-              end
+        hydra.queue request
+      end
+      hydra.run
+    end
 
-              if store_payload!(old_events, result)
-                log "Storing new parsed result for '#{name}': #{result.inspect}"
-                create_event :payload => result
-              end
-            end
+    def handle_success(response)
+      body = response.body
+      if (encoding = options['force_encoding']).present?
+        body = body.encode(Encoding::UTF_8, encoding)
+      end
+      doc = parse(body)
+
+      if extract_full_json?
+        if store_payload!(previous_payloads(1), doc)
+          log "Storing new result for '#{name}': #{doc.inspect}"
+          create_event :payload => doc
+        end
+      else
+        output = extract_output(doc)
+        return unless output
+        generate_events_from_output output
+      end
+    end
+
+    def extract_output(doc)
+      if extraction_type == 'json'
+        extract_from_json doc
+      elsif extraction_type == 'html-node-based'
+        extract_html_nodes doc
+      else
+        extract_whole_body doc
+      end
+    end
+
+    def extract_from_json(doc)
+      output = {}
+      options['extract'].each do |name, extraction_details|
+        result = Utils.values_at(doc, extraction_details['path'])
+        log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
+        output[name] = result
+      end
+      output
+    end
+
+    def extract_whole_body doc
+      output = {}
+      options['extract'].each do |name, extraction_details|
+        nodes = nodes_from_extraction_details(doc, extraction_details)
+        return unless nodes
+        unless Nokogiri::XML::NodeSet === nodes
+          error "The result of HTML/XML extraction was not a NodeSet"
+          return
+        end
+        result = nodes.map { |node| result_from_extraction_details(node, extraction_details) }
+
+        # TODO clean up knowledge of extraction_details during logging
+        log "Extracting #{extraction_type} at #{extraction_details['xpath'] || extraction_details['css']}: #{result}"
+        output[name] = result
+      end
+      output
+    end
+
+    def extract_html_nodes(doc)
+      nodes = nodes_from_extraction_details(doc, options['extract']['_root'])
+      all_rows = []
+      nodes.each do |node|
+        output = {}
+        options['extract'].each do |name, extraction_details|
+          next if name == '_root'
+
+          result = result_from_extraction_details(node, extraction_details)
+          output[name] = result
+        end
+        all_rows << output
+      end
+      
+      # TODO #generate_events_from_output just undoes this, could
+      # optimize to handle it a bit cleaner
+      output = {}
+      extraction_keys.each do |k|
+        output[k] = all_rows.map { |r| r[k] }
+      end
+      output
+    end
+
+    def extraction_keys
+      options['extract'].keys - ['_root']
+    end
+
+    def generate_events_from_output(output)
+      num_unique_lengths = extraction_keys.map { |name| output[name].length }.uniq
+
+      if num_unique_lengths.length != 1
+        error "Got an uneven number of matches for #{options['name']}: #{options['extract'].inspect}"
+        return
+      end
+
+      old_events = previous_payloads num_unique_lengths.first
+
+      num_unique_lengths.first.times do |index|
+        result = {}
+        extraction_keys.each do |name|
+          result[name] = output[name][index]
+          if name.to_s == 'url'
+            result[name] = URI.join(options['url'], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
           end
         end
 
-        hydra.queue request
-        hydra.run
+        if store_payload!(old_events, result)
+          log "Storing new parsed result for '#{name}': #{result.inspect}"
+          create_event :payload => result
+        end
       end
     end
 
@@ -249,10 +306,58 @@ module Agents
           "xml"
         elsif options['url'] =~ /\.json$/i
           "json"
+        elsif options['extract'] && options['extract']['_root']
+          "html-node-based"
         else
           "html"
         end
       end).to_s
+    end
+
+    def nodes_from_extraction_details(doc, extraction_details)
+      nodes = []
+      case
+      when css = extraction_details['css']
+        nodes = doc.css(css)
+      when xpath = extraction_details['xpath']
+        nodes = doc.xpath(xpath)
+        else
+      error "'css' or 'xpath' is required for HTML or XML extraction"
+        return nil
+      end
+
+      # If only_if_contains is set, call this method recursively and strip
+      # out any nodes that don't contain the requisite selector.
+      if filter = extraction_details['only_if_contains'] 
+        if !filter.is_a?(Array)
+          filter = [filter]
+        end
+
+        nodes = nodes.select do |node|
+          filter.any? do |filter|
+            hits = nodes_from_extraction_details(node, filter)
+            hits && !hits.empty?
+          end
+        end
+      end
+
+      nodes
+    end
+
+    def result_from_extraction_details(node, extraction_details)
+      if extraction_type == "html-node-based"
+        node = nodes_from_extraction_details(node, extraction_details)[0]
+        return nil unless node
+      end
+
+      if extraction_details['attr']
+        return node.attr(extraction_details['attr'])
+      elsif extraction_details['text']
+        return node.text().strip
+      end
+
+      error "'attr' or 'text' is required on HTML or XML extraction patterns"
+      nil
     end
 
     def parse(data)
@@ -262,6 +367,8 @@ module Agents
         when "json"
           JSON.parse(data)
         when "html"
+          Nokogiri::HTML(data)
+        when "html-node-based"
           Nokogiri::HTML(data)
         else
           raise "Unknown extraction type #{extraction_type}"
