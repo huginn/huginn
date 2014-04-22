@@ -15,6 +15,16 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  config.vm.define :prl do |prl|
+    prl.vm.box = "parallels/ubuntu-12.04"
+
+    prl.vm.provision :chef_solo do |chef|
+      chef.roles_path = "roles"
+      chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
+      chef.add_role("huginn_development")
+    end
+  end
+
   config.vm.define :ec2 do |ec2|
     ec2.vm.box = "dummy"
     ec2.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
