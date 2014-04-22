@@ -2,7 +2,7 @@ module Agents
   class TriggerAgent < Agent
     cannot_be_scheduled!
 
-    VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value field!=value field>=value field>value]
+    VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value list field!=value field>=value field>value]
 
     description <<-MD
       Use a TriggerAgent to watch for a specific value in an Event payload.
@@ -66,6 +66,14 @@ module Agents
               value_at_path.to_s == rule['value'].to_s
             when "field!=value"
               value_at_path.to_s != rule['value'].to_s
+            when "list"
+              list_match = false
+              rule['value'].each do |value|
+                if value_at_path.to_s == value.to_s 
+                  list_match = true;
+                end
+              end
+              list_match
             else
               raise "Invalid type of #{rule['type']} in TriggerAgent##{id}"
           end

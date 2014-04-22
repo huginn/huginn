@@ -124,6 +124,21 @@ describe Agents::TriggerAgent do
       }.should change { Event.count }.by(1)
     end
 
+    it "handles list comparisons" do
+      @event.payload['foo']['bar']['baz'] = "hello world"
+      @checker.options['rules'].first['type'] = "list"
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello again"]
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello again", "hello world"]
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+    end
+
     it "handles negated comparisons" do
       @event.payload['foo']['bar']['baz'] = "hello world"
       @checker.options['rules'].first['type'] = "field!=value"
