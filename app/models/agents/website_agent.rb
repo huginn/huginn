@@ -4,7 +4,6 @@ require 'date'
 
 module Agents
   class WebsiteAgent < Agent
-    cannot_receive_events!
 
     default_schedule "every_12h"
 
@@ -46,6 +45,8 @@ module Agents
       Set `uniqueness_look_back` to limit the number of events checked for uniqueness (typically for performance).  This defaults to the larger of #{UNIQUENESS_LOOK_BACK} or #{UNIQUENESS_FACTOR}x the number of detected received results.
 
       Set `force_encoding` to an encoding name if the website does not return a Content-Type header with a proper charset.
+
+      The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload.
     MD
 
     event_description do
@@ -105,19 +106,23 @@ module Agents
     end
 
     def check
-      hydra = Typhoeus::Hydra.new
       log "Fetching #{options['url']}"
+      check_url options['url']
+    end
+
+    def check_url(in_url)
+      hydra = Typhoeus::Hydra.new
       request_opts = { :followlocation => true }
       request_opts[:userpwd] = options['basic_auth'] if options['basic_auth'].present?
 
       requests = []
 
-      if options['url'].kind_of?(Array)
-        options['url'].each do |url|
+      if in_url.kind_of?(Array)
+        in_url.each do |url|
            requests.push(Typhoeus::Request.new(url, request_opts))
         end
       else
-        requests.push(Typhoeus::Request.new(options['url'], request_opts))
+        requests.push(Typhoeus::Request.new(in_url, request_opts))
       end
 
       requests.each do |request|
@@ -185,7 +190,7 @@ module Agents
               options['extract'].keys.each do |name|
                 result[name] = output[name][index]
                 if name.to_s == 'url'
-                  result[name] = URI.join(options['url'], result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
+                  result[name] = URI.join(request.base_url, result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
                 end
               end
 
@@ -199,6 +204,13 @@ module Agents
 
         hydra.queue request
         hydra.run
+      end
+    end
+
+    def receive(incoming_events)
+      incoming_events.each do |event|
+        url_to_scrape = Utils.value_at(event['payload'], 'url')
+        check_url(url_to_scrape)
       end
     end
 
@@ -275,5 +287,7 @@ module Agents
         false
       end
     end
+
   end
+
 end
