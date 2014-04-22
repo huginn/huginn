@@ -52,7 +52,7 @@ module Agents
         match = options['rules'].all? do |rule|
           value_at_path = Utils.value_at(event['payload'], rule['path'])
           rule_values = rule['value']
-          if !rule_values.kind_of?(Array) then rule_values = [rule_values] end
+          rule_values = [rule_values] unless rule_values.is_a?(Array)
 
           match_found = false
           rule_values.each do |rule_value|
