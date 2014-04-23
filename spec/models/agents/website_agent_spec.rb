@@ -11,8 +11,9 @@ describe Agents::WebsiteAgent do
         'url' => "http://xkcd.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => {'css' => "#comic img", 'attr' => "src"},
-          'title' => {'css' => "#comic img", 'attr' => "title"}
+          'url' => { 'css' => "#comic img", 'attr' => "src" },
+          'title' => { 'css' => "#comic img", 'attr' => "alt" },
+          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
         }
       }
       @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @site, :keep_events_for => 2)
@@ -21,7 +22,6 @@ describe Agents::WebsiteAgent do
     end
 
     describe "#check" do
-    
       it "should validate the integer fields" do
         @checker.options['expected_update_period_in_days'] = "nonsense"
         lambda { @checker.save! }.should raise_error;
@@ -32,7 +32,17 @@ describe Agents::WebsiteAgent do
         lambda { @checker.save! }.should raise_error;
         @checker.options = @site
       end
-    
+
+      it "should validate the force_encoding option" do
+        @checker.options['force_encoding'] = 'UTF-8'
+        lambda { @checker.save! }.should_not raise_error;
+        @checker.options['force_encoding'] = ['UTF-8']
+        lambda { @checker.save! }.should raise_error;
+        @checker.options['force_encoding'] = 'UTF-42'
+        lambda { @checker.save! }.should raise_error;
+        @checker.options = @site
+      end
+
       it "should check for changes (and update Event.expires_at)" do
         lambda { @checker.check }.should change { Event.count }.by(1)
         event = Event.last
@@ -81,6 +91,86 @@ describe Agents::WebsiteAgent do
         @checker.check
         @checker.logs.first.message.should =~ /Got an uneven number of matches/
       end
+
+      it "should accept an array for url" do
+        @site['url'] = ["http://xkcd.com/1/", "http://xkcd.com/2/"]
+        @checker.options = @site
+        lambda { @checker.save! }.should_not raise_error;
+        lambda { @checker.check }.should_not raise_error;
+      end
+
+      it "should parse events from all urls in array" do
+        lambda {
+          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @site['mode'] = 'all'
+          @checker.options = @site
+          @checker.check
+        }.should change { Event.count }.by(2)
+      end
+
+      it "should follow unique rules when parsing array of urls" do
+        lambda {
+          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @checker.options = @site
+          @checker.check
+        }.should change { Event.count }.by(1)
+      end
+    end
+
+    describe 'encoding' do
+      it 'should be forced with force_encoding option' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /no-encoding/).to_return(:body => {
+            :value => huginn,
+          }.to_json.encode(Encoding::EUC_JP), :headers => {
+            'Content-Type' => 'application/json',
+          }, :status => 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => 2,
+          'type' => "json",
+          'url' => "http://no-encoding.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+          'force_encoding' => 'EUC-JP',
+        }
+        checker = Agents::WebsiteAgent.new(:name => "No Encoding Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        event.payload['value'].should == huginn
+      end
+
+      it 'should be overridden with force_encoding option' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /wrong-encoding/).to_return(:body => {
+            :value => huginn,
+          }.to_json.encode(Encoding::EUC_JP), :headers => {
+            'Content-Type' => 'application/json; UTF-8',
+          }, :status => 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => 2,
+          'type' => "json",
+          'url' => "http://wrong-encoding.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+          'force_encoding' => 'EUC-JP',
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Wrong Encoding Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        event.payload['value'].should == huginn
+      end
     end
 
     describe '#working?' do
@@ -110,7 +200,21 @@ describe Agents::WebsiteAgent do
         @checker.check
         event = Event.last
         event.payload['url'].should == "http://imgs.xkcd.com/comics/evolving.png"
-        event.payload['title'].should =~ /^Biologists play reverse/
+        event.payload['title'].should == "Evolving"
+        event.payload['hovertext'].should =~ /^Biologists play reverse/
+      end
+
+      it "parses XPath" do
+        @site['extract'].each { |key, value|
+          value.delete('css')
+          value['xpath'] = "//*[@id='comic']//img"
+        }
+        @checker.options = @site
+        @checker.check
+        event = Event.last
+        event.payload['url'].should == "http://imgs.xkcd.com/comics/evolving.png"
+        event.payload['title'].should == "Evolving"
+        event.payload['hovertext'].should =~ /^Biologists play reverse/
       end
 
       it "should turn relative urls to absolute" do
@@ -239,8 +343,9 @@ describe Agents::WebsiteAgent do
         'url' => "http://www.example.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => {'css' => "#comic img", 'attr' => "src"},
-          'title' => {'css' => "#comic img", 'attr' => "title"}
+          'url' => { 'css' => "#comic img", 'attr' => "src" },
+          'title' => { 'css' => "#comic img", 'attr' => "alt" },
+          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
         },
         'basic_auth' => "user:pass"
       }

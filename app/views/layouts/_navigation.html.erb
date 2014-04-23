@@ -17,9 +17,15 @@
     </form>
 
     <li id='job-indicator'>
-      <a href="/delayed_job">
-        <span class="badge"><i class="icon-refresh icon-white"></i> <span class='number'>0</span></span>
-      </a>
+      <% if defined?(DelayedJobWeb) %>
+        <a href="/delayed_job">
+          <span class="badge"><i class="icon-refresh icon-white"></i> <span class='number'>0</span></span>
+        </a>
+      <% else %>
+        <a href="#" onclick='return false;'>
+          <span class="badge"><i class="icon-refresh icon-white"></i> <span class='number'>0</span></span>
+        </a>
+      <% end %>
     </li>
 
     <li id='event-indicator'>

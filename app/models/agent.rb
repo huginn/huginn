@@ -16,7 +16,7 @@ class Agent < ActiveRecord::Base
 
   load_types_in "Agents"
 
-  SCHEDULES = %w[every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
+  SCHEDULES = %w[every_1m every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
                  midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm never]
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
@@ -73,7 +73,7 @@ class Agent < ActiveRecord::Base
     # Implement me in your subclass of Agent.
   end
 
-  def receive_webhook(params)
+  def receive_web_request(params, method, format)
     # Implement me in your subclass of Agent.
     ["not implemented", 404]
   end
@@ -81,10 +81,6 @@ class Agent < ActiveRecord::Base
   # Implement me in your subclass to decide if your Agent is working.
   def working?
     raise "Implement me in your subclass"
-  end
-
-  def validate_options
-    # Implement me in your subclass to test for valid options.
   end
 
   def event_created_within?(days)
@@ -136,10 +132,18 @@ class Agent < ActiveRecord::Base
     message.gsub(/<([^>]+)>/) { Utils.value_at(payload, $1) || "??" }
   end
 
-  def trigger_webhook(params)
-    receive_webhook(params).tap do
-      self.last_webhook_at = Time.now
-      save!
+  def trigger_web_request(params, method, format)
+    if respond_to?(:receive_webhook)
+      Rails.logger.warn "DEPRECATED: The .receive_webhook method is deprecated, please switch your Agent to use .receive_web_request."
+      receive_webhook(params).tap do
+        self.last_web_request_at = Time.now
+        save!
+      end
+    else
+      receive_web_request(params, method, format).tap do
+        self.last_web_request_at = Time.now
+        save!
+      end
     end
   end
 
@@ -185,17 +189,7 @@ class Agent < ActiveRecord::Base
     update_column :last_error_log_at, nil
   end
 
-  # Validations and Callbacks
-
-  def sources_are_owned
-    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
-  end
-
-  def validate_schedule
-    unless cannot_be_scheduled?
-      errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
-    end
-  end
+  # Callbacks
 
   def set_default_schedule
     self.schedule = default_schedule unless schedule.present? || cannot_be_scheduled?
@@ -213,6 +207,24 @@ class Agent < ActiveRecord::Base
 
   def possibly_update_event_expirations
     update_event_expirations! if keep_events_for_changed?
+  end
+  
+  #Validation Methods
+  
+  private
+  
+  def sources_are_owned
+    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
+  end
+  
+  def validate_schedule
+    unless cannot_be_scheduled?
+      errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
+    end
+  end
+  
+  def validate_options
+    # Implement me in your subclass to test for valid options.
   end
 
   # Class Methods

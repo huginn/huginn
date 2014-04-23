@@ -75,10 +75,10 @@ module Agents
     end
 
     def post_url(server_url,secret)
-      "#{server_url}/users/#{self.user.id}/webhooks/#{self.id}/#{secret}"
+      "#{server_url}/users/#{self.user.id}/web_requests/#{self.id}/#{secret}"
     end
 
-    def receive_webhook(params)
+    def receive_web_request(params, method, format)
       if memory['pending_calls'].has_key? params['secret']
         response = Twilio::TwiML::Response.new {|r| r.Say memory['pending_calls'][params['secret']], :voice => 'woman'}
         memory['pending_calls'].delete params['secret']
