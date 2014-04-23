@@ -129,6 +129,7 @@ GEM
     httparty (0.13.1)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
+    httpclient (2.3.4.1)
     i18n (0.6.9)
     journey (1.0.4)
     jquery-rails (3.0.4)
@@ -321,6 +322,7 @@ DEPENDENCIES
   geokit (~> 1.6.7)
   geokit-rails3 (~> 0.1.5)
   hipchat (~> 1.1.0)
+  httpclient
   jquery-rails (~> 3.0.4)
   json (>= 1.7.7)
   jsonpath (~> 0.5.3)

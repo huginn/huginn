@@ -35,6 +35,7 @@ gem 'geokit-rails3', '~> 0.1.5'
 gem 'kramdown', '~> 1.1.0'
 gem 'typhoeus', '~> 0.6.3'
 gem 'nokogiri', '~> 1.6.0'
+gem 'httpclient'
 
 gem 'wunderground', '~> 1.1.0'
 gem 'forecast_io', '~> 2.0.0'
