@@ -55,7 +55,7 @@ bash "huginn dependencies" do
     export LANG="en_US.UTF-8"
     export LC_ALL="en_US.UTF-8"
     sudo bundle install
-    sed s/REPLACE_ME_NOW\!/$(sudo rake secret)/ .env.example > .env
+    sed s/REPLACE_ME_NOW\!/$(sudo bundle exec rake secret)/ .env.example > .env
     sudo bundle exec rake db:create
     sudo bundle exec rake db:migrate
     sudo bundle exec rake db:seed
