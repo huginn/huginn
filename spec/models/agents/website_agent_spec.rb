@@ -331,6 +331,19 @@ describe Agents::WebsiteAgent do
         end
       end
     end
+
+    describe "#receive" do
+      it "should scrape from the url element in incoming event payload" do
+        @event = Event.new
+        @event.agent = agents(:bob_rain_notifier_agent)
+        @event.payload = { 'url' => "http://xkcd.com" }
+
+        lambda {
+          @checker.options = @site
+          @checker.receive([@event])
+        }.should change { Event.count }.by(1)
+      end
+    end
   end
 
   describe "checking with http basic auth" do
