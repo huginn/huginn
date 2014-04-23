@@ -158,6 +158,7 @@ GEM
     multi_json (1.7.9)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
+    mustache (0.99.5)
     mysql2 (0.3.13)
     naught (1.0.0)
     nokogiri (1.6.0)
@@ -302,6 +303,7 @@ GEM
       addressable
       httparty (> 0.6.0)
       json (> 1.4.0)
+    xmpp4r (0.5.6)
 
 PLATFORMS
   ruby
@@ -328,6 +330,7 @@ DEPENDENCIES
   jsonpath
   kaminari
   kramdown
+  mustache (~> 0.99.5)
   mysql2
   nokogiri
   pry
@@ -352,3 +355,4 @@ DEPENDENCIES
   webmock
   weibo_2
   wunderground
+  xmpp4r (~> 0.5.6)

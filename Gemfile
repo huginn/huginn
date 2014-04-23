@@ -42,6 +42,9 @@ gem 'twitter-stream', :git => 'https://github.com/cantino/twitter-stream', :bran
 gem 'em-http-request'
 gem 'weibo_2'
 
+gem 'xmpp4r',   '~> 0.5.6'
+gem 'mustache', '~> 0.99.5'
+
 gem 'therubyracer'
 
 platforms :ruby_18 do
