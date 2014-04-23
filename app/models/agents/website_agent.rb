@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'typhoeus'
+require 'httpclient'
 require 'date'
 
 module Agents
@@ -46,6 +47,11 @@ module Agents
       Set `uniqueness_look_back` to limit the number of events checked for uniqueness (typically for performance).  This defaults to the larger of #{UNIQUENESS_LOOK_BACK} or #{UNIQUENESS_FACTOR}x the number of detected received results.
 
       Set `force_encoding` to an encoding name if the website does not return a Content-Type header with a proper charset.
+
+      Set `backend` to a client library of your choice:
+
+      - `hydra`: Use Typhoeus::Hydra which uses libcurl to achieve high performance parallel requests.  This is the default.
+      - `httpclient`: Use HTTPClient, a decent and stable HTTP client library.
     MD
 
     event_description do
@@ -66,7 +72,8 @@ module Agents
             'url' => { 'css' => "#comic img", 'attr' => "src" },
             'title' => { 'css' => "#comic img", 'attr' => "alt" },
             'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
-          }
+          },
+          'backend' => 'hydra',
       }
     end
 
@@ -105,28 +112,11 @@ module Agents
     end
 
     def check
-      hydra = Typhoeus::Hydra.new
-      log "Fetching #{options['url']}"
-      request_opts = { :followlocation => true }
-      request_opts[:userpwd] = options['basic_auth'] if options['basic_auth'].present?
+      return unless options['url'].present?
 
-      requests = []
-
-      if options['url'].kind_of?(Array)
-        options['url'].each do |url|
-           requests.push(Typhoeus::Request.new(url, request_opts))
-        end
-      else
-        requests.push(Typhoeus::Request.new(options['url'], request_opts))
-      end
-
-      requests.each do |request|
-        request.on_failure do |response|
-          error "Failed: #{response.inspect}"
-        end
-
-        request.on_success do |response|
-          body = response.body
+      Array(options['url']).each do |url|
+        log "Fetching #{url}"
+        http_get(url) do |body, header|
           if (encoding = options['force_encoding']).present?
             body = body.encode(Encoding::UTF_8, encoding)
           end
@@ -196,10 +186,9 @@ module Agents
             end
           end
         end
-
-        hydra.queue request
-        hydra.run
       end
+    rescue => e
+      error e.message
     end
 
     private
@@ -273,6 +262,39 @@ module Agents
         Integer(value) >= 0
       rescue
         false
+      end
+    end
+
+    def http_get(url, &block)
+      uri = URI(url.to_s)
+      if options['basic_auth'].present?
+        # basic_auth is only used for the first request
+        userinfo = options['basic_auth']
+      end
+      case (backend = options['backend']).present? ? backend : 'hydra'
+      when 'hydra'
+        hydra = Typhoeus::Hydra.new
+        request = Typhoeus::Request.new(uri,
+                                        followlocation: true,
+                                        userpwd: userinfo)
+        request.on_success do |response|
+          block.call(response.body, response.headers)
+        end
+        request.on_failure do |response|
+          raise "Failed: #{response.inspect}"
+        end
+        hydra.queue request
+        hydra.run
+      when 'httpclient'
+        hc = HTTPClient.new
+        if userinfo
+          hc.set_auth(uri + '/',
+                      *userinfo.split(/:/, 2).map { |x|
+                        URI.decode_www_form_component(x)
+                      })
+        end
+        response = hc.get(uri)
+        block.call(response.body, response.header)
       end
     end
   end
