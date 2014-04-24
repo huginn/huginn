@@ -348,7 +348,9 @@ describe Agents::WebsiteAgent do
 
   describe "checking with http basic auth" do
     before do
-      stub_request(:any, /user:pass/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      stub_request(:any, /example/).
+        with(headers: { 'Authorization' => "Basic #{['user:pass'].pack('m').chomp}" }).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
       @site = {
         'name' => "XKCD",
         'expected_update_period_in_days' => 2,
@@ -363,6 +365,37 @@ describe Agents::WebsiteAgent do
         'basic_auth' => "user:pass"
       }
       @checker = Agents::WebsiteAgent.new(:name => "auth", :options => @site)
+      @checker.user = users(:bob)
+      @checker.save!
+    end
+
+    describe "#check" do
+      it "should check for changes" do
+        lambda { @checker.check }.should change { Event.count }.by(1)
+        lambda { @checker.check }.should_not change { Event.count }
+      end
+    end
+  end
+
+  describe "checking with User-Agent" do
+    before do
+      stub_request(:any, /example/).
+        with(headers: { 'User-Agent' => 'Sushi' }).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      @site = {
+        'name' => "XKCD",
+        'expected_update_period_in_days' => 2,
+        'type' => "html",
+        'url' => "http://www.example.com",
+        'mode' => 'on_change',
+        'extract' => {
+          'url' => { 'css' => "#comic img", 'attr' => "src" },
+          'title' => { 'css' => "#comic img", 'attr' => "alt" },
+          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+        },
+        'user_agent' => "Sushi"
+      }
+      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @site)
       @checker.user = users(:bob)
       @checker.save!
     end

@@ -1,5 +1,6 @@
 require 'nokogiri'
-require 'typhoeus'
+require 'faraday'
+require 'faraday_middleware'
 require 'date'
 
 module Agents
@@ -21,30 +22,32 @@ module Agents
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
-      When parsing HTML or XML, these sub-hashes specify how to extract with either a `css` CSS selector or a `xpath` XPath expression and either `'text': true` or `attr` pointing to an attribute name to grab.  An example:
+      When parsing HTML or XML, these sub-hashes specify how to extract with either a `css` CSS selector or a `xpath` XPath expression and either `"text": true` or `attr` pointing to an attribute name to grab.  An example:
 
-          'extract': {
-            'url': { 'css': "#comic img", 'attr': "src" },
-            'title': { 'css': "#comic img", 'attr': "title" },
-            'body_text': { 'css': "div.main", 'text': true }
+          "extract": {
+            "url": { "css": "#comic img", "attr": "src" },
+            "title": { "css": "#comic img", "attr": "title" },
+            "body_text": { "css": "div.main", "text": true }
           }
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
-          'extract': {
-            'title': { 'path': "results.data[*].title" },
-            'description': { 'path': "results.data[*].description" }
+          "extract": {
+            "title": { "path": "results.data[*].title" },
+            "description": { "path": "results.data[*].description" }
           }
 
       Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
 
-      Can be configured to use HTTP basic auth by including the `basic_auth` parameter with `username:password`.
+      Can be configured to use HTTP basic auth by including the `basic_auth` parameter with `"username:password"`, or `["username", "password"]`.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.  This is only used to set the "working" status.
 
       Set `uniqueness_look_back` to limit the number of events checked for uniqueness (typically for performance).  This defaults to the larger of #{UNIQUENESS_LOOK_BACK} or #{UNIQUENESS_FACTOR}x the number of detected received results.
 
       Set `force_encoding` to an encoding name if the website does not return a Content-Type header with a proper charset.
+
+      Set `user_agent` to a custom User-Agent name if the website does not like the default value ("Faraday v#{Faraday::VERSION}").
 
       The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload.
     MD
@@ -103,34 +106,29 @@ module Agents
           errors.add(:base, "force_encoding must be a string")
         end
       end
+
+      if options['user_agent'].present?
+        errors.add(:base, "user_agent must be a string") unless options['user_agent'].is_a?(String)
+      end
+
+      begin
+        basic_auth_credentials()
+      rescue => e
+        errors.add(:base, e.message)
+      end
     end
 
     def check
-      log "Fetching #{options['url']}"
       check_url options['url']
     end
 
     def check_url(in_url)
-      hydra = Typhoeus::Hydra.new
-      request_opts = { :followlocation => true }
-      request_opts[:userpwd] = options['basic_auth'] if options['basic_auth'].present?
+      return unless in_url.present?
 
-      requests = []
-
-      if in_url.kind_of?(Array)
-        in_url.each do |url|
-           requests.push(Typhoeus::Request.new(url, request_opts))
-        end
-      else
-        requests.push(Typhoeus::Request.new(in_url, request_opts))
-      end
-
-      requests.each do |request|
-        request.on_failure do |response|
-          error "Failed: #{response.inspect}"
-        end
-
-        request.on_success do |response|
+      Array(in_url).each do |url|
+        log "Fetching #{url}"
+        response = faraday.get(url)
+        if response.success?
           body = response.body
           if (encoding = options['force_encoding']).present?
             body = body.encode(Encoding::UTF_8, encoding)
@@ -155,7 +153,7 @@ module Agents
                 when xpath = extraction_details['xpath']
                   nodes = doc.xpath(xpath)
                 else
-                  error "'css' or 'xpath' is required for HTML or XML extraction"
+                  error '"css" or "xpath" is required for HTML or XML extraction'
                   return
                 end
                 unless Nokogiri::XML::NodeSet === nodes
@@ -168,7 +166,7 @@ module Agents
                   elsif extraction_details['text']
                     node.text()
                   else
-                    error "'attr' or 'text' is required on HTML or XML extraction patterns"
+                    error '"attr" or "text" is required on HTML or XML extraction patterns'
                     return
                   end
                 }
@@ -183,14 +181,14 @@ module Agents
               error "Got an uneven number of matches for #{options['name']}: #{options['extract'].inspect}"
               return
             end
-        
+
             old_events = previous_payloads num_unique_lengths.first
             num_unique_lengths.first.times do |index|
               result = {}
               options['extract'].keys.each do |name|
                 result[name] = output[name][index]
                 if name.to_s == 'url'
-                  result[name] = URI.join(request.base_url, result[name]).to_s if (result[name] =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]).nil?
+                  result[name] = (response.env[:url] + result[name]).to_s
                 end
               end
 
@@ -200,10 +198,9 @@ module Agents
               end
             end
           end
+        else
+          error "Failed: #{response.inspect}"
         end
-
-        hydra.queue request
-        hydra.run
       end
     end
 
@@ -288,6 +285,40 @@ module Agents
       end
     end
 
-  end
+    def faraday
+      @faraday ||= Faraday.new { |builder|
+        if (user_agent = options['user_agent']).present?
+          builder.headers[:user_agent] = user_agent
+        end
 
+        builder.use FaradayMiddleware::FollowRedirects
+        builder.request :url_encoded
+        if userinfo = basic_auth_credentials()
+          builder.request :basic_auth, *userinfo
+        end
+
+        case backend = faraday_backend
+        when :typhoeus
+          require 'typhoeus/adapters/faraday'
+        end
+        builder.adapter backend
+      }
+    end
+
+    def faraday_backend
+      ENV.fetch('FARADAY_HTTP_BACKEND', 'typhoeus').to_sym
+    end
+
+    def basic_auth_credentials
+      case value = options['basic_auth']
+      when nil, ''
+        return nil
+      when Array
+        return value if value.size == 2
+      when /:/
+        return value.split(/:/, 2)
+      end
+      raise "bad value for basic_auth: #{value.inspect}"
+    end
+  end
 end

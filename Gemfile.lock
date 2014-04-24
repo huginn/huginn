@@ -106,6 +106,8 @@ GEM
     execjs (2.0.2)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.9.1)
+      faraday (>= 0.7.4, < 0.10)
     ffi (1.9.3)
     forecast_io (2.0.0)
       faraday
@@ -316,6 +318,8 @@ DEPENDENCIES
   devise (~> 3.0.0)
   dotenv-rails
   em-http-request (~> 1.1.2)
+  faraday (~> 0.9.0)
+  faraday_middleware
   forecast_io (~> 2.0.0)
   foreman (~> 0.63.0)
   geokit (~> 1.6.7)
