@@ -1,4 +1,6 @@
 class AgentsController < ApplicationController
+  include DotHelper
+
   def index
     @agents = current_user.agents.page(params[:page])
 
