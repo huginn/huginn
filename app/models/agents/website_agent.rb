@@ -47,6 +47,8 @@ module Agents
 
       Set `force_encoding` to an encoding name if the website does not return a Content-Type header with a proper charset.
 
+      Set `user_agent` to a custom User-Agent name if the website does not like the default value ("Faraday v#{Faraday::VERSION}").
+
       The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload.
     MD
 
@@ -103,6 +105,10 @@ module Agents
         else
           errors.add(:base, "force_encoding must be a string")
         end
+      end
+
+      if options['user_agent'].present?
+        errors.add(:base, "user_agent must be a string") unless options['user_agent'].is_a?(String)
       end
 
       begin
@@ -281,6 +287,10 @@ module Agents
 
     def faraday
       @faraday ||= Faraday.new { |builder|
+        if (user_agent = options['user_agent']).present?
+          builder.headers[:user_agent] = user_agent
+        end
+
         builder.use FaradayMiddleware::FollowRedirects
         builder.request :url_encoded
         if userinfo = basic_auth_credentials()
