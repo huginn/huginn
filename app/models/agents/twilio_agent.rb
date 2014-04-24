@@ -7,17 +7,16 @@ module Agents
     cannot_create_events!
 
     description <<-MD
-      The TwilioAgent receives and collects events and sends them via text message or gives you a call when scheduled.
+      The TwilioAgent receives and collects events and sends them via text message (up to 160 characters) or gives you a call when scheduled.
 
-      It is assumed that events have a `message`, `text`, or `sms` key, the value of which is sent as the content of the text message/call. You can use Event Formatting Agent if your event does not provide these keys.
+      It is assumed that events have a `message`, `text`, or `sms` key, the value of which is sent as the content of the text message/call. You can use the EventFormattingAgent if your event does not provide these keys.
 
       Set `receiver_cell` to the number to receive text messages/call and `sender_cell` to the number sending them.
 
       `expected_receive_period_in_days` is maximum number of days that you would expect to pass between events being received by this agent.
 
-      If you would like to receive calls, then set `receive_call` to true. `server_url` needs to be 
-      filled only if you are making calls. Dont forget to include http/https in `server_url`.
-
+      If you would like to receive calls, set `receive_call` to `true`. In this case, `server_url` must be set to the URL of your
+      Huginn installation (probably "https://#{ENV['DOMAIN']}"), which must be web-accessible.  Be sure to set http/https correctly.
     MD
 
     def default_options
@@ -43,13 +42,14 @@ module Agents
       @client = Twilio::REST::Client.new options['account_sid'], options['auth_token']
       memory['pending_calls'] ||= {}
       incoming_events.each do |event|
-        message = (event.payload['message'] || event.payload['text'] || event.payload['sms']).to_s
-        if message != ""
+        message = (event.payload['message'].presence || event.payload['text'].presence || event.payload['sms'].presence).to_s
+        if message.present?
           if options['receive_call'].to_s == 'true'
             secret = SecureRandom.hex 3
             memory['pending_calls'][secret] = message
             make_call secret
           end
+
           if options['receive_text'].to_s == 'true'
             message = message.slice 0..160
             send_message message
@@ -71,11 +71,11 @@ module Agents
     def make_call(secret)
       @client.account.calls.create :from => options['sender_cell'],
                                    :to => options['receiver_cell'],
-                                   :url => post_url(options['server_url'],secret)
+                                   :url => post_url(options['server_url'], secret)
     end
 
-    def post_url(server_url,secret)
-      "#{server_url}/users/#{self.user.id}/web_requests/#{self.id}/#{secret}"
+    def post_url(server_url, secret)
+      "#{server_url}/users/#{user.id}/web_requests/#{id}/#{secret}"
     end
 
     def receive_web_request(params, method, format)

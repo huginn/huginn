@@ -42,4 +42,5 @@ RSpec.configure do |config|
 
   config.include Devise::TestHelpers, :type => :controller
   config.include SpecHelpers
+  config.include Delorean
 end
