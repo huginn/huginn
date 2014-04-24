@@ -21,19 +21,19 @@ module Agents
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
-      When parsing HTML or XML, these sub-hashes specify how to extract with either a `css` CSS selector or a `xpath` XPath expression and either `'text': true` or `attr` pointing to an attribute name to grab.  An example:
+      When parsing HTML or XML, these sub-hashes specify how to extract with either a `css` CSS selector or a `xpath` XPath expression and either `"text": true` or `attr` pointing to an attribute name to grab.  An example:
 
-          'extract': {
-            'url': { 'css': "#comic img", 'attr': "src" },
-            'title': { 'css': "#comic img", 'attr': "title" },
-            'body_text': { 'css': "div.main", 'text': true }
+          "extract": {
+            "url": { "css": "#comic img", "attr": "src" },
+            "title": { "css": "#comic img", "attr": "title" },
+            "body_text": { "css": "div.main", "text": true }
           }
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
-          'extract': {
-            'title': { 'path': "results.data[*].title" },
-            'description': { 'path': "results.data[*].description" }
+          "extract": {
+            "title": { "path": "results.data[*].title" },
+            "description": { "path": "results.data[*].description" }
           }
 
       Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
@@ -155,7 +155,7 @@ module Agents
                 when xpath = extraction_details['xpath']
                   nodes = doc.xpath(xpath)
                 else
-                  error "'css' or 'xpath' is required for HTML or XML extraction"
+                  error '"css" or "xpath" is required for HTML or XML extraction'
                   return
                 end
                 unless Nokogiri::XML::NodeSet === nodes
@@ -168,7 +168,7 @@ module Agents
                   elsif extraction_details['text']
                     node.text()
                   else
-                    error "'attr' or 'text' is required on HTML or XML extraction patterns"
+                    error '"attr" or "text" is required on HTML or XML extraction patterns'
                     return
                   end
                 }
