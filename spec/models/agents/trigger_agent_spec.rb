@@ -71,6 +71,28 @@ describe Agents::TriggerAgent do
       }.should change { Event.count }.by(1)
     end
 
+    it "handles array of regex" do
+      @event.payload['foo']['bar']['baz'] = "a222b"
+      @checker.options['rules'][0] = {
+        'type' => "regex",
+        'value' => ["a\\db", "a\\Wb"],
+        'path' => "foo.bar.baz",
+      }
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+
+      @event.payload['foo']['bar']['baz'] = "a2b"
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+
+      @event.payload['foo']['bar']['baz'] = "a b"
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+    end
+
     it "handles negated regex" do
       @event.payload['foo']['bar']['baz'] = "a2b"
       @checker.options['rules'][0] = {
@@ -84,6 +106,24 @@ describe Agents::TriggerAgent do
       }.should_not change { Event.count }
 
       @event.payload['foo']['bar']['baz'] = "a22b"
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+    end
+
+    it "handles array of negated regex" do
+      @event.payload['foo']['bar']['baz'] = "a2b"
+      @checker.options['rules'][0] = {
+        'type' => "!regex",
+        'value' => ["a\\db", "a2b"],
+        'path' => "foo.bar.baz",
+      }
+
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+
+      @event.payload['foo']['bar']['baz'] = "a3b"
       lambda {
         @checker.receive([@event])
       }.should change { Event.count }.by(1)
@@ -109,6 +149,21 @@ describe Agents::TriggerAgent do
       }.should_not change { Event.count }
     end
 
+    it "handles array of numerical comparisons" do
+      @event.payload['foo']['bar']['baz'] = "5"
+      @checker.options['rules'].first['value'] = [6, 3]
+      @checker.options['rules'].first['type'] = "field<value"
+
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+
+      @checker.options['rules'].first['value'] = [4, 3]
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+    end
+
     it "handles exact comparisons" do
       @event.payload['foo']['bar']['baz'] = "hello world"
       @checker.options['rules'].first['type'] = "field==value"
@@ -124,6 +179,21 @@ describe Agents::TriggerAgent do
       }.should change { Event.count }.by(1)
     end
 
+    it "handles array of exact comparisons" do
+      @event.payload['foo']['bar']['baz'] = "hello world"
+      @checker.options['rules'].first['type'] = "field==value"
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello universe"]
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+
+      @checker.options['rules'].first['value'] = ["hello world", "hello universe"]
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+    end
+
     it "handles negated comparisons" do
       @event.payload['foo']['bar']['baz'] = "hello world"
       @checker.options['rules'].first['type'] = "field!=value"
@@ -134,6 +204,22 @@ describe Agents::TriggerAgent do
       }.should_not change { Event.count }
 
       @checker.options['rules'].first['value'] = "hello there"
+
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+    end
+
+    it "handles array of negated comparisons" do
+      @event.payload['foo']['bar']['baz'] = "hello world"
+      @checker.options['rules'].first['type'] = "field!=value"
+      @checker.options['rules'].first['value'] = ["hello world", "hello world"]
+
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello world"]
 
       lambda {
         @checker.receive([@event])

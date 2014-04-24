@@ -11,6 +11,8 @@ module Agents
 
       The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.
 
+      The `value` can be a single value or an array of values. In the case of an array, if one or more values match then the rule matches. 
+
       All rules must match for the Agent to match.  The resulting Event will have a payload message of `message`.  You can include extractions in the message, for example: `I saw a bar of: <foo.bar>`
 
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
@@ -49,25 +51,30 @@ module Agents
       incoming_events.each do |event|
         match = options['rules'].all? do |rule|
           value_at_path = Utils.value_at(event['payload'], rule['path'])
-          case rule['type']
+          rule_values = rule['value']
+          rule_values = [rule_values] unless rule_values.is_a?(Array)
+
+          match_found = rule_values.any? do |rule_value|
+            case rule['type']
             when "regex"
-              value_at_path.to_s =~ Regexp.new(rule['value'], Regexp::IGNORECASE)
+              value_at_path.to_s =~ Regexp.new(rule_value, Regexp::IGNORECASE)
             when "!regex"
-              value_at_path.to_s !~ Regexp.new(rule['value'], Regexp::IGNORECASE)
+              value_at_path.to_s !~ Regexp.new(rule_value, Regexp::IGNORECASE)
             when "field>value"
-              value_at_path.to_f > rule['value'].to_f
+              value_at_path.to_f > rule_value.to_f
             when "field>=value"
-              value_at_path.to_f >= rule['value'].to_f
+              value_at_path.to_f >= rule_value.to_f
             when "field<value"
-              value_at_path.to_f < rule['value'].to_f
+              value_at_path.to_f < rule_value.to_f
             when "field<=value"
-              value_at_path.to_f <= rule['value'].to_f
+              value_at_path.to_f <= rule_value.to_f
             when "field==value"
-              value_at_path.to_s == rule['value'].to_s
+              value_at_path.to_s == rule_value.to_s
             when "field!=value"
-              value_at_path.to_s != rule['value'].to_s
+              value_at_path.to_s != rule_value.to_s
             else
               raise "Invalid type of #{rule['type']} in TriggerAgent##{id}"
+            end
           end
         end
 
