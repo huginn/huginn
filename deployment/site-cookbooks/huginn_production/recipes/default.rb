@@ -14,7 +14,7 @@ group "huginn" do
   members ["huginn"]
 end
 
-%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8" "libmysqlclient-dev" "libffi-dev", "libssl-dev").each do |pkg|
+%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8" "libmysqlclient-dev" "libffi-dev" "libssl-dev").each do |pkg|
   package("#{pkg}")
 end
 
@@ -36,6 +36,7 @@ end
 
 deploy "/home/huginn" do
   repo "https://github.com/cantino/huginn.git"
+  branch "master"
   user "huginn"
   group "huginn"
   environment "RAILS_ENV" => "production"
@@ -81,12 +82,13 @@ deploy "/home/huginn" do
       ln -nfs /home/huginn/shared/config/.env ./.env
       ln -nfs /home/huginn/shared/config/unicorn.rb ./config/unicorn.rb
       sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/
+      echo 'gem "unicorn", :group => :production' >> Gemfile
       sudo bundle install --without=development --without=test
       sed -i s/REPLACE_ME_NOW\!/$(sudo bundle exec rake secret)/ .env
-      sed -i s/config\.force_ssl\ \=\ true/config\.force_ssl\ \=\ false/ config/environments/production.rb
-      sudo bundle exec rake db:create
-      sudo bundle exec rake db:migrate
-      sudo bundle exec rake db:seed
+      sudo RAILS_ENV=production bundle exec rake db:create
+      sudo RAILS_ENV=production bundle exec rake db:migrate
+      sudo RAILS_ENV=production bundle exec rake db:seed
+      sudo RAILS_ENV=production bundle exec rake assets:precompile
       sudo foreman export upstart /etc/init -a huginn -u huginn -l log
       sudo start huginn
       EOH

@@ -142,7 +142,6 @@ GEM
     kaminari (0.14.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    kgio (2.9.2)
     kramdown (1.1.0)
     libv8 (3.16.14.3)
     macaddr (1.7.1)
@@ -196,7 +195,6 @@ GEM
       rake (>= 0.8.7)
       rdoc (~> 3.4)
       thor (>= 0.14.6, < 2.0)
-    raindrops (0.13.0)
     rake (10.2.2)
     rdoc (3.12.2)
       json (~> 1.4)
@@ -285,10 +283,6 @@ GEM
     uglifier (2.5.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
-    unicorn (4.8.2)
-      kgio (~> 2.6)
-      rack
-      raindrops (~> 0.7)
     uuid (2.3.7)
       macaddr (~> 1.0)
     warden (1.2.3)
@@ -351,7 +345,6 @@ DEPENDENCIES
   twitter-stream!
   typhoeus (~> 0.6.3)
   uglifier (>= 1.0.3)
-  unicorn
   webmock
   weibo_2 (~> 0.1.4)
   wunderground (~> 1.1.0)
