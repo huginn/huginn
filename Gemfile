@@ -68,7 +68,6 @@ group :development, :test do
 end
 
 group :production do
-  gem 'unicorn'
   gem 'dotenv-deployment'
   gem 'rack'
 end
