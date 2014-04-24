@@ -33,6 +33,8 @@ gem 'geokit', '~> 1.6.7'
 gem 'geokit-rails3', '~> 0.1.5'
 
 gem 'kramdown', '~> 1.1.0'
+gem 'faraday', '~> 0.9.0'
+gem 'faraday_middleware'
 gem 'typhoeus', '~> 0.6.3'
 gem 'nokogiri', '~> 1.6.0'
 
