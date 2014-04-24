@@ -10,7 +10,7 @@
 
 "default_attributes" : {
   "mysql": {
-    "server_root_password": "",
+    "server_root_password": "password",
     "server_repl_password": "",
     "server_debian_password": ""
   },
