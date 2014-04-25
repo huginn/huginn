@@ -4,10 +4,14 @@ gem 'protected_attributes', '~>1.0.7'
 
 gem 'rails', '4.1.0'
 
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
-# Seems FreeBSD's zoneinfo is not exactly what tzinfo expects
-gem 'tzinfo-data' if /freebsd/i === RUBY_PLATFORM
+case RUBY_PLATFORM
+when /freebsd/i
+  # Seems FreeBSD's zoneinfo is not exactly what tzinfo expects
+  gem 'tzinfo-data'
+else
+  # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+  gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
+end
 
 gem 'mysql2', '~> 0.3.15'
 gem 'devise', '~> 3.2.4'
