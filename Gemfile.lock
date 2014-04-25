@@ -285,6 +285,8 @@ GEM
       ethon (>= 0.7.0)
     tzinfo (1.1.0)
       thread_safe (~> 0.1)
+    tzinfo-data (1.2014.2)
+      tzinfo (>= 1.0.0)
     uglifier (2.5.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
@@ -355,6 +357,7 @@ DEPENDENCIES
   twitter (~> 5.8.0)
   twitter-stream!
   typhoeus (~> 0.6.3)
+  tzinfo-data
   uglifier (>= 1.3.0)
   webmock
   weibo_2 (~> 0.1.4)
