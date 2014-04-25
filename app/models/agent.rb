@@ -16,7 +16,7 @@ class Agent < ActiveRecord::Base
 
   load_types_in "Agents"
 
-  SCHEDULES = %w[every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
+  SCHEDULES = %w[every_1m every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
                  midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm never]
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
@@ -39,10 +39,10 @@ class Agent < ActiveRecord::Base
   after_save :possibly_update_event_expirations
 
   belongs_to :user, :inverse_of => :agents
-  has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
+  has_many :events, -> { order("events.id desc") }, :dependent => :delete_all, :inverse_of => :agent
   has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
-  has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
-  has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
+  has_many :logs,  -> { order("agent_logs.id desc") }, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog"
+  has_many :received_events, -> { order("events.id desc") }, :through => :sources, :class_name => "Event", :source => :events
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers

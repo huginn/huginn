@@ -24,7 +24,7 @@ Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, 
 
 ### We need your help!
 
-Want to help with Huginn?  Try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
+Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, add new Agents, write documentation and tutorials, or try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
 
 ## Examples
 
@@ -104,5 +104,5 @@ Huginn is a work in progress and is hopefully just getting started.  Please get 
 
 Please fork, add specs, and send pull requests!
 
-[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.png)](https://coveralls.io/r/cantino/huginn) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.png)](https://coveralls.io/r/cantino/huginn) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![Dependency Status](https://gemnasium.com/cantino/huginn.svg)](https://gemnasium.com/cantino/huginn)
 

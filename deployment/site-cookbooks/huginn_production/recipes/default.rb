@@ -14,7 +14,7 @@ group "huginn" do
   members ["huginn"]
 end
 
-%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8").each do |pkg|
+%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8" "libmysqlclient-dev" "libffi-dev" "libssl-dev").each do |pkg|
   package("#{pkg}")
 end
 
@@ -36,6 +36,7 @@ end
 
 deploy "/home/huginn" do
   repo "https://github.com/cantino/huginn.git"
+  branch "master"
   user "huginn"
   group "huginn"
   environment "RAILS_ENV" => "production"
@@ -56,7 +57,7 @@ deploy "/home/huginn" do
     end
     directory("/home/huginn/shared/tmp/pids")
     directory("/home/huginn/shared/tmp/sockets")
-    %w(Procfile unicorn.rb Gemfile nginx.conf).each do |file|
+    %w(Procfile unicorn.rb nginx.conf).each do |file|
       cookbook_file "/home/huginn/shared/config/#{file}" do
       owner "huginn"
       action :create_if_missing
@@ -77,16 +78,17 @@ deploy "/home/huginn" do
       code <<-EOH
       export LANG="en_US.UTF-8"
       export LC_ALL="en_US.UTF-8"
-      ln -nfs /home/huginn/shared/config/Gemfile ./Gemfile
       ln -nfs /home/huginn/shared/config/Procfile ./Procfile
       ln -nfs /home/huginn/shared/config/.env ./.env
       ln -nfs /home/huginn/shared/config/unicorn.rb ./config/unicorn.rb
-      sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/ 
-      sudo bundle install
-      sed -i s/REPLACE_ME_NOW\!/$(sudo rake secret)/ .env
-      sudo rake db:create
-      sudo rake db:migrate
-      sudo rake db:seed
+      sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/
+      echo 'gem "unicorn", :group => :production' >> Gemfile
+      sudo bundle install --without=development --without=test
+      sed -i s/REPLACE_ME_NOW\!/$(sudo bundle exec rake secret)/ .env
+      sudo RAILS_ENV=production bundle exec rake db:create
+      sudo RAILS_ENV=production bundle exec rake db:migrate
+      sudo RAILS_ENV=production bundle exec rake db:seed
+      sudo RAILS_ENV=production bundle exec rake assets:precompile
       sudo foreman export upstart /etc/init -a huginn -u huginn -l log
       sudo start huginn
       EOH

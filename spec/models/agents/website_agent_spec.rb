@@ -91,6 +91,30 @@ describe Agents::WebsiteAgent do
         @checker.check
         @checker.logs.first.message.should =~ /Got an uneven number of matches/
       end
+
+      it "should accept an array for url" do
+        @site['url'] = ["http://xkcd.com/1/", "http://xkcd.com/2/"]
+        @checker.options = @site
+        lambda { @checker.save! }.should_not raise_error;
+        lambda { @checker.check }.should_not raise_error;
+      end
+
+      it "should parse events from all urls in array" do
+        lambda {
+          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @site['mode'] = 'all'
+          @checker.options = @site
+          @checker.check
+        }.should change { Event.count }.by(2)
+      end
+
+      it "should follow unique rules when parsing array of urls" do
+        lambda {
+          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @checker.options = @site
+          @checker.check
+        }.should change { Event.count }.by(1)
+      end
     end
 
     describe 'encoding' do
@@ -307,11 +331,26 @@ describe Agents::WebsiteAgent do
         end
       end
     end
+
+    describe "#receive" do
+      it "should scrape from the url element in incoming event payload" do
+        @event = Event.new
+        @event.agent = agents(:bob_rain_notifier_agent)
+        @event.payload = { 'url' => "http://xkcd.com" }
+
+        lambda {
+          @checker.options = @site
+          @checker.receive([@event])
+        }.should change { Event.count }.by(1)
+      end
+    end
   end
 
   describe "checking with http basic auth" do
     before do
-      stub_request(:any, /user:pass/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      stub_request(:any, /example/).
+        with(headers: { 'Authorization' => "Basic #{['user:pass'].pack('m').chomp}" }).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
       @site = {
         'name' => "XKCD",
         'expected_update_period_in_days' => 2,
@@ -326,6 +365,37 @@ describe Agents::WebsiteAgent do
         'basic_auth' => "user:pass"
       }
       @checker = Agents::WebsiteAgent.new(:name => "auth", :options => @site)
+      @checker.user = users(:bob)
+      @checker.save!
+    end
+
+    describe "#check" do
+      it "should check for changes" do
+        lambda { @checker.check }.should change { Event.count }.by(1)
+        lambda { @checker.check }.should_not change { Event.count }
+      end
+    end
+  end
+
+  describe "checking with User-Agent" do
+    before do
+      stub_request(:any, /example/).
+        with(headers: { 'User-Agent' => 'Sushi' }).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      @site = {
+        'name' => "XKCD",
+        'expected_update_period_in_days' => 2,
+        'type' => "html",
+        'url' => "http://www.example.com",
+        'mode' => 'on_change',
+        'extract' => {
+          'url' => { 'css' => "#comic img", 'attr' => "src" },
+          'title' => { 'css' => "#comic img", 'attr' => "alt" },
+          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+        },
+        'user_agent' => "Sushi"
+      }
+      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @site)
       @checker.user = users(:bob)
       @checker.save!
     end
