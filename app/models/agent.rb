@@ -230,6 +230,19 @@ class Agent < ActiveRecord::Base
   # Class Methods
 
   class << self
+    def build_clone(original)
+      new(original.slice(:type, :options, :schedule, :source_ids, :keep_events_for, :propagate_immediately)) { |clone|
+        # Give it a unique name
+        2.upto(count) do |i|
+          name = '%s (%d)' % [original.name, i]
+          unless exists?(name: name)
+            clone.name = name
+            break
+          end
+        end
+      }
+    end
+
     def cannot_be_scheduled!
       @cannot_be_scheduled = true
     end
