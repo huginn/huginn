@@ -18,6 +18,7 @@
           <% end %>
           <li><%= link_to '<i class="icon-chevron-left"></i> Back'.html_safe, agents_path %></li>
           <li><%= link_to '<i class="icon-pencil"></i> Edit'.html_safe, edit_agent_path(@agent) %></li>
+          <li><%= link_to '<i class="icon-plus"></i> Clone'.html_safe, new_agent_path(id: @agent) %></li>
 
           <% if @agent.can_be_scheduled? || @agent.events.count > 0 %>
             <li class="dropdown">
