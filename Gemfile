@@ -3,6 +3,10 @@ source 'https://rubygems.org'
 gem 'protected_attributes', '~>1.0.7'
 
 gem 'rails', '4.1.0'
+
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
+
 gem 'mysql2', '~> 0.3.15'
 gem 'devise', '~> 3.2.4'
 gem 'kaminari', '~> 0.15.1'
