@@ -56,9 +56,6 @@ $(document).ready ->
   # JSON Editor
   window.jsonEditor = setupJsonEditor()
 
-  # Select2 Selects
-  $(".select2").select2(width: 'resolve')
-
   # Flash
   if $(".flash").length
     setTimeout((-> $(".flash").slideUp(-> $(".flash").remove())), 5000)
@@ -154,6 +151,9 @@ $(document).ready ->
         $("#agent-spinner").stop(true, true).fadeOut();
 
   $("#agent_type").change() if $("#agent_type").length
+
+  # Select2 Selects
+  $(".select2").select2(width: 'resolve')
 
   if $(".schedule-region")
     if $(".schedule-region").data("can-be-scheduled") == true
