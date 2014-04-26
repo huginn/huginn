@@ -9,14 +9,12 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require select2
+ *= require select2-bootstrap
  *= require jquery.json-editor
  *= require rickshaw
  *= require_tree .
  *= require_self
  */
-
-$glyphicons-halflings-url: "<%= image_path "glyphicons-halflings.png" %>";
-$glyphicons-halflings-white-url: "<%= image_path "glyphicons-halflings-white.png" %>";
 
 @import "bootstrap";
 
@@ -63,6 +61,7 @@ img.odin {
 
 img.spinner {
   display: none;
+  vertical-align: bottom;
 }
 
 .hidden {
@@ -133,4 +132,10 @@ span.not-applicable:after {
   position: relative;
   width: 940px;
   height: 400px;
+}
+
+// Fix JSON Editor
+
+.json-editor blockquote {
+  font-size: 14px;
 }

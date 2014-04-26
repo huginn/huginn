@@ -1,6 +1,6 @@
 <div class='container'>
   <div class='row'>
-    <div class='span12'>
+    <div class='col-md-12'>
       <div class="page-header">
         <h2>
           Your Credentials
@@ -23,9 +23,9 @@
             <td><%= user_credential.credential_name %></td>
             <td>
               <%= truncate user_credential.credential_value %>
-              <div class="btn-group" style="float: right">
-                <%= link_to 'Edit', edit_user_credential_path(user_credential), class: "btn btn-mini" %>
-                <%= link_to 'Delete', user_credential_path(user_credential), method: :delete, data: {confirm: 'Are you sure?'}, class: "btn btn-mini" %>
+              <div class="btn-group btn-group-xs" style="float: right">
+                <%= link_to 'Edit', edit_user_credential_path(user_credential), class: "btn btn-default" %>
+                <%= link_to 'Delete', user_credential_path(user_credential), method: :delete, data: {confirm: 'Are you sure?'}, class: "btn btn-default" %>
               </div>
             </td>
           </tr>
@@ -37,7 +37,7 @@
       <br/>
 
       <div class="btn-group">
-        <%= link_to '<i class="icon-plus"></i> New Credential'.html_safe, new_user_credential_path, class: "btn" %>
+        <%= link_to '<span class="glyphicon glyphicon-plus"></span> New Credential'.html_safe, new_user_credential_path, class: "btn btn-default" %>
       </div>
     </div>
   </div>
