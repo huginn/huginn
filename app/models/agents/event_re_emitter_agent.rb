@@ -21,14 +21,17 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        self.memory['queue'] ||= [].to_set
-        self.memory['queue'] << event.payload
+        self.memory['events'] ||= []
+        self.memory['events'] << event.payload
+
+        # the rest of the app doesn't like sets, so we just go back to an array after converting to set to uniqueify
+        self.memory['events'] = self.memory['events'].to_set.to_a
       end
     end
 
     def check
-      if self.memory['queue'] && self.memory['queue'].length > 0
-        self.memory['queue'].each do |event_payload|
+      if self.memory['events'] && self.memory['events'].length > 0
+        self.memory['events'].each do |event_payload|
           log "Re-emitting event [#{event_payload}]"
           create_event :payload => event_payload
         end
