@@ -21,18 +21,15 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        self.memory['queue'] ||= []
+        self.memory['queue'] ||= [].to_set
         self.memory['queue'] << event.payload
-        self.memory['events'] ||= []
-        self.memory['events'] << event.id
       end
     end
 
     def check
       if self.memory['queue'] && self.memory['queue'].length > 0
-        ids = self.memory['events'].join(",")
-        log "Re-emitting events [#{ids}]"
         self.memory['queue'].each do |event_payload|
+          log "Re-emitting event [#{event_payload}]"
           create_event :payload => event_payload
         end
       end
