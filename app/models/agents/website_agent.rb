@@ -49,6 +49,8 @@ module Agents
 
       Set `user_agent` to a custom User-Agent name if the website does not like the default value ("Faraday v#{Faraday::VERSION}").
 
+      The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
+
       The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload.
     MD
 
@@ -109,6 +111,10 @@ module Agents
 
       if options['user_agent'].present?
         errors.add(:base, "user_agent must be a string") unless options['user_agent'].is_a?(String)
+      end
+
+      unless headers.is_a?(Hash)
+        errors.add(:base, "if provided, headers must be a hash")
       end
 
       begin
@@ -287,6 +293,8 @@ module Agents
 
     def faraday
       @faraday ||= Faraday.new { |builder|
+        builder.headers = headers if headers.length > 0
+
         if (user_agent = options['user_agent']).present?
           builder.headers[:user_agent] = user_agent
         end
@@ -319,6 +327,10 @@ module Agents
         return value.split(/:/, 2)
       end
       raise "bad value for basic_auth: #{value.inspect}"
+    end
+
+    def headers
+      options['headers'].presence || {}
     end
   end
 end
