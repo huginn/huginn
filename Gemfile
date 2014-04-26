@@ -8,7 +8,7 @@ case RUBY_PLATFORM
 when /freebsd/i
   # Seems FreeBSD's zoneinfo is not exactly what tzinfo expects
   gem 'tzinfo-data'
-else
+when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
   # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
   gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 end
