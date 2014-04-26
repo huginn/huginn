@@ -91,6 +91,10 @@ class Agent < ActiveRecord::Base
     last_event_at && last_error_log_at && last_error_log_at > (last_event_at - 2.minutes)
   end
 
+  def received_event_without_error?
+    (last_receive_at.present? && last_error_log_at.blank?) || (last_receive_at.present? && last_error_log_at.present? && last_receive_at > last_error_log_at)
+  end
+
   def create_event(attrs)
     if can_create_events?
       events.create!({ 

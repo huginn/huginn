@@ -591,6 +591,30 @@ describe Agent do
     end
   end
 
+  describe "received_event_without_error?" do
+    before do
+      @agent = Agent.new
+    end
+
+    it "should return false until the first event was received" do
+      @agent.received_event_without_error?.should == false
+      @agent.last_receive_at = Time.now
+      @agent.received_event_without_error?.should == true
+    end
+
+    it "should return false when the last error occured after the last received event" do
+      @agent.last_receive_at = Time.now - 1.minute
+      @agent.last_error_log_at = Time.now
+      @agent.received_event_without_error?.should == false
+    end
+
+    it "should return true when the last received event occured after the last error" do
+      @agent.last_receive_at = Time.now
+      @agent.last_error_log_at = Time.now - 1.minute
+      @agent.received_event_without_error?.should == true
+    end
+  end
+
   describe "scopes" do
     describe "of_type" do
       it "should accept classes" do
