@@ -21,19 +21,32 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        self.memory['events'] ||= []
-        self.memory['events'] << event.payload
-
-        # the rest of the app doesn't like sets, so we just go back to an array after converting to set to uniqueify
-        self.memory['events'] = self.memory['events'].to_set.to_a
+        create_event :payload => event.payload
       end
     end
 
     def check
-      if self.memory['events'] && self.memory['events'].length > 0
-        self.memory['events'].each do |event_payload|
-          log "Re-emitting event [#{event_payload}]"
-          create_event :payload => event_payload
+      if self.events && self.events.length > 0
+        # Get payloads and clear events
+        event_payloads = [].to_set
+        self.events.each do |event|
+          event_payloads << event.payload
+          event.destroy!
+        end
+
+        # Migration from old memory method
+        if self.memory['events'] && self.memory['events'].length > 0
+          self.memory['events'].each do |mem_event|
+            event_payloads << mem_event
+          end
+
+          self.memory['events'] = []
+        end
+
+        # Re create and emit events from stored payloads
+        event_payloads.each do |event|
+          log "Re-emitting event [#{event}]"
+          create_event :payload => event
         end
       end
     end
