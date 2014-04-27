@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-shared_examples_for 'JsonPathOptionsOverwritable' do
+shared_examples_for JsonPathOptionsOverwritable do
   before(:each) do
     @valid_params = described_class.new.default_options
 

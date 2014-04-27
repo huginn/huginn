@@ -48,7 +48,6 @@ module Agents
         response = HTTParty.post "https://api.pushbullet.com/api/pushes", query_options(event)
         log(response.body) if response.body.include? 'error'
       end
-      save!
     end
 
     private

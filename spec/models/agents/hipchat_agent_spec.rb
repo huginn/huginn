@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'models/concerns/json_path_options_overwritable'
 
 describe Agents::HipchatAgent do
-  it_behaves_like 'JsonPathOptionsOverwritable'
+  it_behaves_like JsonPathOptionsOverwritable
 
   before(:each) do
     @valid_params = {
