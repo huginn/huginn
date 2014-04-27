@@ -43,18 +43,13 @@ module Agents
     end
 
     def fetch_stubhub_data(url)
-      begin
-        StubhubFetcher.call(url)
-      rescue
-        log("There was an error fetching data for your StubHub Event")
-      end
+      StubhubFetcher.call(url)
     end
 
     class StubhubFetcher
 
       def self.call(url)
         new(url).fields
-
       end
 
       def initialize(url)
