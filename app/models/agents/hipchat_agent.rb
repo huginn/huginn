@@ -1,6 +1,6 @@
 module Agents
   class HipchatAgent < Agent
-    include JsonPathOptionsOverwritable
+    include LiquidInterpolatable
 
     cannot_be_scheduled!
     cannot_create_events!
@@ -18,22 +18,17 @@ module Agents
       If you want your message to notify the room members change `notify` to "true".
       Modify the background color of your message via the `color` attribute (one of "yellow", "red", "green", "purple", "gray", or "random")
 
-      If you want to specify either of those attributes per event, you can provide a [JSONPath](http://goessner.net/articles/JsonPath/) for each of them (except the `auth_token`).
+      TODO: add a link to the wiki explaining how to use the Liquid templating
     MD
 
     def default_options
       {
         'auth_token' => '',
         'room_name' => '',
-        'room_name_path' => '',
         'username' => "Huginn",
-        'username_path' => '',
         'message' => "Hello from Huginn!",
-        'message_path' => '',
         'notify' => false,
-        'notify_path' => '',
         'color' => 'yellow',
-        'color_path' => '',
       }
     end
 
@@ -49,14 +44,9 @@ module Agents
     def receive(incoming_events)
       client = HipChat::Client.new(options[:auth_token])
       incoming_events.each do |event|
-        mo = merge_json_path_options event
+        mo = interpolate_options options, event.payload
         client[mo[:room_name]].send(mo[:username], mo[:message], :notify => mo[:notify].to_s == 'true' ? 1 : 0, :color => mo[:color])
       end
-    end
-
-    private
-    def options_with_path
-      [:room_name, :username, :message, :notify, :color]
     end
   end
 end

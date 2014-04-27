@@ -22,6 +22,7 @@ gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.3'
 gem 'twilio-ruby', '~> 3.11.5'
 gem 'ruby-growl', '~> 4.1.0'
+gem 'liquid', '~> 2.6.1'
 
 gem 'delayed_job', '~> 4.0.0'
 gem 'delayed_job_active_record', '~> 4.0.0'
