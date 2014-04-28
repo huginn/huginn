@@ -20,7 +20,7 @@ module Agents
         'jabber_sender'   => 'huginn@localhost',
         'jabber_receiver' => 'muninn@localhost',
         'jabber_password' => '',
-        'message'         => 'It will be {{temp}} out tomorrow',
+        'message'         => 'It will be <$.temp> out tomorrow',
         'expected_receive_period_in_days' => "2"
       }
     end
