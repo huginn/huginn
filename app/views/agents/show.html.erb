@@ -14,12 +14,10 @@
           <% end %>
           <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><i class='icon-list-alt'></i> Logs</a></li>
 
-          <% if @agent.can_create_events? %>
-            <% if @agent.events.count > 0 %>
-              <li><%= link_to '<i class="icon-random"></i> Events'.html_safe, events_path(:agent => @agent.to_param) %></li>
-            <% else %>
-              <li class='disabled'><a><i class='icon-random'></i> Events</a></li>
-            <% end %>
+          <% if @agent.can_create_events? && @agent.events.count > 0 %>
+            <li><%= link_to '<i class="icon-random"></i> Events'.html_safe, events_path(:agent => @agent.to_param) %></li>
+          <% else %>
+            <li class='disabled'><a><i class='icon-random'></i> Events</a></li>
           <% end %>
 
           <li class="dropdown">
@@ -32,6 +30,7 @@
               <% end %>
 
               <li><%= link_to '<i class="icon-pencil"></i> Edit'.html_safe, edit_agent_path(@agent) %></li>
+              <li><%= link_to '<i class="icon-plus"></i> Clone'.html_safe, new_agent_path(id: @agent) %></li>
 
               <li>
                 <% if !@agent.disabled? %>

@@ -1,0 +1,17 @@
+{
+  "response":{
+    "docs":[
+      {
+      "url": "http://www.stubhub.com/event/name-1-1-2014-12345",
+      "seo_description_en_US": "name",
+      "event_date_local": "2014-01-01",
+      "maxPrice": "100",
+      "minPrice": "50",
+      "totalPostings": "100",
+      "totalTickets": "200",
+      "venue_name": "Venue Name"
+    }
+    ]
+  }
+}
+

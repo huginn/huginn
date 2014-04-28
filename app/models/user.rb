@@ -23,8 +23,8 @@ class User < ActiveRecord::Base
   validates_inclusion_of :invitation_code, :on => :create, :in => INVITATION_CODES, :message => "is not valid"
 
   has_many :user_credentials, :dependent => :destroy, :inverse_of => :user
-  has_many :events, :order => "events.created_at desc", :dependent => :delete_all, :inverse_of => :user
-  has_many :agents, :order => "agents.created_at desc", :dependent => :destroy, :inverse_of => :user
+  has_many :events, -> { order("events.created_at desc") }, :dependent => :delete_all, :inverse_of => :user
+  has_many :agents, -> { order("agents.created_at desc") }, :dependent => :destroy, :inverse_of => :user
   has_many :logs, :through => :agents, :class_name => "AgentLog"
 
   # Allow users to login via either email or username.

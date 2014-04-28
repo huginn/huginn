@@ -21,28 +21,71 @@ describe Agents::WebsiteAgent do
       @checker.save!
     end
 
-    describe "#check" do
+    describe "validations" do
+      before do
+        @checker.should be_valid
+      end
+
       it "should validate the integer fields" do
-        @checker.options['expected_update_period_in_days'] = "nonsense"
-        lambda { @checker.save! }.should raise_error;
         @checker.options['expected_update_period_in_days'] = "2"
+        @checker.should be_valid
+
+        @checker.options['expected_update_period_in_days'] = "nonsense"
+        @checker.should_not be_valid
+      end
+
+      it "should validate uniqueness_look_back" do
         @checker.options['uniqueness_look_back'] = "nonsense"
-        lambda { @checker.save! }.should raise_error;
+        @checker.should_not be_valid
+
+        @checker.options['uniqueness_look_back'] = "2"
+        @checker.should be_valid
+      end
+
+      it "should validate headers" do
+        @checker.options['headers'] = "blah"
+        @checker.should_not be_valid
+
+        @checker.options['headers'] = ""
+        @checker.should be_valid
+
+        @checker.options['headers'] = {}
+        @checker.should be_valid
+
+        @checker.options['headers'] = { 'foo' => 'bar' }
+        @checker.should be_valid
+      end
+
+      it "should validate mode" do
         @checker.options['mode'] = "nonsense"
-        lambda { @checker.save! }.should raise_error;
-        @checker.options = @site
+        @checker.should_not be_valid
+
+        @checker.options['mode'] = "on_change"
+        @checker.should be_valid
+
+        @checker.options['mode'] = "all"
+        @checker.should be_valid
+
+        @checker.options['mode'] = ""
+        @checker.should be_valid
       end
 
       it "should validate the force_encoding option" do
-        @checker.options['force_encoding'] = 'UTF-8'
-        lambda { @checker.save! }.should_not raise_error;
-        @checker.options['force_encoding'] = ['UTF-8']
-        lambda { @checker.save! }.should raise_error;
-        @checker.options['force_encoding'] = 'UTF-42'
-        lambda { @checker.save! }.should raise_error;
-        @checker.options = @site
-      end
+        @checker.options['force_encoding'] = ''
+        @checker.should be_valid
 
+        @checker.options['force_encoding'] = 'UTF-8'
+        @checker.should be_valid
+
+        @checker.options['force_encoding'] = ['UTF-8']
+        @checker.should_not be_valid
+
+        @checker.options['force_encoding'] = 'UTF-42'
+        @checker.should_not be_valid
+      end
+    end
+
+    describe "#check" do
       it "should check for changes (and update Event.expires_at)" do
         lambda { @checker.check }.should change { Event.count }.by(1)
         event = Event.last
@@ -331,11 +374,26 @@ describe Agents::WebsiteAgent do
         end
       end
     end
+
+    describe "#receive" do
+      it "should scrape from the url element in incoming event payload" do
+        @event = Event.new
+        @event.agent = agents(:bob_rain_notifier_agent)
+        @event.payload = { 'url' => "http://xkcd.com" }
+
+        lambda {
+          @checker.options = @site
+          @checker.receive([@event])
+        }.should change { Event.count }.by(1)
+      end
+    end
   end
 
   describe "checking with http basic auth" do
     before do
-      stub_request(:any, /user:pass/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      stub_request(:any, /example/).
+        with(headers: { 'Authorization' => "Basic #{['user:pass'].pack('m').chomp}" }).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
       @site = {
         'name' => "XKCD",
         'expected_update_period_in_days' => 2,
@@ -358,6 +416,34 @@ describe Agents::WebsiteAgent do
       it "should check for changes" do
         lambda { @checker.check }.should change { Event.count }.by(1)
         lambda { @checker.check }.should_not change { Event.count }
+      end
+    end
+  end
+
+  describe "checking with headers" do
+    before do
+      stub_request(:any, /example/).
+        with(headers: { 'foo' => 'bar', 'user_agent' => /Faraday/ }).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      @site = {
+        'name' => "XKCD",
+        'expected_update_period_in_days' => 2,
+        'type' => "html",
+        'url' => "http://www.example.com",
+        'mode' => 'on_change',
+        'headers' => { 'foo' => 'bar' },
+        'extract' => {
+          'url' => { 'css' => "#comic img", 'attr' => "src" },
+        }
+      }
+      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @site)
+      @checker.user = users(:bob)
+      @checker.save!
+    end
+
+    describe "#check" do
+      it "should check for changes" do
+        lambda { @checker.check }.should change { Event.count }.by(1)
       end
     end
   end

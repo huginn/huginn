@@ -39,10 +39,10 @@ class Agent < ActiveRecord::Base
   after_save :possibly_update_event_expirations
 
   belongs_to :user, :inverse_of => :agents
-  has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
+  has_many :events, -> { order("events.id desc") }, :dependent => :delete_all, :inverse_of => :agent
   has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
-  has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
-  has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
+  has_many :logs,  -> { order("agent_logs.id desc") }, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog"
+  has_many :received_events, -> { order("events.id desc") }, :through => :sources, :class_name => "Event", :source => :events
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
@@ -230,6 +230,19 @@ class Agent < ActiveRecord::Base
   # Class Methods
 
   class << self
+    def build_clone(original)
+      new(original.slice(:type, :options, :schedule, :source_ids, :keep_events_for, :propagate_immediately)) { |clone|
+        # Give it a unique name
+        2.upto(count) do |i|
+          name = '%s (%d)' % [original.name, i]
+          unless exists?(name: name)
+            clone.name = name
+            break
+          end
+        end
+      }
+    end
+
     def cannot_be_scheduled!
       @cannot_be_scheduled = true
     end
