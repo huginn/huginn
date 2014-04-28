@@ -9,7 +9,7 @@ describe Agents::JabberAgent do
       jabber_sender: 'foo@localhost',
       jabber_receiver: 'bar@localhost',
       jabber_password: 'password',
-      message: 'Warning! {{title}} - {{url}}',
+      message: 'Warning! <$.title> - <$.url>',
       expected_receive_period_in_days: '2'
     }
   }

@@ -1,4 +1,3 @@
-require 'mustache'
 module Agents
   class JabberAgent < Agent
     cannot_be_scheduled!
@@ -11,7 +10,7 @@ module Agents
 
       The `message` is sent from `jabber_sender` to `jaber_receiver`. This message
       can contain any keys found in the source's payload, escaped using double curly braces.
-      ex: `"News Story: {{title}}: {{url}}"`
+      ex: `"News Story: <$.title>: <$.url>"`
     MD
 
     def default_options
@@ -59,7 +58,7 @@ module Agents
     end
 
     def body(event)
-      Mustache.render(options['message'], event.payload)
+      Utils.interpolate_jsonpaths(options['message'], event.payload)
     end
   end
 end
