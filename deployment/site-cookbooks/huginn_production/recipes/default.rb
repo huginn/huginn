@@ -91,7 +91,7 @@ deploy "/home/huginn" do
       sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/
       echo 'gem "unicorn", :group => :production' >> Gemfile
       sudo bundle install --without=development --without=test
-      sed -i s/REPLACE_ME_NOW\!/$(sudo bundle exec rake secret)/ .env
+      sed -i s/REPLACE_ME_NOW\!/$(sudo bundle exec rake secret)/ /home/huginn/shared/config/.env
       sudo RAILS_ENV=production bundle exec rake db:create
       sudo RAILS_ENV=production bundle exec rake db:migrate
       sudo RAILS_ENV=production bundle exec rake db:seed
