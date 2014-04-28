@@ -46,7 +46,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         response = HTTParty.post "https://api.pushbullet.com/api/pushes", query_options(event)
-        log(response.body) if response.body.include? 'error'
+        error(response.body) if response.body.include? 'error'
       end
     end
 

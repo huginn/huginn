@@ -57,7 +57,7 @@ describe Agents::PushbulletAgent do
       stub_request(:post, "https://token:@api.pushbullet.com/api/pushes").
         with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
         to_return(:status => 200, :body => "ok", :headers => {})
-      dont_allow(@checker).log
+      dont_allow(@checker).error
       @checker.receive([@event])
     end
 
@@ -65,7 +65,7 @@ describe Agents::PushbulletAgent do
       stub_request(:post, "https://token:@api.pushbullet.com/api/pushes").
         with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
         to_return(:status => 200, :body => "error", :headers => {})
-      mock(@checker).log("error")
+      mock(@checker).error("error")
       @checker.receive([@event])
     end
   end

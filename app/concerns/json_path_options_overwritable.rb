@@ -1,6 +1,6 @@
 module JsonPathOptionsOverwritable
   extend ActiveSupport::Concern
-  # Using this concern allows providing optionional `<attribute>_path` options hash
+  # Using this concern allows providing optional `<attribute>_path` options hash
   # attributes which will then (if not blank) be interpolated using the provided JSONPath.
   #
   # Example options Hash:
@@ -14,9 +14,9 @@ module JsonPathOptionsOverwritable
   # {
   #   name: 'dynamic huginn'
   # }
-  # calling agent.merge_json_path_options(event) returns the fowolling hash:
+  # calling agent.merge_json_path_options(event) returns the following hash:
   # {
-  #   name: 'dynamic huggin'
+  #   name: 'dynamic huginn'
   #   title: 'Hello from Huginn'
   # }
 
