@@ -1,6 +1,9 @@
 require 'spec_helper'
+require 'models/concerns/working_helpers'
 
 describe Agent do
+  it_behaves_like WorkingHelpers
+
   describe ".run_schedule" do
     before do
       Agents::WeatherAgent.count.should > 0
@@ -607,32 +610,6 @@ describe Agent do
         @agent.reload.memory['last_webhook_request'].should == { "some_param" => "some_value" }
         @agent.last_web_request_at.to_i.should be_within(1).of(Time.now.to_i)
       end
-    end
-  end
-
-  describe "recent_error_logs?" do
-    it "returns true if last_error_log_at is near last_event_at" do
-      agent = Agent.new
-
-      agent.last_error_log_at = 10.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
-
-      agent.last_error_log_at = 11.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
-
-      agent.last_error_log_at = 5.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
-
-      agent.last_error_log_at = 15.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_false
-
-      agent.last_error_log_at = 2.days.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_false
     end
   end
 

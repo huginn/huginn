@@ -1,6 +1,9 @@
 require 'spec_helper'
+require 'models/concerns/json_path_options_overwritable'
 
 describe Agents::HipchatAgent do
+  it_behaves_like JsonPathOptionsOverwritable
+
   before(:each) do
     @valid_params = {
                       'auth_token' => 'token',
@@ -47,29 +50,6 @@ describe Agents::HipchatAgent do
       @checker.should be_valid
     end
 
-  end
-
-  describe "helpers" do
-    describe "select_option" do
-      it "should use the room_name_path if specified" do
-        @checker.options['room_name_path'] = "$.room_name"
-        @checker.send(:select_option, @event, :room_name).should == "test room"
-      end
-
-      it "should use the normal option when the path option is blank" do
-        @checker.send(:select_option, @event, :room_name).should == "test"
-      end
-    end
-
-    it "should merge all options" do
-      @checker.send(:merge_options, @event).deep_symbolize_keys.should == {
-        :room_name => "test",
-        :username => "Huggin user",
-        :message => "Looks like its going to rain",
-        :notify => false,
-        :color => "yellow"
-      }
-    end
   end
 
   describe "#receive" do

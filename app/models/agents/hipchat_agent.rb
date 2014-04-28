@@ -1,5 +1,7 @@
 module Agents
   class HipchatAgent < Agent
+    include JsonPathOptionsOverwritable
+
     cannot_be_scheduled!
     cannot_create_events!
 
@@ -47,30 +49,14 @@ module Agents
     def receive(incoming_events)
       client = HipChat::Client.new(options[:auth_token])
       incoming_events.each do |event|
-        mo = merge_options event
+        mo = merge_json_path_options event
         client[mo[:room_name]].send(mo[:username], mo[:message], :notify => mo[:notify].to_s == 'true' ? 1 : 0, :color => mo[:color])
       end
     end
 
     private
-    def select_option(event, a)
-      if options[a.to_s + '_path'].present?
-        Utils.value_at(event.payload, options[a.to_s + '_path'])
-      else
-        options[a]
-      end
-    end
-
     def options_with_path
       [:room_name, :username, :message, :notify, :color]
-    end
-
-    def merge_options event
-      options.select { |k, v| options_with_path.include? k}.tap do |merged_options|
-        options_with_path.each do |a|
-          merged_options[a] = select_option(event, a)
-        end
-      end
     end
   end
 end
