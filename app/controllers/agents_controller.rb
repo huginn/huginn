@@ -30,38 +30,6 @@ class AgentsController < ApplicationController
     end
   end
 
-  def disable
-    agent = current_user.agents.find(params[:id])
-
-    # save_successful = false
-
-    # Enable/Disable the agent
-    if params[:disable] == "true"
-      agent.disabled = true
-      save_successful = agent.save
-      message = "Agent '#{agent.name}' disabled"
-    elsif params[:disable] == "false"
-      agent.disabled = false
-      save_successful = agent.save
-      message = "Agent '#{agent.name}' enabled"
-    end
-
-    # Handle save errors
-    if save_successful != true
-      agent_status = "enabled"
-      if agent.disabled?
-        agent_status = "disabled"
-      end
-      message = "Something went wrong. Agent '#{agent.name}' is still #{agent_status} #{save_successful}"
-    end
-
-    if params[:return] == "show"
-      redirect_to agent_path(agent), notice: message
-    else
-      redirect_to agents_path, notice: message
-    end
-  end
-
   def type_details
     agent = Agent.build_for_type(params[:type], current_user, {})
     render :json => {
@@ -145,7 +113,13 @@ class AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
-        format.html { redirect_to agents_path, notice: 'Your Agent was successfully updated.' }
+        format.html {
+          if params[:return] == "show"
+            redirect_to agent_path(@agent), notice: 'Your Agent was successfully updated.'
+          else
+            redirect_to agents_path, notice: 'Your Agent was successfully updated.'
+          end
+        }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }

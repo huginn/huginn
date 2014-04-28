@@ -37,13 +37,6 @@
   </div>
 
   <div class="control-group">
-    <%= f.label :disable_agent, :class => 'control-label' %>
-    <div class="controls disabled-region">
-      <%= f.check_box :disabled %>
-    </div>
-  </div>
-
-  <div class="control-group">
     <%= f.label :schedule, :class => 'control-label' %>
     <div class="controls schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
       <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'span4' %>

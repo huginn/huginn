@@ -34,9 +34,9 @@
 
               <li>
                 <% if !@agent.disabled? %>
-                  <%= link_to '<i class="icon-pause"></i> Disable agent'.html_safe, disable_agent_path(@agent, :disable => "true", :return => "show"), method: :post %>
+                  <%= link_to '<i class="icon-pause"></i> Disable agent'.html_safe, agent_path(@agent, :agent => { :disabled => true }, :return => "show"), :method => :put %>
                 <% else %>
-                  <%= link_to '<i class="icon-play"></i> Enable agent'.html_safe, disable_agent_path(@agent, :disable => "false", :return => "show"), method: :post %>
+                  <%= link_to '<i class="icon-play"></i> Enable agent'.html_safe, agent_path(@agent, :agent => { :disabled => false }, :return => "show"), :method => :put %>
                 <% end %>
               </li>
 

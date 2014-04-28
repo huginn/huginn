@@ -2,7 +2,6 @@ Huginn::Application.routes.draw do
   resources :agents do
     member do
       post :run
-      post :disable
       post :handle_details_post
       delete :remove_events
     end

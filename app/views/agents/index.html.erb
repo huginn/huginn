@@ -19,7 +19,7 @@
 
         <% @agents.each do |agent| %>
           <% if agent.disabled? %>
-            <tr class='agent-disabled'> <!-- TODO: Change this to an agent-disabled class -->
+            <tr class='agent-disabled'>
           <% else %>
             <tr>
           <% end %>
@@ -71,9 +71,9 @@
                 <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-mini btn-primary" %>
 
                 <% if agent.disabled? %>
-                  <%= link_to 'Enable', disable_agent_path(agent, :disable => "false", :return => "index"), method: :post, class: "btn btn-mini btn-success" %>
+                  <%= link_to "Enable", agent_path(agent, :agent => { :disabled => false }), :method => :put, class: "btn btn-mini btn-success"%>
                 <% else %>
-                  <%= link_to 'Disable', disable_agent_path(agent, :disable => "true", :return => "index"), method: :post, class: "btn btn-mini btn-warning" %>
+                  <%= link_to "Disable", agent_path(agent, :agent => { :disabled => true }), :method => :put, class: "btn btn-mini btn-warning"%>
                 <% end %>
 
                 <%= link_to 'Delete', agent_path(agent), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-mini btn-danger" %>
