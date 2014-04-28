@@ -21,4 +21,22 @@ Vagrant.configure("2") do |config|
   config.vm.provider :parallels do |prl, override|
     override.vm.box = "parallels/ubuntu-12.04"
   end
+
+  config.vm.define "aws" do |remote|
+    remote.vm.box     = "dummy"
+    remote.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+    remote.vm.provider :aws do |aws, override|
+      aws.access_key_id             = ENV["AWS_ACCESS_KEY_ID"]
+      aws.secret_access_key         = ENV["AWS_SECRET_ACCESS_KEY"]
+      aws.keypair_name              = ENV["AWS_KEYPAIR_NAME"]
+      aws.security_groups           = [ ENV["AWS_SECURITY_GROUP"] ]
+      override.ssh.private_key_path = ENV["AWS_SSH_PRIVKEY"]
+      override.ssh.username         = ENV['AWS_SSH_USER'] || "ubuntu"
+      aws.region                    = ENV['AWS_REGION']   || "eu-west-1"
+      # ami-828675f5 == precise32
+      aws.ami                       = ENV['AWS_AMI']      || "ami-828675f5"
+      aws.instance_type             = "t1.micro"
+    end
+  end
 end
