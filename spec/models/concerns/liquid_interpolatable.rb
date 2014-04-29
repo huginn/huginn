@@ -27,5 +27,10 @@ shared_examples_for LiquidInterpolatable do
           "escape" => "This should be Hello+world"
       }
     end
+
+    it "should work for strings" do
+      @checker.send(:interpolate_string, "{{variable}}", @event.payload).should == "hello"
+      @checker.send(:interpolate_string, "{{variable}} you", @event.payload).should == "hello you"
+    end
   end
 end

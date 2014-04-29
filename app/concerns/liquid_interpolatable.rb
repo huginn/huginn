@@ -14,6 +14,10 @@ module LiquidInterpolatable
     duped_options
   end
 
+  def interpolate_string string, payload
+    Liquid::Template.parse(string).render(payload)
+  end
+
   require 'uri'
   # Percent encoding for URI conforming to RFC 3986.
   # Ref: http://tools.ietf.org/html/rfc3986#page-12

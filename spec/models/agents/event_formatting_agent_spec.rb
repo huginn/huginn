@@ -12,7 +12,7 @@ describe Agents::EventFormattingAgent do
             :mode => "clean",
             :matchers => [
                 {
-                    :path => "$.date.pretty",
+                    :path => "{{date.pretty}}",
                     :regexp => "\\A(?<time>\\d\\d:\\d\\d [AP]M [A-Z]+)",
                     :to => "pretty_date",
                 },

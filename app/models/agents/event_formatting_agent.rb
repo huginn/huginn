@@ -43,7 +43,7 @@ module Agents
           {
             "matchers": [
               {
-                "path": "$.date.pretty",
+                "path": "{{date.pretty}}",
                 "regexp": "\\A(?<time>\\d\\d:\\d\\d [AP]M [A-Z]+)",
                 "to": "pretty_date",
               }
@@ -162,7 +162,7 @@ module Agents
             re = Regexp.new(regexp)
             proc { |hash|
               mhash = {}
-              value = Utils.value_at(hash, path)
+              value = interpolate_string(path, hash)
               if value.is_a?(String) && (m = re.match(value))
                 m.to_a.each_with_index { |s, i|
                   mhash[i.to_s] = s
