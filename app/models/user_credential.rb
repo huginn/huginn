@@ -1,5 +1,5 @@
 class UserCredential < ActiveRecord::Base
-  MODES = %w[text java_script]
+  MODES = %w[text java_script coffee]
 
   attr_accessible :credential_name, :credential_value, :mode
 

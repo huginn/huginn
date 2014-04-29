@@ -14,6 +14,8 @@ $ ->
     mode = $("#user_credential_mode").val()
     if mode == 'java_script'
       editor.getSession().setMode("ace/mode/javascript")
+    else if mode == 'coffee'
+      editor.getSession().setMode("ace/mode/coffee")
     else
       editor.getSession().setMode("ace/mode/text")
 
