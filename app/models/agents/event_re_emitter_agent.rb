@@ -1,7 +1,7 @@
 module Agents
   class EventReEmitterAgent < Agent
 
-    default_schedule "1d"
+    default_schedule "every_1d"
 
     description <<-MD
       The Event Re-Emitter Agent is very simple - it will re-emit any events in it's memory on the given schedule.
