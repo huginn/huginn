@@ -9,13 +9,13 @@ module Agents
       The PushoverAgent receives and collects events and sends them via push notification to a user/group.
 
       **You need a Pushover API Token:** [https://pushover.net/apps/build](https://pushover.net/apps/build)
-      
+
       **You must provide** a `message` or `text` key that will contain the body of the notification. This can come from an event or be set as a default. Pushover API has a `512` Character Limit including `title`. `message` will be truncated.
 
       * `token`: your application's API token
       * `user`: the user or group key (not e-mail address).
       * `expected_receive_period_in_days`:  is maximum number of days that you would expect to pass between events being received by this agent.
-      
+
       Your event can provide any of the following optional parameters or you can provide defaults:
 
       * `device` - your user's device name to send the message directly to that device, rather than all of the user's devices
@@ -58,7 +58,7 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        message = (event.payload['message'] || event.payload['text'] || options['message']).to_s
+        message = (event.payload['message'].presence  || event.payload['text'].presence  || options['message']).to_s
         if message.present?
             post_params = {
               'token' => options['token'],
@@ -66,29 +66,29 @@ module Agents
               'message' => message
             }
 
-            post_params['device'] = event.payload['device'] || options['device']
-            post_params['title'] = event.payload['title'] || event.payload['subject'] || options['title']
-            
-            url = (event.payload['url'] || options['url'] || '').to_s
+            post_params['device'] = event.payload['device'].presence  || options['device']
+            post_params['title'] = event.payload['title'].presence  || event.payload['subject'].presence  || options['title']
+
+            url = (event.payload['url'].presence  || options['url'] || '').to_s
             url = url.slice 0..512
             post_params['url'] = url
-            
-            url_title = (event.payload['url_title'] || options['url_title']).to_s
+
+            url_title = (event.payload['url_title'].presence  || options['url_title']).to_s
             url_title = url_title.slice 0..100
             post_params['url_title'] = url_title
-            
-            post_params['priority'] = (event.payload['priority'] || options['priority']).to_i
-            
+
+            post_params['priority'] = (event.payload['priority'].presence  || options['priority']).to_i
+
             if event.payload.has_key? 'timestamp'
               post_params['timestamp'] = (event.payload['timestamp']).to_s
             end
 
-            post_params['sound'] = (event.payload['sound'] || options['sound']).to_s
+            post_params['sound'] = (event.payload['sound'].presence  || options['sound']).to_s
 
-            post_params['retry'] = (event.payload['retry'] || options['retry']).to_i
+            post_params['retry'] = (event.payload['retry'].presence  || options['retry']).to_i
 
-            post_params['expire'] = (event.payload['expire'] || options['expire']).to_i
-            
+            post_params['expire'] = (event.payload['expire'].presence  || options['expire']).to_i
+
             send_notification(post_params)
         end
       end
