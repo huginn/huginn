@@ -17,7 +17,8 @@ stdout_path "log/unicorn_err.log"
 pid '/home/huginn/shared/tmp/pids/unicorn.pid'
 
 before_fork do |server, worker|
-  ActiveRecord::Base.connection.disconnect!
+  defined?(ActiveRecord::Base) and
+    ActiveRecord::Base.connection.disconnect!
   old_pid = "#{server.config[:pid]}.oldbin"
   if File.exists?(old_pid) && server.pid != old_pid
     begin
@@ -29,5 +30,6 @@ before_fork do |server, worker|
 end
 
 after_fork do |server, worker|
-  ActiveRecord::Base.establish_connection
+  defined?(ActiveRecord::Base) and
+    ActiveRecord::Base.establish_connection
 end

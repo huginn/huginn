@@ -97,7 +97,7 @@ describe Utils do
     it "escapes </script> tags in the output JSON" do
       cleaned_json = Utils.jsonify(:foo => "bar", :xss => "</script><script>alert('oh no!')</script>")
       cleaned_json.should_not include("</script>")
-      cleaned_json.should include("<\\/script>")
+      cleaned_json.should include('\\u003c/script\\u003e')
     end
 
     it "html_safes the output unless :skip_safe is passed in" do

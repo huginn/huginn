@@ -21,18 +21,71 @@ describe Agents::WebsiteAgent do
       @checker.save!
     end
 
-    describe "#check" do
-      it "should validate the integer fields" do
-        @checker.options['expected_update_period_in_days'] = "nonsense"
-        lambda { @checker.save! }.should raise_error;
-        @checker.options['expected_update_period_in_days'] = "2"
-        @checker.options['uniqueness_look_back'] = "nonsense"
-        lambda { @checker.save! }.should raise_error;
-        @checker.options['mode'] = "nonsense"
-        lambda { @checker.save! }.should raise_error;
-        @checker.options = @site
+    describe "validations" do
+      before do
+        @checker.should be_valid
       end
-    
+
+      it "should validate the integer fields" do
+        @checker.options['expected_update_period_in_days'] = "2"
+        @checker.should be_valid
+
+        @checker.options['expected_update_period_in_days'] = "nonsense"
+        @checker.should_not be_valid
+      end
+
+      it "should validate uniqueness_look_back" do
+        @checker.options['uniqueness_look_back'] = "nonsense"
+        @checker.should_not be_valid
+
+        @checker.options['uniqueness_look_back'] = "2"
+        @checker.should be_valid
+      end
+
+      it "should validate headers" do
+        @checker.options['headers'] = "blah"
+        @checker.should_not be_valid
+
+        @checker.options['headers'] = ""
+        @checker.should be_valid
+
+        @checker.options['headers'] = {}
+        @checker.should be_valid
+
+        @checker.options['headers'] = { 'foo' => 'bar' }
+        @checker.should be_valid
+      end
+
+      it "should validate mode" do
+        @checker.options['mode'] = "nonsense"
+        @checker.should_not be_valid
+
+        @checker.options['mode'] = "on_change"
+        @checker.should be_valid
+
+        @checker.options['mode'] = "all"
+        @checker.should be_valid
+
+        @checker.options['mode'] = ""
+        @checker.should be_valid
+      end
+
+      it "should validate the force_encoding option" do
+        @checker.options['force_encoding'] = ''
+        @checker.should be_valid
+
+        @checker.options['force_encoding'] = 'UTF-8'
+        @checker.should be_valid
+
+        @checker.options['force_encoding'] = ['UTF-8']
+        @checker.should_not be_valid
+
+        @checker.options['force_encoding'] = 'UTF-42'
+        @checker.should_not be_valid
+      end
+    end
+
+    describe "#check" do
       it "should check for changes (and update Event.expires_at)" do
         lambda { @checker.check }.should change { Event.count }.by(1)
         event = Event.last
@@ -80,6 +133,86 @@ describe Agents::WebsiteAgent do
         @checker.options = @site
         @checker.check
         @checker.logs.first.message.should =~ /Got an uneven number of matches/
+      end
+
+      it "should accept an array for url" do
+        @site['url'] = ["http://xkcd.com/1/", "http://xkcd.com/2/"]
+        @checker.options = @site
+        lambda { @checker.save! }.should_not raise_error;
+        lambda { @checker.check }.should_not raise_error;
+      end
+
+      it "should parse events from all urls in array" do
+        lambda {
+          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @site['mode'] = 'all'
+          @checker.options = @site
+          @checker.check
+        }.should change { Event.count }.by(2)
+      end
+
+      it "should follow unique rules when parsing array of urls" do
+        lambda {
+          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @checker.options = @site
+          @checker.check
+        }.should change { Event.count }.by(1)
+      end
+    end
+
+    describe 'encoding' do
+      it 'should be forced with force_encoding option' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /no-encoding/).to_return(:body => {
+            :value => huginn,
+          }.to_json.encode(Encoding::EUC_JP), :headers => {
+            'Content-Type' => 'application/json',
+          }, :status => 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => 2,
+          'type' => "json",
+          'url' => "http://no-encoding.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+          'force_encoding' => 'EUC-JP',
+        }
+        checker = Agents::WebsiteAgent.new(:name => "No Encoding Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        event.payload['value'].should == huginn
+      end
+
+      it 'should be overridden with force_encoding option' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /wrong-encoding/).to_return(:body => {
+            :value => huginn,
+          }.to_json.encode(Encoding::EUC_JP), :headers => {
+            'Content-Type' => 'application/json; UTF-8',
+          }, :status => 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => 2,
+          'type' => "json",
+          'url' => "http://wrong-encoding.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+          'force_encoding' => 'EUC-JP',
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Wrong Encoding Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        event.payload['value'].should == huginn
       end
     end
 
@@ -241,11 +374,26 @@ describe Agents::WebsiteAgent do
         end
       end
     end
+
+    describe "#receive" do
+      it "should scrape from the url element in incoming event payload" do
+        @event = Event.new
+        @event.agent = agents(:bob_rain_notifier_agent)
+        @event.payload = { 'url' => "http://xkcd.com" }
+
+        lambda {
+          @checker.options = @site
+          @checker.receive([@event])
+        }.should change { Event.count }.by(1)
+      end
+    end
   end
 
   describe "checking with http basic auth" do
     before do
-      stub_request(:any, /user:pass/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      stub_request(:any, /example/).
+        with(headers: { 'Authorization' => "Basic #{['user:pass'].pack('m').chomp}" }).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
       @site = {
         'name' => "XKCD",
         'expected_update_period_in_days' => 2,
@@ -268,6 +416,34 @@ describe Agents::WebsiteAgent do
       it "should check for changes" do
         lambda { @checker.check }.should change { Event.count }.by(1)
         lambda { @checker.check }.should_not change { Event.count }
+      end
+    end
+  end
+
+  describe "checking with headers" do
+    before do
+      stub_request(:any, /example/).
+        with(headers: { 'foo' => 'bar', 'user_agent' => /Faraday/ }).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      @site = {
+        'name' => "XKCD",
+        'expected_update_period_in_days' => 2,
+        'type' => "html",
+        'url' => "http://www.example.com",
+        'mode' => 'on_change',
+        'headers' => { 'foo' => 'bar' },
+        'extract' => {
+          'url' => { 'css' => "#comic img", 'attr' => "src" },
+        }
+      }
+      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @site)
+      @checker.user = users(:bob)
+      @checker.save!
+    end
+
+    describe "#check" do
+      it "should check for changes" do
+        lambda { @checker.check }.should change { Event.count }.by(1)
       end
     end
   end

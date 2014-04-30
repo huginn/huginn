@@ -1,0 +1,21 @@
+[
+  {
+    "creator": {
+      "fullsize_avatar_url": "https://dge9rmgqjs8m1.cloudfront.net/global/dfsdfsdfdsf/original.gif?r=3",
+      "avatar_url": "http://dge9rmgqjs8m1.cloudfront.net/global/dfsdfsdfdsf/avatar.gif?r=3",
+      "name": "Dominik Sander",
+      "id": 123456
+    },
+    "attachments": [],
+    "raw_excerpt": "test test",
+    "excerpt": "test test",
+    "id": 6454342343,
+    "created_at": "2014-04-17T10:25:31.000+02:00",
+    "updated_at": "2014-04-17T10:25:31.000+02:00",
+    "summary": "commented on whaat",
+    "action": "commented on",
+    "target": "whaat",
+    "url": "https://basecamp.com/12456/api/v1/projects/5476464-explore-basecamp/messages/24598238-whaat.json",
+    "html_url": "https://basecamp.com/12456/projects/5476464-explore-basecamp/messages/24598238-whaat#comment_150756301"
+  }
+]

@@ -1,8 +1,13 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'
 
-require 'coveralls'
-Coveralls.wear!('rails')
+if ENV['COVERAGE']
+  require 'simplecov'
+  SimpleCov.start 'rails'
+else
+  require 'coveralls'
+  Coveralls.wear!('rails')
+end
 
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
@@ -42,4 +47,5 @@ RSpec.configure do |config|
 
   config.include Devise::TestHelpers, :type => :controller
   config.include SpecHelpers
+  config.include Delorean
 end

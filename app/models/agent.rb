@@ -11,12 +11,13 @@ class Agent < ActiveRecord::Base
   include MarkdownClassAttributes
   include JSONSerializedField
   include RDBMSFunctions
+  include WorkingHelpers
 
   markdown_class_attributes :description, :event_description
 
   load_types_in "Agents"
 
-  SCHEDULES = %w[every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
+  SCHEDULES = %w[every_1m every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
                  midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm never]
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
@@ -39,10 +40,10 @@ class Agent < ActiveRecord::Base
   after_save :possibly_update_event_expirations
 
   belongs_to :user, :inverse_of => :agents
-  has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
+  has_many :events, -> { order("events.id desc") }, :dependent => :delete_all, :inverse_of => :agent
   has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
-  has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
-  has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
+  has_many :logs,  -> { order("agent_logs.id desc") }, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog"
+  has_many :received_events, -> { order("events.id desc") }, :through => :sources, :class_name => "Event", :source => :events
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
@@ -81,18 +82,6 @@ class Agent < ActiveRecord::Base
   # Implement me in your subclass to decide if your Agent is working.
   def working?
     raise "Implement me in your subclass"
-  end
-
-  def validate_options
-    # Implement me in your subclass to test for valid options.
-  end
-
-  def event_created_within?(days)
-    last_event_at && last_event_at > days.to_i.days.ago
-  end
-
-  def recent_error_logs?
-    last_event_at && last_error_log_at && last_error_log_at > (last_event_at - 2.minutes)
   end
 
   def create_event(attrs)
@@ -193,17 +182,7 @@ class Agent < ActiveRecord::Base
     update_column :last_error_log_at, nil
   end
 
-  # Validations and Callbacks
-
-  def sources_are_owned
-    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
-  end
-
-  def validate_schedule
-    unless cannot_be_scheduled?
-      errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
-    end
-  end
+  # Callbacks
 
   def set_default_schedule
     self.schedule = default_schedule unless schedule.present? || cannot_be_scheduled?
@@ -222,10 +201,41 @@ class Agent < ActiveRecord::Base
   def possibly_update_event_expirations
     update_event_expirations! if keep_events_for_changed?
   end
+  
+  #Validation Methods
+  
+  private
+  
+  def sources_are_owned
+    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
+  end
+  
+  def validate_schedule
+    unless cannot_be_scheduled?
+      errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
+    end
+  end
+  
+  def validate_options
+    # Implement me in your subclass to test for valid options.
+  end
 
   # Class Methods
 
   class << self
+    def build_clone(original)
+      new(original.slice(:type, :options, :schedule, :source_ids, :keep_events_for, :propagate_immediately)) { |clone|
+        # Give it a unique name
+        2.upto(count) do |i|
+          name = '%s (%d)' % [original.name, i]
+          unless exists?(name: name)
+            clone.name = name
+            break
+          end
+        end
+      }
+    end
+
     def cannot_be_scheduled!
       @cannot_be_scheduled = true
     end

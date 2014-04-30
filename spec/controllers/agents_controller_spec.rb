@@ -46,6 +46,22 @@ describe AgentsController do
     end
   end
 
+  describe "GET new with :id" do
+    it "opens a clone of a given Agent" do
+      sign_in users(:bob)
+      get :new, :id => agents(:bob_website_agent).to_param
+      assigns(:agent).attributes.should eq(users(:bob).agents.build_clone(agents(:bob_website_agent)).attributes)
+    end
+
+    it "only allows the current user to clone his own Agent" do
+      sign_in users(:bob)
+
+      lambda {
+        get :new, :id => agents(:jane_website_agent).to_param
+      }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
   describe "GET edit" do
     it "only shows Agents for the current user" do
       sign_in users(:bob)

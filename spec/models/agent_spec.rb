@@ -1,6 +1,9 @@
 require 'spec_helper'
+require 'models/concerns/working_helpers'
 
 describe Agent do
+  it_behaves_like WorkingHelpers
+
   describe ".run_schedule" do
     before do
       Agents::WeatherAgent.count.should > 0
@@ -514,6 +517,51 @@ describe Agent do
         end
       end
     end
+
+    describe "Agent.build_clone" do
+      before do
+        Event.delete_all
+        @sender = Agents::SomethingSource.new(
+          name: 'Agent (2)',
+          options: { foo: 'bar2' },
+          schedule: '5pm')
+        @sender.user = users(:bob)
+        @sender.save!
+        @sender.create_event :payload => {}
+        @sender.create_event :payload => {}
+        @sender.events.count.should == 2
+
+        @receiver = Agents::CannotBeScheduled.new(
+          name: 'Agent',
+          options: { foo: 'bar3' },
+          keep_events_for: 3,
+          propagate_immediately: true)
+        @receiver.user = users(:bob)
+        @receiver.sources << @sender
+        @receiver.memory[:test] = 1
+        @receiver.save!
+      end
+
+      it "should create a clone of a given agent for editing" do
+        sender_clone = users(:bob).agents.build_clone(@sender)
+
+        sender_clone.attributes.should == Agent.new.attributes.
+          update(@sender.slice(:user_id, :type,
+            :options, :schedule, :keep_events_for, :propagate_immediately)).
+          update('name' => 'Agent (2) (2)', 'options' => { 'foo' => 'bar2' })
+
+        sender_clone.source_ids.should == []
+
+        receiver_clone = users(:bob).agents.build_clone(@receiver)
+
+        receiver_clone.attributes.should == Agent.new.attributes.
+          update(@receiver.slice(:user_id, :type,
+            :options, :schedule, :keep_events_for, :propagate_immediately)).
+          update('name' => 'Agent (3)', 'options' => { 'foo' => 'bar3' })
+
+        receiver_clone.source_ids.should == [@sender.id]
+      end
+    end
   end
 
   describe ".trigger_web_request" do
@@ -562,32 +610,6 @@ describe Agent do
         @agent.reload.memory['last_webhook_request'].should == { "some_param" => "some_value" }
         @agent.last_web_request_at.to_i.should be_within(1).of(Time.now.to_i)
       end
-    end
-  end
-
-  describe "recent_error_logs?" do
-    it "returns true if last_error_log_at is near last_event_at" do
-      agent = Agent.new
-
-      agent.last_error_log_at = 10.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
-
-      agent.last_error_log_at = 11.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
-
-      agent.last_error_log_at = 5.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
-
-      agent.last_error_log_at = 15.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_false
-
-      agent.last_error_log_at = 2.days.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_false
     end
   end
 

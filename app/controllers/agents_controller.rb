@@ -1,4 +1,6 @@
 class AgentsController < ApplicationController
+  include DotHelper
+
   def index
     @agents = current_user.agents.page(params[:page])
 
@@ -69,7 +71,13 @@ class AgentsController < ApplicationController
   end
 
   def new
-    @agent = current_user.agents.build
+    agents = current_user.agents
+
+    if id = params[:id]
+      @agent = agents.build_clone(agents.find(id))
+    else
+      @agent = agents.build
+    end
 
     respond_to do |format|
       format.html
