@@ -20,9 +20,9 @@ module LiquidMigrator
           end
           hash[key] = LiquidMigrator.convert_string value, options[:leading_dollarsign_is_jsonpath]
         when 'Hash'
-          # might want to make it recursive?
+          raise "nested Hashes are not supported at the moment"
         when 'Array'
-          # do we need it?
+          raise "nested Arrays are not supported at the moment"
         end
       end
         # remove the unneeded *_path attributes
@@ -51,7 +51,14 @@ module LiquidMigrator
   end
 
   def self.convert_json_path(string, filter = "")
-    "{{#{string[2..-1].gsub(/\.\*\Z/, '')}#{filter}}}"
+    check_path(string)
+    "{{#{string[2..-1]}#{filter}}}"
+  end
+
+  def self.check_path(string)
+    if string !~ /\A(\$\.)?(\w+\.)*(\w+)\Z/
+      raise "JSONPath '#{string}' is too complex, please check your migration."
+    end
   end
 end
 

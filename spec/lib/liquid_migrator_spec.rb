@@ -5,7 +5,6 @@ describe LiquidMigrator do
     it "should work" do
       LiquidMigrator.convert_string("$.data", true).should == "{{data}}"
       LiquidMigrator.convert_string("$.data.test", true).should == "{{data.test}}"
-      LiquidMigrator.convert_string("$.data.test.*", true).should == "{{data.test}}"
     end
 
     it "should ignore strings which just contain a JSONPath" do
@@ -13,12 +12,14 @@ describe LiquidMigrator do
       LiquidMigrator.convert_string(" $.data", true).should == " $.data"
       LiquidMigrator.convert_string("lorem $.data", true).should == "lorem $.data"
     end
+    it "should raise an exception when encountering complex JSONPaths" do
+      expect { LiquidMigrator.convert_string("$.data.test.*", true) }.
+        to raise_error("JSONPath '$.data.test.*' is too complex, please check your migration.")
+    end
   end
 
   describe "converting escaped JSONPath strings" do
     it "should work" do
-      LiquidMigrator.convert_string("Received <$.content.text.*> from <$.content.name> .").should ==
-                                    "Received {{content.text}} from {{content.name}} ."
       LiquidMigrator.convert_string("Weather looks like <$.conditions> according to the forecast at <$.pretty_date.time>").should ==
                                     "Weather looks like {{conditions}} according to the forecast at {{pretty_date.time}}"
     end
@@ -26,6 +27,11 @@ describe LiquidMigrator do
     it "should convert the 'escape' method correctly" do
       LiquidMigrator.convert_string("Escaped: <escape $.content.name>\nNot escaped: <$.content.name>").should ==
                                     "Escaped: {{content.name | uri_escape}}\nNot escaped: {{content.name}}"
+    end
+
+    it "should raise an exception when encountering complex JSONPaths" do
+      expect { LiquidMigrator.convert_string("Received <$.content.text.*> from <$.content.name> .") }.
+        to raise_error("JSONPath '$.content.text.*' is too complex, please check your migration.")
     end
   end
 
@@ -41,6 +47,10 @@ describe LiquidMigrator do
     it "should use the corresponding *_path attributes when using merge_path_attributes"do
       LiquidMigrator.convert_hash({'a' => "default", 'a_path' => "$.data"}, {leading_dollarsign_is_jsonpath: true, merge_path_attributes: true}).should ==
                                   {'a' => "{{data}}"}
+    end
+    it "should raise an exception when encountering complex JSONPaths" do
+      expect { LiquidMigrator.convert_hash({'b' => "This is <$.complex[2]>"}) }.
+        to raise_error("JSONPath '$.complex[2]' is too complex, please check your migration.")
     end
   end
 
@@ -68,6 +78,12 @@ describe LiquidMigrator do
     it "should work" do
       LiquidMigrator.convert_all_agent_options(@agent)
       @agent.reload.options.should == {"auth_token" => 'token', 'color' => 'yellow', 'notify' => false, 'room_name' => 'test', 'username' => '{{username}}', 'message' => '{{message}}'}
+    end
+
+    it "should raise an exception when encountering complex JSONPaths" do
+      @agent.options['username_path'] = "$.very.complex[*]"
+      expect { LiquidMigrator.convert_all_agent_options(@agent) }.
+        to raise_error("JSONPath '$.very.complex[*]' is too complex, please check your migration.")
     end
   end
 end

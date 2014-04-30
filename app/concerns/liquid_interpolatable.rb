@@ -1,7 +1,7 @@
 module LiquidInterpolatable
   extend ActiveSupport::Concern
 
-  def interpolate_options options, payload
+  def interpolate_options(options, payload)
     duped_options = options.dup.tap do |duped_options|
       duped_options.each_pair do |key, value|
         if value.class == String
@@ -14,7 +14,7 @@ module LiquidInterpolatable
     duped_options
   end
 
-  def interpolate_string string, payload
+  def interpolate_string(string, payload)
     Liquid::Template.parse(string).render(payload)
   end
 
