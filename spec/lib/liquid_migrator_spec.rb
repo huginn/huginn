@@ -80,6 +80,18 @@ describe LiquidMigrator do
       @agent.reload.options.should == {"auth_token" => 'token', 'color' => 'yellow', 'notify' => false, 'room_name' => 'test', 'username' => '{{username}}', 'message' => '{{message}}'}
     end
 
+    it "should work with nested hashes" do
+      @agent.options['very'] = {'nested' => '$.value'}
+      LiquidMigrator.convert_all_agent_options(@agent)
+      @agent.reload.options.should == {"auth_token" => 'token', 'color' => 'yellow', 'very' => {'nested' => '{{value}}'}, 'notify' => false, 'room_name' => 'test', 'username' => '{{username}}', 'message' => '{{message}}'}
+    end
+
+    it "should work with nested arrays" do
+      @agent.options['array'] = ["one", "$.two"]
+      LiquidMigrator.convert_all_agent_options(@agent)
+      @agent.reload.options.should == {"auth_token" => 'token', 'color' => 'yellow', 'array' => ['one', '{{two}}'], 'notify' => false, 'room_name' => 'test', 'username' => '{{username}}', 'message' => '{{message}}'}
+    end
+
     it "should raise an exception when encountering complex JSONPaths" do
       @agent.options['username_path'] = "$.very.complex[*]"
       expect { LiquidMigrator.convert_all_agent_options(@agent) }.

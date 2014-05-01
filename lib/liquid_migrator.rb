@@ -19,10 +19,10 @@ module LiquidMigrator
             keys_to_remove << path_key
           end
           hash[key] = LiquidMigrator.convert_string value, options[:leading_dollarsign_is_jsonpath]
-        when 'Hash'
-          raise "nested Hashes are not supported at the moment"
+        when 'ActiveSupport::HashWithIndifferentAccess'
+          hash[key] = convert_hash(hash[key], options)
         when 'Array'
-          raise "nested Arrays are not supported at the moment"
+          hash[key] = hash[key].collect { |k| convert_string(k, options[:leading_dollarsign_is_jsonpath])}
         end
       end
         # remove the unneeded *_path attributes
