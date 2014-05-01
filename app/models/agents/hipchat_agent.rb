@@ -18,7 +18,7 @@ module Agents
       If you want your message to notify the room members change `notify` to "true".
       Modify the background color of your message via the `color` attribute (one of "yellow", "red", "green", "purple", "gray", or "random")
 
-      TODO: add a link to the wiki explaining how to use the Liquid templating
+      Have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to learn more about liquid templating.
     MD
 
     def default_options

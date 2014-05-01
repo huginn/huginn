@@ -20,7 +20,7 @@ module Agents
 
       You can provide a `title` and a `body`.
 
-      In every value of the options hash you can use the [Liquid templating syntax](http://liquidmarkup.org/).
+      In every value of the options hash you can use the liquid templating, learn more about it at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid).
     MD
 
     def default_options
