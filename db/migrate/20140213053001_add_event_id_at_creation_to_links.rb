@@ -15,6 +15,7 @@ class AddEventIdAtCreationToLinks < ActiveRecord::Migration
       else
         link.event_id_at_creation = last_event_id
       end
+      link.save
     end
   end
 
