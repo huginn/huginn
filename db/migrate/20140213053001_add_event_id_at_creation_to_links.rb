@@ -2,14 +2,20 @@ class AddEventIdAtCreationToLinks < ActiveRecord::Migration
   def up
     add_column :links, :event_id_at_creation, :integer, :null => false, :default => 0
 
-    execute <<-SQL
-      UPDATE #{ActiveRecord::Base.connection.quote_table_name('links')}
-      SET event_id_at_creation = (
-        SELECT #{ActiveRecord::Base.connection.quote_column_name('id')}
-        FROM #{ActiveRecord::Base.connection.quote_table_name('events')}
-        WHERE events.agent_id = links.source_id ORDER BY events.id DESC limit 1
-      )
-    SQL
+    Link.all.each do |link|
+      last_event_id = execute(
+        <<-SQL
+          SELECT #{ActiveRecord::Base.connection.quote_column_name('id')}
+          FROM #{ActiveRecord::Base.connection.quote_table_name('events')}
+          WHERE events.agent_id = #{link.source_id} ORDER BY events.id DESC limit 1
+        SQL
+      ).first.to_a.first
+      if last_event_id.nil?
+        link.event_id_at_creation = Event.last.id
+      else
+        link.event_id_at_creation = last_event_id
+      end
+    end
   end
 
   def down
