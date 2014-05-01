@@ -1,5 +1,6 @@
 module Agents
   class TranslationAgent < Agent
+    include LiquidInterpolatable
 
     cannot_be_scheduled!
 
@@ -8,7 +9,7 @@ module Agents
       Services are provided using Microsoft Translator. You can [sign up](https://datamarket.azure.com/dataset/bing/microsofttranslator) and [register your application](https://datamarket.azure.com/developer/applications/register) to get `client_id` and `client_secret` which are required to use this agent.
       `to` must be filled with a [translator language code](http://msdn.microsoft.com/en-us/library/hh456380.aspx).
 
-      Specify what you would like to translate in `content` field, by specifying key and JSONPath of content to be translated.
+      Specify what you would like to translate in `content` field, you can use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) specify which part of the payload you want to translate.
 
       `expected_receive_period_in_days` is the maximum number of days you would allow to pass between events.
     MD
@@ -22,8 +23,8 @@ module Agents
         'to' => "fi",
         'expected_receive_period_in_days' => 1,
         'content' => {
-          'text' => "$.message.text",
-          'content' => "$.xyz"
+          'text' => "{{message.text}}",
+          'content' => "{{xyz}}"
         }
       }
     end
@@ -68,8 +69,8 @@ module Agents
       incoming_events.each do |event|
         translated_event = {}
         options['content'].each_pair do |key, value|
-          to_be_translated = Utils.values_at event.payload, value
-          translated_event[key] = translate to_be_translated.first, options['to'], access_token
+          to_be_translated = interpolate_string(value, event.payload)
+          translated_event[key] = translate(to_be_translated.first, options['to'], access_token)
         end
         create_event :payload => translated_event
       end
