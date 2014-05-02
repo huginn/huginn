@@ -1,8 +1,11 @@
 class AddEventIdAtCreationToLinks < ActiveRecord::Migration
+  class Link < ActiveRecord::Base; end
+  class Event < ActiveRecord::Base; end
+
   def up
     add_column :links, :event_id_at_creation, :integer, :null => false, :default => 0
 
-    Link.all.each do |link|
+    Link.all.find_each do |link|
       last_event_id = execute(
         <<-SQL
           SELECT #{ActiveRecord::Base.connection.quote_column_name('id')}
