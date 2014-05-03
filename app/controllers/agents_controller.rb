@@ -113,7 +113,13 @@ class AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
-        format.html { redirect_to agents_path, notice: 'Your Agent was successfully updated.' }
+        format.html {
+          if params[:return] == "show"
+            redirect_to agent_path(@agent), notice: 'Your Agent was successfully updated.'
+          else
+            redirect_to agents_path, notice: 'Your Agent was successfully updated.'
+          end
+        }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }

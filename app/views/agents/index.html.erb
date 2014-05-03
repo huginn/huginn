@@ -18,7 +18,11 @@
         </tr>
 
         <% @agents.each do |agent| %>
-          <tr>
+          <% if agent.disabled? %>
+            <tr class='agent-disabled'>
+          <% else %>
+            <tr>
+          <% end %>
             <td>
               <%= agent.name %>
               <br/>
@@ -62,13 +66,22 @@
             <td><%= working(agent) %></td>
             <td>
               <div class="btn-group">
-                <%= link_to 'Show', agent_path(agent), class: "btn btn-mini" %>
-                <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-mini" %>
-                <%= link_to 'Delete', agent_path(agent), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-mini" %>
-                <% if agent.can_be_scheduled? %>
-                  <%= link_to 'Run', run_agent_path(agent, :return => "index"), method: :post, class: "btn btn-mini" %>
+                <%= link_to 'Show', agent_path(agent), class: "btn btn-mini btn-primary" %>
+
+                <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-mini btn-primary" %>
+
+                <% if agent.disabled? %>
+                  <%= link_to "Enable", agent_path(agent, :agent => { :disabled => false }), :method => :put, class: "btn btn-mini btn-success"%>
                 <% else %>
-                  <%= link_to 'Run', "#", class: "btn btn-mini disabled" %>
+                  <%= link_to "Disable", agent_path(agent, :agent => { :disabled => true }), :method => :put, class: "btn btn-mini btn-warning"%>
+                <% end %>
+
+                <%= link_to 'Delete', agent_path(agent), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-mini btn-danger" %>
+
+                <% if agent.can_be_scheduled? && !agent.disabled? %>
+                  <%= link_to 'Run', run_agent_path(agent, :return => "index"), method: :post, class: "btn btn-mini btn-success" %>
+                <% else %>
+                  <span class='btn btn-mini disabled'>Run</span>
                 <% end %>
               </div>
             </td>
