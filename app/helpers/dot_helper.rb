@@ -22,16 +22,20 @@ module DotHelper
     '"%s"' % string.gsub(/\\/, "\\\\\\\\").gsub(/"/, "\\\\\"")
   end
 
+  def disabled_label(agent)
+    agent.disabled? ? dot_id(agent.name + " (Disabled)") : dot_id(agent.name)
+  end
+
   def agents_dot(agents, rich = false)
     "digraph foo {".tap { |dot|
       agents.each.with_index do |agent, index|
         if rich
-          dot << '%s[URL=%s];' % [dot_id(agent.name), dot_id(agent_path(agent.id))]
+          dot << '%s[URL=%s];' % [disabled_label(agent), dot_id(agent_path(agent.id))]
         else
-          dot << '%s;' % dot_id(agent.name)
+          dot << '%s;' % disabled_label(agent)
         end
         agent.receivers.each do |receiver|
-          dot << "%s->%s;" % [dot_id(agent.name), dot_id(receiver.name)]
+          dot << "%s->%s;" % [disabled_label(agent), disabled_label(receiver)]
         end
       end
       dot << "}"
