@@ -91,24 +91,19 @@ namespace :sync do
   end
 
   # Used by database_config and remote_database_config to parse database configs that depend on .env files.  Depends on the dotenv-rails gem.
-  class EnvLoader < Dotenv::Environment
+  class EnvLoader
     def initialize(data)
-      @data = data
-      load
+      @env = Dotenv::Parser.call(data)
     end
 
     def with_loaded_env
       begin
         saved_env = ENV.to_hash.dup
-        ENV.update(self)
+        ENV.update(@env)
         yield
       ensure
         ENV.replace(saved_env)
       end
-    end
-
-    def read
-      @data.split("\n")
     end
   end
 
