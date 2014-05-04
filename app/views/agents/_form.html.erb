@@ -1,16 +1,10 @@
 <% if @agent.errors.any? %>
-<div class="row">
-  <div class="col-md-12">
-    <div id="error_explanation">
-      <h2><%= pluralize(@agent.errors.count, "error") %> prohibited this Agent from being saved:</h2>
-      <ul>
-      <% @agent.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
+  <div class="row well">
+    <h2><%= pluralize(@agent.errors.count, "error") %> prohibited this Agent from being saved:</h2>
+    <% @agent.errors.full_messages.each do |msg| %>
+      <p class='text-warning'><%= msg %></p>
+    <% end %>
   </div>
-</div>
 <% end %>
 
 <%= form_for(@agent,
@@ -27,13 +21,13 @@
           <% if @agent.new_record? %>
             <div class="form-group type-select">
               <%= f.label :type %>
-                <%= f.select :type, options_for_select(Agent.types.map(&:to_s).sort.map {|type| [type.gsub(/^.*::/, ''), type] }, @agent.type), {}, :class => 'select2 form-control' %>
+              <%= f.select :type, options_for_select(Agent.types.map(&:to_s).sort.map {|type| [type.gsub(/^.*::/, ''), type] }, @agent.type), {}, :class => 'select2 form-control' %>
             </div>
           <% end %>
 
           <div class="form-group">
             <%= f.label :name %>
-              <%= f.text_field :name, :class => 'form-control' %>
+            <%= f.text_field :name, :class => 'form-control' %>
           </div>
 
           <div class="form-group">
@@ -47,7 +41,7 @@
           <div class='event-related-region' data-can-create-events="<%= @agent.can_create_events? %>">
             <div class="form-group">
               <%= f.label :keep_events_for, "Keep events" %>
-                <%= f.select :keep_events_for, options_for_select(Agent::EVENT_RETENTION_SCHEDULES, @agent.keep_events_for), {}, :class => 'form-control' %>
+              <%= f.select :keep_events_for, options_for_select(Agent::EVENT_RETENTION_SCHEDULES, @agent.keep_events_for), {}, :class => 'form-control' %>
             </div>
           </div>
 

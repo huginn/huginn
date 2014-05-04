@@ -1,50 +1,44 @@
 <%= form_for(@user_credential, :method => @user_credential.new_record? ? "POST" : "PUT") do |f| %>
   <% if @user_credential.errors.any? %>
-    <div class="row">
-      <div class="col-md-12">
-        <div id="error_explanation">
-          <h2><%= pluralize(@user_credential.errors.count, "error") %> prohibited this Credential from being saved:</h2>
-          <ul>
-          <% @user_credential.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-          </ul>
-        </div>
-      </div>
+    <div class="row well">
+      <h2><%= pluralize(@user_credential.errors.count, "error") %> prohibited this Credential from being saved:</h2>
+      <% @user_credential.errors.full_messages.each do |msg| %>
+        <p class='text-warning'><%= msg %></p>
+      <% end %>
     </div>
   <% end %>
 
-<div class="row">
-  <div class="col-md-4">
-    <div class="form-group">
-      <%= f.label :credential_name %>
-      <%= f.text_field :credential_name, :class => 'form-control' %>
-    </div>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="form-group">
+        <%= f.label :credential_name %>
+        <%= f.text_field :credential_name, :class => 'form-control' %>
+      </div>
 
-    <div class="form-group">
-      <%= f.label :mode %>
-      <%= f.select :mode, options_for_select(UserCredential::MODES.map {|s| [s.classify, s] }, @user_credential.mode), {}, :class => 'form-control' %>
+      <div class="form-group">
+        <%= f.label :mode %>
+        <%= f.select :mode, options_for_select(UserCredential::MODES.map {|s| [s.classify, s] }, @user_credential.mode), {}, :class => 'form-control' %>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-md-12">
-    <div class="form-group">
-      <%= f.label :credential_value %>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-group">
+        <%= f.label :credential_value %>
         <%= f.text_area :credential_value, :class => 'form-control', :rows => 10 %>
         <div id="ace-credential-value"></div>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-md-12">
-    <div class='form-actions' style='clear: both'>
-      <%= f.submit "Save Credential", :class => "btn btn-primary" %>
+  <div class="row">
+    <div class="col-md-12">
+      <div class='form-actions' style='clear: both'>
+        <%= f.submit "Save Credential", :class => "btn btn-primary" %>
+      </div>
     </div>
   </div>
-</div>
 <% end %>
 
 <%= javascript_include_tag "user_credentials" %>
