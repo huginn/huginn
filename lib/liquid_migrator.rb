@@ -52,11 +52,15 @@ module LiquidMigrator
 
   def self.convert_json_path(string, filter = "")
     check_path(string)
-    "{{#{string[2..-1]}#{filter}}}"
+    if string.start_with? '$.'
+      "{{#{string[2..-1]}#{filter}}}"
+    else
+      "{{#{string[1..-1]}#{filter}}}"
+    end
   end
 
   def self.check_path(string)
-    if string !~ /\A(\$\.)?(\w+\.)*(\w+)\Z/
+    if string !~ /\A(\$\.?)?(\w+\.)*(\w+)\Z/
       raise "JSONPath '#{string}' is too complex, please check your migration."
     end
   end

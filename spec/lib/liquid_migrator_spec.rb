@@ -5,10 +5,12 @@ describe LiquidMigrator do
     it "should work" do
       LiquidMigrator.convert_string("$.data", true).should == "{{data}}"
       LiquidMigrator.convert_string("$.data.test", true).should == "{{data.test}}"
+      LiquidMigrator.convert_string("$first_title", true).should == "{{first_title}}"
     end
 
     it "should ignore strings which just contain a JSONPath" do
       LiquidMigrator.convert_string("$.data").should == "$.data"
+      LiquidMigrator.convert_string("$first_title").should == "$first_title"
       LiquidMigrator.convert_string(" $.data", true).should == " $.data"
       LiquidMigrator.convert_string("lorem $.data", true).should == "lorem $.data"
     end
