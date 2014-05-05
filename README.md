@@ -51,8 +51,10 @@ If you just want to play around, you can simply clone this repository, then perf
 * Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` variable.
 * Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example Agents.
 * Run `foreman start`, visit [http://localhost:3000/][localhost], and login with the username of `admin` and the password of `password`.
+* Run `git remote add upstream https://github.com/cantino/huginn.git`
 * Setup some Agents!
 * Read the [wiki][wiki] for usage examples and to get started making new Agents.
+* Periodically run `git fetch upstream` and then `git checkout master && git merge upstream/master` to merge in the newest version of Huginn.
 
 Note: by default, emails are not sent in the `development` Rails environment, which is what you just setup.  If you'd like to enable emails when playing with Huginn locally, edit `config.action_mailer.perform_deliveries` in `config/environments/development.rb`.
 
