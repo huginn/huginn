@@ -1,6 +1,6 @@
 <div class='container'>
   <div class='row'>
-    <div class='span12'>
+    <div class='col-md-12'>
       <div class="page-header">
         <h2>
           Create a new Agent
@@ -10,8 +10,12 @@
 
       <%= render 'form' %>
 
-      <div class="btn-group">
-        <%= link_to '<i class="icon-chevron-left"></i> Back'.html_safe, agents_path, class: "btn" %>
+      <hr>
+
+      <div class="row">
+        <div class="col-md-12">
+          <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, agents_path, class: "btn btn-default" %>
+        </div>
       </div>
     </div>
   </div>
