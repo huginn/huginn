@@ -11,11 +11,11 @@ module Agents
     description <<-MD
       The Jira Agent subscribes to Jira issue updates.
 
-      `jira_url` specidies the full URL of the jira installation, including https://
+      `jira_url` specifies the full URL of the jira installation, including https://
       `jql` is an optional Jira Query Language-based filter to limit the flow of events. See [JQL Docs](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) for details. 
       `username` and `password` are optional, and may need to be specified if your Jira instance is read-protected
 
-      The agent does periodical queries and emits the events containing the updated issues in JSON format.
+      The agent does periodic queries and emits the events containing the updated issues in JSON format.
       NOTE: upon the first execution, the agent will fetch everything available by the JQL query. So if it's not desirable, limit the `jql` query by date.
     MD
 
@@ -40,16 +40,18 @@ module Agents
         'username'  => '',
         'password' => '',
         'jira_url' => 'https://jira.atlassian.com',
-        'jql' => '' 
+        'jql' => '',
+        'expected_update_period_in_days', '7'
       }
     end
 
     def validate_options
-        errors.add(:base, "you need to specify your jira URL") unless options['jira_url'].present?
+      errors.add(:base, "you need to specify your jira URL") unless options['jira_url'].present?
+      errors.add(:base, "you need to specify the expected update period") unless options['expected_update_period_in_days'].present?
     end
 
     def working?
-      (events_count.present? && events_count > 0)
+      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def check
@@ -57,23 +59,19 @@ module Agents
 
       current_run = Time.now.utc.iso8601
       last_run = Time.parse(memory[:last_run]) if memory[:last_run]
-      begin
-        issues = get_issues(last_run)
+      issues = get_issues(last_run)
 
-        issues.each do |issue|
-          updated = Time.parse(issue['fields']['updated'])
+      issues.each do |issue|
+        updated = Time.parse(issue['fields']['updated'])
 
-          # this check is more precise than in get_issues()
-          # see get_issues() for explanation
-          if updated > last_run then
-            create_event :payload => issue
-          end
+        # this check is more precise than in get_issues()
+        # see get_issues() for explanation
+        if updated > last_run
+          create_event :payload => issue
         end
-
-        memory[:last_run] = current_run
-      rescue Exception => e
-        log(e.message)
       end
+
+      memory[:last_run] = current_run
     end
 
   private
@@ -84,7 +82,7 @@ module Agents
     def request_options
       ropts = {:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
 
-      if !options[:username].empty?  then
+      if !options[:username].empty?
         ropts = ropts.merge({:basic_auth => {:username =>options[:username], :password=>options[:password]}})
       end
 
@@ -105,7 +103,7 @@ module Agents
 
       jql = ""
 
-      if !options[:jql].empty? && since then 
+      if !options[:jql].empty? && since
         jql = "(#{options[:jql]}) and updated >= '#{since.strftime('%Y-%m-%d %H:%M')}'"
       else
         jql = options[:jql] if !options[:jql].empty?
@@ -116,11 +114,11 @@ module Agents
       loop do
         response = HTTParty.get(request_url(jql, startAt), request_options)
 
-        if response.code == 400 then
+        if response.code == 400
           raise RuntimeError.new("Jira error: #{response['errorMessages']}") 
-        elsif response.code == 403 then
+        elsif response.code == 403
           raise RuntimeError.new("Authentication failed: Forbidden (403)")
-        elsif response.code != 200 then
+        elsif response.code != 200
           raise RuntimeError.new("Request failed: #{response}")
         end
 
