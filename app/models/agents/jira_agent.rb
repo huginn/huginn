@@ -61,7 +61,13 @@ module Agents
         issues = get_issues(last_run)
 
         issues.each do |issue|
-          create_event :payload => issue
+          updated = Time.parse(issue['fields']['updated'])
+
+          # this check is more precise than in get_issues()
+          # see get_issues() for explanation
+          if updated > last_run then
+            create_event :payload => issue
+          end
         end
 
         memory[:last_run] = current_run
@@ -90,13 +96,20 @@ module Agents
       startAt = 0
       issues = []
 
+      # JQL doesn't have an ability to specify timezones
+      # Because of this we have to fetch issues 24 h
+      # earlier and filter out unnecessary ones at a later
+      # stage. Fortunately, the 'updated' field has GMT
+      # offset
+      since -= 24*60*60
+
       jql = ""
 
       if !options[:jql].empty? && since then 
         jql = "(#{options[:jql]}) and updated >= '#{since.strftime('%Y-%m-%d %H:%M')}'"
       else
         jql = options[:jql] if !options[:jql].empty?
-        jql = "updatedd >= '#{since.strftime('%Y-%m-%d %H:%M')}'" if since
+        jql = "updated >= '#{since.strftime('%Y-%m-%d %H:%M')} GMT'" if since
       end
 
 
