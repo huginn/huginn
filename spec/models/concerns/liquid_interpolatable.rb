@@ -20,11 +20,31 @@ shared_examples_for LiquidInterpolatable do
 
   describe "interpolating liquid templates" do
     it "should work" do
-      @checker.send(:interpolate_options, @checker.options, @event.payload).should == {
+      @checker.interpolate_options(@checker.options, @event.payload).should == {
           "normal" => "just some normal text",
           "variable" => "hello",
           "text" => "Some test with an embedded hello",
           "escape" => "This should be Hello+world"
+      }
+    end
+
+    it "hsould work with arrays", focus: true do
+      @checker.options = {"value" => ["{{variable}}", "Much array", "Hey, {{hello_world}}"]}
+      @checker.interpolate_options(@checker.options, @event.payload).should == {
+        "value" => ["hello", "Much array", "Hey, Hello world"]
+      }
+    end
+
+    it "should work recursively" do
+      @checker.options['hash'] = {'recursive' => "{{variable}}"}
+      @checker.options['indifferent_hash'] = ActiveSupport::HashWithIndifferentAccess.new({'recursive' => "{{variable}}"})
+      @checker.interpolate_options(@checker.options, @event.payload).should == {
+          "normal" => "just some normal text",
+          "variable" => "hello",
+          "text" => "Some test with an embedded hello",
+          "escape" => "This should be Hello+world",
+          "hash" => {'recursive' => 'hello'},
+          "indifferent_hash" => {'recursive' => 'hello'},
       }
     end
 

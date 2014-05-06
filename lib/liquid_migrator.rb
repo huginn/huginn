@@ -22,7 +22,13 @@ module LiquidMigrator
         when 'ActiveSupport::HashWithIndifferentAccess'
           hash[key] = convert_hash(hash[key], options)
         when 'Array'
-          hash[key] = hash[key].collect { |k| convert_string(k, options[:leading_dollarsign_is_jsonpath])}
+          hash[key] = hash[key].collect { |k|
+            if k.class == String
+              convert_string(k, options[:leading_dollarsign_is_jsonpath])
+            else
+              convert_hash(k, options)
+            end
+          }
         end
       end
         # remove the unneeded *_path attributes
@@ -48,6 +54,10 @@ module LiquidMigrator
         end
       end
     end
+  end
+
+  def self.convert_make_message(string)
+    string.gsub(/<([^>]+)>/, "{{\\1}}")
   end
 
   def self.convert_json_path(string, filter = "")

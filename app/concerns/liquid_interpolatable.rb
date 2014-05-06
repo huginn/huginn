@@ -2,16 +2,19 @@ module LiquidInterpolatable
   extend ActiveSupport::Concern
 
   def interpolate_options(options, payload)
-    duped_options = options.dup.tap do |duped_options|
-      duped_options.each_pair do |key, value|
-        if value.class == String
-          duped_options[key] = Liquid::Template.parse(value).render(payload)
-        else
-          duped_options[key] = value
-        end
+    case options.class.to_s
+    when 'String'
+      Liquid::Template.parse(options).render(payload)
+    when 'ActiveSupport::HashWithIndifferentAccess', 'Hash'
+      duped_options = options.dup
+      duped_options.each do |key, value|
+        duped_options[key] = interpolate_options(value, payload)
+      end
+    when 'Array'
+      options.collect do |value|
+        interpolate_options(value, payload)
       end
     end
-    duped_options
   end
 
   def interpolate_string(string, payload)

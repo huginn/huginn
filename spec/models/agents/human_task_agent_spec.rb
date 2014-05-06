@@ -1,6 +1,9 @@
 require 'spec_helper'
+require 'models/concerns/liquid_interpolatable'
 
 describe Agents::HumanTaskAgent do
+  it_behaves_like LiquidInterpolatable
+
   before do
     @checker = Agents::HumanTaskAgent.new(:name => "my human task agent")
     @checker.options = @checker.default_options
@@ -116,19 +119,19 @@ describe Agents::HumanTaskAgent do
       @checker.options['poll_options'] = { 'title' => "Take a poll about jokes",
                                            'instructions' => "Rank these by how funny they are",
                                            'assignments' => 3,
-                                           'row_template' => "<$.joke>" }
+                                           'row_template' => "{{joke}}" }
       @checker.should be_valid
       @checker.options['poll_options'] = { 'instructions' => "Rank these by how funny they are",
                                            'assignments' => 3,
-                                           'row_template' => "<$.joke>" }
+                                           'row_template' => "{{joke}}" }
       @checker.should_not be_valid
       @checker.options['poll_options'] = { 'title' => "Take a poll about jokes",
                                            'assignments' => 3,
-                                           'row_template' => "<$.joke>" }
+                                           'row_template' => "{{joke}}" }
       @checker.should_not be_valid
       @checker.options['poll_options'] = { 'title' => "Take a poll about jokes",
                                            'instructions' => "Rank these by how funny they are",
-                                           'row_template' => "<$.joke>" }
+                                           'row_template' => "{{joke}}" }
       @checker.should_not be_valid
       @checker.options['poll_options'] = { 'title' => "Take a poll about jokes",
                                            'instructions' => "Rank these by how funny they are",
@@ -207,9 +210,9 @@ describe Agents::HumanTaskAgent do
 
   describe "creating hits" do
     it "can create HITs based on events, interpolating their values" do
-      @checker.options['hit']['title'] = "Hi <.name>"
-      @checker.options['hit']['description'] = "Make something for <.name>"
-      @checker.options['hit']['questions'][0]['name'] = "<.name> Question 1"
+      @checker.options['hit']['title'] = "Hi {{name}}"
+      @checker.options['hit']['description'] = "Make something for {{name}}"
+      @checker.options['hit']['questions'][0]['name'] = "{{name}} Question 1"
 
       question_form = nil
       hitInterface = OpenStruct.new
@@ -232,7 +235,7 @@ describe Agents::HumanTaskAgent do
     end
 
     it "works without an event too" do
-      @checker.options['hit']['title'] = "Hi <.name>"
+      @checker.options['hit']['title'] = "Hi {{name}}"
       hitInterface = OpenStruct.new
       hitInterface.id = 123
       mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm)
@@ -483,7 +486,7 @@ describe Agents::HumanTaskAgent do
           'title' => "Hi!",
           'instructions' => "hello!",
           'assignments' => 2,
-          'row_template' => "This is <.sentiment>"
+          'row_template' => "This is {{sentiment}}"
         }
         @event.save!
         mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }

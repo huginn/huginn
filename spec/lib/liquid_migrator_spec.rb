@@ -56,6 +56,14 @@ describe LiquidMigrator do
     end
   end
 
+  describe "migrating the 'make_message' format" do
+    it "should work" do
+      LiquidMigrator.convert_make_message('<message>').should == '{{message}}'
+      LiquidMigrator.convert_make_message('<new.message>').should == '{{new.message}}'
+      LiquidMigrator.convert_make_message('Hello <world>. How is <nested.life>').should == 'Hello {{world}}. How is {{nested.life}}'
+    end
+  end
+
   describe "migrating an actual agent" do
     before do
       valid_params = {
@@ -98,6 +106,51 @@ describe LiquidMigrator do
       @agent.options['username_path'] = "$.very.complex[*]"
       expect { LiquidMigrator.convert_all_agent_options(@agent) }.
         to raise_error("JSONPath '$.very.complex[*]' is too complex, please check your migration.")
+    end
+
+    it "should work with the human task agent" do
+      valid_params = {
+        'expected_receive_period_in_days' => 2,
+        'trigger_on' => "event",
+        'hit' =>
+          {
+            'assignments' => 1,
+            'title' => "Sentiment evaluation",
+            'description' => "Please rate the sentiment of this message: '<$.message>'",
+            'reward' => 0.05,
+            'lifetime_in_seconds' => 24 * 60 * 60,
+            'questions' =>
+              [
+                {
+                  'type' => "selection",
+                  'key' => "sentiment",
+                  'name' => "Sentiment",
+                  'required' => "true",
+                  'question' => "Please select the best sentiment value:",
+                  'selections' =>
+                    [
+                      { 'key' => "happy", 'text' => "Happy" },
+                      { 'key' => "sad", 'text' => "Sad" },
+                      { 'key' => "neutral", 'text' => "Neutral" }
+                    ]
+                },
+                {
+                  'type' => "free_text",
+                  'key' => "feedback",
+                  'name' => "Have any feedback for us?",
+                  'required' => "false",
+                  'question' => "Feedback",
+                  'default' => "Type here...",
+                  'min_length' => "2",
+                  'max_length' => "2000"
+                }
+              ]
+          }
+      }
+      @agent = Agents::HumanTaskAgent.new(:name => "somename", :options => valid_params)
+      @agent.user = users(:jane)
+      LiquidMigrator.convert_all_agent_options(@agent)
+      @agent.reload.options['hit']['description'].should == "Please rate the sentiment of this message: '{{message}}'"
     end
   end
 end
