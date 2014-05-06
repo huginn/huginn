@@ -19,7 +19,7 @@
           </tr>
 
           <% @agents.each do |agent| %>
-            <tr>
+            <tr class='<%= "agent-disabled" if agent.disabled? %>'>
               <td>
                 <%= agent.name %>
                 <br/>
@@ -66,7 +66,7 @@
                   <%= link_to 'Show', agent_path(agent), class: "btn btn-default" %>
                   <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-default" %>
                   <%= link_to 'Delete', agent_path(agent), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default" %>
-                  <% if agent.can_be_scheduled? %>
+                  <% if agent.can_be_scheduled? && !agent.disabled? %>
                     <%= link_to 'Run', run_agent_path(agent, :return => "index"), method: :post, class: "btn btn-default" %>
                   <% else %>
                     <%= link_to 'Run', "#", class: "btn btn-default disabled" %>

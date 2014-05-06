@@ -4,6 +4,23 @@ require 'models/concerns/working_helpers'
 describe Agent do
   it_behaves_like WorkingHelpers
 
+  describe ".bulk_check" do
+    before do
+      @weather_agent_count = Agents::WeatherAgent.where(:schedule => "midnight", :disabled => false).count
+    end
+
+    it "should run all Agents with the given schedule" do
+      mock(Agents::WeatherAgent).async_check(anything).times(@weather_agent_count)
+      Agents::WeatherAgent.bulk_check("midnight")
+    end
+
+    it "should skip disabled Agents" do
+      agents(:bob_weather_agent).update_attribute :disabled, true
+      mock(Agents::WeatherAgent).async_check(anything).times(@weather_agent_count - 1)
+      Agents::WeatherAgent.bulk_check("midnight")
+    end
+  end
+
   describe ".run_schedule" do
     before do
       Agents::WeatherAgent.count.should > 0
@@ -194,17 +211,31 @@ describe Agent do
         log.message.should =~ /Exception/
         log.level.should == 4
       end
+
+      it "should not run disabled Agents" do
+        mock(Agent).find(agents(:bob_weather_agent).id) { agents(:bob_weather_agent) }
+        do_not_allow(agents(:bob_weather_agent)).check
+        agents(:bob_weather_agent).update_attribute :disabled, true
+        Agent.async_check(agents(:bob_weather_agent).id)
+      end
     end
 
-    describe ".receive! and .async_receive" do
+    describe ".receive!" do
       before do
         stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
         stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       end
 
       it "should use available events" do
-        mock.any_instance_of(Agents::TriggerAgent).receive(anything).once
         Agent.async_check(agents(:bob_weather_agent).id)
+        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(1)
+        Agent.receive!
+      end
+
+      it "should not propogate to disabled Agents" do
+        Agent.async_check(agents(:bob_weather_agent).id)
+        agents(:bob_rain_notifier_agent).update_attribute :disabled, true
+        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
         Agent.receive!
       end
 
@@ -278,6 +309,15 @@ describe Agent do
         lambda {
           Agent.receive! # and we receive it
         }.should change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+      end
+    end
+
+    describe ".async_receive" do
+      it "should not run disabled Agents" do
+        mock(Agent).find(agents(:bob_rain_notifier_agent).id) { agents(:bob_rain_notifier_agent) }
+        do_not_allow(agents(:bob_rain_notifier_agent)).receive
+        agents(:bob_rain_notifier_agent).update_attribute :disabled, true
+        Agent.async_receive(agents(:bob_rain_notifier_agent).id, [1, 2, 3])
       end
     end
 

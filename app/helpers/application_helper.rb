@@ -8,10 +8,12 @@ module ApplicationHelper
   end
 
   def working(agent)
-    if agent.working?
+    if agent.disabled?
+      '<span class="label label-warning">Disabled</span>'.html_safe
+    elsif agent.working?
       '<span class="label label-success">Yes</span>'.html_safe
     else
-      link_to '<span class="label label-warning">No</span>'.html_safe, agent_path(agent, :tab => (agent.recent_error_logs? ? 'logs' : 'details'))
+      link_to '<span class="label btn-danger">No</span>'.html_safe, agent_path(agent, :tab => (agent.recent_error_logs? ? 'logs' : 'details'))
     end
   end
 end
