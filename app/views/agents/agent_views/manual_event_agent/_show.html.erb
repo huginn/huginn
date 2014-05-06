@@ -3,15 +3,13 @@
 <h4 id='event-creation-status'></h4>
 
 <%= form_tag handle_details_post_agent_path(@agent), :id => "create-event-form" do %>
-  <div class="control-group">
-    <textarea rows="10" id="payload" name="payload" class="span8 payload-editor" data-height="200">
+  <div class="form-group">
+    <textarea rows="10" id="payload" name="payload" class="payload-editor" data-height="200">
       {}
     </textarea>
   </div>
 
-  <div class='form-actions' style='clear: both'>
-    <%= submit_tag "Submit", :class => "btn btn-primary" %>
-  </div>
+  <%= submit_tag "Submit", :class => "btn btn-primary" %>
 <% end %>
 
 <script>

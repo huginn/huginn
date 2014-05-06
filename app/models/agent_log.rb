@@ -11,6 +11,8 @@ class AgentLog < ActiveRecord::Base
   validates_presence_of :agent, :message
   validates_numericality_of :level, :only_integer => true, :greater_than_or_equal_to => 0, :less_than => 5
 
+  before_save :truncate_message
+
   def self.log_for_agent(agent, message, options = {})
     log = agent.logs.create! options.merge(:message => message)
     if agent.logs.count > log_length
@@ -25,5 +27,11 @@ class AgentLog < ActiveRecord::Base
 
   def self.log_length
     ENV['AGENT_LOG_LENGTH'].present? ? ENV['AGENT_LOG_LENGTH'].to_i : 200
+  end
+
+  protected
+
+  def truncate_message
+    self.message = message[0...2048] if message.present?
   end
 end

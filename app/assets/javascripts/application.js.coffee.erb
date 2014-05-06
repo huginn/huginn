@@ -1,5 +1,6 @@
 #= require jquery
 #= require jquery_ujs
+#= require typeahead.bundle
 #= require bootstrap
 #= require select2
 #= require json2
@@ -62,24 +63,34 @@ $(document).ready ->
 
   # Agent Navigation
   $agentNavigate = $('#agent-navigate')
-  $agentNavigate.typeahead(
-    minLength: 0,
-    items: 15,
-    source: agentNames
-  ).on("change", (e) ->
-    if agentPaths[$agentNavigate.val()]
-      $('#agent-navigate').closest(".navbar-search").find(".spinner").show()
-      navigationData = agentPaths[$agentNavigate.val()]
+
+  # initialize typeahead listener
+  $agentNavigate.bind "typeahead:selected", (event, object, name) ->
+    item = object['value']
+    $agentNavigate.typeahead('val', '')
+    if agentPaths[item]
+      $(".spinner").show()
+      navigationData = agentPaths[item]
       if !(navigationData instanceof Object) || !navigationData.method || navigationData.method == 'GET'
         window.location = navigationData.url || navigationData
       else
         $("<a href='#{navigationData.url}' data-method='#{navigationData.method}'></a>").appendTo($("body")).click()
 
-  ).on("focus", (e) ->
-    $agentNavigate.val ''
-  ).on("blur", (e) ->
-    $agentNavigate.val ''
-  )
+  # substring matcher for typeahead
+  substringMatcher = (strings)->
+    findMatches = (query, callback) ->
+      matches = []
+      substrRegex = new RegExp(query, "i")
+      $.each strings, (i, str) ->
+        matches.push value: str  if substrRegex.test(str)
+      callback(matches.slice(0,6))
+
+  $agentNavigate.typeahead
+    minLength: 1,
+    highlight: true,
+  ,
+    source: substringMatcher(agentNames)
+
 
   # Pressing '/' selects the search box.
   $("body").on "keypress", (e) ->
