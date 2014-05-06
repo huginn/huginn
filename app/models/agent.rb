@@ -121,10 +121,6 @@ class Agent < ActiveRecord::Base
     end
   end
 
-  def make_message(payload, message = options[:message])
-    message.gsub(/<([^>]+)>/) { Utils.value_at(payload, $1) || "??" }
-  end
-
   def trigger_web_request(params, method, format)
     if respond_to?(:receive_webhook)
       Rails.logger.warn "DEPRECATED: The .receive_webhook method is deprecated, please switch your Agent to use .receive_web_request."
