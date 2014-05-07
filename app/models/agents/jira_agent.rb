@@ -14,6 +14,7 @@ module Agents
       `jira_url` specifies the full URL of the jira installation, including https://
       `jql` is an optional Jira Query Language-based filter to limit the flow of events. See [JQL Docs](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) for details. 
       `username` and `password` are optional, and may need to be specified if your Jira instance is read-protected
+      `timeout` is an optional parameter that specifies how long the request processing may take in minutes.
 
       The agent does periodic queries and emits the events containing the updated issues in JSON format.
       NOTE: upon the first execution, the agent will fetch everything available by the JQL query. So if it's not desirable, limit the `jql` query by date.
@@ -34,6 +35,7 @@ module Agents
     MD
 
     default_schedule "every_10m"
+    MAX_REQUESTS = 10
 
     def default_options
       {
@@ -41,13 +43,15 @@ module Agents
         'password' => '',
         'jira_url' => 'https://jira.atlassian.com',
         'jql' => '',
-        'expected_update_period_in_days' => '7'
+        'expected_update_period_in_days' => '7',
+        'timeout' => '1'
       }
     end
 
     def validate_options
       errors.add(:base, "you need to specify your jira URL") unless options['jira_url'].present?
       errors.add(:base, "you need to specify the expected update period") unless options['expected_update_period_in_days'].present?
+      errors.add(:base, "you need to specify request timeout") unless options['timeout'].present?
     end
 
     def working?
@@ -107,10 +111,12 @@ module Agents
         jql = "(#{options[:jql]}) and updated >= '#{since.strftime('%Y-%m-%d %H:%M')}'"
       else
         jql = options[:jql] if !options[:jql].empty?
-        jql = "updated >= '#{since.strftime('%Y-%m-%d %H:%M')} GMT'" if since
+        jql = "updated >= '#{since.strftime('%Y-%m-%d %H:%M')}'" if since
       end
 
+      start_time = Time.now
 
+      request_limit = 0
       loop do
         response = HTTParty.get(request_url(jql, startAt), request_options)
 
@@ -120,6 +126,18 @@ module Agents
           raise RuntimeError.new("Authentication failed: Forbidden (403)")
         elsif response.code != 200
           raise RuntimeError.new("Request failed: #{response}")
+        end
+
+        if response['issues'].length == 0
+          request_limit+=1
+        end
+
+        if request_limit > MAX_REQUESTS
+          raise RuntimeError("There is no progress while fetching issues")
+        end
+
+        if Time.now > start_time + options['timeout'].to_i * 60
+          raise RuntimeError("Timeout exceeded while fetching issues")
         end
 
         issues += response['issues']
