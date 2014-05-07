@@ -41,7 +41,7 @@ module Agents
         'password' => '',
         'jira_url' => 'https://jira.atlassian.com',
         'jql' => '',
-        'expected_update_period_in_days', '7'
+        'expected_update_period_in_days' => '7'
       }
     end
 
