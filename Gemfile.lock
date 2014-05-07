@@ -315,6 +315,7 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   bootstrap-kaminari-views (~> 0.0.2)
+  bundler (>= 1.5.0)
   coffee-rails (~> 4.0.0)
   coveralls
   daemons (~> 1.1.9)
