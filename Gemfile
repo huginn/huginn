@@ -1,6 +1,12 @@
 source 'https://rubygems.org'
 
-# bundler <1.5 does not recognize :x64_mingw as a valid platform name
+# Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
+# Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
+unless Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.5.0')
+  STDERR.puts "Bundler >=1.5.0 is required.  Please upgrade bundler with 'gem install bundler'"
+  exit 1
+end
+
 gem 'bundler', '>= 1.5.0'
 
 gem 'protected_attributes', '~>1.0.7'
