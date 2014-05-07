@@ -35,7 +35,7 @@ module Agents
     MD
 
     default_schedule "every_10m"
-    MAX_REQUESTS = 10
+    MAX_EMPTY_REQUESTS = 10
 
     def default_options
       {
@@ -132,7 +132,7 @@ module Agents
           request_limit+=1
         end
 
-        if request_limit > MAX_REQUESTS
+        if request_limit > MAX_EMPTY_REQUESTS
           raise RuntimeError("There is no progress while fetching issues")
         end
 
