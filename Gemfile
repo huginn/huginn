@@ -1,16 +1,19 @@
 source 'https://rubygems.org'
 
+# bundler <1.5 does not recognize :x64_mingw as a valid platform name
+gem 'bundler', '>= 1.5.0'
+
 gem 'protected_attributes', '~>1.0.7'
 
 gem 'rails', '4.1.0'
 
 case RUBY_PLATFORM
-when /freebsd/i
+when /freebsd/
   # Seems FreeBSD's zoneinfo is not exactly what tzinfo expects
   gem 'tzinfo-data'
 else
   # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-  gem 'tzinfo-data', platforms: [:mswin]
+  gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 end
 
 gem 'mysql2', '~> 0.3.15'
