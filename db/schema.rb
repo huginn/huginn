@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(:version => 20140408150825) do
     t.datetime "last_event_at"
     t.datetime "last_error_log_at"
     t.boolean  "propagate_immediately",                       :default => false, :null => false
+    t.boolean  "disabled",                                    :default => false, :null => false
   end
 
   add_index "agents", ["schedule"], :name => "index_agents_on_schedule"

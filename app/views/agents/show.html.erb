@@ -37,6 +37,14 @@
               </li>
 
               <li>
+                <% if @agent.disabled? %>
+                  <%= link_to '<i class="glyphicon glyphicon-play"></i> Enable agent'.html_safe, agent_path(@agent, :agent => { :disabled => false }, :return => "show"), :method => :put %>
+                <% else %>
+                  <%= link_to '<i class="glyphicon glyphicon-pause"></i> Disable agent'.html_safe, agent_path(@agent, :agent => { :disabled => true }, :return => "show"), :method => :put %>
+                <% end %>
+              </li>
+
+              <li>
                 <%= link_to '<span class="glyphicon glyphicon-remove"></span> Delete'.html_safe, agent_path(@agent), method: :delete, data: { confirm: 'Are you sure?' }, :tabindex => "-1" %>
               </li>
             </ul>
