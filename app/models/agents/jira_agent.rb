@@ -49,6 +49,7 @@ module Agents
     end
 
     def validate_options
+      errors.add(:base, "you need to specify password if user name is set") if options['username'].present? and not options['password'].present?
       errors.add(:base, "you need to specify your jira URL") unless options['jira_url'].present?
       errors.add(:base, "you need to specify the expected update period") unless options['expected_update_period_in_days'].present?
       errors.add(:base, "you need to specify request timeout") unless options['timeout'].present?
@@ -70,7 +71,7 @@ module Agents
 
         # this check is more precise than in get_issues()
         # see get_issues() for explanation
-        if updated > last_run
+        if not last_run or updated > last_run
           create_event :payload => issue
         end
       end
@@ -93,6 +94,19 @@ module Agents
       ropts
     end
 
+    def get(url, options)
+        response = HTTParty.get(url, options)
+
+        if response.code == 400
+          raise RuntimeError.new("Jira error: #{response['errorMessages']}") 
+        elsif response.code == 403
+          raise RuntimeError.new("Authentication failed: Forbidden (403)")
+        elsif response.code != 200
+          raise RuntimeError.new("Request failed: #{response}")
+        end
+
+        response
+    end
 
     def get_issues(since)
       startAt = 0
@@ -103,7 +117,7 @@ module Agents
       # earlier and filter out unnecessary ones at a later
       # stage. Fortunately, the 'updated' field has GMT
       # offset
-      since -= 24*60*60
+      since -= 24*60*60 if since
 
       jql = ""
 
@@ -118,26 +132,18 @@ module Agents
 
       request_limit = 0
       loop do
-        response = HTTParty.get(request_url(jql, startAt), request_options)
-
-        if response.code == 400
-          raise RuntimeError.new("Jira error: #{response['errorMessages']}") 
-        elsif response.code == 403
-          raise RuntimeError.new("Authentication failed: Forbidden (403)")
-        elsif response.code != 200
-          raise RuntimeError.new("Request failed: #{response}")
-        end
+        response = get(request_url(jql, startAt), request_options)
 
         if response['issues'].length == 0
           request_limit+=1
         end
 
         if request_limit > MAX_EMPTY_REQUESTS
-          raise RuntimeError("There is no progress while fetching issues")
+          raise RuntimeError.new("There is no progress while fetching issues")
         end
 
         if Time.now > start_time + options['timeout'].to_i * 60
-          raise RuntimeError("Timeout exceeded while fetching issues")
+          raise RuntimeError.new("Timeout exceeded while fetching issues")
         end
 
         issues += response['issues']
