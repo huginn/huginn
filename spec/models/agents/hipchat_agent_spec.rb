@@ -1,22 +1,17 @@
 require 'spec_helper'
-require 'models/concerns/json_path_options_overwritable'
+require 'models/concerns/liquid_interpolatable'
 
 describe Agents::HipchatAgent do
-  it_behaves_like JsonPathOptionsOverwritable
+  it_behaves_like LiquidInterpolatable
 
   before(:each) do
     @valid_params = {
                       'auth_token' => 'token',
                       'room_name' => 'test',
-                      'room_name_path' => '',
-                      'username' => "Huginn",
-                      'username_path' => '$.username',
-                      'message' => "Hello from Huginn!",
-                      'message_path' => '$.message',
+                      'username' => "{{username}}",
+                      'message' => "{{message}}",
                       'notify' => false,
-                      'notify_path' => '',
                       'color' => 'yellow',
-                      'color_path' => '',
                     }
 
     @checker = Agents::HipchatAgent.new(:name => "somename", :options => @valid_params)
