@@ -2,17 +2,16 @@ module Agents
   class BasecampAgent < Agent
     cannot_receive_events!
 
+    include Oauthable
+    valid_oauth_providers '37signals'
+
     description <<-MD
       The BasecampAgent checks a Basecamp project for new Events
 
-      It is required that you enter your Basecamp credentials (`username` and `password`).
-
-      You also need to provide your Basecamp `user_id` and the `project_id` of the project you want to monitor.
+      You need to provide the `project_id` of the project you want to monitor.
       If you have your Basecamp project opened in your browser you can find the user_id and project_id as follows:
 
-      `https://basecamp.com/`
-      user_id
-      `/projects/`
+      `https://basecamp.com/123456/projects/`
       project_id
       `-explore-basecamp`
     MD
@@ -45,17 +44,11 @@ module Agents
 
     def default_options
       {
-        'username' => '',
-        'password' => '',
-        'user_id' => '',
         'project_id' => '',
       }
     end
 
     def validate_options
-      errors.add(:base, "you need to specify your basecamp username") unless options['username'].present?
-      errors.add(:base, "you need to specify your basecamp password") unless options['password'].present?
-      errors.add(:base, "you need to specify your basecamp user id") unless options['user_id'].present?
       errors.add(:base, "you need to specify the basecamp project id of which you want to receive events") unless options['project_id'].present?
     end
 
@@ -64,6 +57,7 @@ module Agents
     end
 
     def check
+      self.service.prepare_request
       reponse = HTTParty.get request_url, request_options.merge(query_parameters)
       memory[:last_run] = Time.now.utc.iso8601
       if last_check_at != nil
@@ -76,11 +70,11 @@ module Agents
 
   private
     def request_url
-      "https://basecamp.com/#{URI.encode(options[:user_id].to_s)}/api/v1/projects/#{URI.encode(options[:project_id].to_s)}/events.json"
+      "https://basecamp.com/#{URI.encode(self.service.options[:user_id].to_s)}/api/v1/projects/#{URI.encode(options[:project_id].to_s)}/events.json"
     end
 
     def request_options
-      {:basic_auth => {:username =>options[:username], :password=>options[:password]}, :headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
+      {:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "Authorization" => "Bearer \"#{self.service.token}\""}}
     end
 
     def query_parameters

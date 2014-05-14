@@ -15,6 +15,7 @@ describe Agents::TwitterUserAgent do
     }
 
     @checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => @opts)
+    @checker.service = services(:generic)
     @checker.user = users(:bob)
     @checker.save!
   end

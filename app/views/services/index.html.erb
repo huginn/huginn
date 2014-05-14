@@ -1,0 +1,52 @@
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>
+          Your Services
+        </h2>
+      </div>
+      <p>
+        Before you can authenticate with a service, you need to set it up. Have a look at the
+        <%= link_to 'wiki', 'tobedone', target: :_blank %>
+        for guidance.
+      </p>
+      <p><%= link_to "Authenticate with Twitter", "/auth/twitter" %></p>
+      <p><%= link_to "Authenticate with 37Signals (Basecamp)", "/auth/37signals" %></p>
+      <p><%= link_to "Authenticate with Github", "/auth/github" %></p>
+      <hr>
+
+      <div class='table-responsive'>
+        <table class='table table-striped events'>
+          <tr>
+            <th>Provider</th>
+            <th>Username</th>
+            <th>Global?</th>
+            <th></th>
+          </tr>
+
+        <% @services.each do |service| %>
+          <tr>
+            <td><%= service.provider %></td>
+            <td><%= service.name %></td>
+            <td><%= service.global ? 'Yes' : 'No' %></td>
+            <td>
+              <div class="btn-group btn-group-xs">
+                <% if service.global %>
+                  <%= link_to 'Make private', toggle_availability_service_path(service), method: :post, data: { confirm: 'Are you sure you want to remove the access to this service for every user?'}, class: "btn btn-default" %>
+                <% else %>
+                   <%= link_to 'Make global', toggle_availability_service_path(service), method: :post, data: { confirm: 'Are you sure you want to grant every user access to this service?'}, class: "btn btn-default" %>
+                <% end %>
+                <%= link_to 'Delete', service_path(service), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default btn-danger" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        </table>
+      </div>
+
+      <%= paginate @services, :theme => 'twitter-bootstrap-3' %>
+    </div>
+  </div>
+</div>
+

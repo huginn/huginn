@@ -26,6 +26,12 @@ class User < ActiveRecord::Base
   has_many :events, -> { order("events.created_at desc") }, :dependent => :delete_all, :inverse_of => :user
   has_many :agents, -> { order("agents.created_at desc") }, :dependent => :destroy, :inverse_of => :user
   has_many :logs, :through => :agents, :class_name => "AgentLog"
+  has_many :services, -> { order("services.name")}, :dependent => :destroy
+  
+
+  def available_services
+    Service.where("user_id = #{self.id} or global = true").order("services.name desc") 
+  end
 
   # Allow users to login via either email or username.
   def self.find_first_by_auth_conditions(warden_conditions)

@@ -13,6 +13,7 @@ describe Agents::TwitterPublishAgent do
     }
 
     @checker = Agents::TwitterPublishAgent.new(:name => "HuginnBot", :options => @opts)
+    @checker.service = services(:generic)
     @checker.user = users(:bob)
     @checker.save!
 

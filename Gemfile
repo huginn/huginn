@@ -76,6 +76,11 @@ gem 'therubyracer', '~> 0.12.1'
 
 gem 'mqtt'
 
+gem 'omniauth'
+gem 'omniauth-twitter'
+gem 'omniauth-37signals'
+gem 'omniauth-github'
+
 group :development do
   gem 'binding_of_caller'
   gem 'better_errors'
