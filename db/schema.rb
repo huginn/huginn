@@ -101,6 +101,20 @@ ActiveRecord::Schema.define(:version => 20140408150825) do
 
   add_index "user_credentials", ["user_id", "credential_name"], :name => "index_user_credentials_on_user_id_and_credential_name", :unique => true
 
+  create_table "scenario_memberships", force: true do |t|
+    t.integer  "agent_id",    null: false
+    t.integer  "scenario_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "scenarios", force: true do |t|
+    t.string   "name",       null: false
+    t.integer  "user_id",    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "",    :null => false
     t.string   "encrypted_password",     :default => "",    :null => false
@@ -120,6 +134,7 @@ ActiveRecord::Schema.define(:version => 20140408150825) do
     t.datetime "locked_at"
     t.string   "username",                                  :null => false
     t.string   "invitation_code",                           :null => false
+    t.integer  "scenario_count",         default: 0,     null: false
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

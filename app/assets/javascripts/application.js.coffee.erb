@@ -61,6 +61,9 @@ $(document).ready ->
   if $(".flash").length
     setTimeout((-> $(".flash").slideUp(-> $(".flash").remove())), 5000)
 
+  # Help popovers
+  $('.hover-help').popover(trigger: 'hover')
+
   # Agent Navigation
   $agentNavigate = $('#agent-navigate')
 
@@ -99,7 +102,7 @@ $(document).ready ->
         e.preventDefault()
         $agentNavigate.focus()
 
-# Agent Show
+  # Agent Show
   fetchLogs = (e) ->
     agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
     e.preventDefault()

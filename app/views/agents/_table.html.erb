@@ -1,0 +1,79 @@
+<div class='table-responsive'>
+  <table class='table table-striped'>
+    <tr>
+      <th>Name</th>
+      <th>Schedule</th>
+      <th>Last Check</th>
+      <th>Last Event Out</th>
+      <th>Last Event In</th>
+      <th>Events Created</th>
+      <th>Working?</th>
+      <th></th>
+    </tr>
+
+    <% @agents.each do |agent| %>
+      <tr class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td>
+          <%= agent.name %>
+          <br/>
+          <span class='text-muted'><%= agent.short_type.titleize %></span>
+          <% if agent.scenarios.present? %>
+            <span>
+              <%= scenario_links(agent) %>
+            </span>
+          <% end %>
+        </td>
+        <td>
+          <% if agent.can_be_scheduled? %>
+            <%= agent.schedule.to_s.humanize.titleize %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td>
+          <% if agent.can_be_scheduled? %>
+            <%= agent.last_check_at ? time_ago_in_words(agent.last_check_at) + " ago" : "never" %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td>
+          <% if agent.can_create_events? %>
+            <%= agent.last_event_at ? time_ago_in_words(agent.last_event_at) + " ago" : "never" %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td>
+          <% if agent.can_receive_events? %>
+            <%= agent.last_receive_at ? time_ago_in_words(agent.last_receive_at) + " ago" : "never" %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td>
+          <% if agent.can_create_events? %>
+            <%= link_to(agent.events_count || 0, events_path(:agent => agent.to_param)) %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td><%= working(agent) %></td>
+        <td>
+          <div class="btn-group btn-group-xs">
+            <%= link_to 'Show', agent_path(agent), class: "btn btn-default" %>
+            <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-default" %>
+            <%= link_to 'Delete', agent_path(agent), method: :delete, data: { confirm: 'Are you sure you wish to permenantly delete this Agent?' }, class: "btn btn-default" %>
+            <% if agent.can_be_scheduled? && !agent.disabled? %>
+              <%= link_to 'Run', run_agent_path(agent, :return => "index"), method: :post, class: "btn btn-default" %>
+            <% else %>
+              <%= link_to 'Run', "#", class: "btn btn-default disabled" %>
+            <% end %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+
+<%= paginate @agents, :theme => 'twitter-bootstrap-3' %>

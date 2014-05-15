@@ -1,0 +1,7 @@
+jane_weather:
+  name: Jane's weather alert Scenario
+  user: jane
+
+bob_weather:
+  name: Bob's weather alert Scenario
+  user: bob

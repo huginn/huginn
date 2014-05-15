@@ -1,0 +1,46 @@
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>
+          Your Scenarios
+        </h2>
+      </div>
+
+      <blockquote>
+        Scenarios are named groups of Agents.  Scenarios allow you to organize your agents, and to export sets of Agents for sharing.
+      </blockquote>
+
+      <table class='table table-striped'>
+        <tr>
+          <th>Name</th>
+          <th>Agents</th>
+          <th></th>
+        </tr>
+
+        <% @scenarios.each do |scenario| %>
+          <tr>
+            <td><span class='label label-info'><%= scenario.name %></span></td>
+            <td><%= link_to pluralize(scenario.agents.count, "agent"), scenario %></td>
+            <td>
+              <div class="btn-group btn-group-xs" style="float: right">
+                <%= link_to 'Show', scenario, class: "btn btn-default" %>
+                <%= link_to 'Edit', edit_scenario_path(scenario), class: "btn btn-default" %>
+                <%= link_to 'Share', share_scenario_path(scenario), class: "btn btn-default" %>
+                <%= link_to 'Delete', scenario_path(scenario), method: :delete, data: {confirm: 'Are you sure?'}, class: "btn btn-default" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+
+      <%= paginate @scenarios, :theme => 'twitter-bootstrap' %>
+
+      <br/>
+
+      <div class="btn-group">
+        <%= link_to '<span class="glyphicon glyphicon-plus"></span> New Scenario'.html_safe, new_scenario_path, class: "btn btn-default" %>
+      </div>
+    </div>
+  </div>
+</div>

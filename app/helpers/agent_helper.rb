@@ -6,6 +6,12 @@ module AgentHelper
     end
   end
 
+  def scenario_links(agent)
+    agent.scenarios.map { |scenario|
+      link_to(scenario.name, scenario, class: "label label-info")
+    }.to_sentence
+  end
+
   def agent_show_class(agent)
     agent.short_type.underscore.dasherize
   end

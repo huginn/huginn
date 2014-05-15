@@ -26,6 +26,12 @@ Huginn::Application.routes.draw do
     end
   end
 
+  resources :scenarios do
+    member do
+      get :share
+    end
+  end
+
   resources :user_credentials, :except => :show
 
   get "/worker_status" => "worker_status#show"

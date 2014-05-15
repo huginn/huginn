@@ -1,0 +1,21 @@
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>Scenario <span class='label label-info scenario'><%= @scenario.name %></span></h2>
+      </div>
+
+      <div class="btn-group">
+        <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, scenarios_path, class: "btn btn-default" %>
+        <%= link_to '<span class="glyphicon glyphicon-edit"></span> Edit'.html_safe, edit_scenario_path(@scenario), class: "btn btn-default" %>
+        <%= link_to '<span class="glyphicon glyphicon-share-alt"></span> Share'.html_safe, share_scenario_path(@scenario), class: "btn btn-default" %>
+      </div>
+
+      <div class="page-header">
+        <h3>Agents</h3>
+      </div>
+
+      <%= render :partial => 'agents/table' %>
+    </div>
+  </div>
+</div>

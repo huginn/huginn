@@ -1,0 +1,40 @@
+<%= form_for(@scenario, :method => @scenario.new_record? ? "POST" : "PUT") do |f| %>
+  <% if @scenario.errors.any? %>
+    <div class="row well">
+      <h2><%= pluralize(@scenario.errors.count, "error") %> prohibited this Scenario from being saved:</h2>
+      <% @scenario.errors.full_messages.each do |msg| %>
+        <p class='text-warning'><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="form-group">
+        <%= f.label :name %>
+        <%= f.text_field :name, :class => 'form-control' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="form-group">
+        <div>
+          <%= f.label :agents %>
+          <%= f.select(:agent_ids,
+                       options_for_select(current_user.agents.pluck(:name, :id), @scenario.agent_ids),
+                       {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class='form-actions' style='clear: both'>
+        <%= f.submit "Save Scenario", :class => "btn btn-primary" %>
+      </div>
+    </div>
+  </div>
+<% end %>
