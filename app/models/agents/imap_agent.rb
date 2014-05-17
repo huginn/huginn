@@ -138,7 +138,6 @@ module Agents
             if memory.has_key?("last_run")
 	        last_run = Time.strptime(memory["last_run"], '%Y-%m-%d %H:%M:%S %z')
             else
-        	log "Using #{time_diff} first event"
                 last_run = today - time_diff
             end
             # I will add the ability to get only UNSEEN messages and mark 
