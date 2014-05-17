@@ -51,6 +51,31 @@ describe Agents::ImapFolderAgent do
       stub(@checker).each_unread_mail.returns { |yielder|
         @mails.each(&yielder)
       }
+
+      @payloads = [
+        {
+          'from' => 'nanashi.gombeh@example.jp',
+          'to' => ['jane.doe@example.com', 'john.doe@example.com'],
+          'cc' => [],
+          'date' => '2014-05-09T16:00:00+09:00',
+          'subject' => 'some subject',
+          'body' => "Some plain text\nSome second line\n",
+          'has_attachment' => false,
+          'matches' => {},
+          'mime_type' => 'text/plain',
+        },
+        {
+          'from' => 'john.doe@example.com',
+          'to' => ['jane.doe@example.com', 'nanashi.gombeh@example.jp'],
+          'cc' => [],
+          'subject' => 'Re: some subject',
+          'body' => "Some reply\n",
+          'date' => '2014-05-09T17:00:00+09:00',
+          'has_attachment' => true,
+          'matches' => {},
+          'mime_type' => 'text/plain',
+        }
+      ]
     end
 
     describe 'validations' do
@@ -83,29 +108,7 @@ describe Agents::ImapFolderAgent do
           (seen[mail.uidvalidity] ||= []) << mail.uid
         }
 
-        events = Event.last(2)
-        events.first.payload.should == {
-          'from' => 'nanashi.gombeh@example.jp',
-          'to' => ['jane.doe@example.com', 'john.doe@example.com'],
-          'cc' => [],
-          'date' => '2014-05-09T16:00:00+09:00',
-          'subject' => 'some subject',
-          'body' => "Some plain text\nSome second line\n",
-          'has_attachment' => false,
-          'matches' => {},
-          'mime_type' => 'text/plain',
-        }
-        events.last.payload.should == {
-          'from' => 'john.doe@example.com',
-          'to' => ['jane.doe@example.com', 'nanashi.gombeh@example.jp'],
-          'cc' => [],
-          'subject' => 'Re: some subject',
-          'body' => "Some reply\n",
-          'date' => '2014-05-09T17:00:00+09:00',
-          'has_attachment' => true,
-          'matches' => {},
-          'mime_type' => 'text/plain',
-        }
+        Event.last(2).map(&:payload) == @payloads
 
         lambda { @checker.check }.should_not change { Event.count }
       end
@@ -119,17 +122,7 @@ describe Agents::ImapFolderAgent do
           (seen[mail.uidvalidity] ||= []) << mail.uid
         }
 
-        Event.last.payload.should == {
-          'from' => 'nanashi.gombeh@example.jp',
-          'to' => ['jane.doe@example.com', 'john.doe@example.com'],
-          'cc' => [],
-          'date' => '2014-05-09T16:00:00+09:00',
-          'subject' => 'some subject',
-          'body' => "Some plain text\nSome second line\n",
-          'has_attachment' => false,
-          'matches' => {},
-          'mime_type' => 'text/plain',
-        }
+        Event.last.payload.should == @payloads.first
 
         lambda { @checker.check }.should_not change { Event.count }
       end
@@ -146,17 +139,11 @@ describe Agents::ImapFolderAgent do
           (seen[mail.uidvalidity] ||= []) << mail.uid
         }
 
-        Event.last.payload.should == {
-          'from' => 'john.doe@example.com',
-          'to' => ['jane.doe@example.com', 'nanashi.gombeh@example.jp'],
-          'cc' => [],
-          'subject' => 'Re: some subject',
+        Event.last.payload.should == @payloads.last.update(
           'body' => "<div dir=\"ltr\">Some HTML reply<br></div>\n",
-          'date' => '2014-05-09T17:00:00+09:00',
-          'has_attachment' => true,
           'matches' => { 'a' => 'some subject', 'b' => 'HTML' },
           'mime_type' => 'text/html',
-        }
+        )
 
         lambda { @checker.check }.should_not change { Event.count }
       end
