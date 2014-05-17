@@ -305,7 +305,7 @@ module Agents
       host, port, ssl, username = options.values_at(:host, :port, :ssl, :username)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
-      Client.open(host, port, ssl) { |imap|
+      Client.open(host, Integer(port), ssl) { |imap|
         log "Logging in as #{username}"
         imap.login(username, options[:password])
 

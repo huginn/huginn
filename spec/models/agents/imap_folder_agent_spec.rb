@@ -90,11 +90,23 @@ describe Agents::ImapFolderAgent do
       end
 
       it 'should validate the integer fields' do
+        @checker.options['expected_update_period_in_days'] = 'nonsense'
+        @checker.should_not be_valid
+
         @checker.options['expected_update_period_in_days'] = '2'
         @checker.should be_valid
 
-        @checker.options['expected_update_period_in_days'] = 'nonsense'
+        @checker.options['port'] = -1
         @checker.should_not be_valid
+
+        @checker.options['port'] = 'imap'
+        @checker.should_not be_valid
+
+        @checker.options['port'] = '143'
+        @checker.should be_valid
+
+        @checker.options['port'] = 993
+        @checker.should be_valid
       end
 
       it 'should validate the boolean fields' do
