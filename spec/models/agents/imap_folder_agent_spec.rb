@@ -183,6 +183,21 @@ describe Agents::ImapFolderAgent do
           (seen[mail.uidvalidity] ||= []) << mail.uid
         }
       end
+
+      it 'should never mark mails as read unless mark_as_read is true' do
+        @mails.each { |mail|
+          stub(mail).mark_as_read.never
+        }
+        lambda { @checker.check }.should change { Event.count }.by(2)
+      end
+
+      it 'should mark mails as read if mark_as_read is true' do
+        @checker.options['mark_as_read'] = true
+        @mails.each { |mail|
+          stub(mail).mark_as_read.once
+        }
+        lambda { @checker.check }.should change { Event.count }.by(2)
+      end
     end
   end
 end
