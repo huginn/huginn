@@ -75,6 +75,7 @@ module Agents
       Events look like this:
 
           {
+            "folder": "INBOX",
             "subject": "...",
             "from": "Nanashi <nanashi.gombeh@example.jp>",
             "to": ["Jane <jane.doe@example.com>"],
@@ -273,6 +274,7 @@ module Agents
         end
 
         create_event :payload => {
+          'folder' => mail.folder,
           'subject' => mail.subject,
           'from' => mail.from_addrs.first,
           'to' => mail.to_addrs,
@@ -355,14 +357,14 @@ module Agents
       end
 
       def select(folder)
-        ret = super
+        ret = super(@folder = folder)
         @uidvalidity = responses['UIDVALIDITY'].last
         ret
       end
 
       def fetch_mails(set)
         fetch(set, %w[UID RFC822.HEADER]).map { |data|
-          Message.new(self, @uidvalidity, data)
+          Message.new(self, data, folder: @folder, uidvalidity: @uidvalidity)
         }
       end
     end
@@ -370,11 +372,13 @@ module Agents
     class Message < SimpleDelegator
       DEFAULT_BODY_MIME_TYPES = %w[text/plain text/enriched text/html]
 
-      attr_reader :uidvalidity, :uid
+      attr_reader :uid, :folder, :uidvalidity
 
-      def initialize(client, uidvalidity, fetch_data)
+      def initialize(client, fetch_data, props = {})
         @client = client
-        @uidvalidity = uidvalidity
+        props.each { |key, value|
+          instance_variable_set(:"@#{key}", value)
+        }
         attr = fetch_data.attr
         @uid = attr['UID']
         super(Mail.read_from_string(attr['RFC822.HEADER']))

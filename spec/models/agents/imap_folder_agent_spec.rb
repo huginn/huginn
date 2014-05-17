@@ -19,6 +19,10 @@ describe Agents::ImapFolderAgent do
       @checker.save!
 
       message_mixin = Module.new {
+        def folder
+          'INBOX'
+        end
+
         def uidvalidity
           '100'
         end
@@ -54,6 +58,7 @@ describe Agents::ImapFolderAgent do
 
       @payloads = [
         {
+          'folder' => 'INBOX',
           'from' => 'nanashi.gombeh@example.jp',
           'to' => ['jane.doe@example.com', 'john.doe@example.com'],
           'cc' => [],
@@ -65,6 +70,7 @@ describe Agents::ImapFolderAgent do
           'mime_type' => 'text/plain',
         },
         {
+          'folder' => 'INBOX',
           'from' => 'john.doe@example.com',
           'to' => ['jane.doe@example.com', 'nanashi.gombeh@example.jp'],
           'cc' => [],
