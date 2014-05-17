@@ -104,6 +104,24 @@ describe Agents::ImapFolderAgent do
         @checker.options['ssl'] = 'true'
         @checker.should_not be_valid
       end
+
+      it 'should validate regexp conditions' do
+        @checker.options['conditions'] = {
+          'subject' => '(foo'
+        }
+        @checker.should_not be_valid
+
+        @checker.options['conditions'] = {
+          'body' => '***'
+        }
+        @checker.should_not be_valid
+
+        @checker.options['conditions'] = {
+          'subject' => '\ARe:',
+          'body' => '(?<foo>http://\S+)'
+        }
+        @checker.should be_valid
+      end
     end
 
     describe '#check' do
