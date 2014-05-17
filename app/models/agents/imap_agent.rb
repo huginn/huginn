@@ -135,6 +135,7 @@ module Agents
             imap1.select(options['mailbox'])
 
             today = Time.now
+            searcharr = []
             if memory.has_key?("last_run")
 	        last_run = Time.strptime(memory["last_run"], '%Y-%m-%d %H:%M:%S %z')
             else
@@ -142,16 +143,23 @@ module Agents
             end
             # I will add the ability to get only UNSEEN messages and mark 
             # the returned ones as SEEN
-            ##searcharr = ["ON", today.strftime('%d-%b-%Y')]
-            searcharr = ["BEFORE", today.strftime('%d-%b-%Y'), "SINCE", last_run.strftime('%d-%b-%Y')]
+            if (today - last_run) < time_diff # Assume same day
+                searcharr = ["ON", today.strftime('%d-%b-%Y')]
+            else
+                searcharr = ["BEFORE", today.strftime('%d-%b-%Y'), "SINCE", last_run.strftime('%d-%b-%Y')]
+            end
+            # log "Searching from #{today.strftime('%d-%b-%Y')} to #{last_run.strftime('%d-%b-%Y')}"
             searcharr.concat ["SUBJECT", options['subject']] if options['subject'] != ""
             searcharr.concat ["FROM", options['from']] if options['from'] != ""
             searcharr.concat ["TO", options['to']] if options['to'] != ""
-        
+       
+            # searching = searcharr.join(" ") 
+            # log "Searching #{searching}"
             imap1.search(searcharr).each do |message_id|
                 envelope = imap1.fetch(message_id, "ENVELOPE")[0].attr["ENVELOPE"]
                 # Only put in messages that arrived since last run because BEFORE/SINCE is only a day filter
-                timestamp = Time.strptime(envelope.date, '%a, %d %b %Y %H:%M:%S %z')
+                # timestamp = Time.strptime(envelope.date, '%a, %d %b %Y %H:%M:%S %z')
+                timestamp = Time.parse(envelope.date)
                 if timestamp >= last_run
                     # flags = imap1.fetch(message_id, "FLAGS")[0].attr["FLAGS"]
                     text = imap1.fetch(message_id, 'BODY[TEXT]')[0].attr['BODY[TEXT]']
