@@ -90,6 +90,14 @@ module Agents
 
     IDCACHE_SIZE = 100
 
+    FNM_FLAGS = [:FNM_CASEFOLD, :FNM_EXTGLOB].inject(0) { |flags, sym|
+      if File.const_defined?(sym)
+        flags | File.const_get(sym)
+      else
+        flags
+      end
+    }
+
     def working?
       event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
     end
@@ -343,7 +351,7 @@ module Agents
     end
 
     def glob_match?(pattern, value)
-      File.fnmatch?(pattern, value, File::FNM_CASEFOLD | File::FNM_EXTGLOB)
+      File.fnmatch?(pattern, value, FNM_FLAGS)
     end
 
     class Client < ::Net::IMAP
