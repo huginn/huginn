@@ -28,10 +28,14 @@ module Agents
       - "subject"
       - "body"
 
-          Specify a string of the regular expression that is matched
-          against the decoded subject/body of each mail.
+          Specify a regular expression to match against the decoded
+          subject/body of each mail.
 
-          Use the `(?i)` directive for case insensitive search.
+          Use the `(?i)` directive for case-insensitive search.  For
+          example, a pattern `(?i)alert` will match "alert", "Alert"
+          or "ALERT".  You can also make only a part of a pattern to
+          work case-insensitively: `Re: (?i:alert)` will match either
+          "Re: Alert" or "Re: alert", but not "RE: alert".
 
           When a mail has multiple non-attachment text parts, they are
           prioritized according to the `mime_types` option (which see
