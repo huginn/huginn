@@ -73,6 +73,14 @@ module Agents
           If this key is unspecified or set to null, it is ignored.
 
       Set `mark_as_read` to true to mark found mails as read.
+
+      Each agent instance memorizes a list of unread mails that are
+      found in the last run, so even if you change a set of conditions
+      so that it matches mails that are missed previously, they will
+      not show up as new events.  Also, in order to avoid duplicated
+      notification it keeps a list of Message-Id's of 100 most recent
+      mails, so if multiple mails of the same Message-Id are found,
+      you will only see one event out of them.
     MD
 
     event_description <<-MD
