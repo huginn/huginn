@@ -228,8 +228,6 @@ module Agents
 
         next if (uids = seen[mail.uidvalidity]) && uids.include?(mail.uid)
 
-        next if notified.include?(mail.message_id)
-
         body_parts = mail.body_parts(mime_types)
         matched_part = nil
         matches = {}
@@ -275,35 +273,37 @@ module Agents
           end
         } or next
 
-        matched_part ||= body_parts.first
+        unless notified.include?(mail.message_id)
+          matched_part ||= body_parts.first
 
-        if matched_part
-          mime_type = matched_part.mime_type
-          body = matched_part.decoded
-        else
-          mime_type = 'text/plain'
-          body = ''
+          if matched_part
+            mime_type = matched_part.mime_type
+            body = matched_part.decoded
+          else
+            mime_type = 'text/plain'
+            body = ''
+          end
+
+          create_event :payload => {
+            'folder' => mail.folder,
+            'subject' => mail.subject,
+            'from' => mail.from_addrs.first,
+            'to' => mail.to_addrs,
+            'cc' => mail.cc_addrs,
+            'date' => (mail.date.iso8601 rescue nil),
+            'mime_type' => mime_type,
+            'body' => body,
+            'matches' => matches,
+            'has_attachment' => mail.has_attachment?,
+          }
+
+          notified << mail.message_id if mail.message_id
         end
-
-        create_event :payload => {
-          'folder' => mail.folder,
-          'subject' => mail.subject,
-          'from' => mail.from_addrs.first,
-          'to' => mail.to_addrs,
-          'cc' => mail.cc_addrs,
-          'date' => (mail.date.iso8601 rescue nil),
-          'mime_type' => mime_type,
-          'body' => body,
-          'matches' => matches,
-          'has_attachment' => mail.has_attachment?,
-        }
 
         if options['mark_as_read']
           log 'Marking as read'
           mail.mark_as_read
         end
-
-        notified << mail.message_id if mail.message_id
       }
 
       notified.slice!(0...-IDCACHE_SIZE) if notified.size > IDCACHE_SIZE

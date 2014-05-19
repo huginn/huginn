@@ -228,6 +228,15 @@ describe Agents::ImapFolderAgent do
         }
         lambda { @checker.check }.should change { Event.count }.by(2)
       end
+
+      it 'should create just one event for multiple mails with the same Message-Id' do
+        @mails.first.message_id = @mails.last.message_id
+        @checker.options['mark_as_read'] = true
+        @mails.each { |mail|
+          stub(mail).mark_as_read.once
+        }
+        lambda { @checker.check }.should change { Event.count }.by(1)
+      end
     end
   end
 end
