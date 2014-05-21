@@ -26,7 +26,7 @@ set :pty, true
 
 # Default value for :linked_files is []
 # set :linked_files, %w{config/database.yml}
-# set :linked_files, %w{config/.env}
+set :linked_files, %w{.env}
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
@@ -129,19 +129,19 @@ end
 
 namespace :deploy do
 
-  # TODO Surely this should be achievable with linked_files ??
-  desc 'Link the .env environment and Procfile from shared/config into the new deploy directory'
-  task :symlink_configs do
-    on roles(:app) do |host|
-      run <<-CMD
-        cd #{latest_release} && ln -nfs #{shared_path}/config/.env #{latest_release}/.env
-      CMD
+  # # TODO Surely this should be achievable with linked_files ??
+  # desc 'Link the .env environment and Procfile from shared/config into the new deploy directory'
+  # task :symlink_configs do
+  #   on roles(:app) do |host|
+  #     run <<-CMD
+  #       cd #{fetch(:latest_release)} && ln -nfs #{fetch(:shared_path)}/config/.env #{fetch(:latest_release)}/.env
+  #     CMD
 
-      run <<-CMD
-        cd #{latest_release} && ln -nfs #{shared_path}/config/Procfile #{latest_release}/Procfile
-      CMD
-    end
-  end
+  #     run <<-CMD
+  #       cd #{fetch(:latest_release)} && ln -nfs #{fetch(:shared_path)}/config/Procfile #{fetch(:latest_release)}/Procfile
+  #     CMD
+  #   end
+  # end
 
 #   desc 'Restart application'
 #   task :restart do
@@ -197,5 +197,5 @@ namespace :foreman do
 end
 
 
-after 'deploy:updated', 'deploy:symlink_configs'
+# after 'deploy:updated', 'deploy:symlink_configs'
 # after 'deploy:publishing', 'deploy:restart' # Not run by default since 3.1.0
