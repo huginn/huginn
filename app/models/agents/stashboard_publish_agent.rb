@@ -15,26 +15,32 @@ module Agents
       You must also specify a `service`, `status`, and `message` parameters, and you can use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the message.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+
+      If you will be receiving events with `services` and `status` options that do not already exist in Stashboard, you can set the `addifnodef` (add if not defined) option to true and optionally define `svcdesc`, `statdesc`, `statimage`, and `statlevel` to pass along service description, status description, status image choice, and status level choice for dynamically created services and alerts.
+
+      The `message`, `svcdesc`, and `statdesc` options can use Liquid Interpolate to populate values.
     MD
 
+    def default_options
+      {
+        'expected_update_period_in_days' => "7",
+        'service' => "",
+        'status' => "",
+        'message' => "{{message}}",
+        'addifnodef' => false,
+      }
+    end
+
     def validate_options
+      # message is an optional option in Stashboard, so no need to validate it here.
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       errors.add(:base, "service is required") unless options['service'].present?
       errors.add(:base, "status is required") unless options['status'].present?
+      errors.add(:base, "addifnodef is required") unless options.has_key?("addifnodef")
     end
 
     def working?
       event_created_within?(options['expected_update_period_in_days']) && most_recent_event && most_recent_event.payload['success'] == true && !recent_error_logs?
-    end
-
-    def default_options
-      {
-        'expected_update_period_in_days' => "365",
-        'service' => "{{service}}",
-        'status' => "{{status}}",
-        'message' => "{{message}}",
-        'addifnodef' => false,
-      }
     end
 
     def receive(incoming_events)
@@ -49,15 +55,15 @@ module Agents
       @sb = Stashboard::Stashboard.new(base, oauth_key, oauth_secret)
       # Loop through remainin events
       incoming_events.each do |event|
-        options['addifnodef'] = (interpolate_string("{{addifnodef}}", event.payload) == 'true') || false
+        options['addifnodef'] = event.payload['addifnodef'].presence || false
         options['svcdesc'] = interpolate_string("{{svcdesc}}", event.payload)
 
         options["statdesc"] = interpolate_string("{{statdesc}}", event.payload)
-        options["statlevel"] = interpolate_string("{{statlevel}}", event.payload)
-        options["statimage"] = interpolate_string("{{statimage}}", event.payload)
+        options["statlevel"] = event.payload['statlevel'].presence || "NORMAL"
+        options["statimage"] = event.payload['statimage'].presence || ""
 
-        svc = interpolate_string(options['service'], event.payload)
-        status = interpolate_string(options['status'], event.payload)
+        svc = event.payload['service']
+        status = event.payload['status']
         message_text = interpolate_string(options['message'], event.payload)
         begin
           sb_result = publish_status(svc, status, message_text)
@@ -70,7 +76,7 @@ module Agents
             'agent_id' => event.agent_id,
             'event_id' => event.id
           }
-        rescue Exception => e
+        rescue StandardError => e
           create_event :payload => {
             'success' => false,
             'error' => e.message,
@@ -95,7 +101,8 @@ module Agents
     end
 
     def random_image
-        img = @sb.status_images[rand(images.length)]
+        images = @sb.status_images
+        img = images[rand(images.length)]
         return img["name"]
     end
 
@@ -122,7 +129,6 @@ module Agents
         stat = status_by_name(status)
         if options["addifnodef"] and stat.nil?
            options["statdesc"] = name unless !options["statdesc"].empty?
-           options["statlevel"] = "NORMAL" unless !options["statlevel"].empty?
            options["statimage"] = random_image unless !options["statimage"].empty?
            stat = @sb.create_status(status, options["statdesc"], options["statlevel"], options["statimage"])
            # log "Finished create_status: #{status}, #{options['statdesc']}, #{options['statlevel']}, #{options['statimage']}"
