@@ -1,0 +1,45 @@
+{
+
+"name" : "huginn_production_centos",
+
+"chef_type" : "role",
+
+"json_class" : "Chef::Role",
+
+"description" : "Huginn Production Environment (CentOS)",
+
+"default_attributes" : {
+  "sudo": {
+    "include_sudoers_d": true
+  },
+  "mysql": {
+    "server_root_password": "password",
+    "server_repl_password": "",
+    "server_debian_password": ""
+  },
+  "nginx" : {
+    "init_style" : "upstart"
+  },
+  "huginn": {
+    "user": "huginn"
+  }
+},
+
+// "env_run_lists": {
+//   "production": [],
+//   "preprod": [],
+//   "test": [ "role[base]", "recipe[apache]", "recipe[apache::copy_test_configs]" ],
+//   "dev": [ "role[base]", "recipe[apache]", "recipe[apache::copy_dev_configs]" ]
+// },
+"run_list":[
+             "recipe[yum]",
+             "recipe[yum-epel]",
+             "recipe[git]",
+             "recipe[nginx]",
+             "recipe[mysql::server]",
+             // postgresql
+             "recipe[nodejs::install_from_binary]",
+             // rails
+             "recipe[huginn_production]"
+           ]
+}

@@ -16,8 +16,16 @@
 # used to set extended properties on the server.
 
 # server 'example.com', user: 'deploy', roles: %w{web app}, my_property: :my_value
-server 'huginn.example.net', user: 'huginn', roles: %w{web app db}, :primary => true
+server 'huginn.devalias.net', user: 'huginn', roles: %w{web app db}, :primary => true
 
+# Capistrano::UnicornNginx (https://github.com/bruno-/capistrano-unicorn-nginx)
+set :nginx_server_name, 'huginn.devalias.net' # Comment this line to default to IP address
+# Ignore this if you do not need SSL
+# set :nginx_use_ssl, true
+# set :nginx_upload_local_cert, true
+# set :nginx_ssl_cert_local_path, "/path/to/ssl_cert.crt"
+# set :nginx_ssl_cert_key_local_path, "/path/to/ssl_cert.key"
+# set :unicorn_workers, 2
 
 # Custom SSH Options
 # ==================
@@ -44,12 +52,12 @@ server 'huginn.example.net', user: 'huginn', roles: %w{web app db}, :primary => 
 #     auth_methods: %w(publickey password)
 #     # password: 'please use keys'
 #   }
-server 'huginn.example.net',
+server 'huginn.devalias.net',
   user: 'huginn',
   roles: %w{web app db},
   ssh_options: {
     # user: 'huginn', # overrides user setting above
-    keys: %w(/Users/myuser/.ssh/digitalocean_huginn_rsa),
+    keys: %w(/Users/alias/.ssh/digitalocean_huginn_rsa),
     forward_agent: true,
     auth_methods: %w(publickey password)
     # password: 'please use keys'

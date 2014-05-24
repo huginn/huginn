@@ -31,8 +31,20 @@ require 'capistrano/bundler'
 require 'capistrano/rails/assets'
 require 'capistrano/rails/migrations'
 
+# https://github.com/bruno-/capistrano-rbenv-install
+require 'capistrano/rbenv_install'
+
+# https://github.com/bruno-/capistrano-safe-deploy-to
+require 'capistrano/safe_deploy_to'
+
+# https://github.com/rjocoleman/capistrano-knife-solo
+require 'capistrano-knife-solo'
+
+# https://github.com/bruno-/capistrano-unicorn-nginx
+require 'capistrano/unicorn_nginx'
+
 # Loads custom tasks from `lib/capistrano/tasks' if you have any defined.
 Dir.glob('lib/capistrano/tasks/*.rake').each { |r| import r }
 
 # Set a default stage NB: Comment this out if you are using multiple staging!!!!!!
-invoke :production
+# invoke :production

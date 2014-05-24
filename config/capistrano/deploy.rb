@@ -74,7 +74,7 @@ set :use_sudo, false # deploy:restart, deploy:cleanup, etc
 # http://capitate.rubyforge.org/recipes/nginx-centos.html
 # https://github.com/capistrano/capistrano/wiki/Capistrano-Tasks
 
-# puts "    Deploying #{:branch}"
+# puts "    Deploying #{fetch(:branch})"
 
 # http://capistranorb.com/documentation/getting-started/flow/
 # before 'deploy:restart', 'deploy:migrate' # https://github.com/capistrano/capistrano/wiki/Capistrano-Tasks#deploymigrate
@@ -117,11 +117,22 @@ namespace :huginn do
   desc 'Setup config files'
   task :setup_configs do
     on roles(:app), in: :sequence, wait: 5 do
-      # TODO
+      # TODO https://github.com/capistrano/sshkit/blob/master/EXAMPLES.md
       #   Copy .env to .env.example
       #   Ask user for values to put into .env
       #     Inclue the value from `rake secret`
       #   Any other config files needed?
+    end
+  end
+
+  desc "Setup Database"
+  task :setup_database do
+    on roles(:app) do |host|
+      info "Testing #{host}"
+      within :latest_release do
+        info  capture(:whoami && :pwd)
+        # run "rake db:create && rake db:migrate && db:seed"
+      end
     end
   end
 end
@@ -196,6 +207,6 @@ namespace :foreman do
 
 end
 
-
+# before 'deploy:updated', 'huginn:setup_database'
 # after 'deploy:updated', 'deploy:symlink_configs'
 # after 'deploy:publishing', 'deploy:restart' # Not run by default since 3.1.0
