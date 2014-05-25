@@ -4,7 +4,10 @@
 site 'http://community.opscode.com/api/v1'
 
 cookbook 'runit'
+cookbook 'sudo', :git => 'git://github.com/opscode-cookbooks/sudo.git'
 cookbook 'git', :git => 'git://github.com/opscode-cookbooks/git.git'
+cookbook 'rbenv', :git => 'git://github.com/fnichol/chef-rbenv'
+cookbook 'ruby_build', :git => 'git://github.com/fnichol/chef-ruby_build'
 cookbook 'nginx', :git => 'git://github.com/opscode-cookbooks/nginx.git'
 cookbook 'mysql', :git => 'git://github.com/opscode-cookbooks/mysql.git'
 cookbook 'nodejs', :git => 'git://github.com/mdxp/nodejs-cookbook.git'

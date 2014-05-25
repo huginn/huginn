@@ -76,6 +76,9 @@ gem 'therubyracer', '~> 0.12.1'
 group :development do
   gem 'binding_of_caller'
   gem 'better_errors'
+  # Chef
+  gem 'knife-solo', require: false
+  gem 'librarian-chef', require: false
 end
 
 group :development, :test do

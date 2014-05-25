@@ -20,6 +20,20 @@ SITE
       yum (~> 3.0)
 
 GIT
+  remote: git://github.com/fnichol/chef-rbenv
+  ref: master
+  sha: 0a3018634bafe58ad21c6ee271af015220e444b9
+  specs:
+    rbenv (0.7.3)
+
+GIT
+  remote: git://github.com/fnichol/chef-ruby_build
+  ref: master
+  sha: 4d3361995a6953076951693eff1b326ab499fe1e
+  specs:
+    ruby_build (0.8.1)
+
+GIT
   remote: git://github.com/mdxp/nodejs-cookbook.git
   ref: master
   sha: e2415cd8c4e03dccf21d7ef6ca31e1c5c81467ca
@@ -62,10 +76,20 @@ GIT
       runit (~> 1.2)
       yum-epel (~> 0.3)
 
+GIT
+  remote: git://github.com/opscode-cookbooks/sudo.git
+  ref: master
+  sha: 8bbdff7302f7a86e18d1a3f029813c665b53b322
+  specs:
+    sudo (2.6.1)
+
 DEPENDENCIES
   git (>= 0)
   mysql (>= 0)
   nginx (>= 0)
   nodejs (>= 0)
+  rbenv (>= 0)
+  ruby_build (>= 0)
   runit (>= 0)
+  sudo (>= 0)
 
