@@ -5,7 +5,7 @@ module Agents
     cannot_create_events!
 
     DEFAULT_WEBHOOK = 'incoming-webhook'
-
+    DEFAULT_USERNAME = 'Huginn'
     description <<-MD
       The SlackAgent lets you receive events and send notifications to [slack](https://slack.com/).
 
@@ -28,7 +28,7 @@ module Agents
         'team_name' => 'your_team_name',
         'auth_token' => 'your_auth_token',
         'channel' => '#general',
-        'username' => "Huginn",
+        'username' => DEFAULT_USERNAME,
         'message' => "Hey there, It's Huginn",
         'webhook' => DEFAULT_WEBHOOK
       }
@@ -45,11 +45,15 @@ module Agents
     end
 
     def webhook
-      options[:webhook].present? ? options[:webhook] : DEFAULT_WEBHOOK
+      options[:webhook].presence || DEFAULT_WEBHOOK
+    end
+
+    def username
+      options[:username].presence || DEFAULT_USERNAME
     end
 
     def slack_notifier
-      @slack_notifier ||= Slack::Notifier.new(options[:team_name], options[:auth_token], webhook)
+      @slack_notifier ||= Slack::Notifier.new(options[:team_name], options[:auth_token], webhook, username: username)
     end
 
     def receive(incoming_events)
