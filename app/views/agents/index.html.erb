@@ -19,41 +19,41 @@
           </tr>
 
           <% @agents.each do |agent| %>
-            <tr class='<%= "agent-disabled" if agent.disabled? %>'>
-              <td>
+            <tr>
+              <td class='<%= "agent-disabled" if agent.disabled? %>'>
                 <%= link_to agent.name, agent_path(agent) %>
                 <br/>
                 <span class='text-muted'><%= agent.short_type.titleize %></span>
               </td>
-              <td>
+              <td class='<%= "agent-disabled" if agent.disabled? %>'>
                 <% if agent.can_be_scheduled? %>
                   <%= agent.schedule.to_s.humanize.titleize %>
                 <% else %>
                   <span class='not-applicable'></span>
                 <% end %>
               </td>
-              <td>
+              <td class='<%= "agent-disabled" if agent.disabled? %>'>
                 <% if agent.can_be_scheduled? %>
                   <%= agent.last_check_at ? time_ago_in_words(agent.last_check_at) + " ago" : "never" %>
                 <% else %>
                   <span class='not-applicable'></span>
                 <% end %>
               </td>
-              <td>
+              <td class='<%= "agent-disabled" if agent.disabled? %>'>
                 <% if agent.can_create_events? %>
                   <%= agent.last_event_at ? time_ago_in_words(agent.last_event_at) + " ago" : "never" %>
                 <% else %>
                   <span class='not-applicable'></span>
                 <% end %>
               </td>
-              <td>
+              <td class='<%= "agent-disabled" if agent.disabled? %>'>
                 <% if agent.can_receive_events? %>
                   <%= agent.last_receive_at ? time_ago_in_words(agent.last_receive_at) + " ago" : "never" %>
                 <% else %>
                   <span class='not-applicable'></span>
                 <% end %>
               </td>
-              <td>
+              <td class='<%= "agent-disabled" if agent.disabled? %>'>
                 <% if agent.can_create_events? %>
                   <%= link_to(agent.events_count || 0, events_path(:agent => agent.to_param)) %>
                 <% else %>
