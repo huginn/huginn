@@ -62,15 +62,11 @@
               </td>
               <td><%= working(agent) %></td>
               <td>
-                <div class="btn-group btn-group-xs">
-                  <%= link_to 'Show', agent_path(agent), class: "btn btn-default" %>
-                  <%= link_to 'Edit', edit_agent_path(agent), class: "btn btn-default" %>
-                  <%= link_to 'Delete', agent_path(agent), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default" %>
-                  <% if agent.can_be_scheduled? && !agent.disabled? %>
-                    <%= link_to 'Run', run_agent_path(agent, :return => "index"), method: :post, class: "btn btn-default" %>
-                  <% else %>
-                    <%= link_to 'Run', "#", class: "btn btn-default disabled" %>
-                  <% end %>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
+                  </button>
+                  <%= render 'action_menu', :agent => agent, :returnTo => "index" %>
                 </div>
               </td>
             </tr>
