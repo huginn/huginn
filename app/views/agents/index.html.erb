@@ -21,7 +21,7 @@
           <% @agents.each do |agent| %>
             <tr class='<%= "agent-disabled" if agent.disabled? %>'>
               <td>
-                <%= agent.name %>
+                <%= link_to agent.name, agent_path(agent) %>
                 <br/>
                 <span class='text-muted'><%= agent.short_type.titleize %></span>
               </td>
