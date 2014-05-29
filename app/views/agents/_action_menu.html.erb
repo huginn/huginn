@@ -9,11 +9,11 @@
     <%= link_to '<span class="glyphicon glyphicon-eye-open"></span> Show'.html_safe, agent_path(agent) %>
   </li>
 
-  <li>
-    <%= link_to '<span class="glyphicon glyphicon-pencil"></span> Edit'.html_safe, edit_agent_path(agent) %>
-  </li>
-
   <li class="divider"></li>
+
+  <li>
+    <%= link_to '<span class="glyphicon glyphicon-pencil"></span> Edit agent'.html_safe, edit_agent_path(agent) %>
+  </li>
 
   <li>
     <%= link_to '<span class="glyphicon glyphicon-plus"></span> Clone agent'.html_safe, new_agent_path(id: agent), :tabindex => "-1" %>
