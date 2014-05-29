@@ -2,6 +2,8 @@
   <div class='row'>
     <div class='col-md-2'>
         <ul class="nav nav-pills nav-stacked" id="show-tabs">
+          <li><%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, agents_path %></li>
+
           <% if agent_show_view(@agent).present? %>
             <li class='active'><a href="#summary" data-toggle="tab"><span class='glyphicon glyphicon-picture'></span> Summary</a></li>
             <li><a href="#details" data-toggle="tab"><span class='glyphicon glyphicon-indent-left'></span> Details</a></li>
@@ -9,31 +11,32 @@
             <li class='disabled'><a><span class='glyphicon glyphicon-picture'></span> Summary</a></li>
             <li class='active'><a href="#details" data-toggle="tab"><span class='glyphicon glyphicon-indent-left'></span> Details</a></li>
           <% end %>
+
           <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><span class='glyphicon glyphicon-list-alt'></span> Logs</a></li>
 
           <% if @agent.can_create_events? && @agent.events.count > 0 %>
             <li><%= link_to '<span class="glyphicon glyphicon-random"></span> Events'.html_safe, events_path(:agent => @agent.to_param) %></li>
+          <% else %>
+            <li class='disabled'><a><span class='glyphicon glyphicon-random'></span> Events</a></li>
           <% end %>
-          <li><%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, agents_path %></li>
-          <li><%= link_to '<span class="glyphicon glyphicon-pencil"></span> Edit'.html_safe, edit_agent_path(@agent) %></li>
 
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Actions <b class="caret"></b></a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
               <% if @agent.can_be_scheduled? %>
                 <li>
-                  <%= link_to '<span class="glyphicon glyphicon-refresh"></span> Run'.html_safe, run_agent_path(@agent, :return => "show"), method: :post, :tabindex => "-1" %>
-                </li>
-              <% end %>
-
-              <% if @agent.can_create_events? && @agent.events.count > 0 %>
-                <li>
-                  <%= link_to '<span class="glyphicon glyphicon-trash"></span> Delete all events'.html_safe, remove_events_agent_path(@agent), method: :delete, data: {confirm: 'Are you sure you want to delete ALL events for this Agent?'}, :tabindex => "-1" %>
+                  <%= link_to '<span class="color-success glyphicon glyphicon-refresh"></span> Run'.html_safe, run_agent_path(@agent, :return => "show"), method: :post, :tabindex => "-1" %>
                 </li>
               <% end %>
 
               <li>
-                <%= link_to '<span class="glyphicon glyphicon-plus"></span> Clone'.html_safe, new_agent_path(id: @agent), :tabindex => "-1" %>
+                <%= link_to '<span class="glyphicon glyphicon-pencil"></span> Edit'.html_safe, edit_agent_path(@agent) %>
+              </li>
+
+              <li class="divider"></li>
+
+              <li>
+                <%= link_to '<span class="glyphicon glyphicon-plus"></span> Clone agent'.html_safe, new_agent_path(id: @agent), :tabindex => "-1" %>
               </li>
 
               <li>
@@ -44,8 +47,16 @@
                 <% end %>
               </li>
 
+              <li class="divider"></li>
+
+              <% if @agent.can_create_events? && @agent.events.count > 0 %>
+                <li>
+                  <%= link_to '<span class="color-danger glyphicon glyphicon-trash"></span> Delete all events'.html_safe, remove_events_agent_path(@agent), method: :delete, data: {confirm: 'Are you sure you want to delete ALL events for this Agent?'}, :tabindex => "-1" %>
+                </li>
+              <% end %>
+
               <li>
-                <%= link_to '<span class="glyphicon glyphicon-remove"></span> Delete'.html_safe, agent_path(@agent), method: :delete, data: { confirm: 'Are you sure?' }, :tabindex => "-1" %>
+                <%= link_to '<span class="color-danger glyphicon glyphicon-remove"></span> Delete agent'.html_safe, agent_path(@agent), method: :delete, data: { confirm: 'Are you sure?' }, :tabindex => "-1" %>
               </li>
             </ul>
           </li>
