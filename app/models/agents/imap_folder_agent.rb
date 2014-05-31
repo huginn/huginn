@@ -372,7 +372,7 @@ module Agents
           imap = new(host, port, ssl)
           yield imap
         ensure
-          imap.disconnect
+          imap.disconnect unless imap.nil?
         end
       end
 
