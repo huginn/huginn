@@ -31,11 +31,11 @@
 
   <% if agent.can_create_events? && agent.events.count > 0 %>
     <li>
-      <%= link_to '<span class="color-danger glyphicon glyphicon-trash"></span> Delete all events'.html_safe, remove_events_agent_path(agent), method: :delete, data: {confirm: 'Are you sure you want to delete ALL emitted events for this Agent?'}, :tabindex => "-1" %>
+      <%= link_to '<span class="color-danger glyphicon glyphicon-trash"></span> Delete all events'.html_safe, remove_events_agent_path(agent, :return => returnTo), method: :delete, data: {confirm: 'Are you sure you want to delete ALL emitted events for this Agent?'}, :tabindex => "-1" %>
     </li>
   <% end %>
 
   <li>
-    <%= link_to '<span class="color-danger glyphicon glyphicon-remove"></span> Delete agent'.html_safe, agent_path(agent), method: :delete, data: { confirm: 'Are you sure that you want to permanently delete this Agent?' }, :tabindex => "-1" %>
+    <%= link_to '<span class="color-danger glyphicon glyphicon-remove"></span> Delete agent'.html_safe, agent_path(agent, :return => returnTo), method: :delete, data: { confirm: 'Are you sure that you want to permanently delete this Agent?' }, :tabindex => "-1" %>
   </li>
 </ul>
