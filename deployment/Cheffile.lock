@@ -1,19 +1,19 @@
 SITE
   remote: http://community.opscode.com/api/v1
   specs:
-    apt (2.3.8)
+    apt (2.4.0)
     bluepill (2.3.1)
       rsyslog (>= 0.0.0)
-    build-essential (2.0.0)
+    build-essential (2.0.2)
     chef_handler (1.1.6)
     dmg (2.2.0)
-    ohai (1.1.12)
+    ohai (2.0.0)
     rsyslog (1.12.2)
     runit (1.5.10)
       build-essential (>= 0.0.0)
       yum (~> 3.0)
       yum-epel (>= 0.0.0)
-    windows (1.30.2)
+    windows (1.31.0)
       chef_handler (>= 0.0.0)
     yum (3.2.0)
     yum-epel (0.3.6)
@@ -32,9 +32,9 @@ GIT
 GIT
   remote: git://github.com/opscode-cookbooks/git.git
   ref: master
-  sha: 76b0f9bb08fdd9e2e201fd70b72298097accdf96
+  sha: b1bca76aaf3a3a2131744f17f6e5087e22fa3c40
   specs:
-    git (4.0.1)
+    git (4.0.3)
       build-essential (>= 0.0.0)
       dmg (>= 0.0.0)
       runit (>= 1.0)
@@ -45,20 +45,20 @@ GIT
 GIT
   remote: git://github.com/opscode-cookbooks/mysql.git
   ref: master
-  sha: a2ff53f0ca6deca75aebf6da55ac381194ec7728
+  sha: 4b70e99730ab4a7ce6c1dd7a35654a764fb6e0fe
   specs:
-    mysql (5.1.9)
+    mysql (5.2.13)
 
 GIT
   remote: git://github.com/opscode-cookbooks/nginx.git
   ref: master
-  sha: 05b3a613f53a0b05c96f9206c5d67aa420f337fb
+  sha: 45588ee2a5c7144a0ef2a5992e7f273542236d27
   specs:
-    nginx (2.6.3)
+    nginx (2.7.3)
       apt (~> 2.2)
       bluepill (~> 2.3)
       build-essential (~> 2.0)
-      ohai (~> 1.1)
+      ohai (~> 2.0)
       runit (~> 1.2)
       yum-epel (~> 0.3)
 
