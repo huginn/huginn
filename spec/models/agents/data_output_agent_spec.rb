@@ -1,8 +1,11 @@
 # encoding: utf-8
 
 require 'spec_helper'
+require 'models/concerns/liquid_interpolatable'
 
 describe Agents::DataOutputAgent do
+  it_behaves_like LiquidInterpolatable
+
   let(:agent) do
     _agent = Agents::DataOutputAgent.new(:name => 'My Data Output Agent')
     _agent.options = _agent.default_options.merge('secrets' => ['secret1', 'secret2'], 'events_to_show' => 2)

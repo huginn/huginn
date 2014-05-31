@@ -6,13 +6,13 @@ describe Agents::EventFormattingAgent do
         :name => "somename",
         :options => {
             :instructions => {
-                :message => "Received <$.content.text.*> from <$.content.name> .",
-                :subject => "Weather looks like <$.conditions> according to the forecast at <$.pretty_date.time>"
+                :message => "Received {{content.text}} from {{content.name}} .",
+                :subject => "Weather looks like {{conditions}} according to the forecast at {{pretty_date.time}}"
             },
             :mode => "clean",
             :matchers => [
                 {
-                    :path => "$.date.pretty",
+                    :path => "{{date.pretty}}",
                     :regexp => "\\A(?<time>\\d\\d:\\d\\d [AP]M [A-Z]+)",
                     :to => "pretty_date",
                 },
@@ -82,7 +82,7 @@ describe Agents::EventFormattingAgent do
     it "should allow escaping" do
       @event.payload[:content][:name] = "escape this!?"
       @event.save!
-      @checker.options[:instructions][:message] = "Escaped: <escape $.content.name>\nNot escaped: <$.content.name>"
+      @checker.options[:instructions][:message] = "Escaped: {{content.name | uri_escape}}\nNot escaped: {{content.name}}"
       @checker.save!
       @checker.receive([@event])
       Event.last.payload[:message].should == "Escaped: escape+this%21%3F\nNot escaped: escape this!?"

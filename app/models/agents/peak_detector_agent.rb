@@ -2,10 +2,12 @@ require 'pp'
 
 module Agents
   class PeakDetectorAgent < Agent
+    include LiquidInterpolatable
+
     cannot_be_scheduled!
 
     description <<-MD
-      Use a PeakDetectorAgent to watch for peaks in an event stream.  When a peak is detected, the resulting Event will have a payload message of `message`.  You can include extractions in the message, for example: `I saw a bar of: <foo.bar>`
+      Use a PeakDetectorAgent to watch for peaks in an event stream.  When a peak is detected, the resulting Event will have a payload message of `message`.  You can include extractions in the message, for example: `I saw a bar of: {{foo.bar}}`, have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
       The `value_path` value is a [JSONPaths](http://goessner.net/articles/JsonPath/) to the value of interest.  `group_by_path` is a hash path that will be used to group values, if present.
 
@@ -67,7 +69,7 @@ module Agents
         if newest_value > average_value + std_multiple * standard_deviation
           memory['peaks'][group] << newest_time
           memory['peaks'][group].reject! { |p| p <= newest_time - window_duration }
-          create_event :payload => { 'message' => options['message'], 'peak' => newest_value, 'peak_time' => newest_time, 'grouped_by' => group.to_s }
+          create_event :payload => { 'message' => interpolate_string(options['message'], event.payload), 'peak' => newest_value, 'peak_time' => newest_time, 'grouped_by' => group.to_s }
         end
       end
     end

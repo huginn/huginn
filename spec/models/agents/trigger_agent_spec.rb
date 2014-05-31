@@ -1,6 +1,9 @@
 require 'spec_helper'
+require 'models/concerns/liquid_interpolatable'
 
 describe Agents::TriggerAgent do
+  it_behaves_like LiquidInterpolatable
+
   before do
     @valid_params = {
       'name' => "my trigger agent",
@@ -11,7 +14,7 @@ describe Agents::TriggerAgent do
                       'value' => "a\\db",
                       'path' => "foo.bar.baz",
                     }],
-        'message' => "I saw '<foo.bar.baz>' from <name>"
+        'message' => "I saw '{{foo.bar.baz}}' from {{name}}"
       }
     }
 

@@ -1,6 +1,9 @@
 require 'spec_helper'
+require 'models/concerns/liquid_interpolatable'
 
 describe Agents::JabberAgent do
+  it_behaves_like LiquidInterpolatable
+
   let(:sent) { [] }
   let(:config) {
     {
@@ -9,7 +12,7 @@ describe Agents::JabberAgent do
       jabber_sender: 'foo@localhost',
       jabber_receiver: 'bar@localhost',
       jabber_password: 'password',
-      message: 'Warning! <$.title> - <$.url>',
+      message: 'Warning! {{title}} - {{url}}',
       expected_receive_period_in_days: '2'
     }
   }

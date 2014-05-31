@@ -9,7 +9,7 @@ describe Agents::TwitterPublishAgent do
       :consumer_secret => "---",
       :oauth_token => "---",
       :oauth_token_secret => "---",
-      :message_path => "text"
+      :message => "{{text}}"
     }
 
     @checker = Agents::TwitterPublishAgent.new(:name => "HuginnBot", :options => @opts)

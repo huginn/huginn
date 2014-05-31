@@ -1,14 +1,14 @@
 require 'spec_helper'
-require 'models/concerns/json_path_options_overwritable'
+require 'models/concerns/liquid_interpolatable'
 
 describe Agents::PushbulletAgent do
-  it_behaves_like JsonPathOptionsOverwritable
+  it_behaves_like LiquidInterpolatable
 
   before(:each) do
     @valid_params = {
                       'api_key' => 'token',
                       'device_id' => '124',
-                      'body_path' => '$.body',
+                      'body' => '{{body}}',
                       'title' => 'hello from huginn'
                     }
 
@@ -39,23 +39,18 @@ describe Agents::PushbulletAgent do
   end
 
   describe "helpers" do
-    it "it should return the correct basic_options" do
-      @checker.send(:basic_options).should == {:basic_auth => {:username =>@checker.options[:api_key], :password=>''},
-                                               :body => {:device_iden => @checker.options[:device_id], :type => 'note'}}
-    end
-
-
     it "should return the query_options" do
-      @checker.send(:query_options, @event).should == @checker.send(:basic_options).deep_merge({
-        :body => {:title => 'hello from huginn', :body => 'One two test'}
-      })
+      @checker.send(:query_options, @event).should == {
+        :body => {:title => 'hello from huginn', :body => 'One two test', :device_iden => @checker.options[:device_id], :type => 'note'},
+        :basic_auth => {:username =>@checker.options[:api_key], :password=>''}
+      }
     end
   end
 
   describe "#receive" do
     it "send a message to the hipchat" do
       stub_request(:post, "https://token:@api.pushbullet.com/api/pushes").
-        with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
+        with(:body => "device_iden=124&title=hello%20from%20huginn&body=One%20two%20test&type=note").
         to_return(:status => 200, :body => "ok", :headers => {})
       dont_allow(@checker).error
       @checker.receive([@event])
@@ -63,7 +58,7 @@ describe Agents::PushbulletAgent do
 
     it "should log resquests which return an error" do
       stub_request(:post, "https://token:@api.pushbullet.com/api/pushes").
-        with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
+        with(:body => "device_iden=124&title=hello%20from%20huginn&body=One%20two%20test&type=note").
         to_return(:status => 200, :body => "error", :headers => {})
       mock(@checker).error("error")
       @checker.receive([@event])

@@ -1,6 +1,10 @@
 require 'spec_helper'
+require 'models/concerns/liquid_interpolatable'
+
 
 describe Agents::TranslationAgent do
+    it_behaves_like LiquidInterpolatable
+
     before do
         @valid_params = {
             :name    => "somename",
@@ -10,8 +14,8 @@ describe Agents::TranslationAgent do
                 :to            => "fi",
                 :expected_receive_period_in_days => 1,
                 :content       => {
-                    :text => "$.message",
-                    :content => "$.xyz"
+                    :text => "{{message}}",
+                    :content => "{{xyz}}"
                 }
             }
         }
