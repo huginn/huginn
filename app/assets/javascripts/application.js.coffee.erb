@@ -130,7 +130,7 @@ $(document).ready ->
 
   if tab = window.location.href.match(/tab=(\w+)\b/i)?[1]
     if tab in ["details", "logs"]
-      $(".agent-show .nav-tabs li a[href='##{tab}']").click()
+      $(".agent-show .nav-pills li a[href='##{tab}']").click()
 
   # Editing Agents
   $("#agent_source_ids").on "change", showEventDescriptions
