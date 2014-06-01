@@ -2,10 +2,7 @@ module TwitterConcern
   extend ActiveSupport::Concern
 
   included do
-    validate :twitter_consumer_key, :presence => true
-    validate :twitter_consumer_secret, :presence => true
-    validate :twitter_oauth_token, :presence => true
-    validate :twitter_oauth_token_secret, :presence => true
+    validate :credential_presence
     validate :valid_credentials
   end
 
@@ -34,10 +31,26 @@ module TwitterConcern
     end
   end
 
+
   private
+    def credential_presence
+      if twitter_consumer_key.nil?
+        errors.add(:base, "Consumer Key cannot be blank")
+      end
+      if twitter_consumer_secret.nil?
+        errors.add(:base, "Consumer secret cannot be blank")
+      end
+      if twitter_oauth_token.nil?
+        errors.add(:base, "Oauth token cannot be blank")
+      end
+      if twitter_oauth_token_secret.nil?
+        errors.add(:base, "Oauth secret cannot be blank")
+      end
+    end
+    
     def valid_credentials
       twitter.verify_credentials.present?
-    rescue Twitter::Error::Unauthorized
+    rescue Twitter::Error
       errors.add(:base, "Twitter credentials are invalid, a connection could not be established")
       false
     end
