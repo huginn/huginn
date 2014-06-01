@@ -20,14 +20,16 @@
 
         <% @scenarios.each do |scenario| %>
           <tr>
-            <td><span class='label label-info'><%= scenario.name %></span></td>
+            <td>
+              <%= link_to(scenario.name, scenario, class: "label label-info") %>
+            </td>
             <td><%= link_to pluralize(scenario.agents.count, "agent"), scenario %></td>
             <td>
               <div class="btn-group btn-group-xs" style="float: right">
                 <%= link_to 'Show', scenario, class: "btn btn-default" %>
                 <%= link_to 'Edit', edit_scenario_path(scenario), class: "btn btn-default" %>
                 <%= link_to 'Share', share_scenario_path(scenario), class: "btn btn-default" %>
-                <%= link_to 'Delete', scenario_path(scenario), method: :delete, data: {confirm: 'Are you sure?'}, class: "btn btn-default" %>
+                <%= link_to 'Delete', scenario_path(scenario), method: :delete, data: { confirm: "This will remove the '#{scenario.name}' Scenerio from all Agents and delete it.  Are you sure?" }, class: "btn btn-default" %>
               </div>
             </td>
           </tr>

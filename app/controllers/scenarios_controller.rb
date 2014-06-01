@@ -1,4 +1,6 @@
 class ScenariosController < ApplicationController
+  skip_before_filter :authenticate_user!, :only => :export
+
   def index
     @scenarios = current_user.scenarios.page(params[:page])
 
@@ -27,15 +29,26 @@ class ScenariosController < ApplicationController
     end
   end
 
-  # Share is a work in progress!
   def share
     @scenario = current_user.scenarios.find(params[:id])
-    @agents = @scenario.agents.preload(:scenarios).page(params[:page])
 
     respond_to do |format|
       format.html
       format.json { render json: @scenario }
     end
+  end
+
+  def export
+    @scenario = Scenario.find(params[:id])
+    raise ActiveRecord::RecordNotFound unless @scenario.public? || (current_user && current_user.id == @scenario.user_id)
+
+    @exporter = AgentsExporter.new(:name => @scenario.name,
+                                   :description => @scenario.description,
+                                   :guid => @scenario.guid,
+                                   :source_url => @scenario.public? && export_scenario_url(@scenario),
+                                   :agents => @scenario.agents)
+    response.headers['Content-Disposition'] = 'attachment; filename="' + @exporter.filename + '"'
+    render :json => JSON.pretty_generate(@exporter.as_json)
   end
 
   def edit

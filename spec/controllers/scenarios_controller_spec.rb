@@ -32,6 +32,59 @@ describe ScenariosController do
     end
   end
 
+  describe "GET share" do
+    it "only displays Scenario share information for the current user" do
+      get :share, :id => scenarios(:bob_weather).to_param
+      assigns(:scenario).should eq(scenarios(:bob_weather))
+
+      lambda {
+        get :share, :id => scenarios(:jane_weather).to_param
+      }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe "GET export" do
+    it "returns a JSON file download from an instantiated AgentsExporter" do
+      get :export, :id => scenarios(:bob_weather).to_param
+      assigns(:exporter).options[:name].should == scenarios(:bob_weather).name
+      assigns(:exporter).options[:description].should == scenarios(:bob_weather).description
+      assigns(:exporter).options[:agents].should == scenarios(:bob_weather).agents
+      assigns(:exporter).options[:guid].should == scenarios(:bob_weather).guid
+      assigns(:exporter).options[:source_url].should be_false
+      response.headers['Content-Disposition'].should == 'attachment; filename="bob-s-weather-alert-scenario.json"'
+      response.headers['Content-Type'].should == 'application/json; charset=utf-8'
+      JSON.parse(response.body)["name"].should == scenarios(:bob_weather).name
+    end
+
+    it "only exports private Scenarios for the current user" do
+      get :export, :id => scenarios(:bob_weather).to_param
+      assigns(:scenario).should eq(scenarios(:bob_weather))
+
+      lambda {
+        get :export, :id => scenarios(:jane_weather).to_param
+      }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    describe "public exports" do
+      before do
+        scenarios(:jane_weather).update_attribute :public, true
+      end
+
+      it "exports public scenarios for other users when logged in" do
+        get :export, :id => scenarios(:jane_weather).to_param
+        assigns(:scenario).should eq(scenarios(:jane_weather))
+        assigns(:exporter).options[:source_url].should == export_scenario_url(scenarios(:jane_weather))
+      end
+
+      it "exports public scenarios for other users when logged out" do
+        sign_out :user
+        get :export, :id => scenarios(:jane_weather).to_param
+        assigns(:scenario).should eq(scenarios(:jane_weather))
+        assigns(:exporter).options[:source_url].should == export_scenario_url(scenarios(:jane_weather))
+      end
+    end
+  end
+
   describe "GET edit" do
     it "only shows Scenarios for the current user" do
       get :edit, :id => scenarios(:bob_weather).to_param
@@ -67,9 +120,10 @@ describe ScenariosController do
 
   describe "PUT update" do
     it "updates attributes on Scenarios for the current user" do
-      post :update, :id => scenarios(:bob_weather).to_param, :scenario => { :name => "new_name" }
+      post :update, :id => scenarios(:bob_weather).to_param, :scenario => { :name => "new_name", :public => "1" }
       response.should redirect_to(scenario_path(scenarios(:bob_weather)))
       scenarios(:bob_weather).reload.name.should == "new_name"
+      scenarios(:bob_weather).should be_public
 
       lambda {
         post :update, :id => scenarios(:jane_weather).to_param, :scenario => { :name => "new_name" }

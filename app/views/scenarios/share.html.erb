@@ -5,6 +5,22 @@
         <h2>Share <span class='label label-info scenario'><%= @scenario.name %></span> with the world</h2>
       </div>
 
+      <p>
+        <strong>Please be sure that none of the Agents in this Scenario have sensitive data in their settings before sharing!</strong>
+      </p>
+
+      <% if @scenario.public? %>
+        <p>
+          This Scenario is public.  You can <%= link_to "download and share your export file", export_scenario_path(@scenario) %>, or give out this URL:
+        </p>
+
+        <form onsubmit='return false;'>
+          <input type='text' class='form-control' value='<%= export_scenario_url(@scenario) %>' onclick="return this.select();"/>
+        </form>
+      <% else %>
+        This Scenario is not public.  You can share it by <%= link_to "downloading and sharing your export file", export_scenario_path(@scenario) %>.
+      <% end %>
+
       <hr>
 
       <div class="row">

@@ -26,6 +26,17 @@ describe Scenario do
     end
   end
 
+  describe "guid" do
+    it "gets created before_save, but only if it's not present" do
+      scenario = users(:bob).scenarios.new(:name => "some scenario")
+      scenario.guid.should be_nil
+      scenario.save!
+      scenario.guid.should_not be_nil
+
+      lambda { scenario.save! }.should_not change { scenario.reload.guid }
+    end
+  end
+
   describe "counters" do
     before do
       @scenario = users(:bob).scenarios.new(:name => "some scenario")

@@ -29,6 +29,7 @@ Huginn::Application.routes.draw do
   resources :scenarios do
     member do
       get :share
+      get :export
     end
   end
 

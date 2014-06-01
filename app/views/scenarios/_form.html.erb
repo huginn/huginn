@@ -12,8 +12,25 @@
     <div class="col-md-4">
       <div class="form-group">
         <%= f.label :name %>
-        <%= f.text_field :name, :class => 'form-control' %>
+        <%= f.text_field :name, :class => 'form-control', :placeholder => "Name your Scenario" %>
       </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="form-group">
+        <%= f.label :description, "Optional Description" %>
+        <%= f.text_area :description, :rows => 10, :class => 'form-control', :placeholder => "Optionally describe what this set of Agents will do" %>
+      </div>
+
+      <div class="checkbox">
+        <%= f.label :public do %>
+          <%= f.check_box :public %> Share this Scenario publicly
+        <% end %>
+        <span class="glyphicon glyphicon-question-sign hover-help" data-content="When selected, this Scenario and all Agents in it will be made public.  An export URL will be available to share with other Huginn users.  Be very careful that you do not have secret credentials stored in these Agents' options.  Instead, use Credentials by reference."></span>
+      </div>
+
     </div>
   </div>
 

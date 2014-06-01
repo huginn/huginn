@@ -2,20 +2,19 @@
   <div class='row'>
     <div class='col-md-12'>
       <div class="page-header">
-        <h2>Scenario <span class='label label-info scenario'><%= @scenario.name %></span></h2>
+        <h2><%= "Public" if @scenario.public? %> Scenario <span class='label label-info scenario'><%= @scenario.name %></span></h2>
       </div>
+
+      <%= render 'agents/table', :returnTo => scenario_path(@scenario) %>
+
+      <br/>
 
       <div class="btn-group">
         <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, scenarios_path, class: "btn btn-default" %>
         <%= link_to '<span class="glyphicon glyphicon-edit"></span> Edit'.html_safe, edit_scenario_path(@scenario), class: "btn btn-default" %>
         <%= link_to '<span class="glyphicon glyphicon-share-alt"></span> Share'.html_safe, share_scenario_path(@scenario), class: "btn btn-default" %>
+        <%= link_to '<span class="glyphicon glyphicon-trash"></span> Delete'.html_safe, scenario_path(@scenario), method: :delete, data: { confirm: "This will remove the '#{@scenario.name}' Scenerio from all Agents and delete it.  Are you sure?" }, class: "btn btn-default" %>
       </div>
-
-      <div class="page-header">
-        <h3>Agents</h3>
-      </div>
-
-      <%= render 'agents/table', :returnTo => scenario_path(@scenario) %>
     </div>
   </div>
 </div>
