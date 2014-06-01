@@ -207,6 +207,12 @@ describe AgentsController do
       assigns(:agent).should have(1).errors_on(:sources)
     end
 
+    it "will not accept Scenarios owned by other users" do
+      sign_in users(:bob)
+      post :update, :id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:scenario_ids => [scenarios(:jane_weather).id])
+      assigns(:agent).should have(1).errors_on(:scenarios)
+    end
+
     it "shows errors" do
       sign_in users(:bob)
       post :update, :id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:name => "")
@@ -244,6 +250,22 @@ describe AgentsController do
         post :update, :id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:name => "New name"), :return => "javascript:alert(1)"
         response.should redirect_to(agents_path)
       end
+    end
+  end
+
+  describe "PUT leave_scenario" do
+    it "removes an Agent from the given Scenario for the current user" do
+      sign_in users(:bob)
+
+      agents(:bob_weather_agent).scenarios.should include(scenarios(:bob_weather))
+      put :leave_scenario, :id => agents(:bob_weather_agent).to_param, :scenario_id => scenarios(:bob_weather).to_param
+      agents(:bob_weather_agent).scenarios.should_not include(scenarios(:bob_weather))
+
+      Scenario.where(:id => scenarios(:bob_weather).id).should exist
+
+      lambda {
+        put :leave_scenario, :id => agents(:jane_weather_agent).to_param, :scenario_id => scenarios(:jane_weather).to_param
+      }.should raise_error(ActiveRecord::RecordNotFound)
     end
   end
 

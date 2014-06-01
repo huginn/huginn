@@ -9,7 +9,7 @@ module AgentHelper
   def scenario_links(agent)
     agent.scenarios.map { |scenario|
       link_to(scenario.name, scenario, class: "label label-info")
-    }.to_sentence
+    }.join(" ").html_safe
   end
 
   def agent_show_class(agent)

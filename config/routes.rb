@@ -3,6 +3,7 @@ Huginn::Application.routes.draw do
     member do
       post :run
       post :handle_details_post
+      put :leave_scenario
       delete :remove_events
     end
 

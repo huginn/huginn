@@ -98,7 +98,7 @@ class AgentsController < ApplicationController
   end
 
   def diagram
-    @agents = current_user.agents.includes(:receivers)
+    @agents = ((params[:scenario_id].present? && current_user.scenarios.find(params[:scenario_id])) || current_user).agents.includes(:receivers)
   end
 
   def create
@@ -127,6 +127,17 @@ class AgentsController < ApplicationController
         format.html { render action: "edit" }
         format.json { render json: @agent.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def leave_scenario
+    @agent = current_user.agents.find(params[:id])
+    @scenario = current_user.scenarios.find(params[:scenario_id])
+    @agent.scenarios.destroy(@scenario)
+
+    respond_to do |format|
+      format.html { redirect_back "'#{@agent.name}' removed from '#{@scenario.name}'" }
+      format.json { head :no_content }
     end
   end
 
