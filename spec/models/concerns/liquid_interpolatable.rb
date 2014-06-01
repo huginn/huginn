@@ -49,8 +49,19 @@ shared_examples_for LiquidInterpolatable do
     end
 
     it "should work for strings" do
-      @checker.send(:interpolate_string, "{{variable}}", @event.payload).should == "hello"
-      @checker.send(:interpolate_string, "{{variable}} you", @event.payload).should == "hello you"
+      @checker.interpolate_string("{{variable}}", @event.payload).should == "hello"
+      @checker.interpolate_string("{{variable}} you", @event.payload).should == "hello you"
+    end
+  end
+  describe "liquid tags" do
+    it "should work with existing credentials" do
+      @checker.interpolate_string("{% credential aws_key %}", {}).should == '2222222222-jane'
+    end
+
+    it "should raise an exception for undefined credentials" do
+      expect {
+        @checker.interpolate_string("{% credential unknown %}", {})
+      }.to raise_error
     end
   end
 end

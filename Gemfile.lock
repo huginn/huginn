@@ -245,6 +245,7 @@ GEM
       multi_json
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
+    slack-notifier (0.5.0)
     slop (3.5.0)
     sprockets (2.11.0)
       hike (~> 1.2)
@@ -355,6 +356,7 @@ DEPENDENCIES
   sass-rails (~> 4.0.0)
   select2-rails (~> 3.5.4)
   shoulda-matchers
+  slack-notifier (~> 0.5.0)
   therubyracer (~> 0.12.1)
   twilio-ruby (~> 3.11.5)
   twitter (~> 5.8.0)

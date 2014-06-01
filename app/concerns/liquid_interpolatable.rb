@@ -4,7 +4,7 @@ module LiquidInterpolatable
   def interpolate_options(options, payload)
     case options.class.to_s
     when 'String'
-      Liquid::Template.parse(options).render(payload)
+      interpolate_string(options, payload)
     when 'ActiveSupport::HashWithIndifferentAccess', 'Hash'
       duped_options = options.dup
       duped_options.each do |key, value|
@@ -18,17 +18,32 @@ module LiquidInterpolatable
   end
 
   def interpolate_string(string, payload)
-    Liquid::Template.parse(string).render(payload)
+    Liquid::Template.parse(string).render!(payload, registers: {agent: self})
   end
 
   require 'uri'
   # Percent encoding for URI conforming to RFC 3986.
   # Ref: http://tools.ietf.org/html/rfc3986#page-12
-  module Huginn
+  module Filters
     def uri_escape(string)
       CGI::escape string
     end
   end
+  Liquid::Template.register_filter(LiquidInterpolatable::Filters)
 
-  Liquid::Template.register_filter(LiquidInterpolatable::Huginn)
+  module Tags
+    class Credential < Liquid::Tag
+      def initialize(tag_name, name, tokens)
+        super
+        @credential_name = name.strip
+      end
+
+      def render(context)
+        credential = context.registers[:agent].credential(@credential_name)
+        raise "No user credential named '#{@credential_name}' defined" if credential.nil?
+        credential
+      end
+    end
+  end
+  Liquid::Template.register_tag('credential', LiquidInterpolatable::Tags::Credential)
 end
