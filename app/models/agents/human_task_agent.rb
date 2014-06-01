@@ -2,6 +2,8 @@ require 'rturk'
 
 module Agents
   class HumanTaskAgent < Agent
+    include LiquidInterpolatable
+
     default_schedule "every_10m"
 
     description <<-MD
@@ -16,7 +18,7 @@ module Agents
 
       # Example
 
-      If created with an event, all HIT fields can contain interpolated values via [JSONPaths](http://goessner.net/articles/JsonPath/) placed between < and > characters.
+      If created with an event, all HIT fields can contain interpolated values via [liquid templating](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid).
       For example, if the incoming event was a Twitter event, you could make a HITT to rate its sentiment like this:
 
           {
@@ -25,7 +27,7 @@ module Agents
             "hit": {
               "assignments": 1,
               "title": "Sentiment evaluation",
-              "description": "Please rate the sentiment of this message: '<$.message>'",
+              "description": "Please rate the sentiment of this message: '{{message}}'",
               "reward": 0.05,
               "lifetime_in_seconds": "3600",
               "questions": [
@@ -83,7 +85,7 @@ module Agents
               "title": "Take a poll about some jokes",
               "instructions": "Please rank these jokes from most funny (5) to least funny (1)",
               "assignments": 3,
-              "row_template": "<$.joke>"
+              "row_template": "{{joke}}"
             },
             "hit": {
               "assignments": 5,
@@ -168,7 +170,7 @@ module Agents
           {
             'assignments' => 1,
             'title' => "Sentiment evaluation",
-            'description' => "Please rate the sentiment of this message: '<$.message>'",
+            'description' => "Please rate the sentiment of this message: '{{message}}'",
             'reward' => 0.05,
             'lifetime_in_seconds' => 24 * 60 * 60,
             'questions' =>
@@ -332,7 +334,7 @@ module Agents
                   'name' => "Item #{index + 1}",
                   'key' => index,
                   'required' => "true",
-                  'question' => Utils.interpolate_jsonpaths(options['poll_options']['row_template'], assignments[index].answers),
+                  'question' => interpolate_string(options['poll_options']['row_template'], assignments[index].answers),
                   'selections' => selections
                 }
               end
@@ -387,9 +389,9 @@ module Agents
 
     def create_hit(opts = {})
       payload = opts['payload'] || {}
-      title = Utils.interpolate_jsonpaths(opts['title'], payload).strip
-      description = Utils.interpolate_jsonpaths(opts['description'], payload).strip
-      questions = Utils.recursively_interpolate_jsonpaths(opts['questions'], payload)
+      title = interpolate_string(opts['title'], payload).strip
+      description = interpolate_string(opts['description'], payload).strip
+      questions = interpolate_options(opts['questions'], payload)
       hit = RTurk::Hit.create(:title => title) do |hit|
         hit.max_assignments = (opts['assignments'] || 1).to_i
         hit.description = description

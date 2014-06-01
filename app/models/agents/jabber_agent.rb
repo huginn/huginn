@@ -1,5 +1,7 @@
 module Agents
   class JabberAgent < Agent
+    include LiquidInterpolatable
+
     cannot_be_scheduled!
     cannot_create_events!
 
@@ -10,7 +12,9 @@ module Agents
 
       The `message` is sent from `jabber_sender` to `jaber_receiver`. This message
       can contain any keys found in the source's payload, escaped using double curly braces.
-      ex: `"News Story: <$.title>: <$.url>"`
+      ex: `"News Story: {{title}}: {{url}}"`
+
+      Have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to learn more about liquid templating.
     MD
 
     def default_options
@@ -20,7 +24,7 @@ module Agents
         'jabber_sender'   => 'huginn@localhost',
         'jabber_receiver' => 'muninn@localhost',
         'jabber_password' => '',
-        'message'         => 'It will be <$.temp> out tomorrow',
+        'message'         => 'It will be {{temp}} out tomorrow',
         'expected_receive_period_in_days' => "2"
       }
     end
@@ -58,7 +62,7 @@ module Agents
     end
 
     def body(event)
-      Utils.interpolate_jsonpaths(options['message'], event.payload)
+      interpolate_string(options['message'], event.payload)
     end
   end
 end

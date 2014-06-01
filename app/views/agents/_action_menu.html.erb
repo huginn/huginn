@@ -1,0 +1,41 @@
+<ul class="dropdown-menu" role="menu">
+  <% if agent.can_be_scheduled? %>
+    <li>
+      <%= link_to '<span class="color-success glyphicon glyphicon-refresh"></span> Run'.html_safe, run_agent_path(agent, :return => returnTo), method: :post, :tabindex => "-1" %>
+    </li>
+  <% end %>
+
+  <li>
+    <%= link_to '<span class="glyphicon glyphicon-eye-open"></span> Show'.html_safe, agent_path(agent) %>
+  </li>
+
+  <li class="divider"></li>
+
+  <li>
+    <%= link_to '<span class="glyphicon glyphicon-pencil"></span> Edit agent'.html_safe, edit_agent_path(agent) %>
+  </li>
+
+  <li>
+    <%= link_to '<span class="glyphicon glyphicon-plus"></span> Clone agent'.html_safe, new_agent_path(id: agent), :tabindex => "-1" %>
+  </li>
+
+  <li>
+    <% if agent.disabled? %>
+      <%= link_to '<i class="glyphicon glyphicon-play"></i> Enable agent'.html_safe, agent_path(agent, :agent => { :disabled => false }, :return => returnTo), :method => :put %>
+    <% else %>
+      <%= link_to '<i class="glyphicon glyphicon-pause"></i> Disable agent'.html_safe, agent_path(agent, :agent => { :disabled => true }, :return => returnTo), :method => :put %>
+    <% end %>
+  </li>
+
+  <li class="divider"></li>
+
+  <% if agent.can_create_events? && agent.events.count > 0 %>
+    <li>
+      <%= link_to '<span class="color-danger glyphicon glyphicon-trash"></span> Delete all events'.html_safe, remove_events_agent_path(agent), method: :delete, data: {confirm: 'Are you sure you want to delete ALL events for this Agent?'}, :tabindex => "-1" %>
+    </li>
+  <% end %>
+
+  <li>
+    <%= link_to '<span class="color-danger glyphicon glyphicon-remove"></span> Delete agent'.html_safe, agent_path(agent), method: :delete, data: { confirm: 'Are you sure?' }, :tabindex => "-1" %>
+  </li>
+</ul>

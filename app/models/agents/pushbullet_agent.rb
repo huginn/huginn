@@ -1,6 +1,6 @@
 module Agents
   class PushbulletAgent < Agent
-    include JsonPathOptionsOverwritable
+    include LiquidInterpolatable
 
     cannot_be_scheduled!
     cannot_create_events!
@@ -20,7 +20,7 @@ module Agents
 
       You can provide a `title` and a `body`.
 
-      If you want to specify `title` or `body` per event, you can provide a [JSONPath](http://goessner.net/articles/JsonPath/) for each of them.
+      In every value of the options hash you can use the liquid templating, learn more about it at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid).
     MD
 
     def default_options
@@ -28,9 +28,7 @@ module Agents
         'api_key' => '',
         'device_id' => '',
         'title' => "Hello from Huginn!",
-        'title_path' => '',
-        'body' => '',
-        'body_path' => '',
+        'body' => '{{body}}',
       }
     end
 
@@ -52,16 +50,11 @@ module Agents
 
     private
     def query_options(event)
-      mo = merge_json_path_options event
-      basic_options.deep_merge(:body => {:title => mo[:title], :body => mo[:body]})
-    end
-
-    def basic_options
-      {:basic_auth => {:username =>options[:api_key], :password=>''}, :body => {:device_iden => options[:device_id], :type => 'note'}}
-    end
-
-    def options_with_path
-      [:title, :body]
+      mo = interpolate_options options, event.payload
+      {
+        :basic_auth => {:username =>mo[:api_key], :password=>''},
+        :body => {:device_iden => mo[:device_id], :title => mo[:title], :body => mo[:body], :type => 'note'}
+      }
     end
   end
 end
