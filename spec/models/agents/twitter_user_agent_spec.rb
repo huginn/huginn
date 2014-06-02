@@ -4,10 +4,11 @@ describe Agents::TwitterUserAgent do
   before do
     # intercept the twitter API request for @tectonic's user profile
     stub_request(:any, /tectonic/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
-  
+
     @opts = {
       :username => "tectonic",
       :expected_update_period_in_days => "2",
+      :starting_at => "Jan 01 00:00:01 +0000 2014",
       :consumer_key => "---",
       :consumer_secret => "---",
       :oauth_token => "---",
