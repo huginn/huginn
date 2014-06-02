@@ -69,7 +69,7 @@ unless user.agents.where(:name => "Rain Notifier").exists?
 end
 
 unless user.agents.where(:name => "Morning Digest").exists?
-  Agent.build_for_type("Agents::DigestEmailAgent", user,
+  Agent.build_for_type("Agents::EmailDigestAgent", user,
                        :name => "Morning Digest",
                        :schedule => "6am",
                        :options => { 'subject' => "Your Morning Digest", 'expected_receive_period_in_days' => "30" },
@@ -77,7 +77,7 @@ unless user.agents.where(:name => "Morning Digest").exists?
 end
 
 unless user.agents.where(:name => "Afternoon Digest").exists?
-  Agent.build_for_type("Agents::DigestEmailAgent", user,
+  Agent.build_for_type("Agents::EmailDigestAgent", user,
                        :name => "Afternoon Digest",
                        :schedule => "5pm",
                        :options => { 'subject' => "Your Afternoon Digest", 'expected_receive_period_in_days' => "7" },
