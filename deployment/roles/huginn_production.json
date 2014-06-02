@@ -9,22 +9,48 @@
 "description" : "Huginn Production Environment",
 
 "default_attributes" : {
+  // "authorization": {
+  //   "sudo": {
+  //     // "groups": ["admin", "wheel", "sysadmin"],
+  //     // "users": ["huginn"],
+  //     // "passwordless": "true",
+  //     "include_sudoers_d" : "true"
+  //   }
+  // },
+  "rbenv": {
+    "rubies": ["1.9.3-p547"],
+    "global": "1.9.3-p547",
+    "gems": {
+      "1.9.3-p547": [
+        { "name": "rake" },
+        { "name": "bundler" }
+      ]
+    },
+    "plugins" : [
+      {
+        "name": "rbenv-sudo",
+        "git_url": "https://github.com/dcarley/rbenv-sudo.git"
+      }
+    ]
+  },
   "mysql": {
     "server_root_password": "password",
     "server_repl_password": "",
     "server_debian_password": ""
   },
-    "nginx" : {
-       "init_style" : "upstart"
-    }
+  "nginx" : {
+    "init_style" : "upstart"
+  }
 },
 
 "run_list":[
              "recipe[git]",
-             "recipe[apt]",
+             // "recipe[apt]",
+             "recipe[ruby_build]",
+             "recipe[rbenv::system]",
              "recipe[mysql::server]",
              "recipe[nodejs::install_from_binary]",
              "recipe[nginx]",
-             "recipe[huginn_production]"
+             "recipe[huginn]"
            ]
 }
