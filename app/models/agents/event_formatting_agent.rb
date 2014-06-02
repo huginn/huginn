@@ -74,6 +74,8 @@ module Agents
           {
             "message": "A peak was on Twitter in {{group_by}}.  Search: https://twitter.com/search?q={{group_by | uri_escape}}"
           }
+
+      By default, an event is also emitted, if none of the regular expressions in `matchers` matched. You can change this behavior by setting `require_match` to `true`: In this case, an event will only be emitted, if no match failed.
     MD
 
     event_description "User defined"
@@ -107,6 +109,7 @@ module Agents
       incoming_events.each do |event|
         formatted_event = options['mode'].to_s == "merge" ? event.payload.dup : {}
         payload = perform_matching(event.payload)
+        next if options['require_match'].to_s == "true" and payload.nil?
         formatted_event.merge! interpolate_options(options['instructions'], payload)
         formatted_event['agent'] = Agent.find(event.agent_id).type.slice!(8..-1) unless options['skip_agent'].to_s == "true"
         formatted_event['created_at'] = event.created_at unless options['skip_created_at'].to_s == "true"
@@ -155,31 +158,37 @@ module Agents
     end
 
     def matchers
+      require_match = options['require_match'].to_s == "true"
       @matchers ||=
         if matchers = options['matchers']
           matchers.map { |matcher|
             regexp, path, to = matcher.values_at(*%w[regexp path to])
             re = Regexp.new(regexp)
             proc { |hash|
-              mhash = {}
-              value = interpolate_string(path, hash)
-              if value.is_a?(String) && (m = re.match(value))
-                m.to_a.each_with_index { |s, i|
-                  mhash[i.to_s] = s
-                }
-                m.names.each do |name|
-                  mhash[name] = m[name]
-                end if m.respond_to?(:names)
-              end
-              if to
-                case value = hash[to]
-                when Hash
-                  value.update(mhash)
-                else
-                  hash[to] = mhash
+              unless hash.nil? and require_match
+                mhash = {}
+                value = interpolate_string(path, hash)
+                matched = value.is_a?(String) && (m = re.match(value))
+                if matched
+                  m.to_a.each_with_index { |s, i|
+                    mhash[i.to_s] = s
+                  }
+                  m.names.each do |name|
+                    mhash[name] = m[name]
+                  end if m.respond_to?(:names)
                 end
-              else
-                hash.update(mhash)
+                if not matched and require_match
+                  hash = nil
+                elsif to
+                  case value = hash[to]
+                  when Hash
+                    value.update(mhash)
+                  else
+                    hash[to] = mhash
+                  end
+                else
+                  hash.update(mhash)
+                end
               end
               hash
             }
