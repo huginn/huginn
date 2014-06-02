@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140531232016) do
+ActiveRecord::Schema.define(version: 20140602014917) do
 
   create_table "agent_logs", force: true do |t|
     t.integer  "agent_id",                                       null: false
@@ -97,6 +97,9 @@ ActiveRecord::Schema.define(version: 20140531232016) do
     t.datetime "updated_at"
   end
 
+  add_index "scenario_memberships", ["agent_id"], name: "index_scenario_memberships_on_agent_id", using: :btree
+  add_index "scenario_memberships", ["scenario_id"], name: "index_scenario_memberships_on_scenario_id", using: :btree
+
   create_table "scenarios", force: true do |t|
     t.string   "name",                        null: false
     t.integer  "user_id",                     null: false
@@ -107,6 +110,8 @@ ActiveRecord::Schema.define(version: 20140531232016) do
     t.string   "guid",                        null: false
     t.string   "source_url"
   end
+
+  add_index "scenarios", ["user_id", "guid"], name: "index_scenarios_on_user_id_and_guid", using: :btree
 
   create_table "user_credentials", force: true do |t|
     t.integer  "user_id",                           null: false

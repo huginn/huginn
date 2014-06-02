@@ -28,6 +28,10 @@ Huginn::Application.routes.draw do
   end
 
   resources :scenarios do
+    collection do
+      resource :scenario_imports, :only => [:new, :create]
+    end
+
     member do
       get :share
       get :export

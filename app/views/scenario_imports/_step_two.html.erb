@@ -1,0 +1,51 @@
+<div class="col-md-12">
+  <div class="page-header">
+    <h2><%= @scenario_import.parsed_data["name"] %> (exported <%= time_ago_in_words Time.parse(@scenario_import.parsed_data["exported_at"]) %> ago)</h2>
+  </div>
+
+  <% if @scenario_import.parsed_data["description"].present? %>
+    <blockquote><%= @scenario_import.parsed_data["description"] %></blockquote>
+  <% end %>
+
+  <p>
+    This import contains <%= pluralize @scenario_import.parsed_data["agents"].length, "Agent" %>:
+  </p>
+
+  <ul class='agent-import-list'>
+    <% @scenario_import.parsed_data["agents"].each do |agent_data| %>
+      <li>
+        <%= link_to agent_data['name'], '#', :class => 'options-toggle' %>
+        <span class='text-muted'>
+          (<%= agent_data["type"].split("::").pop.titleize %>)
+        </span>
+        <pre class='options' style='display: none;'><%= Utils.pretty_jsonify agent_data["options"] || {} %></pre>
+      </li>
+    <% end %>
+  </ul>
+
+  <script>
+    $(function() {
+      $('.agent-import-list .options-toggle').on('click', function(e) {
+        e.preventDefault();
+        $(this).siblings('.options').fadeToggle();
+      });
+    });
+  </script>
+
+  <% if @scenario_import.existing_scenario.present? %>
+    <strong>
+      This Scenario already exists on your Huginn.
+      If you continue, the import will overwrite your existing <span class='label label-info scenario'><%= @scenario_import.existing_scenario.name %></span> Scenario.
+    </strong>
+  <% end %>
+
+  <div class="checkbox">
+    <%= f.label :do_import do %>
+      <%= f.check_box :do_import %> I confirm that I want to import these Agents.
+    <% end %>
+  </div>
+
+  <div class='form-actions'>
+    <%= f.submit "Finish Import", :class => "btn btn-primary" %>
+  </div>
+</div>
