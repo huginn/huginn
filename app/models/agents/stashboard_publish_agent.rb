@@ -27,7 +27,7 @@ module Agents
         'service' => "",
         'status' => "",
         'message' => "{{message}}",
-        'addifnodef' => false,
+        'addifnodef' => "false",
       }
     end
 
@@ -36,7 +36,7 @@ module Agents
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       errors.add(:base, "service is required") unless options['service'].present?
       errors.add(:base, "status is required") unless options['status'].present?
-      errors.add(:base, "addifnodef is required") unless options.has_key?("addifnodef")
+      errors.add(:base, "addifnodef is required") unless options["addifnodef"].present?
     end
 
     def working?
@@ -45,17 +45,17 @@ module Agents
 
     def receive(incoming_events)
       # if there are too many, dump a bunch to avoid getting rate limited
-      if incoming_events.count > 20
-        incoming_events = incoming_events.first(20)
+      if incoming_events.count > 30
+        incoming_events = incoming_events.first(30)
       end
       # Initialize globally used consumer and token clients
       oauth_key = credential("stashboard_oauth_token")
       oauth_secret = credential("stashboard_oauth_token_secret")
       base = credential("stashboard_oauth_url")
       @sb = Stashboard::Stashboard.new(base, oauth_key, oauth_secret)
-      # Loop through remainin events
+      # Loop through remaining events
       incoming_events.each do |event|
-        options['addifnodef'] = event.payload['addifnodef'].presence || false
+        options['addifnodef'] = (event.payload['addifnodef'] == 'true') ? true : false
         options['svcdesc'] = interpolate_string("{{svcdesc}}", event.payload)
 
         options["statdesc"] = interpolate_string("{{statdesc}}", event.payload)
@@ -120,20 +120,16 @@ module Agents
     def publish_status(name, status, text)
         svc = service_by_name(name)
         # Create this service if it wasn't found and we were told to create it
-        # log "AddIfNoDef: #{options['addifnodef']}"
         if options["addifnodef"] and svc.nil?
             options["svcdesc"] = name unless !options["svcdesc"].empty?
             svc = @sb.create_service(name, options["svcdesc"])
-            # log "Finished create_service: #{name}, #{options['svcdesc']}"
         end
         stat = status_by_name(status)
         if options["addifnodef"] and stat.nil?
            options["statdesc"] = name unless !options["statdesc"].empty?
            options["statimage"] = random_image unless !options["statimage"].empty?
            stat = @sb.create_status(status, options["statdesc"], options["statlevel"], options["statimage"])
-           # log "Finished create_status: #{status}, #{options['statdesc']}, #{options['statlevel']}, #{options['statimage']}"
         end
-        # log "SVC: #{svc}"
         # Now set the service status
         return @sb.create_event(svc['id'], stat['id'], text)
     end
