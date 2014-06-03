@@ -114,7 +114,6 @@ module Agents
             # Only create event if the state has changed.
             checks.each do |check, chkinfo|
                 checkkey = check.to_s
-                log "#{check} transitioning from #{last_run[checkkey]} : #{chkinfo}"
                 if last_run.has_key?(checkkey)
                     if last_run[checkkey]["state"] != chkinfo[:state]
                         log "#{check} transitioning from #{last_run[checkkey]["state"]} to #{chkinfo[:state]}"
