@@ -86,7 +86,6 @@ module Agents
       errors.add(:base, "location is required") unless location.present?
       errors.add(:base, "api_key is required") unless key_setup?
       errors.add(:base, "which_day selection is required") unless which_day.present?
-      errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
     end
 
     def wunderground
