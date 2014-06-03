@@ -67,22 +67,27 @@ module Agents
         options['expected_update_period_in_days'].present?
         errors.add(:base, "username and expected_update_period_in_days are required")
       end
+
+      if options[:include_retweets].present? &&
+        !(!!options[:include_retweets] === true || !!options[:include_retweets] === false)
+        errors.add(:base, "include_retweets must be a boolean (true/false)")
+      end
+
+      if options[:starting_at].present?
+        Time.parse(options[:starting_at]) rescue errors.add(:base, "Error parsing starting_at")
+      end
     end
 
     def starting_at
       if options[:starting_at].present?
-        Time.parse(options[:starting_at])
+        Time.parse(options[:starting_at]) rescue created_at
       else
         created_at
       end
     end
 
     def include_retweets?
-      if options[:include_retweets].present?
-        !!options[:include_retweets]
-      else
-        true
-      end
+      options[:include_retweets] != false
     end
 
     def check
