@@ -63,10 +63,8 @@ module Agents
     end
 
     def validate_options
-      unless options['username'].present? &&
-        options['expected_update_period_in_days'].present?
-        errors.add(:base, "username and expected_update_period_in_days are required")
-      end
+      errors.add(:base, "username is required") unless options['username'].present?
+      errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
 
       if options[:include_retweets].present? &&
         !(!!options[:include_retweets] === true || !!options[:include_retweets] === false)
