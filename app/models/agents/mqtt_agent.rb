@@ -67,10 +67,10 @@ module Agents
     MD
 
     def validate_options
-      # unless options['uid'].present? &&
-      #   options['expected_update_period_in_days'].present?
-      #   errors.add(:base, "expected_update_period_in_days and uid are required")
-      # end
+      unless options['uri'].present? &&
+        options['topic'].present?
+        errors.add(:base, "topic and uri are required")
+      end
     end
 
     def working?
