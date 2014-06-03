@@ -127,6 +127,8 @@ gem 'spectrum-rails'
 gem 'therubyracer', '~> 0.12.3'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '~> 2.7.2'
+# Required for the pingdom agent
+gem 'rest-client', '~> 1.6.7', require: false
 
 group :development do
   gem 'better_errors', '~> 1.1'
