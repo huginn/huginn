@@ -1,0 +1,8 @@
+{
+  "id": "huginn",
+  "password": "",
+  "ssh_keys": [
+    "ssh-rsa AAA123...xyz== foo",
+    "ssh-rsa AAA456...uvw== bar"
+  ]
+}
