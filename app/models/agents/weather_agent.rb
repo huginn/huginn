@@ -19,6 +19,8 @@ module Agents
       You must setup an [API key for Wunderground](http://www.wunderground.com/weather/api/) in order to use this Agent with Wunderground.
 
       You must setup an [API key for Forecast](https://developer.forecast.io/) in order to use this Agent with ForecastIO.
+
+      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
 
     event_description <<-MD
@@ -49,7 +51,7 @@ module Agents
     default_schedule "8pm"
 
     def working?
-      event_created_within?(2) && !recent_error_logs?
+      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def key_setup?
@@ -61,7 +63,8 @@ module Agents
         'service' => 'wunderground',
         'api_key' => 'your-key',
         'location' => '94103',
-        'which_day' => '1'
+        'which_day' => '1',
+        'expected_update_period_in_days' => '2'
       }
     end
 
@@ -83,6 +86,7 @@ module Agents
       errors.add(:base, "location is required") unless location.present?
       errors.add(:base, "api_key is required") unless key_setup?
       errors.add(:base, "which_day selection is required") unless which_day.present?
+      errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
     end
 
     def wunderground
@@ -163,7 +167,7 @@ module Agents
               'ozone' => value.ozone.to_s
             }
             return day
-          end    
+          end
         end
       end
     end
