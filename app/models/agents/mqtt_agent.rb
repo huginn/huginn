@@ -1,5 +1,6 @@
 # encoding: utf-8 
 require "mqtt"
+require "json"
 
 module Agents
   class MqttAgent < Agent
@@ -56,6 +57,27 @@ module Agents
 
     MD
 
+    event_description <<-MD
+      Events are simply nested MQTT payloads. For example, an MQTT payload for Owntracks
+
+      <pre><code>{
+        "topic": "owntracks/kcqlmkgx/Dan",
+        "message": {
+  "topic": "owntracks/kcqlmkgx/Galaxy S3 Dan",
+  "message": {
+    "_type": "location",
+    "lat": "-34.849373",
+    "lon": "138.5218449",
+    "tst": "1401761484",
+    "acc": "10.0",
+    "batt": "71"
+  },
+  "time": 1401771825
+},
+        "time": 1401771051
+      }</code></pre>
+    MD
+
     def validate_options
       # unless options['uid'].present? &&
       #   options['expected_update_period_in_days'].present?
@@ -103,7 +125,7 @@ module Agents
     def check
       mqtt_client.connect do |c|
         c.get(options['topic']) do |topic,message|
-          create_event :payload => { 'topic' => topic, 'message' => message, 'time' => Time.now.to_i }
+          create_event :payload => { 'topic' => topic, 'message' => JSON.parse(message), 'time' => Time.now.to_i }
         end
       end
     end
