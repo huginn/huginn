@@ -41,14 +41,14 @@ module Agents
       temperature and other events are being published.
 
       <pre><code>{
-        'uri' => 'mqtt://kcqlmkgx:sVNoccqwvXxE@m10.cloudmqtt.com:13858'
+        'uri' => 'mqtt://kcqlmkgx:sVNoccqwvXxE@m10.cloudmqtt.com:13858',
         'topic' => 'the_thing_system/demo'
       }
       </code></pre>
 
       Subscribe to all topics
       <pre><code>{
-        'uri' => 'mqtt://kcqlmkgx:sVNoccqwvXxE@m10.cloudmqtt.com:13858'
+        'uri' => 'mqtt://kcqlmkgx:sVNoccqwvXxE@m10.cloudmqtt.com:13858',
         'topic' => '/#'
       }
       </code></pre>
@@ -81,24 +81,25 @@ module Agents
       {
         'uri' => 'mqtts://user:pass@locahost:8883',
         'ssl' => :TLSv1,
-        'ca_file' => './ca.pem',
+        'ca_file'  => './ca.pem',
         'cert_file' => './client.crt',
         'key_file' => './client.key',
-        'topic' => 'huginn'
+        'topic' => 'huginn',
+        'max_read_time' => '10'
       }
     end
 
     def mqtt_client
-      client = MQTT::Client.new(options['uri'])
+      @client ||= MQTT::Client.new(options['uri'])
 
       if options['ssl']
-        client.ssl = options['ssl'].to_sym
-        client.ca_file = options['ca_file']
-        client.cert_file = options['cert_file']
-        client.key_file = options['key_file']
+        @client.ssl = options['ssl'].to_sym
+        @client.ca_file = options['ca_file']
+        @client.cert_file = options['cert_file']
+        @client.key_file = options['key_file']
       end
 
-      client
+      @client
     end
 
     def receive(incoming_events)
@@ -106,15 +107,30 @@ module Agents
         incoming_events.each do |event|
           c.publish(options['topic'], payload)
         end
+
+        c.disconnect
       end
     end
 
 
     def check
       mqtt_client.connect do |c|
-        c.get(options['topic']) do |topic,message|
-          create_event :payload => { 'topic' => topic, 'message' => JSON.parse(message), 'time' => Time.now.to_i }
-        end
+
+        Timeout::timeout(options['max_read_time']) {        
+          c.get(options['topic']) do |topic, message|
+
+            # A lot of services generate JSON. Try that first
+            payload = JSON.parse(message) rescue message
+
+            create_event :payload => { 
+              'topic' => topic, 
+              'message' => payload, 
+              'time' => Time.now.to_i 
+            }
+          end
+        } rescue TimeoutError
+
+        c.disconnect   
       end
     end
 
