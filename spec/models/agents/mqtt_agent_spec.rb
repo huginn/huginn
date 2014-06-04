@@ -18,7 +18,8 @@ describe Agents::MqttAgent do
 		@valid_params = {
       'uri' => "mqtt://#{@server.address}:#{@server.port}",
       'topic' => '/#',
-      'max_read_time' => 1
+      'max_read_time' => 1,
+      'expected_update_period_in_days' => "2"
     }
 
 		@checker = Agents::MqttAgent.new(
