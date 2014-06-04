@@ -108,6 +108,12 @@ class MQTT::FakeServer
             :payload => "hello #{topic}",
             :retain => true
           )
+          client.write MQTT::Packet::Publish.new(
+            :topic => topic,
+            :payload => "did you know about #{topic}",
+            :retain => true
+          )
+
         when MQTT::Packet::Pingreq
           client.write MQTT::Packet::Pingresp.new
           @pings_received += 1
