@@ -66,9 +66,8 @@ module Agents
       errors.add(:base, "username is required") unless options['username'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
 
-      if options[:include_retweets].present? &&
-        !(!!options[:include_retweets] === true || !!options[:include_retweets] === false)
-        errors.add(:base, "include_retweets must be a boolean (true/false)")
+      if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
+        errors.add(:base, "include_retweets must be a boolean value string (true/false)")
       end
 
       if options[:starting_at].present?
@@ -85,7 +84,7 @@ module Agents
     end
 
     def include_retweets?
-      options[:include_retweets] != false
+      options[:include_retweets] != "false"
     end
 
     def check
