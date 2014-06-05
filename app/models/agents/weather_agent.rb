@@ -51,7 +51,7 @@ module Agents
     default_schedule "8pm"
 
     def working?
-      event_created_within?(options['expected_update_period_in_days'].presence || 2) && !recent_error_logs?
+      event_created_within?((options['expected_update_period_in_days'].presence || 2).to_i) && !recent_error_logs?
     end
 
     def key_setup?
