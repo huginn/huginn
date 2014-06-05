@@ -3,10 +3,10 @@ require 'mqtt'
 require './spec/support/fake_mqtt_server'
 
 describe Agents::MqttAgent do
+
   before :each do
-    # stub_request(:get, /parse/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/adioso_parse.json")), :status => 200, :headers => {"Content-Type" => "text/json"})
-    # stub_request(:get, /fares/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/adioso_fare.json")),  :status => 200, :headers => {"Content-Type" => "text/json"})
     @error_log = StringIO.new
+    
     @server = MQTT::FakeServer.new(1234, '127.0.0.1')
     @server.just_one = true
     @server.logger = Logger.new(@error_log)
