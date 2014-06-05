@@ -116,7 +116,7 @@ module Agents
     def check
       mqtt_client.connect do |c|
 
-        Timeout::timeout(options['max_read_time']) {        
+        Timeout::timeout((options['max_read_time'].presence || 15).to_i) {
           c.get(options['topic']) do |topic, message|
 
             # A lot of services generate JSON. Try that first
