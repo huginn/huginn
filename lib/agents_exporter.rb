@@ -46,7 +46,7 @@ class AgentsExporter
       :keep_events_for => agent.keep_events_for,
       :propagate_immediately => agent.propagate_immediately,
       :disabled => agent.disabled,
-      :source_system_agent_id => agent.id,
+      :guid => agent.guid,
       :options => agent.options
     }
   end

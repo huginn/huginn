@@ -13,6 +13,7 @@
         <tr>
           <th>Name</th>
           <th>Agents</th>
+          <th>Public</th>
           <th></th>
         </tr>
 
@@ -22,6 +23,7 @@
               <%= link_to(scenario.name, scenario, class: "label label-info") %>
             </td>
             <td><%= link_to pluralize(scenario.agents.count, "agent"), scenario %></td>
+            <td><%= scenario.public? ? "yes" : "no" %></td>
             <td>
               <div class="btn-group btn-group-xs" style="float: right">
                 <%= link_to 'Show', scenario, class: "btn btn-default" %>

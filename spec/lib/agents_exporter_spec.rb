@@ -20,7 +20,7 @@ describe AgentsExporter do
       Time.parse(data[:exported_at]).should be_within(2).of(Time.now.utc)
       data[:links].should == [{ :source => 0, :receiver => 1 }]
       data[:agents].should == agent_list.map { |agent| exporter.agent_as_json(agent) }
-      data[:agents].all? { |agent_json| agent_json[:source_system_agent_id] && agent_json[:type] && agent_json[:name] }.should be_true
+      data[:agents].all? { |agent_json| agent_json[:guid].present? && agent_json[:type].present? && agent_json[:name].present? }.should be_true
     end
 
     it "does not output links to other agents" do

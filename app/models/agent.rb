@@ -12,6 +12,7 @@ class Agent < ActiveRecord::Base
   include JSONSerializedField
   include RDBMSFunctions
   include WorkingHelpers
+  include HasGuid
 
   markdown_class_attributes :description, :event_description
 

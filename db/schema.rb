@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140602014917) do
+ActiveRecord::Schema.define(version: 20140605032822) do
 
   create_table "agent_logs", force: true do |t|
     t.integer  "agent_id",                                       null: false
@@ -42,8 +42,10 @@ ActiveRecord::Schema.define(version: 20140602014917) do
     t.integer  "keep_events_for",                          default: 0,     null: false
     t.boolean  "propagate_immediately",                    default: false, null: false
     t.boolean  "disabled",                                 default: false, null: false
+    t.string   "guid",                                                     null: false
   end
 
+  add_index "agents", ["guid"], name: "index_agents_on_guid", using: :btree
   add_index "agents", ["schedule"], name: "index_agents_on_schedule", using: :btree
   add_index "agents", ["type"], name: "index_agents_on_type", using: :btree
   add_index "agents", ["user_id", "created_at"], name: "index_agents_on_user_id_and_created_at", using: :btree
@@ -111,7 +113,7 @@ ActiveRecord::Schema.define(version: 20140602014917) do
     t.string   "source_url"
   end
 
-  add_index "scenarios", ["user_id", "guid"], name: "index_scenarios_on_user_id_and_guid", using: :btree
+  add_index "scenarios", ["user_id", "guid"], name: "index_scenarios_on_user_id_and_guid", unique: true, using: :btree
 
   create_table "user_credentials", force: true do |t|
     t.integer  "user_id",                           null: false

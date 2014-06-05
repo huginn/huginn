@@ -32,11 +32,20 @@
     });
   </script>
 
+  <% if @scenario_import.dangerous? %>
+    <div class="danger">
+      This Scenario contains one or more potentially dangerous Agents.
+      These may be able to run local commands or execute code.
+      Please be sure that you understand the above Agent configurations before importing!
+    </div>
+  <% end %>
+
   <% if @scenario_import.existing_scenario.present? %>
-    <strong>
-      This Scenario already exists on your Huginn.
-      If you continue, the import will overwrite your existing <span class='label label-info scenario'><%= @scenario_import.existing_scenario.name %></span> Scenario.
-    </strong>
+    <div class="danger">
+      This Scenario already exists in your system.
+      If you continue, the import will overwrite your existing
+      <span class='label label-info scenario'><%= @scenario_import.existing_scenario.name %></span> Scenario and the Agents in it.
+    </div>
   <% end %>
 
   <div class="checkbox">

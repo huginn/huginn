@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'models/concerns/working_helpers'
 
 describe Agent do
   it_behaves_like WorkingHelpers
@@ -121,6 +120,14 @@ describe Agent do
       stub(Agents::SomethingSource).valid_type?("Agents::SomethingSource") { true }
       stub(Agents::CannotBeScheduled).valid_type?("Agents::CannotBeScheduled") { true }
     end
+
+    let(:new_instance) do
+      agent = Agents::SomethingSource.new(:name => "some agent")
+      agent.user = users(:bob)
+      agent
+    end
+
+    it_behaves_like HasGuid
 
     describe ".default_schedule" do
       it "stores the default on the class" do

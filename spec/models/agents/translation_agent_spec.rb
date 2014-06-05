@@ -1,6 +1,4 @@
 require 'spec_helper'
-require 'models/concerns/liquid_interpolatable'
-
 
 describe Agents::TranslationAgent do
     it_behaves_like LiquidInterpolatable
