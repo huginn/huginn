@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe Agents::DigestEmailAgent do
+describe Agents::EmailDigestAgent do
   def get_message_part(mail, content_type)
     mail.body.parts.find { |p| p.content_type.match content_type }.body.raw_source
   end
 
   before do
-    @checker = Agents::DigestEmailAgent.new(:name => "something", :options => { :expected_receive_period_in_days => 2, :subject => "something interesting" })
+    @checker = Agents::EmailDigestAgent.new(:name => "something", :options => { :expected_receive_period_in_days => 2, :subject => "something interesting" })
     @checker.user = users(:bob)
     @checker.save!
   end
@@ -27,14 +27,14 @@ describe Agents::DigestEmailAgent do
       event2.payload = { :data => "Something else you should know about" }
       event2.save!
 
-      Agents::DigestEmailAgent.async_receive(@checker.id, [event1.id, event2.id])
+      Agents::EmailDigestAgent.async_receive(@checker.id, [event1.id, event2.id])
       @checker.reload.memory[:queue].should == [{ 'data' => "Something you should know about" }, { 'data' => "Something else you should know about" }]
     end
   end
 
   describe "#check" do
     it "should send an email" do
-      Agents::DigestEmailAgent.async_check(@checker.id)
+      Agents::EmailDigestAgent.async_check(@checker.id)
       ActionMailer::Base.deliveries.should == []
 
       @checker.memory[:queue] = [{ :data => "Something you should know about" },
@@ -44,7 +44,7 @@ describe Agents::DigestEmailAgent do
       @checker.memory[:events] = [1,2,3,4]
       @checker.save!
 
-      Agents::DigestEmailAgent.async_check(@checker.id)
+      Agents::EmailDigestAgent.async_check(@checker.id)
       ActionMailer::Base.deliveries.last.to.should == ["bob@example.com"]
       ActionMailer::Base.deliveries.last.subject.should == "something interesting"
       get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Event\n  data: Something you should know about\n\nFoo\n  bar: 2\n  url: http://google.com\n\nhi\n  woah: there\n\nEvent\n  test: 2"
@@ -61,7 +61,7 @@ describe Agents::DigestEmailAgent do
       Agent.receive!
       @checker.reload.memory[:queue].should_not be_empty
 
-      Agents::DigestEmailAgent.async_check(@checker.id)
+      Agents::EmailDigestAgent.async_check(@checker.id)
 
       plain_email_text = get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip
       html_email_text = get_message_part(ActionMailer::Base.deliveries.last, /html/).strip
