@@ -11,8 +11,8 @@ class ScenarioImport
 
   attr_reader :user
 
-  before_validation :fetch_url
   before_validation :parse_file
+  before_validation :fetch_url
 
   validate :validate_presence_of_file_url_or_data
   validates_format_of :url, :with => URL_REGEX, :allow_nil => true, :allow_blank => true, :message => "appears to be invalid"
@@ -82,6 +82,10 @@ class ScenarioImport
 
   def scenario
     @scenario || @existing_scenario
+  end
+
+  def will_request_local?(url_root)
+    data.blank? && file.blank? && url.present? && url.starts_with?(url_root)
   end
 
   protected
