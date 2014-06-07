@@ -2,8 +2,8 @@ class RenameDigestEmailToEmailDigest < ActiveRecord::Migration
   def up
     sql = <<-SQL
       UPDATE #{ActiveRecord::Base.connection.quote_table_name('agents')}
-      SET #{ActiveRecord::Base.connection.quote_column_name('type')} = "Agents::EmailDigestAgent"
-      WHERE #{ActiveRecord::Base.connection.quote_column_name('type')} = "Agents::DigestEmailAgent"
+      SET #{ActiveRecord::Base.connection.quote_column_name('type')} = 'Agents::EmailDigestAgent'
+      WHERE #{ActiveRecord::Base.connection.quote_column_name('type')} = 'Agents::DigestEmailAgent'
     SQL
 
     execute sql
@@ -12,8 +12,8 @@ class RenameDigestEmailToEmailDigest < ActiveRecord::Migration
   def down
     sql = <<-SQL
       UPDATE #{ActiveRecord::Base.connection.quote_table_name('agents')}
-      SET #{ActiveRecord::Base.connection.quote_column_name('type')} = "Agents::DigestEmailAgent"
-      WHERE #{ActiveRecord::Base.connection.quote_column_name('type')} = "Agents::EmailDigestAgent"
+      SET #{ActiveRecord::Base.connection.quote_column_name('type')} = 'Agents::DigestEmailAgent'
+      WHERE #{ActiveRecord::Base.connection.quote_column_name('type')} = 'Agents::EmailDigestAgent'
     SQL
 
     execute sql
