@@ -1,5 +1,5 @@
 module Agents
-  class DigestEmailAgent < Agent
+  class EmailDigestAgent < Agent
     include EmailConcern
 
     default_schedule "5am"
@@ -7,7 +7,7 @@ module Agents
     cannot_create_events!
 
     description <<-MD
-      The DigestEmailAgent collects any Events sent to it and sends them all via email when run.
+      The EmailDigestAgent collects any Events sent to it and sends them all via email when run.
       The email will be sent to your account's address and will have a `subject` and an optional `headline` before
       listing the Events.  If the Events' payloads contain a `message`, that will be highlighted, otherwise everything in
       their payloads will be shown.
