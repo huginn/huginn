@@ -1,5 +1,6 @@
 include_recipe 'apt'
 include_recipe 'build-essential'
+include_recipe 'huginn::ruby'
 
 user "huginn" do
   system true
@@ -7,33 +8,20 @@ user "huginn" do
   password "$6$ZwO6b.6tij$SMa8UIwtESGDxB37NwHsct.gJfXWmmflNbH.oypwJ9y0KkzMkCdw7D14iK7GX9C4CWSEcpGOFUow7p01rQFu5."
   supports :manage_home => true
   shell "/bin/bash"
-  gid "sudo"
+end
+
+group "sudo"
+
+group "sudo" do
+   action :modify
+   members "huginn"
+   append true
 end
 
 group "huginn" do
   members ["huginn"]
 end
 
-%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libmysqlclient-dev" "libffi-dev" "libssl-dev").each do |pkg|
-  package("#{pkg}")
-end
-
-bash "Setting default ruby and gem versions to 1.9" do
-  code <<-EOH
-    if [ $(readlink /usr/bin/ruby) != "ruby1.9.1" ]
-    then
-      update-alternatives --set ruby /usr/bin/ruby1.9.1
-    fi
-
-    if [ $(readlink /usr/bin/gem) != "gem1.9.1" ]
-    then
-      update-alternatives --set gem /usr/bin/gem1.9.1
-    fi
-  EOH
-end
-
-gem_package("rake")
-gem_package("bundle")
 
 service "nginx" do
   supports :restart => true, :start => true, :stop => true, :reload => true
