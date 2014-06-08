@@ -1,9 +1,14 @@
 include_recipe "rbenv::system"
 
-rbenv_ruby node["rbenv"]["ruby_version"]
+rbenv_ruby node["rbenv"]["ruby_version"] do
+  action :install
+end
 
-rbenv_gem "rake"
-rbenv_gem "bundle"
+%w(rake bundle).each do |gem_name|
+  rbenv_gem gem_name do
+    rbenv_version  node["rbenv"]["ruby_version"]
+  end
+end
 
 
 case node['platform']
