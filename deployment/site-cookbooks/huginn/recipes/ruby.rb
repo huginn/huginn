@@ -4,7 +4,7 @@ rbenv_ruby node["rbenv"]["ruby_version"] do
   action :install
 end
 
-%w(rake bundle).each do |gem_name|
+%w(bundler).each do |gem_name|
   rbenv_gem gem_name do
     rbenv_version  node["rbenv"]["ruby_version"]
   end
