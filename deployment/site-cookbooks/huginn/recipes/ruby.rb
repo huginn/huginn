@@ -1,7 +1,12 @@
-# TODO Shift
-%w(ruby1.9.1 ruby1.9.1-dev).each do |pkg|
-  package pkg
-end
+include_recipe "rbenv::default"
+include_recipe "rbenv::ruby_build"
+
+rbenv_ruby node["rbenv"]["ruby_version"]
+
+
+rbenv_gem "rake"
+rbenv_gem "bundle"
+
 
 case node['platform']
 when "centos"
@@ -14,19 +19,3 @@ packages.each do |pkg|
   package pkg
 end
 
-bash "Setting default ruby and gem versions to 1.9" do
-  code <<-EOH
-    if [ $(readlink /usr/bin/ruby) != "ruby1.9.1" ]
-    then
-      update-alternatives --set ruby /usr/bin/ruby1.9.1
-    fi
-
-    if [ $(readlink /usr/bin/gem) != "gem1.9.1" ]
-    then
-      update-alternatives --set gem /usr/bin/gem1.9.1
-    fi
-  EOH
-end
-
-gem_package("rake")
-gem_package("bundle")

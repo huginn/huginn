@@ -8,6 +8,11 @@ SITE
     chef_handler (1.1.6)
     dmg (2.2.0)
     ohai (2.0.0)
+    rbenv (1.7.1)
+      apt (>= 0.0.0)
+      build-essential (>= 0.0.0)
+      git (>= 0.0.0)
+      ohai (>= 1.1)
     rsyslog (1.12.2)
     runit (1.5.10)
       build-essential (>= 0.0.0)
@@ -67,5 +72,6 @@ DEPENDENCIES
   mysql (>= 0)
   nginx (>= 0)
   nodejs (>= 0)
+  rbenv (>= 0)
   runit (>= 0)
 
