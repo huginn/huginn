@@ -8,6 +8,8 @@ module Agents
     description <<-MD
       The BasecampAgent checks a Basecamp project for new Events
 
+      To be able to use this Agent you need to authenticate with 37signals in the [Services](/services) section first.
+
       You need to provide the `project_id` of the project you want to monitor.
       If you have your Basecamp project opened in your browser you can find the user_id and project_id as follows:
 
