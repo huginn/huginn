@@ -25,6 +25,8 @@
              "recipe[mysql::server]",
              "recipe[nodejs::install_from_binary]",
              "recipe[nginx]",
-             "recipe[huginn_production]"
+             "recipe[huginn::ruby]",
+             "recipe[huginn::user]",
+             "recipe[huginn::production]"
            ]
 }
