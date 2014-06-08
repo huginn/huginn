@@ -1,7 +1,3 @@
-include_recipe 'apt'
-include_recipe 'build-essential'
-include_recipe 'huginn::ruby'
-
 user "huginn" do
   system true
   home "/home/huginn"
