@@ -8,11 +8,6 @@ SITE
     chef_handler (1.1.6)
     dmg (2.2.0)
     ohai (2.0.0)
-    rbenv (1.6.5)
-      apt (>= 0.0.0)
-      build-essential (>= 0.0.0)
-      git (>= 0.0.0)
-      ohai (>= 1.1)
     rsyslog (1.12.2)
     runit (1.5.10)
       build-essential (>= 0.0.0)
@@ -67,11 +62,18 @@ GIT
       runit (~> 1.2)
       yum-epel (~> 0.3)
 
+GIT
+  remote: https://github.com/fnichol/chef-rbenv.git
+  ref: master
+  sha: 0a3018634bafe58ad21c6ee271af015220e444b9
+  specs:
+    rbenv (0.7.3)
+
 DEPENDENCIES
   git (>= 0)
   mysql (>= 0)
   nginx (>= 0)
   nodejs (>= 0)
-  rbenv (= 1.6.5)
+  rbenv (>= 0)
   runit (>= 0)
 
