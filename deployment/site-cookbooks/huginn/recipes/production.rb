@@ -57,7 +57,7 @@ deploy "/home/huginn" do
   before_restart do
     rbenv_script "Huginn - Bundle, edit config, compile assets" do
       group "huginn"
-      rbenv_version node['rbenv']['global']
+      rbenv_version node['rbenv']['ruby_version']
       cwd "/home/huginn/current"
       environment({
         "LANG" => "en_US.UTF-8",
@@ -71,8 +71,8 @@ deploy "/home/huginn" do
         rbenv rehash
 
         # Fix Procfile to work with rbenv
-        sed -i s/sudo\ RAILS_ENV=production\ bundle\ exec/rbenv\ sudo/ /home/huginn/shared/config/Procfile
-        sed -i s/sudo\ bundle\ exec/rbenv\ sudo/ /home/huginn/shared/config/Procfile
+        sed -i s/RAILS_ENV=production\ bundle\ exec/rbenv\ sudo/ /home/huginn/shared/config/Procfile
+        sed -i s/bundle\ exec/rbenv\ sudo/ /home/huginn/shared/config/Procfile
 
         # Configure .env file
         sed -i s/REPLACE_ME_NOW\!/$(rake secret)/ /home/huginn/shared/config/.env
@@ -82,7 +82,7 @@ deploy "/home/huginn" do
 
     rbenv_script "Huginn - Create/Seed Database (if first time)" do
       group "huginn"
-      rbenv_version node['rbenv']['global']
+      rbenv_version node['rbenv']['ruby_version']
       cwd "/home/huginn/current"
       creates "/home/huginn/shared/RAKE-DB-CREATED"
       environment({
@@ -91,9 +91,9 @@ deploy "/home/huginn" do
         "RAILS_ENV" => "production"
       })
       code <<-EOH
-        rbenv sudo rake db:create
-        rbenv sudo rake db:migrate
-        rbenv sudo rake db:seed
+        bundle exec rake db:create
+        bundle exec rake db:migrate
+        bundle exec rake db:seed
 
         # This prevents the db:create db:seed from happening again in future
         echo 1 > /home/huginn/shared/RAKE-DB-CREATED
@@ -102,7 +102,7 @@ deploy "/home/huginn" do
 
     rbenv_script "Huginn - Perform migrations and precompile assets" do
       group "huginn"
-      rbenv_version node['rbenv']['global']
+      rbenv_version node['rbenv']['ruby_version']
       cwd "/home/huginn/current"
       environment({
         "LANG" => "en_US.UTF-8",
@@ -110,14 +110,14 @@ deploy "/home/huginn" do
         "RAILS_ENV" => "production"
       })
       code <<-EOH
-        rbenv sudo rake db:migrate
-        rake assets:precompile
+        bundle exec rake db:migrate
+        bundle exec rake assets:precompile
       EOH
     end
 
     rbenv_script "Huginn - Setup nginx/foreman configs" do
       group "huginn"
-      rbenv_version node['rbenv']['global']
+      rbenv_version node['rbenv']['ruby_version']
       cwd "/home/huginn/current"
       environment({
         "LANG" => "en_US.UTF-8",
