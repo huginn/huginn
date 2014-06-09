@@ -25,16 +25,13 @@ deploy "/home/huginn" do
 
 
   before_symlink do
-    %w(config log tmp).each do |dir|
+    %w(config log tmp tmp/pids tmp/sockets).each do |dir|
       directory "/home/huginn/shared/#{dir}" do
         owner "huginn"
         group "huginn"
         recursive true
       end
     end
-
-    directory "/home/huginn/shared/tmp/pids"
-    directory "/home/huginn/shared/tmp/sockets"
 
     %w(Procfile unicorn.rb nginx.conf).each do |file|
       cookbook_file "/home/huginn/shared/config/#{file}" do
@@ -47,35 +44,90 @@ deploy "/home/huginn" do
       source "env.example"
       mode "666"
       owner "huginn"
-      action :create_if_missing
+      action :create  # Upload a fresh copy, it will be configured from chef settings automagically
     end
   end
 
   before_restart do
-    bash "huginn dependencies" do
-      cwd "/home/huginn/current"
-      user "huginn"
+    rbenv_script "Huginn - Bundle, edit config, compile assets" do
       group "huginn"
+      rbenv_version node['rbenv']['global']
+      cwd "/home/huginn/current"
+      environment({
+        "LANG" => "en_US.UTF-8",
+        "LC_ALL" => "en_US.UTF-8",
+        "RAILS_ENV" => "production"
+      })
       code <<-EOH
-      export LANG="en_US.UTF-8"
-      export LC_ALL="en_US.UTF-8"
-      ln -nfs /home/huginn/shared/config/Procfile ./Procfile
-      ln -nfs /home/huginn/shared/config/.env ./.env
-      ln -nfs /home/huginn/shared/config/unicorn.rb ./config/unicorn.rb
-      sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/
-      echo 'gem "unicorn", :group => :production' >> Gemfile
-      sudo bundle install --without=development --without=test
-      sed -i s/REPLACE_ME_NOW\!/$(sudo bundle exec rake secret)/ /home/huginn/shared/config/.env
-      sudo RAILS_ENV=production bundle exec rake db:create
-      sudo RAILS_ENV=production bundle exec rake db:migrate
-      sudo RAILS_ENV=production bundle exec rake db:seed
-      sudo RAILS_ENV=production bundle exec rake assets:precompile
-      sudo foreman export upstart /etc/init -a huginn -u huginn -l log
-      sudo start huginn
+        # Install gems
+        echo 'gem "unicorn", :group => :production' >> Gemfile
+        bundle install --without=development --without=test
+        rbenv rehash
+
+        # Fix Procfile to work with rbenv
+        sed -i s/sudo\ RAILS_ENV=production\ bundle\ exec/rbenv\ sudo/ /home/huginn/shared/config/Procfile
+        sed -i s/sudo\ bundle\ exec/rbenv\ sudo/ /home/huginn/shared/config/Procfile
+
+        # Configure .env file
+        sed -i s/REPLACE_ME_NOW\!/$(rake secret)/ /home/huginn/shared/config/.env
+        sed -i s/\=try-huginn/\=#{node['huginn']['env']['invitation_code']}/ /home/huginn/shared/config/.env
+      EOH
+    end
+
+    rbenv_script "Huginn - Create/Seed Database (if first time)" do
+      group "huginn"
+      rbenv_version node['rbenv']['global']
+      cwd "/home/huginn/current"
+      creates "/home/huginn/shared/RAKE-DB-CREATED"
+      environment({
+        "LANG" => "en_US.UTF-8",
+        "LC_ALL" => "en_US.UTF-8",
+        "RAILS_ENV" => "production"
+      })
+      code <<-EOH
+        rbenv sudo rake db:create
+        rbenv sudo rake db:migrate
+        rbenv sudo rake db:seed
+
+        # This prevents the db:create db:seed from happening again in future
+        echo 1 > /home/huginn/shared/RAKE-DB-CREATED
+      EOH
+    end
+
+    rbenv_script "Huginn - Perform migrations and precompile assets" do
+      group "huginn"
+      rbenv_version node['rbenv']['global']
+      cwd "/home/huginn/current"
+      environment({
+        "LANG" => "en_US.UTF-8",
+        "LC_ALL" => "en_US.UTF-8",
+        "RAILS_ENV" => "production"
+      })
+      code <<-EOH
+        rbenv sudo rake db:migrate
+        rake assets:precompile
+      EOH
+    end
+
+    rbenv_script "Huginn - Setup nginx/foreman configs" do
+      group "huginn"
+      rbenv_version node['rbenv']['global']
+      cwd "/home/huginn/current"
+      environment({
+        "LANG" => "en_US.UTF-8",
+        "LC_ALL" => "en_US.UTF-8",
+        "RAILS_ENV" => "production"
+      })
+      code <<-EOH
+        sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/
+        rbenv sudo foreman export upstart /etc/init -a huginn -u huginn -l log
       EOH
     end
   end
   
+  notifies :enable, "service[huginn]"
+  notifies :start, "service[huginn]"
+
   notifies :enable, "service[nginx]"
   notifies :start, "service[nginx]"
 end
