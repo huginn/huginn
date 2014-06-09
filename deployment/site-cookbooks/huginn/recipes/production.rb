@@ -125,9 +125,6 @@ deploy "/home/huginn" do
     end
   end
   
-  notifies :enable, "service[huginn]"
-  notifies :start, "service[huginn]"
-
   notifies :enable, "service[nginx]"
   notifies :start, "service[nginx]"
 end
