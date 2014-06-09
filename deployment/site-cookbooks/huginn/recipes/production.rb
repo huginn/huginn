@@ -3,6 +3,12 @@ service "nginx" do
   action :nothing
 end
 
+service "huginn" do
+  provider Chef::Provider::Service::Upstart
+  supports :restart => true, :start => true, :stop => true
+  action :nothing
+end
+
 deploy "/home/huginn" do
   repo node['huginn']['repo']
   branch node['huginn']['branch']
@@ -124,7 +130,10 @@ deploy "/home/huginn" do
       EOH
     end
   end
-  
+
+  notifies :enable, "service[huginn]"
+  notifies :start, "service[huginn]"
+
   notifies :enable, "service[nginx]"
   notifies :start, "service[nginx]"
 end
