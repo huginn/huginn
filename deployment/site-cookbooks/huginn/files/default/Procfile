@@ -1,2 +1,2 @@
-web: sudo bundle exec unicorn_rails -c config/unicorn.rb -E production
-jobs: sudo RAILS_ENV=production bundle exec rails runner bin/threaded.rb
+web: rbenv sudo bundle exec unicorn_rails -c config/unicorn.rb -E production
+jobs: rbenv sudo RAILS_ENV=production bundle exec rails runner bin/threaded.rb
