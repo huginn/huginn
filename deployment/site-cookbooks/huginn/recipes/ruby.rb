@@ -10,6 +10,7 @@ end
   end
 end
 
+rbenv_global node["rbenv"]["ruby_version"]
 
 case node['platform']
 when "centos"
@@ -21,4 +22,3 @@ end
 packages.each do |pkg|
   package pkg
 end
-
