@@ -26,6 +26,7 @@
              "recipe[nodejs::install_from_binary]",
              "recipe[nginx]",
              "recipe[ruby_build]",
+             "recipe[rbenv]",
              "recipe[huginn::ruby]",
              "recipe[huginn::user]",
              "recipe[huginn::production]"
