@@ -11,13 +11,8 @@ class ScenarioImportsController < ApplicationController
       render :text => 'Sorry, you cannot import a Scenario by URL from your own Huginn server.' and return
     end
 
-    if @scenario_import.valid?
-      if @scenario_import.do_import?
-        @scenario_import.import!
-        redirect_to @scenario_import.scenario, notice: "Import successful!"
-      else
-        render action: "new"
-      end
+    if @scenario_import.valid? && @scenario_import.should_import? && @scenario_import.import
+      redirect_to @scenario_import.scenario, notice: "Import successful!"
     else
       render action: "new"
     end

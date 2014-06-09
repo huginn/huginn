@@ -42,12 +42,13 @@ class AgentsExporter
     {
       :type => agent.type,
       :name => agent.name,
-      :schedule => agent.schedule,
-      :keep_events_for => agent.keep_events_for,
-      :propagate_immediately => agent.propagate_immediately,
       :disabled => agent.disabled,
       :guid => agent.guid,
       :options => agent.options
-    }
+    }.tap do |options|
+      options[:schedule] = agent.schedule if agent.can_be_scheduled?
+      options[:keep_events_for] = agent.keep_events_for if agent.can_create_events?
+      options[:propagate_immediately] = agent.propagate_immediately if agent.can_receive_events?
+    end
   end
 end

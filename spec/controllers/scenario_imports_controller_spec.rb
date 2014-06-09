@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe ScenarioImportsController do
-  def valid_attributes(options = {})
-    { :name => "some_name" }.merge(options)
-  end
-
   before do
     sign_in users(:bob)
   end
@@ -22,6 +18,7 @@ describe ScenarioImportsController do
       post :create, :scenario_import => { :url => "bad url" }
       assigns(:scenario_import).user.should == users(:bob)
       assigns(:scenario_import).url.should == "bad url"
+      assigns(:scenario_import).should_not be_valid
       response.should render_template(:new)
     end
   end

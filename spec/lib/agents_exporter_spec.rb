@@ -21,9 +21,12 @@ describe AgentsExporter do
       data[:links].should == [{ :source => 0, :receiver => 1 }]
       data[:agents].should == agent_list.map { |agent| exporter.agent_as_json(agent) }
       data[:agents].all? { |agent_json| agent_json[:guid].present? && agent_json[:type].present? && agent_json[:name].present? }.should be_true
+
+      data[:agents][0].should_not have_key(:propagate_immediately) # can't receive events
+      data[:agents][1].should_not have_key(:schedule) # can't be scheduled
     end
 
-    it "does not output links to other agents" do
+    it "does not output links to other agents outside of the incoming set" do
       Link.create!(:source_id => agents(:jane_weather_agent).id, :receiver_id => agents(:jane_website_agent).id)
       Link.create!(:source_id => agents(:jane_website_agent).id, :receiver_id => agents(:jane_rain_notifier_agent).id)
 
