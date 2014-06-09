@@ -85,7 +85,8 @@ module Agents
         'cert_file' => './client.crt',
         'key_file' => './client.key',
         'topic' => 'huginn',
-        'max_read_time' => '10'
+        'max_read_time' => '10',
+        'expected_update_period_in_days' => '2'
       }
     end
 
