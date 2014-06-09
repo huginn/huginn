@@ -4,18 +4,25 @@ service "nginx" do
 end
 
 deploy "/home/huginn" do
-  repo "https://github.com/cantino/huginn.git"
-  branch "master"
+  repo node['huginn']['repo']
+  branch node['huginn']['branch']
+  keep_releases node['huginn']['keep_releases' ]
+  rollback_on_error true
+
   user "huginn"
   group "huginn"
-  environment "RAILS_ENV" => "production"
-  keep_releases 5
+  
+  environment "RAILS_ENV" => node['huginn']['rails_env']
+
   create_dirs_before_symlink []
-  symlinks "log" => "log"
+  symlinks({
+    "log" => "log",
+    "config/Procfile" => "Procfile",
+    "config/.env" => ".env",
+    "config/unicorn.rb" => "/config/unicorn.rb"
+  })
   symlink_before_migrate({})
-  rollback_on_error true
-  notifies :enable, "service[nginx]"
-  notifies :start, "service[nginx]"
+
 
   before_symlink do
     %w(config log tmp).each do |dir|
@@ -68,4 +75,7 @@ deploy "/home/huginn" do
       EOH
     end
   end
+  
+  notifies :enable, "service[nginx]"
+  notifies :start, "service[nginx]"
 end
