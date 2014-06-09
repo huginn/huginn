@@ -23,7 +23,7 @@ end
 
 case node['platform']
 when "centos"
-  packages = %w(libxslt-devel libxml2-devel mysql-devel curl libffi-devel openssl-devel)
+  packages = %w(libxslt-devel libxml2-devel mysql-devel curl libffi-devel openssl-devel patch)
 else
   packages = %w(libxslt-dev libxml2-dev curl libmysqlclient-dev libffi-dev libssl-dev)
 end
