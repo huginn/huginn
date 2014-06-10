@@ -237,5 +237,20 @@ class ScenarioImport
       yield 'propagate_immediately', propagate_immediately, boolean if self['propagate_immediately'].present? && propagate_immediately.requires_merge?
       yield 'disabled', disabled, boolean if disabled.requires_merge?
     end
+
+    # Unfortunately Ruby 1.9's OpenStruct doesn't expose [] and []=.
+    unless instance_methods.include?(:[]=)
+      def [](key)
+        self.send(sanitize key)
+      end
+
+      def []=(key, val)
+        self.send("#{sanitize key}=", val)
+      end
+
+      def sanitize(key)
+        key.gsub(/[^a-zA-Z0-9_-]/, '')
+      end
+    end
   end
 end
