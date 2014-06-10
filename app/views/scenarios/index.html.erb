@@ -20,7 +20,7 @@
         <% @scenarios.each do |scenario| %>
           <tr>
             <td>
-              <%= link_to(scenario.name, scenario, class: "label label-info") %>
+              <%= link_to(scenario.name, scenario) %>
             </td>
             <td><%= link_to pluralize(scenario.agents.count, "agent"), scenario %></td>
             <td><%= scenario.public? ? "yes" : "no" %></td>
