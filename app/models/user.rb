@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
   
 
   def available_services
-    Service.where("user_id = #{self.id} or global = true").order("services.name desc") 
+    Service.where("user_id = ? or global = true", self.id).order("services.name desc") 
   end
 
   # Allow users to login via either email or username.
