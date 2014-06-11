@@ -1,4 +1,5 @@
 require 'date'
+require 'time'
 
 module Agents
   class ChangeOverTimeAgent < Agent
@@ -52,9 +53,8 @@ module Agents
     end
 
     def receive(incoming_events)
-      incoming_events.sort_by(&:created_at).each do |event|
+      incoming_events.sort_by { |e| time_for e }.each do |event|
         data = parse event
-        log "computing1"
         compute_difference_quotient data
         remember data
       end
@@ -71,7 +71,12 @@ module Agents
     end
 
     def time_for(event)
-      ((options['time_path'].present? && DateTime.parse(Utils.value_at(event.payload, options['time_path']))) || event.created_at).to_time.to_f
+      time = if options['time_path'].present? then
+        DateTime.parse(Utils.value_at(event.payload, options['time_path']))
+      else
+        event.created_at
+      end
+      time.to_time.to_f
     end
 
     def parse(event)
@@ -93,7 +98,9 @@ module Agents
         if timediff != 0
           quotient = (data['value'] - old_data['value']) / timediff
           time = options['store_time_at_end'].to_s == 'true' ? data['time'] : ((old_data['time'] + data['time']) / 2)
-          create_event :payload => {"value" => quotient * factor, "time" => time.rfc2822.to_s}
+          create_event :payload => {"value" => quotient * factor,
+                                    "time" => Time.at(time).iso8601.to_s,
+                                    "group" => data['group']}
         end
       end
     end
