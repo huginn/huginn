@@ -28,11 +28,15 @@ module Agents
 
       `calendar_id` - The id the calendar you want to publish to. Typically your google account email address.
 
-      `service_account_email` - The authorised service account.
+      `google` A hash of configuration options for the agent.
 
-      `key_file` - The path to the key file.
+      `google` `service_account_email` - The authorised service account.
 
-      `key_secret` - The secret for the key, typically 'notasecret'
+      `google` `key_file` - The path to the key file.
+
+      `google` `key_secret` - The secret for the key, typically 'notasecret'
+
+      `details` A hash of event details. See https://developers.google.com/google-apps/calendar/v3/reference/events/insert
       
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
@@ -55,6 +59,17 @@ module Agents
           'key_file' => '/path/to/private.key'
           'key_secret' => 'notasecret',
           'service_account_email' => ''
+        },
+        'details' => {
+          'visibility' => 'default',
+          'summary' => "Awesome event",
+          'description' => "An example event with {{text}}. Pro tip: DateTimes are in RFC3339",
+          'start': {
+            'dateTime': '2014-10-02T10:00:00-05:00'
+          },
+          'end': {
+            'dateTime': '2014-10-02T11:00:00-05:00'
+          }
         }
       }
     end
