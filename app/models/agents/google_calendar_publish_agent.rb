@@ -1,7 +1,5 @@
 module Agents
   class GoogleCalendarPublishAgent < Agent
-    include LiquidInterpolatable
-
     cannot_be_scheduled!
 
     description <<-MD
@@ -40,6 +38,8 @@ module Agents
       
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+
+      Use it with a trigger agent to shape your payload!
     MD
 
     def validate_options
@@ -63,7 +63,7 @@ module Agents
         'details' => {
           'visibility' => 'default',
           'summary' => "Awesome event",
-          'description' => "An example event with {{text}}. Pro tip: DateTimes are in RFC3339",
+          'description' => "An example event with text. Pro tip: DateTimes are in RFC3339",
           'start': {
             'dateTime': '2014-10-02T10:00:00-05:00'
           },
@@ -76,23 +76,18 @@ module Agents
 
     def receive(incoming_events)
      incoming_events.each do |event|
-        text = interpolate_string(options['message'], event.payload)
-        calendar_event = publish text
+        calendar = GoogleCalendar.new(options, Rails.logger)
+
+        calender.publish_as(options['calendar_id'], event.payload)
 
         create_event :payload => {
           'success' => true,
           'published_calendar_event' => text,
-          'tweet_id' => calendar_event.id,
+          'google_calendar_event_id' => calendar_event.id,
           'agent_id' => event.agent_id,
           'event_id' => event.id
         }
       end
-    end
-
-    def publish(text)
-      calendar = GoogleCalendar.new(options, Rails.logger)
-
-      calender.publish_as(options['calendar_id'], text)
     end
   end
 end
