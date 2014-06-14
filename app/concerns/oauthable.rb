@@ -2,9 +2,9 @@ module Oauthable
   extend ActiveSupport::Concern
 
   included do |base|
+    @valid_oauth_providers = :all
     attr_accessible :service_id
     validates_presence_of :service_id
-    self.class_variable_set(:@@valid_oauth_providers, :all)
   end
 
   def oauthable?
@@ -20,12 +20,13 @@ module Oauthable
   end
 
   def valid_oauth_providers
-    self.class.class_variable_get(:@@valid_oauth_providers)
+    self.class.valid_oauth_providers
   end
 
   module ClassMethods
     def valid_oauth_providers(*providers)
-      self.class_variable_set(:@@valid_oauth_providers, providers)
+      return @valid_oauth_providers if providers == []
+      @valid_oauth_providers = providers
     end
   end
 end
