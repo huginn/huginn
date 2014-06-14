@@ -1,10 +1,10 @@
 class CreateServices < ActiveRecord::Migration
   def change
     create_table :services do |t|
-      t.integer :user_id
-      t.string :provider
-      t.string :name
-      t.text :token
+      t.integer :user_id, null: false
+      t.string :provider, null: false
+      t.string :name, null: false
+      t.text :token, null: false
       t.text :secret
       t.text :refresh_token
       t.datetime :expires_at

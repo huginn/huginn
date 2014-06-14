@@ -24,7 +24,7 @@ class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration
         secret: twitter_oauth_token_secret(agent)
       )
       agent.service_id = service.id
-      agent.save!
+      agent.save!(validate: false)
     end
     if agents.length > 0
       puts <<-EOF.strip_heredoc

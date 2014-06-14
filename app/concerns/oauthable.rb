@@ -4,7 +4,6 @@ module Oauthable
   included do |base|
     attr_accessible :service_id
     validates_presence_of :service_id
-    base.extend ClassMethods
     self.class_variable_set(:@@valid_oauth_providers, :all)
   end
 
