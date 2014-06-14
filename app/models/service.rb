@@ -4,8 +4,19 @@ class Service < ActiveRecord::Base
   serialize :options, Hash
 
   belongs_to :user
+  has_many :agents
 
   validates_presence_of :user_id, :provider, :name, :token
+
+  before_destroy :disable_agents
+
+  def disable_agents
+    self.agents.each do |agent|
+      agent.service_id = nil
+      agent.disabled = true
+      agent.save!(validate: false)
+    end
+  end
 
   def toggle_availability!
     self.global = !self.global

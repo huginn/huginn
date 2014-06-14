@@ -1,11 +1,27 @@
 class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration
+  def twitter_consumer_key(agent)
+    agent.options['consumer_key'].presence || agent.credential('twitter_consumer_key')
+  end
+
+  def twitter_consumer_secret(agent)
+    agent.options['consumer_secret'].presence || agent.credential('twitter_consumer_secret')
+  end
+
+  def twitter_oauth_token(agent)
+    agent.options['oauth_token'].presence || agent.options['access_key'].presence || agent.credential('twitter_oauth_token')
+  end
+
+  def twitter_oauth_token_secret(agent)
+    agent.options['oauth_token_secret'].presence || agent.options['access_secret'].presence || agent.credential('twitter_oauth_token_secret')
+  end
+
   def up
     agents = Agent.where(type: ['Agents::TwitterUserAgent', 'Agents::TwitterStreamAgent', 'Agents::TwitterPublishAgent']).each do |agent|
       service = agent.user.services.create!(
         provider: 'twitter',
         name: "Migrated '#{agent.name}'",
-        token: agent.twitter_oauth_token,
-        secret: agent.twitter_oauth_token_secret
+        token: twitter_oauth_token(agent),
+        secret: twitter_oauth_token_secret(agent)
       )
       agent.service_id = service.id
       agent.save!
@@ -15,8 +31,8 @@ class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration
 
         Your Twitter agents were successfully migrated. You need to update your .env file and add the following two lines:
 
-        TWITTER_OAUTH_KEY=#{agents.first.twitter_consumer_key}
-        TWITTER_OAUTH_SECRET=#{agents.first.twitter_consumer_secret}
+        TWITTER_OAUTH_KEY=#{twitter_consumer_key(agents.first)}
+        TWITTER_OAUTH_SECRET=#{twitter_consumer_secret(agents.first)}
 
 
       EOF

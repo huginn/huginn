@@ -14,6 +14,15 @@ describe Service do
     @service.global.should == false
   end
 
+  it "disables all agents before beeing destroyed" do
+    agent = agents(:bob_basecamp_agent)
+    service = agent.service
+    service.destroy
+    agent.reload
+    agent.service_id.should be_nil
+    agent.disabled.should be_true
+  end
+
   describe "preparing for a request" do
     before(:each) do
       @service = services(:generic)

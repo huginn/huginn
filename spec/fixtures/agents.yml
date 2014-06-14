@@ -101,3 +101,8 @@ bob_manual_event_agent:
   type: Agents::ManualEventAgent
   user: bob
   name: "Bob's event testing agent"
+
+bob_basecamp_agent:
+  type: Agents::BasecampAgent
+  user: bob
+  service: generic
