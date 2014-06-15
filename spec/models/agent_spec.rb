@@ -122,6 +122,10 @@ describe Agent do
       stub(Agents::CannotBeScheduled).valid_type?("Agents::CannotBeScheduled") { true }
     end
 
+    describe Agents::SomethingSource do
+      it_behaves_like LiquidInterpolatable
+    end
+
     describe ".default_schedule" do
       it "stores the default on the class" do
         Agents::SomethingSource.default_schedule.should == "2pm"

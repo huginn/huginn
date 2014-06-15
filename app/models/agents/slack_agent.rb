@@ -1,6 +1,5 @@
 module Agents
   class SlackAgent < Agent
-    include LiquidInterpolatable
     cannot_be_scheduled!
     cannot_create_events!
 
@@ -45,20 +44,20 @@ module Agents
     end
 
     def webhook
-      options[:webhook].presence || DEFAULT_WEBHOOK
+      interpolated_options[:webhook].presence || DEFAULT_WEBHOOK
     end
 
     def username
-      options[:username].presence || DEFAULT_USERNAME
+      interpolated_options[:username].presence || DEFAULT_USERNAME
     end
 
     def slack_notifier
-      @slack_notifier ||= Slack::Notifier.new(options[:team_name], options[:auth_token], webhook, username: username)
+      @slack_notifier ||= Slack::Notifier.new(interpolated_options[:team_name], interpolated_options[:auth_token], webhook, username: username)
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        opts = interpolate_options options, event.payload
+        opts = interpolated_options(event.payload)
         slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username]
       end
     end

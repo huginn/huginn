@@ -1,7 +1,5 @@
 module Agents
   class TriggerAgent < Agent
-    include LiquidInterpolatable
-
     cannot_be_scheduled!
 
     VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value field!=value field>=value field>value]
@@ -30,7 +28,7 @@ module Agents
 
     def validate_options
       unless options['expected_receive_period_in_days'].present? && options['rules'].present? &&
-          options['rules'].all? { |rule| rule['type'].present? && VALID_COMPARISON_TYPES.include?(rule['type']) && rule['value'].present? && rule['path'].present? }
+             options['rules'].all? { |rule| rule['type'].present? && VALID_COMPARISON_TYPES.include?(rule['type']) && rule['value'].present? && rule['path'].present? }
         errors.add(:base, "expected_receive_period_in_days, message, and rules, with a type, value, and path for every rule, are required")
       end
 
@@ -53,12 +51,15 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated_options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        match = options['rules'].all? do |rule|
+
+        opts = interpolated_options(event.payload)
+
+        match = opts['rules'].all? do |rule|
           value_at_path = Utils.value_at(event['payload'], rule['path'])
           rule_values = rule['value']
           rule_values = [rule_values] unless rule_values.is_a?(Array)
@@ -90,9 +91,9 @@ module Agents
         if match
           if keep_event?
             payload = event.payload.dup
-            payload['message'] = interpolate_string(options['message'], event.payload) if options['message'].present?
+            payload['message'] = opts['message'] if opts['message'].present?
           else
-            payload = { 'message' => interpolate_string(options['message'], event.payload) }
+            payload = { 'message' => opts['message'] }
           end
 
           create_event :payload => payload
@@ -101,7 +102,7 @@ module Agents
     end
 
     def keep_event?
-      options['keep_event'] == 'true'
+      interpolated_options['keep_event'] == 'true'
     end
   end
 end

@@ -1,6 +1,5 @@
 module Agents
   class EventFormattingAgent < Agent
-    include LiquidInterpolatable
     cannot_be_scheduled!
 
     description <<-MD
@@ -81,7 +80,7 @@ module Agents
     after_save :clear_matchers
 
     def validate_options
-      errors.add(:base, "instructions, mode, skip_agent, and skip_created_at all need to be present.") unless options['instructions'].present? and options['mode'].present? and options['skip_agent'].present? and options['skip_created_at'].present?
+      errors.add(:base, "instructions, mode, skip_agent, and skip_created_at all need to be present.") unless options['instructions'].present? && options['mode'].present? && options['skip_agent'].present? && options['skip_created_at'].present?
 
       validate_matchers
     end
@@ -105,11 +104,12 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        formatted_event = options['mode'].to_s == "merge" ? event.payload.dup : {}
         payload = perform_matching(event.payload)
-        formatted_event.merge! interpolate_options(options['instructions'], payload)
-        formatted_event['agent'] = Agent.find(event.agent_id).type.slice!(8..-1) unless options['skip_agent'].to_s == "true"
-        formatted_event['created_at'] = event.created_at unless options['skip_created_at'].to_s == "true"
+        opts = interpolated_options(payload)
+        formatted_event = opts['mode'].to_s == "merge" ? event.payload.dup : {}
+        formatted_event.merge! opts['instructions']
+        formatted_event['agent'] = Agent.find(event.agent_id).type.slice!(8..-1) unless opts['skip_agent'].to_s == "true"
+        formatted_event['created_at'] = event.created_at unless opts['skip_created_at'].to_s == "true"
         create_event :payload => formatted_event
       end
     end

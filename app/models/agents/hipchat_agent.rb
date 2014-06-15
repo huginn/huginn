@@ -1,7 +1,5 @@
 module Agents
   class HipchatAgent < Agent
-    include LiquidInterpolatable
-
     cannot_be_scheduled!
     cannot_create_events!
 
@@ -42,9 +40,9 @@ module Agents
     end
 
     def receive(incoming_events)
-      client = HipChat::Client.new(options[:auth_token])
+      client = HipChat::Client.new(interpolated_options[:auth_token])
       incoming_events.each do |event|
-        mo = interpolate_options options, event.payload
+        mo = interpolated_options(event.payload)
         client[mo[:room_name]].send(mo[:username], mo[:message], :notify => mo[:notify].to_s == 'true' ? 1 : 0, :color => mo[:color])
       end
     end

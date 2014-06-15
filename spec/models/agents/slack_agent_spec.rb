@@ -2,8 +2,6 @@ require 'spec_helper'
 require 'models/concerns/liquid_interpolatable'
 
 describe Agents::SlackAgent do
-  it_behaves_like LiquidInterpolatable
-
   before(:each) do
     @valid_params = {
                       'auth_token' => 'token',

@@ -31,7 +31,4 @@ module EmailConcern
   def present_hash(hash, skip_key = nil)
     hash.to_a.sort_by {|a| a.first.to_s }.map { |k, v| "#{k}: #{v}" unless k.to_s == skip_key.to_s }.compact
   end
-
-  module ClassMethods
-  end
 end

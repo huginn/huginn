@@ -1,7 +1,5 @@
 module Agents
   class PushbulletAgent < Agent
-    include LiquidInterpolatable
-
     cannot_be_scheduled!
     cannot_create_events!
 
@@ -49,10 +47,11 @@ module Agents
     end
 
     private
+
     def query_options(event)
-      mo = interpolate_options options, event.payload
+      mo = interpolated_options(event.payload)
       {
-        :basic_auth => {:username =>mo[:api_key], :password=>''},
+        :basic_auth => {:username => mo[:api_key], :password => ''},
         :body => {:device_iden => mo[:device_id], :title => mo[:title], :body => mo[:body], :type => 'note'}
       }
     end

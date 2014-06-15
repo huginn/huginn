@@ -68,13 +68,13 @@ module Agents
 
     def validate_options
       unless options['uri'].present? &&
-        options['topic'].present?
+             options['topic'].present?
         errors.add(:base, "topic and uri are required")
       end
     end
 
     def working?
-      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated_options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
@@ -91,13 +91,13 @@ module Agents
     end
 
     def mqtt_client
-      @client ||= MQTT::Client.new(options['uri'])
+      @client ||= MQTT::Client.new(interpolated_options['uri'])
 
-      if options['ssl']
-        @client.ssl = options['ssl'].to_sym
-        @client.ca_file = options['ca_file']
-        @client.cert_file = options['cert_file']
-        @client.key_file = options['key_file']
+      if interpolated_options['ssl']
+        @client.ssl = interpolated_options['ssl'].to_sym
+        @client.ca_file = interpolated_options['ca_file']
+        @client.cert_file = interpolated_options['cert_file']
+        @client.key_file = interpolated_options['key_file']
       end
 
       @client
@@ -106,7 +106,7 @@ module Agents
     def receive(incoming_events)
       mqtt_client.connect do |c|
         incoming_events.each do |event|
-          c.publish(options['topic'], payload)
+          c.publish(interpolated_options(event.payload)['topic'], event.payload)
         end
 
         c.disconnect
@@ -117,8 +117,8 @@ module Agents
     def check
       mqtt_client.connect do |c|
 
-        Timeout::timeout((options['max_read_time'].presence || 15).to_i) {
-          c.get(options['topic']) do |topic, message|
+        Timeout::timeout((interpolated_options['max_read_time'].presence || 15).to_i) {
+          c.get(interpolated_options['topic']) do |topic, message|
 
             # A lot of services generate JSON. Try that first
             payload = JSON.parse(message) rescue message

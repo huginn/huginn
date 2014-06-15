@@ -2,8 +2,6 @@ require 'pp'
 
 module Agents
   class PeakDetectorAgent < Agent
-    include LiquidInterpolatable
-
     cannot_be_scheduled!
 
     description <<-MD
@@ -45,7 +43,7 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated_options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def receive(incoming_events)
@@ -69,7 +67,7 @@ module Agents
         if newest_value > average_value + std_multiple * standard_deviation
           memory['peaks'][group] << newest_time
           memory['peaks'][group].reject! { |p| p <= newest_time - window_duration }
-          create_event :payload => { 'message' => interpolate_string(options['message'], event.payload), 'peak' => newest_value, 'peak_time' => newest_time, 'grouped_by' => group.to_s }
+          create_event :payload => { 'message' => interpolated_options(event.payload)['message'], 'peak' => newest_value, 'peak_time' => newest_time, 'grouped_by' => group.to_s }
         end
       end
     end
@@ -94,33 +92,33 @@ module Agents
     end
 
     def window_duration
-      if options['window_duration'].present? # The older option
-        options['window_duration'].to_i
+      if interpolated_options['window_duration'].present? # The older option
+        interpolated_options['window_duration'].to_i
       else
-        (options['window_duration_in_days'] || 14).to_f.days
+        (interpolated_options['window_duration_in_days'] || 14).to_f.days
       end
     end
 
     def std_multiple
-      (options['std_multiple'] || 3).to_f
+      (interpolated_options['std_multiple'] || 3).to_f
     end
 
     def peak_spacing
-      if options['peak_spacing'].present? # The older option
-        options['peak_spacing'].to_i
+      if interpolated_options['peak_spacing'].present? # The older option
+        interpolated_options['peak_spacing'].to_i
       else
-        (options['min_peak_spacing_in_days'] || 2).to_f.days
+        (interpolated_options['min_peak_spacing_in_days'] || 2).to_f.days
       end
     end
 
     def group_for(event)
-      ((options['group_by_path'].present? && Utils.value_at(event.payload, options['group_by_path'])) || 'no_group')
+      ((interpolated_options['group_by_path'].present? && Utils.value_at(event.payload, interpolated_options['group_by_path'])) || 'no_group')
     end
 
     def remember(group, event)
       memory['data'] ||= {}
       memory['data'][group] ||= []
-      memory['data'][group] << [ Utils.value_at(event.payload, options['value_path']), event.created_at.to_i ]
+      memory['data'][group] << [ Utils.value_at(event.payload, interpolated_options['value_path']), event.created_at.to_i ]
       cleanup group
     end
 

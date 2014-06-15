@@ -1,20 +1,24 @@
 module LiquidInterpolatable
   extend ActiveSupport::Concern
 
-  def interpolate_options(options, payload)
-    case options.class.to_s
-    when 'String'
-      interpolate_string(options, payload)
-    when 'ActiveSupport::HashWithIndifferentAccess', 'Hash'
-      duped_options = options.dup
-      duped_options.each do |key, value|
-        duped_options[key] = interpolate_options(value, payload)
-      end
-    when 'Array'
-      options.collect do |value|
-        interpolate_options(value, payload)
-      end
+  def interpolate_options(options, payload = {})
+    case options
+      when String
+        interpolate_string(options, payload)
+      when ActiveSupport::HashWithIndifferentAccess, Hash
+        options.inject(ActiveSupport::HashWithIndifferentAccess.new) { |memo, (key, value)| memo[key] = interpolate_options(value, payload); memo }
+      when Array
+        options.map { |value| interpolate_options(value, payload) }
+      else
+        options
     end
+  end
+
+  def interpolated_options(payload = {})
+    key = [options, payload]
+    @interpolated_options_cache ||= {}
+    @interpolated_options_cache[key] ||= interpolate_options(options, payload)
+    @interpolated_options_cache[key]
   end
 
   def interpolate_string(string, payload)

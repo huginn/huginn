@@ -2,8 +2,6 @@ require 'spec_helper'
 require 'models/concerns/liquid_interpolatable'
 
 describe Agents::TriggerAgent do
-  it_behaves_like LiquidInterpolatable
-
   before do
     @valid_params = {
       'name' => "my trigger agent",

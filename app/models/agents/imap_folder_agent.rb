@@ -111,7 +111,7 @@ module Agents
     }
 
     def working?
-      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated_options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
@@ -240,7 +240,7 @@ module Agents
         matched_part = nil
         matches = {}
 
-        options['conditions'].all? { |key, value|
+        interpolated_options['conditions'].all? { |key, value|
           case key
           when 'subject'
             value.present? or next true
@@ -308,7 +308,7 @@ module Agents
           notified << mail.message_id if mail.message_id
         end
 
-        if options['mark_as_read']
+        if interpolated_options['mark_as_read']
           log 'Marking as read'
           mail.mark_as_read
         end
@@ -322,14 +322,14 @@ module Agents
     end
 
     def each_unread_mail
-      host, port, ssl, username = options.values_at(:host, :port, :ssl, :username)
+      host, port, ssl, username = interpolated_options.values_at(:host, :port, :ssl, :username)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
       Client.open(host, Integer(port), ssl) { |imap|
         log "Logging in as #{username}"
-        imap.login(username, options[:password])
+        imap.login(username, interpolated_options[:password])
 
-        options['folders'].each { |folder|
+        interpolated_options['folders'].each { |folder|
           log "Selecting the folder: %s" % folder
 
           imap.select(folder)
@@ -351,7 +351,7 @@ module Agents
     end
 
     def mime_types
-      options['mime_types'] || %w[text/plain text/enriched text/html]
+      interpolated_options['mime_types'] || %w[text/plain text/enriched text/html]
     end
 
     private

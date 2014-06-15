@@ -1,7 +1,5 @@
 module Agents
   class DataOutputAgent < Agent
-    include LiquidInterpolatable
-
     cannot_be_scheduled!
 
     description  do
@@ -52,6 +50,7 @@ module Agents
       unless options['secrets'].is_a?(Array) && options['secrets'].length > 0
         errors.add(:base, "Please specify one or more secrets for 'authenticating' incoming feed requests")
       end
+
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
         errors.add(:base, "Please provide 'expected_receive_period_in_days' to indicate how many days can pass before this Agent is considered to be not working")
       end
@@ -62,27 +61,27 @@ module Agents
     end
 
     def events_to_show
-      (options['events_to_show'].presence || 40).to_i
+      (interpolated_options['events_to_show'].presence || 40).to_i
     end
 
     def feed_ttl
-      (options['ttl'].presence || 60).to_i
+      (interpolated_options['ttl'].presence || 60).to_i
     end
 
     def feed_title
-      options['template']['title'].presence || "#{name} Event Feed"
+      interpolated_options['template']['title'].presence || "#{name} Event Feed"
     end
 
     def feed_link
-      options['template']['link'].presence || "https://#{ENV['DOMAIN']}"
+      interpolated_options['template']['link'].presence || "https://#{ENV['DOMAIN']}"
     end
 
     def feed_description
-      options['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
+      interpolated_options['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
     end
 
     def receive_web_request(params, method, format)
-      if options['secrets'].include?(params['secret'])
+      if interpolated_options['secrets'].include?(params['secret'])
         items = received_events.order('id desc').limit(events_to_show).map do |event|
           interpolated = interpolate_options(options['template']['item'], event.payload)
           interpolated['guid'] = event.id
