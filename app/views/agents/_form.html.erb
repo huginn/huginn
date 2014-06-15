@@ -77,7 +77,7 @@
         <div class="col-md-12">
           <div class="form-group">
             <%= f.label :options %>
-            <textarea rows="10" id="agent_options" name="agent[options]" class="form-control live-json-editor <%= (@agent.new_record? && @agent.options == {}) ? "showing-default" : "" %>">
+            <textarea rows="15" id="agent_options" name="agent[options]" class="form-control live-json-editor <%= (@agent.new_record? && @agent.options == {}) ? "showing-default" : "" %>">
               <%= Utils.jsonify((@agent.new_record? && @agent.options == {}) ? @agent.default_options : @agent.options) %>
             </textarea>
           </div>
@@ -104,7 +104,7 @@
 
   <div class='row'>
     <div class="col-md-12">
-      <%= f.submit :class => "btn btn-primary" %>
+      <%= f.submit "Save", :class => "btn btn-primary" %>
     </div>
   </div>
       

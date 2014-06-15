@@ -22,8 +22,10 @@
     <div class="page-header">
       <h2>
         <%= @scenario_import.parsed_data["name"] %>
-        <span class='text-muted'>(<%= pluralize @scenario_import.parsed_data["agents"].length, "Agent" %>
-          ; exported <%= time_ago_in_words Time.parse(@scenario_import.parsed_data["exported_at"]) %> ago)</span>
+        <span class='text-muted'>
+          (<%= pluralize @scenario_import.parsed_data["agents"].length, "Agent" %>;
+          exported <%= time_ago_in_words Time.parse(@scenario_import.parsed_data["exported_at"]) %> ago)
+        </span>
       </h2>
     </div>
 
@@ -48,7 +50,7 @@
           </h3>
 
           <% if agent_diff.agent_exists? %>
-            <div>
+            <div class="instructions">
               This Agent exists in your Huginn system.
 
               <% if agent_diff.requires_merge? %>
@@ -105,7 +107,7 @@
           </div>
 
           <div class='col-md-6'>
-            <textarea name="scenario_import[merges][<%= index %>][options]" rows='10' class="form-control live-json-editor">
+            <textarea name="scenario_import[merges][<%= index %>][options]" rows='15' class="form-control live-json-editor">
               <%= Utils.pretty_jsonify(agent_diff.options.updated) %>
             </textarea>
           </div>
