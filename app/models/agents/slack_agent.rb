@@ -44,20 +44,20 @@ module Agents
     end
 
     def webhook
-      interpolated_options[:webhook].presence || DEFAULT_WEBHOOK
+      interpolated[:webhook].presence || DEFAULT_WEBHOOK
     end
 
     def username
-      interpolated_options[:username].presence || DEFAULT_USERNAME
+      interpolated[:username].presence || DEFAULT_USERNAME
     end
 
     def slack_notifier
-      @slack_notifier ||= Slack::Notifier.new(interpolated_options[:team_name], interpolated_options[:auth_token], webhook, username: username)
+      @slack_notifier ||= Slack::Notifier.new(interpolated[:team_name], interpolated[:auth_token], webhook, username: username)
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        opts = interpolated_options(event.payload)
+        opts = interpolated(event.payload)
         slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username]
       end
     end

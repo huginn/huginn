@@ -55,11 +55,11 @@ module Agents
     MD
 
     event_description do
-      "Events will have the fields you specified.  Your options look like:\n\n    #{Utils.pretty_print interpolated_options['extract']}"
+      "Events will have the fields you specified.  Your options look like:\n\n    #{Utils.pretty_print interpolated['extract']}"
     end
 
     def working?
-      event_created_within?(interpolated_options['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
@@ -125,7 +125,7 @@ module Agents
     end
 
     def check
-      check_url interpolated_options['url']
+      check_url interpolated['url']
     end
 
     def check_url(in_url)
@@ -136,7 +136,7 @@ module Agents
         response = faraday.get(url)
         if response.success?
           body = response.body
-          if (encoding = interpolated_options['force_encoding']).present?
+          if (encoding = interpolated['force_encoding']).present?
             body = body.encode(Encoding::UTF_8, encoding)
           end
           doc = parse(body)
@@ -148,7 +148,7 @@ module Agents
             end
           else
             output = {}
-            interpolated_options['extract'].each do |name, extraction_details|
+            interpolated['extract'].each do |name, extraction_details|
               if extraction_type == "json"
                 result = Utils.values_at(doc, extraction_details['path'])
                 log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
@@ -181,17 +181,17 @@ module Agents
               output[name] = result
             end
 
-            num_unique_lengths = interpolated_options['extract'].keys.map { |name| output[name].length }.uniq
+            num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
 
             if num_unique_lengths.length != 1
-              error "Got an uneven number of matches for #{interpolated_options['name']}: #{interpolated_options['extract'].inspect}"
+              error "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
               return
             end
 
             old_events = previous_payloads num_unique_lengths.first
             num_unique_lengths.first.times do |index|
               result = {}
-              interpolated_options['extract'].keys.each do |name|
+              interpolated['extract'].keys.each do |name|
                 result[name] = output[name][index]
                 if name.to_s == 'url'
                   result[name] = (response.env[:url] + result[name]).to_s
@@ -223,11 +223,11 @@ module Agents
     # If mode is set to 'on_change', this method may return false and update an existing
     # event to expire further in the future.
     def store_payload!(old_events, result)
-      if !interpolated_options['mode'].present?
+      if !interpolated['mode'].present?
         return true
-      elsif interpolated_options['mode'].to_s == "all"
+      elsif interpolated['mode'].to_s == "all"
         return true
-      elsif interpolated_options['mode'].to_s == "on_change"
+      elsif interpolated['mode'].to_s == "on_change"
         result_json = result.to_json
         old_events.each do |old_event|
           if old_event.payload.to_json == result_json
@@ -238,12 +238,12 @@ module Agents
         end
         return true
       end
-      raise "Illegal options[mode]: " + interpolated_options['mode'].to_s
+      raise "Illegal options[mode]: " + interpolated['mode'].to_s
     end
 
     def previous_payloads(num_events)
-      if interpolated_options['uniqueness_look_back'].present?
-        look_back = interpolated_options['uniqueness_look_back'].to_i
+      if interpolated['uniqueness_look_back'].present?
+        look_back = interpolated['uniqueness_look_back'].to_i
       else
         # Larger of UNIQUENESS_FACTOR * num_events and UNIQUENESS_LOOK_BACK
         look_back = UNIQUENESS_FACTOR * num_events
@@ -251,18 +251,18 @@ module Agents
           look_back = UNIQUENESS_LOOK_BACK
         end
       end
-      events.order("id desc").limit(look_back) if interpolated_options['mode'].present? && interpolated_options['mode'].to_s == "on_change"
+      events.order("id desc").limit(look_back) if interpolated['mode'].present? && interpolated['mode'].to_s == "on_change"
     end
 
     def extract_full_json?
-      !interpolated_options['extract'].present? && extraction_type == "json"
+      !interpolated['extract'].present? && extraction_type == "json"
     end
 
     def extraction_type
-      (interpolated_options['type'] || begin
-        if interpolated_options['url'] =~ /\.(rss|xml)$/i
+      (interpolated['type'] || begin
+        if interpolated['url'] =~ /\.(rss|xml)$/i
           "xml"
-        elsif interpolated_options['url'] =~ /\.json$/i
+        elsif interpolated['url'] =~ /\.json$/i
           "json"
         else
           "html"
@@ -295,7 +295,7 @@ module Agents
       @faraday ||= Faraday.new { |builder|
         builder.headers = headers if headers.length > 0
 
-        if (user_agent = interpolated_options['user_agent']).present?
+        if (user_agent = interpolated['user_agent']).present?
           builder.headers[:user_agent] = user_agent
         end
 
@@ -318,7 +318,7 @@ module Agents
     end
 
     def basic_auth_credentials
-      case value = interpolated_options['basic_auth']
+      case value = interpolated['basic_auth']
       when nil, ''
         return nil
       when Array
@@ -330,7 +330,7 @@ module Agents
     end
 
     def headers
-      interpolated_options['headers'].presence || {}
+      interpolated['headers'].presence || {}
     end
   end
 end

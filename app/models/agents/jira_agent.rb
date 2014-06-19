@@ -56,7 +56,7 @@ module Agents
     end
 
     def working?
-      event_created_within?(interpolated_options['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def check
@@ -81,14 +81,14 @@ module Agents
 
   private
     def request_url(jql, start_at)
-      "#{interpolated_options[:jira_url]}/rest/api/2/search?jql=#{CGI::escape(jql)}&fields=*all&startAt=#{start_at}"
+      "#{interpolated[:jira_url]}/rest/api/2/search?jql=#{CGI::escape(jql)}&fields=*all&startAt=#{start_at}"
     end
 
     def request_options
       ropts = {:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
 
-      if !interpolated_options[:username].empty?
-        ropts = ropts.merge({:basic_auth => {:username =>interpolated_options[:username], :password=>interpolated_options[:password]}})
+      if !interpolated[:username].empty?
+        ropts = ropts.merge({:basic_auth => {:username =>interpolated[:username], :password=>interpolated[:password]}})
       end
 
       ropts
@@ -121,10 +121,10 @@ module Agents
 
       jql = ""
 
-      if !interpolated_options[:jql].empty? && since
-        jql = "(#{interpolated_options[:jql]}) and updated >= '#{since.strftime('%Y-%m-%d %H:%M')}'"
+      if !interpolated[:jql].empty? && since
+        jql = "(#{interpolated[:jql]}) and updated >= '#{since.strftime('%Y-%m-%d %H:%M')}'"
       else
-        jql = interpolated_options[:jql] if !interpolated_options[:jql].empty?
+        jql = interpolated[:jql] if !interpolated[:jql].empty?
         jql = "updated >= '#{since.strftime('%Y-%m-%d %H:%M')}'" if since
       end
 
@@ -142,7 +142,7 @@ module Agents
           raise RuntimeError.new("There is no progress while fetching issues")
         end
 
-        if Time.now > start_time + interpolated_options['timeout'].to_i * 60
+        if Time.now > start_time + interpolated['timeout'].to_i * 60
           raise RuntimeError.new("Timeout exceeded while fetching issues")
         end
 

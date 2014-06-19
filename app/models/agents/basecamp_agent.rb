@@ -76,11 +76,11 @@ module Agents
 
   private
     def request_url
-      "https://basecamp.com/#{URI.encode(interpolated_options[:user_id].to_s)}/api/v1/projects/#{URI.encode(interpolated_options[:project_id].to_s)}/events.json"
+      "https://basecamp.com/#{URI.encode(interpolated[:user_id].to_s)}/api/v1/projects/#{URI.encode(interpolated[:project_id].to_s)}/events.json"
     end
 
     def request_options
-      {:basic_auth => {:username => interpolated_options[:username], :password => interpolated_options[:password]}, :headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
+      {:basic_auth => {:username => interpolated[:username], :password => interpolated[:password]}, :headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
     end
 
     def query_parameters

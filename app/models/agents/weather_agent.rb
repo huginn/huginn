@@ -51,11 +51,11 @@ module Agents
     default_schedule "8pm"
 
     def working?
-      event_created_within?((interpolated_options['expected_update_period_in_days'].presence || 2).to_i) && !recent_error_logs?
+      event_created_within?((interpolated['expected_update_period_in_days'].presence || 2).to_i) && !recent_error_logs?
     end
 
     def key_setup?
-      interpolated_options['api_key'].present? && interpolated_options['api_key'] != "your-key"
+      interpolated['api_key'].present? && interpolated['api_key'] != "your-key"
     end
 
     def default_options
@@ -69,15 +69,15 @@ module Agents
     end
 
     def service
-      interpolated_options["service"].presence || "wunderground"
+      interpolated["service"].presence || "wunderground"
     end
 
     def which_day
-      (interpolated_options["which_day"].presence || 1).to_i
+      (interpolated["which_day"].presence || 1).to_i
     end
 
     def location
-      interpolated_options["location"].presence || interpolated_options["zipcode"]
+      interpolated["location"].presence || interpolated["zipcode"]
     end
 
     def validate_options
@@ -89,12 +89,12 @@ module Agents
     end
 
     def wunderground
-      Wunderground.new(interpolated_options['api_key']).forecast_for(location)['forecast']['simpleforecast']['forecastday'] if key_setup?
+      Wunderground.new(interpolated['api_key']).forecast_for(location)['forecast']['simpleforecast']['forecastday'] if key_setup?
     end
 
     def forecastio
       if key_setup?
-        ForecastIO.api_key = interpolated_options['api_key']
+        ForecastIO.api_key = interpolated['api_key']
         lat, lng = location.split(',')
         ForecastIO.forecast(lat,lng)['daily']['data']
       end

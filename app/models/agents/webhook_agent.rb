@@ -27,7 +27,7 @@ module Agents
     event_description do
       <<-MD
         The event payload is base on the value of the `payload_path` option,
-        which is set to `#{interpolated_options['payload_path']}`.
+        which is set to `#{interpolated['payload_path']}`.
       MD
     end
 
@@ -40,7 +40,7 @@ module Agents
     def receive_web_request(params, method, format)
       secret = params.delete('secret')
       return ["Please use POST requests only", 401] unless method == "post"
-      return ["Not Authorized", 401] unless secret == interpolated_options['secret']
+      return ["Not Authorized", 401] unless secret == interpolated['secret']
 
       create_event(:payload => payload_for(params))
 
@@ -48,7 +48,7 @@ module Agents
     end
 
     def working?
-      event_created_within?(interpolated_options['expected_receive_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated['expected_receive_period_in_days']) && !recent_error_logs?
     end
 
     def validate_options
@@ -58,7 +58,7 @@ module Agents
     end
 
     def payload_for(params)
-      Utils.value_at(params, interpolated_options['payload_path']) || {}
+      Utils.value_at(params, interpolated['payload_path']) || {}
     end
   end
 end

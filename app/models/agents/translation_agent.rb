@@ -28,7 +28,7 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > interpolated_options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def translate(text, to, access_token)
@@ -59,14 +59,14 @@ module Agents
 
     def receive(incoming_events)
       auth_uri = URI "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
-      response = postform auth_uri, :client_id => interpolated_options['client_id'],
-                                    :client_secret => interpolated_options['client_secret'],
+      response = postform auth_uri, :client_id => interpolated['client_id'],
+                                    :client_secret => interpolated['client_secret'],
                                     :scope => "http://api.microsofttranslator.com",
                                     :grant_type => "client_credentials"
       access_token = JSON.parse(response.body)["access_token"]
       incoming_events.each do |event|
         translated_event = {}
-        opts = interpolated_options(event.payload)
+        opts = interpolated(event.payload)
         opts['content'].each_pair do |key, value|
           translated_event[key] = translate(value.first, opts['to'], access_token)
         end

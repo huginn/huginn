@@ -74,7 +74,7 @@ module Agents
     end
 
     def working?
-      event_created_within?(interpolated_options['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
@@ -91,13 +91,13 @@ module Agents
     end
 
     def mqtt_client
-      @client ||= MQTT::Client.new(interpolated_options['uri'])
+      @client ||= MQTT::Client.new(interpolated['uri'])
 
-      if interpolated_options['ssl']
-        @client.ssl = interpolated_options['ssl'].to_sym
-        @client.ca_file = interpolated_options['ca_file']
-        @client.cert_file = interpolated_options['cert_file']
-        @client.key_file = interpolated_options['key_file']
+      if interpolated['ssl']
+        @client.ssl = interpolated['ssl'].to_sym
+        @client.ca_file = interpolated['ca_file']
+        @client.cert_file = interpolated['cert_file']
+        @client.key_file = interpolated['key_file']
       end
 
       @client
@@ -106,7 +106,7 @@ module Agents
     def receive(incoming_events)
       mqtt_client.connect do |c|
         incoming_events.each do |event|
-          c.publish(interpolated_options(event.payload)['topic'], event.payload)
+          c.publish(interpolated(event.payload)['topic'], event.payload)
         end
 
         c.disconnect
@@ -117,8 +117,8 @@ module Agents
     def check
       mqtt_client.connect do |c|
 
-        Timeout::timeout((interpolated_options['max_read_time'].presence || 15).to_i) {
-          c.get(interpolated_options['topic']) do |topic, message|
+        Timeout::timeout((interpolated['max_read_time'].presence || 15).to_i) {
+          c.get(interpolated['topic']) do |topic, message|
 
             # A lot of services generate JSON. Try that first
             payload = JSON.parse(message) rescue message

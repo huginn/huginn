@@ -14,11 +14,11 @@ module LiquidInterpolatable
     end
   end
 
-  def interpolated_options(payload = {})
+  def interpolated(payload = {})
     key = [options, payload]
-    @interpolated_options_cache ||= {}
-    @interpolated_options_cache[key] ||= interpolate_options(options, payload)
-    @interpolated_options_cache[key]
+    @interpolated_cache ||= {}
+    @interpolated_cache[key] ||= interpolate_options(options, payload)
+    @interpolated_cache[key]
   end
 
   def interpolate_string(string, payload)

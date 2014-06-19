@@ -56,17 +56,17 @@ module Agents
     end
 
     def working?
-      Agents::ShellCommandAgent.should_run? && event_created_within?(interpolated_options['expected_update_period_in_days']) && !recent_error_logs?
+      Agents::ShellCommandAgent.should_run? && event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        handle(interpolated_options(event.payload), event)
+        handle(interpolated(event.payload), event)
       end
     end
 
     def check
-      handle(interpolated_options)
+      handle(interpolated)
     end
 
     private

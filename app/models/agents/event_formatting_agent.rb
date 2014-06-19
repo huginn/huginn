@@ -105,7 +105,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         payload = perform_matching(event.payload)
-        opts = interpolated_options(payload)
+        opts = interpolated(payload)
         formatted_event = opts['mode'].to_s == "merge" ? event.payload.dup : {}
         formatted_event.merge! opts['instructions']
         formatted_event['agent'] = Agent.find(event.agent_id).type.slice!(8..-1) unless opts['skip_agent'].to_s == "true"

@@ -51,13 +51,13 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > interpolated_options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
 
-        opts = interpolated_options(event.payload)
+        opts = interpolated(event.payload)
 
         match = opts['rules'].all? do |rule|
           value_at_path = Utils.value_at(event['payload'], rule['path'])
@@ -102,7 +102,7 @@ module Agents
     end
 
     def keep_event?
-      interpolated_options['keep_event'] == 'true'
+      interpolated['keep_event'] == 'true'
     end
   end
 end

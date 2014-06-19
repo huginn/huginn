@@ -61,27 +61,27 @@ module Agents
     end
 
     def events_to_show
-      (interpolated_options['events_to_show'].presence || 40).to_i
+      (interpolated['events_to_show'].presence || 40).to_i
     end
 
     def feed_ttl
-      (interpolated_options['ttl'].presence || 60).to_i
+      (interpolated['ttl'].presence || 60).to_i
     end
 
     def feed_title
-      interpolated_options['template']['title'].presence || "#{name} Event Feed"
+      interpolated['template']['title'].presence || "#{name} Event Feed"
     end
 
     def feed_link
-      interpolated_options['template']['link'].presence || "https://#{ENV['DOMAIN']}"
+      interpolated['template']['link'].presence || "https://#{ENV['DOMAIN']}"
     end
 
     def feed_description
-      interpolated_options['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
+      interpolated['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
     end
 
     def receive_web_request(params, method, format)
-      if interpolated_options['secrets'].include?(params['secret'])
+      if interpolated['secrets'].include?(params['secret'])
         items = received_events.order('id desc').limit(events_to_show).map do |event|
           interpolated = interpolate_options(options['template']['item'], event.payload)
           interpolated['guid'] = event.id

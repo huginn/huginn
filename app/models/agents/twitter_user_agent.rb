@@ -51,7 +51,7 @@ module Agents
     default_schedule "every_1h"
 
     def working?
-      event_created_within?(interpolated_options['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
@@ -76,15 +76,15 @@ module Agents
     end
 
     def starting_at
-      if interpolated_options[:starting_at].present?
-        Time.parse(interpolated_options[:starting_at]) rescue created_at
+      if interpolated[:starting_at].present?
+        Time.parse(interpolated[:starting_at]) rescue created_at
       else
         created_at
       end
     end
 
     def include_retweets?
-      interpolated_options[:include_retweets] != "false"
+      interpolated[:include_retweets] != "false"
     end
 
     def check
@@ -93,7 +93,7 @@ module Agents
       opts.merge! :since_id => since_id unless since_id.nil?
 
       # http://rdoc.info/gems/twitter/Twitter/REST/Timelines#user_timeline-instance_method
-      tweets = twitter.user_timeline(interpolated_options['username'], opts)
+      tweets = twitter.user_timeline(interpolated['username'], opts)
 
       tweets.each do |tweet|
         if tweet.created_at >= starting_at
