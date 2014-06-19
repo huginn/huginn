@@ -29,7 +29,7 @@ module Agents
     MD
 
     def working?
-      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
@@ -90,10 +90,10 @@ module Agents
     end
 
     def each_entry
-      patterns = options['patterns']
+      patterns = interpolated['patterns']
 
       after =
-        if str = options['after']
+        if str = interpolated['after']
           Time.parse(str)
         else
           Time.at(0)
@@ -174,7 +174,7 @@ module Agents
     end
 
     def base_uri
-      @base_uri ||= URI(options['url'])
+      @base_uri ||= URI(interpolated['url'])
     end
 
     def saving_entries

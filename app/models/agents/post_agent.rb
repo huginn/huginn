@@ -27,15 +27,15 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def method
-      (options['method'].presence || 'post').to_s.downcase
+      (interpolated['method'].presence || 'post').to_s.downcase
     end
 
     def headers
-      options['headers'].presence || {}
+      interpolated['headers'].presence || {}
     end
 
     def validate_options
@@ -58,16 +58,16 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        handle (options['payload'].presence || {}).merge(event.payload)
+        handle (interpolated(event.payload)['payload'].presence || {}).merge(event.payload)
       end
     end
 
     def check
-      handle options['payload'].presence || {}
+      handle interpolated['payload'].presence || {}
     end
 
     def generate_uri(params = nil)
-      uri = URI options[:post_url]
+      uri = URI interpolated[:post_url]
       uri.query = URI.encode_www_form(Hash[URI.decode_www_form(uri.query || '')].merge(params)) if params
       uri
     end

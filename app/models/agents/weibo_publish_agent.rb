@@ -21,13 +21,13 @@ module Agents
 
     def validate_options
       unless options['uid'].present? &&
-        options['expected_update_period_in_days'].present?
+             options['expected_update_period_in_days'].present?
         errors.add(:base, "expected_update_period_in_days and uid are required")
       end
     end
 
     def working?
-      event_created_within?(options['expected_update_period_in_days']) && most_recent_event.payload['success'] == true && !recent_error_logs?
+      event_created_within?(interpolated['expected_update_period_in_days']) && most_recent_event.payload['success'] == true && !recent_error_logs?
     end
 
     def default_options
@@ -47,7 +47,7 @@ module Agents
         incoming_events = incoming_events.first(20)
       end
       incoming_events.each do |event|
-        tweet_text = Utils.value_at(event.payload, options['message_path'])
+        tweet_text = Utils.value_at(event.payload, interpolated(event.payload)['message_path'])
         if event.agent.type == "Agents::TwitterUserAgent"
           tweet_text = unwrap_tco_urls(tweet_text, event.payload)
         end

@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Agents::JabberAgent do
-  it_behaves_like LiquidInterpolatable
-
   let(:sent) { [] }
   let(:config) {
     {

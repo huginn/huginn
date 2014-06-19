@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Agents::PeakDetectorAgent do
-  it_behaves_like LiquidInterpolatable
-
   before do
     @valid_params = {
         'name' => "my peak detector agent",

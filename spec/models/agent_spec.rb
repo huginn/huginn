@@ -121,13 +121,16 @@ describe Agent do
       stub(Agents::CannotBeScheduled).valid_type?("Agents::CannotBeScheduled") { true }
     end
 
-    let(:new_instance) do
-      agent = Agents::SomethingSource.new(:name => "some agent")
-      agent.user = users(:bob)
-      agent
-    end
+    describe Agents::SomethingSource do
+      let(:new_instance) do
+        agent = Agents::SomethingSource.new(:name => "some agent")
+        agent.user = users(:bob)
+        agent
+      end
 
-    it_behaves_like HasGuid
+      it_behaves_like LiquidInterpolatable
+      it_behaves_like HasGuid
+    end
 
     describe ".default_schedule" do
       it "stores the default on the class" do

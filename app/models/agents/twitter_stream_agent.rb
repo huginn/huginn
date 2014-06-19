@@ -65,7 +65,7 @@ module Agents
     end
 
     def working?
-      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
@@ -80,7 +80,7 @@ module Agents
       filter = lookup_filter(filter)
 
       if filter
-        if options['generate'] == "counts"
+        if interpolated['generate'] == "counts"
           # Avoid memory pollution by reloading the Agent.
           agent = Agent.find(id)
           agent.memory['filter_counts'] ||= {}
@@ -95,7 +95,7 @@ module Agents
     end
 
     def check
-      if options['generate'] == "counts" && memory['filter_counts'] && memory['filter_counts'].length > 0
+      if interpolated['generate'] == "counts" && memory['filter_counts'] && memory['filter_counts'].length > 0
         memory['filter_counts'].each do |filter, count|
           create_event :payload => { 'filter' => filter, 'count' => count, 'time' => Time.now.to_i }
         end
@@ -106,7 +106,7 @@ module Agents
     protected
 
     def lookup_filter(filter)
-      options['filters'].each do |known_filter|
+      interpolated['filters'].each do |known_filter|
         if known_filter == filter
           return filter
         elsif known_filter.is_a?(Array)
@@ -119,7 +119,7 @@ module Agents
 
     def remove_unused_keys!(agent, base)
       if agent.memory[base]
-        (agent.memory[base].keys - agent.options['filters'].map {|f| f.is_a?(Array) ? f.first.to_s : f.to_s }).each do |removed_key|
+        (agent.memory[base].keys - agent.interpolated['filters'].map {|f| f.is_a?(Array) ? f.first.to_s : f.to_s }).each do |removed_key|
           agent.memory[base].delete(removed_key)
         end
       end

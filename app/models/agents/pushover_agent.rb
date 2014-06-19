@@ -58,44 +58,45 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        message = (event.payload['message'].presence  || event.payload['text'].presence  || options['message']).to_s
+        payload_interpolated = interpolated(event.payload)
+        message = (event.payload['message'].presence || event.payload['text'].presence || payload_interpolated['message']).to_s
         if message.present?
-            post_params = {
-              'token' => options['token'],
-              'user' => options['user'],
-              'message' => message
-            }
+          post_params = {
+            'token' => payload_interpolated['token'],
+            'user' => payload_interpolated['user'],
+            'message' => message
+          }
 
-            post_params['device'] = event.payload['device'].presence  || options['device']
-            post_params['title'] = event.payload['title'].presence  || event.payload['subject'].presence  || options['title']
+          post_params['device'] = event.payload['device'].presence || payload_interpolated['device']
+          post_params['title'] = event.payload['title'].presence || event.payload['subject'].presence || payload_interpolated['title']
 
-            url = (event.payload['url'].presence  || options['url'] || '').to_s
-            url = url.slice 0..512
-            post_params['url'] = url
+          url = (event.payload['url'].presence || payload_interpolated['url'] || '').to_s
+          url = url.slice 0..512
+          post_params['url'] = url
 
-            url_title = (event.payload['url_title'].presence  || options['url_title']).to_s
-            url_title = url_title.slice 0..100
-            post_params['url_title'] = url_title
+          url_title = (event.payload['url_title'].presence || payload_interpolated['url_title']).to_s
+          url_title = url_title.slice 0..100
+          post_params['url_title'] = url_title
 
-            post_params['priority'] = (event.payload['priority'].presence  || options['priority']).to_i
+          post_params['priority'] = (event.payload['priority'].presence || payload_interpolated['priority']).to_i
 
-            if event.payload.has_key? 'timestamp'
-              post_params['timestamp'] = (event.payload['timestamp']).to_s
-            end
+          if event.payload.has_key? 'timestamp'
+            post_params['timestamp'] = (event.payload['timestamp']).to_s
+          end
 
-            post_params['sound'] = (event.payload['sound'].presence  || options['sound']).to_s
+          post_params['sound'] = (event.payload['sound'].presence || payload_interpolated['sound']).to_s
 
-            post_params['retry'] = (event.payload['retry'].presence  || options['retry']).to_i
+          post_params['retry'] = (event.payload['retry'].presence || payload_interpolated['retry']).to_i
 
-            post_params['expire'] = (event.payload['expire'].presence  || options['expire']).to_i
+          post_params['expire'] = (event.payload['expire'].presence || payload_interpolated['expire']).to_i
 
-            send_notification(post_params)
+          send_notification(post_params)
         end
       end
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def send_notification(post_params)

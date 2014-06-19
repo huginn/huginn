@@ -2,8 +2,6 @@ require 'rturk'
 
 module Agents
   class HumanTaskAgent < Agent
-    include LiquidInterpolatable
-
     default_schedule "every_10m"
 
     description <<-MD
@@ -204,20 +202,20 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def check
       review_hits
 
-      if options['trigger_on'] == "schedule" && (memory['last_schedule'] || 0) <= Time.now.to_i - options['submission_period'].to_i * 60 * 60
+      if interpolated['trigger_on'] == "schedule" && (memory['last_schedule'] || 0) <= Time.now.to_i - interpolated['submission_period'].to_i * 60 * 60
         memory['last_schedule'] = Time.now.to_i
         create_basic_hit
       end
     end
 
     def receive(incoming_events)
-      if options['trigger_on'] == "event"
+      if interpolated['trigger_on'] == "event"
         incoming_events.each do |event|
           create_basic_hit event
         end
@@ -227,11 +225,11 @@ module Agents
     protected
 
     def take_majority?
-      options['combination_mode'] == "take_majority" || options['take_majority'] == "true"
+      interpolated['combination_mode'] == "take_majority" || interpolated['take_majority'] == "true"
     end
 
     def create_poll?
-      options['combination_mode'] == "poll"
+      interpolated['combination_mode'] == "poll"
     end
 
     def event_for_hit(hit_id)
@@ -367,7 +365,7 @@ module Agents
     end
 
     def all_questions_are_numeric?
-      options['hit']['questions'].all? do |question|
+      interpolated['hit']['questions'].all? do |question|
         question['selections'].all? do |selection|
           selection['key'] == selection['key'].to_f.to_s || selection['key'] == selection['key'].to_i.to_s
         end

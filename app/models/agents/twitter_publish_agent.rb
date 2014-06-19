@@ -3,7 +3,6 @@ require "twitter"
 module Agents
   class TwitterPublishAgent < Agent
     include TwitterConcern
-    include LiquidInterpolatable
 
     cannot_be_scheduled!
 
@@ -26,7 +25,7 @@ module Agents
     end
 
     def working?
-      event_created_within?(options['expected_update_period_in_days']) && most_recent_event && most_recent_event.payload['success'] == true && !recent_error_logs?
+      event_created_within?(interpolated['expected_update_period_in_days']) && most_recent_event && most_recent_event.payload['success'] == true && !recent_error_logs?
     end
 
     def default_options
@@ -42,7 +41,7 @@ module Agents
         incoming_events = incoming_events.first(20)
       end
       incoming_events.each do |event|
-        tweet_text = interpolate_string(options['message'], event.payload)
+        tweet_text = interpolated(event.payload)['message']
         begin
           tweet = publish_tweet tweet_text
           create_event :payload => {

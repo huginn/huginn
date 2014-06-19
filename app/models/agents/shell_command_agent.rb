@@ -15,7 +15,8 @@ module Agents
 
       `expected_update_period_in_days` is used to determine if the Agent is working.
 
-      ShellCommandAgent can also act upon received events. These events may contain their own `path` and `command` values. If they do not, ShellCommandAgent will use the configured options. For this reason, please specify defaults even if you are planning to have this Agent to respond to events.
+      ShellCommandAgent can also act upon received events. When receiving an event, this Agent's options can interpolate values from the incoming event.
+      For example, your command could be defined as `{{cmd}}`, in which case the event's `cmd` property would be used.
 
       The resulting event will contain the `command` which was executed, the `path` it was executed under, the `exit_status` of the command, the `errors`, and the actual `output`. ShellCommandAgent will not log an error if the result implies that something went wrong.
 
@@ -55,25 +56,25 @@ module Agents
     end
 
     def working?
-      Agents::ShellCommandAgent.should_run? && event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
+      Agents::ShellCommandAgent.should_run? && event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        handle(event.payload, event)
+        handle(interpolated(event.payload), event)
       end
     end
 
     def check
-      handle(options)
+      handle(interpolated)
     end
 
     private
 
-    def handle(opts = options, event = nil)
+    def handle(opts, event = nil)
       if Agents::ShellCommandAgent.should_run?
-        command = opts['command'] || options['command']
-        path = opts['path'] || options['path']
+        command = opts['command']
+        path = opts['path']
 
         result, errors, exit_status = run_command(path, command)
 

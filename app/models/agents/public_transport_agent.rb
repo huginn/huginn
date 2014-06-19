@@ -48,12 +48,12 @@ module Agents
     MD
 
     def check_url
-      stop_query = URI.encode(options["stops"].collect{|a| "&stops=#{a}"}.join)
-      "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=#{options["agency"]}#{stop_query}"
+      stop_query = URI.encode(interpolated["stops"].collect{|a| "&stops=#{a}"}.join)
+      "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=#{interpolated["agency"]}#{stop_query}"
     end
 
     def stops
-      options["stops"].collect{|a| a.split("|").last}
+      interpolated["stops"].collect{|a| a.split("|").last}
     end
 
     def check
@@ -65,7 +65,7 @@ module Agents
         predictions.each do |pr|
           parent = pr.parent.parent
           vals = {"routeTitle" => parent["routeTitle"], "stopTag" => parent["stopTag"]}
-          if pr["minutes"] && pr["minutes"].to_i < options["alert_window_in_minutes"].to_i
+          if pr["minutes"] && pr["minutes"].to_i < interpolated["alert_window_in_minutes"].to_i
             vals = vals.merge Hash.from_xml(pr.to_xml)
             if not_already_in_memory?(vals)
               create_event(:payload => vals)

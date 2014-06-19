@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Agents::HumanTaskAgent do
-  it_behaves_like LiquidInterpolatable
-
   before do
     @checker = Agents::HumanTaskAgent.new(:name => "my human task agent")
     @checker.options = @checker.default_options
