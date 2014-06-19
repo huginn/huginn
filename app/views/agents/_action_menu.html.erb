@@ -27,15 +27,25 @@
     <% end %>
   </li>
 
+  <% if agent.scenarios.length > 0 %>
+    <li class="divider"></li>
+
+    <% agent.scenarios.each do |scenario| %>
+      <li>
+        <%= link_to "<span class='color-warning glyphicon glyphicon-remove-circle'></span> Remove from <span class='scenario label label-info'>#{h scenario.name}</span>".html_safe, leave_scenario_agent_path(agent, :scenario_id => scenario.to_param, :return => returnTo), method: :put, :tabindex => "-1" %>
+      </li>
+    <% end %>
+  <% end %>
+
   <li class="divider"></li>
 
   <% if agent.can_create_events? && agent.events.count > 0 %>
     <li>
-      <%= link_to '<span class="color-danger glyphicon glyphicon-trash"></span> Delete all events'.html_safe, remove_events_agent_path(agent), method: :delete, data: {confirm: 'Are you sure you want to delete ALL events for this Agent?'}, :tabindex => "-1" %>
+      <%= link_to '<span class="color-danger glyphicon glyphicon-trash"></span> Delete all events'.html_safe, remove_events_agent_path(agent, :return => returnTo), method: :delete, data: {confirm: 'Are you sure you want to delete ALL emitted events for this Agent?'}, :tabindex => "-1" %>
     </li>
   <% end %>
 
   <li>
-    <%= link_to '<span class="color-danger glyphicon glyphicon-remove"></span> Delete agent'.html_safe, agent_path(agent), method: :delete, data: { confirm: 'Are you sure?' }, :tabindex => "-1" %>
+    <%= link_to '<span class="color-danger glyphicon glyphicon-remove"></span> Delete agent'.html_safe, agent_path(agent, :return => returnTo), method: :delete, data: { confirm: 'Are you sure that you want to permanently delete this Agent?' }, :tabindex => "-1" %>
   </li>
 </ul>

@@ -1,0 +1,33 @@
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>Share <span class='label label-info scenario'><%= @scenario.name %></span> with the world</h2>
+      </div>
+
+      <p>
+        <strong>Please be sure that none of the Agents in this Scenario have sensitive data in their settings before sharing!</strong>
+      </p>
+
+      <% if @scenario.public? %>
+        <p>
+          This Scenario is public.  You can <%= link_to "download and share your export file", export_scenario_path(@scenario, :format => :json) %>, or give out this URL:
+        </p>
+
+        <form onsubmit='return false;'>
+          <input type='text' class='form-control' value='<%= export_scenario_url(@scenario, :format => :json) %>' onclick="return this.select();"/>
+        </form>
+      <% else %>
+        This Scenario is not public.  You can share it by <%= link_to "downloading and sharing your export file", export_scenario_path(@scenario, :format => :json) %>.
+      <% end %>
+
+      <hr>
+
+      <div class="row">
+        <div class="col-md-12">
+          <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, scenario_path(@scenario), class: "btn btn-default" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

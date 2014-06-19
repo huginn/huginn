@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require 'spec_helper'
-require 'models/concerns/liquid_interpolatable'
 
 describe Agents::DataOutputAgent do
   it_behaves_like LiquidInterpolatable

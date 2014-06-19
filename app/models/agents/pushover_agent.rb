@@ -19,13 +19,13 @@ module Agents
       Your event can provide any of the following optional parameters or you can provide defaults:
 
       * `device` - your user's device name to send the message directly to that device, rather than all of the user's devices
-      * `title` or `subject` - your notifications's title
+      * `title` or `subject` - your notification's title
       * `url` - a supplementary URL to show with your message - `512` Character Limit
       * `url_title` - a title for your supplementary URL, otherwise just the URL is shown - `100` Character Limit
       * `priority` - send as `-1` to always send as a quiet notification, `0` is default, `1` to display as high-priority and bypass the user's quiet hours, or `2` for emergency priority: [Please read Pushover Docs on Emergency Priority](https://pushover.net/api#priority)
       * `sound` - the name of one of the sounds supported by device clients to override the user's default sound choice. [See PushOver docs for sound options.](https://pushover.net/api#sounds)
-      * `retry` - Requred for emergency priority - Specifies how often (in seconds) the Pushover servers will send the same notification to the user. Minimum value: `30`
-      * `expire` - Requred for emergency priority - Specifies how many seconds your notification will continue to be retried for (every retry seconds). Maximum value: `86400`
+      * `retry` - Required for emergency priority - Specifies how often (in seconds) the Pushover servers will send the same notification to the user. Minimum value: `30`
+      * `expire` - Required for emergency priority - Specifies how many seconds your notification will continue to be retried for (every retry seconds). Maximum value: `86400`
 
       Your event can also pass along a timestamp parameter:
 
@@ -42,10 +42,10 @@ module Agents
         'title' => '',
         'url' => '',
         'url_title' => '',
-        'priority' => 0,
+        'priority' => '0',
         'sound' => 'pushover',
-        'retry' => 0,
-        'expire' => 0,
+        'retry' => '0',
+        'expire' => '0',
         'expected_receive_period_in_days' => '1'
       }
     end
@@ -102,6 +102,5 @@ module Agents
       response = HTTParty.post(API_URL, :query => post_params)
       puts response
     end
-
   end
 end

@@ -14,7 +14,7 @@
 
 <script>
   $(function () {
-    var payloadJsonEditor = window.setupJsonEditor($(".payload-editor"));
+    var payloadJsonEditor = window.setupJsonEditor($(".payload-editor"))[0];
     $("#create-event-form").submit(function (e) {
       e.preventDefault();
       var $form = $("#create-event-form");

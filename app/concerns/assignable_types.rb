@@ -29,7 +29,7 @@ module AssignableTypes
       const_get(:TYPES).include?(type)
     end
 
-    def build_for_type(type, user, attributes)
+    def build_for_type(type, user, attributes = {})
       attributes.delete(:type)
 
       if valid_type?(type)

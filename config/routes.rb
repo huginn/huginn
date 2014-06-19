@@ -3,6 +3,7 @@ Huginn::Application.routes.draw do
     member do
       post :run
       post :handle_details_post
+      put :leave_scenario
       delete :remove_events
     end
 
@@ -23,6 +24,17 @@ Huginn::Application.routes.draw do
   resources :events, :only => [:index, :show, :destroy] do
     member do
       post :reemit
+    end
+  end
+
+  resources :scenarios do
+    collection do
+      resource :scenario_imports, :only => [:new, :create]
+    end
+
+    member do
+      get :share
+      get :export
     end
   end
 

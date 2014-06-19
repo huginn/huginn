@@ -3,7 +3,7 @@ require 'spec_helper'
 shared_examples_for WorkingHelpers do
   describe "recent_error_logs?" do
     it "returns true if last_error_log_at is near last_event_at" do
-      agent = Agent.new
+      agent = described_class.new
 
       agent.last_error_log_at = 10.minutes.ago
       agent.last_event_at = 10.minutes.ago
@@ -26,9 +26,10 @@ shared_examples_for WorkingHelpers do
       agent.recent_error_logs?.should be_false
     end
   end
+
   describe "received_event_without_error?" do
     before do
-      @agent = Agent.new
+      @agent = described_class.new
     end
 
     it "should return false until the first event was received" do
@@ -49,5 +50,4 @@ shared_examples_for WorkingHelpers do
       @agent.received_event_without_error?.should == true
     end
   end
-
 end

@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'models/concerns/liquid_interpolatable'
 
 describe Agents::SlackAgent do
   it_behaves_like LiquidInterpolatable
@@ -51,7 +50,8 @@ describe Agents::SlackAgent do
                        username: @event.payload[:username]
                       )
       end
-      expect(@checker.receive([@event])).to_not raise_error
+
+      lambda { @checker.receive([@event]) }.should_not raise_error
     end
   end
 
