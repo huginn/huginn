@@ -35,6 +35,7 @@ module DotHelper
           dot << '%s;' % disabled_label(agent)
         end
         agent.receivers.each do |receiver|
+          next unless agents.include?(receiver)
           dot << "%s->%s;" % [disabled_label(agent), disabled_label(receiver)]
         end
       end

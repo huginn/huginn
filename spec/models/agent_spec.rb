@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'models/concerns/working_helpers'
 
 describe Agent do
   it_behaves_like WorkingHelpers
@@ -123,7 +122,14 @@ describe Agent do
     end
 
     describe Agents::SomethingSource do
+      let(:new_instance) do
+        agent = Agents::SomethingSource.new(:name => "some agent")
+        agent.user = users(:bob)
+        agent
+      end
+
       it_behaves_like LiquidInterpolatable
+      it_behaves_like HasGuid
     end
 
     describe ".default_schedule" do
@@ -482,6 +488,23 @@ describe Agent do
         agent.should have(1).errors_on(:sources)
         agent.user = users(:jane)
         agent.should have(0).errors_on(:sources)
+      end
+
+      it "should not allow scenarios owned by other people" do
+        agent = Agents::SomethingSource.new(:name => "something")
+        agent.user = users(:bob)
+
+        agent.scenario_ids = [scenarios(:bob_weather).id]
+        agent.should have(0).errors_on(:scenarios)
+
+        agent.scenario_ids = [scenarios(:bob_weather).id, scenarios(:jane_weather).id]
+        agent.should have(1).errors_on(:scenarios)
+
+        agent.scenario_ids = [scenarios(:jane_weather).id]
+        agent.should have(1).errors_on(:scenarios)
+
+        agent.user = users(:jane)
+        agent.should have(0).errors_on(:scenarios)
       end
 
       it "validates keep_events_for" do

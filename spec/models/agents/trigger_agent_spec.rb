@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'models/concerns/liquid_interpolatable'
 
 describe Agents::TriggerAgent do
   before do

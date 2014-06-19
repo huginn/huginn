@@ -1,0 +1,75 @@
+<div class='table-responsive'>
+  <table class='table table-striped'>
+    <tr>
+      <th>Name</th>
+      <th>Schedule</th>
+      <th>Last Check</th>
+      <th>Last Event Out</th>
+      <th>Last Event In</th>
+      <th>Events Created</th>
+      <th>Working?</th>
+      <th></th>
+    </tr>
+
+    <% @agents.each do |agent| %>
+      <tr>
+        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+          <%= link_to agent.name, agent_path(agent) %>
+          <br/>
+          <span class='text-muted'><%= agent.short_type.titleize %></span>
+          <% if agent.scenarios.present? %>
+            <span>
+              <%= scenario_links(agent) %>
+            </span>
+          <% end %>
+        </td>
+        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+          <% if agent.can_be_scheduled? %>
+            <%= agent.schedule.to_s.humanize.titleize %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+          <% if agent.can_be_scheduled? %>
+            <%= agent.last_check_at ? time_ago_in_words(agent.last_check_at) + " ago" : "never" %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+          <% if agent.can_create_events? %>
+            <%= agent.last_event_at ? time_ago_in_words(agent.last_event_at) + " ago" : "never" %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+          <% if agent.can_receive_events? %>
+            <%= agent.last_receive_at ? time_ago_in_words(agent.last_receive_at) + " ago" : "never" %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+          <% if agent.can_create_events? %>
+            <%= link_to(agent.events_count || 0, events_path(:agent => agent.to_param)) %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td><%= working(agent) %></td>
+        <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+              <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
+            </button>
+            <%= render 'agents/action_menu', :agent => agent, :returnTo => (defined?(returnTo) && returnTo) || "index" %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+
+<%= paginate @agents, :theme => 'twitter-bootstrap-3' %>

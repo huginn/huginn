@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'models/concerns/liquid_interpolatable'
 
 describe Agents::PushbulletAgent do
   before(:each) do

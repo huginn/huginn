@@ -13,6 +13,7 @@
   <% if user_signed_in? %>
     <ul class='nav navbar-nav'>
       <%= nav_link "Agents", agents_path %>
+      <%= nav_link "Scenarios", scenarios_path %>
       <%= nav_link "Events", events_path %>
       <%= nav_link "Credentials", user_credentials_path %>
     </ul>
