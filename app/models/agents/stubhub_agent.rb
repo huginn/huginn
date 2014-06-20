@@ -35,7 +35,7 @@ module Agents
     end
 
     def url
-      options['url']
+      interpolated['url']
     end
 
     def check

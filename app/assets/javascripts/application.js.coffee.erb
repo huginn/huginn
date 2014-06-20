@@ -9,14 +9,17 @@
 #= require ./worker-checker
 #= require_self
 
-window.setupJsonEditor = ($editor = $(".live-json-editor")) ->
+window.setupJsonEditor = ($editors = $(".live-json-editor")) ->
   JSONEditor.prototype.ADD_IMG = '<%= image_path 'json-editor/add.png' %>'
   JSONEditor.prototype.DELETE_IMG = '<%= image_path 'json-editor/delete.png' %>'
-  if $editor.length
+  editors = []
+  $editors.each ->
+    $editor = $(this)
     jsonEditor = new JSONEditor($editor, $editor.data('width') || 400, $editor.data('height') || 500)
     jsonEditor.doTruncation true
     jsonEditor.showFunctionButtons()
-    return jsonEditor
+    editors.push jsonEditor
+  return editors
 
 hideSchedule = ->
   $(".schedule-region select").hide()
@@ -55,11 +58,14 @@ showEventDescriptions = ->
 
 $(document).ready ->
   # JSON Editor
-  window.jsonEditor = setupJsonEditor()
+  window.jsonEditor = setupJsonEditor()[0]
 
   # Flash
   if $(".flash").length
     setTimeout((-> $(".flash").slideUp(-> $(".flash").remove())), 5000)
+
+  # Help popovers
+  $('.hover-help').popover(trigger: 'hover')
 
   # Agent Navigation
   $agentNavigate = $('#agent-navigate')
@@ -99,7 +105,7 @@ $(document).ready ->
         e.preventDefault()
         $agentNavigate.focus()
 
-# Agent Show
+  # Agent Show
   fetchLogs = (e) ->
     agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
     e.preventDefault()

@@ -1,7 +1,5 @@
 module Agents
   class TranslationAgent < Agent
-    include LiquidInterpolatable
-
     cannot_be_scheduled!
 
     description <<-MD
@@ -30,7 +28,7 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def translate(text, to, access_token)
@@ -61,16 +59,16 @@ module Agents
 
     def receive(incoming_events)
       auth_uri = URI "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
-      response = postform auth_uri, :client_id => options['client_id'],
-                                    :client_secret => options['client_secret'],
+      response = postform auth_uri, :client_id => interpolated['client_id'],
+                                    :client_secret => interpolated['client_secret'],
                                     :scope => "http://api.microsofttranslator.com",
                                     :grant_type => "client_credentials"
       access_token = JSON.parse(response.body)["access_token"]
       incoming_events.each do |event|
         translated_event = {}
-        options['content'].each_pair do |key, value|
-          to_be_translated = interpolate_string(value, event.payload)
-          translated_event[key] = translate(to_be_translated.first, options['to'], access_token)
+        opts = interpolated(event.payload)
+        opts['content'].each_pair do |key, value|
+          translated_event[key] = translate(value.first, opts['to'], access_token)
         end
         create_event :payload => translated_event
       end

@@ -28,7 +28,7 @@ shared_examples_for LiquidInterpolatable do
       }
     end
 
-    it "hsould work with arrays", focus: true do
+    it "should work with arrays", focus: true do
       @checker.options = {"value" => ["{{variable}}", "Much array", "Hey, {{hello_world}}"]}
       @checker.interpolate_options(@checker.options, @event.payload).should == {
         "value" => ["hello", "Much array", "Hey, Hello world"]
@@ -53,6 +53,7 @@ shared_examples_for LiquidInterpolatable do
       @checker.interpolate_string("{{variable}} you", @event.payload).should == "hello you"
     end
   end
+
   describe "liquid tags" do
     it "should work with existing credentials" do
       @checker.interpolate_string("{% credential aws_key %}", {}).should == '2222222222-jane'

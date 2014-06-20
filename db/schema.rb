@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140525150140) do
+ActiveRecord::Schema.define(version: 20140605032822) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,8 +46,10 @@ ActiveRecord::Schema.define(version: 20140525150140) do
     t.boolean  "propagate_immediately", default: false, null: false
     t.boolean  "disabled",              default: false, null: false
     t.integer  "service_id"
+    t.string   "guid",                                  null: false
   end
 
+  add_index "agents", ["guid"], name: "index_agents_on_guid", using: :btree
   add_index "agents", ["schedule"], name: "index_agents_on_schedule", using: :btree
   add_index "agents", ["type"], name: "index_agents_on_type", using: :btree
   add_index "agents", ["user_id", "created_at"], name: "index_agents_on_user_id_and_created_at", using: :btree
@@ -93,6 +95,29 @@ ActiveRecord::Schema.define(version: 20140525150140) do
 
   add_index "links", ["receiver_id", "source_id"], name: "index_links_on_receiver_id_and_source_id", using: :btree
   add_index "links", ["source_id", "receiver_id"], name: "index_links_on_source_id_and_receiver_id", using: :btree
+
+  create_table "scenario_memberships", force: true do |t|
+    t.integer  "agent_id",    null: false
+    t.integer  "scenario_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "scenario_memberships", ["agent_id"], name: "index_scenario_memberships_on_agent_id", using: :btree
+  add_index "scenario_memberships", ["scenario_id"], name: "index_scenario_memberships_on_scenario_id", using: :btree
+
+  create_table "scenarios", force: true do |t|
+    t.string   "name",                        null: false
+    t.integer  "user_id",                     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "description"
+    t.boolean  "public",      default: false, null: false
+    t.string   "guid",                        null: false
+    t.string   "source_url"
+  end
+
+  add_index "scenarios", ["user_id", "guid"], name: "index_scenarios_on_user_id_and_guid", unique: true, using: :btree
 
   create_table "services", force: true do |t|
     t.integer  "user_id"
@@ -141,6 +166,7 @@ ActiveRecord::Schema.define(version: 20140525150140) do
     t.datetime "locked_at"
     t.string   "username",                               null: false
     t.string   "invitation_code",                        null: false
+    t.integer  "scenario_count",         default: 0,     null: false
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree

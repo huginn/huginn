@@ -21,12 +21,12 @@ class AgentsController < ApplicationController
   end
 
   def run
-    agent = current_user.agents.find(params[:id])
-    Agent.async_check(agent.id)
-    if params[:return] == "show"
-      redirect_to agent_path(agent), notice: "Agent run queued"
-    else
-      redirect_to agents_path, notice: "Agent run queued"
+    @agent = current_user.agents.find(params[:id])
+    Agent.async_check(@agent.id)
+
+    respond_to do |format|
+      format.html { redirect_back "Agent run queued for '#{@agent.name}'" }
+      format.json { head :ok }
     end
   end
 
@@ -54,12 +54,20 @@ class AgentsController < ApplicationController
   def remove_events
     @agent = current_user.agents.find(params[:id])
     @agent.events.delete_all
-    redirect_to agents_path, notice: "All events removed"
+
+    respond_to do |format|
+      format.html { redirect_back "All emitted events removed for '#{@agent.name}'" }
+      format.json { head :ok }
+    end
   end
 
   def propagate
-    details = Agent.receive!
-    redirect_to agents_path, notice: "Queued propagation calls for #{details[:event_count]} event(s) on #{details[:agent_count]} agent(s)"
+    details = Agent.receive! # Eventually this should probably be scoped to the current_user.
+
+    respond_to do |format|
+      format.html { redirect_back "Queued propagation calls for #{details[:event_count]} event(s) on #{details[:agent_count]} agent(s)" }
+      format.json { head :ok }
+    end
   end
 
   def show
@@ -91,7 +99,11 @@ class AgentsController < ApplicationController
   end
 
   def diagram
-    @agents = current_user.agents.includes(:receivers)
+    @agents = if params[:scenario_id].present?
+                current_user.scenarios.find(params[:scenario_id]).agents.includes(:receivers)
+              else
+                current_user.agents.includes(:receivers)
+              end
   end
 
   def create
@@ -100,8 +112,8 @@ class AgentsController < ApplicationController
                                   params[:agent])
     respond_to do |format|
       if @agent.save
-        format.html { redirect_to agents_path, notice: 'Your Agent was successfully created.' }
-        format.json { render json: @agent, status: :created, location: @agent }
+        format.html { redirect_back "'#{@agent.name}' was successfully created." }
+        format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
         format.html { render action: "new" }
         format.json { render json: @agent.errors, status: :unprocessable_entity }
@@ -114,18 +126,23 @@ class AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
-        format.html {
-          if params[:return] == "show"
-            redirect_to agent_path(@agent), notice: 'Your Agent was successfully updated.'
-          else
-            redirect_to agents_path, notice: 'Your Agent was successfully updated.'
-          end
-        }
-        format.json { head :no_content }
+        format.html { redirect_back "'#{@agent.name}' was successfully updated." }
+        format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
         format.html { render action: "edit" }
         format.json { render json: @agent.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def leave_scenario
+    @agent = current_user.agents.find(params[:id])
+    @scenario = current_user.scenarios.find(params[:scenario_id])
+    @agent.scenarios.destroy(@scenario)
+
+    respond_to do |format|
+      format.html { redirect_back "'#{@agent.name}' removed from '#{@scenario.name}'" }
+      format.json { head :no_content }
     end
   end
 
@@ -134,8 +151,23 @@ class AgentsController < ApplicationController
     @agent.destroy
 
     respond_to do |format|
-      format.html { redirect_to agents_path }
+      format.html { redirect_back "'#{@agent.name}' deleted" }
       format.json { head :no_content }
     end
+  end
+
+  protected
+
+  # Sanitize params[:return] to prevent open redirect attacks, a common security issue.
+  def redirect_back(message)
+    if params[:return] == "show" && @agent
+      path = agent_path(@agent)
+    elsif params[:return] =~ /\A#{Regexp::escape scenarios_path}\/\d+\Z/
+      path = params[:return]
+    else
+      path = agents_path
+    end
+
+    redirect_to path, notice: message
   end
 end

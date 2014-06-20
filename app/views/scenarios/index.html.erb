@@ -1,0 +1,50 @@
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>
+          Your Scenarios
+        </h2>
+      </div>
+
+      <blockquote>Scenarios are named groups of Agents.  Scenarios allow you to organize your agents,
+        and to import and export sets of Agents to share.</blockquote>
+
+      <table class='table table-striped'>
+        <tr>
+          <th>Name</th>
+          <th>Agents</th>
+          <th>Public</th>
+          <th></th>
+        </tr>
+
+        <% @scenarios.each do |scenario| %>
+          <tr>
+            <td>
+              <%= link_to(scenario.name, scenario) %>
+            </td>
+            <td><%= link_to pluralize(scenario.agents.count, "agent"), scenario %></td>
+            <td><%= scenario.public? ? "yes" : "no" %></td>
+            <td>
+              <div class="btn-group btn-group-xs" style="float: right">
+                <%= link_to 'Show', scenario, class: "btn btn-default" %>
+                <%= link_to 'Edit', edit_scenario_path(scenario), class: "btn btn-default" %>
+                <%= link_to 'Share', share_scenario_path(scenario), class: "btn btn-default" %>
+                <%= link_to 'Delete', scenario_path(scenario), method: :delete, data: { confirm: "This will remove the '#{scenario.name}' Scenerio from all Agents and delete it.  Are you sure?" }, class: "btn btn-default" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+
+      <%= paginate @scenarios, :theme => 'twitter-bootstrap' %>
+
+      <br/>
+
+      <div class="btn-group">
+        <%= link_to '<span class="glyphicon glyphicon-plus"></span> New Scenario'.html_safe, new_scenario_path, class: "btn btn-default" %>
+        <%= link_to '<span class="glyphicon glyphicon-plus"></span> Import Scenario'.html_safe, new_scenario_imports_path, class: "btn btn-default" %>
+      </div>
+    </div>
+  </div>
+</div>

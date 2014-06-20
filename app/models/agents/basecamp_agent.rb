@@ -72,7 +72,7 @@ module Agents
 
   private
     def request_url
-      "https://basecamp.com/#{URI.encode(self.service.options[:user_id].to_s)}/api/v1/projects/#{URI.encode(options[:project_id].to_s)}/events.json"
+      "https://basecamp.com/#{URI.encode(self.service.options[:user_id].to_s)}/api/v1/projects/#{URI.encode(interpolated[:project_id].to_s)}/events.json"
     end
 
     def request_options

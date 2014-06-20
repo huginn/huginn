@@ -1,9 +1,6 @@
 require 'spec_helper'
-require 'models/concerns/liquid_interpolatable'
 
 describe Agents::PushbulletAgent do
-  it_behaves_like LiquidInterpolatable
-
   before(:each) do
     @valid_params = {
                       'api_key' => 'token',

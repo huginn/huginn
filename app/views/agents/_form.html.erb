@@ -50,6 +50,7 @@
           <div class='event-related-region' data-can-create-events="<%= @agent.can_create_events? %>">
             <div class="form-group">
               <%= f.label :keep_events_for, "Keep events" %>
+              <span class="glyphicon glyphicon-question-sign hover-help" data-content="In order to conserve disk space, you can choose to have events created by this Agent expire after a certain period of time.  Make sure you keep them long enough to allow any subsequent Agents to make use of them."></span>
               <%= f.select :keep_events_for, options_for_select(Agent::EVENT_RETENTION_SCHEDULES, @agent.keep_events_for), {}, :class => 'form-control' %>
             </div>
           </div>
@@ -68,13 +69,24 @@
               <% end %>
             </div>
           </div>
+
+          <% if current_user.scenario_count > 0 %>
+            <div class="form-group">
+              <%= f.label :scenarios %>
+              <span class="glyphicon glyphicon-question-sign hover-help" data-content="Use Scenarios to group sets of Agents, both for organization, and to make them easy to export and share."></span>
+              <%= f.select(:scenario_ids,
+                           options_for_select(current_user.scenarios.pluck(:name, :id), @agent.scenario_ids),
+                           {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
+            </div>
+          <% end %>
+
         </div>
 
         <!-- Form controls full width -->
         <div class="col-md-12">
           <div class="form-group">
             <%= f.label :options %>
-            <textarea rows="10" id="agent_options" name="agent[options]" class="form-control live-json-editor <%= (@agent.new_record? && @agent.options == {}) ? "showing-default" : "" %>">
+            <textarea rows="15" id="agent_options" name="agent[options]" class="form-control live-json-editor <%= (@agent.new_record? && @agent.options == {}) ? "showing-default" : "" %>">
               <%= Utils.jsonify((@agent.new_record? && @agent.options == {}) ? @agent.default_options : @agent.options) %>
             </textarea>
           </div>
@@ -101,7 +113,7 @@
 
   <div class='row'>
     <div class="col-md-12">
-      <%= f.submit :class => "btn btn-primary" %>
+      <%= f.submit "Save", :class => "btn btn-primary" %>
     </div>
   </div>
       

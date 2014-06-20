@@ -1,7 +1,5 @@
 module Agents
   class JabberAgent < Agent
-    include LiquidInterpolatable
-
     cannot_be_scheduled!
     cannot_create_events!
 
@@ -30,12 +28,12 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        log "Sending IM to #{options['jabber_receiver']} with event #{event.id}"
+        log "Sending IM to #{interpolated['jabber_receiver']} with event #{event.id}"
         deliver body(event)
       end
     end
@@ -45,15 +43,15 @@ module Agents
     end
 
     def deliver(text)
-      client.send Jabber::Message::new(options['jabber_receiver'], text).set_type(:chat)
+      client.send Jabber::Message::new(interpolated['jabber_receiver'], text).set_type(:chat)
     end
 
     private
 
     def client
-      Jabber::Client.new(Jabber::JID::new(options['jabber_sender'])).tap do |sender|
-        sender.connect(options['jabber_server'], (options['jabber_port'] || '5222'))
-        sender.auth(options['jabber_password'])
+      Jabber::Client.new(Jabber::JID::new(interpolated['jabber_sender'])).tap do |sender|
+        sender.connect(interpolated['jabber_server'], interpolated['jabber_port'] || '5222')
+        sender.auth interpolated['jabber_password']
       end
     end
 
@@ -62,7 +60,7 @@ module Agents
     end
 
     def body(event)
-      interpolate_string(options['message'], event.payload)
+      interpolated(event.payload)['message']
     end
   end
 end

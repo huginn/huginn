@@ -12,6 +12,8 @@ class Agent < ActiveRecord::Base
   include JSONSerializedField
   include RDBMSFunctions
   include WorkingHelpers
+  include LiquidInterpolatable
+  include HasGuid
 
   markdown_class_attributes :description, :event_description
 
@@ -22,13 +24,14 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :disabled, :source_ids, :keep_events_for, :propagate_immediately
+  attr_accessible :options, :memory, :name, :type, :schedule, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
 
   json_serialize :options, :memory
 
   validates_presence_of :name, :user
   validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
   validate :sources_are_owned
+  validate :scenarios_are_owned
   validate :validate_schedule
   validate :validate_options
 
@@ -49,6 +52,8 @@ class Agent < ActiveRecord::Base
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
   has_many :receivers, :through => :links_as_source, :class_name => "Agent", :inverse_of => :sources
+  has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :agent
+  has_many :scenarios, :through => :scenario_memberships, :inverse_of => :agents
 
   scope :of_type, lambda { |type|
     type = case type
@@ -207,6 +212,10 @@ class Agent < ActiveRecord::Base
     errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
   end
   
+  def scenarios_are_owned
+    errors.add(:scenarios, "must be owned by you") unless scenarios.all? {|s| s.user == user }
+  end
+
   def validate_schedule
     unless cannot_be_scheduled?
       errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
