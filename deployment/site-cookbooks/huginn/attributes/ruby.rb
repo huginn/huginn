@@ -1,4 +1,4 @@
-default['rbenv']['ruby_version'] = "1.9.3-p353"
+default['rbenv']['ruby_version'] = "1.9.3-p547"
 
 default['huginn']['repo'] = "https://github.com/cantino/huginn.git"
 default['huginn']['branch'] = "master"
