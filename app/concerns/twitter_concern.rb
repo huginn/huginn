@@ -61,9 +61,9 @@ module TwitterConcern
     end
     
     def valid_credentials
-    #   twitter.verify_credentials.present?
-    # rescue Twitter::Error
-    #   errors.add(:base, "Twitter credentials are invalid, a connection could not be established")
-    #   false
+      twitter.verify_credentials.present?
+    rescue Twitter::Error
+      errors.add(:base, "Twitter credentials are invalid, a connection could not be established")
+      false
     end
 end

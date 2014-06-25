@@ -17,26 +17,6 @@ describe Agents::TwitterStreamAgent do
     @agent.save!
   end
 
-  describe "#valid_credentials" do 
-    let(:stream) { Agents::TwitterStreamAgent.new }
-    let(:invalid_error_message) { "Twitter credentials are invalid, a connection could not be established" }
-    context "invalid credentials" do 
-      it 'includes invalid credential errors' do 
-        mock.any_instance_of(Twitter::REST::Client).verify_credentials { raise Twitter::Error::Unauthorized.new("invalid") }
-        stream.valid?
-        expect(stream.errors.full_messages).to include?(invalid_error_message)
-      end
-    end
-
-    context "valid credentials" do 
-      it 'includes invalid credential errors' do 
-        mock.any_instance_of(Twitter::REST::Client).verify_credentials { true }
-        stream.valid?
-        expect(stream.errors.full_messages).to_not include?(invalid_error_message)
-      end
-    end
-  end
-
   describe '#process_tweet' do
     context "when generate is set to 'counts'" do
       before do
@@ -103,44 +83,6 @@ describe Agents::TwitterStreamAgent do
           'text' => "something",
           'user' => { 'name' => "Mr. Someone" }
         }
-      end
-    end
-  end
-
-  describe '#check' do
-    context "when generate is set to 'counts'" do
-      before do
-        @agent.options[:generate] = 'counts'
-        @agent.save!
-      end
-
-      it 'emits events' do
-        @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
-        @agent.process_tweet('keyword2', {:text => "something", :user => {:name => "Mr. Someone"}})
-        @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
-
-        lambda {
-          @agent.reload.check
-        }.should change { @agent.events.count }.by(2)
-
-        @agent.events[-1].payload[:filter].should == 'keyword1'
-        @agent.events[-1].payload[:count].should == 2
-
-        @agent.events[-2].payload[:filter].should == 'keyword2'
-        @agent.events[-2].payload[:count].should == 1
-
-        @agent.memory[:filter_counts].should == {}
-      end
-    end
-
-    context "when generate is not set to 'counts'" do
-      it 'does nothing' do
-        @agent.memory[:filter_counts] = { :keyword1 => 2 }
-        @agent.save!
-        lambda {
-          @agent.reload.check
-        }.should_not change { Event.count }
-        @agent.memory[:filter_counts].should == {}
       end
     end
   end
