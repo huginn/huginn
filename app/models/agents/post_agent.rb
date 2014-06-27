@@ -5,7 +5,7 @@ module Agents
     default_schedule "never"
 
     description <<-MD
-      A PostAgent receives events from other agents (or runs periodically), merges those events with the contents of `payload`, and sends the results as POST (or GET) requests to a specified url.
+      A PostAgent receives events from other agents (or runs periodically), merges those events with the [Liquid-interpolated](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) contents of `payload`, and sends the results as POST (or GET) requests to a specified url.  To skip merging in the incoming event, but still send the interpolated payload, set `no_merge` to `true`.
 
       The `post_url` field must specify where you would like to send requests. Please include the URI scheme (`http` or `https`).
 
@@ -21,11 +21,12 @@ module Agents
     def default_options
       {
         'post_url' => "http://www.example.com",
-        'expected_receive_period_in_days' => 1,
+        'expected_receive_period_in_days' => '1',
         'content_type' => 'form',
         'method' => 'post',
         'payload' => {
-          'key' => 'value'
+          'key' => 'value',
+          'something' => 'the event contained {{ somekey }}'
         },
         'headers' => {}
       }
@@ -52,8 +53,12 @@ module Agents
         errors.add(:base, "if provided, payload must be a hash")
       end
 
-      unless %w[post get].include?(method)
-        errors.add(:base, "method must be 'post' or 'get'")
+      unless %w[post get put delete patch].include?(method)
+        errors.add(:base, "method must be 'post', 'get', 'put', 'delete', or 'patch'")
+      end
+
+      if options['no_merge'].present? && !%[true false].include?(options['no_merge'].to_s)
+        errors.add(:base, "if provided, no_merge must be 'true' or 'false'")
       end
 
       unless headers.is_a?(Hash)
@@ -63,7 +68,12 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        handle (interpolated(event.payload)['payload'].presence || {}).merge(event.payload)
+        outgoing = interpolated(event.payload)['payload'].presence || {}
+        if interpolated['no_merge'].to_s == 'true'
+          handle outgoing
+        else
+          handle outgoing.merge(event.payload)
+        end
       end
     end
 

@@ -38,6 +38,7 @@ describe Agents::PostAgent do
         'post' => Net::HTTP::Post, 'patch' => Net::HTTP::Patch,
         'delete' => Net::HTTP::Delete }.each.with_index do |(verb, type), index|
         @checker.options['method'] = verb
+        @checker.should be_valid
         @checker.check
         @requests.should == index + 1
         @sent_requests[type].length.should == 1
@@ -75,6 +76,15 @@ describe Agents::PostAgent do
       }.should_not change { @sent_requests[Net::HTTP::Post].length }
 
       @sent_requests[Net::HTTP::Get][0].should == @event.payload.merge('default' => 'value')
+    end
+
+    it "can skip merging the incoming event when no_merge is set, but it still interpolates" do
+      @checker.options['no_merge'] = 'true'
+      @checker.options['payload'] = {
+        'key' => 'it said: {{ someotherkey.somekey }}'
+      }
+      @checker.receive([@event])
+      @sent_requests[Net::HTTP::Post].first.should == { 'key' => 'it said: value' }
     end
   end
 
@@ -125,7 +135,7 @@ describe Agents::PostAgent do
       @checker.should_not be_valid
     end
 
-    it "should validate method as post or get, defaulting to post" do
+    it "should validate method as post, get, put, patch, or delete, defaulting to post" do
       @checker.options['method'] = ""
       @checker.method.should == "post"
       @checker.should be_valid
@@ -138,8 +148,32 @@ describe Agents::PostAgent do
       @checker.method.should == "get"
       @checker.should be_valid
 
+      @checker.options['method'] = "patch"
+      @checker.method.should == "patch"
+      @checker.should be_valid
+
       @checker.options['method'] = "wut"
       @checker.method.should == "wut"
+      @checker.should_not be_valid
+    end
+
+    it "should validate that no_merge is 'true' or 'false', if present" do
+      @checker.options['no_merge'] = ""
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = "true"
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = "false"
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = false
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = true
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = 'blarg'
       @checker.should_not be_valid
     end
 
