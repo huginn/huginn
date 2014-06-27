@@ -25,7 +25,10 @@ hideSchedule = ->
   $(".schedule-region select").hide()
   $(".schedule-region .cannot-be-scheduled").show()
 
-showSchedule = ->
+showSchedule = (defaultSchedule = null) ->
+  $(".schedule-region select").show()
+  if defaultSchedule?
+    $(".schedule-region select").val(defaultSchedule).change()
   $(".schedule-region select").show()
   $(".schedule-region .cannot-be-scheduled").hide()
 
@@ -145,7 +148,7 @@ $(document).ready ->
       $(".event-descriptions").html("").hide()
       $.getJSON "/agents/type_details", { type: $(@).val() }, (json) =>
         if json.can_be_scheduled
-          showSchedule()
+          showSchedule(json.default_schedule)
         else
           hideSchedule()
 

@@ -34,6 +34,7 @@ class AgentsController < ApplicationController
     agent = Agent.build_for_type(params[:type], current_user, {})
     render :json => {
         :can_be_scheduled => agent.can_be_scheduled?,
+        :default_schedule => agent.default_schedule,
         :can_receive_events => agent.can_receive_events?,
         :can_create_events => agent.can_create_events?,
         :options => agent.default_options,
