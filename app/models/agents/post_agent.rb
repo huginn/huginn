@@ -9,6 +9,8 @@ module Agents
 
       The `post_url` field must specify where you would like to send requests. Please include the URI scheme (`http` or `https`).
 
+      The `method` used can be any of `get`, `post`, `put`, `patch`, and `delete`.
+
       The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
     MD
 
@@ -76,7 +78,13 @@ module Agents
 
     def handle(data)
       if method == 'post'
-        post_data(data)
+        post_data(data, Net::HTTP::Post)
+      elsif method == 'put'
+        post_data(data, Net::HTTP::Put)
+      elsif method == 'delete'
+        post_data(data, Net::HTTP::Delete)
+      elsif method == 'patch'
+        post_data(data, Net::HTTP::Patch)
       elsif method == 'get'
         get_data(data)
       else
@@ -84,9 +92,9 @@ module Agents
       end
     end
 
-    def post_data(data)
+    def post_data(data, request_type = Net::HTTP::Post)
       uri = generate_uri
-      req = Net::HTTP::Post.new(uri.request_uri, headers)
+      req = request_type.new(uri.request_uri, headers)
       req.form_data = data
       Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
     end
