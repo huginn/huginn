@@ -11,6 +11,8 @@ module Agents
 
       The `method` used can be any of `get`, `post`, `put`, `patch`, and `delete`.
 
+      By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).  Change `content_type` to `json` to send JSON instead.
+
       The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
     MD
 
@@ -20,6 +22,7 @@ module Agents
       {
         'post_url' => "http://www.example.com",
         'expected_receive_period_in_days' => 1,
+        'content_type' => 'form',
         'method' => 'post',
         'payload' => {
           'key' => 'value'
@@ -95,7 +98,14 @@ module Agents
     def post_data(data, request_type = Net::HTTP::Post)
       uri = generate_uri
       req = request_type.new(uri.request_uri, headers)
-      req.form_data = data
+
+      if interpolated['content_type'] == 'json'
+        req.set_content_type('application/json', 'charset' => 'utf-8')
+        req.body = data.to_json
+      else
+        req.form_data = data
+      end
+
       Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
     end
 
