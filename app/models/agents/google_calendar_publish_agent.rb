@@ -41,14 +41,16 @@ module Agents
 
       Example payload for trigger agent:
       <pre><code>{
-        'visibility' => 'default',
-        'summary' => "Awesome event",
-        'description' => "An example event with text. Pro tip: DateTimes are in RFC3339",
-        'start' => {
-          'dateTime' => '2014-10-02T10:00:00-05:00'
-        },
-        'end' => {
-          'dateTime' => '2014-10-02T11:00:00-05:00'
+        "message": {
+          "visibility": "default",
+          "summary": "Awesome event",
+          "description": "An example event with text. Pro tip: DateTimes are in RFC3339",
+          "start": {
+            "dateTime": "2014-10-02T10:00:00-05:00"
+          },
+          "end": {
+            "dateTime": "2014-10-02T11:00:00-05:00"
+          }
         }
       }</code></pre>
     MD
@@ -89,7 +91,7 @@ module Agents
      incoming_events.each do |event|
         calendar = GoogleCalendar.new(options, Rails.logger)
 
-        calendar_event = JSON.parse(calendar.publish_as(options['calendar_id'], event.payload).response.body)
+        calendar_event = JSON.parse(calendar.publish_as(options['calendar_id'], event.payload["message"]).response.body)
   
         create_event :payload => {
           'success' => true,
