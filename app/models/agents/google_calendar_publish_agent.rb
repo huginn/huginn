@@ -1,3 +1,5 @@
+require 'json'
+
 module Agents
   class GoogleCalendarPublishAgent < Agent
     cannot_be_scheduled!
@@ -78,12 +80,11 @@ module Agents
      incoming_events.each do |event|
         calendar = GoogleCalendar.new(options, Rails.logger)
 
-        calender.publish_as(options['calendar_id'], event.payload)
-
+        calendar_event = JSON.parse(calendar.publish_as(options['calendar_id'], event.payload).response.body)
+  
         create_event :payload => {
           'success' => true,
-          'published_calendar_event' => text,
-          'google_calendar_event_id' => calendar_event.id,
+          'published_calendar_event' => calendar_event,
           'agent_id' => event.agent_id,
           'event_id' => event.id
         }

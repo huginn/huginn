@@ -1,4 +1,4 @@
-require "google-api-client"
+require "google/api_client"
 
 class GoogleCalendar
 
@@ -15,14 +15,13 @@ class GoogleCalendar
     @logger.debug @calendar.inspect
   end
 
-  def auth_as(who)
+  def auth_as
     @client.authorization = Signet::OAuth2::Client.new({
       token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
       audience:             'https://accounts.google.com/o/oauth2/token',
       scope:                'https://www.googleapis.com/auth/calendar',
       issuer:               @config['google']['service_account_email'],
-      signing_key:          @key,
-      person:               who # Who are we emulating?
+      signing_key:          @key
     });
 
     @client.authorization.fetch_access_token!
@@ -31,7 +30,7 @@ class GoogleCalendar
   # who - String: email of user to add event
   # details - JSON String: see https://developers.google.com/google-apps/calendar/v3/reference/events/insert
   def publish_as(who, details)
-    auth_as(who)
+    auth_as
 
     @logger.info("Attempting to create event for " + who)
     @logger.debug details.to_yaml
@@ -39,7 +38,7 @@ class GoogleCalendar
     ret = @client.execute(
       api_method: @calendar.events.insert,
       parameters: {'calendarId' => who, 'sendNotifications' => true},
-      body: details,
+      body: details.to_json,
       headers: {'Content-Type' => 'application/json'}
     )
     @logger.debug ret.to_yaml
@@ -47,7 +46,7 @@ class GoogleCalendar
   end
 
   def events_as(who, date)
-    auth_as(who)
+    auth_as
 
     date ||= Date.today
 
@@ -57,7 +56,7 @@ class GoogleCalendar
     ret = @client.execute(
       api_method: @calendar.events.list,
       parameters: {'calendarId' => who, 'sendNotifications' => true},
-      body: details,
+      body: details.to_json,
       headers: {'Content-Type' => 'application/json'}
     )
 
