@@ -319,6 +319,7 @@ GEM
     uuid (2.3.7)
       macaddr (~> 1.0)
     uuidtools (2.1.4)
+    vcr (2.9.2)
     warden (1.2.3)
       rack (>= 1.0)
     webmock (1.17.4)
@@ -392,6 +393,7 @@ DEPENDENCIES
   typhoeus (~> 0.6.3)
   tzinfo-data
   uglifier (>= 1.3.0)
+  vcr
   webmock
   weibo_2 (~> 0.1.4)
   wunderground (~> 1.2.0)
