@@ -11,17 +11,12 @@ module Agents
 
       Setup:
 
-      1) Visit https://code.google.com/apis/console/b/0/
-
-      2) New project -> Huginn
- 
-      3) APIs & Auth -> Enable google calendar
-
-      4) Credentials -> Create new Client ID -> Service Account
-
-      5) Persist the generated private key to a path, ie: /home/hugin/a822ccdefac89fac6330f95039c492dfa3ce6843.p12
-
-      6) Grant access via google calendar UI to the service account email address for each calendar you wish to manage. For a whole google apps domain, you can delegate authority (https://developers.google.com/+/domains/authentication/delegation)
+      1. Visit [the google api console](https://code.google.com/apis/console/b/0/)
+      2. New project -> Huginn
+      3. APIs & Auth -> Enable google calendar
+      4. Credentials -> Create new Client ID -> Service Account
+      5. Persist the generated private key to a path, ie: `/home/hugin/a822ccdefac89fac6330f95039c492dfa3ce6843.p12`
+      6. Grant access via google calendar UI to the service account email address for each calendar you wish to manage. For a whole google apps domain, you can [delegate authority](https://developers.google.com/+/domains/authentication/delegation)
 
 
       Agent Configuration:
@@ -36,12 +31,37 @@ module Agents
 
       `google` `key_secret` - The secret for the key, typically 'notasecret'
 
-      `details` A hash of event details. See https://developers.google.com/google-apps/calendar/v3/reference/events/insert
       
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
       Use it with a trigger agent to shape your payload!
+
+      A hash of event details. See the [Google Calendar API docs](https://developers.google.com/google-apps/calendar/v3/reference/events/insert)
+
+      Example payload for trigger agent:
+      <pre><code>{
+        'visibility' => 'default',
+        'summary' => "Awesome event",
+        'description' => "An example event with text. Pro tip: DateTimes are in RFC3339",
+        'start' => {
+          'dateTime' => '2014-10-02T10:00:00-05:00'
+        },
+        'end' => {
+          'dateTime' => '2014-10-02T11:00:00-05:00'
+        }
+      }</code></pre>
+    MD
+
+    event_description <<-MD
+      {
+        'success' => true,
+        'published_calendar_event' => {
+           ....
+        },
+        'agent_id' => 1234,
+        'event_id' => 3432,
+      }
     MD
 
     def validate_options
@@ -61,17 +81,6 @@ module Agents
           'key_file' => '/path/to/private.key',
           'key_secret' => 'notasecret',
           'service_account_email' => ''
-        },
-        'details' => {
-          'visibility' => 'default',
-          'summary' => "Awesome event",
-          'description' => "An example event with text. Pro tip: DateTimes are in RFC3339",
-          'start' => {
-            'dateTime' => '2014-10-02T10:00:00-05:00'
-          },
-          'end' => {
-            'dateTime' => '2014-10-02T11:00:00-05:00'
-          }
         }
       }
     end
