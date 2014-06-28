@@ -56,7 +56,7 @@ module Agents
         'calendar_id' => 'you@email.com',
         'message' => "{{text}}",
         'google' => {
-          'key_file' => '/path/to/private.key'
+          'key_file' => '/path/to/private.key',
           'key_secret' => 'notasecret',
           'service_account_email' => ''
         },
@@ -64,11 +64,11 @@ module Agents
           'visibility' => 'default',
           'summary' => "Awesome event",
           'description' => "An example event with text. Pro tip: DateTimes are in RFC3339",
-          'start': {
-            'dateTime': '2014-10-02T10:00:00-05:00'
+          'start' => {
+            'dateTime' => '2014-10-02T10:00:00-05:00'
           },
-          'end': {
-            'dateTime': '2014-10-02T11:00:00-05:00'
+          'end' => {
+            'dateTime' => '2014-10-02T11:00:00-05:00'
           }
         }
       }
