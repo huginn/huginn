@@ -78,7 +78,6 @@ module Agents
       {
         'expected_update_period_in_days' => "10",
         'calendar_id' => 'you@email.com',
-        'message' => "{{text}}",
         'google' => {
           'key_file' => '/path/to/private.key',
           'key_secret' => 'notasecret',
