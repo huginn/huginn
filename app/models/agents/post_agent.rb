@@ -5,9 +5,13 @@ module Agents
     default_schedule "never"
 
     description <<-MD
-      A PostAgent receives events from other agents (or runs periodically), merges those events with the contents of `payload`, and sends the results as POST (or GET) requests to a specified url.
+      A PostAgent receives events from other agents (or runs periodically), merges those events with the [Liquid-interpolated](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) contents of `payload`, and sends the results as POST (or GET) requests to a specified url.  To skip merging in the incoming event, but still send the interpolated payload, set `no_merge` to `true`.
 
       The `post_url` field must specify where you would like to send requests. Please include the URI scheme (`http` or `https`).
+
+      The `method` used can be any of `get`, `post`, `put`, `patch`, and `delete`.
+
+      By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).  Change `content_type` to `json` to send JSON instead.
 
       The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
     MD
@@ -17,10 +21,12 @@ module Agents
     def default_options
       {
         'post_url' => "http://www.example.com",
-        'expected_receive_period_in_days' => 1,
+        'expected_receive_period_in_days' => '1',
+        'content_type' => 'form',
         'method' => 'post',
         'payload' => {
-          'key' => 'value'
+          'key' => 'value',
+          'something' => 'the event contained {{ somekey }}'
         },
         'headers' => {}
       }
@@ -47,8 +53,12 @@ module Agents
         errors.add(:base, "if provided, payload must be a hash")
       end
 
-      unless %w[post get].include?(method)
-        errors.add(:base, "method must be 'post' or 'get'")
+      unless %w[post get put delete patch].include?(method)
+        errors.add(:base, "method must be 'post', 'get', 'put', 'delete', or 'patch'")
+      end
+
+      if options['no_merge'].present? && !%[true false].include?(options['no_merge'].to_s)
+        errors.add(:base, "if provided, no_merge must be 'true' or 'false'")
       end
 
       unless headers.is_a?(Hash)
@@ -58,7 +68,12 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        handle (interpolated(event.payload)['payload'].presence || {}).merge(event.payload)
+        outgoing = interpolated(event.payload)['payload'].presence || {}
+        if interpolated['no_merge'].to_s == 'true'
+          handle outgoing
+        else
+          handle outgoing.merge(event.payload)
+        end
       end
     end
 
@@ -76,7 +91,13 @@ module Agents
 
     def handle(data)
       if method == 'post'
-        post_data(data)
+        post_data(data, Net::HTTP::Post)
+      elsif method == 'put'
+        post_data(data, Net::HTTP::Put)
+      elsif method == 'delete'
+        post_data(data, Net::HTTP::Delete)
+      elsif method == 'patch'
+        post_data(data, Net::HTTP::Patch)
       elsif method == 'get'
         get_data(data)
       else
@@ -84,10 +105,17 @@ module Agents
       end
     end
 
-    def post_data(data)
+    def post_data(data, request_type = Net::HTTP::Post)
       uri = generate_uri
-      req = Net::HTTP::Post.new(uri.request_uri, headers)
-      req.form_data = data
+      req = request_type.new(uri.request_uri, headers)
+
+      if interpolated['content_type'] == 'json'
+        req.set_content_type('application/json', 'charset' => 'utf-8')
+        req.body = data.to_json
+      else
+        req.form_data = data
+      end
+
       Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
     end
 

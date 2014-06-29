@@ -25,11 +25,25 @@ describe Agents::PostAgent do
         'somekey' => 'value'
       }
     }
+    @requests = 0
+    @sent_requests = { Net::HTTP::Get => [], Net::HTTP::Post => [], Net::HTTP::Put => [], Net::HTTP::Delete => [], Net::HTTP::Patch => [] }
 
-    @sent_posts = []
-    @sent_gets = []
-    stub.any_instance_of(Agents::PostAgent).post_data { |data| @sent_posts << data }
-    stub.any_instance_of(Agents::PostAgent).get_data { |data| @sent_gets << data }
+    stub.any_instance_of(Agents::PostAgent).post_data { |data, type| @requests += 1; @sent_requests[type] << data }
+    stub.any_instance_of(Agents::PostAgent).get_data { |data| @requests += 1; @sent_requests[Net::HTTP::Get] << data }
+  end
+
+  describe "making requests" do
+    it "can make requests of each type" do
+      { 'get' => Net::HTTP::Get, 'put' => Net::HTTP::Put,
+        'post' => Net::HTTP::Post, 'patch' => Net::HTTP::Patch,
+        'delete' => Net::HTTP::Delete }.each.with_index do |(verb, type), index|
+        @checker.options['method'] = verb
+        @checker.should be_valid
+        @checker.check
+        @requests.should == index + 1
+        @sent_requests[type].length.should == 1
+      end
+    end
   end
 
   describe "#receive" do
@@ -45,11 +59,11 @@ describe Agents::PostAgent do
       lambda {
         lambda {
           @checker.receive([@event, event1])
-        }.should change { @sent_posts.length }.by(2)
-      }.should_not change { @sent_gets.length }
+        }.should change { @sent_requests[Net::HTTP::Post].length }.by(2)
+      }.should_not change { @sent_requests[Net::HTTP::Get].length }
 
-      @sent_posts[0].should == @event.payload.merge('default' => 'value')
-      @sent_posts[1].should == event1.payload
+      @sent_requests[Net::HTTP::Post][0].should == @event.payload.merge('default' => 'value')
+      @sent_requests[Net::HTTP::Post][1].should == event1.payload
     end
 
     it "can make GET requests" do
@@ -58,10 +72,19 @@ describe Agents::PostAgent do
       lambda {
         lambda {
           @checker.receive([@event])
-        }.should change { @sent_gets.length }.by(1)
-      }.should_not change { @sent_posts.length }
+        }.should change { @sent_requests[Net::HTTP::Get].length }.by(1)
+      }.should_not change { @sent_requests[Net::HTTP::Post].length }
 
-      @sent_gets[0].should == @event.payload.merge('default' => 'value')
+      @sent_requests[Net::HTTP::Get][0].should == @event.payload.merge('default' => 'value')
+    end
+
+    it "can skip merging the incoming event when no_merge is set, but it still interpolates" do
+      @checker.options['no_merge'] = 'true'
+      @checker.options['payload'] = {
+        'key' => 'it said: {{ someotherkey.somekey }}'
+      }
+      @checker.receive([@event])
+      @sent_requests[Net::HTTP::Post].first.should == { 'key' => 'it said: value' }
     end
   end
 
@@ -69,9 +92,9 @@ describe Agents::PostAgent do
     it "sends options['payload'] as a POST request" do
       lambda {
         @checker.check
-      }.should change { @sent_posts.length }.by(1)
+      }.should change { @sent_requests[Net::HTTP::Post].length }.by(1)
 
-      @sent_posts[0].should == @checker.options['payload']
+      @sent_requests[Net::HTTP::Post][0].should == @checker.options['payload']
     end
 
     it "sends options['payload'] as a GET request" do
@@ -79,10 +102,10 @@ describe Agents::PostAgent do
       lambda {
         lambda {
           @checker.check
-        }.should change { @sent_gets.length }.by(1)
-      }.should_not change { @sent_posts.length }
+        }.should change { @sent_requests[Net::HTTP::Get].length }.by(1)
+      }.should_not change { @sent_requests[Net::HTTP::Post].length }
 
-      @sent_gets[0].should == @checker.options['payload']
+      @sent_requests[Net::HTTP::Get][0].should == @checker.options['payload']
     end
   end
 
@@ -112,7 +135,7 @@ describe Agents::PostAgent do
       @checker.should_not be_valid
     end
 
-    it "should validate method as post or get, defaulting to post" do
+    it "should validate method as post, get, put, patch, or delete, defaulting to post" do
       @checker.options['method'] = ""
       @checker.method.should == "post"
       @checker.should be_valid
@@ -125,8 +148,32 @@ describe Agents::PostAgent do
       @checker.method.should == "get"
       @checker.should be_valid
 
+      @checker.options['method'] = "patch"
+      @checker.method.should == "patch"
+      @checker.should be_valid
+
       @checker.options['method'] = "wut"
       @checker.method.should == "wut"
+      @checker.should_not be_valid
+    end
+
+    it "should validate that no_merge is 'true' or 'false', if present" do
+      @checker.options['no_merge'] = ""
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = "true"
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = "false"
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = false
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = true
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = 'blarg'
       @checker.should_not be_valid
     end
 
