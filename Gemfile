@@ -78,7 +78,6 @@ gem 'therubyracer', '~> 0.12.1'
 
 gem 'mqtt'
 
-gem 'vcr'
 
 group :development do
   gem 'binding_of_caller'
@@ -86,6 +85,7 @@ group :development do
 end
 
 group :development, :test do
+  gem 'vcr'
   gem 'dotenv-rails'
   gem 'pry'
   gem 'rspec-rails'
