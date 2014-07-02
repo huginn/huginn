@@ -65,7 +65,7 @@ gem 'forecast_io', '~> 2.0.0'
 gem 'rturk', '~> 2.12.1'
 
 gem 'twitter', '~> 5.8.0'
-gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
+gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'em-http-request', '~> 1.1.2'
 gem 'weibo_2', '~> 0.1.4'
 gem 'hipchat', '~> 1.2.0'
