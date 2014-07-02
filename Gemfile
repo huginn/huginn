@@ -64,6 +64,8 @@ gem 'wunderground', '~> 1.2.0'
 gem 'forecast_io', '~> 2.0.0'
 gem 'rturk', '~> 2.12.1'
 
+gem "google-api-client"
+
 gem 'twitter', '~> 5.8.0'
 gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'em-http-request', '~> 1.1.2'
@@ -76,12 +78,14 @@ gem 'therubyracer', '~> 0.12.1'
 
 gem 'mqtt'
 
+
 group :development do
   gem 'binding_of_caller'
   gem 'better_errors'
 end
 
 group :development, :test do
+  gem 'vcr'
   gem 'dotenv-rails'
   gem 'pry'
   gem 'rspec-rails'
