@@ -82,6 +82,7 @@ gem 'mqtt'
 group :development do
   gem 'binding_of_caller'
   gem 'better_errors'
+  gem 'quiet_assets'
 end
 
 group :development, :test do

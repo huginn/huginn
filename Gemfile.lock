@@ -200,6 +200,8 @@ GEM
       coderay (~> 1.0)
       method_source (~> 0.8)
       slop (~> 3.4)
+    quiet_assets (1.0.2)
+      railties (>= 3.1, < 5.0)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
@@ -375,6 +377,7 @@ DEPENDENCIES
   nokogiri (~> 1.6.1)
   protected_attributes (~> 1.0.7)
   pry
+  quiet_assets
   rack
   rails (= 4.1.1)
   rr
