@@ -116,6 +116,11 @@
                   None
                 <% end %>
               </p>
+
+              <p>
+                <b>Propagate immediately:</b>
+                <%= yes_no @agent.propagate_immediately %>
+              </p>
             <% end %>
 
             <% if @agent.can_create_events? %>
