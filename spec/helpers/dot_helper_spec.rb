@@ -41,7 +41,7 @@ describe DotHelper do
         @bar.save!
 
         agents_dot([@foo, @bar]).should == 'digraph foo {"foo";"foo"->"bar";"bar";}'
-        agents_dot([@foo, @bar], true).should == 'digraph foo {"foo"[URL="/agents/%d"];"foo"->"bar";"bar"[URL="/agents/%d"];}' % [@foo.id, @bar.id]
+        agents_dot([@foo, @bar], true).should == 'digraph foo {"foo"[URL="/agents/%d"];"foo"->"bar"[style=dashed];"bar"[URL="/agents/%d"];}' % [@foo.id, @bar.id]
       end
     end
   end

@@ -36,7 +36,13 @@ module DotHelper
         end
         agent.receivers.each do |receiver|
           next unless agents.include?(receiver)
-          dot << "%s->%s;" % [disabled_label(agent), disabled_label(receiver)]
+          dot << "%s->%s%s;" % [
+            disabled_label(agent),
+            disabled_label(receiver),
+            if rich
+              '[style=dashed]' unless receiver.propagate_immediately
+            end
+          ]
         end
       end
       dot << "}"
