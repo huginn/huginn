@@ -9,9 +9,9 @@ end
 
 gem 'bundler', '>= 1.5.0'
 
-gem 'protected_attributes', '~>1.0.7'
+gem 'protected_attributes', '~>1.0.8'
 
-gem 'rails', '4.1.1'
+gem 'rails' , '4.1.4'
 
 case RUBY_PLATFORM
 when /freebsd/
@@ -22,13 +22,13 @@ else
   gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 end
 
-gem 'mysql2', '~> 0.3.15'
+gem 'mysql2', '~> 0.3.16'
 gem 'devise', '~> 3.2.4'
-gem 'kaminari', '~> 0.15.1'
-gem 'bootstrap-kaminari-views', '~> 0.0.2'
-gem 'rufus-scheduler', '~> 3.0.7', require: false
+gem 'kaminari', '~> 0.16.1'
+gem 'bootstrap-kaminari-views', '~> 0.0.3'
+gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'json', '~> 1.8.1'
-gem 'jsonpath', '~> 0.5.3'
+gem 'jsonpath', '~> 0.5.6'
 gem 'twilio-ruby', '~> 3.11.5'
 gem 'ruby-growl', '~> 4.1.0'
 gem 'liquid', '~> 2.6.1'
@@ -89,12 +89,12 @@ group :development, :test do
   gem 'vcr'
   gem 'dotenv-rails'
   gem 'pry'
-  gem 'rspec-rails'
-  gem 'rspec'
+  gem 'rspec-rails', '~> 2.14'
+  gem 'rspec', '~> 2.14'
   gem 'shoulda-matchers'
   gem 'rr'
   gem 'delorean'
-  gem 'webmock', require: false
+  gem 'webmock', '~> 1.17.4', require: false
   gem 'coveralls', require: false
 end
 
