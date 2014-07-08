@@ -118,11 +118,19 @@ describe Agents::ImapFolderAgent do
       end
 
       it 'should validate the boolean fields' do
-        @checker.options['ssl'] = false
-        @checker.should be_valid
+        %w[ssl mark_as_read].each do |key|
+          @checker.options[key] = 1
+          @checker.should_not be_valid
 
-        @checker.options['ssl'] = 'true'
-        @checker.should_not be_valid
+          @checker.options[key] = false
+          @checker.should be_valid
+
+          @checker.options[key] = 'true'
+          @checker.should be_valid
+
+          @checker.options[key] = ''
+          @checker.should be_valid
+        end
       end
 
       it 'should validate regexp conditions' do

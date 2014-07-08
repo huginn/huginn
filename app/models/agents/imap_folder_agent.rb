@@ -139,9 +139,7 @@ module Agents
 
       %w[ssl mark_as_read].each { |key|
         if options[key].present?
-          case options[key]
-          when true, false
-          else
+          if boolify(options[key]).nil?
             errors.add(:base, '%s must be a boolean value' % key)
           end
         end
@@ -204,7 +202,7 @@ module Agents
               end
             }
           when 'has_attachment'
-            case value
+            case boolify(value)
             when true, false
             else
               errors.add(:base, 'conditions.%s must be a boolean value or null' % key)
@@ -260,7 +258,7 @@ module Agents
               }
             }
           when 'has_attachment'
-            value == mail.has_attachment?
+            boolify(value) == mail.has_attachment?
           else
             log 'Unknown condition key ignored: %s' % key
             true
@@ -294,7 +292,7 @@ module Agents
           notified << mail.message_id if mail.message_id
         end
 
-        if interpolated['mark_as_read']
+        if boolify(interpolated['mark_as_read'])
           log 'Marking as read'
           mail.mark_as_read
         end
@@ -303,6 +301,7 @@ module Agents
 
     def each_unread_mail
       host, port, ssl, username = interpolated.values_at(:host, :port, :ssl, :username)
+      ssl = boolify(ssl)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
       Client.open(host, Integer(port), ssl) { |imap|
