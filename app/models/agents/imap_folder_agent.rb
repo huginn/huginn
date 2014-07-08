@@ -302,9 +302,10 @@ module Agents
     def each_unread_mail
       host, port, ssl, username = interpolated.values_at(:host, :port, :ssl, :username)
       ssl = boolify(ssl)
+      port = (Integer(port) if port.present?)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
-      Client.open(host, Integer(port), ssl) { |imap|
+      Client.open(host, port, ssl) { |imap|
         log "Logging in as #{username}"
         imap.login(username, interpolated[:password])
 
