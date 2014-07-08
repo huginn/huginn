@@ -420,7 +420,12 @@ module Agents
     class Seen < Hash
       def initialize(hash = nil)
         super()
-        update(hash) if hash
+        if hash
+          # Deserialize a JSON hash which keys are strings
+          hash.each { |uidvalidity, uid|
+            self[uidvalidity.to_i] = uid
+          }
+        end
       end
 
       def []=(uidvalidity, uid)

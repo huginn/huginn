@@ -24,7 +24,7 @@ describe Agents::ImapFolderAgent do
         end
 
         def uidvalidity
-          '100'
+          100
         end
 
         def has_attachment?
