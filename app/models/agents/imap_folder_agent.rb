@@ -74,13 +74,14 @@ module Agents
 
       Set `mark_as_read` to true to mark found mails as read.
 
-      Each agent instance memorizes a list of unread mails that are
-      found in the last run, so even if you change a set of conditions
-      so that it matches mails that are missed previously, they will
-      not show up as new events.  Also, in order to avoid duplicated
-      notification it keeps a list of Message-Id's of 100 most recent
-      mails, so if multiple mails of the same Message-Id are found,
-      you will only see one event out of them.
+      Each agent instance memorizes the highest UID of mails that are
+      found in the last run for each watched folder, so even if you
+      change a set of conditions so that it matches mails that are
+      missed previously, or if you unmark already seen mails as read,
+      they will not show up as new events.  Also, in order to avoid
+      duplicated notification it keeps a list of Message-Id's of 100
+      most recent mails, so if multiple mails of the same Message-Id
+      are found, you will only see one event out of them.
     MD
 
     event_description <<-MD
@@ -220,22 +221,7 @@ module Agents
     end
 
     def check
-      # 'seen' keeps a hash of { uidvalidity => uids, ... } which
-      # lists unread mails in watched folders.
-      seen = memory['seen'] || {}
-      new_seen = Hash.new { |hash, key|
-        hash[key] = []
-      }
-
-      # 'notified' keeps an array of message-ids of {IDCACHE_SIZE}
-      # most recent notified mails.
-      notified = memory['notified'] || []
-
-      each_unread_mail { |mail|
-        new_seen[mail.uidvalidity] << mail.uid
-
-        next if (uids = seen[mail.uidvalidity]) && uids.include?(mail.uid)
-
+      each_unread_mail { |mail, notified|
         body_parts = mail.body_parts(mime_types)
         matched_part = nil
         matches = {}
@@ -313,12 +299,6 @@ module Agents
           mail.mark_as_read
         end
       }
-
-      notified.slice!(0...-IDCACHE_SIZE) if notified.size > IDCACHE_SIZE
-
-      memory['seen'] = new_seen
-      memory['notified'] = notified
-      save!
     end
 
     def each_unread_mail
@@ -329,22 +309,47 @@ module Agents
         log "Logging in as #{username}"
         imap.login(username, interpolated[:password])
 
+        # 'lastseen' keeps a hash of { uidvalidity => lastseenuid, ... }
+        lastseen, seen = self.lastseen, self.make_seen
+
+        # 'notified' keeps an array of message-ids of {IDCACHE_SIZE}
+        # most recent notified mails.
+        notified = self.notified
+
         interpolated['folders'].each { |folder|
           log "Selecting the folder: %s" % folder
 
           imap.select(folder)
+          uidvalidity = imap.uidvalidity
 
-          unseen = imap.search('UNSEEN')
+          if lastseenuid = lastseen[uidvalidity]
+            seen[uidvalidity] = lastseenuid
+            uids = imap.uid_fetch((lastseenuid + 1)..-1, 'FLAGS').
+                   each_with_object([]) { |data, ret|
+              uid, flags = data.attr.values_at('UID', 'FLAGS')
+              seen[uidvalidity] = uid
+              next if uid <= lastseenuid || flags.include?(:Seen)
+              ret << uid
+            }
+          else
+            uids = imap.uid_search('UNSEEN')
+            seen[uidvalidity] = uids.max unless uids.empty?
+          end
 
-          if unseen.empty?
+          if uids.empty?
             log "No unread mails"
             next
           end
 
-          imap.fetch_mails(unseen).each { |mail|
-            yield mail
+          imap.uid_fetch_mails(uids).each { |mail|
+            yield mail, notified
           }
         }
+
+        self.notified = notified
+        self.lastseen = seen
+
+        save!
       }
     ensure
       log 'Connection closed'
@@ -352,6 +357,27 @@ module Agents
 
     def mime_types
       interpolated['mime_types'] || %w[text/plain text/enriched text/html]
+    end
+
+    def lastseen
+      Seen.new(memory['lastseen'])
+    end
+
+    def lastseen= value
+      memory.delete('seen')  # obsolete key
+      memory['lastseen'] = value
+    end
+
+    def make_seen
+      Seen.new
+    end
+
+    def notified
+      Notified.new(memory['notified'])
+    end
+
+    def notified= value
+      memory['notified'] = value
     end
 
     private
@@ -376,16 +402,44 @@ module Agents
         end
       end
 
+      attr_reader :uidvalidity
+
       def select(folder)
         ret = super(@folder = folder)
         @uidvalidity = responses['UIDVALIDITY'].last
         ret
       end
 
-      def fetch_mails(set)
-        fetch(set, %w[UID RFC822.HEADER]).map { |data|
+      def uid_fetch_mails(set)
+        uid_fetch(set, 'RFC822.HEADER').map { |data|
           Message.new(self, data, folder: @folder, uidvalidity: @uidvalidity)
         }
+      end
+    end
+
+    class Seen < Hash
+      def initialize(hash = nil)
+        super()
+        update(hash) if hash
+      end
+
+      def []=(uidvalidity, uid)
+        # Update only if the new value is larger than the current value
+        if (curr = self[uidvalidity]).nil? || curr <= uid
+          super
+        end
+      end
+    end
+
+    class Notified < Array
+      def initialize(array = nil)
+        super()
+        replace(array) if array
+      end
+
+      def <<(value)
+        slice!(0...-IDCACHE_SIZE) if size > IDCACHE_SIZE
+        super
       end
     end
 
