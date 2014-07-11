@@ -230,6 +230,7 @@ module Agents
 
     def check
       each_unread_mail { |mail, notified|
+        message_id = mail.message_id
         body_parts = mail.body_parts(mime_types)
         matched_part = nil
         matches = {}
@@ -277,7 +278,9 @@ module Agents
           end
         } or next
 
-        unless notified.include?(mail.message_id)
+        if notified.include?(mail.message_id)
+          log 'Ignoring mail: %s (already notified)' % message_id
+        else
           matched_part ||= body_parts.first
 
           if matched_part
@@ -287,6 +290,8 @@ module Agents
             mime_type = 'text/plain'
             body = ''
           end
+
+          log 'Emitting an event for mail: %s' % message_id
 
           create_event :payload => {
             'folder' => mail.folder,
