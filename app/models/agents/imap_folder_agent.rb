@@ -11,7 +11,9 @@ module Agents
     description <<-MD
 
       The ImapFolderAgent checks an IMAP server in specified folders
-      and creates Events based on new unread mails.
+      and creates Events based on new mails found since the last run.
+      In the first visit to a foler, this agent only checks for the
+      initial status and does not create events.
 
       Specify an IMAP server to connect with `host`, and set `ssl` to
       true if the server supports IMAP over SSL.  Specify `port` if
@@ -65,6 +67,13 @@ module Agents
           body.  The default value is `['text/plain', 'text/enriched',
           'text/html']`.
 
+      - "is_unread"
+
+          Setting this to true or false means only mails that is
+          marked as unread or read respectively, are selected.
+
+          If this key is unspecified or set to null, it is ignored.
+
       - "has_attachment"
 
           Setting this to true or false means only mails that does or does
@@ -77,11 +86,13 @@ module Agents
       Each agent instance memorizes the highest UID of mails that are
       found in the last run for each watched folder, so even if you
       change a set of conditions so that it matches mails that are
-      missed previously, or if you unmark already seen mails as read,
-      they will not show up as new events.  Also, in order to avoid
-      duplicated notification it keeps a list of Message-Id's of 100
-      most recent mails, so if multiple mails of the same Message-Id
-      are found, you will only see one event out of them.
+      missed previously, or if you alter the flag status of already
+      found mails, they will not show up as new events.
+
+      Also, in order to avoid duplicated notification it keeps a list
+      of Message-Id's of 100 most recent mails, so if multiple mails
+      of the same Message-Id are found, you will only see one event
+      out of them.
     MD
 
     event_description <<-MD
@@ -200,7 +211,7 @@ module Agents
                 errors.add(:base, 'conditions.%s contains a non-string object' % key)
               end
             }
-          when 'has_attachment'
+          when 'is_unread', 'has_attachment'
             case boolify(value)
             when true, false
             else
@@ -258,6 +269,8 @@ module Agents
             }
           when 'has_attachment'
             boolify(value) == mail.has_attachment?
+          when 'is_unread'
+            true  # already filtered out by each_unread_mail
           else
             log 'Unknown condition key ignored: %s' % key
             true
@@ -321,24 +334,46 @@ module Agents
           imap.select(folder)
           uidvalidity = imap.uidvalidity
 
-          if lastseenuid = lastseen[uidvalidity]
-            seen[uidvalidity] = lastseenuid
-            uids = imap.uid_fetch((lastseenuid + 1)..-1, 'FLAGS').
-                   each_with_object([]) { |data, ret|
-              uid, flags = data.attr.values_at('UID', 'FLAGS')
-              seen[uidvalidity] = uid
-              next if uid <= lastseenuid || flags.include?(:Seen)
-              ret << uid
-            }
-          else
-            uids = imap.uid_search('UNSEEN')
-            seen[uidvalidity] = uids.max unless uids.empty?
-          end
+          lastseenuid = lastseen[uidvalidity]
 
-          if uids.empty?
-            log "No unread mails"
+          if lastseenuid.nil?
+            maxseq = imap.responses['EXISTS'].last
+
+            log "Recording the initial status: %s" % pluralize(maxseq, 'existing mail')
+
+            if maxseq > 0
+              seen[uidvalidity] = imap.fetch(maxseq, 'UID').last.attr['UID']
+            end
+
             next
           end
+
+          seen[uidvalidity] = lastseenuid
+          is_unread = boolify(interpolated['conditions']['is_unread'])
+
+          uids = imap.uid_fetch((lastseenuid + 1)..-1, 'FLAGS').
+                 each_with_object([]) { |data, ret|
+            uid, flags = data.attr.values_at('UID', 'FLAGS')
+            seen[uidvalidity] = uid
+            next if uid <= lastseenuid
+
+            case is_unread
+            when nil, !flags.include?(:Seen)
+              ret << uid
+            end
+          }
+
+          log pluralize(uids.size,
+                        case is_unread
+                        when true
+                          'new unread mail'
+                        when false
+                          'new read mail'
+                        else
+                          'new mail'
+                        end)
+
+          next if uids.empty?
 
           imap.uid_fetch_mails(uids).each { |mail|
             yield mail, notified
@@ -389,6 +424,10 @@ module Agents
 
     def glob_match?(pattern, value)
       File.fnmatch?(pattern, value, FNM_FLAGS)
+    end
+
+    def pluralize(count, noun)
+      "%d %s" % [count, noun.pluralize(count)]
     end
 
     class Client < ::Net::IMAP
