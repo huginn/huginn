@@ -172,7 +172,6 @@ module Agents
       end
 
       case conditions = options['conditions']
-      when nil
       when Hash
         conditions.each { |key, value|
           value.present? or next
