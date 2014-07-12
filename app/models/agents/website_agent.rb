@@ -157,6 +157,7 @@ module Agents
                 when css = extraction_details['css']
                   nodes = doc.css(css)
                 when xpath = extraction_details['xpath']
+                  doc.remove_namespaces! # ignore xmlns, useful when parsing atom feeds
                   nodes = doc.xpath(xpath)
                 else
                   error '"css" or "xpath" is required for HTML or XML extraction'
