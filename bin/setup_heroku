@@ -1,0 +1,127 @@
+#!/usr/bin/env ruby
+require 'open3'
+
+unless `which heroku` =~ /heroku/
+  puts "It looks like the heroku command line tool hasn't been installed yet.  Please install"
+  puts "the Heroku Toolback from https://toolbelt.heroku.com, run 'heroku auth:login', and then"
+  puts "run this script again."
+  exit 1
+end
+
+def capture(cmd, opts = {})
+  o, s = Open3.capture2e(cmd, opts)
+  o
+end
+
+def ask(question)
+  print question + " "
+  STDOUT.flush
+  gets.strip
+end
+
+def nag(question)
+  answer = ''
+  while answer.length == 0
+    answer = ask(question)
+  end
+  answer
+end
+
+def yes?(question)
+  ask(question) =~ /^y/i
+end
+
+def grab_heroku_config
+  config_data = capture("heroku config -s")
+  config = {}
+  if config_data !~ /has no config vars/
+    config_data.split("\n").map do |line|
+      next if line =~ /^\s*(#|$)/ # skip comments and empty lines
+      first_equal_sign = line.index('=')
+      config[line.slice(0, first_equal_sign)] = line.slice(first_equal_sign + 1, line.length)
+    end
+  end
+  config
+end
+
+puts "Welcome #{`heroku auth:whoami`.strip}!  It looks like you're logged into Heroku."
+puts
+
+info = capture("heroku info")
+if info =~ /No app specified/i
+  puts "It looks like you don't have a Heroku app set up yet for this repo."
+  puts "You can either exit now and run 'heroku create', or I can do it for you."
+  if yes?("Would you like me to create a heroku app for you now in this repo? (y/n)")
+    puts `heroku create`
+    info = capture("heroku info")
+  else
+    puts "Okay, exiting so you can do it."
+    exit 0
+  end
+end
+
+app_name = info.scan(/http:\/\/([\w\d-]+)\.herokuapp\.com/).flatten.first
+
+unless yes?("Your Heroku app name is #{app_name}.  Is this correct?")
+  puts "Well, then I'm not sure what to do here, sorry."
+end
+
+config = grab_heroku_config
+
+if config.length > 0
+  puts
+  puts "Your current Heroku config:"
+  config.each do |key, value|
+    puts '  ' + key + ' ' * (20 - key.length) + '= ' + value
+  end
+end
+
+unless config['APP_SECRET_TOKEN']
+  puts "Setting up APP_SECRET_TOKEN..."
+  puts capture("heroku config:set APP_SECRET_TOKEN=`rake secret`")
+end
+
+unless config['FORCE_SSL']
+  puts "Setting FORCE_SSL to true..."
+  puts capture("heroku config:set FORCE_SSL=true")
+end
+
+unless config['DOMAIN']
+  puts "Setting DOMAIN to #{app_name}.herokuapp.com..."
+  puts capture("heroku config:set DOMAIN=#{app_name}.herokuapp.com")
+end
+
+unless config['INVITATION_CODE']
+  puts "You need to set an invitation code for your Huginn instance.  If you plan to share this instance, you will"
+  puts "tell this code to anyone who you'd like to invite.  If you won't share it, then just set this to something"
+  puts "that people will not guess."
+
+  invitation_code = nag("What code would you like to use?")
+  puts "Setting INVITATION_CODE to #{invitation_code}..."
+  puts capture("heroku config:set INVITATION_CODE=#{invitation_code}")
+end
+
+unless config['SMTP_DOMAIN'] && config['SMTP_USER_NAME'] && config['SMTP_PASSWORD'] && config['SMTP_SERVER'] && config['EMAIL_FROM_ADDRESS']
+  puts "Okay, let's setup outgoing email settings.  The simplest solution is to use the free sendgrid Heroku addon."
+  puts "If you'd like to use your own server, or your Gmail account, please see .env.example and set"
+  puts "SMTP_DOMAIN, SMTP_USER_NAME, SMTP_PASSWORD, and SMTP_SERVER with 'heroku config:set'."
+  if yes?("Should I enable the free sendgrid addon? (y/n)")
+    puts capture("heroku addons:add sendgrid")
+    puts capture("heroku config:set SMTP_SERVER=smtp.sendgrid.net")
+    puts capture("heroku config:set SMTP_DOMAIN=heroku.com")
+
+    config = grab_heroku_config
+    puts capture("heroku config:set SMTP_USER_NAME=#{config['SENDGRID_USERNAME']}")
+    puts capture("heroku config:set SMTP_PASSWORD=#{config['SENDGRID_PASSWORD']}")
+  else
+    puts "Okay, you'll need to set SMTP_DOMAIN, SMTP_USER_NAME, SMTP_PASSWORD, and SMTP_SERVER with 'heroku config:set' manually."
+  end
+
+  unless config['EMAIL_FROM_ADDRESS']
+    email = nag("What email address would you like email to appear to be sent from?")
+    puts "Setting EMAIL_FROM_ADDRESS to #{email}..."
+    puts capture("heroku config:set EMAIL_FROM_ADDRESS=#{email}")
+  end
+end
+
+puts "Done!"

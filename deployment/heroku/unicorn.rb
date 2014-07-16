@@ -16,8 +16,9 @@ Thread.new do
 
     sleep 30
 
-    if ENV['PING_URL']
-      Net::HTTP.get_response(URI(ENV['PING_URL']))
+    if ENV['DOMAIN']
+      force_ssl = ENV['FORCE_SSL'].present? && ENV['FORCE_SSL'] == 'true'
+      Net::HTTP.get_response(URI((force_ssl ? "https://" : "http://") + ENV['DOMAIN']))
     end
 
     begin
