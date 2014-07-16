@@ -11,7 +11,9 @@ module Agents
     description <<-MD
 
       The ImapFolderAgent checks an IMAP server in specified folders
-      and creates Events based on new unread mails.
+      and creates Events based on new mails found since the last run.
+      In the first visit to a foler, this agent only checks for the
+      initial status and does not create events.
 
       Specify an IMAP server to connect with `host`, and set `ssl` to
       true if the server supports IMAP over SSL.  Specify `port` if
@@ -65,6 +67,13 @@ module Agents
           body.  The default value is `['text/plain', 'text/enriched',
           'text/html']`.
 
+      - "is_unread"
+
+          Setting this to true or false means only mails that is
+          marked as unread or read respectively, are selected.
+
+          If this key is unspecified or set to null, it is ignored.
+
       - "has_attachment"
 
           Setting this to true or false means only mails that does or does
@@ -74,13 +83,16 @@ module Agents
 
       Set `mark_as_read` to true to mark found mails as read.
 
-      Each agent instance memorizes a list of unread mails that are
-      found in the last run, so even if you change a set of conditions
-      so that it matches mails that are missed previously, they will
-      not show up as new events.  Also, in order to avoid duplicated
-      notification it keeps a list of Message-Id's of 100 most recent
-      mails, so if multiple mails of the same Message-Id are found,
-      you will only see one event out of them.
+      Each agent instance memorizes the highest UID of mails that are
+      found in the last run for each watched folder, so even if you
+      change a set of conditions so that it matches mails that are
+      missed previously, or if you alter the flag status of already
+      found mails, they will not show up as new events.
+
+      Also, in order to avoid duplicated notification it keeps a list
+      of Message-Id's of 100 most recent mails, so if multiple mails
+      of the same Message-Id are found, you will only see one event
+      out of them.
     MD
 
     event_description <<-MD
@@ -138,9 +150,7 @@ module Agents
 
       %w[ssl mark_as_read].each { |key|
         if options[key].present?
-          case options[key]
-          when true, false
-          else
+          if boolify(options[key]).nil?
             errors.add(:base, '%s must be a boolean value' % key)
           end
         end
@@ -173,7 +183,6 @@ module Agents
       end
 
       case conditions = options['conditions']
-      when nil
       when Hash
         conditions.each { |key, value|
           value.present? or next
@@ -202,8 +211,8 @@ module Agents
                 errors.add(:base, 'conditions.%s contains a non-string object' % key)
               end
             }
-          when 'has_attachment'
-            case value
+          when 'is_unread', 'has_attachment'
+            case boolify(value)
             when true, false
             else
               errors.add(:base, 'conditions.%s must be a boolean value or null' % key)
@@ -220,22 +229,8 @@ module Agents
     end
 
     def check
-      # 'seen' keeps a hash of { uidvalidity => uids, ... } which
-      # lists unread mails in watched folders.
-      seen = memory['seen'] || {}
-      new_seen = Hash.new { |hash, key|
-        hash[key] = []
-      }
-
-      # 'notified' keeps an array of message-ids of {IDCACHE_SIZE}
-      # most recent notified mails.
-      notified = memory['notified'] || []
-
-      each_unread_mail { |mail|
-        new_seen[mail.uidvalidity] << mail.uid
-
-        next if (uids = seen[mail.uidvalidity]) && uids.include?(mail.uid)
-
+      each_unread_mail { |mail, notified|
+        message_id = mail.message_id
         body_parts = mail.body_parts(mime_types)
         matched_part = nil
         matches = {}
@@ -274,14 +269,18 @@ module Agents
               }
             }
           when 'has_attachment'
-            value == mail.has_attachment?
+            boolify(value) == mail.has_attachment?
+          when 'is_unread'
+            true  # already filtered out by each_unread_mail
           else
             log 'Unknown condition key ignored: %s' % key
             true
           end
         } or next
 
-        unless notified.include?(mail.message_id)
+        if notified.include?(mail.message_id)
+          log 'Ignoring mail: %s (already notified)' % message_id
+        else
           matched_part ||= body_parts.first
 
           if matched_part
@@ -291,6 +290,8 @@ module Agents
             mime_type = 'text/plain'
             body = ''
           end
+
+          log 'Emitting an event for mail: %s' % message_id
 
           create_event :payload => {
             'folder' => mail.folder,
@@ -308,43 +309,86 @@ module Agents
           notified << mail.message_id if mail.message_id
         end
 
-        if interpolated['mark_as_read']
+        if boolify(interpolated['mark_as_read'])
           log 'Marking as read'
           mail.mark_as_read
         end
       }
-
-      notified.slice!(0...-IDCACHE_SIZE) if notified.size > IDCACHE_SIZE
-
-      memory['seen'] = new_seen
-      memory['notified'] = notified
-      save!
     end
 
     def each_unread_mail
       host, port, ssl, username = interpolated.values_at(:host, :port, :ssl, :username)
+      ssl = boolify(ssl)
+      port = (Integer(port) if port.present?)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
-      Client.open(host, Integer(port), ssl) { |imap|
+      Client.open(host, port, ssl) { |imap|
         log "Logging in as #{username}"
         imap.login(username, interpolated[:password])
+
+        # 'lastseen' keeps a hash of { uidvalidity => lastseenuid, ... }
+        lastseen, seen = self.lastseen, self.make_seen
+
+        # 'notified' keeps an array of message-ids of {IDCACHE_SIZE}
+        # most recent notified mails.
+        notified = self.notified
 
         interpolated['folders'].each { |folder|
           log "Selecting the folder: %s" % folder
 
           imap.select(folder)
+          uidvalidity = imap.uidvalidity
 
-          unseen = imap.search('UNSEEN')
+          lastseenuid = lastseen[uidvalidity]
 
-          if unseen.empty?
-            log "No unread mails"
+          if lastseenuid.nil?
+            maxseq = imap.responses['EXISTS'].last
+
+            log "Recording the initial status: %s" % pluralize(maxseq, 'existing mail')
+
+            if maxseq > 0
+              seen[uidvalidity] = imap.fetch(maxseq, 'UID').last.attr['UID']
+            end
+
             next
           end
 
-          imap.fetch_mails(unseen).each { |mail|
-            yield mail
+          seen[uidvalidity] = lastseenuid
+          is_unread = boolify(interpolated['conditions']['is_unread'])
+
+          uids = imap.uid_fetch((lastseenuid + 1)..-1, 'FLAGS').
+                 each_with_object([]) { |data, ret|
+            uid, flags = data.attr.values_at('UID', 'FLAGS')
+            seen[uidvalidity] = uid
+            next if uid <= lastseenuid
+
+            case is_unread
+            when nil, !flags.include?(:Seen)
+              ret << uid
+            end
+          }
+
+          log pluralize(uids.size,
+                        case is_unread
+                        when true
+                          'new unread mail'
+                        when false
+                          'new read mail'
+                        else
+                          'new mail'
+                        end)
+
+          next if uids.empty?
+
+          imap.uid_fetch_mails(uids).each { |mail|
+            yield mail, notified
           }
         }
+
+        self.notified = notified
+        self.lastseen = seen
+
+        save!
       }
     ensure
       log 'Connection closed'
@@ -352,6 +396,27 @@ module Agents
 
     def mime_types
       interpolated['mime_types'] || %w[text/plain text/enriched text/html]
+    end
+
+    def lastseen
+      Seen.new(memory['lastseen'])
+    end
+
+    def lastseen= value
+      memory.delete('seen')  # obsolete key
+      memory['lastseen'] = value
+    end
+
+    def make_seen
+      Seen.new
+    end
+
+    def notified
+      Notified.new(memory['notified'])
+    end
+
+    def notified= value
+      memory['notified'] = value
     end
 
     private
@@ -366,6 +431,10 @@ module Agents
       File.fnmatch?(pattern, value, FNM_FLAGS)
     end
 
+    def pluralize(count, noun)
+      "%d %s" % [count, noun.pluralize(count)]
+    end
+
     class Client < ::Net::IMAP
       class << self
         def open(host, port, ssl)
@@ -376,16 +445,49 @@ module Agents
         end
       end
 
+      attr_reader :uidvalidity
+
       def select(folder)
         ret = super(@folder = folder)
         @uidvalidity = responses['UIDVALIDITY'].last
         ret
       end
 
-      def fetch_mails(set)
-        fetch(set, %w[UID RFC822.HEADER]).map { |data|
+      def uid_fetch_mails(set)
+        uid_fetch(set, 'RFC822.HEADER').map { |data|
           Message.new(self, data, folder: @folder, uidvalidity: @uidvalidity)
         }
+      end
+    end
+
+    class Seen < Hash
+      def initialize(hash = nil)
+        super()
+        if hash
+          # Deserialize a JSON hash which keys are strings
+          hash.each { |uidvalidity, uid|
+            self[uidvalidity.to_i] = uid
+          }
+        end
+      end
+
+      def []=(uidvalidity, uid)
+        # Update only if the new value is larger than the current value
+        if (curr = self[uidvalidity]).nil? || curr <= uid
+          super
+        end
+      end
+    end
+
+    class Notified < Array
+      def initialize(array = nil)
+        super()
+        replace(array) if array
+      end
+
+      def <<(value)
+        slice!(0...-IDCACHE_SIZE) if size > IDCACHE_SIZE
+        super
       end
     end
 
