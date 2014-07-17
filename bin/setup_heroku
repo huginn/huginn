@@ -1,34 +1,35 @@
 #!/usr/bin/env ruby
 require 'open3'
+require 'io/console'
 
 unless `which heroku` =~ /heroku/
   puts "It looks like the heroku command line tool hasn't been installed yet.  Please install"
-  puts "the Heroku Toolback from https://toolbelt.heroku.com, run 'heroku auth:login', and then"
+  puts "the Heroku Toolbelt from https://toolbelt.heroku.com, run 'heroku auth:login', and then"
   puts "run this script again."
   exit 1
 end
 
 def capture(cmd, opts = {})
   o, s = Open3.capture2e(cmd, opts)
-  o
+  o.strip
 end
 
-def ask(question)
+def ask(question, opts = {})
   print question + " "
   STDOUT.flush
-  gets.strip
+  (opts[:noecho] ? STDIN.noecho(&:gets) : gets).strip
 end
 
-def nag(question)
+def nag(question, opts = {})
   answer = ''
   while answer.length == 0
-    answer = ask(question)
+    answer = ask(question, opts)
   end
   answer
 end
 
 def yes?(question)
-  ask(question) =~ /^y/i
+  ask(question + " (y/n)") =~ /^y/i
 end
 
 def grab_heroku_config
@@ -44,6 +45,11 @@ def grab_heroku_config
   config
 end
 
+unless File.exists?(File.expand_path("~/.netrc")) && File.read(File.expand_path("~/.netrc")) =~ /heroku/
+  puts "It looks like you need to log in to Heroku.  Please run 'heroku auth:login' before continuing."
+  exit 1
+end
+
 puts "Welcome #{`heroku auth:whoami`.strip}!  It looks like you're logged into Heroku."
 puts
 
@@ -51,7 +57,7 @@ info = capture("heroku info")
 if info =~ /No app specified/i
   puts "It looks like you don't have a Heroku app set up yet for this repo."
   puts "You can either exit now and run 'heroku create', or I can do it for you."
-  if yes?("Would you like me to create a heroku app for you now in this repo? (y/n)")
+  if yes?("Would you like me to create a Heroku app for you now in this repo?")
     puts `heroku create`
     info = capture("heroku info")
   else
@@ -72,7 +78,7 @@ if config.length > 0
   puts
   puts "Your current Heroku config:"
   config.each do |key, value|
-    puts '  ' + key + ' ' * (20 - key.length) + '= ' + value
+    puts '  ' + key + ' ' * (25 - [key.length, 25].min) + '= ' + value
   end
 end
 
@@ -105,7 +111,7 @@ unless config['SMTP_DOMAIN'] && config['SMTP_USER_NAME'] && config['SMTP_PASSWOR
   puts "Okay, let's setup outgoing email settings.  The simplest solution is to use the free sendgrid Heroku addon."
   puts "If you'd like to use your own server, or your Gmail account, please see .env.example and set"
   puts "SMTP_DOMAIN, SMTP_USER_NAME, SMTP_PASSWORD, and SMTP_SERVER with 'heroku config:set'."
-  if yes?("Should I enable the free sendgrid addon? (y/n)")
+  if yes?("Should I enable the free sendgrid addon?")
     puts capture("heroku addons:add sendgrid")
     puts capture("heroku config:set SMTP_SERVER=smtp.sendgrid.net")
     puts capture("heroku config:set SMTP_DOMAIN=heroku.com")
@@ -124,4 +130,29 @@ unless config['SMTP_DOMAIN'] && config['SMTP_USER_NAME'] && config['SMTP_PASSWOR
   end
 end
 
+branch = capture("git rev-parse --abbrev-ref HEAD")
+if yes?("Should I push your current branch (#{branch}) to heroku?")
+  puts "This may take a moment..."
+  puts capture("git push heroku #{branch}:master -f")
+
+  puts "Running database migrations..."
+  puts capture("heroku run rake db:migrate")
+
+  puts
+  puts
+  puts "I can make an admin user on your new Huginn instance and setup some example Agents."
+  if yes?("Should I create a new admin user and some example Agents?")
+    seed_email = nag "Okay, what is your email address?"
+    seed_username = nag "And what username would you like to login as?"
+    seed_password = nag "Finally, what password would you like to use?", noecho: true
+    puts "\nJust a moment..."
+
+    capture("heroku run rake db:seed SEED_EMAIL=#{seed_email} SEED_USERNAME=#{seed_username} SEED_PASSWORD=#{seed_password}")
+    puts
+    puts
+    puts "Okay, you should be all set!  Visit https://#{app_name}.herokuapp.com and login as '#{seed_username}' with your password."
+  end
+end
+
+puts
 puts "Done!"
