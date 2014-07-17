@@ -42,7 +42,7 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ![Making a new agent](doc/imgs/new-agent.png)
 
-## Getting Started
+## Getting Started  [![Try it on Terminal.com](http://www.terminal.com/images/run-on-terminal.png)](http://www.terminal.com/snapshot/2ba043d6f8911851bab65fa6eea489c0ce4c288c39deb0a908f0f2562a8493fa)
 
 ### Quick Start
 
@@ -106,5 +106,5 @@ Huginn is a work in progress and is hopefully just getting started.  Please get 
 
 Please fork, add specs, and send pull requests!
 
-[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.png)](https://coveralls.io/r/cantino/huginn) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![Dependency Status](https://gemnasium.com/cantino/huginn.svg)](https://gemnasium.com/cantino/huginn)
+[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.png)](https://coveralls.io/r/cantino/huginn) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![Dependency Status](https://gemnasium.com/cantino/huginn.svg)](https://gemnasium.com/cantino/huginn) [![Try it on Terminal.com](http://www.terminal.com/images/run-on-terminal.png)](http://www.terminal.com/snapshot/2ba043d6f8911851bab65fa6eea489c0ce4c288c39deb0a908f0f2562a8493fa)
 
