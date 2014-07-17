@@ -75,7 +75,7 @@ gem 'slack-notifier', '~> 0.5.0'
 gem 'therubyracer', '~> 0.12.1'
 gem 'mqtt'
 
-gem 'mysql2', '~> 0.3.16'
+gem 'mysql2', '~> 0.3.16', groups: [:development, :test]
 gem 'pg', group: :production
 gem 'unicorn', groups: [:development, :production]
 gem 'rails_12factor', group: :production

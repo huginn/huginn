@@ -24,7 +24,7 @@ describe Agents::ImapFolderAgent do
         end
 
         def uidvalidity
-          '100'
+          100
         end
 
         def has_attachment?
@@ -53,7 +53,15 @@ describe Agents::ImapFolderAgent do
       ]
 
       stub(@checker).each_unread_mail.returns { |yielder|
-        @mails.each(&yielder)
+        seen = @checker.lastseen
+        notified = @checker.notified
+        @mails.each_with_object(notified) { |mail|
+          yielder[mail, notified]
+          seen[mail.uidvalidity] = mail.uid
+        }
+        @checker.lastseen = seen
+        @checker.notified = notified
+        nil
       }
 
       @payloads = [
@@ -110,11 +118,19 @@ describe Agents::ImapFolderAgent do
       end
 
       it 'should validate the boolean fields' do
-        @checker.options['ssl'] = false
-        @checker.should be_valid
+        %w[ssl mark_as_read].each do |key|
+          @checker.options[key] = 1
+          @checker.should_not be_valid
 
-        @checker.options['ssl'] = 'true'
-        @checker.should_not be_valid
+          @checker.options[key] = false
+          @checker.should be_valid
+
+          @checker.options[key] = 'true'
+          @checker.should be_valid
+
+          @checker.options[key] = ''
+          @checker.should be_valid
+        end
       end
 
       it 'should validate regexp conditions' do
@@ -139,9 +155,9 @@ describe Agents::ImapFolderAgent do
     describe '#check' do
       it 'should check for mails and save memory' do
         lambda { @checker.check }.should change { Event.count }.by(2)
-        @checker.memory['notified'].sort.should == @mails.map(&:message_id).sort
-        @checker.memory['seen'].should == @mails.each_with_object({}) { |mail, seen|
-          (seen[mail.uidvalidity] ||= []) << mail.uid
+        @checker.notified.sort.should == @mails.map(&:message_id).sort
+        @checker.lastseen.should == @mails.each_with_object(@checker.make_seen) { |mail, seen|
+          seen[mail.uidvalidity] = mail.uid
         }
 
         Event.last(2).map(&:payload) == @payloads
@@ -153,9 +169,9 @@ describe Agents::ImapFolderAgent do
         @checker.options['conditions']['to'] = 'John.Doe@*'
 
         lambda { @checker.check }.should change { Event.count }.by(1)
-        @checker.memory['notified'].sort.should == [@mails.first.message_id]
-        @checker.memory['seen'].should == @mails.each_with_object({}) { |mail, seen|
-          (seen[mail.uidvalidity] ||= []) << mail.uid
+        @checker.notified.sort.should == [@mails.first.message_id]
+        @checker.lastseen.should == @mails.each_with_object(@checker.make_seen) { |mail, seen|
+          seen[mail.uidvalidity] = mail.uid
         }
 
         Event.last.payload.should == @payloads.first
@@ -170,9 +186,9 @@ describe Agents::ImapFolderAgent do
         )
 
         lambda { @checker.check }.should change { Event.count }.by(1)
-        @checker.memory['notified'].sort.should == [@mails.last.message_id]
-        @checker.memory['seen'].should == @mails.each_with_object({}) { |mail, seen|
-          (seen[mail.uidvalidity] ||= []) << mail.uid
+        @checker.notified.sort.should == [@mails.last.message_id]
+        @checker.lastseen.should == @mails.each_with_object(@checker.make_seen) { |mail, seen|
+          seen[mail.uidvalidity] = mail.uid
         }
 
         Event.last.payload.should == @payloads.last.update(
@@ -208,9 +224,9 @@ describe Agents::ImapFolderAgent do
         )
 
         lambda { @checker.check }.should_not change { Event.count }
-        @checker.memory['notified'].sort.should == []
-        @checker.memory['seen'].should == @mails.each_with_object({}) { |mail, seen|
-          (seen[mail.uidvalidity] ||= []) << mail.uid
+        @checker.notified.sort.should == []
+        @checker.lastseen.should == @mails.each_with_object(@checker.make_seen) { |mail, seen|
+          seen[mail.uidvalidity] = mail.uid
         }
       end
 

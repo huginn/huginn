@@ -225,6 +225,19 @@ class Agent < ActiveRecord::Base
     # Implement me in your subclass to test for valid options.
   end
 
+  # Utility Methods
+
+  def boolify(option_value)
+    case option_value
+    when true, 'true'
+      true
+    when false, 'false'
+      false
+    else
+      nil
+    end
+  end
+
   # Class Methods
 
   class << self
