@@ -32,21 +32,20 @@ def yes?(question)
   ask(question + " (y/n)") =~ /^y/i
 end
 
-def grab_heroku_config
+def grab_heroku_config!
   config_data = capture("heroku config -s")
-  config = {}
+  $config = {}
   if config_data !~ /has no config vars/
     config_data.split("\n").map do |line|
       next if line =~ /^\s*(#|$)/ # skip comments and empty lines
       first_equal_sign = line.index('=')
-      config[line.slice(0, first_equal_sign)] = line.slice(first_equal_sign + 1, line.length)
+      $config[line.slice(0, first_equal_sign)] = line.slice(first_equal_sign + 1, line.length)
     end
   end
-  config
 end
 
 def set_value(key, value, options = {})
-  unless config[key] == value
+  unless $config[key] == value
     puts "Setting #{key} to #{value}" unless options[:silent]
     puts capture("heroku config:set #{key}=#{value}")
   end
@@ -79,17 +78,17 @@ unless yes?("Your Heroku app name is #{app_name}.  Is this correct?")
   puts "Well, then I'm not sure what to do here, sorry."
 end
 
-config = grab_heroku_config
+grab_heroku_config!
 
-if config.length > 0
+if $config.length > 0
   puts
   puts "Your current Heroku config:"
-  config.each do |key, value|
+  $config.each do |key, value|
     puts '  ' + key + ' ' * (25 - [key.length, 25].min) + '= ' + value
   end
 end
 
-unless config['APP_SECRET_TOKEN']
+unless $config['APP_SECRET_TOKEN']
   puts "Setting up APP_SECRET_TOKEN..."
   puts capture("heroku config:set APP_SECRET_TOKEN=`rake secret`")
 end
@@ -100,7 +99,7 @@ set_value 'ON_HEROKU', "true"
 set_value 'FORCE_SSL', "true"
 set_value 'DOMAIN', "#{app_name}.herokuapp.com"
 
-unless config['INVITATION_CODE']
+unless $config['INVITATION_CODE']
   puts "You need to set an invitation code for your Huginn instance.  If you plan to share this instance, you will"
   puts "tell this code to anyone who you'd like to invite.  If you won't share it, then just set this to something"
   puts "that people will not guess."
@@ -109,7 +108,7 @@ unless config['INVITATION_CODE']
   set_value 'INVITATION_CODE', invitation_code
 end
 
-unless config['SMTP_DOMAIN'] && config['SMTP_USER_NAME'] && config['SMTP_PASSWORD'] && config['SMTP_SERVER'] && config['EMAIL_FROM_ADDRESS']
+unless $config['SMTP_DOMAIN'] && $config['SMTP_USER_NAME'] && $config['SMTP_PASSWORD'] && $config['SMTP_SERVER'] && $config['EMAIL_FROM_ADDRESS']
   puts "Okay, let's setup outgoing email settings.  The simplest solution is to use the free sendgrid Heroku addon."
   puts "If you'd like to use your own server, or your Gmail account, please see .env.example and set"
   puts "SMTP_DOMAIN, SMTP_USER_NAME, SMTP_PASSWORD, and SMTP_SERVER with 'heroku config:set'."
@@ -119,14 +118,14 @@ unless config['SMTP_DOMAIN'] && config['SMTP_USER_NAME'] && config['SMTP_PASSWOR
     set_value 'SMTP_SERVER', "smtp.sendgrid.net", silent: true
     set_value 'SMTP_DOMAIN', "heroku.com", silent: true
 
-    config = grab_heroku_config
-    set_value 'SMTP_USER_NAME', config['SENDGRID_USERNAME'], silent: true
-    set_value 'SMTP_PASSWORD', config['SENDGRID_PASSWORD'], silent: true
+    grab_heroku_config!
+    set_value 'SMTP_USER_NAME', $config['SENDGRID_USERNAME'], silent: true
+    set_value 'SMTP_PASSWORD', $config['SENDGRID_PASSWORD'], silent: true
   else
     puts "Okay, you'll need to set SMTP_DOMAIN, SMTP_USER_NAME, SMTP_PASSWORD, and SMTP_SERVER with 'heroku config:set' manually."
   end
 
-  unless config['EMAIL_FROM_ADDRESS']
+  unless $config['EMAIL_FROM_ADDRESS']
     email = nag("What email address would you like email to appear to be sent from?")
     set_value 'EMAIL_FROM_ADDRESS', email
   end
