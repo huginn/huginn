@@ -22,6 +22,7 @@ else
   gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 end
 
+gem 'mysql2', '~> 0.3.16'
 gem 'devise', '~> 3.2.4'
 gem 'kaminari', '~> 0.16.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
@@ -75,11 +76,6 @@ gem 'slack-notifier', '~> 0.5.0'
 gem 'therubyracer', '~> 0.12.1'
 gem 'mqtt'
 
-gem 'mysql2', '~> 0.3.16', groups: [:development, :test]
-gem 'pg', group: :production
-gem 'unicorn', groups: [:development, :production]
-gem 'rails_12factor', group: :production
-
 group :development do
   gem 'binding_of_caller'
   gem 'better_errors'
@@ -103,3 +99,10 @@ group :production do
   gem 'dotenv-deployment'
   gem 'rack'
 end
+
+if ENV['ON_HEROKU'] || ENV['HEROKU_POSTGRESQL_ROSE_URL']
+  gem 'pg', group: :production
+  gem 'unicorn', groups: [:development, :production]
+  gem 'rails_12factor', group: :production
+end
+

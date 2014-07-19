@@ -45,6 +45,13 @@ def grab_heroku_config
   config
 end
 
+def set_value(key, value, options = {})
+  unless config[key] == value
+    puts "Setting #{key} to #{value}" unless options[:silent]
+    puts capture("heroku config:set #{key}=#{value}")
+  end
+end
+
 unless File.exists?(File.expand_path("~/.netrc")) && File.read(File.expand_path("~/.netrc")) =~ /heroku/
   puts "It looks like you need to log in to Heroku.  Please run 'heroku auth:login' before continuing."
   exit 1
@@ -87,15 +94,11 @@ unless config['APP_SECRET_TOKEN']
   puts capture("heroku config:set APP_SECRET_TOKEN=`rake secret`")
 end
 
-unless config['FORCE_SSL']
-  puts "Setting FORCE_SSL to true..."
-  puts capture("heroku config:set FORCE_SSL=true")
-end
-
-unless config['DOMAIN']
-  puts "Setting DOMAIN to #{app_name}.herokuapp.com..."
-  puts capture("heroku config:set DOMAIN=#{app_name}.herokuapp.com")
-end
+set_value 'BUILDPACK_URL', "https://github.com/ddollar/heroku-buildpack-multi.git"
+set_value 'PROCFILE_PATH', "deployment/heroku/Procfile.heroku"
+set_value 'ON_HEROKU', "true"
+set_value 'FORCE_SSL', "true"
+set_value 'DOMAIN', "#{app_name}.herokuapp.com"
 
 unless config['INVITATION_CODE']
   puts "You need to set an invitation code for your Huginn instance.  If you plan to share this instance, you will"
@@ -103,8 +106,7 @@ unless config['INVITATION_CODE']
   puts "that people will not guess."
 
   invitation_code = nag("What code would you like to use?")
-  puts "Setting INVITATION_CODE to #{invitation_code}..."
-  puts capture("heroku config:set INVITATION_CODE=#{invitation_code}")
+  set_value 'INVITATION_CODE', invitation_code
 end
 
 unless config['SMTP_DOMAIN'] && config['SMTP_USER_NAME'] && config['SMTP_PASSWORD'] && config['SMTP_SERVER'] && config['EMAIL_FROM_ADDRESS']
@@ -113,20 +115,20 @@ unless config['SMTP_DOMAIN'] && config['SMTP_USER_NAME'] && config['SMTP_PASSWOR
   puts "SMTP_DOMAIN, SMTP_USER_NAME, SMTP_PASSWORD, and SMTP_SERVER with 'heroku config:set'."
   if yes?("Should I enable the free sendgrid addon?")
     puts capture("heroku addons:add sendgrid")
-    puts capture("heroku config:set SMTP_SERVER=smtp.sendgrid.net")
-    puts capture("heroku config:set SMTP_DOMAIN=heroku.com")
+
+    set_value 'SMTP_SERVER', "smtp.sendgrid.net", silent: true
+    set_value 'SMTP_DOMAIN', "heroku.com", silent: true
 
     config = grab_heroku_config
-    puts capture("heroku config:set SMTP_USER_NAME=#{config['SENDGRID_USERNAME']}")
-    puts capture("heroku config:set SMTP_PASSWORD=#{config['SENDGRID_PASSWORD']}")
+    set_value 'SMTP_USER_NAME', config['SENDGRID_USERNAME'], silent: true
+    set_value 'SMTP_PASSWORD', config['SENDGRID_PASSWORD'], silent: true
   else
     puts "Okay, you'll need to set SMTP_DOMAIN, SMTP_USER_NAME, SMTP_PASSWORD, and SMTP_SERVER with 'heroku config:set' manually."
   end
 
   unless config['EMAIL_FROM_ADDRESS']
     email = nag("What email address would you like email to appear to be sent from?")
-    puts "Setting EMAIL_FROM_ADDRESS to #{email}..."
-    puts capture("heroku config:set EMAIL_FROM_ADDRESS=#{email}")
+    set_value 'EMAIL_FROM_ADDRESS', email
   end
 end
 
