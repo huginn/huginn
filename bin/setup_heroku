@@ -76,6 +76,7 @@ app_name = info.scan(/http:\/\/([\w\d-]+)\.herokuapp\.com/).flatten.first
 
 unless yes?("Your Heroku app name is #{app_name}.  Is this correct?")
   puts "Well, then I'm not sure what to do here, sorry."
+  exit 1
 end
 
 grab_heroku_config!
