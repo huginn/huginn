@@ -5,7 +5,8 @@ timeout 15
 preload_app true
 
 # Note that this will only work correctly when running Heroku with ONE web worker.
-# If you want to run more than one, use the standard Huginn Procfile instead with separate web and job entries.
+# If you want to run more than one, use the standard Huginn Procfile instead, with separate web and job entries.
+# You'll need to set the Heroku config variable PROCFILE_PATH to 'Procfile'.
 Thread.new do
   worker_pid = nil
   while true
@@ -14,7 +15,7 @@ Thread.new do
       puts "New threaded worker PID: #{worker_pid}"
     end
 
-    sleep 30
+    sleep 45
 
     if ENV['DOMAIN']
       force_ssl = ENV['FORCE_SSL'].present? && ENV['FORCE_SSL'] == 'true'

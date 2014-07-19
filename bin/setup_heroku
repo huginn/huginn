@@ -45,7 +45,7 @@ def grab_heroku_config!
 end
 
 def set_value(key, value, options = {})
-  unless $config[key] == value
+  if $config[key].nil? || $config[key] == '' || ($config[key] != value && options[:force] != false)
     puts "Setting #{key} to #{value}" unless options[:silent]
     puts capture("heroku config:set #{key}=#{value}")
   end
@@ -94,10 +94,10 @@ unless $config['APP_SECRET_TOKEN']
 end
 
 set_value 'BUILDPACK_URL', "https://github.com/ddollar/heroku-buildpack-multi.git"
-set_value 'PROCFILE_PATH', "deployment/heroku/Procfile.heroku"
+set_value 'PROCFILE_PATH', "deployment/heroku/Procfile.heroku", force: false
 set_value 'ON_HEROKU', "true"
 set_value 'FORCE_SSL', "true"
-set_value 'DOMAIN', "#{app_name}.herokuapp.com"
+set_value 'DOMAIN', "#{app_name}.herokuapp.com", force: false
 
 unless $config['INVITATION_CODE']
   puts "You need to set an invitation code for your Huginn instance.  If you plan to share this instance, you will"
