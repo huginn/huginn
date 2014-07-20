@@ -70,9 +70,9 @@ module Agents
       incoming_events.each do |event|
         outgoing = interpolated(event.payload)['payload'].presence || {}
         if interpolated['no_merge'].to_s == 'true'
-          handle outgoing
+          handle outgoing, event.payload
         else
-          handle outgoing.merge(event.payload)
+          handle outgoing.merge(event.payload), event.payload
         end
       end
     end
@@ -81,35 +81,35 @@ module Agents
       handle interpolated['payload'].presence || {}
     end
 
-    def generate_uri(params = nil)
-      uri = URI interpolated[:post_url]
+    def generate_uri(params = nil, payload = {})
+      uri = URI interpolated(payload)[:post_url]
       uri.query = URI.encode_www_form(Hash[URI.decode_www_form(uri.query || '')].merge(params)) if params
       uri
     end
 
     private
 
-    def handle(data)
+    def handle(data, payload = {})
       if method == 'post'
-        post_data(data, Net::HTTP::Post)
+        post_data(data, payload, Net::HTTP::Post)
       elsif method == 'put'
-        post_data(data, Net::HTTP::Put)
+        post_data(data, payload, Net::HTTP::Put)
       elsif method == 'delete'
-        post_data(data, Net::HTTP::Delete)
+        post_data(data, payload, Net::HTTP::Delete)
       elsif method == 'patch'
-        post_data(data, Net::HTTP::Patch)
+        post_data(data, payload, Net::HTTP::Patch)
       elsif method == 'get'
-        get_data(data)
+        get_data(data, payload)
       else
         error "Invalid method '#{method}'"
       end
     end
 
-    def post_data(data, request_type = Net::HTTP::Post)
-      uri = generate_uri
+    def post_data(data, payload, request_type = Net::HTTP::Post)
+      uri = generate_uri(nil, payload)
       req = request_type.new(uri.request_uri, headers)
 
-      if interpolated['content_type'] == 'json'
+      if interpolated(payload)['content_type'] == 'json'
         req.set_content_type('application/json', 'charset' => 'utf-8')
         req.body = data.to_json
       else
@@ -119,8 +119,8 @@ module Agents
       Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
     end
 
-    def get_data(data)
-      uri = generate_uri(data)
+    def get_data(data, payload)
+      uri = generate_uri(data, payload)
       req = Net::HTTP::Get.new(uri.request_uri, headers)
       Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == "https") { |http| http.request(req) }
     end
