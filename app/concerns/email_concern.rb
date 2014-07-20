@@ -9,6 +9,27 @@ module EmailConcern
 
   def validate_email_options
     errors.add(:base, "subject and expected_receive_period_in_days are required") unless options['subject'].present? && options['expected_receive_period_in_days'].present?
+
+    if options['recipients'].present?
+      emails = options['recipients']
+      emails = [emails] if emails.is_a?(String)
+      unless emails.all? { |email| email =~ Devise.email_regexp }
+        errors.add(:base, "'when provided, 'recipients' should be an email address or an array of email addresses")
+      end
+    end
+  end
+
+  def recipients(payload = {})
+    emails = interpolated(payload)['recipients']
+    if emails.present?
+      if emails.is_a?(String)
+        [emails]
+      else
+        emails
+      end
+    else
+      [user.email]
+    end
   end
 
   def working?

@@ -7,10 +7,14 @@ module Agents
     cannot_create_events!
 
     description <<-MD
-      The EmailDigestAgent collects any Events sent to it and sends them all via email when run.
-      The email will be sent to your account's address and will have a `subject` and an optional `headline` before
-      listing the Events.  If the Events' payloads contain a `message`, that will be highlighted, otherwise everything in
+      The EmailDigestAgent collects any Events sent to it and sends them all via email when scheduled.
+
+      By default, the will have a `subject` and an optional `headline` before listing the Events.  If the Events'
+      payloads contain a `message`, that will be highlighted, otherwise everything in
       their payloads will be shown.
+
+      You can specify one or more `recipients` for the email, or skip the option in order to send the email to your
+      account's default email address.
 
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
     MD
@@ -37,7 +41,9 @@ module Agents
         ids = self.memory['events'].join(",")
         groups = self.memory['queue'].map { |payload| present(payload) }
         log "Sending digest mail to #{user.email} with events [#{ids}]"
-        SystemMailer.delay.send_message(:to => user.email, :subject => interpolated['subject'], :headline => interpolated['headline'], :groups => groups)
+        recipients.each do |recipient|
+          SystemMailer.delay.send_message(:to => recipient, :subject => interpolated['subject'], :headline => interpolated['headline'], :groups => groups)
+        end
         self.memory['queue'] = []
         self.memory['events'] = []
       end
