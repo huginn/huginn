@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xml:lang="en-US">
+  <id>tag:github.com,2008:/cantino/huginn/commits/master</id>
+  <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commits/master"/>
+  <link type="application/atom+xml" rel="self" href="https://github.com/cantino/huginn/commits/master.atom"/>
+  <title>Recent Commits to huginn:master</title>
+  <updated>2014-07-16T22:26:22-07:00</updated>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/d0a844662846cf3c83b94c637c1803f03db5a5b0</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0"/>
+    <title>
+        Merge pull request #402 from albertsun/safer-liquid-migration
+    </title>
+    <updated>2014-07-16T22:26:22-07:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/83835?s=30"/>
+    <author>
+      <name>cantino</name>
+      <uri>https://github.com/cantino</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Merge pull request #402 from albertsun/safer-liquid-migration
+
+Inline models into migration&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/4a433806eeace44f1e39f02ac61cefdadf3597e2</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/4a433806eeace44f1e39f02ac61cefdadf3597e2"/>
+    <title>
+        inline models into migration
+    </title>
+    <updated>2014-07-16T15:25:08-04:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/382862?s=30"/>
+    <author>
+      <name>albertsun</name>
+      <uri>https://github.com/albertsun</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>inline models into migration&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/6ffa528ab0af7f9f5bb4b68437e7613e74fdb8c4</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/6ffa528ab0af7f9f5bb4b68437e7613e74fdb8c4"/>
+    <title>
+        Merge pull request #398 from knu/imap_use_uid
+    </title>
+    <updated>2014-07-15T19:47:37-07:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/83835?s=30"/>
+    <author>
+      <name>cantino</name>
+      <uri>https://github.com/cantino</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Merge pull request #398 from knu/imap_use_uid
+
+Use &quot;last seen UID&quot; in ImapFolderAgent&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/c7e29492c98652cc9738c374d02dcbb7c9bdeac6</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/c7e29492c98652cc9738c374d02dcbb7c9bdeac6"/>
+    <title>
+        Merge pull request #391 from theofpa/master
+    </title>
+    <updated>2014-07-12T15:19:56-07:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/83835?s=30"/>
+    <author>
+      <name>cantino</name>
+      <uri>https://github.com/cantino</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Merge pull request #391 from theofpa/master
+
+Ignore xmlns when evaluating xpath&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/f3552ece2e9af187bd5e613783dd27810b63c32f</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/f3552ece2e9af187bd5e613783dd27810b63c32f"/>
+    <title>
+        ImapFolderAgent: Emit a log message when creating an event or skipping it.
+    </title>
+    <updated>2014-07-11T19:19:12+09:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/10236?s=30"/>
+    <author>
+      <name>knu</name>
+      <uri>https://github.com/knu</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>ImapFolderAgent: Emit a log message when creating an event or skipping it.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/d144d3797d2db362943357c6d85238ec657cfa06</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/d144d3797d2db362943357c6d85238ec657cfa06"/>
+    <title>
+        ImapFolderAgent: Enable notification of mails already marked as read.
+    </title>
+    <updated>2014-07-11T19:08:55+09:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/10236?s=30"/>
+    <author>
+      <name>knu</name>
+      <uri>https://github.com/knu</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>ImapFolderAgent: Enable notification of mails already marked as read.
+
+Add a condition key &quot;is_unread&quot; to allow user to select mails based on
+the read status.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/d1196a35ada22418bf0cf8b0d5947c2164e983e6</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/d1196a35ada22418bf0cf8b0d5947c2164e983e6"/>
+    <title>
+        ImapFolderAgent: &quot;conditions&quot; must not actually be nil.
+    </title>
+    <updated>2014-07-11T18:02:09+09:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/10236?s=30"/>
+    <author>
+      <name>knu</name>
+      <uri>https://github.com/knu</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>ImapFolderAgent: &quot;conditions&quot; must not actually be nil.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/280c09415ea8114d8a128cd7c2583ae0e0aa480d</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/280c09415ea8114d8a128cd7c2583ae0e0aa480d"/>
+    <title>
+        ImapFolderAgent: Do not fail when port is blank.
+    </title>
+    <updated>2014-07-11T18:02:09+09:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/10236?s=30"/>
+    <author>
+      <name>knu</name>
+      <uri>https://github.com/knu</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>ImapFolderAgent: Do not fail when port is blank.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/045fb957b2370d80190fa8dc036863076d8806fb</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/045fb957b2370d80190fa8dc036863076d8806fb"/>
+    <title>
+        ImapFolderAgent now recognizes &quot;true&quot;/&quot;false&quot; as boolean option values.
+    </title>
+    <updated>2014-07-11T18:02:09+09:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/10236?s=30"/>
+    <author>
+      <name>knu</name>
+      <uri>https://github.com/knu</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>ImapFolderAgent now recognizes &quot;true&quot;/&quot;false&quot; as boolean option values.
+
+Add a utility method Agent#boolify to make it easier to handle boolean
+option values.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/c1b9caa8ccb0c8b8f6103fc80b90fba57a822435</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/c1b9caa8ccb0c8b8f6103fc80b90fba57a822435"/>
+    <title>
+        ImapFolderAgent: Unstringify integer keys of a hash saved in JSON.
+    </title>
+    <updated>2014-07-11T18:01:26+09:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/10236?s=30"/>
+    <author>
+      <name>knu</name>
+      <uri>https://github.com/knu</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>ImapFolderAgent: Unstringify integer keys of a hash saved in JSON.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/6a06a32447721abc4477979610e36db0650e2f92</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/6a06a32447721abc4477979610e36db0650e2f92"/>
+    <title>
+        ImapFolderAgent: Only keep a single UID value for each folder in memory.
+    </title>
+    <updated>2014-07-11T18:01:26+09:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/10236?s=30"/>
+    <author>
+      <name>knu</name>
+      <uri>https://github.com/knu</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>ImapFolderAgent: Only keep a single UID value for each folder in memory.
+
+Previously it used to keep a list of the UIDs of unread mails.  Now we
+start to assume that UIDs in a folder identified by a UID VALIDITY value
+are strictly ascending (monotonically increasing) as suggested by RFC
+3501 and 4549 and just keep the highest UID seen in the last run.
+
+This enhancement will help reduce the size of memory typically where
+mails are left unread forever.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/9ed63e45b247c30a02e8e59b4d24fccbe8644876</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/9ed63e45b247c30a02e8e59b4d24fccbe8644876"/>
+    <title>
+        Merge pull request #397 from cantino/update_rails_and_gems
+    </title>
+    <updated>2014-07-05T16:34:29-07:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/83835?s=30"/>
+    <author>
+      <name>cantino</name>
+      <uri>https://github.com/cantino</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Merge pull request #397 from cantino/update_rails_and_gems
+
+upgrade rails and gems&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/87a7abda23a82305d7050ac0bb400ce36c863d01</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/87a7abda23a82305d7050ac0bb400ce36c863d01"/>
+    <title>
+        upgrade rails and gems
+    </title>
+    <updated>2014-07-05T08:01:36-07:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/83835?s=30"/>
+    <author>
+      <name>cantino</name>
+      <uri>https://github.com/cantino</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>upgrade rails and gems&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/ea7594fa976fe24bb7024b6e3e0d2881dd86033a</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/ea7594fa976fe24bb7024b6e3e0d2881dd86033a"/>
+    <title>
+        Merge pull request #396 from knu/show_propagate_immediately
+    </title>
+    <updated>2014-07-03T20:50:40-07:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/83835?s=30"/>
+    <author>
+      <name>cantino</name>
+      <uri>https://github.com/cantino</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Merge pull request #396 from knu/show_propagate_immediately
+
+Make propagate_immediately more visible in agent details and the diagram.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/0e80f5341587aace2c023b06eb9265b776ac4535</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535"/>
+    <title>
+        Dashed line in a diagram indicates propagate_immediately being false.
+    </title>
+    <updated>2014-07-04T03:42:52+09:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/10236?s=30"/>
+    <author>
+      <name>knu</name>
+      <uri>https://github.com/knu</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Dashed line in a diagram indicates propagate_immediately being false.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/cf9cdfb3ac9d47b7fdf5d7669577c964bee9a186</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/cf9cdfb3ac9d47b7fdf5d7669577c964bee9a186"/>
+    <title>
+        Show the propagate_immediately flag in agent details.
+    </title>
+    <updated>2014-07-04T02:53:31+09:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/10236?s=30"/>
+    <author>
+      <name>knu</name>
+      <uri>https://github.com/knu</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Show the propagate_immediately flag in agent details.&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/b1128335b8de98afc5cad1b2ca5573e3bab1da1d</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/b1128335b8de98afc5cad1b2ca5573e3bab1da1d"/>
+    <title>
+        Merge pull request #389 from dsander/silence_worker_status
+    </title>
+    <updated>2014-07-01T21:47:40-07:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/83835?s=30"/>
+    <author>
+      <name>cantino</name>
+      <uri>https://github.com/cantino</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Merge pull request #389 from dsander/silence_worker_status
+
+Supress logging for requests to the /worker_status&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/d25e670b1c040f78eb648120c117853421d522c3</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/d25e670b1c040f78eb648120c117853421d522c3"/>
+    <title>
+        Merge pull request #393 from CloCkWeRX/google_calendar
+    </title>
+    <updated>2014-07-01T21:47:16-07:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/83835?s=30"/>
+    <author>
+      <name>cantino</name>
+      <uri>https://github.com/cantino</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Merge pull request #393 from CloCkWeRX/google_calendar
+
+Add Google calendar publish agent&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/d7b0e35aaaafec3032d3fe271b426f1e9d3727b4</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/d7b0e35aaaafec3032d3fe271b426f1e9d3727b4"/>
+    <title>
+        switch to cantino-twitter-stream
+    </title>
+    <updated>2014-07-01T21:36:38-07:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/83835?s=30"/>
+    <author>
+      <name>cantino</name>
+      <uri>https://github.com/cantino</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>switch to cantino-twitter-stream&lt;/pre>
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/d465158f77dcd9078697e6167b50abbfdfa8b1af</id>
+    <link type="text/html" rel="alternate" href="https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af"/>
+    <title>
+        Shift to dev group
+    </title>
+    <updated>2014-07-01T16:37:47+09:30</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars3.githubusercontent.com/u/365751?s=30"/>
+    <author>
+      <name>CloCkWeRX</name>
+      <uri>https://github.com/CloCkWeRX</uri>
+    </author>
+    <content type="html">
+      &lt;pre style='white-space:pre-wrap;width:81ex'>Shift to dev group&lt;/pre>
+    </content>
+  </entry>
+</feed>
