@@ -28,8 +28,8 @@ describe Agents::PostAgent do
     @requests = 0
     @sent_requests = { Net::HTTP::Get => [], Net::HTTP::Post => [], Net::HTTP::Put => [], Net::HTTP::Delete => [], Net::HTTP::Patch => [] }
 
-    stub.any_instance_of(Agents::PostAgent).post_data { |data, type| @requests += 1; @sent_requests[type] << data }
-    stub.any_instance_of(Agents::PostAgent).get_data { |data| @requests += 1; @sent_requests[Net::HTTP::Get] << data }
+    stub.any_instance_of(Agents::PostAgent).post_data { |data, payload, type| @requests += 1; @sent_requests[type] << data }
+    stub.any_instance_of(Agents::PostAgent).get_data { |data, payload| @requests += 1; @sent_requests[Net::HTTP::Get] << data }
   end
 
   describe "making requests" do
@@ -225,7 +225,17 @@ describe Agents::PostAgent do
     it "just returns the post_uri when no params are given" do
       @checker.options['post_url'] = "http://example.com/a/path?existing_param=existing_value"
       uri = @checker.generate_uri
+      uri.host.should == 'example.com'
+      uri.scheme.should == 'http'
       uri.request_uri.should == "/a/path?existing_param=existing_value"
+    end
+
+    it "interpolates when receiving a payload" do
+      @checker.options['post_url'] = "https://{{ domain }}/{{ variable }}?existing_param=existing_value"
+      uri = @checker.generate_uri({ "some_param" => "some_value", "another_param" => "another_value" }, { 'domain' => 'google.com', 'variable' => 'a_variable' })
+      uri.request_uri.should == "/a_variable?existing_param=existing_value&some_param=some_value&another_param=another_value"
+      uri.host.should == 'google.com'
+      uri.scheme.should == 'https'
     end
   end
 end
