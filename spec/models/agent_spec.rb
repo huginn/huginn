@@ -132,6 +132,13 @@ describe Agent do
       it_behaves_like HasGuid
     end
 
+    describe ".short_type" do
+      it "returns a short name without 'Agents::'" do
+        Agents::SomethingSource.new.short_type.should == "SomethingSource"
+        Agents::CannotBeScheduled.new.short_type.should == "CannotBeScheduled"
+      end
+    end
+
     describe ".default_schedule" do
       it "stores the default on the class" do
         Agents::SomethingSource.default_schedule.should == "2pm"

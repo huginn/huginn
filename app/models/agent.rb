@@ -66,6 +66,10 @@ class Agent < ActiveRecord::Base
     where(:type => type)
   }
 
+  def short_type
+    type.demodulize
+  end
+
   def check
     # Implement me in your subclass of Agent.
   end

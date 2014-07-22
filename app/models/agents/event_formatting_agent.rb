@@ -104,11 +104,12 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
+        agent = Agent.find(event.agent_id)
         payload = perform_matching(event.payload)
         opts = interpolated(payload)
         formatted_event = opts['mode'].to_s == "merge" ? event.payload.dup : {}
         formatted_event.merge! opts['instructions']
-        formatted_event['agent'] = Agent.find(event.agent_id).type.slice!(8..-1) unless opts['skip_agent'].to_s == "true"
+        formatted_event['agent'] = agent.short_type unless opts['skip_agent'].to_s == "true"
         formatted_event['created_at'] = event.created_at unless opts['skip_created_at'].to_s == "true"
         create_event :payload => formatted_event
       end
