@@ -68,7 +68,7 @@ module Agents
 
       If you want to retain original contents of events and only add new keys, then set `mode` to `merge`, otherwise set it to `clean`.
 
-      By default, the output event will have `agent` and `created_at` fields added as well, reflecting the original Agent type and Event creation time.  You can skip these outputs by setting `skip_agent` and `skip_created_at` to `true`.
+      By default, the output event will have `created_at` fields added as well, reflecting the original Event creation time.  You can skip this output by setting `skip_created_at` to `true`.
 
       To CGI escape output (for example when creating a link), use the Liquid `uri_escape` filter, like so:
 
@@ -82,7 +82,7 @@ module Agents
     after_save :clear_matchers
 
     def validate_options
-      errors.add(:base, "instructions, mode, skip_agent, and skip_created_at all need to be present.") unless options['instructions'].present? && options['mode'].present? && options['skip_agent'].present? && options['skip_created_at'].present?
+      errors.add(:base, "instructions, mode, and skip_created_at all need to be present.") unless options['instructions'].present? && options['mode'].present? && options['skip_created_at'].present?
 
       validate_matchers
     end
@@ -91,11 +91,11 @@ module Agents
       {
         'instructions' => {
           'message' =>  "You received a text {{text}} from {{fields.from}}",
+          'agent' => "{{agent.type}}",
           'some_other_field' => "Looks like the weather is going to be {{fields.weather}}"
         },
         'matchers' => [],
         'mode' => "clean",
-        'skip_agent' => "false",
         'skip_created_at' => "false"
       }
     end
@@ -111,7 +111,6 @@ module Agents
         opts = interpolated(payload)
         formatted_event = opts['mode'].to_s == "merge" ? event.payload.dup : {}
         formatted_event.merge! opts['instructions']
-        formatted_event['agent'] = agent.short_type unless opts['skip_agent'].to_s == "true"
         formatted_event['created_at'] = event.created_at unless opts['skip_created_at'].to_s == "true"
         create_event :payload => formatted_event
       end
