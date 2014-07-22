@@ -60,7 +60,7 @@ module Agents
       So you can use it in `instructions` like this:
 
           "instructions": {
-            "message": "Today's conditions look like <$.conditions> with a high temperature of {{high.celsius}} degrees Celsius according to the forecast at {{pretty_date.time}}.",
+            "message": "Today's conditions look like {{conditions}} with a high temperature of {{high.celsius}} degrees Celsius according to the forecast at {{pretty_date.time}}.",
             "subject": "{{data}}"
           }
 
