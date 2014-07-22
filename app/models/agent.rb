@@ -382,3 +382,25 @@ class Agent < ActiveRecord::Base
     handle_asynchronously :async_check
   end
 end
+
+class AgentDrop < Liquid::Drop
+  def initialize(object)
+    @object = object
+  end
+
+  def type
+    @object.short_type
+  end
+
+  %w[options memory name sources receivers schedule disabled keep_events_for propagate_immediately].each { |attr|
+    define_method(attr) {
+      @object.__send__(attr)
+    }
+  }
+
+  class ::Agent
+    def to_liquid
+      AgentDrop.new(self)
+    end
+  end
+end
