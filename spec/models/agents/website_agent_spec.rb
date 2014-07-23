@@ -11,9 +11,9 @@ describe Agents::WebsiteAgent do
         'url' => "http://xkcd.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => { 'css' => "#comic img", 'attr' => "src" },
-          'title' => { 'css' => "#comic img", 'attr' => "alt" },
-          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+          'url' => { 'css' => "#comic img", 'value' => "@src" },
+          'title' => { 'css' => "#comic img", 'value' => "@alt" },
+          'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
         }
       }
       @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @valid_options, :keep_events_for => 2)
@@ -256,8 +256,8 @@ describe Agents::WebsiteAgent do
           'url' => "http://xkcd.com",
           'mode' => "on_change",
           'extract' => {
-            'url' => {'css' => "#topLeft a", 'attr' => "href"},
-            'title' => {'css' => "#topLeft a", 'text' => "true"}
+            'url' => {'css' => "#topLeft a", 'value' => "@href"},
+            'title' => {'css' => "#topLeft a", 'value' => "text()"}
           }
         }
         rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
@@ -389,9 +389,9 @@ describe Agents::WebsiteAgent do
         'url' => "http://www.example.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => { 'css' => "#comic img", 'attr' => "src" },
-          'title' => { 'css' => "#comic img", 'attr' => "alt" },
-          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+          'url' => { 'css' => "#comic img", 'value' => "@src" },
+          'title' => { 'css' => "#comic img", 'value' => "@alt" },
+          'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
         },
         'basic_auth' => "user:pass"
       }
@@ -421,7 +421,7 @@ describe Agents::WebsiteAgent do
         'mode' => 'on_change',
         'headers' => { 'foo' => 'bar' },
         'extract' => {
-          'url' => { 'css' => "#comic img", 'attr' => "src" },
+          'url' => { 'css' => "#comic img", 'value' => "@src" },
         }
       }
       @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)
