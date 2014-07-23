@@ -68,7 +68,7 @@ module Agents
 
       If you want to retain original contents of events and only add new keys, then set `mode` to `merge`, otherwise set it to `clean`.
 
-      By default, the output event will have `created_at` fields added as well, reflecting the original Event creation time.  You can skip this output by setting `skip_created_at` to `true`.
+      By default, the output event will have a `created_at` field added as well, reflecting the original Event creation time.  You can skip this output by setting `skip_created_at` to `true`.
 
       To CGI escape output (for example when creating a link), use the Liquid `uri_escape` filter, like so:
 
