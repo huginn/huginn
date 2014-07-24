@@ -769,7 +769,7 @@ describe AgentDrop do
         mode: 'on_change',
         extract: {
           url: { css: '[id^=strip_enlarged_] img', value: '@src' },
-          title: { css: '.STR_DateStrip', value: 'text()' },
+          title: { css: '.STR_DateStrip', value: './/text()' },
         },
       },
       schedule: 'every_12h',

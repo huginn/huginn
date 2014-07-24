@@ -257,7 +257,6 @@ describe Agents::WebsiteAgent do
           'mode' => "on_change",
           'extract' => {
             'url' => {'css' => "#topLeft a", 'value' => "@href"},
-            'title' => {'css' => "#topLeft a", 'value' => "text()"}
           }
         }
         rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
@@ -285,6 +284,25 @@ describe Agents::WebsiteAgent do
         rel.check
         event = Event.last
         event.payload['num_links'].should == "9"
+      end
+
+      it "should return all texts concatenated if XPath returns many text nodes" do
+        rel_site = {
+          'name' => "XKCD",
+          'expected_update_period_in_days' => 2,
+          'type' => "html",
+          'url' => "http://xkcd.com",
+          'mode' => "on_change",
+          'extract' => {
+            'slogan' => {'css' => "#slogan", 'value' => ".//text()"}
+          }
+        }
+        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel.user = users(:bob)
+        rel.save!
+        rel.check
+        event = Event.last
+        event.payload['slogan'].should == "A webcomic of romance, sarcasm, math, and language."
       end
 
       describe "JSON" do

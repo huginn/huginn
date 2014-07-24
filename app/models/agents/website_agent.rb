@@ -28,10 +28,10 @@ module Agents
           "extract": {
             "url": { "css": "#comic img", "value": "@src" },
             "title": { "css": "#comic img", "value": "@title" },
-            "body_text": { "css": "div.main", "value": "text()" }
+            "body_text": { "css": "div.main", "value": ".//text()" }
           }
 
-      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and "text()" is to extract the enclosed text.  You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.
+      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and "//text()" is to extract all the enclosed texts.  You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-text(.//text())` should actually be `normalize-text(.)`.
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
@@ -162,8 +162,6 @@ module Agents
                       # Node#xpath() returns any numeric value as float;
                       # convert it to integer as appropriate.
                       value = value.to_i if value.to_i == value
-                    when Nokogiri::XML::NodeSet
-                      value = value.first
                     end
                     value.to_s
                   }
