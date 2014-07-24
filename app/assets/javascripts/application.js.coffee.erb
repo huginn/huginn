@@ -68,7 +68,7 @@ $(document).ready ->
     setTimeout((-> $(".flash").slideUp(-> $(".flash").remove())), 5000)
 
   # Help popovers
-  $('.hover-help').popover(trigger: 'hover')
+  $('.hover-help').popover(trigger: 'hover', html: true)
 
   # Agent Navigation
   $agentNavigate = $('#agent-navigate')

@@ -77,6 +77,7 @@
         <div class="col-md-12">
           <div class="form-group">
             <%= f.label :options %>
+            <span class="glyphicon glyphicon-question-sign hover-help" data-content="In this JSON hash, interpolation is available in almost all values using the Liquid templating language.<p>Available template variables include the following:<dl><dt><code>message</code>, <code>url</code>, etc.</dt><dd>Refers to the corresponding key's value of each incoming event's payload.</dd><dt><code>agent</code></dt><dd>Refers to the agent that created each incoming event.  It has attributes like <code>type</code>, <code>name</code> and <code>options</code>, so <code>{{agent.type}}</code> will expand to <code>WebsiteAgent</code> if an incoming event is created by that agent.</dd></dl></p><p>To access user credentials, use the <code>credential</code> tag like this: <code>{% credential <em>bare_key_name</em> %}</code></p>"></span>
             <textarea rows="15" id="agent_options" name="agent[options]" class="form-control live-json-editor <%= (@agent.new_record? && @agent.options == {}) ? "showing-default" : "" %>">
               <%= Utils.jsonify((@agent.new_record? && @agent.options == {}) ? @agent.default_options : @agent.options) %>
             </textarea>
