@@ -5,6 +5,7 @@ require 'json_serialized_field'
 # fields.
 class Event < ActiveRecord::Base
   include JSONSerializedField
+  include LiquidDroppable
 
   attr_accessible :lat, :lng, :payload, :user_id, :user, :expires_at
 
@@ -42,9 +43,9 @@ class Event < ActiveRecord::Base
   end
 end
 
-class EventDrop < Liquid::Drop
+class EventDrop
   def initialize(event, payload = event.payload)
-    @event = event
+    super(event)
     @payload = payload
   end
 
@@ -54,22 +55,13 @@ class EventDrop < Liquid::Drop
     else
       case key
       when 'agent'
-        @event.agent
+        @object.agent
       end
     end
   end
 
-  # Allow iteration using a "for" loop.  Including Enumerable will
-  # enable methods like max, min and sort, but it does not make much
-  # sense since this is a hash-like object.
   def each(&block)
     return to_enum(__method__) unless block
     @payload.each(&block)
-  end
-
-  class ::Event
-    def to_liquid
-      EventDrop.new(self)
-    end
   end
 end

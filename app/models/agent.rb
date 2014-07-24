@@ -14,6 +14,7 @@ class Agent < ActiveRecord::Base
   include WorkingHelpers
   include LiquidInterpolatable
   include HasGuid
+  include LiquidDroppable
 
   markdown_class_attributes :description, :event_description
 
@@ -383,24 +384,35 @@ class Agent < ActiveRecord::Base
   end
 end
 
-class AgentDrop < Liquid::Drop
-  def initialize(object)
-    @object = object
-  end
-
+class AgentDrop
   def type
     @object.short_type
   end
 
-  %w[options memory name sources receivers schedule disabled keep_events_for propagate_immediately].each { |attr|
+  METHODS = [
+    :name,
+    :type,
+    :options,
+    :memory,
+    :sources,
+    :receivers,
+    :schedule,
+    :disabled,
+    :keep_events_for,
+    :propagate_immediately,
+  ]
+
+  METHODS.each { |attr|
     define_method(attr) {
       @object.__send__(attr)
-    }
+    } unless method_defined?(attr)
   }
 
-  class ::Agent
-    def to_liquid
-      AgentDrop.new(self)
-    end
+  def each(&block)
+    return to_enum(__method__) unless block
+
+    METHODS.each { |attr|
+      yield [attr, __sent__(attr)]
+    }
   end
 end

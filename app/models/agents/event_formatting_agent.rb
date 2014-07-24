@@ -107,7 +107,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         payload = perform_matching(event.payload)
-        opts = interpolated(EventDrop.new(event, payload))
+        opts = interpolated(event.to_liquid(payload))
         formatted_event = opts['mode'].to_s == "merge" ? event.payload.dup : {}
         formatted_event.merge! opts['instructions']
         formatted_event['created_at'] = event.created_at unless opts['skip_created_at'].to_s == "true"
