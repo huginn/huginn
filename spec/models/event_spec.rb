@@ -76,3 +76,39 @@ describe Event do
     end
   end
 end
+
+describe EventDrop do
+  def interpolate(string, event)
+    event.agent.interpolate_string(string, event.to_liquid)
+  end
+
+  before do
+    @event = Event.new
+    @event.agent = agents(:jane_weather_agent)
+    @event.payload = {
+      'title' => 'some title',
+      'url' => 'http://some.site.example.org/',
+    }
+    @event.save!
+  end
+
+  it 'should be created via Agent#to_liquid' do
+    @event.to_liquid.class.should be(EventDrop)
+  end
+
+  it 'should have attributes of its payload' do
+    t = '{{title}}: {{url}}'
+    interpolate(t, @event).should eq('some title: http://some.site.example.org/')
+  end
+
+  it 'should be iteratable' do
+    # to_liquid returns self
+    t = "{% for pair in to_liquid %}{{pair | join:':' }}\n{% endfor %}"
+    interpolate(t, @event).should eq("title:some title\nurl:http://some.site.example.org/\n")
+  end
+
+  it 'should have agent' do
+    t = '{{agent.name}}'
+    interpolate(t, @event).should eq('SF Weather')
+  end
+end

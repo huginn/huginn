@@ -83,7 +83,7 @@ module Agents
     def receive_web_request(params, method, format)
       if interpolated['secrets'].include?(params['secret'])
         items = received_events.order('id desc').limit(events_to_show).map do |event|
-          interpolated = interpolate_options(options['template']['item'], event.payload)
+          interpolated = interpolate_options(options['template']['item'], event)
           interpolated['guid'] = event.id
           interpolated['pubDate'] = event.created_at.rfc2822.to_s
           interpolated

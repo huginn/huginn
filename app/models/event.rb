@@ -41,3 +41,35 @@ class Event < ActiveRecord::Base
     Agent.receive!(:only_receivers => propagate_ids) unless propagate_ids.empty?
   end
 end
+
+class EventDrop < Liquid::Drop
+  def initialize(event, payload = event.payload)
+    @event = event
+    @payload = payload
+  end
+
+  def before_method(key)
+    if @payload.key?(key)
+      @payload[key]
+    else
+      case key
+      when 'agent'
+        @event.agent
+      end
+    end
+  end
+
+  # Allow iteration using a "for" loop.  Including Enumerable will
+  # enable methods like max, min and sort, but it does not make much
+  # sense since this is a hash-like object.
+  def each(&block)
+    return to_enum(__method__) unless block
+    @payload.each(&block)
+  end
+
+  class ::Event
+    def to_liquid
+      EventDrop.new(self)
+    end
+  end
+end

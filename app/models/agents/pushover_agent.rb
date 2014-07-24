@@ -58,7 +58,7 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        payload_interpolated = interpolated(event.payload)
+        payload_interpolated = interpolated(event)
         message = (event.payload['message'].presence || event.payload['text'].presence || payload_interpolated['message']).to_s
         if message.present?
           post_params = {

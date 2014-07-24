@@ -44,13 +44,13 @@ module Agents
       incoming_events.each do |event|
         message = (event.payload['message'].presence || event.payload['text'].presence || event.payload['sms'].presence).to_s
         if message.present?
-          if interpolated(event.payload)['receive_call'].to_s == 'true'
+          if interpolated(event)['receive_call'].to_s == 'true'
             secret = SecureRandom.hex 3
             memory['pending_calls'][secret] = message
             make_call secret
           end
 
-          if interpolated(event.payload)['receive_text'].to_s == 'true'
+          if interpolated(event)['receive_text'].to_s == 'true'
             message = message.slice 0..160
             send_message message
           end

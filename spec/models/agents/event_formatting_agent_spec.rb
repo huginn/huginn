@@ -8,7 +8,8 @@ describe Agents::EventFormattingAgent do
             :instructions => {
                 :message => "Received {{content.text}} from {{content.name}} .",
                 :subject => "Weather looks like {{conditions}} according to the forecast at {{pretty_date.time}}",
-                :agent => "{{agent.type}}",
+                :agent_type => "{{agent.type}}",
+                :agent_type_via_matching => "{{agent_info.type}}",
             },
             :mode => "clean",
             :matchers => [
@@ -16,6 +17,11 @@ describe Agents::EventFormattingAgent do
                     :path => "{{date.pretty}}",
                     :regexp => "\\A(?<time>\\d\\d:\\d\\d [AP]M [A-Z]+)",
                     :to => "pretty_date",
+                },
+                {
+                    :path => "{{agent.type}}",
+                    :regexp => "\\A(?<type>.*)\\z",
+                    :to => "agent_info",
                 },
             ],
             :skip_created_at => "false"
@@ -64,12 +70,13 @@ describe Agents::EventFormattingAgent do
     it "should handle Liquid templating in instructions" do
       @checker.receive([@event])
       Event.last.payload[:message].should == "Received Some Lorem Ipsum from somevalue ."
-      Event.last.payload[:agent].should == "WeatherAgent"
+      Event.last.payload[:agent_type].should == "WeatherAgent"
     end
 
     it "should handle matchers and Liquid templating in instructions" do
       @checker.receive([@event])
       Event.last.payload[:subject].should == "Weather looks like someothervalue according to the forecast at 10:00 PM EST"
+      Event.last.payload[:agent_type_via_matching].should == "WeatherAgent"
     end
 
     it "should allow escaping" do

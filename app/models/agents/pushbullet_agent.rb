@@ -49,7 +49,7 @@ module Agents
     private
 
     def query_options(event)
-      mo = interpolated(event.payload)
+      mo = interpolated(event)
       {
         :basic_auth => {:username => mo[:api_key], :password => ''},
         :body => {:device_iden => mo[:device_id], :title => mo[:title], :body => mo[:body], :type => 'note'}

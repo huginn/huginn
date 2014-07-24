@@ -61,7 +61,7 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        handle(interpolated(event.payload), event)
+        handle(interpolated(event), event)
       end
     end
 

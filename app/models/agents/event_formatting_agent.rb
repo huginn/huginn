@@ -106,9 +106,8 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        agent = Agent.find(event.agent_id)
-        payload = perform_matching({ 'agent' => agent }.update(event.payload))
-        opts = interpolated(payload)
+        payload = perform_matching({ 'agent' => event.agent.to_h }.merge(event.payload))
+        opts = interpolated(EventDrop.new(event, payload))
         formatted_event = opts['mode'].to_s == "merge" ? event.payload.dup : {}
         formatted_event.merge! opts['instructions']
         formatted_event['created_at'] = event.created_at unless opts['skip_created_at'].to_s == "true"

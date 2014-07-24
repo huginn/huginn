@@ -68,7 +68,7 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        outgoing = interpolated(event.payload)['payload'].presence || {}
+        outgoing = interpolated(event)['payload'].presence || {}
         if interpolated['no_merge'].to_s == 'true'
           handle outgoing, event.payload
         else
