@@ -106,7 +106,7 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        payload = perform_matching({ 'agent' => event.agent.to_h }.merge(event.payload))
+        payload = perform_matching(event.payload)
         opts = interpolated(EventDrop.new(event, payload))
         formatted_event = opts['mode'].to_s == "merge" ? event.payload.dup : {}
         formatted_event.merge! opts['instructions']

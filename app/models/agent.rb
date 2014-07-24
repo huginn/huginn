@@ -402,12 +402,5 @@ class AgentDrop < Liquid::Drop
     def to_liquid
       AgentDrop.new(self)
     end
-
-    def to_h
-      drop = to_liquid
-      AgentDrop.public_instance_methods(false).each_with_object({}) { |attr, hash|
-        hash[attr.to_s] = drop.__send__(attr)
-      }
-    end
   end
 end
