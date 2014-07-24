@@ -154,17 +154,23 @@ module Agents
                   error '"css" or "xpath" is required for HTML or XML extraction'
                   return
                 end
-                unless Nokogiri::XML::NodeSet === nodes
+                case nodes
+                when Nokogiri::XML::NodeSet
+                  result = nodes.map { |node|
+                    case value = node.xpath(extraction_details['value'])
+                    when Float
+                      # Node#xpath() returns any numeric value as float;
+                      # convert it to integer as appropriate.
+                      value = value.to_i if value.to_i == value
+                    when Nokogiri::XML::NodeSet
+                      value = value.first
+                    end
+                    value.to_s
+                  }
+                else
                   error "The result of HTML/XML extraction was not a NodeSet"
                   return
                 end
-                result = nodes.map { |node|
-                  value, = node.xpath(extraction_details['value'])
-                  if value.is_a?(Float) && value.to_i == value
-                    value = value.to_i
-                  end
-                  value.to_s
-                }
                 log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
               end
               output[name] = result
