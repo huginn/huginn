@@ -268,6 +268,25 @@ describe Agents::WebsiteAgent do
         event.payload['url'].should == "http://xkcd.com/about"
       end
 
+      it "should return an integer value if XPath evaluates to one" do
+        rel_site = {
+          'name' => "XKCD",
+          'expected_update_period_in_days' => 2,
+          'type' => "html",
+          'url' => "http://xkcd.com",
+          'mode' => "on_change",
+          'extract' => {
+            'num_links' => {'css' => "#comicLinks", 'value' => "count(./a)"}
+          }
+        }
+        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel.user = users(:bob)
+        rel.save!
+        rel.check
+        event = Event.last
+        event.payload['num_links'].should == "9"
+      end
+
       describe "JSON" do
         it "works with paths" do
           json = {
