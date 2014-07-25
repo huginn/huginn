@@ -146,6 +146,7 @@ module DotHelper
         statement 'node',
                   shape: 'box',
                   style: 'rounded',
+                  target: '_blank',
                   fontsize: 10,
                   fontname: ('Helvetica' if rich)
 
