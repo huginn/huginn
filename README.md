@@ -2,7 +2,7 @@
 
 ## What is Huginn?
 
-Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events, propagating them along a directed event flow graph.  Think of it as Yahoo! Pipes plus IFTTT on your own server.  You always know who has your data.  You do.
+Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events, propagating them along a directed graph.  Think of it as a hackable Yahoo! Pipes plus IFTTT on your own server.  You always know who has your data.  You do.
 
 ![the origin of the name](doc/imgs/the-name.png)
 
@@ -10,12 +10,13 @@ Huginn is a system for building agents that perform automated tasks for you onli
 
 * Track the weather and get an email when it's going to rain (or snow) tomorrow ("Don't forget your umbrella!")
 * List terms that you care about and receive emails when their occurrence on Twitter changes.  (For example, want to know when something interesting has happened in the world of Machine Learning?  Huginn will watch the term "machine learning" on Twitter and tell you when there is a large spike.)
-* Watch for air travel deals
+* Watch for air travel or shopping deals
 * Follow your project names on Twitter and get updates when people mention them
 * Scrape websites and receive emails when they change
+* Connect to Adioso, HipChat, Basecamp, Growl, FTP, IMAP, Jabber, JIRA, MQTT, nextbus, Pushbullet, Pushover, RSS, Bash, Slack, StubHub, translation APIs, Twilio, Twitter, Wunderground, and Weibo, to name a few.
 * Compose digest emails about things you care about to be sent at specific times of the day
 * Track counts of high frequency events and send an SMS within moments when they spike, such as the term "san francisco emergency"
-* Watch public transit
+* Send and receive WebHooks
 * Run arbitrary JavaScript Agents on the server
 * Track your location over time
 * Create Amazon Mechanical Turk workflows as the inputs, or outputs, of agents.  ("Once a day, ask 5 people for a funny cat photo; send the results to 5 more people to be rated; send the top-rated photo to 5 people for a funny caption; send to 5 final people to rate for funniest caption; finally, post the best captioned photo on my blog.")
@@ -66,7 +67,7 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 
 ## Deployment
 
-Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
+Huginn can run on Heroku for free!  Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
 ### Optional Setup
 
@@ -76,11 +77,7 @@ See [private development instructions](https://github.com/cantino/huginn/wiki/Pr
 
 #### Enable the WeatherAgent
 
-In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/). Signup for one and then change value of `api_key: your-key` in your seeded WeatherAgent.
-
-#### Logging your location to the UserLocationAgent
-
-You can use [Post Location](https://github.com/cantino/post_location) on your iPhone to post your location to an instance of the UserLocationAgent.  Make a new one to see instructions.
+In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/). Signup for one and then change the value of `api_key: your-key` in your seeded WeatherAgent.
 
 #### Enable DelayedJobWeb for handy delayed\_job monitoring and control
 
@@ -102,7 +99,7 @@ Some of us are hanging out there, come and say hello.
 
 ## Contribution
 
-Huginn is a work in progress and is hopefully just getting started.  Please get involved!  You can [add new Agents](https://github.com/cantino/huginn/wiki/Creating-a-new-agent), expand the [Wiki](https://github.com/cantino/huginn/wiki), or help us simplify and strengthen the Agent API or core application.
+Huginn is a work in progress and is just getting started.  Please get involved!  You can [add new Agents](https://github.com/cantino/huginn/wiki/Creating-a-new-agent), expand the [Wiki](https://github.com/cantino/huginn/wiki), or help us simplify and strengthen the Agent API or core application.
 
 Please fork, add specs, and send pull requests!
 
