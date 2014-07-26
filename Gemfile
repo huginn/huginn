@@ -74,11 +74,8 @@ gem 'hipchat', '~> 1.2.0'
 gem 'xmpp4r',  '~> 0.5.6'
 gem 'feed-normalizer'
 gem 'slack-notifier', '~> 0.5.0'
-
 gem 'therubyracer', '~> 0.12.1'
-
 gem 'mqtt'
-
 
 group :development do
   gem 'binding_of_caller'
@@ -103,3 +100,17 @@ group :production do
   gem 'dotenv-deployment'
   gem 'rack'
 end
+
+# This hack needs some explanation.  When on Heroku, use the pg, unicorn, and rails12factor gems.
+# When not on Heroku, we still want our Gemfile.lock to include these gems, so we scope them to
+# an unsupported platform.
+if ENV['ON_HEROKU'] || ENV['HEROKU_POSTGRESQL_ROSE_URL'] || File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
+  gem 'pg'
+  gem 'unicorn'
+  gem 'rails_12factor'
+else
+  gem 'pg', platform: :ruby_18
+  gem 'unicorn', platform: :ruby_18
+  gem 'rails_12factor', platform: :ruby_18
+end
+

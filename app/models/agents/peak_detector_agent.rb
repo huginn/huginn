@@ -38,7 +38,7 @@ module Agents
         'expected_receive_period_in_days' => "2",
         'group_by_path' => "filter",
         'value_path' => "count",
-        'message' => "A peak was found"
+        'message' => "A peak of {{count}} was found in {{filter}}"
       }
     end
 
