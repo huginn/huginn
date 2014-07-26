@@ -72,6 +72,7 @@ gem 'em-http-request', '~> 1.1.2'
 gem 'weibo_2', '~> 0.1.4'
 gem 'hipchat', '~> 1.2.0'
 gem 'xmpp4r',  '~> 0.5.6'
+gem 'feed-normalizer'
 gem 'slack-notifier', '~> 0.5.0'
 
 gem 'therubyracer', '~> 0.12.1'
