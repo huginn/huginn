@@ -31,7 +31,7 @@ module Agents
             "body_text": { "css": "div.main", "value": ".//text()" }
           }
 
-      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and "//text()" is to extract all the enclosed texts.  You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-text(.//text())` should actually be `normalize-text(.)`.
+      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and ".//text()" is to extract all the enclosed texts.  You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-text(.//text())` should actually be `normalize-text(.)`.
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
