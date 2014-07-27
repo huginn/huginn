@@ -1,7 +1,15 @@
 class AdoptXpathInWebsiteAgent < ActiveRecord::Migration
+  class Agent < ActiveRecord::Base
+    include JSONSerializedField
+    json_serialize :options
+  end
+
   def up
     Agent.where(type: 'Agents::WebsiteAgent').each do |agent|
-      next if agent.extraction_type == 'json'
+      extract = agent.options['extract']
+      next unless extract.is_a?(Hash) && extract.all? { |name, detail|
+        detail.key?('xpath') || detail.key?('css')
+      }
 
       agent.options_will_change!
       agent.options['extract'].each { |name, extraction|
