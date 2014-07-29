@@ -9,6 +9,7 @@ SITE
     dmg (2.2.0)
     ohai (2.0.0)
     rsyslog (1.12.2)
+    ruby_build (0.8.0)
     runit (1.5.10)
       build-essential (>= 0.0.0)
       yum (~> 3.0)
@@ -18,6 +19,13 @@ SITE
     yum (3.2.0)
     yum-epel (0.3.6)
       yum (~> 3.0)
+
+GIT
+  remote: git://github.com/fnichol/chef-rbenv.git
+  ref: v0.7.2
+  sha: f2b53292e810dd2b43f6121f9958f5f29979dcb1
+  specs:
+    rbenv (0.7.2)
 
 GIT
   remote: git://github.com/mdxp/nodejs-cookbook.git
@@ -67,5 +75,7 @@ DEPENDENCIES
   mysql (>= 0)
   nginx (>= 0)
   nodejs (>= 0)
+  rbenv (>= 0)
+  ruby_build (>= 0)
   runit (>= 0)
 
