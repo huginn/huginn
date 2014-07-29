@@ -60,7 +60,7 @@ module Agents
     end
 
     def body(event)
-      interpolated(event.payload)['message']
+      interpolated(event)['message']
     end
   end
 end

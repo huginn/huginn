@@ -41,7 +41,7 @@ module Agents
         incoming_events = incoming_events.first(20)
       end
       incoming_events.each do |event|
-        tweet_text = interpolated(event.payload)['message']
+        tweet_text = interpolated(event)['message']
         begin
           tweet = publish_tweet tweet_text
           create_event :payload => {

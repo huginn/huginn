@@ -132,6 +132,13 @@ describe Agent do
       it_behaves_like HasGuid
     end
 
+    describe ".short_type" do
+      it "returns a short name without 'Agents::'" do
+        Agents::SomethingSource.new.short_type.should == "SomethingSource"
+        Agents::CannotBeScheduled.new.short_type.should == "CannotBeScheduled"
+      end
+    end
+
     describe ".default_schedule" do
       it "stores the default on the class" do
         Agents::SomethingSource.default_schedule.should == "2pm"
@@ -727,5 +734,100 @@ describe Agent do
         event.expires_at.should be_nil
       end
     end
+  end
+end
+
+describe AgentDrop do
+  def interpolate(string, agent)
+    agent.interpolate_string(string, "agent" => agent)
+  end
+
+  before do
+    @wsa1 = Agents::WebsiteAgent.new(
+      name: 'XKCD',
+      options: {
+        expected_update_period_in_days: 2,
+        type: 'html',
+        url: 'http://xkcd.com/',
+        mode: 'on_change',
+        extract: {
+          url: { css: '#comic img', attr: 'src' },
+          title: { css: '#comic img', attr: 'alt' },
+        },
+      },
+      schedule: 'every_1h',
+      keep_events_for: 2)
+    @wsa1.user = users(:bob)
+    @wsa1.save!
+
+    @wsa2 = Agents::WebsiteAgent.new(
+      name: 'Dilbert',
+      options: {
+        expected_update_period_in_days: 2,
+        type: 'html',
+        url: 'http://dilbert.com/',
+        mode: 'on_change',
+        extract: {
+          url: { css: '[id^=strip_enlarged_] img', attr: 'src' },
+          title: { css: '.STR_DateStrip', text: true },
+        },
+      },
+      schedule: 'every_12h',
+      keep_events_for: 2)
+    @wsa2.user = users(:bob)
+    @wsa2.save!
+
+    @efa = Agents::EventFormattingAgent.new(
+      name: 'Formatter',
+      options: {
+        instructions: {
+          message: '{{agent.name}}: {{title}} {{url}}',
+          agent: '{{agent.type}}',
+        },
+        mode: 'clean',
+        matchers: [],
+        skip_created_at: 'false',
+      },
+      keep_events_for: 2,
+      propagate_immediately: true)
+    @efa.user = users(:bob)
+    @efa.sources << @wsa1 << @wsa2
+    @efa.memory[:test] = 1
+    @efa.save!
+  end
+
+  it 'should be created via Agent#to_liquid' do
+    @wsa1.to_liquid.class.should be(AgentDrop)
+    @wsa2.to_liquid.class.should be(AgentDrop)
+    @efa.to_liquid.class.should be(AgentDrop)
+  end
+
+  it 'should have .type and .name' do
+    t = '{{agent.type}}: {{agent.name}}'
+    interpolate(t, @wsa1).should eq('WebsiteAgent: XKCD')
+    interpolate(t, @wsa2).should eq('WebsiteAgent: Dilbert')
+    interpolate(t, @efa).should eq('EventFormattingAgent: Formatter')
+  end
+
+  it 'should have .options' do
+    t = '{{agent.options.url}}'
+    interpolate(t, @wsa1).should eq('http://xkcd.com/')
+    interpolate(t, @wsa2).should eq('http://dilbert.com/')
+    interpolate('{{agent.options.instructions.message}}',
+                @efa).should eq('{{agent.name}}: {{title}} {{url}}')
+  end
+
+  it 'should have .sources' do
+    t = '{{agent.sources.size}}: {{agent.sources | map:"name" | join:", "}}'
+    interpolate(t, @wsa1).should eq('0: ')
+    interpolate(t, @wsa2).should eq('0: ')
+    interpolate(t, @efa).should eq('2: XKCD, Dilbert')
+  end
+
+  it 'should have .receivers' do
+    t = '{{agent.receivers.size}}: {{agent.receivers | map:"name" | join:", "}}'
+    interpolate(t, @wsa1).should eq('1: Formatter')
+    interpolate(t, @wsa2).should eq('1: Formatter')
+    interpolate(t, @efa).should eq('0: ')
   end
 end

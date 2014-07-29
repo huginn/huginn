@@ -14,6 +14,7 @@ class Agent < ActiveRecord::Base
   include WorkingHelpers
   include LiquidInterpolatable
   include HasGuid
+  include LiquidDroppable
 
   markdown_class_attributes :description, :event_description
 
@@ -65,6 +66,10 @@ class Agent < ActiveRecord::Base
            end
     where(:type => type)
   }
+
+  def short_type
+    type.demodulize
+  end
 
   def check
     # Implement me in your subclass of Agent.
@@ -376,5 +381,38 @@ class Agent < ActiveRecord::Base
       end
     end
     handle_asynchronously :async_check
+  end
+end
+
+class AgentDrop
+  def type
+    @object.short_type
+  end
+
+  METHODS = [
+    :name,
+    :type,
+    :options,
+    :memory,
+    :sources,
+    :receivers,
+    :schedule,
+    :disabled,
+    :keep_events_for,
+    :propagate_immediately,
+  ]
+
+  METHODS.each { |attr|
+    define_method(attr) {
+      @object.__send__(attr)
+    } unless method_defined?(attr)
+  }
+
+  def each(&block)
+    return to_enum(__method__) unless block
+
+    METHODS.each { |attr|
+      yield [attr, __sent__(attr)]
+    }
   end
 end

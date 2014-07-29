@@ -57,7 +57,7 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        opts = interpolated(event.payload)
+        opts = interpolated(event)
         slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username]
       end
     end
