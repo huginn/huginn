@@ -42,6 +42,12 @@ describe Agents::HipchatAgent do
       @checker.should be_valid
     end
 
+    it "should also allow a credential" do
+      @checker.options['auth_token'] = nil
+      @checker.should_not be_valid
+      @checker.user.user_credentials.create :credential_name => 'hipchat_auth_token', :credential_value => 'something'
+      @checker.reload.should be_valid
+    end
   end
 
   describe "#receive" do
