@@ -751,8 +751,8 @@ describe AgentDrop do
         url: 'http://xkcd.com/',
         mode: 'on_change',
         extract: {
-          url: { css: '#comic img', attr: 'src' },
-          title: { css: '#comic img', attr: 'alt' },
+          url: { css: '#comic img', value: '@src' },
+          title: { css: '#comic img', value: '@alt' },
         },
       },
       schedule: 'every_1h',

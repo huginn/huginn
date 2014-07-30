@@ -31,9 +31,9 @@ unless user.agents.where(:name => "XKCD Source").exists?
                            'mode' => "on_change",
                            'expected_update_period_in_days' => 5,
                            'extract' => {
-                               'url' => { 'css' => "#comic img", 'attr' => "src" },
-                               'title' => { 'css' => "#comic img", 'attr' => "alt" },
-                               'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+                               'url' => { 'css' => "#comic img", 'value' => "@src" },
+                               'title' => { 'css' => "#comic img", 'value' => "@alt" },
+                               'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
                            }
                        }).save!
 end
@@ -47,8 +47,8 @@ unless user.agents.where(:name => "iTunes Trailer Source").exists?
                            'type' => "xml",
                            'expected_update_period_in_days' => 5,
                            'extract' => {
-                               'title' => { 'css' => "item title", 'text' => true},
-                               'url' => { 'css' => "item link", 'text' => true}
+                               'title' => { 'css' => "item title", 'value' => ".//text()"},
+                               'url' => { 'css' => "item link", 'value' => ".//text()"}
                            }
                        }).save!
 end
