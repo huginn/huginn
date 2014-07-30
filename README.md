@@ -27,6 +27,8 @@ Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, 
 
 Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, add new Agents, write documentation and tutorials, or try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
 
+Have an awesome an idea but not feeling quite up to contributing yet? Head over to our [Official 'suggest an agent' thread ](https://github.com/cantino/huginn/issues/353) and tell us about your cool idea!
+
 ## Examples
 
 Please checkout the [Huginn Introductory Screencast](http://vimeo.com/61976251)!
