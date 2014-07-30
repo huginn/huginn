@@ -768,8 +768,8 @@ describe AgentDrop do
         url: 'http://dilbert.com/',
         mode: 'on_change',
         extract: {
-          url: { css: '[id^=strip_enlarged_] img', attr: 'src' },
-          title: { css: '.STR_DateStrip', text: true },
+          url: { css: '[id^=strip_enlarged_] img', value: '@src' },
+          title: { css: '.STR_DateStrip', value: './/text()' },
         },
       },
       schedule: 'every_12h',

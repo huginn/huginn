@@ -11,9 +11,9 @@ describe Agents::WebsiteAgent do
         'url' => "http://xkcd.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => { 'css' => "#comic img", 'attr' => "src" },
-          'title' => { 'css' => "#comic img", 'attr' => "alt" },
-          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+          'url' => { 'css' => "#comic img", 'value' => "@src" },
+          'title' => { 'css' => "#comic img", 'value' => "@alt" },
+          'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
         }
       }
       @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @valid_options, :keep_events_for => 2)
@@ -256,8 +256,7 @@ describe Agents::WebsiteAgent do
           'url' => "http://xkcd.com",
           'mode' => "on_change",
           'extract' => {
-            'url' => {'css' => "#topLeft a", 'attr' => "href"},
-            'title' => {'css' => "#topLeft a", 'text' => "true"}
+            'url' => {'css' => "#topLeft a", 'value' => "@href"},
           }
         }
         rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
@@ -266,6 +265,44 @@ describe Agents::WebsiteAgent do
         rel.check
         event = Event.last
         event.payload['url'].should == "http://xkcd.com/about"
+      end
+
+      it "should return an integer value if XPath evaluates to one" do
+        rel_site = {
+          'name' => "XKCD",
+          'expected_update_period_in_days' => 2,
+          'type' => "html",
+          'url' => "http://xkcd.com",
+          'mode' => "on_change",
+          'extract' => {
+            'num_links' => {'css' => "#comicLinks", 'value' => "count(./a)"}
+          }
+        }
+        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel.user = users(:bob)
+        rel.save!
+        rel.check
+        event = Event.last
+        event.payload['num_links'].should == "9"
+      end
+
+      it "should return all texts concatenated if XPath returns many text nodes" do
+        rel_site = {
+          'name' => "XKCD",
+          'expected_update_period_in_days' => 2,
+          'type' => "html",
+          'url' => "http://xkcd.com",
+          'mode' => "on_change",
+          'extract' => {
+            'slogan' => {'css' => "#slogan", 'value' => ".//text()"}
+          }
+        }
+        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel.user = users(:bob)
+        rel.save!
+        rel.check
+        event = Event.last
+        event.payload['slogan'].should == "A webcomic of romance, sarcasm, math, and language."
       end
 
       describe "JSON" do
@@ -389,9 +426,9 @@ describe Agents::WebsiteAgent do
         'url' => "http://www.example.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => { 'css' => "#comic img", 'attr' => "src" },
-          'title' => { 'css' => "#comic img", 'attr' => "alt" },
-          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+          'url' => { 'css' => "#comic img", 'value' => "@src" },
+          'title' => { 'css' => "#comic img", 'value' => "@alt" },
+          'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
         },
         'basic_auth' => "user:pass"
       }
@@ -421,7 +458,7 @@ describe Agents::WebsiteAgent do
         'mode' => 'on_change',
         'headers' => { 'foo' => 'bar' },
         'extract' => {
-          'url' => { 'css' => "#comic img", 'attr' => "src" },
+          'url' => { 'css' => "#comic img", 'value' => "@src" },
         }
       }
       @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)

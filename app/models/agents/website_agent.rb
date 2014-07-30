@@ -23,13 +23,15 @@ module Agents
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
-      When parsing HTML or XML, these sub-hashes specify how to extract with either a `css` CSS selector or a `xpath` XPath expression and either `"text": true` or `attr` pointing to an attribute name to grab.  An example:
+      When parsing HTML or XML, these sub-hashes specify how each extraction should be done.  The Agent first selects a node set from the document for each extraction key by evaluating either a CSS selector in `css` or an XPath expression in `xpath`.  It then evaluates an XPath expression in `value` on each node in the node set, converting the result into string.  Here's an example:
 
           "extract": {
-            "url": { "css": "#comic img", "attr": "src" },
-            "title": { "css": "#comic img", "attr": "title" },
-            "body_text": { "css": "div.main", "text": true }
+            "url": { "css": "#comic img", "value": "@src" },
+            "title": { "css": "#comic img", "value": "@title" },
+            "body_text": { "css": "div.main", "value": ".//text()" }
           }
+
+      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and ".//text()" is to extract all the enclosed texts.  You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-text(.//text())` should actually be `normalize-text(.)`.
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
@@ -70,9 +72,9 @@ module Agents
           'type' => "html",
           'mode' => "on_change",
           'extract' => {
-            'url' => { 'css' => "#comic img", 'attr' => "src" },
-            'title' => { 'css' => "#comic img", 'attr' => "alt" },
-            'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+            'url' => { 'css' => "#comic img", 'value' => "@src" },
+            'title' => { 'css' => "#comic img", 'value' => "@alt" },
+            'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
           }
       }
     end
@@ -152,20 +154,21 @@ module Agents
                   error '"css" or "xpath" is required for HTML or XML extraction'
                   return
                 end
-                unless Nokogiri::XML::NodeSet === nodes
+                case nodes
+                when Nokogiri::XML::NodeSet
+                  result = nodes.map { |node|
+                    case value = node.xpath(extraction_details['value'])
+                    when Float
+                      # Node#xpath() returns any numeric value as float;
+                      # convert it to integer as appropriate.
+                      value = value.to_i if value.to_i == value
+                    end
+                    value.to_s
+                  }
+                else
                   error "The result of HTML/XML extraction was not a NodeSet"
                   return
                 end
-                result = nodes.map { |node|
-                  if extraction_details['attr']
-                    node.attr(extraction_details['attr'])
-                  elsif extraction_details['text']
-                    node.text()
-                  else
-                    error '"attr" or "text" is required on HTML or XML extraction patterns'
-                    return
-                  end
-                }
                 log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
               end
               output[name] = result
