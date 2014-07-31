@@ -15,12 +15,12 @@ describe EventsController do
 
     it "can filter by Agent" do
       sign_in users(:bob)
-      get :index, :agent => agents(:bob_website_agent)
+      get :index, :agent_id => agents(:bob_website_agent)
       assigns(:events).length.should == agents(:bob_website_agent).events.length
       assigns(:events).all? {|i| i.agent.should == agents(:bob_website_agent) }.should be_true
 
       lambda {
-        get :index, :agent => agents(:jane_website_agent)
+        get :index, :agent_id => agents(:jane_website_agent)
       }.should raise_error(ActiveRecord::RecordNotFound)
     end
   end

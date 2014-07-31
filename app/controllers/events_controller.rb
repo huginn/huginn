@@ -2,8 +2,8 @@ class EventsController < ApplicationController
   before_filter :load_event, :except => :index
 
   def index
-    if params[:agent]
-      @agent = current_user.agents.find(params[:agent])
+    if params[:agent_id]
+      @agent = current_user.agents.find(params[:agent_id])
       @events = @agent.events.page(params[:page])
     else
       @events = current_user.events.preload(:agent).page(params[:page])
