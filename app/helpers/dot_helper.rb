@@ -193,6 +193,7 @@ module DotHelper
           badge['class'] = 'badge'
           badge['href'] = events_path(agent: agent)
           badge['target'] = '_blank'
+          badge['title'] = "#{count} events created"
           badge.content = count.to_s
 
           node['data-badge-id'] = id
