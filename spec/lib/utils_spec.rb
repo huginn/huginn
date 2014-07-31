@@ -22,8 +22,8 @@ describe Utils do
 
       Utils.unindent("Hello\n  I am indented").should == "Hello\n  I am indented"
 
-      a = "        Events will have the fields you specified.  Your options look like:\n\n            {\n      \"url\": {\n        \"css\": \"#comic img\",\n        \"attr\": \"src\"\n      },\n      \"title\": {\n        \"css\": \"#comic img\",\n        \"attr\": \"title\"\n      }\n    }\"\n"
-      Utils.unindent(a).should == "Events will have the fields you specified.  Your options look like:\n\n    {\n      \"url\": {\n\"css\": \"#comic img\",\n\"attr\": \"src\"\n      },\n      \"title\": {\n\"css\": \"#comic img\",\n\"attr\": \"title\"\n      }\n    }\""
+      a = "        Events will have the fields you specified.  Your options look like:\n\n            {\n      \"url\": {\n        \"css\": \"#comic img\",\n        \"value\": \"@src\"\n      },\n      \"title\": {\n        \"css\": \"#comic img\",\n        \"value\": \"@title\"\n      }\n    }\"\n"
+      Utils.unindent(a).should == "Events will have the fields you specified.  Your options look like:\n\n    {\n      \"url\": {\n\"css\": \"#comic img\",\n\"value\": \"@src\"\n      },\n      \"title\": {\n\"css\": \"#comic img\",\n\"value\": \"@title\"\n      }\n    }\""
     end
   end
 
