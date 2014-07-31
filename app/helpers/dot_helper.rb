@@ -6,7 +6,7 @@ module DotHelper
           dot.close_write
           dot.read
         } rescue false)
-      svg.html_safe
+      decorate_svg(svg, agents).html_safe
     else
       tag('img', src: URI('https://chart.googleapis.com/chart').tap { |uri|
             uri.query = URI.encode_www_form(cht: 'gv', chl: agents_dot(agents))
@@ -160,5 +160,86 @@ module DotHelper
         }
       }
     }
+  end
+
+  def decorate_svg(xml, agents)
+    svg = Nokogiri::XML(xml).at('svg')
+
+    Nokogiri::HTML::Document.new.tap { |doc|
+      doc << root = Nokogiri::XML::Node.new('div', doc) { |div|
+        div['class'] = 'agent-diagram'
+      }
+
+      svg['class'] = 'diagram'
+
+      root << svg
+      root << overlay_container = Nokogiri::XML::Node.new('div', doc) { |div|
+        div['class'] = 'overlay-container'
+        div['style'] = "width: #{svg['width']}; height: #{svg['height']}"
+      }
+      overlay_container << overlay = Nokogiri::XML::Node.new('div', doc) { |div|
+        div['class'] = 'overlay'
+      }
+
+      svg.xpath('//xmlns:g[@class="node"]', svg.namespaces).each { |node|
+        agent_id = (node.xpath('./xmlns:title/text()', svg.namespaces).to_s[/\d+/] or next).to_i
+        agent = agents.find { |a| a.id == agent_id }
+
+        count = agent.events_count
+        next unless count && count > 0
+
+        overlay << Nokogiri::XML::Node.new('a', doc) { |badge|
+          badge['id'] = id = 'b%d' % agent_id
+          badge['class'] = 'badge'
+          badge['href'] = events_path(agent: agent)
+          badge['target'] = '_blank'
+          badge.content = count.to_s
+
+          node['data-badge-id'] = id
+
+          badge << Nokogiri::XML::Node.new('span', doc) { |label|
+            # a dummy label only to obtain the background color
+            label['class'] = [
+              'label',
+              if agent.disabled?
+                'label-warning'
+              elsif agent.working?
+                'label-success'
+              else
+                'label-danger'
+              end
+            ].join(' ')
+            label['style'] = 'display: none';
+          }
+        }
+      }
+
+      root << Nokogiri::XML::Node.new('script', doc) { |script|
+        script.content = <<-SCRIPT
+$(function () {
+  var svg = document.querySelector('.agent-diagram svg.diagram');
+  var overlay = document.querySelector('.agent-diagram .overlay');
+  var getTopLeft = function (node) {
+    var bbox = node.getBBox();
+    var point = svg.createSVGPoint();
+    point.x = bbox.x + bbox.width;
+    point.y = bbox.y;
+    return point.matrixTransform(node.getCTM());
+  };
+  $(svg).find('g.node[data-badge-id]').each(function () {
+    var tl = getTopLeft(this)
+    $('#' + this.getAttribute('data-badge-id'), overlay).each(function () {
+      var badge = $(this);
+      badge.css({
+        left: tl.x - badge.outerWidth()  * (2/3),
+        top:  tl.y - badge.outerHeight() * (1/3),
+        'background-color': badge.find('.label').css('background-color')
+      }).show();
+    });
+  });
+})
+        SCRIPT
+      }
+    }.at('div.agent-diagram').to_s
   end
 end
