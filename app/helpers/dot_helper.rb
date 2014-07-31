@@ -57,6 +57,13 @@ module DotHelper
       end
     end
 
+    def ids(values)
+      values.each_with_index { |id, i|
+        raw ' ' if i > 0
+        id id
+      }
+    end
+
     def attr_list(attrs = nil)
       return if attrs.nil?
       attrs = attrs.select { |key, value| value.present? }
@@ -86,16 +93,13 @@ module DotHelper
     end
 
     def statement(ids, attrs = nil)
-      Array(ids).each_with_index { |id, i|
-        raw ' ' if i > 0
-        id id
-      }
+      ids Array(ids)
       attr_list attrs
       raw ';'
     end
 
-    def block(title, &block)
-      raw title
+    def block(*ids, &block)
+      ids ids
       raw '{'
       block.call
       raw '}'
@@ -137,7 +141,7 @@ module DotHelper
              color: (@disabled if agent.disabled? || receiver.disabled?))
       end
 
-      block('digraph foo') {
+      block('digraph', 'Agent Event Flow') {
         # statement 'graph', rankdir: 'LR'
         statement 'node',
                   shape: 'box',

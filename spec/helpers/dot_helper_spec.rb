@@ -56,7 +56,7 @@ describe DotHelper do
       it "generates a DOT script" do
         agents_dot(@agents).should =~ %r{
           \A
-          digraph \s foo \{
+          digraph \x20 "Agent \x20 Event \x20 Flow" \{
             node \[ [^\]]+ \];
             (?<foo>\w+) \[label=foo\];
             \k<foo> -> (?<bar1>\w+) \[style=dashed\];
@@ -73,7 +73,7 @@ describe DotHelper do
       it "generates a richer DOT script" do
         agents_dot(@agents, true).should =~ %r{
           \A
-          digraph \s foo \{
+          digraph \x20 "Agent \x20 Event \x20 Flow" \{
             node \[ [^\]]+ \];
             (?<foo>\w+) \[label=foo,URL="#{Regexp.quote(agent_path(@foo))}"\];
             \k<foo> -> (?<bar1>\w+) \[style=dashed\];
