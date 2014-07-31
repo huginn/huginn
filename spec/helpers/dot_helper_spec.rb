@@ -62,7 +62,7 @@ describe DotHelper do
             \k<foo> -> (?<bar1>\w+) \[style=dashed\];
             \k<foo> -> (?<bar2>\w+) \[color="\#999999"\];
             \k<bar1> \[label=bar1\];
-            \k<bar2> \[label="bar2 \s \(Disabled\)",style="rounded,dashed",color="\#999999",fontcolor="\#999999"\];
+            \k<bar2> \[label=bar2,style="rounded,dashed",color="\#999999",fontcolor="\#999999"\];
             \k<bar2> -> (?<bar3>\w+) \[style=dashed,color="\#999999"\];
             \k<bar3> \[label=bar3\];
           \}
@@ -79,7 +79,7 @@ describe DotHelper do
             \k<foo> -> (?<bar1>\w+) \[style=dashed\];
             \k<foo> -> (?<bar2>\w+) \[color="\#999999"\];
             \k<bar1> \[label=bar1,URL="#{Regexp.quote(agent_path(@bar1))}"\];
-            \k<bar2> \[label="bar2 \s \(Disabled\)",URL="#{Regexp.quote(agent_path(@bar2))}",style="rounded,dashed",color="\#999999",fontcolor="\#999999"\];
+            \k<bar2> \[label=bar2,URL="#{Regexp.quote(agent_path(@bar2))}",style="rounded,dashed",color="\#999999",fontcolor="\#999999"\];
             \k<bar2> -> (?<bar3>\w+) \[style=dashed,color="\#999999"\];
             \k<bar3> \[label=bar3,URL="#{Regexp.quote(agent_path(@bar3))}"\];
           \}

@@ -112,11 +112,7 @@ module DotHelper
     draw(agents: agents,
          agent_id: ->agent { 'a%d' % agent.id },
          agent_label: ->agent {
-           if agent.disabled?
-             '%s (Disabled)' % agent.name
-           else
-             agent.name
-           end.gsub(/(.{20}\S*)\s+/) {
+           agent.name.gsub(/(.{20}\S*)\s+/) {
              # Fold after every 20+ characters
              $1 + "\n"
            }
