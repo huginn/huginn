@@ -27,6 +27,8 @@ Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, 
 
 Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, add new Agents, write documentation and tutorials, or try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
 
+Really want an issue fixed/feature implemented? Or maybe you just want to solve some community issues and earn some extra coffee money? Then you should take a look at the [current bounties on Bountysource](https://www.bountysource.com/trackers/282580-huginn).
+
 Have an awesome an idea but not feeling quite up to contributing yet? Head over to our [Official 'suggest an agent' thread ](https://github.com/cantino/huginn/issues/353) and tell us about your cool idea!
 
 ## Examples
@@ -105,5 +107,5 @@ Huginn is a work in progress and is just getting started.  Please get involved! 
 
 Please fork, add specs, and send pull requests!
 
-[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.png)](https://coveralls.io/r/cantino/huginn) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![Dependency Status](https://gemnasium.com/cantino/huginn.svg)](https://gemnasium.com/cantino/huginn)
+[![Build Status](https://travis-ci.org/cantino/huginn.png)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.png)](https://coveralls.io/r/cantino/huginn) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cantino/huginn/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![Dependency Status](https://gemnasium.com/cantino/huginn.svg)](https://gemnasium.com/cantino/huginn) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=282580)](https://www.bountysource.com/trackers/282580-huginn?utm_source=282580&utm_medium=shield&utm_campaign=TRACKER_BADGE)
 
