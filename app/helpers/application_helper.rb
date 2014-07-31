@@ -7,6 +7,14 @@ module ApplicationHelper
     HTML
   end
 
+  def yes_no(bool)
+    if bool
+      '<span class="label label-info">Yes</span>'.html_safe
+    else
+      '<span class="label label-default">No</span>'.html_safe
+    end
+  end
+
   def working(agent)
     if agent.disabled?
       link_to 'Disabled', agent_path(agent), :class => 'label label-warning'

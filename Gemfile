@@ -9,9 +9,9 @@ end
 
 gem 'bundler', '>= 1.5.0'
 
-gem 'protected_attributes', '~>1.0.7'
+gem 'protected_attributes', '~>1.0.8'
 
-gem 'rails', '4.1.1'
+gem 'rails' , '4.1.4'
 
 case RUBY_PLATFORM
 when /freebsd/
@@ -22,13 +22,13 @@ else
   gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 end
 
-gem 'mysql2', '~> 0.3.15'
+gem 'mysql2', '~> 0.3.16'
 gem 'devise', '~> 3.2.4'
-gem 'kaminari', '~> 0.15.1'
-gem 'bootstrap-kaminari-views', '~> 0.0.2'
-gem 'rufus-scheduler', '~> 3.0.7', require: false
+gem 'kaminari', '~> 0.16.1'
+gem 'bootstrap-kaminari-views', '~> 0.0.3'
+gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'json', '~> 1.8.1'
-gem 'jsonpath', '~> 0.5.3'
+gem 'jsonpath', '~> 0.5.6'
 gem 'twilio-ruby', '~> 3.11.5'
 gem 'ruby-growl', '~> 4.1.0'
 gem 'liquid', '~> 2.6.1'
@@ -64,16 +64,17 @@ gem 'wunderground', '~> 1.2.0'
 gem 'forecast_io', '~> 2.0.0'
 gem 'rturk', '~> 2.12.1'
 
+gem "google-api-client"
+
 gem 'twitter', '~> 5.8.0'
-gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
+gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'em-http-request', '~> 1.1.2'
 gem 'weibo_2', '~> 0.1.4'
 gem 'hipchat', '~> 1.2.0'
 gem 'xmpp4r',  '~> 0.5.6'
+gem 'feed-normalizer'
 gem 'slack-notifier', '~> 0.5.0'
-
 gem 'therubyracer', '~> 0.12.1'
-
 gem 'mqtt'
 
 gem 'omniauth'
@@ -84,17 +85,19 @@ gem 'omniauth-github'
 group :development do
   gem 'binding_of_caller'
   gem 'better_errors'
+  gem 'quiet_assets'
 end
 
 group :development, :test do
+  gem 'vcr'
   gem 'dotenv-rails'
   gem 'pry'
-  gem 'rspec-rails'
-  gem 'rspec'
+  gem 'rspec-rails', '~> 2.14'
+  gem 'rspec', '~> 2.14'
   gem 'shoulda-matchers'
   gem 'rr'
   gem 'delorean'
-  gem 'webmock', require: false
+  gem 'webmock', '~> 1.17.4', require: false
   gem 'coveralls', require: false
 end
 
@@ -102,3 +105,17 @@ group :production do
   gem 'dotenv-deployment'
   gem 'rack'
 end
+
+# This hack needs some explanation.  When on Heroku, use the pg, unicorn, and rails12factor gems.
+# When not on Heroku, we still want our Gemfile.lock to include these gems, so we scope them to
+# an unsupported platform.
+if ENV['ON_HEROKU'] || ENV['HEROKU_POSTGRESQL_ROSE_URL'] || File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
+  gem 'pg'
+  gem 'unicorn'
+  gem 'rails_12factor'
+else
+  gem 'pg', platform: :ruby_18
+  gem 'unicorn', platform: :ruby_18
+  gem 'rails_12factor', platform: :ruby_18
+end
+

@@ -47,7 +47,7 @@ module Agents
         incoming_events = incoming_events.first(20)
       end
       incoming_events.each do |event|
-        tweet_text = Utils.value_at(event.payload, interpolated(event.payload)['message_path'])
+        tweet_text = Utils.value_at(event.payload, interpolated(event)['message_path'])
         if event.agent.type == "Agents::TwitterUserAgent"
           tweet_text = unwrap_tco_urls(tweet_text, event.payload)
         end

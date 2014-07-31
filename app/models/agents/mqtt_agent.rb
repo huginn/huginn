@@ -106,7 +106,7 @@ module Agents
     def receive(incoming_events)
       mqtt_client.connect do |c|
         incoming_events.each do |event|
-          c.publish(interpolated(event.payload)['topic'], event.payload)
+          c.publish(interpolated(event)['topic'], event)
         end
 
         c.disconnect

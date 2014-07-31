@@ -1,12 +1,14 @@
 require 'spec_helper'
 
 describe Agents::EmailDigestAgent do
+  it_behaves_like EmailConcern
+
   def get_message_part(mail, content_type)
     mail.body.parts.find { |p| p.content_type.match content_type }.body.raw_source
   end
 
   before do
-    @checker = Agents::EmailDigestAgent.new(:name => "something", :options => { :expected_receive_period_in_days => 2, :subject => "something interesting" })
+    @checker = Agents::EmailDigestAgent.new(:name => "something", :options => { :expected_receive_period_in_days => "2", :subject => "something interesting" })
     @checker.user = users(:bob)
     @checker.save!
   end

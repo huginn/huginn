@@ -51,7 +51,7 @@ module Agents
         message = (event.payload['message'] || event.payload['text']).to_s
         subject = event.payload['subject'].to_s
         if message.present? && subject.present?
-          log "Sending Growl notification '#{subject}': '#{message}' to #{interpolated(event.payload)['growl_server']} with event #{event.id}"
+          log "Sending Growl notification '#{subject}': '#{message}' to #{interpolated(event)['growl_server']} with event #{event.id}"
           notify_growl(subject,message)
         else
           log "Event #{event.id} not sent, message and subject expected"

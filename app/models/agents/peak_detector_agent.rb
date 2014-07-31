@@ -38,7 +38,7 @@ module Agents
         'expected_receive_period_in_days' => "2",
         'group_by_path' => "filter",
         'value_path' => "count",
-        'message' => "A peak was found"
+        'message' => "A peak of {{count}} was found in {{filter}}"
       }
     end
 
@@ -67,7 +67,7 @@ module Agents
         if newest_value > average_value + std_multiple * standard_deviation
           memory['peaks'][group] << newest_time
           memory['peaks'][group].reject! { |p| p <= newest_time - window_duration }
-          create_event :payload => { 'message' => interpolated(event.payload)['message'], 'peak' => newest_value, 'peak_time' => newest_time, 'grouped_by' => group.to_s }
+          create_event :payload => { 'message' => interpolated(event)['message'], 'peak' => newest_value, 'peak_time' => newest_time, 'grouped_by' => group.to_s }
         end
       end
     end

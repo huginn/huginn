@@ -20,7 +20,7 @@ shared_examples_for LiquidInterpolatable do
 
   describe "interpolating liquid templates" do
     it "should work" do
-      @checker.interpolate_options(@checker.options, @event.payload).should == {
+      @checker.interpolate_options(@checker.options, @event).should == {
           "normal" => "just some normal text",
           "variable" => "hello",
           "text" => "Some test with an embedded hello",
@@ -30,7 +30,7 @@ shared_examples_for LiquidInterpolatable do
 
     it "should work with arrays", focus: true do
       @checker.options = {"value" => ["{{variable}}", "Much array", "Hey, {{hello_world}}"]}
-      @checker.interpolate_options(@checker.options, @event.payload).should == {
+      @checker.interpolate_options(@checker.options, @event).should == {
         "value" => ["hello", "Much array", "Hey, Hello world"]
       }
     end
@@ -38,7 +38,7 @@ shared_examples_for LiquidInterpolatable do
     it "should work recursively" do
       @checker.options['hash'] = {'recursive' => "{{variable}}"}
       @checker.options['indifferent_hash'] = ActiveSupport::HashWithIndifferentAccess.new({'recursive' => "{{variable}}"})
-      @checker.interpolate_options(@checker.options, @event.payload).should == {
+      @checker.interpolate_options(@checker.options, @event).should == {
           "normal" => "just some normal text",
           "variable" => "hello",
           "text" => "Some test with an embedded hello",
@@ -49,8 +49,8 @@ shared_examples_for LiquidInterpolatable do
     end
 
     it "should work for strings" do
-      @checker.interpolate_string("{{variable}}", @event.payload).should == "hello"
-      @checker.interpolate_string("{{variable}} you", @event.payload).should == "hello you"
+      @checker.interpolate_string("{{variable}}", @event).should == "hello"
+      @checker.interpolate_string("{{variable}} you", @event).should == "hello you"
     end
   end
 

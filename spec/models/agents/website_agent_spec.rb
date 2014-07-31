@@ -4,22 +4,24 @@ describe Agents::WebsiteAgent do
   describe "checking without basic auth" do
     before do
       stub_request(:any, /xkcd/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
-      @site = {
+      @valid_options = {
         'name' => "XKCD",
-        'expected_update_period_in_days' => 2,
+        'expected_update_period_in_days' => "2",
         'type' => "html",
         'url' => "http://xkcd.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => { 'css' => "#comic img", 'attr' => "src" },
-          'title' => { 'css' => "#comic img", 'attr' => "alt" },
-          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+          'url' => { 'css' => "#comic img", 'value' => "@src" },
+          'title' => { 'css' => "#comic img", 'value' => "@alt" },
+          'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
         }
       }
-      @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @site, :keep_events_for => 2)
+      @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @valid_options, :keep_events_for => 2)
       @checker.user = users(:bob)
       @checker.save!
     end
+
+    it_behaves_like WebRequestConcern
 
     describe "validations" do
       before do
@@ -39,20 +41,6 @@ describe Agents::WebsiteAgent do
         @checker.should_not be_valid
 
         @checker.options['uniqueness_look_back'] = "2"
-        @checker.should be_valid
-      end
-
-      it "should validate headers" do
-        @checker.options['headers'] = "blah"
-        @checker.should_not be_valid
-
-        @checker.options['headers'] = ""
-        @checker.should be_valid
-
-        @checker.options['headers'] = {}
-        @checker.should be_valid
-
-        @checker.options['headers'] = { 'foo' => 'bar' }
         @checker.should be_valid
       end
 
@@ -97,16 +85,16 @@ describe Agents::WebsiteAgent do
 
       it "should always save events when in :all mode" do
         lambda {
-          @site['mode'] = 'all'
-          @checker.options = @site
+          @valid_options['mode'] = 'all'
+          @checker.options = @valid_options
           @checker.check
           @checker.check
         }.should change { Event.count }.by(2)
       end
 
       it "should take uniqueness_look_back into account during deduplication" do
-        @site['mode'] = 'all'
-        @checker.options = @site
+        @valid_options['mode'] = 'all'
+        @checker.options = @valid_options
         @checker.check
         @checker.check
         event = Event.last
@@ -114,47 +102,47 @@ describe Agents::WebsiteAgent do
         event.save
 
         lambda {
-          @site['mode'] = 'on_change'
-          @site['uniqueness_look_back'] = 2
-          @checker.options = @site
+          @valid_options['mode'] = 'on_change'
+          @valid_options['uniqueness_look_back'] = 2
+          @checker.options = @valid_options
           @checker.check
         }.should_not change { Event.count }
 
         lambda {
-          @site['mode'] = 'on_change'
-          @site['uniqueness_look_back'] = 1
-          @checker.options = @site
+          @valid_options['mode'] = 'on_change'
+          @valid_options['uniqueness_look_back'] = 1
+          @checker.options = @valid_options
           @checker.check
         }.should change { Event.count }.by(1)
       end
 
       it "should log an error if the number of results for a set of extraction patterns differs" do
-        @site['extract']['url']['css'] = "div"
-        @checker.options = @site
+        @valid_options['extract']['url']['css'] = "div"
+        @checker.options = @valid_options
         @checker.check
         @checker.logs.first.message.should =~ /Got an uneven number of matches/
       end
 
       it "should accept an array for url" do
-        @site['url'] = ["http://xkcd.com/1/", "http://xkcd.com/2/"]
-        @checker.options = @site
+        @valid_options['url'] = ["http://xkcd.com/1/", "http://xkcd.com/2/"]
+        @checker.options = @valid_options
         lambda { @checker.save! }.should_not raise_error;
         lambda { @checker.check }.should_not raise_error;
       end
 
       it "should parse events from all urls in array" do
         lambda {
-          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
-          @site['mode'] = 'all'
-          @checker.options = @site
+          @valid_options['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @valid_options['mode'] = 'all'
+          @checker.options = @valid_options
           @checker.check
         }.should change { Event.count }.by(2)
       end
 
       it "should follow unique rules when parsing array of urls" do
         lambda {
-          @site['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
-          @checker.options = @site
+          @valid_options['url'] = ["http://xkcd.com/", "http://xkcd.com/"]
+          @checker.options = @valid_options
           @checker.check
         }.should change { Event.count }.by(1)
       end
@@ -170,7 +158,7 @@ describe Agents::WebsiteAgent do
           }, :status => 200)
         site = {
           'name' => "Some JSON Response",
-          'expected_update_period_in_days' => 2,
+          'expected_update_period_in_days' => "2",
           'type' => "json",
           'url' => "http://no-encoding.example.com",
           'mode' => 'on_change',
@@ -197,7 +185,7 @@ describe Agents::WebsiteAgent do
           }, :status => 200)
         site = {
           'name' => "Some JSON Response",
-          'expected_update_period_in_days' => 2,
+          'expected_update_period_in_days' => "2",
           'type' => "json",
           'url' => "http://wrong-encoding.example.com",
           'mode' => 'on_change',
@@ -248,11 +236,11 @@ describe Agents::WebsiteAgent do
       end
 
       it "parses XPath" do
-        @site['extract'].each { |key, value|
+        @valid_options['extract'].each { |key, value|
           value.delete('css')
           value['xpath'] = "//*[@id='comic']//img"
         }
-        @checker.options = @site
+        @checker.options = @valid_options
         @checker.check
         event = Event.last
         event.payload['url'].should == "http://imgs.xkcd.com/comics/evolving.png"
@@ -263,13 +251,12 @@ describe Agents::WebsiteAgent do
       it "should turn relative urls to absolute" do
         rel_site = {
           'name' => "XKCD",
-          'expected_update_period_in_days' => 2,
+          'expected_update_period_in_days' => "2",
           'type' => "html",
           'url' => "http://xkcd.com",
           'mode' => "on_change",
           'extract' => {
-            'url' => {'css' => "#topLeft a", 'attr' => "href"},
-            'title' => {'css' => "#topLeft a", 'text' => "true"}
+            'url' => {'css' => "#topLeft a", 'value' => "@href"},
           }
         }
         rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
@@ -278,6 +265,44 @@ describe Agents::WebsiteAgent do
         rel.check
         event = Event.last
         event.payload['url'].should == "http://xkcd.com/about"
+      end
+
+      it "should return an integer value if XPath evaluates to one" do
+        rel_site = {
+          'name' => "XKCD",
+          'expected_update_period_in_days' => 2,
+          'type' => "html",
+          'url' => "http://xkcd.com",
+          'mode' => "on_change",
+          'extract' => {
+            'num_links' => {'css' => "#comicLinks", 'value' => "count(./a)"}
+          }
+        }
+        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel.user = users(:bob)
+        rel.save!
+        rel.check
+        event = Event.last
+        event.payload['num_links'].should == "9"
+      end
+
+      it "should return all texts concatenated if XPath returns many text nodes" do
+        rel_site = {
+          'name' => "XKCD",
+          'expected_update_period_in_days' => 2,
+          'type' => "html",
+          'url' => "http://xkcd.com",
+          'mode' => "on_change",
+          'extract' => {
+            'slogan' => {'css' => "#slogan", 'value' => ".//text()"}
+          }
+        }
+        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel.user = users(:bob)
+        rel.save!
+        rel.check
+        event = Event.last
+        event.payload['slogan'].should == "A webcomic of romance, sarcasm, math, and language."
       end
 
       describe "JSON" do
@@ -291,7 +316,7 @@ describe Agents::WebsiteAgent do
           stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
           site = {
             'name' => "Some JSON Response",
-            'expected_update_period_in_days' => 2,
+            'expected_update_period_in_days' => "2",
             'type' => "json",
             'url' => "http://json-site.com",
             'mode' => 'on_change',
@@ -322,7 +347,7 @@ describe Agents::WebsiteAgent do
           stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
           site = {
             'name' => "Some JSON Response",
-            'expected_update_period_in_days' => 2,
+            'expected_update_period_in_days' => "2",
             'type' => "json",
             'url' => "http://json-site.com",
             'mode' => 'on_change',
@@ -358,7 +383,7 @@ describe Agents::WebsiteAgent do
           stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
           site = {
             'name' => "Some JSON Response",
-            'expected_update_period_in_days' => 2,
+            'expected_update_period_in_days' => "2",
             'type' => "json",
             'url' => "http://json-site.com",
             'mode' => 'on_change'
@@ -382,7 +407,7 @@ describe Agents::WebsiteAgent do
         @event.payload = { 'url' => "http://xkcd.com" }
 
         lambda {
-          @checker.options = @site
+          @checker.options = @valid_options
           @checker.receive([@event])
         }.should change { Event.count }.by(1)
       end
@@ -394,20 +419,20 @@ describe Agents::WebsiteAgent do
       stub_request(:any, /example/).
         with(headers: { 'Authorization' => "Basic #{['user:pass'].pack('m').chomp}" }).
         to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
-      @site = {
+      @valid_options = {
         'name' => "XKCD",
-        'expected_update_period_in_days' => 2,
+        'expected_update_period_in_days' => "2",
         'type' => "html",
         'url' => "http://www.example.com",
         'mode' => 'on_change',
         'extract' => {
-          'url' => { 'css' => "#comic img", 'attr' => "src" },
-          'title' => { 'css' => "#comic img", 'attr' => "alt" },
-          'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+          'url' => { 'css' => "#comic img", 'value' => "@src" },
+          'title' => { 'css' => "#comic img", 'value' => "@alt" },
+          'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
         },
         'basic_auth' => "user:pass"
       }
-      @checker = Agents::WebsiteAgent.new(:name => "auth", :options => @site)
+      @checker = Agents::WebsiteAgent.new(:name => "auth", :options => @valid_options)
       @checker.user = users(:bob)
       @checker.save!
     end
@@ -425,18 +450,18 @@ describe Agents::WebsiteAgent do
       stub_request(:any, /example/).
         with(headers: { 'foo' => 'bar', 'user_agent' => /Faraday/ }).
         to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
-      @site = {
+      @valid_options = {
         'name' => "XKCD",
-        'expected_update_period_in_days' => 2,
+        'expected_update_period_in_days' => "2",
         'type' => "html",
         'url' => "http://www.example.com",
         'mode' => 'on_change',
         'headers' => { 'foo' => 'bar' },
         'extract' => {
-          'url' => { 'css' => "#comic img", 'attr' => "src" },
+          'url' => { 'css' => "#comic img", 'value' => "@src" },
         }
       }
-      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @site)
+      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)
       @checker.user = users(:bob)
       @checker.save!
     end

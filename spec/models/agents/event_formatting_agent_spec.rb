@@ -7,7 +7,8 @@ describe Agents::EventFormattingAgent do
         :options => {
             :instructions => {
                 :message => "Received {{content.text}} from {{content.name}} .",
-                :subject => "Weather looks like {{conditions}} according to the forecast at {{pretty_date.time}}"
+                :subject => "Weather looks like {{conditions}} according to the forecast at {{pretty_date.time}}",
+                :agent => "{{agent.type}}",
             },
             :mode => "clean",
             :matchers => [
@@ -17,7 +18,6 @@ describe Agents::EventFormattingAgent do
                     :to => "pretty_date",
                 },
             ],
-            :skip_agent => "false",
             :skip_created_at => "false"
         }
     }
@@ -53,14 +53,6 @@ describe Agents::EventFormattingAgent do
       Event.last.payload[:content].should_not == nil
     end
 
-    it "should accept skip_agent" do
-      @checker.receive([@event])
-      Event.last.payload[:agent].should == "WeatherAgent"
-      @checker.options[:skip_agent] = "true"
-      @checker.receive([@event])
-      Event.last.payload[:agent].should == nil
-    end
-
     it "should accept skip_created_at" do
       @checker.receive([@event])
       Event.last.payload[:created_at].should_not == nil
@@ -69,12 +61,13 @@ describe Agents::EventFormattingAgent do
       Event.last.payload[:created_at].should == nil
     end
 
-    it "should handle JSONPaths in instructions" do
+    it "should handle Liquid templating in instructions" do
       @checker.receive([@event])
       Event.last.payload[:message].should == "Received Some Lorem Ipsum from somevalue ."
+      Event.last.payload[:agent].should == "WeatherAgent"
     end
 
-    it "should handle matchers and JSONPaths in instructions" do
+    it "should handle matchers and Liquid templating in instructions" do
       @checker.receive([@event])
       Event.last.payload[:subject].should == "Weather looks like someothervalue according to the forecast at 10:00 PM EST"
     end
@@ -149,11 +142,6 @@ describe Agents::EventFormattingAgent do
 
     it "should validate presence of mode" do
       @checker.options[:mode] = ""
-      @checker.should_not be_valid
-    end
-
-    it "should validate presence of skip_agent" do
-      @checker.options[:skip_agent] = ""
       @checker.should_not be_valid
     end
 

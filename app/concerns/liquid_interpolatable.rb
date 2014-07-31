@@ -1,28 +1,28 @@
 module LiquidInterpolatable
   extend ActiveSupport::Concern
 
-  def interpolate_options(options, payload = {})
+  def interpolate_options(options, event = {})
     case options
       when String
-        interpolate_string(options, payload)
+        interpolate_string(options, event)
       when ActiveSupport::HashWithIndifferentAccess, Hash
-        options.inject(ActiveSupport::HashWithIndifferentAccess.new) { |memo, (key, value)| memo[key] = interpolate_options(value, payload); memo }
+        options.inject(ActiveSupport::HashWithIndifferentAccess.new) { |memo, (key, value)| memo[key] = interpolate_options(value, event); memo }
       when Array
-        options.map { |value| interpolate_options(value, payload) }
+        options.map { |value| interpolate_options(value, event) }
       else
         options
     end
   end
 
-  def interpolated(payload = {})
-    key = [options, payload]
+  def interpolated(event = {})
+    key = [options, event]
     @interpolated_cache ||= {}
-    @interpolated_cache[key] ||= interpolate_options(options, payload)
+    @interpolated_cache[key] ||= interpolate_options(options, event)
     @interpolated_cache[key]
   end
 
-  def interpolate_string(string, payload)
-    Liquid::Template.parse(string).render!(payload, registers: {agent: self})
+  def interpolate_string(string, event)
+    Liquid::Template.parse(string).render!(event.to_liquid, registers: {agent: self})
   end
 
   require 'uri'

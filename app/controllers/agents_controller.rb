@@ -31,14 +31,14 @@ class AgentsController < ApplicationController
   end
 
   def type_details
-    @agent = Agent.build_for_type(params[:type], current_user, {})
+    agent = Agent.build_for_type(params[:type], current_user, {})
     render :json => {
-        :can_be_scheduled => @agent.can_be_scheduled?,
-        :can_receive_events => @agent.can_receive_events?,
-        :can_create_events => @agent.can_create_events?,
-        :options => @agent.default_options,
-        :description_html => @agent.html_description,
-        :form => render_to_string(partial: 'form')
+        :can_be_scheduled => agent.can_be_scheduled?,
+        :default_schedule => agent.default_schedule,
+        :can_receive_events => agent.can_receive_events?,
+        :can_create_events => agent.can_create_events?,
+        :options => agent.default_options,
+        :description_html => agent.html_description
     }
   end
 

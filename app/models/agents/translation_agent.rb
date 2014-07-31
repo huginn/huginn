@@ -66,7 +66,7 @@ module Agents
       access_token = JSON.parse(response.body)["access_token"]
       incoming_events.each do |event|
         translated_event = {}
-        opts = interpolated(event.payload)
+        opts = interpolated(event)
         opts['content'].each_pair do |key, value|
           translated_event[key] = translate(value.first, opts['to'], access_token)
         end

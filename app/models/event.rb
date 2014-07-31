@@ -5,6 +5,7 @@ require 'json_serialized_field'
 # fields.
 class Event < ActiveRecord::Base
   include JSONSerializedField
+  include LiquidDroppable
 
   attr_accessible :lat, :lng, :payload, :user_id, :user, :expires_at
 
@@ -39,5 +40,28 @@ class Event < ActiveRecord::Base
     #immediately schedule agents that want immediate updates
     propagate_ids = agent.receivers.where(:propagate_immediately => true).pluck(:id)
     Agent.receive!(:only_receivers => propagate_ids) unless propagate_ids.empty?
+  end
+end
+
+class EventDrop
+  def initialize(event, payload = event.payload)
+    super(event)
+    @payload = payload
+  end
+
+  def before_method(key)
+    if @payload.key?(key)
+      @payload[key]
+    else
+      case key
+      when 'agent'
+        @object.agent
+      end
+    end
+  end
+
+  def each(&block)
+    return to_enum(__method__) unless block
+    @payload.each(&block)
   end
 end
