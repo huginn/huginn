@@ -128,6 +128,7 @@ module DotHelper
       def agent_node(agent)
         node(agent_id[agent],
              label: agent_label[agent],
+             tooltip: (agent.short_type.titleize if rich),
              URL: (agent_url[agent] if rich),
              style: ('rounded,dashed' if agent.disabled?),
              color: (@disabled if agent.disabled?),
