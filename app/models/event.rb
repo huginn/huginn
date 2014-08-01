@@ -56,6 +56,8 @@ class EventDrop
       case key
       when 'agent'
         @object.agent
+      when 'created_at'
+        @object.created_at
       end
     end
   end
