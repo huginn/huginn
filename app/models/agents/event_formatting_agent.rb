@@ -95,8 +95,7 @@ module Agents
         'instructions' => {
           'message' =>  "You received a text {{text}} from {{fields.from}}",
           'agent' => "{{agent.type}}",
-          'some_other_field' => "Looks like the weather is going to be {{fields.weather}}",
-          'created_at' => "{{created_at}}"
+          'some_other_field' => "Looks like the weather is going to be {{fields.weather}}"
         },
         'matchers' => [],
         'mode' => "clean",
