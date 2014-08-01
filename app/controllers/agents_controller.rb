@@ -98,14 +98,6 @@ class AgentsController < ApplicationController
     @agent = current_user.agents.find(params[:id])
   end
 
-  def diagram
-    @agents = if params[:scenario_id].present?
-                current_user.scenarios.find(params[:scenario_id]).agents.includes(:receivers)
-              else
-                current_user.agents.includes(:receivers)
-              end
-  end
-
   def create
     @agent = Agent.build_for_type(params[:agent].delete(:type),
                                   current_user,
