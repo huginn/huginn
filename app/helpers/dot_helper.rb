@@ -214,33 +214,7 @@ module DotHelper
           }
         }
       }
-
-      root << Nokogiri::XML::Node.new('script', doc) { |script|
-        script.content = <<-SCRIPT
-$(function () {
-  var svg = document.querySelector('.agent-diagram svg.diagram');
-  var overlay = document.querySelector('.agent-diagram .overlay');
-  var getTopLeft = function (node) {
-    var bbox = node.getBBox();
-    var point = svg.createSVGPoint();
-    point.x = bbox.x + bbox.width;
-    point.y = bbox.y;
-    return point.matrixTransform(node.getCTM());
-  };
-  $(svg).find('g.node[data-badge-id]').each(function () {
-    var tl = getTopLeft(this)
-    $('#' + this.getAttribute('data-badge-id'), overlay).each(function () {
-      var badge = $(this);
-      badge.css({
-        left: tl.x - badge.outerWidth()  * (2/3),
-        top:  tl.y - badge.outerHeight() * (1/3),
-        'background-color': badge.find('.label').css('background-color')
-      }).show();
-    });
-  });
-})
-        SCRIPT
-      }
+      # See also: app/assets/diagram.js.coffee
     }.at('div.agent-diagram').to_s
   end
 end
