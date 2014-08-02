@@ -6,7 +6,7 @@ module DotHelper
           dot.close_write
           dot.read
         } rescue false)
-      svg.html_safe
+      decorate_svg(svg, agents).html_safe
     else
       tag('img', src: URI('https://chart.googleapis.com/chart').tap { |uri|
             uri.query = URI.encode_www_form(cht: 'gv', chl: agents_dot(agents))
@@ -57,6 +57,13 @@ module DotHelper
       end
     end
 
+    def ids(values)
+      values.each_with_index { |id, i|
+        raw ' ' if i > 0
+        id id
+      }
+    end
+
     def attr_list(attrs = nil)
       return if attrs.nil?
       attrs = attrs.select { |key, value| value.present? }
@@ -86,16 +93,13 @@ module DotHelper
     end
 
     def statement(ids, attrs = nil)
-      Array(ids).each_with_index { |id, i|
-        raw ' ' if i > 0
-        id id
-      }
+      ids Array(ids)
       attr_list attrs
       raw ';'
     end
 
-    def block(title, &block)
-      raw title
+    def block(*ids, &block)
+      ids ids
       raw '{'
       block.call
       raw '}'
@@ -112,11 +116,7 @@ module DotHelper
     draw(agents: agents,
          agent_id: ->agent { 'a%d' % agent.id },
          agent_label: ->agent {
-           if agent.disabled?
-             '%s (Disabled)' % agent.name
-           else
-             agent.name
-           end.gsub(/(.{20}\S*)\s+/) {
+           agent.name.gsub(/(.{20}\S*)\s+/) {
              # Fold after every 20+ characters
              $1 + "\n"
            }
@@ -128,6 +128,7 @@ module DotHelper
       def agent_node(agent)
         node(agent_id[agent],
              label: agent_label[agent],
+             tooltip: (agent.short_type.titleize if rich),
              URL: (agent_url[agent] if rich),
              style: ('rounded,dashed' if agent.disabled?),
              color: (@disabled if agent.disabled?),
@@ -141,7 +142,7 @@ module DotHelper
              color: (@disabled if agent.disabled? || receiver.disabled?))
       end
 
-      block('digraph foo') {
+      block('digraph', 'Agent Event Flow') {
         # statement 'graph', rankdir: 'LR'
         statement 'node',
                   shape: 'box',
@@ -159,5 +160,61 @@ module DotHelper
         }
       }
     }
+  end
+
+  def decorate_svg(xml, agents)
+    svg = Nokogiri::XML(xml).at('svg')
+
+    Nokogiri::HTML::Document.new.tap { |doc|
+      doc << root = Nokogiri::XML::Node.new('div', doc) { |div|
+        div['class'] = 'agent-diagram'
+      }
+
+      svg['class'] = 'diagram'
+
+      root << svg
+      root << overlay_container = Nokogiri::XML::Node.new('div', doc) { |div|
+        div['class'] = 'overlay-container'
+        div['style'] = "width: #{svg['width']}; height: #{svg['height']}"
+      }
+      overlay_container << overlay = Nokogiri::XML::Node.new('div', doc) { |div|
+        div['class'] = 'overlay'
+      }
+
+      svg.xpath('//xmlns:g[@class="node"]', svg.namespaces).each { |node|
+        agent_id = (node.xpath('./xmlns:title/text()', svg.namespaces).to_s[/\d+/] or next).to_i
+        agent = agents.find { |a| a.id == agent_id }
+
+        count = agent.events_count
+        next unless count && count > 0
+
+        overlay << Nokogiri::XML::Node.new('a', doc) { |badge|
+          badge['id'] = id = 'b%d' % agent_id
+          badge['class'] = 'badge'
+          badge['href'] = events_path(agent: agent)
+          badge['target'] = '_blank'
+          badge['title'] = "#{count} events created"
+          badge.content = count.to_s
+
+          node['data-badge-id'] = id
+
+          badge << Nokogiri::XML::Node.new('span', doc) { |label|
+            # a dummy label only to obtain the background color
+            label['class'] = [
+              'label',
+              if agent.disabled?
+                'label-warning'
+              elsif agent.working?
+                'label-success'
+              else
+                'label-danger'
+              end
+            ].join(' ')
+            label['style'] = 'display: none';
+          }
+        }
+      }
+      # See also: app/assets/diagram.js.coffee
+    }.at('div.agent-diagram').to_s
   end
 end
