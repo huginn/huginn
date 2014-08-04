@@ -59,8 +59,8 @@ describe Service do
       stub_request(:post, "https://launchpad.37signals.com/authorization/token?client_id=TESTKEY&client_secret=TESTSECRET&refresh_token=refreshtokentest&type=refresh").
         to_return(:status => 200, :body => '{"expires_in":1209600,"access_token": "NEWTOKEN"}', :headers => {})
       @service.provider = '37signals'
-      ENV['37SIGNALS_OAUTH_KEY'] = 'TESTKEY'
-      ENV['37SIGNALS_OAUTH_SECRET'] = 'TESTSECRET'
+      ENV['THIRTY_SEVEN_SIGNALS_OAUTH_KEY'] = 'TESTKEY'
+      ENV['THIRTY_SEVEN_SIGNALS_OAUTH_SECRET'] = 'TESTSECRET'
       @service.refresh_token = 'refreshtokentest'
       @service.refresh_token!
       @service.token.should == 'NEWTOKEN'
