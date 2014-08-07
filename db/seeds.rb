@@ -64,7 +64,7 @@ unless user.agents.where(:name => "Rain Notifier").exists?
                                           'value' => "rain|storm",
                                           'path' => "conditions"
                                       }],
-                           'message' => "Just so you know, it looks like '<conditions>' tomorrow in <location>"
+                           'message' => "Just so you know, it looks like '{{conditions}}' tomorrow in {{location}}"
                        }).save!
 end
 
