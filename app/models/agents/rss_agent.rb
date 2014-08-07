@@ -20,6 +20,9 @@ module Agents
           * `url` - The URL of the RSS feed.
           * `clean` - Attempt to use [feed-normalizer](https://github.com/aasmith/feed-normalizer)'s' `clean!` method to cleanup HTML in the feed.  Set to `true` to use.
           * `expected_update_period_in_days` - How often you expect this RSS feed to change.  If more than this amount of time passes without an update, the Agent will mark itself as not working.
+          * `headers` - When present, it should be a hash of headers to send with the request.
+          * `basic_auth` - Specify HTTP basic auth parameters: `"username:password"`, or `["username", "password"]`.
+          * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
       MD
     end
 
