@@ -37,9 +37,13 @@ describe Agents::PostAgent do
         data = request.uri.query
       else
         if data = request.body
-          case request.headers['Content-Type']
-          when /json/
+          case request.headers['Content-Type'][/\A[^;\s]+/]
+          when 'application/x-www-form-urlencoded'
+            # ok
+          when 'application/json'
             data = ActiveSupport::JSON.decode(data)
+          else
+            raise "unexpected Content-Type: #{content_type}"
           end
         end
       end
@@ -111,6 +115,15 @@ describe Agents::PostAgent do
       }.should change { @sent_requests[:post].length }.by(1)
 
       @sent_requests[:post][0].should == @checker.options['payload'].to_query
+    end
+
+    it "sends options['payload'] as JSON as a POST request" do
+      @checker.options['content_type'] = 'json'
+      lambda {
+        @checker.check
+      }.should change { @sent_requests[:post].length }.by(1)
+
+      @sent_requests[:post][0].should == @checker.options['payload']
     end
 
     it "sends options['payload'] as a GET request" do
