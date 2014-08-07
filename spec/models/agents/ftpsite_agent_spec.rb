@@ -76,6 +76,12 @@ describe Agents::FtpsiteAgent do
           'timestamp' => '2014-04-02T10:00:00Z',
         }
 
+        Event.last.payload.should == {
+          'url' => 'ftp://ftp.example.org/pub/releases/example%20latest.tar.gz',
+          'filename' => 'example latest.tar.gz',
+          'timestamp' => '2014-04-02T10:00:01Z',
+        }
+
         lambda { @checker.check }.should_not change { Event.count }
       end
     end
