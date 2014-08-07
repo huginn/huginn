@@ -72,7 +72,7 @@ jane_rain_notifier_agent:
                    :value => "rain",
                    :path => "conditions"
                  }],
-                 :message => "Just so you know, it looks like '<conditions>' tomorrow in <location>"
+                 :message => "Just so you know, it looks like '{{conditions}}' tomorrow in {{location}}"
                }.to_json.inspect %>
 
 bob_rain_notifier_agent:
@@ -87,7 +87,7 @@ bob_rain_notifier_agent:
                    :value => "rain",
                    :path => "conditions"
                   }],
-                 :message => "Just so you know, it looks like '<conditions>' tomorrow in <location>"
+                 :message => "Just so you know, it looks like '{{conditions}}' tomorrow in {{location}}"
                }.to_json.inspect %>
 
 bob_twitter_user_agent:

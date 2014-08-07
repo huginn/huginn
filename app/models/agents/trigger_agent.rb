@@ -102,7 +102,7 @@ module Agents
     end
 
     def keep_event?
-      interpolated['keep_event'] == 'true'
+      boolify(interpolated['keep_event'])
     end
   end
 end

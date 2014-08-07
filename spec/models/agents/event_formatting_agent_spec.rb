@@ -9,6 +9,8 @@ describe Agents::EventFormattingAgent do
                 :message => "Received {{content.text}} from {{content.name}} .",
                 :subject => "Weather looks like {{conditions}} according to the forecast at {{pretty_date.time}}",
                 :agent => "{{agent.type}}",
+                :created_at => "{{created_at}}",
+                :created_at_iso => "{{created_at | date:'%FT%T%:z'}}",
             },
             :mode => "clean",
             :matchers => [
@@ -18,7 +20,6 @@ describe Agents::EventFormattingAgent do
                     :to => "pretty_date",
                 },
             ],
-            :skip_created_at => "false"
         }
     }
     @checker = Agents::EventFormattingAgent.new(@valid_params)
@@ -53,18 +54,12 @@ describe Agents::EventFormattingAgent do
       Event.last.payload[:content].should_not == nil
     end
 
-    it "should accept skip_created_at" do
-      @checker.receive([@event])
-      Event.last.payload[:created_at].should_not == nil
-      @checker.options[:skip_created_at] = "true"
-      @checker.receive([@event])
-      Event.last.payload[:created_at].should == nil
-    end
-
     it "should handle Liquid templating in instructions" do
       @checker.receive([@event])
       Event.last.payload[:message].should == "Received Some Lorem Ipsum from somevalue ."
       Event.last.payload[:agent].should == "WeatherAgent"
+      Event.last.payload[:created_at].should == @event.created_at.to_s
+      Event.last.payload[:created_at_iso].should == @event.created_at.iso8601
     end
 
     it "should handle matchers and Liquid templating in instructions" do
@@ -142,11 +137,6 @@ describe Agents::EventFormattingAgent do
 
     it "should validate presence of mode" do
       @checker.options[:mode] = ""
-      @checker.should_not be_valid
-    end
-
-    it "should validate presence of skip_created_at" do
-      @checker.options[:skip_created_at] = ""
       @checker.should_not be_valid
     end
   end

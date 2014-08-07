@@ -17,7 +17,7 @@ module Agents
 
       Simply choose a topic (think email subject line) to publish/listen to, and configure your service.
 
-      It's easy to setup your own [broker](http://jpmens.net/2013/09/01/installing-mosquitto-on-a-raspberry-pi/) or connect to a [cloud service](www.cloudmqtt.com)
+      It's easy to setup your own [broker](http://jpmens.net/2013/09/01/installing-mosquitto-on-a-raspberry-pi/) or connect to a [cloud service](http://www.cloudmqtt.com)
 
       Hints:
       Many services run mqtts (mqtt over SSL) often with a custom certificate.

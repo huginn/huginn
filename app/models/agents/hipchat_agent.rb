@@ -31,7 +31,7 @@ module Agents
     end
 
     def validate_options
-      errors.add(:base, "you need to specify a hipchat auth_token") unless options['auth_token'].present?
+      errors.add(:base, "you need to specify a hipchat auth_token or provide a credential named hipchat_auth_token") unless options['auth_token'].present? || credential('hipchat_auth_token').present?
       errors.add(:base, "you need to specify a room_name or a room_name_path") if options['room_name'].blank? && options['room_name_path'].blank?
     end
 
@@ -40,10 +40,10 @@ module Agents
     end
 
     def receive(incoming_events)
-      client = HipChat::Client.new(interpolated[:auth_token])
+      client = HipChat::Client.new(interpolated[:auth_token] || credential('hipchat_auth_token'))
       incoming_events.each do |event|
         mo = interpolated(event)
-        client[mo[:room_name]].send(mo[:username], mo[:message], :notify => mo[:notify].to_s == 'true' ? 1 : 0, :color => mo[:color])
+        client[mo[:room_name]].send(mo[:username], mo[:message], :notify => boolify(mo[:notify]) ? 1 : 0, :color => mo[:color])
       end
     end
   end

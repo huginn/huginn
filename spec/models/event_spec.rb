@@ -85,6 +85,7 @@ describe EventDrop do
   before do
     @event = Event.new
     @event.agent = agents(:jane_weather_agent)
+    @event.created_at = Time.at(1400000000)
     @event.payload = {
       'title' => 'some title',
       'url' => 'http://some.site.example.org/',
@@ -110,5 +111,10 @@ describe EventDrop do
   it 'should have agent' do
     t = '{{agent.name}}'
     interpolate(t, @event).should eq('SF Weather')
+  end
+
+  it 'should have created_at' do
+    t = '{{created_at | date:"%FT%T%z" }}'
+    interpolate(t, @event).should eq('2014-05-13T09:53:20-0700')
   end
 end

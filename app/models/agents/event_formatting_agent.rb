@@ -25,8 +25,13 @@ module Agents
 
           "instructions": {
             "message": "Today's conditions look like {{conditions}} with a high temperature of {{high.celsius}} degrees Celsius.",
-            "subject": "{{data}}"
+            "subject": "{{data}}",
+            "created_at": "{{created_at}}"
           }
+
+      Names here like `conditions`, `high` and `data` refer to the corresponding values in the Event hash.
+
+      The special key `created_at` refers to the timestamp of the Event, which can be reformatted by the `date` filter, like `{{created_at | date:"at %I:%M %p" }}`.
 
       The upstream agent of each received event is accessible via the key `agent`, which has the following attributes: #{''.tap { |s| s << AgentDrop.instance_methods(false).map { |m| "`#{m}`" }.join(', ') }}.
 
@@ -68,8 +73,6 @@ module Agents
 
       If you want to retain original contents of events and only add new keys, then set `mode` to `merge`, otherwise set it to `clean`.
 
-      By default, the output event will have a `created_at` field added as well, reflecting the original Event creation time.  You can skip this output by setting `skip_created_at` to `true`.
-
       To CGI escape output (for example when creating a link), use the Liquid `uri_escape` filter, like so:
 
           {
@@ -82,7 +85,7 @@ module Agents
     after_save :clear_matchers
 
     def validate_options
-      errors.add(:base, "instructions, mode, and skip_created_at all need to be present.") unless options['instructions'].present? && options['mode'].present? && options['skip_created_at'].present?
+      errors.add(:base, "instructions and mode need to be present.") unless options['instructions'].present? && options['mode'].present?
 
       validate_matchers
     end
@@ -96,7 +99,6 @@ module Agents
         },
         'matchers' => [],
         'mode' => "clean",
-        'skip_created_at' => "false"
       }
     end
 
@@ -110,7 +112,6 @@ module Agents
         opts = interpolated(event.to_liquid(payload))
         formatted_event = opts['mode'].to_s == "merge" ? event.payload.dup : {}
         formatted_event.merge! opts['instructions']
-        formatted_event['created_at'] = event.created_at unless opts['skip_created_at'].to_s == "true"
         create_event :payload => formatted_event
       end
     end

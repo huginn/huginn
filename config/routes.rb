@@ -11,7 +11,6 @@ Huginn::Application.routes.draw do
       post :propagate
       get :type_details
       get :event_descriptions
-      get :diagram
     end
 
     resources :logs, :only => [:index] do
@@ -19,7 +18,11 @@ Huginn::Application.routes.draw do
         delete :clear
       end
     end
+
+    resources :events, :only => [:index]
   end
+
+  resource :diagram, :only => [:show]
 
   resources :events, :only => [:index, :show, :destroy] do
     member do
@@ -36,6 +39,8 @@ Huginn::Application.routes.draw do
       get :share
       get :export
     end
+
+    resource :diagram, :only => [:show]
   end
 
   resources :user_credentials, :except => :show

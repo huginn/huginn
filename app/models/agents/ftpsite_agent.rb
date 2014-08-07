@@ -1,4 +1,5 @@
 require 'net/ftp'
+require 'net/ftp/list'
 require 'uri'
 require 'time'
 
@@ -105,33 +106,14 @@ module Agents
         # commands during iteration.
         list = ftp.list('-a')
 
-        month2year = {}
-
         list.each do |line|
-          mon, day, smtn, rest = line.split(' ', 9)[5..-1]
-
-          # Remove symlink target part if any
-          filename = rest[/\A(.+?)(?:\s+->\s|\z)/, 1]
-
+          entry = Net::FTP::List.parse line
+          filename = entry.basename
+          mtime = Time.parse(entry.mtime.to_s).utc
+          
           patterns.any? { |pattern|
             File.fnmatch?(pattern, filename)
           } or next
-
-          case smtn
-          when /:/
-            if year = month2year[mon]
-              mtime = Time.parse("#{mon} #{day} #{year} #{smtn} GMT")
-            else
-              log "Getting mtime of #{filename}"
-              mtime = ftp.mtime(filename)
-              month2year[mon] = mtime.year
-            end
-          else
-            # Do not bother calling MDTM for old files.  Losing the
-            # time part only makes a timestamp go backwards, meaning
-            # that it will trigger no new event.
-            mtime = Time.parse("#{mon} #{day} #{smtn} GMT")
-          end
 
           after < mtime or next
 
@@ -193,7 +175,7 @@ module Agents
         found_entries[filename]
       }.each { |filename|
         create_event :payload => {
-          'url' => (base_uri + filename).to_s,
+          'url' => "#{base_uri}#{filename}",
           'filename' => filename,
           'timestamp' => found_entries[filename],
         }
