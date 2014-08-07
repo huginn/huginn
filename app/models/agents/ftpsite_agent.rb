@@ -174,8 +174,8 @@ module Agents
       new_files.sort_by { |filename|
         found_entries[filename]
       }.each { |filename|
-        create_event :payload => {
-          'url' => "#{base_uri}#{filename}",
+        create_event payload: {
+          'url' => (base_uri + uri_path_escape(filename)).to_s,
           'filename' => filename,
           'timestamp' => found_entries[filename],
         }
@@ -191,6 +191,14 @@ module Agents
       Integer(value) >= 0
     rescue
       false
+    end
+
+    def uri_path_escape(string)
+      str = string.dup.force_encoding(Encoding::ASCII_8BIT)  # string.b in Ruby >=2.0
+      str.gsub!(/([^A-Za-z0-9\-._~!$&()*+,=@]+)/) { |m|
+        '%' + m.unpack('H2' * m.bytesize).join('%').upcase
+      }
+      str.force_encoding(Encoding::US_ASCII)
     end
   end
 end
