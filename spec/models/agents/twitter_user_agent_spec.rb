@@ -16,6 +16,7 @@ describe Agents::TwitterUserAgent do
     }
 
     @checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => @opts)
+    @checker.service = services(:generic)
     @checker.user = users(:bob)
     @checker.save!
   end
@@ -31,6 +32,7 @@ describe Agents::TwitterUserAgent do
       opts = @opts.merge({ :starting_at => "Jan 01 00:00:01 +0000 2999", })
 
       checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => opts)
+      checker.service = services(:generic)
       checker.user = users(:bob)
       checker.save!
 
