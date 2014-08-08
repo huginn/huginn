@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'ostruct'
 
 describe Agents::PostAgent do
   before do
@@ -32,22 +33,20 @@ describe Agents::PostAgent do
     stub_request(:any, /:/).to_return { |request|
       method = request.method
       @requests += 1
+      @sent_requests[method] << req = OpenStruct.new(uri: request.uri)
       case method
       when :get, :delete
-        data = request.uri.query
+        req.data = request.uri.query
       else
-        if data = request.body
-          case request.headers['Content-Type'][/\A[^;\s]+/]
-          when 'application/x-www-form-urlencoded'
-            # ok
-          when 'application/json'
-            data = ActiveSupport::JSON.decode(data)
-          else
-            raise "unexpected Content-Type: #{content_type}"
-          end
+        case request.headers['Content-Type'][/\A[^;\s]+/]
+        when 'application/x-www-form-urlencoded'
+          req.data = request.body
+        when 'application/json'
+          req.data = ActiveSupport::JSON.decode(request.body)
+        else
+          raise "unexpected Content-Type: #{content_type}"
         end
       end
-      @sent_requests[method] << data
       { status: 200, body: "ok" }
     }
   end
@@ -82,8 +81,8 @@ describe Agents::PostAgent do
         }.should change { @sent_requests[:post].length }.by(2)
       }.should_not change { @sent_requests[:get].length }
 
-      @sent_requests[:post][0].should == @event.payload.merge('default' => 'value').to_query
-      @sent_requests[:post][1].should == event1.payload.to_query
+      @sent_requests[:post][0].data.should == @event.payload.merge('default' => 'value').to_query
+      @sent_requests[:post][1].data.should == event1.payload.to_query
     end
 
     it "can make GET requests" do
@@ -95,7 +94,20 @@ describe Agents::PostAgent do
         }.should change { @sent_requests[:get].length }.by(1)
       }.should_not change { @sent_requests[:post].length }
 
-      @sent_requests[:get][0].should == @event.payload.merge('default' => 'value').to_query
+      @sent_requests[:get][0].data.should == @event.payload.merge('default' => 'value').to_query
+    end
+
+    it "can make a GET request merging params in post_url, payload and event" do
+      @checker.options['method'] = 'get'
+      @checker.options['post_url'] = "http://example.com/a/path?existing_param=existing_value"
+      @event.payload = {
+        "some_param" => "some_value",
+        "another_param" => "another_value"
+      }
+      @checker.receive([@event])
+      uri = @sent_requests[:get].first.uri
+      # parameters are alphabetically sorted by Faraday
+      uri.request_uri.should == "/a/path?another_param=another_value&default=value&existing_param=existing_value&some_param=some_value"
     end
 
     it "can skip merging the incoming event when no_merge is set, but it still interpolates" do
@@ -104,7 +116,21 @@ describe Agents::PostAgent do
         'key' => 'it said: {{ someotherkey.somekey }}'
       }
       @checker.receive([@event])
-      @sent_requests[:post].first.should == { 'key' => 'it said: value' }.to_query
+      @sent_requests[:post].first.data.should == { 'key' => 'it said: value' }.to_query
+    end
+
+    it "interpolates when receiving a payload" do
+      @checker.options['post_url'] = "https://{{ domain }}/{{ variable }}?existing_param=existing_value"
+      @event.payload = {
+        'domain' => 'google.com',
+        'variable' => 'a_variable'
+      }
+      @checker.receive([@event])
+      uri = @sent_requests[:post].first.uri
+      uri.scheme.should == 'https'
+      uri.host.should == 'google.com'
+      uri.path.should == '/a_variable'
+      uri.query.should == "existing_param=existing_value"
     end
   end
 
@@ -114,7 +140,7 @@ describe Agents::PostAgent do
         @checker.check
       }.should change { @sent_requests[:post].length }.by(1)
 
-      @sent_requests[:post][0].should == @checker.options['payload'].to_query
+      @sent_requests[:post][0].data.should == @checker.options['payload'].to_query
     end
 
     it "sends options['payload'] as JSON as a POST request" do
@@ -123,7 +149,7 @@ describe Agents::PostAgent do
         @checker.check
       }.should change { @sent_requests[:post].length }.by(1)
 
-      @sent_requests[:post][0].should == @checker.options['payload']
+      @sent_requests[:post][0].data.should == @checker.options['payload']
     end
 
     it "sends options['payload'] as a GET request" do
@@ -134,7 +160,7 @@ describe Agents::PostAgent do
         }.should change { @sent_requests[:get].length }.by(1)
       }.should_not change { @sent_requests[:post].length }
 
-      @sent_requests[:get][0].should == @checker.options['payload'].to_query
+      @sent_requests[:get][0].data.should == @checker.options['payload'].to_query
     end
   end
 
