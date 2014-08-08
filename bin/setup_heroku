@@ -99,6 +99,7 @@ set_value 'PROCFILE_PATH', "deployment/heroku/Procfile.heroku", force: false
 set_value 'ON_HEROKU', "true"
 set_value 'FORCE_SSL', "true"
 set_value 'DOMAIN', "#{app_name}.herokuapp.com", force: false
+set_value 'USE_GRAPHVIZ_DOT', 'dot'
 
 unless $config['INVITATION_CODE']
   puts "You need to set an invitation code for your Huginn instance.  If you plan to share this instance, you will"
