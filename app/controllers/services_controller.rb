@@ -1,5 +1,4 @@
 class ServicesController < ApplicationController
-
   def index
     @services = current_user.services.page(params[:page])
 

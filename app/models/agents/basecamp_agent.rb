@@ -59,7 +59,7 @@ module Agents
     end
 
     def check
-      self.service.prepare_request
+      service.prepare_request
       reponse = HTTParty.get request_url, request_options.merge(query_parameters)
       memory[:last_run] = Time.now.utc.iso8601
       if last_check_at != nil
@@ -72,11 +72,11 @@ module Agents
 
   private
     def request_url
-      "https://basecamp.com/#{URI.encode(self.service.options[:user_id].to_s)}/api/v1/projects/#{URI.encode(interpolated[:project_id].to_s)}/events.json"
+      "https://basecamp.com/#{URI.encode(service.options[:user_id].to_s)}/api/v1/projects/#{URI.encode(interpolated[:project_id].to_s)}/events.json"
     end
 
     def request_options
-      {:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "Authorization" => "Bearer \"#{self.service.token}\""}}
+      {:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "Authorization" => "Bearer \"#{service.token}\""}}
     end
 
     def query_parameters
