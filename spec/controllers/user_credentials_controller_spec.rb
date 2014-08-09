@@ -15,7 +15,7 @@ describe UserCredentialsController do
   describe "GET index" do
     it "only returns UserCredentials for the current user" do
       get :index
-      assigns(:user_credentials).all? {|i| i.user.should == users(:bob) }.should be_true
+      assigns(:user_credentials).all? {|i| i.user.should == users(:bob) }.should be_truthy
     end
   end
 

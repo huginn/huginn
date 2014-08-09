@@ -323,7 +323,7 @@ describe Agents::HumanTaskAgent do
 
       @checker.send :review_hits
 
-      assignments.all? {|a| a.approved == true }.should be_false
+      assignments.all? {|a| a.approved == true }.should be_falsey
       @checker.memory['hits'].should == { "JH3132836336DHG" => { 'event_id' => @event.id } }
     end
 
@@ -341,7 +341,7 @@ describe Agents::HumanTaskAgent do
 
       @checker.send :review_hits
 
-      assignments.all? {|a| a.approved == true }.should be_false
+      assignments.all? {|a| a.approved == true }.should be_falsey
       @checker.memory['hits'].should == { "JH3132836336DHG" => { 'event_id' => @event.id } }
     end
 
@@ -360,7 +360,7 @@ describe Agents::HumanTaskAgent do
         @checker.send :review_hits
       }.should change { Event.count }.by(1)
 
-      assignments.all? {|a| a.approved == true }.should be_true
+      assignments.all? {|a| a.approved == true }.should be_truthy
       hit.should be_disposed
 
       @checker.events.last.payload['answers'].should == [
@@ -405,7 +405,7 @@ describe Agents::HumanTaskAgent do
           @checker.send :review_hits
         }.should change { Event.count }.by(1)
 
-        assignments.all? {|a| a.approved == true }.should be_true
+        assignments.all? {|a| a.approved == true }.should be_truthy
 
         @checker.events.last.payload['answers'].should == [
           { 'sentiment' => "sad", 'age_range' => "<50" },
@@ -458,7 +458,7 @@ describe Agents::HumanTaskAgent do
           @checker.send :review_hits
         }.should change { Event.count }.by(1)
 
-        assignments.all? {|a| a.approved == true }.should be_true
+        assignments.all? {|a| a.approved == true }.should be_truthy
 
         @checker.events.last.payload['answers'].should == [
           { 'rating' => "1" },
@@ -520,7 +520,7 @@ describe Agents::HumanTaskAgent do
 
         # it approves the existing assignments
 
-        assignments.all? {|a| a.approved == true }.should be_true
+        assignments.all? {|a| a.approved == true }.should be_truthy
         hit.should be_disposed
 
         # it creates a new HIT for the poll
@@ -582,7 +582,7 @@ describe Agents::HumanTaskAgent do
 
         # it approves the existing assignments
 
-        assignments.all? {|a| a.approved == true }.should be_true
+        assignments.all? {|a| a.approved == true }.should be_truthy
         hit.should be_disposed
 
         @checker.memory['hits'].should be_empty

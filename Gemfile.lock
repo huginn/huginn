@@ -433,8 +433,9 @@ DEPENDENCIES
   rails (= 4.1.4)
   rails_12factor
   rr
-  rspec (~> 2.14)
-  rspec-rails (~> 2.14)
+  rspec (~> 2.99)
+  rspec-collection_matchers
+  rspec-rails (~> 2.99)
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
   rufus-scheduler (~> 3.0.8)

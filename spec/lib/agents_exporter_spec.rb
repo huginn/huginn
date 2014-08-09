@@ -20,7 +20,7 @@ describe AgentsExporter do
       Time.parse(data[:exported_at]).should be_within(2).of(Time.now.utc)
       data[:links].should == [{ :source => 0, :receiver => 1 }]
       data[:agents].should == agent_list.map { |agent| exporter.agent_as_json(agent) }
-      data[:agents].all? { |agent_json| agent_json[:guid].present? && agent_json[:type].present? && agent_json[:name].present? }.should be_true
+      data[:agents].all? { |agent_json| agent_json[:guid].present? && agent_json[:type].present? && agent_json[:name].present? }.should be_truthy
 
       data[:agents][0].should_not have_key(:propagate_immediately) # can't receive events
       data[:agents][1].should_not have_key(:schedule) # can't be scheduled

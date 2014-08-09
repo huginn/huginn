@@ -213,7 +213,7 @@ describe Agent do
         @checker.last_check_at.should be_nil
         Agents::SomethingSource.async_check(@checker.id)
         @checker.reload.last_check_at.should be_within(2).of(Time.now)
-        @checker.reload.options[:new].should be_true # Show that we save options
+        @checker.reload.options[:new].should be_truthy # Show that we save options
       end
 
       it "should log exceptions" do
