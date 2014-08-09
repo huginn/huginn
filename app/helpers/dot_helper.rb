@@ -191,7 +191,7 @@ module DotHelper
         overlay << Nokogiri::XML::Node.new('a', doc) { |badge|
           badge['id'] = id = 'b%d' % agent_id
           badge['class'] = 'badge'
-          badge['href'] = events_path(agent: agent)
+          badge['href'] = agent_events_path(agent)
           badge['target'] = '_blank'
           badge['title'] = "#{count} events created"
           badge.content = count.to_s
