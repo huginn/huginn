@@ -14,7 +14,7 @@ describe AgentsController do
     it "only returns Agents for the current user" do
       sign_in users(:bob)
       get :index
-      assigns(:agents).all? {|i| i.user.should == users(:bob) }.should be_true
+      assigns(:agents).all? {|i| i.user.should == users(:bob) }.should be_truthy
     end
   end
 

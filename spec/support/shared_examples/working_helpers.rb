@@ -7,23 +7,23 @@ shared_examples_for WorkingHelpers do
 
       agent.last_error_log_at = 10.minutes.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
+      agent.recent_error_logs?.should be_truthy
 
       agent.last_error_log_at = 11.minutes.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
+      agent.recent_error_logs?.should be_truthy
 
       agent.last_error_log_at = 5.minutes.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
+      agent.recent_error_logs?.should be_truthy
 
       agent.last_error_log_at = 15.minutes.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_false
+      agent.recent_error_logs?.should be_falsey
 
       agent.last_error_log_at = 2.days.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_false
+      agent.recent_error_logs?.should be_falsey
     end
   end
 
