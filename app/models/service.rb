@@ -32,8 +32,8 @@ class Service < ActiveRecord::Base
   def refresh_token!
     response = HTTParty.post(endpoint, query: {
                   type:          'refresh',
-                  client_id:     ENV["#{self.provider.upcase}_OAUTH_KEY"],
-                  client_secret: ENV["#{self.provider.upcase}_OAUTH_SECRET"],
+                  client_id:     ENV["#{provider_to_env}_OAUTH_KEY"],
+                  client_secret: ENV["#{provider_to_env}_OAUTH_SECRET"],
                   refresh_token: self.refresh_token
     })
     data = JSON.parse(response.body)
@@ -66,5 +66,10 @@ class Service < ActiveRecord::Base
   def endpoint
     client_options = "OmniAuth::Strategies::#{OmniAuth::Utils.camelize(self.provider)}".constantize.default_options['client_options']
     URI.join(client_options['site'], client_options['token_url'])
+  end
+
+  @@provider_to_env_map = {'37signals' => 'THIRTY_SEVEN_SIGNALS'}
+  def provider_to_env
+    @@provider_to_env_map[self.provider].presence || self.provider.upcase
   end
 end

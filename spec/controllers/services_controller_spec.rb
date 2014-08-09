@@ -10,7 +10,7 @@ describe ServicesController do
   describe "GET index" do
     it "only returns sevices of the current user" do
       get :index
-      assigns(:services).all? {|i| i.user.should == users(:bob) }.should be_true
+      assigns(:services).all? {|i| i.user.should == users(:bob) }.should == true
     end
   end
 

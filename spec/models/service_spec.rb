@@ -20,7 +20,7 @@ describe Service do
     service.destroy
     agent.reload
     agent.service_id.should be_nil
-    agent.disabled.should be_true
+    agent.disabled.should be true
   end
 
   describe "preparing for a request" do
