@@ -89,7 +89,7 @@ describe DotHelper do
     end
   end
 
-  describe DotHelper::DotDrawer do
+  describe "DotHelper::DotDrawer" do
     describe "#id" do
       it "properly escapes double quotaion and backslash" do
         DotHelper::DotDrawer.draw(foo: "") {

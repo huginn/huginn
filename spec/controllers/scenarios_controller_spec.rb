@@ -12,7 +12,7 @@ describe ScenariosController do
   describe "GET index" do
     it "only returns Scenarios for the current user" do
       get :index
-      assigns(:scenarios).all? {|i| i.user.should == users(:bob) }.should be_true
+      assigns(:scenarios).all? {|i| i.user.should == users(:bob) }.should be_truthy
     end
   end
 
@@ -50,7 +50,7 @@ describe ScenariosController do
       assigns(:exporter).options[:description].should == scenarios(:bob_weather).description
       assigns(:exporter).options[:agents].should == scenarios(:bob_weather).agents
       assigns(:exporter).options[:guid].should == scenarios(:bob_weather).guid
-      assigns(:exporter).options[:source_url].should be_false
+      assigns(:exporter).options[:source_url].should be_falsey
       response.headers['Content-Disposition'].should == 'attachment; filename="bob-s-weather-alert-scenario.json"'
       response.headers['Content-Type'].should == 'application/json; charset=utf-8'
       JSON.parse(response.body)["name"].should == scenarios(:bob_weather).name

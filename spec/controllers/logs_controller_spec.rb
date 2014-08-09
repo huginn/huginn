@@ -6,7 +6,7 @@ describe LogsController do
       sign_in users(:bob)
       get :index, :agent_id => agents(:bob_weather_agent).id
       assigns(:logs).length.should == agents(:bob_weather_agent).logs.length
-      assigns(:logs).all? {|i| i.agent.should == agents(:bob_weather_agent) }.should be_true
+      assigns(:logs).all? {|i| i.agent.should == agents(:bob_weather_agent) }.should be_truthy
     end
 
     it "only loads Agents owned by the current user" do
