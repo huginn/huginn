@@ -64,20 +64,24 @@ class Service < ActiveRecord::Base
 
   def self.provider_specific_options(omniauth)
     case omniauth['provider']
+      when 'twitter', 'github'
+        { name: omniauth['info']['nickname'] }
       when '37signals'
-        { user_id: omniauth['extra']['accounts'][0]['id'] }
+        { user_id: omniauth['extra']['accounts'][0]['id'], name: omniauth['info']['name'] }
       else
-        {}
+        { name: omniauth['info']['nickname'] }
     end
   end
 
   def self.initialize_or_update_via_omniauth(omniauth)
-    find_or_initialize_by(provider: omniauth['provider'], name: omniauth['info']['nickname'] || omniauth['info']['name']).tap do |service|
+    options = provider_specific_options(omniauth)
+
+    find_or_initialize_by(provider: omniauth['provider'], name: options[:name]).tap do |service|
       service.assign_attributes token: omniauth['credentials']['token'],
                                 secret: omniauth['credentials']['secret'],
                                 refresh_token: omniauth['credentials']['refresh_token'],
                                 expires_at: omniauth['credentials']['expires_at'] && Time.at(omniauth['credentials']['expires_at']),
-                                options: provider_specific_options(omniauth)
+                                options: options
     end
   end
 end
