@@ -49,16 +49,15 @@ describe Agents::ChangeDetectorAgent do
 
     it "is when event created within :expected_update_period_in_days" do
       @checker.options[:expected_update_period_in_days] = 2
-      three_days_from_now = 1.days.from_now
       @checker.should be_working
     end
 
     it "isnt when event created outside :expected_update_period_in_days" do
       @checker.options[:expected_update_period_in_days] = 2
-      three_days_from_now = 2.days.from_now
-      stub(Time).now { three_days_from_now }
 
-      @checker.should_not be_working
+      time_travel_to 2.days.from_now do
+          @checker.should_not be_working
+      end
     end
   end
 

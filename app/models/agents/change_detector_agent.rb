@@ -26,7 +26,7 @@ module Agents
 
     def default_options
       {
-          'property' => 'output',
+          'property' => '{{output}}',
           'expected_update_period_in_days' => 1
       }
     end
