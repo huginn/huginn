@@ -9,7 +9,9 @@ shared_examples_for LiquidInterpolatable do
       "escape" => "This should be {{hello_world | uri_escape}}"
     }
 
-    @checker = described_class.new(:name => "somename", :options => @valid_params)
+    @checker = new_instance
+    @checker.name = "somename"
+    @checker.options = @valid_params
     @checker.user = users(:jane)
 
     @event = Event.new

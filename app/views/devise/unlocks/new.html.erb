@@ -1,14 +1,28 @@
-<h2>Resend unlock instructions</h2>
+<div class='row'>
+  <div class='col-md-6 col-md-offset-3'>
+    <div class='well'>
+      <h2>Resend unlock instructions</h2>
 
-<%= form_for(resource, :as => resource_name, :url => unlock_path(resource_name), :html => { :method => :post }) do |f| %>
-  <%= devise_error_messages! %>
+      <%= form_for(resource, :as => resource_name, :url => unlock_path(resource_name), :html => { :method => :post, :class => 'form-horizontal' }) do |f| %>
+        <%= devise_error_messages! %>
 
-  <div>
-    <%= f.label :email %>
-    <%= f.email_field :email %>
+        <div class="form-group">
+          <%= f.label :email, :class => 'col-md-2 col-md-offset-2 control-label' %>
+          <div class="col-md-6">
+            <%= f.text_field :email, :class => 'form-control' %>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-md-offset-4 col-md-10">
+            <%= f.submit "Resend unlock instructions", :class => "btn btn-primary" %>
+          </div>
+        </div>
+      <% end %>
+
+      <hr>
+
+      <%= render "devise/shared/links" %>
+    </div>
   </div>
-
-  <div><%= f.submit "Resend unlock instructions" %></div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
