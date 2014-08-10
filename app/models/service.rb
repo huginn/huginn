@@ -1,17 +1,22 @@
 class Service < ActiveRecord::Base
+  PROVIDER_TO_ENV_MAP = {'37signals' => 'THIRTY_SEVEN_SIGNALS'}
+
   attr_accessible :provider, :name, :token, :secret, :refresh_token, :expires_at, :global, :options
 
   serialize :options, Hash
 
-  belongs_to :user
-  has_many :agents
+  belongs_to :user, :inverse_of => :services
+  has_many :agents, :inverse_of => :service
 
   validates_presence_of :user_id, :provider, :name, :token
 
   before_destroy :disable_agents
 
+  scope :available_to_user, lambda { |user| where("services.user_id = ? or services.global = true", user.id) }
+  scope :by_name, lambda { |dir = 'desc'| order("services.name #{dir}") }
+
   def disable_agents
-    self.agents.each do |agent|
+    agents.each do |agent|
       agent.service_id = nil
       agent.disabled = true
       agent.save!(validate: false)
@@ -24,52 +29,59 @@ class Service < ActiveRecord::Base
   end
 
   def prepare_request
-    if self.expires_at && Time.now > self.expires_at
-      self.refresh_token!
+    if expires_at && Time.now > expires_at
+      refresh_token!
     end
   end
 
   def refresh_token!
     response = HTTParty.post(endpoint, query: {
                   type:          'refresh',
-                  client_id:     ENV["#{provider_to_env}_OAUTH_KEY"],
-                  client_secret: ENV["#{provider_to_env}_OAUTH_SECRET"],
-                  refresh_token: self.refresh_token
+                  client_id:     oauth_key,
+                  client_secret: oauth_secret,
+                  refresh_token: refresh_token
     })
     data = JSON.parse(response.body)
-    self.update(expires_at: Time.now + data['expires_in'], token: data['access_token'], refresh_token: data['refresh_token'].presence || self.refresh_token)
+    update(expires_at: Time.now + data['expires_in'], token: data['access_token'], refresh_token: data['refresh_token'].presence || refresh_token)
   end
 
-  def self.initialize_or_update_via_omniauth(omniauth)
-    case omniauth['provider']
-    when 'twitter'
-      find_or_initialize_by(provider: omniauth['provider'], name: omniauth['info']['nickname']).tap do |service|
-        service.assign_attributes(token: omniauth['credentials']['token'], secret: omniauth['credentials']['secret'])
-      end
-    when 'github'
-      find_or_initialize_by(provider: omniauth['provider'], name: omniauth['info']['nickname']).tap do |service|
-        service.assign_attributes(token: omniauth['credentials']['token'])
-      end
-    when '37signals'
-      find_or_initialize_by(provider: omniauth['provider'], name: omniauth['info']['name']).tap do |service|
-        service.assign_attributes(token: omniauth['credentials']['token'],
-                                  refresh_token: omniauth['credentials']['refresh_token'],
-                                  expires_at: Time.at(omniauth['credentials']['expires_at']),
-                                  options: {user_id: omniauth['extra']['accounts'][0]['id']})
-      end
-    else
-      false
-    end
-  end
-
-  private
   def endpoint
     client_options = "OmniAuth::Strategies::#{OmniAuth::Utils.camelize(self.provider)}".constantize.default_options['client_options']
     URI.join(client_options['site'], client_options['token_url'])
   end
 
-  @@provider_to_env_map = {'37signals' => 'THIRTY_SEVEN_SIGNALS'}
   def provider_to_env
-    @@provider_to_env_map[self.provider].presence || self.provider.upcase
+    PROVIDER_TO_ENV_MAP[provider].presence || provider.upcase
+  end
+
+  def oauth_key
+    ENV["#{provider_to_env}_OAUTH_KEY"]
+  end
+
+  def oauth_secret
+    ENV["#{provider_to_env}_OAUTH_SECRET"]
+  end
+
+  def self.provider_specific_options(omniauth)
+    case omniauth['provider']
+      when 'twitter', 'github'
+        { name: omniauth['info']['nickname'] }
+      when '37signals'
+        { user_id: omniauth['extra']['accounts'][0]['id'], name: omniauth['info']['name'] }
+      else
+        { name: omniauth['info']['nickname'] }
+    end
+  end
+
+  def self.initialize_or_update_via_omniauth(omniauth)
+    options = provider_specific_options(omniauth)
+
+    find_or_initialize_by(provider: omniauth['provider'], name: options[:name]).tap do |service|
+      service.assign_attributes token: omniauth['credentials']['token'],
+                                secret: omniauth['credentials']['secret'],
+                                refresh_token: omniauth['credentials']['refresh_token'],
+                                expires_at: omniauth['credentials']['expires_at'] && Time.at(omniauth['credentials']['expires_at']),
+                                options: options
+    end
   end
 end

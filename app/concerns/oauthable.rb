@@ -11,11 +11,11 @@ module Oauthable
     true
   end
 
-  def valid_services(current_user)
+  def valid_services_for(user)
     if valid_oauth_providers == :all
-      current_user.available_services
+      user.available_services
     else
-      current_user.available_services.where(provider: valid_oauth_providers)
+      user.available_services.where(provider: valid_oauth_providers)
     end
   end
 

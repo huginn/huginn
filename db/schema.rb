@@ -11,10 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140730005210) do
-
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+ActiveRecord::Schema.define(version: 20140809211540) do
 
   create_table "agent_logs", force: true do |t|
     t.integer  "agent_id",                      null: false
@@ -120,10 +117,10 @@ ActiveRecord::Schema.define(version: 20140730005210) do
   add_index "scenarios", ["user_id", "guid"], name: "index_scenarios_on_user_id_and_guid", unique: true, using: :btree
 
   create_table "services", force: true do |t|
-    t.integer  "user_id"
-    t.string   "provider"
-    t.string   "name"
-    t.text     "token"
+    t.integer  "user_id",                       null: false
+    t.string   "provider",                      null: false
+    t.string   "name",                          null: false
+    t.text     "token",                         null: false
     t.text     "secret"
     t.text     "refresh_token"
     t.datetime "expires_at"
@@ -134,7 +131,6 @@ ActiveRecord::Schema.define(version: 20140730005210) do
   end
 
   add_index "services", ["user_id", "global"], name: "index_accounts_on_user_id_and_global", using: :btree
-  add_index "services", ["user_id"], name: "index_accounts_on_user_id", using: :btree
 
   create_table "user_credentials", force: true do |t|
     t.integer  "user_id",                           null: false

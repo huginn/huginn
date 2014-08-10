@@ -41,17 +41,18 @@ describe ServicesController do
   end
 
   describe "accepting a callback url" do
-    it "should update the users credentials" do
+    it "should update the user's credentials" do
       expect {
         get :callback, provider: 'twitter'
       }.to change { users(:bob).services.count }.by(1)
     end
 
-    it "should not work with an unknown provider" do
+    it "should work with an unknown provider (for now)" do
       request.env["omniauth.auth"]['provider'] = 'unknown'
       expect {
         get :callback, provider: 'unknown'
-      }.to change { users(:bob).services.count }.by(0)
+      }.to change { users(:bob).services.count }.by(1)
+      users(:bob).services.first.provider.should == 'unknown'
     end
   end
 end
