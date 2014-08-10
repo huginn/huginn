@@ -31,12 +31,7 @@
           </div>
 
           <div class='oauthable-form'>
-            <% if @agent.try(:oauthable?) %>
-              <div class="form-group type-select">
-                <%= f.label :service %>
-                <%= f.select :service_id, options_for_select(@agent.valid_services(current_user).collect { |s| ["(#{s.provider}) #{s.name}", s.id]}, @agent.service_id),{}, class: 'form-control' %>
-              </div>
-            <% end %>
+            <%= render partial: 'oauth_dropdown' %>
           </div>
 
           <div class="form-group">
