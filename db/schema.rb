@@ -11,7 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140809211540) do
+ActiveRecord::Schema.define(version: 20140811200922) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "agent_logs", force: true do |t|
     t.integer  "agent_id",                      null: false
@@ -128,8 +131,11 @@ ActiveRecord::Schema.define(version: 20140809211540) do
     t.text     "options"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "uid"
   end
 
+  add_index "services", ["provider"], name: "index_services_on_provider", using: :btree
+  add_index "services", ["uid"], name: "index_services_on_uid", using: :btree
   add_index "services", ["user_id", "global"], name: "index_accounts_on_user_id_and_global", using: :btree
 
   create_table "user_credentials", force: true do |t|

@@ -1,7 +1,7 @@
 class Service < ActiveRecord::Base
   PROVIDER_TO_ENV_MAP = {'37signals' => 'THIRTY_SEVEN_SIGNALS'}
 
-  attr_accessible :provider, :name, :token, :secret, :refresh_token, :expires_at, :global, :options
+  attr_accessible :provider, :name, :token, :secret, :refresh_token, :expires_at, :global, :options, :uid
 
   serialize :options, Hash
 
@@ -15,8 +15,8 @@ class Service < ActiveRecord::Base
   scope :available_to_user, lambda { |user| where("services.user_id = ? or services.global = true", user.id) }
   scope :by_name, lambda { |dir = 'desc'| order("services.name #{dir}") }
 
-  def disable_agents
-    agents.each do |agent|
+  def disable_agents(conditions = {})
+    agents.where.not(conditions).each do |agent|
       agent.service_id = nil
       agent.disabled = true
       agent.save!(validate: false)
@@ -24,6 +24,7 @@ class Service < ActiveRecord::Base
   end
 
   def toggle_availability!
+    disable_agents(user_id: self.user_id) if global
     self.global = !self.global
     self.save!
   end
@@ -76,9 +77,10 @@ class Service < ActiveRecord::Base
   def self.initialize_or_update_via_omniauth(omniauth)
     options = provider_specific_options(omniauth)
 
-    find_or_initialize_by(provider: omniauth['provider'], name: options[:name]).tap do |service|
+    find_or_initialize_by(provider: omniauth['provider'], uid: omniauth['uid'].to_s).tap do |service|
       service.assign_attributes token: omniauth['credentials']['token'],
                                 secret: omniauth['credentials']['secret'],
+                                name: options[:name],
                                 refresh_token: omniauth['credentials']['refresh_token'],
                                 expires_at: omniauth['credentials']['expires_at'] && Time.at(omniauth['credentials']['expires_at']),
                                 options: options

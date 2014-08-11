@@ -115,3 +115,9 @@ bob_basecamp_agent:
   user: bob
   service: generic
   guid: <%= SecureRandom.hex %>
+
+jane_basecamp_agent:
+  type: Agents::BasecampAgent
+  user: jane
+  service: generic
+  guid: <%= SecureRandom.hex %>
