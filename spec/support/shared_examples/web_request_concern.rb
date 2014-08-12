@@ -63,4 +63,29 @@ shared_examples_for WebRequestConcern do
       agent.should_not be_valid
     end
   end
+
+  describe "User-Agent" do
+    before do
+      @default_http_user_agent = ENV['DEFAULT_HTTP_USER_AGENT']
+      ENV['DEFAULT_HTTP_USER_AGENT'] = nil
+    end
+
+    after do
+      ENV['DEFAULT_HTTP_USER_AGENT'] = @default_http_user_agent
+    end
+
+    it "should have the default value set by Faraday" do
+      agent.user_agent.should == Faraday.new.headers[:user_agent]
+    end
+
+    it "should be overridden by the environment variable if present" do
+      ENV['DEFAULT_HTTP_USER_AGENT'] = 'Huginn - https://github.com/cantino/huginn'
+      agent.user_agent.should == 'Huginn - https://github.com/cantino/huginn'
+    end
+
+    it "should be overriden by the value in options if present" do
+      agent.options['user_agent'] = 'Override'
+      agent.user_agent.should == 'Override'
+    end
+  end
 end
