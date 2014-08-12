@@ -1,6 +1,28 @@
 module ApplicationHelper
-  def nav_link(name, path, options = {})
-    content_tag :li, link_to(name, path), class: current_page?(path) ? 'active' : ''
+  def nav_link(name, path, options = {}, &block)
+    if glyphicon = options[:glyphicon]
+      name = "<span class='glyphicon glyphicon-#{glyphicon}'></span> ".html_safe + name
+    end
+    content = link_to(name, path)
+    active = current_page?(path)
+    if block
+      # Passing a block signifies that the link is a header of a hover
+      # menu which contains what's in the block.
+      begin
+        @nav_in_menu = true
+        @nav_link_active = active
+        content += capture(&block)
+        class_name = "dropdown dropdown-hover #{@nav_link_active ? 'active' : ''}"
+      ensure
+        @nav_in_menu = @nav_link_active = false
+      end
+    else
+      # Mark the menu header active if it contains the current page
+      @nav_link_active ||= active if @nav_in_menu
+      # An "active" menu item may be an eyesore, hence `!@nav_in_menu &&`.
+      class_name = !@nav_in_menu && active ? 'active' : ''
+    end
+    content_tag :li, content, class: class_name
   end
 
   def yes_no(bool)
