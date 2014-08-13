@@ -1,5 +1,8 @@
 require 'active_record'
 
+# Module#prepend support for Ruby 1.9
+require 'prepend' unless Module.method_defined?(:prepend)
+
 module ActiveRecord::ConnectionAdapters
   class ColumnDefinition
     module CharsetSupport
@@ -77,4 +80,4 @@ module ActiveRecord::ConnectionAdapters
       prepend CharsetSupport
     end
   end
-end if Module.method_defined?(:prepend)  # ruby >=2.0
+end
