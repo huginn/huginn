@@ -14,13 +14,21 @@ gem 'protected_attributes', '~>1.0.8'
 gem 'rails' , '4.1.4'
 
 case RUBY_PLATFORM
-when /freebsd/
-  # Seems FreeBSD's zoneinfo is not exactly what tzinfo expects
-  gem 'tzinfo-data'
-else
-  # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-  gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
+when /freebsd|netbsd|openbsd/
+  # ffi (required by typhoeus via ethon) merged fixes for bugs fatal
+  # on these platforms after 1.9.3; no following release as yet.
+  gem 'ffi', github: 'ffi/ffi', branch: 'master'
+
+  # tzinfo 1.2.0 has added support for reading zoneinfo on these
+  # platforms.
+  gem 'tzinfo', '>= 1.2.0'
+when /solaris/
+  # ditto
+  gem 'tzinfo', '>= 1.2.0'
 end
+
+# Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 
 gem 'mysql2', '~> 0.3.16'
 gem 'devise', '~> 3.2.4'
