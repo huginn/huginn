@@ -55,6 +55,8 @@ class Agent < ActiveRecord::Base
   has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :agent
   has_many :scenarios, :through => :scenario_memberships, :inverse_of => :agents
 
+  scope :active, -> { where(disabled: false) }
+
   scope :of_type, lambda { |type|
     type = case type
              when String, Symbol, Class
