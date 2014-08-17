@@ -1,9 +1,9 @@
 module ApplicationHelper
   def nav_link(name, path, options = {}, &block)
-    if glyphicon = options[:glyphicon]
+    if glyphicon = options.delete(:glyphicon)
       name = "<span class='glyphicon glyphicon-#{glyphicon}'></span> ".html_safe + name
     end
-    content = link_to(name, path)
+    content = link_to(name, path, options)
     active = current_page?(path)
     if block
       # Passing a block signifies that the link is a header of a hover
