@@ -7,7 +7,7 @@ describe Agents::HipchatAgent do
                       'room_name' => 'test',
                       'username' => "{{username}}",
                       'message' => "{{message}}",
-                      'notify' => false,
+                      'notify' => 'false',
                       'color' => 'yellow',
                     }
 
@@ -53,7 +53,7 @@ describe Agents::HipchatAgent do
   describe "#receive" do
     it "send a message to the hipchat" do
       any_instance_of(HipChat::Room) do |obj|
-        mock(obj).send(@event.payload[:username], @event.payload[:message], {:notify => 0, :color => 'yellow'})
+        mock(obj).send(@event.payload[:username], @event.payload[:message], {:notify => false, :color => 'yellow'})
       end
       @checker.receive([@event])
     end

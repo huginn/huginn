@@ -43,7 +43,7 @@ module Agents
       client = HipChat::Client.new(interpolated[:auth_token] || credential('hipchat_auth_token'))
       incoming_events.each do |event|
         mo = interpolated(event)
-        client[mo[:room_name]].send(mo[:username], mo[:message], :notify => boolify(mo[:notify]) ? 1 : 0, :color => mo[:color])
+        client[mo[:room_name]].send(mo[:username], mo[:message], :notify => boolify(mo[:notify]), :color => mo[:color])
       end
     end
   end
