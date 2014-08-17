@@ -15,7 +15,7 @@
       <%= nav_link "Agents", agents_path do %>
         <ul class='dropdown-menu' role='menu'>
           <%= nav_link "New Agent", new_agent_path, glyphicon: "plus" %>
-          <%= nav_link "Run event propagation", propagate_agents_path, glyphicon: "refresh" %>
+          <%= nav_link "Run event propagation", propagate_agents_path, method: 'post', glyphicon: "refresh" %>
           <%= nav_link "View Diagram", diagram_path, glyphicon: 'random' %>
         </ul>
       <% end %>
