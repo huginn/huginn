@@ -58,7 +58,12 @@ module WebRequestConcern
   end
 
   def user_agent
-    interpolated['user_agent'].presence ||
+    interpolated['user_agent'].presence || self.class.default_user_agent
+  end
+
+  module ClassMethods
+    def default_user_agent
       ENV.fetch('DEFAULT_HTTP_USER_AGENT', Faraday.new.headers[:user_agent])
+    end
   end
 end
