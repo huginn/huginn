@@ -21,25 +21,25 @@ module Agents
     event_description <<-MD
       Events are the raw JSON provided by the Basecamp API. Should look something like:
 
-        {
-          "creator": {
-            "fullsize_avatar_url": "https://dge9rmgqjs8m1.cloudfront.net/global/dfsdfsdfdsf/original.gif?r=3",
-            "avatar_url": "http://dge9rmgqjs8m1.cloudfront.net/global/dfsdfsdfdsf/avatar.gif?r=3",
-            "name": "Dominik Sander",
-            "id": 123456
-          },
-          "attachments": [],
-          "raw_excerpt": "test test",
-          "excerpt": "test test",
-          "id": 6454342343,
-          "created_at": "2014-04-17T10:25:31.000+02:00",
-          "updated_at": "2014-04-17T10:25:31.000+02:00",
-          "summary": "commented on whaat",
-          "action": "commented on",
-          "target": "whaat",
-          "url": "https://basecamp.com/12456/api/v1/projects/76454545-explore-basecamp/messages/76454545-whaat.json",
-          "html_url": "https://basecamp.com/12456/projects/76454545-explore-basecamp/messages/76454545-whaat#comment_76454545"
-        }
+          {
+            "creator": {
+              "fullsize_avatar_url": "https://dge9rmgqjs8m1.cloudfront.net/global/dfsdfsdfdsf/original.gif?r=3",
+              "avatar_url": "http://dge9rmgqjs8m1.cloudfront.net/global/dfsdfsdfdsf/avatar.gif?r=3",
+              "name": "Dominik Sander",
+              "id": 123456
+            },
+            "attachments": [],
+            "raw_excerpt": "test test",
+            "excerpt": "test test",
+            "id": 6454342343,
+            "created_at": "2014-04-17T10:25:31.000+02:00",
+            "updated_at": "2014-04-17T10:25:31.000+02:00",
+            "summary": "commented on whaat",
+            "action": "commented on",
+            "target": "whaat",
+            "url": "https://basecamp.com/12456/api/v1/projects/76454545-explore-basecamp/messages/76454545-whaat.json",
+            "html_url": "https://basecamp.com/12456/projects/76454545-explore-basecamp/messages/76454545-whaat#comment_76454545"
+          }
     MD
 
     default_schedule "every_10m"
@@ -61,12 +61,13 @@ module Agents
     def check
       service.prepare_request
       reponse = HTTParty.get request_url, request_options.merge(query_parameters)
-      memory[:last_run] = Time.now.utc.iso8601
-      if last_check_at != nil
-        JSON.parse(reponse.body).each do |event|
+      events = JSON.parse(reponse.body)
+      if !memory[:last_event].nil?
+        events.each do |event|
           create_event :payload => event
         end
       end
+      memory[:last_event] = events.first['created_at'] if events.length > 0
       save!
     end
 
@@ -80,7 +81,7 @@ module Agents
     end
 
     def query_parameters
-      memory[:last_run].present? ? { :query => {:since => memory[:last_run]} } : {}
+      memory[:last_event].present? ? { :query => {:since => memory[:last_event]} } : {}
     end
   end
 end
