@@ -19,7 +19,7 @@ module Agents
 
       `url` can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape)
 
-      The `type` value can be `xml`, `html`, or `json`.
+      The `type` value can be `xml`, `html`, `json`, or `text`.
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
@@ -38,6 +38,26 @@ module Agents
           "extract": {
             "title": { "path": "results.data[*].title" },
             "description": { "path": "results.data[*].description" }
+          }
+
+      When parsing text, each sub-hash should contain a `regexp` and `index`.  Output text is matched against the regular expression repeatedly from the beginning through to the end, collecting a captured group specified by `index` in each match.  Each index should be either an integer or a string name which corresponds to `(?<_name_>...)`.  For example, to parse lines of `_word_: _definition_`, the following should work:
+
+          "extract": {
+            "word": { "regexp": "^(.+?): (.+)$", index: 1 },
+            "definition": { "regexp": "^(.+?): (.+)$", index: 2 },
+          }
+
+      Or if you prefer names to numbers for index:
+
+          "extract": {
+            "word": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'word' },
+            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'definition' },
+          }
+
+      To extract the whole content as one event:
+
+          "extract": {
+            "content": { "regexp": "\A(?:.|\n)*\z", index: 0 },
           }
 
       Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
@@ -140,7 +160,15 @@ module Agents
           else
             output = {}
             interpolated['extract'].each do |name, extraction_details|
-              if extraction_type == "json"
+              case extraction_type
+              when "text"
+                regexp = Regexp.new(extraction_details['regexp'])
+                result = []
+                doc.scan(regexp) {
+                  result << Regexp.last_match[extraction_details['index']]
+                }
+                log "Extracting #{extraction_type} at #{regexp}: #{result}"
+              when "json"
                 result = Utils.values_at(doc, extraction_details['path'])
                 log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
               else
@@ -253,10 +281,13 @@ module Agents
 
     def extraction_type
       (interpolated['type'] || begin
-        if interpolated['url'] =~ /\.(rss|xml)$/i
+        case interpolated['url']
+        when /\.(rss|xml)$/i
           "xml"
-        elsif interpolated['url'] =~ /\.json$/i
+        when /\.json$/i
           "json"
+        when /\.(txt|text)$/i
+          "text"
         else
           "html"
         end
@@ -271,6 +302,8 @@ module Agents
           JSON.parse(data)
         when "html"
           Nokogiri::HTML(data)
+        when "text"
+          data
         else
           raise "Unknown extraction type #{extraction_type}"
       end
