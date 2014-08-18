@@ -16,7 +16,7 @@ class Service < ActiveRecord::Base
   scope :by_name, lambda { |dir = 'desc'| order("services.name #{dir}") }
 
   def disable_agents(conditions = {})
-    agents.where.not(conditions).each do |agent|
+    agents.where.not(conditions[:where_not] || {}).each do |agent|
       agent.service_id = nil
       agent.disabled = true
       agent.save!(validate: false)
@@ -24,7 +24,7 @@ class Service < ActiveRecord::Base
   end
 
   def toggle_availability!
-    disable_agents(user_id: self.user_id) if global
+    disable_agents(where_not: {user_id: self.user_id}) if global
     self.global = !self.global
     self.save!
   end
