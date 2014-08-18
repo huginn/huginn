@@ -50,7 +50,7 @@ module Agents
 
       Set `force_encoding` to an encoding name if the website does not return a Content-Type header with a proper charset.
 
-      Set `user_agent` to a custom User-Agent name if the website does not like the default value ("Faraday v#{Faraday::VERSION}").
+      Set `user_agent` to a custom User-Agent name if the website does not like the default value (`#{default_user_agent}`).
 
       The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
 
