@@ -85,7 +85,6 @@ gem 'feed-normalizer'
 gem 'slack-notifier', '~> 0.5.0'
 gem 'therubyracer', '~> 0.12.1'
 gem 'mqtt'
-gem 'redcarpet', '~> 3.1.1'
 
 group :development do
   gem 'binding_of_caller'

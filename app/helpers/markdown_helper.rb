@@ -1,8 +1,7 @@
 module MarkdownHelper
 
   def markdown(text)
-    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
-    markdown.render(text).html_safe
+    Kramdown::Document.new(text, :auto_ids => false).to_html.html_safe
   end
 
 end
