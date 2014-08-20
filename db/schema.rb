@@ -111,6 +111,8 @@ ActiveRecord::Schema.define(version: 20140605032822) do
     t.boolean  "public",      default: false, null: false
     t.string   "guid",                        null: false
     t.string   "source_url"
+    t.string   "tag_bg_color", default: "#5bc0de"
+    t.string   "tag_fg_color", default: "#ffffff"
   end
 
   add_index "scenarios", ["user_id", "guid"], name: "index_scenarios_on_user_id_and_guid", unique: true, using: :btree

@@ -5,6 +5,15 @@ describe Scenario do
 
   it_behaves_like HasGuid
 
+  describe "defaults" do
+    it "defaults the tag foreground color" do
+      new_instance.tag_fg_color.should == '#ffffff'
+    end
+    it "defaults the tag background color" do
+      new_instance.tag_bg_color.should == '#5bc0de'
+    end
+  end
+
   describe "validations" do
     before do
       new_instance.should be_valid
