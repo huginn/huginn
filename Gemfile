@@ -11,7 +11,7 @@ gem 'bundler', '>= 1.5.0'
 
 gem 'protected_attributes', '~>1.0.8'
 
-gem 'rails' , '4.1.4'
+gem 'rails' , '4.1.5'
 
 case RUBY_PLATFORM
 when /freebsd|netbsd|openbsd/
