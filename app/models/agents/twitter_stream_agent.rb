@@ -10,11 +10,7 @@ module Agents
       To follow the Twitter stream, provide an array of `filters`.  Multiple words in a filter must all show up in a tweet, but are independent of order.
       If you provide an array instead of a filter, the first entry will be considered primary and any additional values will be treated as aliases.
 
-      Twitter credentials must be supplied as either [credentials](/user_credentials) called
-      `twitter_consumer_key`, `twitter_consumer_secret`, `twitter_oauth_token`, and `twitter_oauth_token_secret`,
-      or as options to this Agent called `consumer_key`, `consumer_secret`, `oauth_token`, and `oauth_token_secret`.
-
-      To get oAuth credentials for Twitter, [follow these instructions](https://github.com/cantino/huginn/wiki/Getting-a-twitter-oauth-token).
+      To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
