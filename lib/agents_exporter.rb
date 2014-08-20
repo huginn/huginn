@@ -16,6 +16,8 @@ class AgentsExporter
       :description => options[:description].presence || 'No description provided',
       :source_url => options[:source_url],
       :guid => options[:guid],
+      :tag_fg_color => options[:tag_fg_color],
+      :tag_bg_color => options[:tag_bg_color],
       :exported_at => Time.now.utc.iso8601,
       :agents => agents.map { |agent| agent_as_json(agent) },
       :links => links

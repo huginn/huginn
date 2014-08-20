@@ -3,6 +3,8 @@ require 'spec_helper'
 describe ScenarioImport do
   let(:user) { users(:bob) }
   let(:guid) { "somescenarioguid" }
+  let(:tag_fg_color) { "#ffffff" }
+  let(:tag_bg_color) { "#000000" }
   let(:description) { "This is a cool Huginn Scenario that does something useful!" }
   let(:name) { "A useful Scenario" }
   let(:source_url) { "http://example.com/scenarios/2/export.json" }
@@ -46,10 +48,12 @@ describe ScenarioImport do
     }
   end
   let(:valid_parsed_data) do
-    { 
+    {
       :name => name,
       :description => description,
       :guid => guid,
+      :tag_fg_color => tag_fg_color,
+      :tag_bg_color => tag_bg_color,
       :source_url => source_url,
       :exported_at => 2.days.ago.utc.iso8601,
       :agents => [
@@ -142,7 +146,7 @@ describe ScenarioImport do
       end
     end
   end
-  
+
   describe "#dangerous?" do
     it "returns false on most Agents" do
       ScenarioImport.new(:data => valid_data).should_not be_dangerous
@@ -171,6 +175,8 @@ describe ScenarioImport do
           scenario_import.scenario.name.should == name
           scenario_import.scenario.description.should == description
           scenario_import.scenario.guid.should == guid
+          scenario_import.scenario.tag_fg_color.should == tag_fg_color
+          scenario_import.scenario.tag_bg_color.should == tag_bg_color
           scenario_import.scenario.source_url.should == source_url
           scenario_import.scenario.public.should be_falsey
         end
@@ -269,6 +275,8 @@ describe ScenarioImport do
 
           existing_scenario.reload
           existing_scenario.guid.should == guid
+          existing_scenario.tag_fg_color.should == tag_fg_color
+          existing_scenario.tag_bg_color.should == tag_bg_color
           existing_scenario.description.should == description
           existing_scenario.name.should == name
           existing_scenario.source_url.should == source_url
