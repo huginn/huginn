@@ -1,3 +1,6 @@
+require 'faraday'
+require 'faraday_middleware'
+
 module WebRequestConcern
   extend ActiveSupport::Concern
 

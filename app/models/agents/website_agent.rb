@@ -1,6 +1,4 @@
 require 'nokogiri'
-require 'faraday'
-require 'faraday_middleware'
 require 'date'
 
 module Agents
