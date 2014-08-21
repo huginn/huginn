@@ -138,7 +138,9 @@ module DotHelper
       def agent_edge(agent, receiver)
         edge(agent_id[agent],
              agent_id[receiver],
-             style: ('dashed' unless receiver.propagate_immediately),
+             style: ('dashed' unless agent.can_run_other_agents? || !receiver.propagate_immediately?),
+             label: (' runs ' if agent.can_run_other_agents?),
+             arrowhead: ('empty' if agent.can_run_other_agents?),
              color: (@disabled if agent.disabled? || receiver.disabled?))
       end
 
@@ -151,10 +153,17 @@ module DotHelper
                   fontsize: 10,
                   fontname: ('Helvetica' if rich)
 
+        statement 'edge',
+                  fontsize: 10,
+                  fontname: ('Helvetica' if rich)
+
         agents.each.with_index { |agent, index|
           agent_node(agent)
 
-          agent.receivers.each { |receiver|
+          [
+            *agent.receivers,
+            *(agent.targets if agent.can_run_other_agents?)
+          ].each { |receiver|
             agent_edge(agent, receiver) if agents.include?(receiver)
           }
         }

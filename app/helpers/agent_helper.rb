@@ -15,4 +15,14 @@ module AgentHelper
   def agent_show_class(agent)
     agent.short_type.underscore.dasherize
   end
+
+  def agent_schedule(agent, delimiter = ', ')
+    return 'n/a' unless agent.can_be_scheduled?
+
+    runners = agent.runners
+    [
+      *(CGI.escape_html(agent.schedule.humanize.titleize) unless agent.schedule == 'never' && agent.runners.count > 0),
+      *runners.map { |agent| link_to(agent.name, agent_path(agent)) },
+    ].join(delimiter).html_safe
+  end
 end
