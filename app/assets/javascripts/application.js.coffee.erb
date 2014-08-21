@@ -22,14 +22,13 @@ window.setupJsonEditor = ($editors = $(".live-json-editor")) ->
   return editors
 
 hideSchedule = ->
-  $(".schedule-region select").hide()
+  $(".schedule-region .can-be-scheduled").hide()
   $(".schedule-region .cannot-be-scheduled").show()
 
 showSchedule = (defaultSchedule = null) ->
-  $(".schedule-region select").show()
   if defaultSchedule?
     $(".schedule-region select").val(defaultSchedule).change()
-  $(".schedule-region select").show()
+  $(".schedule-region .can-be-scheduled").show()
   $(".schedule-region .cannot-be-scheduled").hide()
 
 hideLinks = ->
@@ -42,6 +41,16 @@ showLinks = ->
   $(".link-region .propagate-immediately").show()
   $(".link-region .cannot-receive-events").hide()
   showEventDescriptions()
+
+hideChains = ->
+  $(".chain-region .select2-container").hide()
+  $(".chain-region .propagate-immediately").hide()
+  $(".chain-region .cannot-receive-events").show()
+
+showChains = ->
+  $(".chain-region .select2-container").show()
+  $(".chain-region .propagate-immediately").show()
+  $(".chain-region .cannot-receive-events").hide()
 
 hideEventCreation = ->
   $(".event-related-region").hide()
@@ -161,6 +170,11 @@ $(document).ready ->
         else
           hideLinks()
 
+        if json.can_run_other_agents
+          showChains()
+        else
+          hideChains()
+
         if json.can_create_events
           showEventCreation()
         else
@@ -190,6 +204,12 @@ $(document).ready ->
       showLinks()
     else
       hideLinks()
+
+  if $(".chain-region")
+    if $(".chain-region").data("can-run-other-agents") == true
+      showChains()
+    else
+      hideChains()
 
   if $(".event-related-region")
     if $(".event-related-region").data("can-create-events") == true

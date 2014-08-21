@@ -182,6 +182,10 @@ class Agent < ActiveRecord::Base
     !cannot_create_events?
   end
 
+  def can_run_other_agents?
+    self.class.can_run_other_agents?
+  end
+
   def log(message, options = {})
     puts "Agent##{id}: #{message}" unless Rails.env.test?
     AgentLog.log_for_agent(self, message, options)
@@ -302,6 +306,14 @@ class Agent < ActiveRecord::Base
 
     def cannot_receive_events?
       !!@cannot_receive_events
+    end
+
+    def can_run_other_agents!
+      @can_run_other_agents = true
+    end
+
+    def can_run_other_agents?
+      @can_run_other_agents
     end
 
     # Find all Agents that have received Events since the last execution of this method.  Update those Agents with

@@ -33,8 +33,23 @@
           <div class="form-group">
             <%= f.label :schedule, :class => 'control-label' %>
             <div class="schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
-              <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'form-control' %>
+              <div class="can-be-scheduled">
+                <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'form-control' %>
+              </div>
               <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
+            </div>
+          </div>
+
+          <div class="chain-region" data-can-run-other-agents="<%= @agent.can_run_other_agents? %>">
+            <div class="can-run-other-agents">
+              <div class="form-group">
+                <%= f.label :targets %>
+                <% eventTargets = current_user.agents.select(&:can_be_scheduled?) %>
+                <%= f.select(:target_ids,
+                               options_for_select(eventTargets.map {|s| [s.name, s.id] },
+                                                  @agent.target_ids),
+                               {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
+              </div>
             </div>
           </div>
 

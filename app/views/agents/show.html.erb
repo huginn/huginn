@@ -134,6 +134,17 @@
               </p>
             <% end %>
 
+            <% if @agent.can_run_other_agents? %>
+              <p>
+                <b>Targets:</b>
+                <% if (agents = @agent.targets).length > 0 %>
+                  <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
+                <% else %>
+                  None
+                <% end %>
+              </p>
+            <% end %>
+
             <p>
               <b>Working:</b>
               <%= working @agent %>
