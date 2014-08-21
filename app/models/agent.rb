@@ -25,13 +25,15 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
+  attr_accessible :options, :memory, :name, :type, :schedule, :runner_ids, :target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
 
   json_serialize :options, :memory
 
   validates_presence_of :name, :user
   validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
   validate :sources_are_owned
+  validate :runners_are_owned
+  validate :targets_are_owned
   validate :scenarios_are_owned
   validate :validate_schedule
   validate :validate_options
@@ -52,6 +54,10 @@ class Agent < ActiveRecord::Base
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
   has_many :receivers, :through => :links_as_source, :class_name => "Agent", :inverse_of => :sources
+  has_many :chains_as_runner, dependent: :delete_all, foreign_key: 'runner_id', class_name: 'Chain', inverse_of: :runner
+  has_many :chains_as_target, dependent: :delete_all, foreign_key: 'target_id', class_name: 'Chain', inverse_of: :target
+  has_many :runners, through: :chains_as_target, class_name: "Agent", inverse_of: :targets
+  has_many :targets, through: :chains_as_runner, class_name: "Agent", inverse_of: :runners
   has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :agent
   has_many :scenarios, :through => :scenario_memberships, :inverse_of => :agents
 
@@ -218,6 +224,14 @@ class Agent < ActiveRecord::Base
     errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
   end
   
+  def runners_are_owned
+    errors.add(:runners, "must be owned by you") unless runners.all? {|s| s.user == user }
+  end
+
+  def targets_are_owned
+    errors.add(:targets, "must be owned by you") unless targets.all? {|s| s.user == user }
+  end
+
   def scenarios_are_owned
     errors.add(:scenarios, "must be owned by you") unless scenarios.all? {|s| s.user == user }
   end
@@ -249,7 +263,7 @@ class Agent < ActiveRecord::Base
 
   class << self
     def build_clone(original)
-      new(original.slice(:type, :options, :schedule, :source_ids, :keep_events_for, :propagate_immediately)) { |clone|
+      new(original.slice(:type, :options, :schedule, :runner_ids, :source_ids, :keep_events_for, :propagate_immediately)) { |clone|
         # Give it a unique name
         2.upto(count) do |i|
           name = '%s (%d)' % [original.name, i]
@@ -399,6 +413,8 @@ class AgentDrop
     :sources,
     :receivers,
     :schedule,
+    :runners,
+    :targets,
     :disabled,
     :keep_events_for,
     :propagate_immediately,
