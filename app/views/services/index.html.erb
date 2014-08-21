@@ -11,9 +11,15 @@
         <%= link_to 'wiki', 'https://github.com/cantino/huginn/wiki/Configuring-OAuth-applications', target: :_blank %>
         for guidance.
       </p>
-      <p><%= link_to "Authenticate with Twitter", "/auth/twitter" %></p>
-      <p><%= link_to "Authenticate with 37Signals (Basecamp)", "/auth/37signals" %></p>
-      <p><%= link_to "Authenticate with Github", "/auth/github" %></p>
+      <% if has_oauth_configuration_for('twitter') %>
+        <p><%= link_to "Authenticate with Twitter", "/auth/twitter" %></p>
+      <% end %>
+      <% if has_oauth_configuration_for('thirty_seven_signals') %>
+        <p><%= link_to "Authenticate with 37Signals (Basecamp)", "/auth/37signals" %></p>
+      <% end -%>
+      <% if has_oauth_configuration_for('github') %>
+        <p><%= link_to "Authenticate with Github", "/auth/github" %></p>
+      <% end -%>
       <hr>
 
       <div class='table-responsive'>
