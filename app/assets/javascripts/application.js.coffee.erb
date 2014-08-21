@@ -60,6 +60,10 @@ showEventDescriptions = ->
     $(".event-descriptions").html("").hide()
 
 $(document).ready ->
+  $('.navbar .dropdown.dropdown-hover').hover \
+    -> $(this).addClass('open'),
+    -> $(this).removeClass('open')
+
   # JSON Editor
   window.jsonEditor = setupJsonEditor()[0]
 
