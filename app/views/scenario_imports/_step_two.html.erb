@@ -30,7 +30,7 @@
     </div>
 
     <% if @scenario_import.parsed_data["description"].present? %>
-      <blockquote><%= @scenario_import.parsed_data["description"] %></blockquote>
+      <blockquote><%= markdown(@scenario_import.parsed_data["description"]) %></blockquote>
     <% end %>
 
   </div>

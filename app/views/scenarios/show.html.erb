@@ -6,7 +6,7 @@
       </div>
 
       <% if @scenario.description.present? %>
-        <blockquote><%= @scenario.description %></blockquote>
+        <blockquote><%= markdown(@scenario.description) %></blockquote>
       <% end %>
 
       <%= render 'agents/table', :returnTo => scenario_path(@scenario) %>
