@@ -38,6 +38,31 @@ module ActiveRecord::ConnectionAdapters
       def migration_keys
         super + [:charset, :collation]
       end
+
+      def utf8mb4_supported?
+        if @utf8mb4_supported.nil?
+          @utf8mb4_supported = !select("show character set like 'utf8mb4'").empty?
+        else
+          @utf8mb4_supported
+        end
+      end
+
+      def charset_collation(charset, collation)
+        [charset, collation].map { |name|
+          case name
+          when nil
+            nil
+          when /\A(utf8mb4(_\w*)?)\z/
+            if utf8mb4_supported?
+              $1
+            else
+              "utf8#{$2}"
+            end
+          else
+            name.to_s
+          end
+        }
+      end
     end
 
     prepend CharsetSupport
@@ -52,12 +77,14 @@ module ActiveRecord::ConnectionAdapters
         end
 
         def add_column_options!(sql, options)
-          if options[:charset]
-            sql << " CHARACTER SET #{options[:charset]}"
+          charset, collation = @conn.charset_collation(options[:charset], options[:collation])
+
+          if charset
+            sql << " CHARACTER SET #{charset}"
           end
 
-          if options[:collation]
-            sql << " COLLATE #{options[:collation]}"
+          if collation
+            sql << " COLLATE #{collation}"
           end
 
           super
