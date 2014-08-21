@@ -13,9 +13,8 @@
       <div class="alert alert-warning">
         <span class='glyphicon glyphicon-warning-sign'></span>
         This Scenario already exists in your system. The import will update your existing
-        <span class='label scenario' style="<%= style_colors(@scenario_import.existing_scenario) %>"><%= @scenario_import.existing_scenario.name %></span> Scenario's title
-        and
-        description. Below you can customize how the individual agents get updated.
+        <%= scenario_label(@scenario_import.existing_scenario) %> Scenario's title,
+        description and tag colors. Below you can customize how the individual agents get updated.
       </div>
     <% end %>
 

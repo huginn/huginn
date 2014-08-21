@@ -2,7 +2,8 @@
   <div class='row'>
     <div class='col-md-12'>
       <div class="page-header">
-        <h2><span class='label scenario' style="<%= style_colors(@scenario) %>"><%= @scenario.name %></span> <%= "Public" if @scenario.public? %> Scenario</h2>
+        <h2><%= scenario_label(@scenario) %> <%= "Public" if @scenario.public? %> Scenario</h2>
+
       </div>
 
       <% if @scenario.description.present? %>
