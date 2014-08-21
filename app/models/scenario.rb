@@ -10,8 +10,9 @@ class Scenario < ActiveRecord::Base
   validates_presence_of :name, :user
 
   validates_format_of :tag_fg_color, :tag_bg_color,
-    :with => /\A#(?:[0-9a-fA-F]{3}){1,2}\z/, :message => "must be a valid hex color."
     # Regex adapted from: http://stackoverflow.com/a/1636354/3130625
+    :with => /\A#(?:[0-9a-fA-F]{3}){1,2}\z/, :allow_nil => true,
+    :message => "must be a valid hex color."
 
   validate :agents_are_owned
 

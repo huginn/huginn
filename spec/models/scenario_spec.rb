@@ -5,15 +5,6 @@ describe Scenario do
 
   it_behaves_like HasGuid
 
-  describe "defaults" do
-    it "defaults the tag foreground color" do
-      new_instance.tag_fg_color.should == '#ffffff'
-    end
-    it "defaults the tag background color" do
-      new_instance.tag_bg_color.should == '#5bc0de'
-    end
-  end
-
   describe "validations" do
     before do
       new_instance.should be_valid
@@ -34,9 +25,19 @@ describe Scenario do
       new_instance.should_not be_valid
     end
 
+    it "allows nil tag_fg_color" do
+      new_instance.tag_fg_color = nil
+      new_instance.should be_valid
+    end
+
     it "validates tag_bg_color is hex color" do
       new_instance.tag_bg_color = '#N07H3X'
       new_instance.should_not be_valid
+    end
+
+    it "allows nil tag_bg_color" do
+      new_instance.tag_bg_color = nil
+      new_instance.should be_valid
     end
 
     it "only allows Agents owned by user" do
