@@ -72,7 +72,7 @@
             <% if @agent.can_be_scheduled? %>
               <p>
                 <b>Schedule:</b>
-                <%= (@agent.schedule || "n/a").humanize.titleize %>
+                <%= agent_schedule(@agent) %>
               </p>
 
               <p>
