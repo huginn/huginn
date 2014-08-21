@@ -1,3 +1,6 @@
+require 'faraday'
+require 'faraday_middleware'
+
 module WebRequestConcern
   extend ActiveSupport::Concern
 
@@ -21,9 +24,7 @@ module WebRequestConcern
     @faraday ||= Faraday.new { |builder|
       builder.headers = headers if headers.length > 0
 
-      if (user_agent = interpolated['user_agent']).present?
-        builder.headers[:user_agent] = user_agent
-      end
+      builder.headers[:user_agent] = user_agent
 
       builder.use FaradayMiddleware::FollowRedirects
       builder.request :url_encoded
@@ -57,5 +58,15 @@ module WebRequestConcern
 
   def faraday_backend
     ENV.fetch('FARADAY_HTTP_BACKEND', 'typhoeus').to_sym
+  end
+
+  def user_agent
+    interpolated['user_agent'].presence || self.class.default_user_agent
+  end
+
+  module ClassMethods
+    def default_user_agent
+      ENV.fetch('DEFAULT_HTTP_USER_AGENT', Faraday.new.headers[:user_agent])
+    end
   end
 end

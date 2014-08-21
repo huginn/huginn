@@ -12,7 +12,13 @@
   
   <% if user_signed_in? %>
     <ul class='nav navbar-nav'>
-      <%= nav_link "Agents", agents_path %>
+      <%= nav_link "Agents", agents_path do %>
+        <ul class='dropdown-menu' role='menu'>
+          <%= nav_link "New Agent", new_agent_path, glyphicon: "plus" %>
+          <%= nav_link "Run event propagation", propagate_agents_path, method: 'post', glyphicon: "refresh" %>
+          <%= nav_link "View Diagram", diagram_path, glyphicon: 'random' %>
+        </ul>
+      <% end %>
       <%= nav_link "Scenarios", scenarios_path %>
       <%= nav_link "Events", events_path %>
       <%= nav_link "Credentials", user_credentials_path %>

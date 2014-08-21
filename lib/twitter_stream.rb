@@ -11,7 +11,6 @@ class TwitterStream
 
   def stop
     @running = false
-    EventMachine::stop_event_loop if EventMachine.reactor_running?
   end
 
   def stream!(filters, agent, &block)
@@ -91,9 +90,13 @@ class TwitterStream
   def run
     while @running
       begin
-        agents = Agents::TwitterStreamAgent.all
+        agents = Agents::TwitterStreamAgent.active.all
 
         EventMachine::run do
+          EventMachine.add_periodic_timer(1) {
+            EventMachine::stop_event_loop if !@running
+          }
+
           EventMachine.add_periodic_timer(RELOAD_TIMEOUT) {
             puts "Reloading EventMachine and all Agents..."
             EventMachine::stop_event_loop
@@ -101,17 +104,14 @@ class TwitterStream
 
           if agents.length == 0
             puts "No agents found.  Will look again in a minute."
-            sleep 60
-            EventMachine::stop_event_loop
+            EventMachine.add_timer(60) {
+              EventMachine::stop_event_loop
+            }
           else
             puts "Found #{agents.length} agent(s).  Loading them now..."
             load_and_run agents
           end
         end
-
-        print "Pausing..."; STDOUT.flush
-        sleep 1
-        puts "done."
       rescue SignalException, SystemExit
         @running = false
         EventMachine::stop_event_loop if EventMachine.reactor_running?
