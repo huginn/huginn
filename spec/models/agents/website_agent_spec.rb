@@ -398,6 +398,58 @@ describe Agents::WebsiteAgent do
           event.payload['response']['title'].should == "hello!"
         end
       end
+
+      describe "text parsing" do
+        before do
+          stub_request(:any, /text-site/).to_return(body: <<-EOF, status: 200)
+water: wet
+fire: hot
+          EOF
+          site = {
+            'name' => 'Some Text Response',
+            'expected_update_period_in_days' => '2',
+            'type' => 'text',
+            'url' => 'http://text-site.com',
+            'mode' => 'on_change',
+            'extract' => {
+              'word' => { 'regexp' => '^(.+?): (.+)$', index: 1 },
+              'property' => { 'regexp' => '^(.+?): (.+)$', index: 2 },
+            }
+          }
+          @checker = Agents::WebsiteAgent.new(name: 'Text Site', options: site)
+          @checker.user = users(:bob)
+          @checker.save!
+        end
+
+        it "works with regexp" do
+          @checker.options = @checker.options.merge('extract' => {
+            'word' => { 'regexp' => '^(?<word>.+?): (?<property>.+)$', index: 'word' },
+            'property' => { 'regexp' => '^(?<word>.+?): (?<property>.+)$', index: 'property' },
+          })
+
+          lambda {
+            @checker.check
+          }.should change { Event.count }.by(2)
+
+          event1, event2 = Event.last(2)
+          event1.payload['word'].should == 'water'
+          event1.payload['property'].should == 'wet'
+          event2.payload['word'].should == 'fire'
+          event2.payload['property'].should == 'hot'
+        end
+
+        it "works with regexp with named capture" do
+          lambda {
+            @checker.check
+          }.should change { Event.count }.by(2)
+
+          event1, event2 = Event.last(2)
+          event1.payload['word'].should == 'water'
+          event1.payload['property'].should == 'wet'
+          event2.payload['word'].should == 'fire'
+          event2.payload['property'].should == 'hot'
+        end
+      end
     end
 
     describe "#receive" do
