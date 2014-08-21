@@ -57,8 +57,10 @@ module Agents
       To extract the whole content as one event:
 
           "extract": {
-            "content": { "regexp": "\A(?:.|\n)*\z", index: 0 },
+            "content": { "regexp": "\A(?m:.)*\z", index: 0 },
           }
+
+      Beware that `.` does not match the newline character (LF) unless the `m` flag is in effect, and `^`/`$` basically match every line beginning/end.  See [this document](http://ruby-doc.org/core-#{RUBY_VERSION}/doc/regexp_rdoc.html) to learn the regular expression variant used in this service.
 
       Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
 
