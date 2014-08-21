@@ -1,12 +1,14 @@
 language: ruby
 cache: bundler
 bundler_args: --without development production
+env:
+  - APP_SECRET_TOKEN=b2724973fd81c2f4ac0f92ac48eb3f0152c4a11824c122bcf783419a4c51d8b9bba81c8ba6a66c7de599677c7f486242cf819775c433908e77c739c5c8ae118d
 rvm:
   - 2.0.0
   - 2.1.1
   - 1.9.3
 before_install:
-  - travis_retry gem install bundler  
+  - travis_retry gem install bundler
 before_script:
   - mysql -e 'create database huginn_test;'
   - bundle exec rake db:migrate db:test:prepare
