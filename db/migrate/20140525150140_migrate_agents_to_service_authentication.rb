@@ -26,6 +26,7 @@ class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration
       agent.service_id = service.id
       agent.save!(validate: false)
     end
+    migrated = false
     if agents.length > 0
       puts <<-EOF.strip_heredoc
 
@@ -36,6 +37,7 @@ class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration
 
 
       EOF
+      migrated = true
     end
     if Agent.where(type: ['Agents::BasecampAgent']).count > 0
       puts <<-EOF.strip_heredoc
@@ -45,7 +47,9 @@ class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration
 
 
       EOF
+      migrated = true
     end
+    sleep 20 if migrated
   end
 
   def down

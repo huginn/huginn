@@ -1,4 +1,5 @@
 <% if user_signed_in? %>
+  <%= render "upgrade_warning" %>
   <%= render "signed_in_index" %>
 <% else %>
   <%= render "signed_out_index" %>
