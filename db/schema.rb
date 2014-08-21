@@ -164,7 +164,7 @@ ActiveRecord::Schema.define(version: 20140813110107) do
     t.integer  "failed_attempts",                    default: 0
     t.string   "unlock_token"
     t.datetime "locked_at"
-    t.string   "username",               limit: 191,                 null: false, charset: "utf8mb4", collation: "utf8mb4_general_ci"
+    t.string   "username",               limit: 191,                 null: false, charset: "utf8mb4", collation: "utf8mb4_unicode_ci"
     t.string   "invitation_code",                                    null: false,                     collation: "utf8_bin"
     t.integer  "scenario_count",                     default: 0,     null: false
   end

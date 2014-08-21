@@ -40,10 +40,10 @@ class SetCharsetForMysql < ActiveRecord::Migration
 
             case type
             when :string, :text
-              options.update(charset: 'utf8', collation: 'utf8_general_ci')
+              options.update(charset: 'utf8', collation: 'utf8_unicode_ci')
               case name
               when 'username'
-                options.update(limit: 767 / 4, charset: 'utf8mb4', collation: 'utf8mb4_general_ci')
+                options.update(limit: 767 / 4, charset: 'utf8mb4', collation: 'utf8mb4_unicode_ci')
               when 'message', 'options', 'name', 'memory',
                    'handler', 'last_error', 'payload', 'description'
                 options.update(charset: 'utf8mb4', collation: 'utf8mb4_bin')
@@ -60,10 +60,10 @@ class SetCharsetForMysql < ActiveRecord::Migration
             change_column table_name, name, type, options
           }
 
-          execute 'ALTER TABLE %s CHARACTER SET utf8 COLLATE utf8_general_ci' % table_name
+          execute 'ALTER TABLE %s CHARACTER SET utf8 COLLATE utf8_unicode_ci' % table_name
         }
 
-        execute 'ALTER DATABASE %s CHARACTER SET utf8 COLLATE utf8_general_ci' % conn.current_database
+        execute 'ALTER DATABASE %s CHARACTER SET utf8 COLLATE utf8_unicode_ci' % conn.current_database
       end
 
       dir.down do
