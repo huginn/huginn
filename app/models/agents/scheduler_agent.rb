@@ -66,24 +66,5 @@ module Agents
     before_save do
       self.memory.delete('scheduled_at') if self.options_changed?
     end
-
-    def scheduler_tag
-      '%s#%d' % [self.class.name, id]
-    end
-
-    class << self
-      def scheduler_tag_to_id(tag)
-        case tag
-        when /\A#{Regexp.quote(self.name)}\#(\d+)\z/o
-          $1.to_i
-        end
-      end
-
-      def from_scheduler_tag(tag)
-        if id = scheduler_tag_to_id
-          find_by(id: id)
-        end
-      end
-    end
   end
 end

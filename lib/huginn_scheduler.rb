@@ -4,13 +4,14 @@ class Rufus::Scheduler
   SCHEDULER_AGENT_TAG = Agents::SchedulerAgent.name
 
   class Job
-    # Extract an ID of SchedulerAgent if a matching tag is found.
+    # Store an ID of SchedulerAgent in this job.
+    def scheduler_agent_id= id
+      self[:scheduler_agent_id] = id
+    end
+
+    # Extract an ID of SchedulerAgent if any.
     def scheduler_agent_id
-      tags.each { |tag|
-        if agent_id = Agents::SchedulerAgent.scheduler_tag_to_id(tag)
-          return agent_id
-        end
-      }
+      self[:scheduler_agent_id]
     end
 
     # Return a SchedulerAgent tied to this job.  Return nil if it is
@@ -29,7 +30,9 @@ class Rufus::Scheduler
 
   # Get a job tied to a given SchedulerAgent
   def scheduler_agent_job(agent)
-    jobs(tags: [SCHEDULER_AGENT_TAG, agent.scheduler_tag]).first
+    scheduler_agent_jobs.find { |job|
+      job[:scheduler_agent_id] == agent.id
+    }
   end
 
   # Schedule or reschedule a job for a given SchedulerAgent and return
@@ -52,7 +55,11 @@ class Rufus::Scheduler
         puts "Scheduling SchedulerAgent##{agent.id}"
       end
 
-      job = schedule_cron agent.options['schedule'], tags: [SCHEDULER_AGENT_TAG, agent.scheduler_tag] do |job|
+      agent_id = agent.id
+
+      job = schedule_cron agent.options['schedule'], tag: SCHEDULER_AGENT_TAG do |job|
+        job.scheduler_agent_id = agent_id
+
         if scheduler_agent = job.scheduler_agent
           scheduler_agent.check!
         else
