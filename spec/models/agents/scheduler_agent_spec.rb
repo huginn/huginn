@@ -4,6 +4,7 @@ describe Agents::SchedulerAgent do
   before do
     @agent = Agents::SchedulerAgent.new(name: 'Example', options: { 'schedule' => '0 * * * *' })
     @agent.user = users(:bob)
+    @agent.save
   end
 
   describe "validation" do
@@ -33,6 +34,22 @@ describe Agents::SchedulerAgent do
 
       @agent.options['schedule'] = '*/1 * * *'
       @agent.should_not be_valid
+    end
+  end
+
+  describe "save" do
+    it "should delete memory['scheduled_at'] if and only if options is changed" do
+      time = Time.now.to_i
+
+      @agent.memory['scheduled_at'] = time
+      @agent.save
+      @agent.memory['scheduled_at'].should == time
+
+      @agent.memory['scheduled_at'] = time
+      # Currently @agent.options[]= is not detected
+      @agent.options = { 'schedule' => '*/5 * * * *' }
+      @agent.save
+      @agent.memory['scheduled_at'].should be_nil
     end
   end
 
