@@ -8,7 +8,11 @@ module Agents
     cannot_receive_events!
     cannot_create_events!
 
-    description <<-MD
+    @@second_precision_enabled = ENV['ENABLE_SECOND_PRECISION_SCHEDULE'] == 'true'
+
+    cattr_reader :second_precision_enabled
+
+    description <<-MD % { seconds: (<<-MD_SECONDS if second_precision_enabled) }
       This agent periodically triggers a run of each target Agent according to a user-defined schedule.
 
       # Targets
@@ -34,11 +38,7 @@ module Agents
 
       * `0 22 * * 1-5 Etc/GMT+2`: every day of the week when it's 22:00 in GMT+2
 
-      ## Seconds
-
-      You can optionally specify seconds before the minute field.
-
-      * `*/30 * * * * *`: every 30 seconds
+      %{seconds}
 
       ## Last day of month
 
@@ -61,6 +61,14 @@ module Agents
       * `0 22 * * Sun#L1`: every last Sunday of the month, at 22:00
     MD
 
+      ## Seconds
+
+      You can optionally specify seconds before the minute field.
+
+      * `*/30 * * * * *`: every 30 seconds
+
+    MD_SECONDS
+
     def default_options
       super.update({
         'schedule' => '0 * * * *',
@@ -78,7 +86,10 @@ module Agents
     def validate_options
       if (spec = options['schedule']).present?
         begin
-          Rufus::Scheduler::CronLine.new(spec)
+          cron = Rufus::Scheduler::CronLine.new(spec)
+          if !second_precision_enabled && cron.seconds != [0]
+            errors.add(:base, "second precision schedule is not allowed in this service")
+          end
         rescue ArgumentError
           errors.add(:base, "invalid schedule")
         end
