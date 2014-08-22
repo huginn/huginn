@@ -43,26 +43,26 @@
           <div class="schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
             <div class="can-be-scheduled">
               <div class="form-group">
-                <%= f.label :runners %>
-                <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run by user-defined ScheduleAgents."></span>
-                <% eventRunners = current_user.agents.select(&:can_run_other_agents?) %>
-                <%= f.select(:runner_ids,
-                               options_for_select(eventRunners.map {|s| [s.name, s.id] },
-                                                  @agent.runner_ids),
-                               {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
+                <%= f.label :controllers %>
+                <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run by user-defined Agents."></span>
+                <% eventControllers = current_user.agents.select(&:can_control_other_agents?) %>
+                <%= f.select(:controller_ids,
+                             options_for_select(eventControllers.map {|s| [s.name, s.id] },
+                                                @agent.controller_ids),
+                             {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
               </div>
             </div>
           </div>
 
-          <div class="chain-region" data-can-run-other-agents="<%= @agent.can_run_other_agents? %>">
-            <div class="can-run-other-agents">
+          <div class="chain-region" data-can-control-other-agents="<%= @agent.can_control_other_agents? %>">
+            <div class="can-control-other-agents">
               <div class="form-group">
                 <%= f.label :targets %>
                 <% eventTargets = current_user.agents.select(&:can_be_scheduled?) %>
                 <%= f.select(:target_ids,
-                               options_for_select(eventTargets.map {|s| [s.name, s.id] },
-                                                  @agent.target_ids),
-                               {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
+                             options_for_select(eventTargets.map {|s| [s.name, s.id] },
+                                                @agent.target_ids),
+                             {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
               </div>
             </div>
           </div>

@@ -134,7 +134,7 @@
               </p>
             <% end %>
 
-            <% if @agent.can_run_other_agents? %>
+            <% if @agent.can_control_other_agents? %>
               <p>
                 <b>Targets:</b>
                 <% if (agents = @agent.targets).length > 0 %>

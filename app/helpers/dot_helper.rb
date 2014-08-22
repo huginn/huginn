@@ -138,9 +138,9 @@ module DotHelper
       def agent_edge(agent, receiver)
         edge(agent_id[agent],
              agent_id[receiver],
-             style: ('dashed' unless agent.can_run_other_agents? || !receiver.propagate_immediately?),
-             label: (' runs ' if agent.can_run_other_agents?),
-             arrowhead: ('empty' if agent.can_run_other_agents?),
+             style: ('dashed' unless agent.can_control_other_agents? || !receiver.propagate_immediately?),
+             label: (" #{agent.control_action}s " if agent.can_control_other_agents?),
+             arrowhead: ('empty' if agent.can_control_other_agents?),
              color: (@disabled if agent.disabled? || receiver.disabled?))
       end
 
@@ -162,7 +162,7 @@ module DotHelper
 
           [
             *agent.receivers,
-            *(agent.targets if agent.can_run_other_agents?)
+            *(agent.targets if agent.can_control_other_agents?)
           ].each { |receiver|
             agent_edge(agent, receiver) if agents.include?(receiver)
           }

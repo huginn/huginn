@@ -2,10 +2,11 @@ require 'rufus-scheduler'
 
 module Agents
   class SchedulerAgent < Agent
+    include AgentControllerConcern
+
     cannot_be_scheduled!
     cannot_receive_events!
     cannot_create_events!
-    can_run_other_agents!
 
     description <<-MD
       This agent periodically triggers a run of each target Agent according to a user-defined schedule.
@@ -37,7 +38,9 @@ module Agents
     MD
 
     def default_options
-      { 'schedule' => '0 * * * *' }
+      super.update({
+        'schedule' => '0 * * * *',
+      })
     end
 
     def working?
@@ -45,10 +48,7 @@ module Agents
     end
 
     def check!
-      targets.active.each { |target|
-        log "Agent run queued for '#{target.name}'"
-        Agent.async_check(target.id)
-      }
+      control_targets!
     end
 
     def validate_options

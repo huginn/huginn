@@ -19,10 +19,10 @@ module AgentHelper
   def agent_schedule(agent, delimiter = ', ')
     return 'n/a' unless agent.can_be_scheduled?
 
-    runners = agent.runners
+    controllers = agent.controllers
     [
-      *(CGI.escape_html(agent.schedule.humanize.titleize) unless agent.schedule == 'never' && agent.runners.count > 0),
-      *runners.map { |agent| link_to(agent.name, agent_path(agent)) },
+      *(CGI.escape_html(agent.schedule.humanize.titleize) unless agent.schedule == 'never' && agent.controllers.count > 0),
+      *controllers.map { |agent| link_to(agent.name, agent_path(agent)) },
     ].join(delimiter).html_safe
   end
 end

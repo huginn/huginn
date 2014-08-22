@@ -170,7 +170,7 @@ $(document).ready ->
         else
           hideLinks()
 
-        if json.can_run_other_agents
+        if json.can_control_other_agents
           showChains()
         else
           hideChains()
@@ -206,7 +206,7 @@ $(document).ready ->
       hideLinks()
 
   if $(".chain-region")
-    if $(".chain-region").data("can-run-other-agents") == true
+    if $(".chain-region").data("can-control-other-agents") == true
       showChains()
     else
       hideChains()

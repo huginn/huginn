@@ -497,15 +497,15 @@ describe Agent do
         agent.should have(0).errors_on(:sources)
       end
 
-      it "should not allow runner agents owned by other people" do
+      it "should not allow controller agents owned by other people" do
         agent = Agents::SomethingSource.new(:name => "something")
         agent.user = users(:bob)
-        agent.runner_ids = [agents(:bob_weather_agent).id]
-        agent.should have(0).errors_on(:runners)
-        agent.runner_ids = [agents(:jane_weather_agent).id]
-        agent.should have(1).errors_on(:runners)
+        agent.controller_ids = [agents(:bob_weather_agent).id]
+        agent.should have(0).errors_on(:controllers)
+        agent.controller_ids = [agents(:jane_weather_agent).id]
+        agent.should have(1).errors_on(:controllers)
         agent.user = users(:jane)
-        agent.should have(0).errors_on(:runners)
+        agent.should have(0).errors_on(:controllers)
       end
 
       it "should not allow target agents owned by other people" do
