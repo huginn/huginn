@@ -8,6 +8,18 @@ describe Agents::SchedulerAgent do
   end
 
   describe "validation" do
+    it "should validate action" do
+      ['run', 'enable', 'disable', '', nil].each { |action|
+        @agent.options['action'] = action
+        @agent.should be_valid
+      }
+
+      ['delete', 1, true].each { |action|
+        @agent.options['action'] = action
+        @agent.should_not be_valid
+      }
+    end
+
     it "should validate schedule" do
       @agent.should be_valid
 
@@ -45,6 +57,20 @@ describe Agents::SchedulerAgent do
     end
   end
 
+  describe 'control_action' do
+    it "should be one of the supported values" do
+      ['run', '', nil].each { |action|
+        @agent.options['action'] = action
+        @agent.control_action.should == 'run'
+      }
+
+      ['enable', 'disable'].each { |action|
+        @agent.options['action'] = action
+        @agent.control_action.should == action
+      }
+    end
+  end
+
   describe "save" do
     it "should delete memory['scheduled_at'] if and only if options is changed" do
       time = Time.now.to_i
@@ -62,7 +88,7 @@ describe Agents::SchedulerAgent do
   end
 
   describe "check!" do
-    it "should run targets" do
+    it "should control targets" do
       targets = [agents(:bob_website_agent), agents(:bob_weather_agent)]
       @agent.targets = targets
       @agent.save!
@@ -74,6 +100,18 @@ describe Agents::SchedulerAgent do
 
       @agent.check!
       target_ids.should be_empty
+
+      @agent.options['action'] = 'disable'
+      @agent.save!
+
+      @agent.check!
+      targets.all? { |target| target.disabled? }
+
+      @agent.options['action'] = 'enable'
+      @agent.save!
+
+      @agent.check!
+      targets.all? { |target| !target.disabled? }
     end
   end
 end

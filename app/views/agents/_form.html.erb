@@ -44,7 +44,7 @@
             <div class="can-be-scheduled">
               <div class="form-group">
                 <%= f.label :controllers %>
-                <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run by user-defined Agents."></span>
+                <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run or controlled by user-defined Agents."></span>
                 <% eventControllers = current_user.agents.select(&:can_control_other_agents?) %>
                 <%= f.select(:controller_ids,
                              options_for_select(eventControllers.map {|s| [s.name, s.id] },

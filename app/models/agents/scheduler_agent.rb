@@ -13,7 +13,17 @@ module Agents
     cattr_reader :second_precision_enabled
 
     description <<-MD % { seconds: (<<-MD_SECONDS if second_precision_enabled) }
-      This agent periodically triggers a run of each target Agent according to a user-defined schedule.
+      This agent periodically takes an action on target Agents according to a user-defined schedule.
+
+      # Action types
+
+      Set `action` to one of the action types below:
+
+      * `run`: This is the default.  Target Agents are run at intervals.
+
+      * `disable`: Target Agents are disabled (if not) at intervals.
+
+      * `enable`: Target Agents are enabled (if not) at intervals.
 
       # Targets
 
