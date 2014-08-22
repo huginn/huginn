@@ -21,6 +21,7 @@
         <% @scenarios.each do |scenario| %>
           <tr>
             <td>
+              <%= scenario_label(scenario, content_tag(:i, '', class: 'glyphicon glyphicon-font')) %>
               <%= link_to(scenario.name, scenario) %>
             </td>
             <td><%= link_to pluralize(scenario.agents.count, "agent"), scenario %></td>

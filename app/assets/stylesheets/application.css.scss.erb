@@ -12,6 +12,7 @@
  *= require select2-bootstrap
  *= require jquery.json-editor
  *= require rickshaw
+ *= require spectrum
  *= require_tree .
  *= require_self
  */
@@ -185,4 +186,18 @@ h2 .scenario, a span.label.scenario {
 
 .color-success {
   color: #5cb85c;
+}
+
+.form-group {
+  .sp-replacer {
+    @extend .form-control;
+  }
+
+  .sp-preview {
+    width: 100%;
+  }
+
+  .sp-dd {
+    display: none;
+  }
 }

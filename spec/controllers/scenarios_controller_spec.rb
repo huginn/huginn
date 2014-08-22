@@ -50,6 +50,8 @@ describe ScenariosController do
       assigns(:exporter).options[:description].should == scenarios(:bob_weather).description
       assigns(:exporter).options[:agents].should == scenarios(:bob_weather).agents
       assigns(:exporter).options[:guid].should == scenarios(:bob_weather).guid
+      assigns(:exporter).options[:tag_fg_color].should == scenarios(:bob_weather).tag_fg_color
+      assigns(:exporter).options[:tag_bg_color].should == scenarios(:bob_weather).tag_bg_color
       assigns(:exporter).options[:source_url].should be_falsey
       response.headers['Content-Disposition'].should == 'attachment; filename="bob-s-weather-alert-scenario.json"'
       response.headers['Content-Type'].should == 'application/json; charset=utf-8'
