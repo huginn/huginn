@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140605032822) do
+ActiveRecord::Schema.define(version: 20140820003139) do
 
   create_table "agent_logs", force: true do |t|
     t.integer  "agent_id",                                       null: false
@@ -111,6 +111,8 @@ ActiveRecord::Schema.define(version: 20140605032822) do
     t.boolean  "public",      default: false, null: false
     t.string   "guid",                        null: false
     t.string   "source_url"
+    t.string   "tag_bg_color"
+    t.string   "tag_fg_color"
   end
 
   add_index "scenarios", ["user_id", "guid"], name: "index_scenarios_on_user_id_and_guid", unique: true, using: :btree

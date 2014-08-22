@@ -45,6 +45,8 @@ class ScenariosController < ApplicationController
     @exporter = AgentsExporter.new(:name => @scenario.name,
                                    :description => @scenario.description,
                                    :guid => @scenario.guid,
+                                   :tag_fg_color => @scenario.tag_fg_color,
+                                   :tag_bg_color => @scenario.tag_bg_color,
                                    :source_url => @scenario.public? && export_scenario_url(@scenario),
                                    :agents => @scenario.agents)
     response.headers['Content-Disposition'] = 'attachment; filename="' + @exporter.filename + '"'
