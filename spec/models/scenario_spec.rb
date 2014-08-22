@@ -23,6 +23,8 @@ describe Scenario do
     it "validates tag_fg_color is hex color" do
       new_instance.tag_fg_color = '#N07H3X'
       new_instance.should_not be_valid
+      new_instance.tag_fg_color = '#BADA55'
+      new_instance.should be_valid
     end
 
     it "allows nil tag_fg_color" do
@@ -33,6 +35,8 @@ describe Scenario do
     it "validates tag_bg_color is hex color" do
       new_instance.tag_bg_color = '#N07H3X'
       new_instance.should_not be_valid
+      new_instance.tag_bg_color = '#BADA55'
+      new_instance.should be_valid
     end
 
     it "allows nil tag_bg_color" do
