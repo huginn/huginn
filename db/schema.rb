@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140821155428) do
+ActiveRecord::Schema.define(version: 20140821115428) do
 
   create_table "agent_logs", force: true do |t|
     t.integer  "agent_id",                                       null: false
