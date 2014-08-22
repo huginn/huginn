@@ -11,30 +11,54 @@ module Agents
     description <<-MD
       This agent periodically triggers a run of each target Agent according to a user-defined schedule.
 
-      Select target Agents and set a cron-style schedule to `schedule`.
-      In the traditional cron format, a schedule part consists of these five columns: `minute hour day-of-month month day-of-week`.
+      # Targets
+
+      Select Agents that you want to run periodically by this SchedulerAgent.
+
+      # Schedule
+
+      Set `schedule` to a schedule specification in the [cron](http://en.wikipedia.org/wiki/Cron) format.
+      For example:
 
       * `0 22 * * 1-5`: every day of the week at 22:00 (10pm)
 
-      In this variant, you can also specify seconds:
+      * `*/10 8-11 * * *`: every 10 minutes from 8:00 to and not including 12:00
 
-      * `30 0 22 * * 1-5`: every day of the week at 22:00:30
+      This variant has several extensions as explained below.
 
-      And timezones:
+      ## Timezones
+
+      You can optionally specify a timezone (default: `#{Time.zone.name}`) after the day-of-week field.
 
       * `0 22 * * 1-5 Europe/Paris`: every day of the week when it's 22:00 in Paris
 
       * `0 22 * * 1-5 Etc/GMT+2`: every day of the week when it's 22:00 in GMT+2
 
-      There's also a way to specify "last day of month":
+      ## Seconds
+
+      You can optionally specify seconds before the minute field.
+
+      * `*/30 * * * * *`: every 30 seconds
+
+      ## Last day of month
+
+      `L` signifies "last day of month" in `day-of-month`.
 
       * `0 22 L * *`: every month on the last day at 22:00
 
-      And "monthdays":
+      ## Weekday names
 
-      * `0 22 * * sun#1,sun#2`: every first and second sunday of the month, at 22:00
+      You can use three letter names instead of numbers in the `weekdays` field.
 
-      * `0 22 * * sun#L1`: every last sunday of the month, at 22:00
+      * `0 22 * * Sat,Sun`: every Saturday and Sunday, at 22:00
+
+      ## Nth weekday of the month
+
+      You can specify "nth weekday of the month" like this.
+
+      * `0 22 * * Sun#1,Sun#2`: every first and second Sunday of the month, at 22:00
+
+      * `0 22 * * Sun#L1`: every last Sunday of the month, at 22:00
     MD
 
     def default_options
