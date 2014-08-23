@@ -38,7 +38,7 @@ module AgentControllerConcern
           target.update!(disable: true) unless target.disabled?
         end
       rescue => e
-        log "Failed to #{control_action} '#{target.name}': #{e.message}"
+        error "Failed to #{control_action} '#{target.name}': #{e.message}"
       end
     }
   end
