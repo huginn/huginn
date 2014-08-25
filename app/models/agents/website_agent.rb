@@ -78,7 +78,11 @@ module Agents
     MD
 
     event_description do
-      "Events will have the fields you specified.  Your options look like:\n\n    #{Utils.pretty_print interpolated['extract']}"
+      "Events will have the following fields:\n\n    %s" % [
+        Utils.pretty_print(Hash[options['extract'].keys.map { |key|
+          [key, "..."]
+        }])
+      ]
     end
 
     def working?
