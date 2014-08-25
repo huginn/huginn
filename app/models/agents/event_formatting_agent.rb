@@ -80,7 +80,19 @@ module Agents
           }
     MD
 
-    event_description "User defined"
+    event_description do
+      "Events will have the following fields%s:\n\n    %s" % [
+        case options['mode'].to_s
+        when 'merged'
+          ', merged with the original contents'
+        when /\{/
+          ', conditionally merged with the original contents'
+        end,
+        Utils.pretty_print(Hash[options['instructions'].keys.map { |key|
+          [key, "..."]
+        }])
+      ]
+    end
 
     after_save :clear_matchers
 
