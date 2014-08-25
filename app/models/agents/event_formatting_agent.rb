@@ -51,7 +51,7 @@ module Agents
               {
                 "path": "{{date.pretty}}",
                 "regexp": "\\A(?<time>\\d\\d:\\d\\d [AP]M [A-Z]+)",
-                "to": "pretty_date",
+                "to": "pretty_date"
               }
             ]
           }
@@ -61,7 +61,7 @@ module Agents
           "pretty_date": {
             "time": "10:00 PM EST",
             "0": "10:00 PM EST on January 11, 2013"
-            "1": "10:00 PM EST",
+            "1": "10:00 PM EST"
           }
 
       So you can use it in `instructions` like this:
