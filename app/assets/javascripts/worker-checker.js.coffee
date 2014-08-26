@@ -1,22 +1,29 @@
 $ ->
   firstEventCount = null
+  previousJobs = null
 
-  if $("#job-indicator").length
+  if $(".job-indicator").length
     check = ->
       $.getJSON "/worker_status", (json) ->
+        for method in ['pending', 'awaiting_retry', 'recent_failures']
+          count = json[method]
+          elem = $(".job-indicator[role=#{method}]")
+          if count > 0
+            tooltipOptions = {
+              title: "#{count} jobs #{method.split('_').join(' ')}"
+              delay: 0
+              placement: "bottom"
+              trigger: "hover"
+            }
+            if elem.is(":visible")
+              elem.tooltip('destroy').tooltip(tooltipOptions).find(".number").text(count)
+            else
+              elem.tooltip('destroy').tooltip(tooltipOptions).fadeIn().find(".number").text(count)
+          else
+            if elem.is(":visible")
+              elem.tooltip('destroy').fadeOut()
+
         firstEventCount = json.event_count unless firstEventCount?
-
-        if json.pending? && json.pending > 0
-          tooltipOptions = {
-            title: "#{json.pending} jobs pending, #{json.awaiting_retry} awaiting retry, and #{json.recent_failures} recent failures"
-            delay: 0
-            placement: "bottom"
-            trigger: "hover"
-          }
-          $("#job-indicator").tooltip('destroy').tooltip(tooltipOptions).fadeIn().find(".number").text(json.pending)
-        else
-          $("#job-indicator:visible").tooltip('destroy').fadeOut()
-
         if firstEventCount? && json.event_count > firstEventCount
           $("#event-indicator").tooltip('destroy').
                                 tooltip(title: "Click to reload", delay: 0, placement: "bottom", trigger: "hover").
@@ -25,6 +32,12 @@ $ ->
                                 text(json.event_count - firstEventCount)
         else
           $("#event-indicator").tooltip('destroy').fadeOut()
+
+        currentJobs = [json.pending, json.awaiting_retry, json.recent_failures]
+        if document.location.pathname == '/jobs' && previousJobs? && previousJobs.join(',') != currentJobs.join(',')
+          $.get '/jobs', (data) =>
+            $("#main-content").html(data)
+        previousJobs = currentJobs
 
         window.workerCheckTimeout = setTimeout check, 2000
 

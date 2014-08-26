@@ -11,3 +11,4 @@ jane:
   username: jane
   invitation_code: <%= User::INVITATION_CODES.last %>
   scenario_count: 1
+  admin: true

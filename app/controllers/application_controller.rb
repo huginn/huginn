@@ -14,6 +14,10 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.for(:account_update) { |u| u.permit(:username, :email, :password, :password_confirmation, :current_password) }
   end
 
+  def authenticate_admin!
+    redirect_to root_path unless current_user && current_user.admin
+  end
+
   def upgrade_warning
     return unless current_user
     twitter_oauth_check
