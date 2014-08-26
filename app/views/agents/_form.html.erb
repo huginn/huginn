@@ -25,9 +25,13 @@
             </div>
           <% end %>
 
-          <div class="form-group">
+          <div class="form-group type-select">
             <%= f.label :name %>
             <%= f.text_field :name, :class => 'form-control' %>
+          </div>
+
+          <div class='oauthable-form'>
+            <%= render partial: 'oauth_dropdown' %>
           </div>
 
           <div class="form-group">

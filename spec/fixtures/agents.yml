@@ -109,3 +109,15 @@ bob_manual_event_agent:
   user: bob
   name: "Bob's event testing agent"
   guid: <%= SecureRandom.hex %>
+
+bob_basecamp_agent:
+  type: Agents::BasecampAgent
+  user: bob
+  service: generic
+  guid: <%= SecureRandom.hex %>
+
+jane_basecamp_agent:
+  type: Agents::BasecampAgent
+  user: jane
+  service: generic
+  guid: <%= SecureRandom.hex %>

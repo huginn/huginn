@@ -191,12 +191,33 @@ GEM
     net-ftp-list (3.2.8)
     nokogiri (1.6.3.1)
       mini_portile (= 0.6.0)
+    oauth (0.4.7)
     oauth2 (0.9.4)
       faraday (>= 0.8, < 0.10)
       jwt (~> 1.0)
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (~> 1.2)
+    omniauth (1.2.2)
+      hashie (>= 1.2, < 4)
+      rack (~> 1.0)
+    omniauth-37signals (1.0.5)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.0)
+    omniauth-github (1.1.2)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.1)
+    omniauth-oauth (1.0.1)
+      oauth
+      omniauth (~> 1.0)
+    omniauth-oauth2 (1.1.2)
+      faraday (>= 0.8, < 0.10)
+      multi_json (~> 1.3)
+      oauth2 (~> 0.9.3)
+      omniauth (~> 1.2)
+    omniauth-twitter (1.0.1)
+      multi_json (~> 1.3)
+      omniauth-oauth (~> 1.0)
     orm_adapter (0.5.0)
     pg (0.17.1)
     polyglot (0.3.5)
@@ -402,6 +423,10 @@ DEPENDENCIES
   mysql2 (~> 0.3.16)
   net-ftp-list (~> 3.2.8)
   nokogiri (~> 1.6.1)
+  omniauth
+  omniauth-37signals
+  omniauth-github
+  omniauth-twitter
   pg
   protected_attributes (~> 1.0.8)
   pry

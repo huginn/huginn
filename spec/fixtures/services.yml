@@ -1,0 +1,17 @@
+generic:
+  token: 1234token
+  secret: 56789secret
+  refresh_token: refresh12345
+  provider: testprovider
+  name: test
+  expires_at: <%= Time.parse("2015-01-01 00:00:00") %>
+  options: <%= { user_id: 12345 }.to_yaml.inspect %>
+  user: bob
+global:
+  token: 1234token
+  provider: testprovider
+  name: test
+  expires_at: <%= Time.parse("2015-01-01 00:00:00") %>
+  options: <%= { user_id: 12345 }.to_yaml.inspect %>
+  user: jane
+  global: true

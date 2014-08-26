@@ -119,6 +119,17 @@
           </div>
         <% end %>
       </div>
+
+      <% if agent_diff.requires_service? %>
+        <div class='row'>
+          <div class='col-md-4'>
+            <div class="form-group type-select">
+              <%= label_tag "scenario_import[merges][#{index}][service_id]", 'Service' %>
+              <%= select_tag "scenario_import[merges][#{index}][service_id]", options_for_select(agent_diff.agent_instance.valid_services_for(current_user).collect { |s| ["(#{s.provider}) #{s.name}", s.id]}, agent_diff.agent.try(:service_id)), class: 'form-control' %>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
   <% end %>
 </div>
