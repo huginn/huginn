@@ -471,7 +471,7 @@ fire: hot
 
         lambda {
           @valid_options['extract']['site_title'] = {
-            'css' => "#comic img", 'value' => "'{{title}}'"
+            'css' => "#comic img", 'value' => "{{title | to_xpath }}"
           }
           @checker.options = @valid_options
           @checker.receive([@event])
