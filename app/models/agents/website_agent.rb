@@ -161,78 +161,46 @@ module Agents
               log "Storing new result for '#{name}': #{doc.inspect}"
               create_event :payload => doc
             end
-          else
-            output = {}
-            interpolated['extract'].each do |name, extraction_details|
-              case extraction_type
-              when "text"
-                regexp = Regexp.new(extraction_details['regexp'])
-                result = []
-                doc.scan(regexp) {
-                  result << Regexp.last_match[extraction_details['index']]
-                }
-                log "Extracting #{extraction_type} at #{regexp}: #{result}"
-              when "json"
-                result = Utils.values_at(doc, extraction_details['path'])
-                log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
-              else
-                case
-                when css = extraction_details['css']
-                  nodes = doc.css(css)
-                when xpath = extraction_details['xpath']
-                  doc.remove_namespaces! # ignore xmlns, useful when parsing atom feeds
-                  nodes = doc.xpath(xpath)
-                else
-                  error '"css" or "xpath" is required for HTML or XML extraction'
-                  return
-                end
-                case nodes
-                when Nokogiri::XML::NodeSet
-                  result = nodes.map { |node|
-                    case value = node.xpath(extraction_details['value'])
-                    when Float
-                      # Node#xpath() returns any numeric value as float;
-                      # convert it to integer as appropriate.
-                      value = value.to_i if value.to_i == value
-                    end
-                    value.to_s
-                  }
-                else
-                  error "The result of HTML/XML extraction was not a NodeSet"
-                  return
-                end
-                log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
-              end
-              output[name] = result
+            next
+          end
+
+          output =
+            case extraction_type
+            when 'json'
+              extract_json(doc)
+            when 'text'
+              extract_text(doc)
+            else
+              extract_xml(doc)
             end
 
-            num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
+          num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
 
-            if num_unique_lengths.length != 1
-              error "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
-              return
+          if num_unique_lengths.length != 1
+            raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
+          end
+
+          old_events = previous_payloads num_unique_lengths.first
+          num_unique_lengths.first.times do |index|
+            result = {}
+            interpolated['extract'].keys.each do |name|
+              result[name] = output[name][index]
+              if name.to_s == 'url'
+                result[name] = (response.env[:url] + result[name]).to_s
+              end
             end
 
-            old_events = previous_payloads num_unique_lengths.first
-            num_unique_lengths.first.times do |index|
-              result = {}
-              interpolated['extract'].keys.each do |name|
-                result[name] = output[name][index]
-                if name.to_s == 'url'
-                  result[name] = (response.env[:url] + result[name]).to_s
-                end
-              end
-
-              if store_payload!(old_events, result)
-                log "Storing new parsed result for '#{name}': #{result.inspect}"
-                create_event :payload => result
-              end
+            if store_payload!(old_events, result)
+              log "Storing new parsed result for '#{name}': #{result.inspect}"
+              create_event :payload => result
             end
           end
         else
-          error "Failed: #{response.inspect}"
+          raise "Failed: #{response.inspect}"
         end
       end
+    rescue => e
+      error e.message
     end
 
     def receive(incoming_events)
@@ -266,7 +234,7 @@ module Agents
             old_event.expires_at = new_event_expiration_date
             old_event.save!
             return false
-         end
+          end
         end
         return true
       end
@@ -305,27 +273,81 @@ module Agents
       end).to_s
     end
 
+    def extract_each(doc, &block)
+      interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
+        output[name] = block.call(extraction_details)
+      }
+    end
+
+    def extract_json(doc)
+      extract_each(doc) { |extraction_details|
+        result = Utils.values_at(doc, extraction_details['path'])
+        log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
+        result
+      }
+    end
+
+    def extract_text(doc)
+      extract_each(doc) { |extraction_details|
+        regexp = Regexp.new(extraction_details['regexp'])
+        result = []
+        doc.scan(regexp) {
+          result << Regexp.last_match[extraction_details['index']]
+        }
+        log "Extracting #{extraction_type} at #{regexp}: #{result}"
+        result
+      }
+    end
+
+    def extract_xml(doc)
+      extract_each(doc) { |extraction_details|
+        case
+        when css = extraction_details['css']
+          nodes = doc.css(css)
+        when xpath = extraction_details['xpath']
+          doc.remove_namespaces! # ignore xmlns, useful when parsing atom feeds
+          nodes = doc.xpath(xpath)
+        else
+          raise '"css" or "xpath" is required for HTML or XML extraction'
+        end
+        case nodes
+        when Nokogiri::XML::NodeSet
+          result = nodes.map { |node|
+            case value = node.xpath(extraction_details['value'])
+            when Float
+              # Node#xpath() returns any numeric value as float;
+              # convert it to integer as appropriate.
+              value = value.to_i if value.to_i == value
+            end
+            value.to_s
+          }
+        else
+          raise "The result of HTML/XML extraction was not a NodeSet"
+        end
+        log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
+        result
+      }
+    end
+
     def parse(data)
       case extraction_type
-        when "xml"
-          Nokogiri::XML(data)
-        when "json"
-          JSON.parse(data)
-        when "html"
-          Nokogiri::HTML(data)
-        when "text"
-          data
-        else
-          raise "Unknown extraction type #{extraction_type}"
+      when "xml"
+        Nokogiri::XML(data)
+      when "json"
+        JSON.parse(data)
+      when "html"
+        Nokogiri::HTML(data)
+      when "text"
+        data
+      else
+        raise "Unknown extraction type #{extraction_type}"
       end
     end
 
     def is_positive_integer?(value)
-      begin
-        Integer(value) >= 0
-      rescue
-        false
-      end
+      Integer(value) >= 0
+    rescue
+      false
     end
   end
 end
