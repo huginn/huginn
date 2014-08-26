@@ -453,15 +453,31 @@ fire: hot
     end
 
     describe "#receive" do
-      it "should scrape from the url element in incoming event payload" do
+      before do
         @event = Event.new
         @event.agent = agents(:bob_rain_notifier_agent)
         @event.payload = { 'url' => "http://xkcd.com" }
+      end
 
+      it "should scrape from the url element in incoming event payload" do
         lambda {
           @checker.options = @valid_options
           @checker.receive([@event])
         }.should change { Event.count }.by(1)
+      end
+
+      it "should interpolate values from incoming event payload" do
+        @event.payload['title'] = 'XKCD'
+
+        lambda {
+          @valid_options['extract']['site_title'] = {
+            'css' => "#comic img", 'value' => "'{{title}}'"
+          }
+          @checker.options = @valid_options
+          @checker.receive([@event])
+        }.should change { Event.count }.by(1)
+
+        Event.last.payload['site_title'].should == 'XKCD'
       end
     end
   end

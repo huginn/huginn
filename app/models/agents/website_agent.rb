@@ -237,9 +237,16 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
+        Thread.current[:current_event] = event
         url_to_scrape = event.payload['url']
         check_url(url_to_scrape) if url_to_scrape =~ /^https?:\/\//i
       end
+    ensure
+      Thread.current[:current_event] = nil
+    end
+
+    def interpolated(event = Thread.current[:current_event])
+      super
     end
 
     private
