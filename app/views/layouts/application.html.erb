@@ -24,7 +24,10 @@
           <%= render 'layouts/messages' %>
         </div>
       </div>
-      
+      <% if user_signed_in? %>
+        <%= render "upgrade_warning" %>
+      <% end %>
+
       <%= yield %>
       
     </div>

@@ -12,6 +12,8 @@
 TWITTER_OAUTH_KEY=<%= @twitter_oauth_key %>
 TWITTER_OAUTH_SECRET=<%= @twitter_oauth_secret %>
         </pre>
+        To authenticate new accounts with your twitter OAuth application you need to log in the to <a href="https://apps.twitter.com/" target="_blank">twitter application management page</a> and set the callback URL of your application to "http<%= ENV['FORCE_SSL'] == 'true' ? 's' : '' %>://<%= ENV['DOMAIN'] %>/auth/twitter/callback".
+
       </p>
     <% end %>
     <% if @basecamp_agent %>

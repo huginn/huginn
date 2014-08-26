@@ -35,6 +35,8 @@ class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration
         TWITTER_OAUTH_KEY=#{twitter_consumer_key(agents.first)}
         TWITTER_OAUTH_SECRET=#{twitter_consumer_secret(agents.first)}
 
+        To authenticate new accounts with your twitter OAuth application you need to log in the to twitter application management page (https://apps.twitter.com/)
+        and set the callback URL of your application to "http#{ENV['FORCE_SSL'] == 'true' ? 's' : ''}://#{ENV['DOMAIN']}/auth/twitter/callback"
 
       EOF
       migrated = true
