@@ -1,6 +1,13 @@
 module LiquidInterpolatable
   extend ActiveSupport::Concern
 
+  def valid?(context = nil)
+    super
+  rescue Liquid::Error => e
+    errors.add(:base, e.message)
+    false
+  end
+
   def interpolate_options(options, event = {})
     case options
       when String
