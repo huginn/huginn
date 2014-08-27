@@ -223,11 +223,8 @@ module Agents
     # If mode is set to 'on_change', this method may return false and update an existing
     # event to expire further in the future.
     def store_payload!(old_events, result)
-      if !interpolated['mode'].present?
-        return true
-      elsif interpolated['mode'].to_s == "all"
-        return true
-      elsif interpolated['mode'].to_s == "on_change"
+      case interpolated['mode'].presence
+      when 'on_change'
         result_json = result.to_json
         old_events.each do |old_event|
           if old_event.payload.to_json == result_json
@@ -236,9 +233,12 @@ module Agents
             return false
           end
         end
-        return true
+        true
+      when 'all', ''
+        true
+      else
+        raise "Illegal options[mode]: #{interpolated['mode']}"
       end
-      raise "Illegal options[mode]: " + interpolated['mode'].to_s
     end
 
     def previous_payloads(num_events)
@@ -251,7 +251,7 @@ module Agents
           look_back = UNIQUENESS_LOOK_BACK
         end
       end
-      events.order("id desc").limit(look_back) if interpolated['mode'].present? && interpolated['mode'].to_s == "on_change"
+      events.order("id desc").limit(look_back) if interpolated['mode'] == "on_change"
     end
 
     def extract_full_json?
