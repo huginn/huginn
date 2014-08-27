@@ -45,7 +45,7 @@ end
 
 class EventDrop
   def initialize(object, locals = nil)
-    locals ||= object.payload
+    locals = object.payload.merge(locals || {})
     super
   end
 
