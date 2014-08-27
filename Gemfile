@@ -56,6 +56,8 @@ gem 'uglifier', '>= 1.3.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'jquery-rails', '~> 3.1.0'
 gem 'ace-rails-ap', '~> 2.0.1'
+gem 'spectrum-rails'
+
 
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
 # in its own Gemfile.
@@ -128,4 +130,3 @@ else
   gem 'unicorn', platform: :ruby_18
   gem 'rails_12factor', platform: :ruby_18
 end
-

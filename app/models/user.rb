@@ -27,10 +27,10 @@ class User < ActiveRecord::Base
   has_many :agents, -> { order("agents.created_at desc") }, :dependent => :destroy, :inverse_of => :user
   has_many :logs, :through => :agents, :class_name => "AgentLog"
   has_many :scenarios, :inverse_of => :user, :dependent => :destroy
-  has_many :services, -> { order("services.name")}, :dependent => :destroy
+  has_many :services, -> { by_name('asc') }, :dependent => :destroy
 
   def available_services
-    Service.where("user_id = ? or global = true", self.id).order("services.name desc")
+    Service.available_to_user(self).by_name
   end
 
   # Allow users to login via either email or username.

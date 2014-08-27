@@ -32,7 +32,7 @@
 
     <% agent.scenarios.each do |scenario| %>
       <li>
-        <%= link_to "<span class='color-warning glyphicon glyphicon-remove-circle'></span> Remove from <span class='scenario label label-info'>#{h scenario.name}</span>".html_safe, leave_scenario_agent_path(agent, :scenario_id => scenario.to_param, :return => returnTo), method: :put, :tabindex => "-1" %>
+        <%= link_to "<span class='color-warning glyphicon glyphicon-remove-circle'></span> Remove from #{scenario_label(scenario)}".html_safe, leave_scenario_agent_path(agent, :scenario_id => scenario.to_param, :return => returnTo), method: :put, :tabindex => "-1" %>
       </li>
     <% end %>
   <% end %>

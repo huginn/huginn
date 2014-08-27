@@ -5,14 +5,14 @@
   </head>
   <body>
     <% if @headline %>
-      <h1><%= @headline %></h1>
+      <h1><%= sanitize @headline %></h1>
     <% end %>
     <% @groups.each do |group| %>
       <div style='margin-bottom: 10px;'>
-        <div><%= group[:title] %></div>
+        <div><%= sanitize group[:title] %></div>
         <% group[:entries].each do |entry| %>
           <div style='margin-left: 10px;'>
-            <%= entry %>
+            <%= sanitize entry %>
           </div>
         <% end %>
       </div>

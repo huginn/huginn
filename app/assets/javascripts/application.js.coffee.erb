@@ -6,6 +6,7 @@
 #= require json2
 #= require jquery.json-editor
 #= require latlon_and_geo
+#= require spectrum
 #= require ./worker-checker
 #= require_self
 
@@ -60,6 +61,10 @@ showEventDescriptions = ->
     $(".event-descriptions").html("").hide()
 
 $(document).ready ->
+  $('.navbar .dropdown.dropdown-hover').hover \
+    -> $(this).addClass('open'),
+    -> $(this).removeClass('open')
+
   # JSON Editor
   window.jsonEditor = setupJsonEditor()[0]
 
@@ -164,7 +169,7 @@ $(document).ready ->
 
         $(".description").html(json.description_html) if json.description_html?
 
-        $('.oauthable-form').html($(json.form).find('.oauthable-form').html()) if json.form?
+        $('.oauthable-form').html(json.form) if json.form?
 
         if $("#agent_options").hasClass("showing-default") || $("#agent_options").val().match(/\A\s*(\{\s*\}|)\s*\Z/g)
           window.jsonEditor.json = json.options

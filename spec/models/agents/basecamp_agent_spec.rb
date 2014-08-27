@@ -6,7 +6,7 @@ describe Agents::BasecampAgent do
 
   before(:each) do
     stub_request(:get, /json$/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/basecamp.json")), :status => 200, :headers => {"Content-Type" => "text/json"})
-    stub_request(:get, /Z$/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/basecamp.json")), :status => 200, :headers => {"Content-Type" => "text/json"})
+    stub_request(:get, /02:00$/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/basecamp.json")), :status => 200, :headers => {"Content-Type" => "text/json"})
     @valid_params = { :project_id => 6789 }
 
     @checker = Agents::BasecampAgent.new(:name => "somename", :options => @valid_params)
@@ -43,7 +43,7 @@ describe Agents::BasecampAgent do
 
     it "should provide the since attribute after the first run" do
       time = (Time.now-1.minute).iso8601
-      @checker.memory[:last_run] = time
+      @checker.memory[:last_event] = time
       @checker.save
       @checker.reload.send(:query_parameters).should == {:query => {:since => time}}
     end
@@ -51,9 +51,10 @@ describe Agents::BasecampAgent do
   describe "#check" do
     it "should not emit events on its first run" do
       expect { @checker.check }.to change { Event.count }.by(0)
+      expect(@checker.memory[:last_event]).to eq '2014-04-17T10:25:31.000+02:00'
     end
     it "should check that initial run creates an event" do
-      @checker.last_check_at = Time.now - 1.minute
+      @checker.memory[:last_event] = '2014-04-17T10:25:31.000+02:00'
       expect { @checker.check }.to change { Event.count }.by(1)
     end
   end
@@ -61,7 +62,7 @@ describe Agents::BasecampAgent do
   describe "#working?" do
     it "it is working when at least one event was emited" do
       @checker.should_not be_working
-      @checker.last_check_at = Time.now - 1.minute
+      @checker.memory[:last_event] = '2014-04-17T10:25:31.000+02:00'
       @checker.check
       @checker.reload.should be_working
     end

@@ -1,4 +1,5 @@
 class ServicesController < ApplicationController
+  before_filter :upgrade_warning, only: :index
 
   def index
     @services = current_user.services.page(params[:page])

@@ -44,7 +44,7 @@ class Agent < ActiveRecord::Base
   after_save :possibly_update_event_expirations
 
   belongs_to :user, :inverse_of => :agents
-  belongs_to :service
+  belongs_to :service, :inverse_of => :agents
   has_many :events, -> { order("events.id desc") }, :dependent => :delete_all, :inverse_of => :agent
   has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
   has_many :logs,  -> { order("agent_logs.id desc") }, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog"
@@ -392,7 +392,7 @@ class AgentDrop
     @object.short_type
   end
 
-  METHODS = [
+  [
     :name,
     :type,
     :options,
@@ -403,19 +403,9 @@ class AgentDrop
     :disabled,
     :keep_events_for,
     :propagate_immediately,
-  ]
-
-  METHODS.each { |attr|
+  ].each { |attr|
     define_method(attr) {
       @object.__send__(attr)
     } unless method_defined?(attr)
   }
-
-  def each(&block)
-    return to_enum(__method__) unless block
-
-    METHODS.each { |attr|
-      yield [attr, __sent__(attr)]
-    }
-  end
 end

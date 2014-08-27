@@ -13,9 +13,8 @@
       <div class="alert alert-warning">
         <span class='glyphicon glyphicon-warning-sign'></span>
         This Scenario already exists in your system. The import will update your existing
-        <span class='label label-info scenario'><%= @scenario_import.existing_scenario.name %></span> Scenario's title
-        and
-        description. Below you can customize how the individual agents get updated.
+        <%= scenario_label(@scenario_import.existing_scenario) %> Scenario's title,
+        description and tag colors. Below you can customize how the individual agents get updated.
       </div>
     <% end %>
 
@@ -30,7 +29,7 @@
     </div>
 
     <% if @scenario_import.parsed_data["description"].present? %>
-      <blockquote><%= @scenario_import.parsed_data["description"] %></blockquote>
+      <blockquote><%= markdown(@scenario_import.parsed_data["description"]) %></blockquote>
     <% end %>
 
   </div>
@@ -120,12 +119,13 @@
           </div>
         <% end %>
       </div>
+
       <% if agent_diff.requires_service? %>
         <div class='row'>
           <div class='col-md-4'>
             <div class="form-group type-select">
               <%= label_tag "scenario_import[merges][#{index}][service_id]", 'Service' %>
-              <%= select_tag "scenario_import[merges][#{index}][service_id]", options_for_select(agent_diff.agent_instance.valid_services(current_user).collect { |s| ["(#{s.provider}) #{s.name}", s.id]}, agent_diff.service_id.try(:current)), class: 'form-control' %>
+              <%= select_tag "scenario_import[merges][#{index}][service_id]", options_for_select(agent_diff.agent_instance.valid_services_for(current_user).collect { |s| ["(#{s.provider}) #{s.name}", s.id]}, agent_diff.agent.try(:service_id)), class: 'form-control' %>
             </div>
           </div>
         </div>

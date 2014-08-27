@@ -110,8 +110,8 @@
             <% if @agent.can_receive_events? %>
               <p>
                 <b>Event sources:</b>
-                <% if @agent.sources.length %>
-                  <%= @agent.sources.map { |source_agent| link_to(source_agent.name, agent_path(source_agent)) }.to_sentence.html_safe %>
+                <% if (agents = @agent.sources).length > 0 %>
+                  <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
                 <% else %>
                   None
                 <% end %>
@@ -126,8 +126,8 @@
             <% if @agent.can_create_events? %>
               <p>
                 <b>Event receivers:</b>
-                <% if @agent.receivers.length %>
-                  <%= @agent.receivers.map { |receiver_agent| link_to(receiver_agent.name, agent_path(receiver_agent)) }.to_sentence.html_safe %>
+                <% if (agents = @agent.receivers).length > 0 %>
+                  <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
                 <% else %>
                   None
                 <% end %>
