@@ -45,6 +45,12 @@ Huginn::Application.routes.draw do
 
   resources :user_credentials, :except => :show
 
+  resources :services, :only => [:index, :destroy] do
+    member do
+      post :toggle_availability
+    end
+  end
+
   get "/worker_status" => "worker_status#show"
 
   post "/users/:user_id/update_location/:secret" => "user_location_updates#create"
@@ -56,6 +62,7 @@ Huginn::Application.routes.draw do
 #  get "/delayed_job" => DelayedJobWeb, :anchor => false
 
   devise_for :users, :sign_out_via => [ :post, :delete ]
+  get '/auth/:provider/callback', to: 'services#callback'
 
   get "/about" => "home#about"
   root :to => "home#index"

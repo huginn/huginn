@@ -56,6 +56,8 @@ gem 'uglifier', '>= 1.3.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'jquery-rails', '~> 3.1.0'
 gem 'ace-rails-ap', '~> 2.0.1'
+gem 'spectrum-rails'
+
 
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
 # in its own Gemfile.
@@ -85,6 +87,11 @@ gem 'feed-normalizer'
 gem 'slack-notifier', '~> 0.5.0'
 gem 'therubyracer', '~> 0.12.1'
 gem 'mqtt'
+
+gem 'omniauth'
+gem 'omniauth-twitter'
+gem 'omniauth-37signals'
+gem 'omniauth-github'
 
 group :development do
   gem 'binding_of_caller'

@@ -15,6 +15,18 @@
         <%= f.text_field :name, :class => 'form-control', :placeholder => "Name your Scenario" %>
       </div>
     </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <%= f.label :tag_bg_color, "Tag Background Color" %>
+        <%= f.color_field :tag_bg_color, :class => 'form-control', :value => @scenario.tag_bg_color || default_scenario_bg_color %>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <%= f.label :tag_fg_color, "Tag Foreground Color" %>
+        <%= f.color_field :tag_fg_color, :class => 'form-control', :value => @scenario.tag_fg_color || default_scenario_fg_color %>
+      </div>
+    </div>
   </div>
 
   <div class="row">

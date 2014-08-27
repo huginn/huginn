@@ -6,6 +6,7 @@
 #= require json2
 #= require jquery.json-editor
 #= require latlon_and_geo
+#= require spectrum
 #= require ./worker-checker
 #= require_self
 
@@ -181,6 +182,8 @@ $(document).ready ->
           hideEventCreation()
 
         $(".description").html(json.description_html) if json.description_html?
+
+        $('.oauthable-form').html(json.form) if json.form?
 
         if $("#agent_options").hasClass("showing-default") || $("#agent_options").val().match(/\A\s*(\{\s*\}|)\s*\Z/g)
           window.jsonEditor.json = json.options

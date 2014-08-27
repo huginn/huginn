@@ -62,7 +62,7 @@ module Agents
            ....
         },
         'agent_id' => 1234,
-        'event_id' => 3432,
+        'event_id' => 3432
       }
     MD
 

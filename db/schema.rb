@@ -13,19 +13,22 @@
 
 ActiveRecord::Schema.define(version: 20140822085519) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "agent_logs", force: true do |t|
-    t.integer  "agent_id",                                       null: false
-    t.text     "message",           limit: 16777215,             null: false
-    t.integer  "level",                              default: 3, null: false
+    t.integer  "agent_id",                      null: false
+    t.text     "message",                       null: false
+    t.integer  "level",             default: 3, null: false
     t.integer  "inbound_event_id"
     t.integer  "outbound_event_id"
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "agents", force: true do |t|
     t.integer  "user_id"
-    t.text     "options",               limit: 16777215
+    t.text     "options"
     t.string   "type"
     t.string   "name"
     t.string   "schedule"
@@ -33,16 +36,17 @@ ActiveRecord::Schema.define(version: 20140822085519) do
     t.datetime "last_check_at"
     t.datetime "last_receive_at"
     t.integer  "last_checked_event_id"
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
-    t.text     "memory",                limit: 2147483647
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "memory"
     t.datetime "last_web_request_at"
+    t.integer  "keep_events_for",       default: 0,     null: false
     t.datetime "last_event_at"
     t.datetime "last_error_log_at"
-    t.integer  "keep_events_for",                          default: 0,     null: false
-    t.boolean  "propagate_immediately",                    default: false, null: false
-    t.boolean  "disabled",                                 default: false, null: false
-    t.string   "guid",                                                     null: false
+    t.boolean  "propagate_immediately", default: false, null: false
+    t.boolean  "disabled",              default: false, null: false
+    t.string   "guid",                                  null: false
+    t.integer  "service_id"
   end
 
   add_index "agents", ["guid"], name: "index_agents_on_guid", using: :btree
@@ -61,17 +65,17 @@ ActiveRecord::Schema.define(version: 20140822085519) do
   add_index "chains", ["target_id"], name: "index_chains_on_target_id", using: :btree
 
   create_table "delayed_jobs", force: true do |t|
-    t.integer  "priority",                    default: 0
-    t.integer  "attempts",                    default: 0
-    t.text     "handler",    limit: 16777215
-    t.text     "last_error", limit: 16777215
+    t.integer  "priority",   default: 0
+    t.integer  "attempts",   default: 0
+    t.text     "handler"
+    t.text     "last_error"
     t.datetime "run_at"
     t.datetime "locked_at"
     t.datetime "failed_at"
     t.string   "locked_by"
     t.string   "queue"
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
@@ -79,11 +83,11 @@ ActiveRecord::Schema.define(version: 20140822085519) do
   create_table "events", force: true do |t|
     t.integer  "user_id"
     t.integer  "agent_id"
-    t.decimal  "lat",                           precision: 15, scale: 10
-    t.decimal  "lng",                           precision: 15, scale: 10
-    t.text     "payload",    limit: 2147483647
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
+    t.decimal  "lat",        precision: 15, scale: 10
+    t.decimal  "lng",        precision: 15, scale: 10
+    t.text     "payload"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.datetime "expires_at"
   end
 
@@ -94,8 +98,8 @@ ActiveRecord::Schema.define(version: 20140822085519) do
   create_table "links", force: true do |t|
     t.integer  "source_id"
     t.integer  "receiver_id"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "event_id_at_creation", default: 0, null: false
   end
 
@@ -113,24 +117,45 @@ ActiveRecord::Schema.define(version: 20140822085519) do
   add_index "scenario_memberships", ["scenario_id"], name: "index_scenario_memberships_on_scenario_id", using: :btree
 
   create_table "scenarios", force: true do |t|
-    t.string   "name",                        null: false
-    t.integer  "user_id",                     null: false
+    t.string   "name",                         null: false
+    t.integer  "user_id",                      null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "description"
-    t.boolean  "public",      default: false, null: false
-    t.string   "guid",                        null: false
+    t.boolean  "public",       default: false, null: false
+    t.string   "guid",                         null: false
     t.string   "source_url"
+    t.string   "tag_bg_color"
+    t.string   "tag_fg_color"
   end
 
   add_index "scenarios", ["user_id", "guid"], name: "index_scenarios_on_user_id_and_guid", unique: true, using: :btree
+
+  create_table "services", force: true do |t|
+    t.integer  "user_id",                       null: false
+    t.string   "provider",                      null: false
+    t.string   "name",                          null: false
+    t.text     "token",                         null: false
+    t.text     "secret"
+    t.text     "refresh_token"
+    t.datetime "expires_at"
+    t.boolean  "global",        default: false
+    t.text     "options"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "uid"
+  end
+
+  add_index "services", ["provider"], name: "index_services_on_provider", using: :btree
+  add_index "services", ["uid"], name: "index_services_on_uid", using: :btree
+  add_index "services", ["user_id", "global"], name: "index_services_on_user_id_and_global", using: :btree
 
   create_table "user_credentials", force: true do |t|
     t.integer  "user_id",                           null: false
     t.string   "credential_name",                   null: false
     t.text     "credential_value",                  null: false
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "mode",             default: "text", null: false
   end
 
@@ -147,8 +172,8 @@ ActiveRecord::Schema.define(version: 20140822085519) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "admin",                  default: false, null: false
     t.integer  "failed_attempts",        default: 0
     t.string   "unlock_token"

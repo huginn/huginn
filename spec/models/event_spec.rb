@@ -102,6 +102,15 @@ describe EventDrop do
     interpolate(t, @event).should eq('some title: http://some.site.example.org/')
   end
 
+  it 'should use created_at from the payload if it exists' do
+    created_at = @event.created_at - 86400
+    # Avoid timezone issue by using %s
+    @event.payload['created_at'] = created_at.strftime("%s")
+    @event.save!
+    t = '{{created_at | date:"%s" }}'
+    interpolate(t, @event).should eq(created_at.strftime("%s"))
+  end
+
   it 'should be iteratable' do
     # to_liquid returns self
     t = "{% for pair in to_liquid %}{{pair | join:':' }}\n{% endfor %}"

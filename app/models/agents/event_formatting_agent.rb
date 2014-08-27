@@ -51,7 +51,7 @@ module Agents
               {
                 "path": "{{date.pretty}}",
                 "regexp": "\\A(?<time>\\d\\d:\\d\\d [AP]M [A-Z]+)",
-                "to": "pretty_date",
+                "to": "pretty_date"
               }
             ]
           }
@@ -61,7 +61,7 @@ module Agents
           "pretty_date": {
             "time": "10:00 PM EST",
             "0": "10:00 PM EST on January 11, 2013"
-            "1": "10:00 PM EST",
+            "1": "10:00 PM EST"
           }
 
       So you can use it in `instructions` like this:
@@ -80,7 +80,19 @@ module Agents
           }
     MD
 
-    event_description "User defined"
+    event_description do
+      "Events will have the following fields%s:\n\n    %s" % [
+        case options['mode'].to_s
+        when 'merged'
+          ', merged with the original contents'
+        when /\{/
+          ', conditionally merged with the original contents'
+        end,
+        Utils.pretty_print(Hash[options['instructions'].keys.map { |key|
+          [key, "..."]
+        }])
+      ]
+    end
 
     after_save :clear_matchers
 

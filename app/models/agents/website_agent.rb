@@ -42,20 +42,20 @@ module Agents
 
           "extract": {
             "word": { "regexp": "^(.+?): (.+)$", index: 1 },
-            "definition": { "regexp": "^(.+?): (.+)$", index: 2 },
+            "definition": { "regexp": "^(.+?): (.+)$", index: 2 }
           }
 
       Or if you prefer names to numbers for index:
 
           "extract": {
             "word": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'word' },
-            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'definition' },
+            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'definition' }
           }
 
       To extract the whole content as one event:
 
           "extract": {
-            "content": { "regexp": "\A(?m:.)*\z", index: 0 },
+            "content": { "regexp": "\A(?m:.)*\z", index: 0 }
           }
 
       Beware that `.` does not match the newline character (LF) unless the `m` flag is in effect, and `^`/`$` basically match every line beginning/end.  See [this document](http://ruby-doc.org/core-#{RUBY_VERSION}/doc/regexp_rdoc.html) to learn the regular expression variant used in this service.
@@ -78,7 +78,11 @@ module Agents
     MD
 
     event_description do
-      "Events will have the fields you specified.  Your options look like:\n\n    #{Utils.pretty_print interpolated['extract']}"
+      "Events will have the following fields:\n\n    %s" % [
+        Utils.pretty_print(Hash[options['extract'].keys.map { |key|
+          [key, "..."]
+        }])
+      ]
     end
 
     def working?
@@ -157,85 +161,60 @@ module Agents
               log "Storing new result for '#{name}': #{doc.inspect}"
               create_event :payload => doc
             end
-          else
-            output = {}
-            interpolated['extract'].each do |name, extraction_details|
-              case extraction_type
-              when "text"
-                regexp = Regexp.new(extraction_details['regexp'])
-                result = []
-                doc.scan(regexp) {
-                  result << Regexp.last_match[extraction_details['index']]
-                }
-                log "Extracting #{extraction_type} at #{regexp}: #{result}"
-              when "json"
-                result = Utils.values_at(doc, extraction_details['path'])
-                log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
-              else
-                case
-                when css = extraction_details['css']
-                  nodes = doc.css(css)
-                when xpath = extraction_details['xpath']
-                  doc.remove_namespaces! # ignore xmlns, useful when parsing atom feeds
-                  nodes = doc.xpath(xpath)
-                else
-                  error '"css" or "xpath" is required for HTML or XML extraction'
-                  return
-                end
-                case nodes
-                when Nokogiri::XML::NodeSet
-                  result = nodes.map { |node|
-                    case value = node.xpath(extraction_details['value'])
-                    when Float
-                      # Node#xpath() returns any numeric value as float;
-                      # convert it to integer as appropriate.
-                      value = value.to_i if value.to_i == value
-                    end
-                    value.to_s
-                  }
-                else
-                  error "The result of HTML/XML extraction was not a NodeSet"
-                  return
-                end
-                log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
-              end
-              output[name] = result
+            next
+          end
+
+          output =
+            case extraction_type
+            when 'json'
+              extract_json(doc)
+            when 'text'
+              extract_text(doc)
+            else
+              extract_xml(doc)
             end
 
-            num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
+          num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
 
-            if num_unique_lengths.length != 1
-              error "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
-              return
+          if num_unique_lengths.length != 1
+            raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
+          end
+
+          old_events = previous_payloads num_unique_lengths.first
+          num_unique_lengths.first.times do |index|
+            result = {}
+            interpolated['extract'].keys.each do |name|
+              result[name] = output[name][index]
+              if name.to_s == 'url'
+                result[name] = (response.env[:url] + result[name]).to_s
+              end
             end
 
-            old_events = previous_payloads num_unique_lengths.first
-            num_unique_lengths.first.times do |index|
-              result = {}
-              interpolated['extract'].keys.each do |name|
-                result[name] = output[name][index]
-                if name.to_s == 'url'
-                  result[name] = (response.env[:url] + result[name]).to_s
-                end
-              end
-
-              if store_payload!(old_events, result)
-                log "Storing new parsed result for '#{name}': #{result.inspect}"
-                create_event :payload => result
-              end
+            if store_payload!(old_events, result)
+              log "Storing new parsed result for '#{name}': #{result.inspect}"
+              create_event :payload => result
             end
           end
         else
-          error "Failed: #{response.inspect}"
+          raise "Failed: #{response.inspect}"
         end
       end
+    rescue => e
+      error e.message
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
+        Thread.current[:current_event] = event
         url_to_scrape = event.payload['url']
         check_url(url_to_scrape) if url_to_scrape =~ /^https?:\/\//i
       end
+    ensure
+      Thread.current[:current_event] = nil
+    end
+
+    def interpolated(event = Thread.current[:current_event])
+      super
     end
 
     private
@@ -244,22 +223,22 @@ module Agents
     # If mode is set to 'on_change', this method may return false and update an existing
     # event to expire further in the future.
     def store_payload!(old_events, result)
-      if !interpolated['mode'].present?
-        return true
-      elsif interpolated['mode'].to_s == "all"
-        return true
-      elsif interpolated['mode'].to_s == "on_change"
+      case interpolated['mode'].presence
+      when 'on_change'
         result_json = result.to_json
         old_events.each do |old_event|
           if old_event.payload.to_json == result_json
             old_event.expires_at = new_event_expiration_date
             old_event.save!
             return false
-         end
+          end
         end
-        return true
+        true
+      when 'all', ''
+        true
+      else
+        raise "Illegal options[mode]: #{interpolated['mode']}"
       end
-      raise "Illegal options[mode]: " + interpolated['mode'].to_s
     end
 
     def previous_payloads(num_events)
@@ -272,7 +251,7 @@ module Agents
           look_back = UNIQUENESS_LOOK_BACK
         end
       end
-      events.order("id desc").limit(look_back) if interpolated['mode'].present? && interpolated['mode'].to_s == "on_change"
+      events.order("id desc").limit(look_back) if interpolated['mode'] == "on_change"
     end
 
     def extract_full_json?
@@ -294,27 +273,81 @@ module Agents
       end).to_s
     end
 
+    def extract_each(doc, &block)
+      interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
+        output[name] = block.call(extraction_details)
+      }
+    end
+
+    def extract_json(doc)
+      extract_each(doc) { |extraction_details|
+        result = Utils.values_at(doc, extraction_details['path'])
+        log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
+        result
+      }
+    end
+
+    def extract_text(doc)
+      extract_each(doc) { |extraction_details|
+        regexp = Regexp.new(extraction_details['regexp'])
+        result = []
+        doc.scan(regexp) {
+          result << Regexp.last_match[extraction_details['index']]
+        }
+        log "Extracting #{extraction_type} at #{regexp}: #{result}"
+        result
+      }
+    end
+
+    def extract_xml(doc)
+      extract_each(doc) { |extraction_details|
+        case
+        when css = extraction_details['css']
+          nodes = doc.css(css)
+        when xpath = extraction_details['xpath']
+          doc.remove_namespaces! # ignore xmlns, useful when parsing atom feeds
+          nodes = doc.xpath(xpath)
+        else
+          raise '"css" or "xpath" is required for HTML or XML extraction'
+        end
+        case nodes
+        when Nokogiri::XML::NodeSet
+          result = nodes.map { |node|
+            case value = node.xpath(extraction_details['value'])
+            when Float
+              # Node#xpath() returns any numeric value as float;
+              # convert it to integer as appropriate.
+              value = value.to_i if value.to_i == value
+            end
+            value.to_s
+          }
+        else
+          raise "The result of HTML/XML extraction was not a NodeSet"
+        end
+        log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
+        result
+      }
+    end
+
     def parse(data)
       case extraction_type
-        when "xml"
-          Nokogiri::XML(data)
-        when "json"
-          JSON.parse(data)
-        when "html"
-          Nokogiri::HTML(data)
-        when "text"
-          data
-        else
-          raise "Unknown extraction type #{extraction_type}"
+      when "xml"
+        Nokogiri::XML(data)
+      when "json"
+        JSON.parse(data)
+      when "html"
+        Nokogiri::HTML(data)
+      when "text"
+        data
+      else
+        raise "Unknown extraction type #{extraction_type}"
       end
     end
 
     def is_positive_integer?(value)
-      begin
-        Integer(value) >= 0
-      rescue
-        false
-      end
+      Integer(value) >= 0
+    rescue
+      false
     end
   end
 end
