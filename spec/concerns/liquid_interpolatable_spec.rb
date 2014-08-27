@@ -11,6 +11,10 @@ describe LiquidInterpolatable::Filters do
     it 'should escape a string for use in URI' do
       @filter.uri_escape('abc:/?=').should == 'abc%3A%2F%3F%3D'
     end
+
+    it 'should not raise an error when an operand is nil' do
+      @filter.uri_escape(nil).should be_nil
+    end
   end
 
   describe 'validations' do

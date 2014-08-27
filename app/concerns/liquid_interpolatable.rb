@@ -47,7 +47,7 @@ module LiquidInterpolatable
   # Ref: http://tools.ietf.org/html/rfc3986#page-12
   module Filters
     def uri_escape(string)
-      CGI::escape string
+      CGI.escape(string) rescue string
     end
   end
   Liquid::Template.register_filter(LiquidInterpolatable::Filters)
