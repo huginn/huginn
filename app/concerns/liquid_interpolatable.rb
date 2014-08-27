@@ -1,10 +1,20 @@
 module LiquidInterpolatable
   extend ActiveSupport::Concern
 
+  included do
+    validate :validate_interpolation
+  end
+
   def valid?(context = nil)
     super
+  rescue Liquid::Error
+    errors.empty?
+  end
+
+  def validate_interpolation
+    interpolated
   rescue Liquid::Error => e
-    errors.add(:base, e.message)
+    errors.add(:options, "has an error with Liquid templating: #{e.message}")
     false
   end
 

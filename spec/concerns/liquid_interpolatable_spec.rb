@@ -29,7 +29,7 @@ describe LiquidInterpolatable::Filters do
     it "should finish without raising an exception" do
       agent = Agents::InterpolatableAgent.new(name: "test", options: { 'foo' => '{{bar}' })
       agent.valid?.should == false
-      agent.errors[:base].first.should =~ /not properly terminated/
+      agent.errors[:options].first.should =~ /not properly terminated/
     end
   end
 end
