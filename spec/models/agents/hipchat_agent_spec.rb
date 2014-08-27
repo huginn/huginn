@@ -17,7 +17,7 @@ describe Agents::HipchatAgent do
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :room_name => 'test room', :message => 'Looks like its going to rain', username: "Huggin user"}
+    @event.payload = { :room_name => 'test room', :message => 'Looks like its going to rain', username: "Huggin user                  "}
     @event.save!
   end
 
@@ -53,7 +53,7 @@ describe Agents::HipchatAgent do
   describe "#receive" do
     it "send a message to the hipchat" do
       any_instance_of(HipChat::Room) do |obj|
-        mock(obj).send(@event.payload[:username], @event.payload[:message], {:notify => false, :color => 'yellow'})
+        mock(obj).send(@event.payload[:username][0..14], @event.payload[:message], {:notify => false, :color => 'yellow'})
       end
       @checker.receive([@event])
     end
