@@ -48,6 +48,7 @@ def set_value(key, value, options = {})
   if $config[key].nil? || $config[key] == '' || ($config[key] != value && options[:force] != false)
     puts "Setting #{key} to #{value}" unless options[:silent]
     puts capture("heroku config:set #{key}=#{value}")
+    $config[key] = value
   end
 end
 
@@ -94,11 +95,15 @@ unless $config['APP_SECRET_TOKEN']
   puts capture("heroku config:set APP_SECRET_TOKEN=`rake secret`")
 end
 
+unless $config['DOMAIN']
+  set_value 'DOMAIN', "#{app_name}.herokuapp.com", force: false
+  first_time = true
+end
+
 set_value 'BUILDPACK_URL', "https://github.com/ddollar/heroku-buildpack-multi.git"
 set_value 'PROCFILE_PATH', "deployment/heroku/Procfile.heroku", force: false
 set_value 'ON_HEROKU', "true"
 set_value 'FORCE_SSL', "true"
-set_value 'DOMAIN', "#{app_name}.herokuapp.com", force: false
 set_value 'USE_GRAPHVIZ_DOT', 'dot'
 
 unless $config['INVITATION_CODE']
@@ -131,6 +136,19 @@ unless $config['SMTP_DOMAIN'] && $config['SMTP_USER_NAME'] && $config['SMTP_PASS
     email = nag("What email address would you like email to appear to be sent from?")
     set_value 'EMAIL_FROM_ADDRESS', email
   end
+end
+
+if first_time
+  puts "Restarting..."
+  puts capture("heroku restart")
+
+  puts "Done!"
+  puts
+  puts "Visit https://#{app_name}.herokuapp.com/users/sign_up and use the invitation code shown below:"
+  puts
+  puts "\t#{$config['INVITATION_CODE']}"
+
+  exit
 end
 
 branch = capture("git rev-parse --abbrev-ref HEAD")
