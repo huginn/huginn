@@ -53,5 +53,10 @@ describe LiquidInterpolatable::Filters do
         @filter.to_xpath_roundtrip(string).should == string
       }
     end
+
+    it 'should stringize a non-string operand' do
+      @filter.to_xpath_roundtrip(nil).should == ''
+      @filter.to_xpath_roundtrip(1).should == '1'
+    end
   end
 end

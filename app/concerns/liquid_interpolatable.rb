@@ -52,7 +52,7 @@ module LiquidInterpolatable
 
     # Escape a string for use in XPath expression
     def to_xpath(string)
-      subs = string.scan(/\G(?:\A\z|[^"]+|[^']+)/).map { |x|
+      subs = string.to_s.scan(/\G(?:\A\z|[^"]+|[^']+)/).map { |x|
         case x
         when /"/
           %Q{'#{x}'}
