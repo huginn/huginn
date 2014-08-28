@@ -456,7 +456,10 @@ fire: hot
       before do
         @event = Event.new
         @event.agent = agents(:bob_rain_notifier_agent)
-        @event.payload = { 'url' => "http://xkcd.com" }
+        @event.payload = {
+          'url' => 'http://xkcd.com',
+          'link' => 'Random',
+        }
       end
 
       it "should scrape from the url element in incoming event payload" do
@@ -467,17 +470,25 @@ fire: hot
       end
 
       it "should interpolate values from incoming event payload" do
-        @event.payload['title'] = 'XKCD'
-
         lambda {
-          @valid_options['extract']['site_title'] = {
-            'css' => "#comic img", 'value' => "{{title | to_xpath }}"
+          @valid_options['extract'] = {
+            'from' => {
+              'xpath' => '*[1]',
+              'value' => '{{url | to_xpath}}'
+            },
+            'to' => {
+              'xpath' => '(//a[@href and text()={{link | to_xpath}}])[1]',
+              'value' => '@href'
+            },
           }
           @checker.options = @valid_options
           @checker.receive([@event])
         }.should change { Event.count }.by(1)
 
-        Event.last.payload['site_title'].should == 'XKCD'
+        Event.last.payload.should == {
+          'from' => 'http://xkcd.com',
+          'to' => 'http://dynamic.xkcd.com/random/comic/',
+        }
       end
     end
   end
