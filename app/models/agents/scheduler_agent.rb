@@ -90,7 +90,7 @@ module Agents
     end
 
     def check!
-      control_targets!
+      control!
     end
 
     def validate_options

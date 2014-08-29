@@ -23,7 +23,7 @@ module AgentControllerConcern
     end
   end
 
-  def control_targets!
+  def control!
     targets.active.each { |target|
       begin
         case control_action
