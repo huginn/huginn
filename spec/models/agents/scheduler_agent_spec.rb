@@ -89,29 +89,29 @@ describe Agents::SchedulerAgent do
 
   describe "check!" do
     it "should control targets" do
-      targets = [agents(:bob_website_agent), agents(:bob_weather_agent)]
-      @agent.targets = targets
+      control_targets = [agents(:bob_website_agent), agents(:bob_weather_agent)]
+      @agent.control_targets = control_targets
       @agent.save!
 
-      target_ids = targets.map(&:id)
+      control_target_ids = control_targets.map(&:id)
       stub(Agent).async_check(anything) { |id|
-        target_ids.delete(id)
+        control_target_ids.delete(id)
       }
 
       @agent.check!
-      target_ids.should be_empty
+      control_target_ids.should be_empty
 
       @agent.options['action'] = 'disable'
       @agent.save!
 
       @agent.check!
-      targets.all? { |target| target.disabled? }
+      control_targets.all? { |control_target| control_target.disabled? }
 
       @agent.options['action'] = 'enable'
       @agent.save!
 
       @agent.check!
-      targets.all? { |target| !target.disabled? }
+      control_targets.all? { |control_target| !control_target.disabled? }
     end
   end
 end

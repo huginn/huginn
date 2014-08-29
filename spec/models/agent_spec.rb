@@ -508,15 +508,15 @@ describe Agent do
         agent.should have(0).errors_on(:controllers)
       end
 
-      it "should not allow target agents owned by other people" do
+      it "should not allow control target agents owned by other people" do
         agent = Agents::CannotBeScheduled.new(:name => "something")
         agent.user = users(:bob)
-        agent.target_ids = [agents(:bob_weather_agent).id]
-        agent.should have(0).errors_on(:targets)
-        agent.target_ids = [agents(:jane_weather_agent).id]
-        agent.should have(1).errors_on(:targets)
+        agent.control_target_ids = [agents(:bob_weather_agent).id]
+        agent.should have(0).errors_on(:control_targets)
+        agent.control_target_ids = [agents(:jane_weather_agent).id]
+        agent.should have(1).errors_on(:control_targets)
         agent.user = users(:jane)
-        agent.should have(0).errors_on(:targets)
+        agent.should have(0).errors_on(:control_targets)
       end
 
       it "should not allow scenarios owned by other people" do

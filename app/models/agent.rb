@@ -25,7 +25,7 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
+  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
 
   json_serialize :options, :memory
 
@@ -33,7 +33,7 @@ class Agent < ActiveRecord::Base
   validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
   validate :sources_are_owned
   validate :controllers_are_owned
-  validate :targets_are_owned
+  validate :control_targets_are_owned
   validate :scenarios_are_owned
   validate :validate_schedule
   validate :validate_options
@@ -56,9 +56,9 @@ class Agent < ActiveRecord::Base
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
   has_many :receivers, :through => :links_as_source, :class_name => "Agent", :inverse_of => :sources
   has_many :chains_as_controller, dependent: :delete_all, foreign_key: 'controller_id', class_name: 'Chain', inverse_of: :controller
-  has_many :chains_as_target, dependent: :delete_all, foreign_key: 'target_id', class_name: 'Chain', inverse_of: :target
-  has_many :controllers, through: :chains_as_target, class_name: "Agent", inverse_of: :targets
-  has_many :targets, through: :chains_as_controller, class_name: "Agent", inverse_of: :controllers
+  has_many :chains_as_control_target, dependent: :delete_all, foreign_key: 'control_target_id', class_name: 'Chain', inverse_of: :control_target
+  has_many :controllers, through: :chains_as_control_target, class_name: "Agent", inverse_of: :control_targets
+  has_many :control_targets, through: :chains_as_controller, class_name: "Agent", inverse_of: :controllers
   has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :agent
   has_many :scenarios, :through => :scenario_memberships, :inverse_of => :agents
 
@@ -233,8 +233,8 @@ class Agent < ActiveRecord::Base
     errors.add(:controllers, "must be owned by you") unless controllers.all? {|s| s.user == user }
   end
 
-  def targets_are_owned
-    errors.add(:targets, "must be owned by you") unless targets.all? {|s| s.user == user }
+  def control_targets_are_owned
+    errors.add(:control_targets, "must be owned by you") unless control_targets.all? {|s| s.user == user }
   end
 
   def scenarios_are_owned
@@ -423,7 +423,7 @@ class AgentDrop
     :receivers,
     :schedule,
     :controllers,
-    :targets,
+    :control_targets,
     :disabled,
     :keep_events_for,
     :propagate_immediately,

@@ -162,7 +162,7 @@ module DotHelper
 
           [
             *agent.receivers,
-            *(agent.targets if agent.can_control_other_agents?)
+            *(agent.control_targets if agent.can_control_other_agents?)
           ].each { |receiver|
             agent_edge(agent, receiver) if agents.include?(receiver)
           }

@@ -11,10 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140822085519) do
-
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+ActiveRecord::Schema.define(version: 20140829081212) do
 
   create_table "agent_logs", force: true do |t|
     t.integer  "agent_id",                      null: false
@@ -38,14 +35,14 @@ ActiveRecord::Schema.define(version: 20140822085519) do
     t.integer  "last_checked_event_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "memory"
+    t.text     "memory",                limit: 2147483647
     t.datetime "last_web_request_at"
-    t.integer  "keep_events_for",       default: 0,     null: false
+    t.integer  "keep_events_for",                          default: 0,     null: false
     t.datetime "last_event_at"
     t.datetime "last_error_log_at"
-    t.boolean  "propagate_immediately", default: false, null: false
-    t.boolean  "disabled",              default: false, null: false
-    t.string   "guid",                                  null: false
+    t.boolean  "propagate_immediately",                    default: false, null: false
+    t.boolean  "disabled",                                 default: false, null: false
+    t.string   "guid",                                                     null: false
     t.integer  "service_id"
   end
 
@@ -56,18 +53,18 @@ ActiveRecord::Schema.define(version: 20140822085519) do
 
   create_table "chains", force: true do |t|
     t.integer  "controller_id"
-    t.integer  "target_id"
+    t.integer  "control_target_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "chains", ["controller_id", "target_id"], name: "index_chains_on_controller_id_and_target_id", unique: true, using: :btree
-  add_index "chains", ["target_id"], name: "index_chains_on_target_id", using: :btree
+  add_index "chains", ["control_target_id"], name: "index_chains_on_control_target_id", using: :btree
+  add_index "chains", ["controller_id", "control_target_id"], name: "index_chains_on_controller_id_and_control_target_id", unique: true, using: :btree
 
   create_table "delayed_jobs", force: true do |t|
-    t.integer  "priority",   default: 0
-    t.integer  "attempts",   default: 0
-    t.text     "handler"
+    t.integer  "priority",                    default: 0
+    t.integer  "attempts",                    default: 0
+    t.text     "handler",    limit: 16777215
     t.text     "last_error"
     t.datetime "run_at"
     t.datetime "locked_at"
@@ -83,9 +80,9 @@ ActiveRecord::Schema.define(version: 20140822085519) do
   create_table "events", force: true do |t|
     t.integer  "user_id"
     t.integer  "agent_id"
-    t.decimal  "lat",        precision: 15, scale: 10
-    t.decimal  "lng",        precision: 15, scale: 10
-    t.text     "payload"
+    t.decimal  "lat",                         precision: 15, scale: 10
+    t.decimal  "lng",                         precision: 15, scale: 10
+    t.text     "payload",    limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "expires_at"

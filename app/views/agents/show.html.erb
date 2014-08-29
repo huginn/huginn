@@ -136,8 +136,8 @@
 
             <% if @agent.can_control_other_agents? %>
               <p>
-                <b>Targets:</b>
-                <% if (agents = @agent.targets).length > 0 %>
+                <b>Control Targets:</b>
+                <% if (agents = @agent.control_targets).length > 0 %>
                   <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
                 <% else %>
                   None
