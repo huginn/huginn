@@ -14,8 +14,22 @@ group "huginn" do
   members ["huginn"]
 end
 
-%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libshadow-ruby1.8" "libmysqlclient-dev" "libffi-dev" "libssl-dev").each do |pkg|
+%w("ruby1.9.1" "ruby1.9.1-dev" "libxslt-dev" "libxml2-dev" "curl" "libmysqlclient-dev" "libffi-dev" "libssl-dev").each do |pkg|
   package("#{pkg}")
+end
+
+bash "Setting default ruby and gem versions to 1.9" do
+  code <<-EOH
+    if [ $(readlink /usr/bin/ruby) != "ruby1.9.1" ]
+    then
+      update-alternatives --set ruby /usr/bin/ruby1.9.1
+    fi
+
+    if [ $(readlink /usr/bin/gem) != "gem1.9.1" ]
+    then
+      update-alternatives --set gem /usr/bin/gem1.9.1
+    fi
+  EOH
 end
 
 gem_package("rake")
@@ -84,7 +98,7 @@ deploy "/home/huginn" do
       sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/
       echo 'gem "unicorn", :group => :production' >> Gemfile
       sudo bundle install --without=development --without=test
-      sed -i s/REPLACE_ME_NOW\!/$(sudo bundle exec rake secret)/ .env
+      sed -i s/REPLACE_ME_NOW\!/$(sudo bundle exec rake secret)/ /home/huginn/shared/config/.env
       sudo RAILS_ENV=production bundle exec rake db:create
       sudo RAILS_ENV=production bundle exec rake db:migrate
       sudo RAILS_ENV=production bundle exec rake db:seed

@@ -1,0 +1,26 @@
+<% if @twitter_agent || @basecamp_agent %>
+  <div class="alert alert-danger" role="alert">
+    <p>
+      <b>Warning!</b> You need to update your Huginn configuration, so your agents continue to work with the new OAuth services.
+    </p>
+    <br/>
+    <% if @twitter_agent %>
+      <p>
+        To complete the migration of your <b>Twitter</b> agents you need to update your .env file and add the following two lines:
+
+        <pre>
+TWITTER_OAUTH_KEY=<%= @twitter_oauth_key %>
+TWITTER_OAUTH_SECRET=<%= @twitter_oauth_secret %>
+        </pre>
+        To authenticate new accounts with your twitter OAuth application you need to log in the to <a href="https://apps.twitter.com/" target="_blank">twitter application management page</a> and set the callback URL of your application to "http<%= ENV['FORCE_SSL'] == 'true' ? 's' : '' %>://<%= ENV['DOMAIN'] %>/auth/twitter/callback".
+
+      </p>
+    <% end %>
+    <% if @basecamp_agent %>
+      <p>
+        Your <b>Basecamp</b> agents could not be migrated automatically. You need to manually register an application with 37signals and authenticate Huginn to use it.<br/>
+        Have a look at the <%= link_to 'Wiki', 'https://github.com/cantino/huginn/wiki/Configuring-OAuth-applications', target: '_blank' %> if you need help.
+      </p>
+    <% end %>
+  </div>
+<% end -%>

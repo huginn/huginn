@@ -1,0 +1,164 @@
+<div class="row">
+  <div class="col-md-12">
+    <% if @scenario_import.dangerous? %>
+      <div class="alert alert-danger">
+        <span class='glyphicon glyphicon-warning-sign'></span>
+        This Scenario contains one or more potentially dangerous Agents.
+        These may be able to run local commands or execute code.
+        Please be sure that you understand the Agent configurations before importing!
+      </div>
+    <% end %>
+
+    <% if @scenario_import.existing_scenario.present? %>
+      <div class="alert alert-warning">
+        <span class='glyphicon glyphicon-warning-sign'></span>
+        This Scenario already exists in your system. The import will update your existing
+        <%= scenario_label(@scenario_import.existing_scenario) %> Scenario's title,
+        description and tag colors. Below you can customize how the individual agents get updated.
+      </div>
+    <% end %>
+
+    <div class="page-header">
+      <h2>
+        <%= @scenario_import.parsed_data["name"] %>
+        <span class='text-muted'>
+          (<%= pluralize @scenario_import.parsed_data["agents"].length, "Agent" %>;
+          exported <%= time_ago_in_words Time.parse(@scenario_import.parsed_data["exported_at"]) %> ago)
+        </span>
+      </h2>
+    </div>
+
+    <% if @scenario_import.parsed_data["description"].present? %>
+      <blockquote><%= markdown(@scenario_import.parsed_data["description"]) %></blockquote>
+    <% end %>
+
+  </div>
+</div>
+
+<div class='agent-import-list'>
+  <% @scenario_import.agent_diffs.each.with_index do |agent_diff, index| %>
+    <div class='agent-import' data-index='<%= index %>'>
+
+      <div class='row'>
+        <div class='col-md-12'>
+          <h3>
+            <a href='#' data-toggle="modal" data-target="#agent_options_<%= index %>"><%= agent_diff.name.incoming %></a>
+            <span class='text-muted'>
+              (<%= agent_diff.type.incoming %><% " -- WARNING: this Agent's type has been changed.  This import will likely fail!" if agent_diff.type.requires_merge? %>)
+            </span>
+          </h3>
+
+          <% if agent_diff.agent_exists? %>
+            <div class="instructions">
+              This Agent exists in your Huginn system.
+
+              <% if agent_diff.requires_merge? %>
+                Here are the differences between the incoming version and the one you have now. For each field, please
+                select which value you'd like to keep.
+              <% else %>
+                It's already up-to-date.
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="modal fade" id="agent_options_<%= index %>" tabindex="-1" role="dialog" aria-labelledby="modalLabel<%= index %>" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="modalLabel<%= index %>">Options for '<%= agent_diff.name.updated %>'</h4>
+            </div>
+            <div class="modal-body">
+              <pre class='options'><%= Utils.pretty_jsonify agent_diff.options.incoming %></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% agent_diff.each_field do |field, value, selection_options| %>
+        <div class='row'>
+          <div class='col-md-4'>
+            <div class="form-group">
+              <%= label_tag "scenario_import[merges][#{index}][#{field}]", field.titleize %>
+              <% if selection_options.present? %>
+                <div>
+                  Your current Agent's value is:
+                  <span class='current'><%= selection_options.find { |s| s.last.to_s == value.current.to_s }.first %></span>
+                </div>
+                <%= select_tag "scenario_import[merges][#{index}][#{field}]", options_for_select(selection_options, value.updated), :class => 'form-control' %>
+              <% else %>
+                <div>
+                  Your current Agent's value is: <span class='current'><%= value.current.to_s %></span>
+                </div>
+                <%= text_field_tag "scenario_import[merges][#{index}][#{field}]", value.updated, :class => 'form-control' %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class='row'>
+        <% if agent_diff.options.requires_merge? %>
+          <div class='col-md-12'>
+            <label>Options</label>
+          </div>
+
+          <div class='col-md-6'>
+            <textarea name="scenario_import[merges][<%= index %>][options]" rows='15' class="form-control live-json-editor">
+              <%= Utils.pretty_jsonify(agent_diff.options.updated) %>
+            </textarea>
+          </div>
+
+          <div class='col-md-6'>
+            <div>
+              Your current options:
+            </div>
+            <pre class='options'><%= Utils.pretty_jsonify agent_diff.options.current %></pre>
+          </div>
+        <% end %>
+      </div>
+
+      <% if agent_diff.requires_service? %>
+        <div class='row'>
+          <div class='col-md-4'>
+            <div class="form-group type-select">
+              <%= label_tag "scenario_import[merges][#{index}][service_id]", 'Service' %>
+              <%= select_tag "scenario_import[merges][#{index}][service_id]", options_for_select(agent_diff.agent_instance.valid_services_for(current_user).collect { |s| ["(#{s.provider}) #{s.name}", s.id]}, agent_diff.agent.try(:service_id)), class: 'form-control' %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class='row'>
+  <div class='col-md-12'>
+    <div class="checkbox">
+      <%= f.label :do_import do %>
+        <%= f.check_box :do_import %> I confirm that I want to import these Agents.
+      <% end %>
+    </div>
+
+    <div class='form-actions'>
+      <%= f.submit "Finish Import", :class => "btn btn-primary" %>
+    </div>
+  </div>
+</div>
+
+
+<script>
+//  $(function() {
+//    $('.agent-import-list .options-toggle').on('click', function (e) {
+//      e.preventDefault();
+//      $(this).siblings('.options').slideToggle()
+//      if ($(this).text() == "Show Options") {
+//        $(this).text("Hide Options");
+//      } else {
+//        $(this).text("Show Options");
+//      }
+//    });
+//  });
+</script>

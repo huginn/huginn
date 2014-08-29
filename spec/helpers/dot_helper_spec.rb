@@ -1,12 +1,6 @@
 require 'spec_helper'
 
 describe DotHelper do
-  describe "#dot_id" do
-    it "properly escapes double quotaion and backslash" do
-      dot_id('hello\\"').should == '"hello\\\\\\""'
-    end
-  end
-
   describe "with example Agents" do
     class Agents::DotFoo < Agent
       default_schedule "2pm"
@@ -30,18 +24,77 @@ describe DotHelper do
     end
 
     describe "#agents_dot" do
+      before do
+        @agents = [
+          @foo = Agents::DotFoo.new(name: "foo").tap { |agent|
+            agent.user = users(:bob)
+            agent.save!
+          },
+
+          @bar1 = Agents::DotBar.new(name: "bar1").tap { |agent|
+            agent.user = users(:bob)
+            agent.sources << @foo
+            agent.save!
+          },
+
+          @bar2 = Agents::DotBar.new(name: "bar2").tap { |agent|
+            agent.user = users(:bob)
+            agent.sources << @foo
+            agent.propagate_immediately = true
+            agent.disabled = true
+            agent.save!
+          },
+
+          @bar3 = Agents::DotBar.new(name: "bar3").tap { |agent|
+            agent.user = users(:bob)
+            agent.sources << @bar2
+            agent.save!
+          },
+        ]
+      end
+
       it "generates a DOT script" do
-        @foo = Agents::DotFoo.new(:name => "foo")
-        @foo.user = users(:bob)
-        @foo.save!
+        agents_dot(@agents).should =~ %r{
+          \A
+          digraph \x20 "Agent \x20 Event \x20 Flow" \{
+            node \[ [^\]]+ \];
+            (?<foo>\w+) \[label=foo\];
+            \k<foo> -> (?<bar1>\w+) \[style=dashed\];
+            \k<foo> -> (?<bar2>\w+) \[color="\#999999"\];
+            \k<bar1> \[label=bar1\];
+            \k<bar2> \[label=bar2,style="rounded,dashed",color="\#999999",fontcolor="\#999999"\];
+            \k<bar2> -> (?<bar3>\w+) \[style=dashed,color="\#999999"\];
+            \k<bar3> \[label=bar3\];
+          \}
+          \z
+        }x
+      end
 
-        @bar = Agents::DotBar.new(:name => "bar")
-        @bar.user = users(:bob)
-        @bar.sources << @foo
-        @bar.save!
+      it "generates a richer DOT script" do
+        agents_dot(@agents, true).should =~ %r{
+          \A
+          digraph \x20 "Agent \x20 Event \x20 Flow" \{
+            node \[ [^\]]+ \];
+            (?<foo>\w+) \[label=foo,tooltip="Dot \x20 Foo",URL="#{Regexp.quote(agent_path(@foo))}"\];
+            \k<foo> -> (?<bar1>\w+) \[style=dashed\];
+            \k<foo> -> (?<bar2>\w+) \[color="\#999999"\];
+            \k<bar1> \[label=bar1,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar1))}"\];
+            \k<bar2> \[label=bar2,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar2))}",style="rounded,dashed",color="\#999999",fontcolor="\#999999"\];
+            \k<bar2> -> (?<bar3>\w+) \[style=dashed,color="\#999999"\];
+            \k<bar3> \[label=bar3,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar3))}"\];
+          \}
+          \z
+        }x
+      end
+    end
+  end
 
-        agents_dot([@foo, @bar]).should == 'digraph foo {"foo";"foo"->"bar";"bar";}'
-        agents_dot([@foo, @bar], true).should == 'digraph foo {"foo"[URL="/agents/%d"];"foo"->"bar";"bar"[URL="/agents/%d"];}' % [@foo.id, @bar.id]
+  describe "DotHelper::DotDrawer" do
+    describe "#id" do
+      it "properly escapes double quotaion and backslash" do
+        DotHelper::DotDrawer.draw(foo: "") {
+          id('hello\\"')
+        }.should == '"hello\\\\\\""'
       end
     end
   end

@@ -10,17 +10,17 @@ describe EventsController do
     it "only returns Events created by Agents of the current user" do
       sign_in users(:bob)
       get :index
-      assigns(:events).all? {|i| i.user.should == users(:bob) }.should be_true
+      assigns(:events).all? {|i| i.user.should == users(:bob) }.should be_truthy
     end
 
     it "can filter by Agent" do
       sign_in users(:bob)
-      get :index, :agent => agents(:bob_website_agent)
+      get :index, :agent_id => agents(:bob_website_agent)
       assigns(:events).length.should == agents(:bob_website_agent).events.length
-      assigns(:events).all? {|i| i.agent.should == agents(:bob_website_agent) }.should be_true
+      assigns(:events).all? {|i| i.agent.should == agents(:bob_website_agent) }.should be_truthy
 
       lambda {
-        get :index, :agent => agents(:jane_website_agent)
+        get :index, :agent_id => agents(:jane_website_agent)
       }.should raise_error(ActiveRecord::RecordNotFound)
     end
   end

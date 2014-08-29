@@ -34,13 +34,13 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def receive(incoming_events)
       anew = self.class.sentiment_hash
       incoming_events.each do |event|
-        Utils.values_at(event.payload, options['content']).each do |content|
+        Utils.values_at(event.payload, interpolated['content']).each do |content|
           sent_values = sentiment_values anew, content
           create_event :payload => { 'content' => content,
                                      'valence' => sent_values[0],

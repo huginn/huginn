@@ -19,6 +19,8 @@ module Agents
       You must setup an [API key for Wunderground](http://www.wunderground.com/weather/api/) in order to use this Agent with Wunderground.
 
       You must setup an [API key for Forecast](https://developer.forecast.io/) in order to use this Agent with ForecastIO.
+
+      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
 
     event_description <<-MD
@@ -49,11 +51,11 @@ module Agents
     default_schedule "8pm"
 
     def working?
-      event_created_within?(2) && !recent_error_logs?
+      event_created_within?((interpolated['expected_update_period_in_days'].presence || 2).to_i) && !recent_error_logs?
     end
 
     def key_setup?
-      options['api_key'].present? && options['api_key'] != "your-key"
+      interpolated['api_key'].present? && interpolated['api_key'] != "your-key"
     end
 
     def default_options
@@ -61,20 +63,21 @@ module Agents
         'service' => 'wunderground',
         'api_key' => 'your-key',
         'location' => '94103',
-        'which_day' => '1'
+        'which_day' => '1',
+        'expected_update_period_in_days' => '2'
       }
     end
 
     def service
-      options["service"].presence || "wunderground"
+      interpolated["service"].presence || "wunderground"
     end
 
     def which_day
-      (options["which_day"].presence || 1).to_i
+      (interpolated["which_day"].presence || 1).to_i
     end
 
     def location
-      options["location"].presence || options["zipcode"]
+      interpolated["location"].presence || interpolated["zipcode"]
     end
 
     def validate_options
@@ -86,12 +89,12 @@ module Agents
     end
 
     def wunderground
-      Wunderground.new(options['api_key']).forecast_for(location)['forecast']['simpleforecast']['forecastday'] if key_setup?
+      Wunderground.new(interpolated['api_key']).forecast_for(location)['forecast']['simpleforecast']['forecastday'] if key_setup?
     end
 
     def forecastio
       if key_setup?
-        ForecastIO.api_key = options['api_key']
+        ForecastIO.api_key = interpolated['api_key']
         lat, lng = location.split(',')
         ForecastIO.forecast(lat,lng)['daily']['data']
       end
@@ -163,7 +166,7 @@ module Agents
               'ozone' => value.ozone.to_s
             }
             return day
-          end    
+          end
         end
       end
     end

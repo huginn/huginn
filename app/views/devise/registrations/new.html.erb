@@ -1,51 +1,55 @@
 <div class='container'>
   <div class='row'>
-    <div class='span8 offset2'>
+    <div class='col-md-8 col-md-offset-2'>
       <div class='well'>
-        <h2>Sign up</h2>
+
+        <h2>Sign Up</h2>
 
         <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :class => 'form-horizontal' }) do |f| %>
           <%= devise_error_messages! %>
 
-          <div class="control-group">
-            <%= f.label :invitation_code, :class => 'control-label' %>
-            <div class="controls">
-              <%= f.text_field :invitation_code, :class => 'span4' %>
+          <div class="form-group">
+            <%= f.label :invitation_code, :class => 'col-md-4 control-label' %>
+            <div class="col-md-6">
+              <%= f.text_field :invitation_code, :class => 'form-control' %>
               <span class="help-inline">We are not yet open to the public.  If you have an invitation code, please enter it here.</span>
             </div>
           </div>
 
-          <div class="control-group">
-            <%= f.label :email, :class => 'control-label' %>
-            <div class="controls">
-              <%= f.email_field :email, :class => 'span4' %>
+          <div class="form-group">
+            <%= f.label :email, :class => 'col-md-4 control-label' %>
+            <div class="col-md-6">
+              <%= f.email_field :email, :class => 'form-control' %>
             </div>
           </div>
 
-          <div class="control-group">
-            <%= f.label :username, :class => 'control-label' %>
-            <div class="controls">
-              <%= f.text_field :username, :class => 'span4' %>
+          <div class="form-group">
+            <%= f.label :username, :class => 'col-md-4 control-label' %>
+            <div class="col-md-6">
+              <%= f.text_field :username, :class => 'form-control' %>
             </div>
           </div>
 
-          <div class="control-group">
-            <%= f.label :password, :class => 'control-label' %>
-            <div class="controls">
-              <%= f.password_field :password, :class => 'span4' %>
+          <div class="form-group">
+            <%= f.label :password, :class => 'col-md-4 control-label' %>
+            <div class="col-md-6">
+              <%= f.password_field :password, :autocomplete => "off", :class => 'form-control' %>
             </div>
           </div>
 
-          <div class="control-group">
-            <%= f.label :password_confirmation, :class => 'control-label' %>
-            <div class="controls">
-              <%= f.password_field :password_confirmation, :class => 'span4' %>
+          <div class="form-group">
+            <%= f.label :password_confirmation, :class => 'col-md-4 control-label' %>
+            <div class="col-md-6">
+              <%= f.password_field :password_confirmation, :class => 'form-control' %>
             </div>
           </div>
 
-          <div class='form-actions'>
-            <%= f.submit "Sign up", :class => "btn btn-primary" %>
+          <div class="form-group">
+            <div class="col-md-offset-4 col-md-10">
+              <%= f.submit "Sign Up", :class => "btn btn-primary" %>
+            </div>
           </div>
+
         <% end %>
 
         <%= render "devise/shared/links" %>

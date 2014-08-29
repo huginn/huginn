@@ -1,8 +1,16 @@
-# This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'
 
-require 'coveralls'
-Coveralls.wear!('rails')
+if ENV['COVERAGE']
+  require 'simplecov'
+  SimpleCov.start 'rails'
+else
+  require 'coveralls'
+  Coveralls.wear!('rails')
+end
+
+# Required ENV variables that are normally set in .env are setup here for the test environment.
+require 'dotenv'
+Dotenv.overload File.join(File.dirname(__FILE__), "env.test")
 
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
@@ -14,7 +22,9 @@ WebMock.disable_net_connect!
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+
+ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
   config.mock_with :rr
@@ -26,6 +36,11 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   config.use_transactional_fixtures = true
+
+  # rspec-rails 3 will no longer automatically infer an example group's spec type
+  # from the file location. You can explicitly opt-in to this feature using this
+  # snippet:
+  config.infer_spec_type_from_file_location!
 
   # If true, the base class of anonymous controllers will be inferred
   # automatically. This will be the default behavior in future versions of

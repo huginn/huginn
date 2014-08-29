@@ -1,10 +1,9 @@
 require 'nokogiri'
-require 'faraday'
-require 'faraday_middleware'
 require 'date'
 
 module Agents
   class WebsiteAgent < Agent
+    include WebRequestConcern
 
     default_schedule "every_12h"
 
@@ -18,17 +17,19 @@ module Agents
 
       `url` can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape)
 
-      The `type` value can be `xml`, `html`, or `json`.
+      The `type` value can be `xml`, `html`, `json`, or `text`.
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
-      When parsing HTML or XML, these sub-hashes specify how to extract with either a `css` CSS selector or a `xpath` XPath expression and either `"text": true` or `attr` pointing to an attribute name to grab.  An example:
+      When parsing HTML or XML, these sub-hashes specify how each extraction should be done.  The Agent first selects a node set from the document for each extraction key by evaluating either a CSS selector in `css` or an XPath expression in `xpath`.  It then evaluates an XPath expression in `value` on each node in the node set, converting the result into string.  Here's an example:
 
           "extract": {
-            "url": { "css": "#comic img", "attr": "src" },
-            "title": { "css": "#comic img", "attr": "title" },
-            "body_text": { "css": "div.main", "text": true }
+            "url": { "css": "#comic img", "value": "@src" },
+            "title": { "css": "#comic img", "value": "@title" },
+            "body_text": { "css": "div.main", "value": ".//text()" }
           }
+
+      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and ".//text()" is to extract all the enclosed texts.  You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-text(.//text())` should actually be `normalize-text(.)`.
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
@@ -36,6 +37,28 @@ module Agents
             "title": { "path": "results.data[*].title" },
             "description": { "path": "results.data[*].description" }
           }
+
+      When parsing text, each sub-hash should contain a `regexp` and `index`.  Output text is matched against the regular expression repeatedly from the beginning through to the end, collecting a captured group specified by `index` in each match.  Each index should be either an integer or a string name which corresponds to `(?<_name_>...)`.  For example, to parse lines of `_word_: _definition_`, the following should work:
+
+          "extract": {
+            "word": { "regexp": "^(.+?): (.+)$", index: 1 },
+            "definition": { "regexp": "^(.+?): (.+)$", index: 2 }
+          }
+
+      Or if you prefer names to numbers for index:
+
+          "extract": {
+            "word": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'word' },
+            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'definition' }
+          }
+
+      To extract the whole content as one event:
+
+          "extract": {
+            "content": { "regexp": "\A(?m:.)*\z", index: 0 }
+          }
+
+      Beware that `.` does not match the newline character (LF) unless the `m` flag is in effect, and `^`/`$` basically match every line beginning/end.  See [this document](http://ruby-doc.org/core-#{RUBY_VERSION}/doc/regexp_rdoc.html) to learn the regular expression variant used in this service.
 
       Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
 
@@ -47,17 +70,23 @@ module Agents
 
       Set `force_encoding` to an encoding name if the website does not return a Content-Type header with a proper charset.
 
-      Set `user_agent` to a custom User-Agent name if the website does not like the default value ("Faraday v#{Faraday::VERSION}").
+      Set `user_agent` to a custom User-Agent name if the website does not like the default value (`#{default_user_agent}`).
+
+      The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
 
       The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload.
     MD
 
     event_description do
-      "Events will have the fields you specified.  Your options look like:\n\n    #{Utils.pretty_print options['extract']}"
+      "Events will have the following fields:\n\n    %s" % [
+        Utils.pretty_print(Hash[options['extract'].keys.map { |key|
+          [key, "..."]
+        }])
+      ]
     end
 
     def working?
-      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
@@ -67,9 +96,9 @@ module Agents
           'type' => "html",
           'mode' => "on_change",
           'extract' => {
-            'url' => { 'css' => "#comic img", 'attr' => "src" },
-            'title' => { 'css' => "#comic img", 'attr' => "alt" },
-            'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+            'url' => { 'css' => "#comic img", 'value' => "@src" },
+            'title' => { 'css' => "#comic img", 'value' => "@alt" },
+            'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
           }
       }
     end
@@ -107,19 +136,11 @@ module Agents
         end
       end
 
-      if options['user_agent'].present?
-        errors.add(:base, "user_agent must be a string") unless options['user_agent'].is_a?(String)
-      end
-
-      begin
-        basic_auth_credentials()
-      rescue => e
-        errors.add(:base, e.message)
-      end
+      validate_web_request_options!
     end
 
     def check
-      check_url options['url']
+      check_url interpolated['url']
     end
 
     def check_url(in_url)
@@ -130,7 +151,7 @@ module Agents
         response = faraday.get(url)
         if response.success?
           body = response.body
-          if (encoding = options['force_encoding']).present?
+          if (encoding = interpolated['force_encoding']).present?
             body = body.encode(Encoding::UTF_8, encoding)
           end
           doc = parse(body)
@@ -140,75 +161,60 @@ module Agents
               log "Storing new result for '#{name}': #{doc.inspect}"
               create_event :payload => doc
             end
-          else
-            output = {}
-            options['extract'].each do |name, extraction_details|
-              if extraction_type == "json"
-                result = Utils.values_at(doc, extraction_details['path'])
-                log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
-              else
-                case
-                when css = extraction_details['css']
-                  nodes = doc.css(css)
-                when xpath = extraction_details['xpath']
-                  nodes = doc.xpath(xpath)
-                else
-                  error '"css" or "xpath" is required for HTML or XML extraction'
-                  return
-                end
-                unless Nokogiri::XML::NodeSet === nodes
-                  error "The result of HTML/XML extraction was not a NodeSet"
-                  return
-                end
-                result = nodes.map { |node|
-                  if extraction_details['attr']
-                    node.attr(extraction_details['attr'])
-                  elsif extraction_details['text']
-                    node.text()
-                  else
-                    error '"attr" or "text" is required on HTML or XML extraction patterns'
-                    return
-                  end
-                }
-                log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
-              end
-              output[name] = result
+            next
+          end
+
+          output =
+            case extraction_type
+            when 'json'
+              extract_json(doc)
+            when 'text'
+              extract_text(doc)
+            else
+              extract_xml(doc)
             end
 
-            num_unique_lengths = options['extract'].keys.map { |name| output[name].length }.uniq
+          num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
 
-            if num_unique_lengths.length != 1
-              error "Got an uneven number of matches for #{options['name']}: #{options['extract'].inspect}"
-              return
+          if num_unique_lengths.length != 1
+            raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
+          end
+
+          old_events = previous_payloads num_unique_lengths.first
+          num_unique_lengths.first.times do |index|
+            result = {}
+            interpolated['extract'].keys.each do |name|
+              result[name] = output[name][index]
+              if name.to_s == 'url'
+                result[name] = (response.env[:url] + result[name]).to_s
+              end
             end
 
-            old_events = previous_payloads num_unique_lengths.first
-            num_unique_lengths.first.times do |index|
-              result = {}
-              options['extract'].keys.each do |name|
-                result[name] = output[name][index]
-                if name.to_s == 'url'
-                  result[name] = (response.env[:url] + result[name]).to_s
-                end
-              end
-
-              if store_payload!(old_events, result)
-                log "Storing new parsed result for '#{name}': #{result.inspect}"
-                create_event :payload => result
-              end
+            if store_payload!(old_events, result)
+              log "Storing new parsed result for '#{name}': #{result.inspect}"
+              create_event :payload => result
             end
           end
         else
-          error "Failed: #{response.inspect}"
+          raise "Failed: #{response.inspect}"
         end
       end
+    rescue => e
+      error e.message
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
+        Thread.current[:current_event] = event
         url_to_scrape = event.payload['url']
         check_url(url_to_scrape) if url_to_scrape =~ /^https?:\/\//i
       end
+    ensure
+      Thread.current[:current_event] = nil
+    end
+
+    def interpolated(event = Thread.current[:current_event])
+      super
     end
 
     private
@@ -217,27 +223,27 @@ module Agents
     # If mode is set to 'on_change', this method may return false and update an existing
     # event to expire further in the future.
     def store_payload!(old_events, result)
-      if !options['mode'].present?
-        return true
-      elsif options['mode'].to_s == "all"
-        return true
-      elsif options['mode'].to_s == "on_change"
+      case interpolated['mode'].presence
+      when 'on_change'
         result_json = result.to_json
         old_events.each do |old_event|
           if old_event.payload.to_json == result_json
             old_event.expires_at = new_event_expiration_date
             old_event.save!
             return false
-         end
+          end
         end
-        return true
+        true
+      when 'all', ''
+        true
+      else
+        raise "Illegal options[mode]: #{interpolated['mode']}"
       end
-      raise "Illegal options[mode]: " + options['mode'].to_s
     end
 
     def previous_payloads(num_events)
-      if options['uniqueness_look_back'].present?
-        look_back = options['uniqueness_look_back'].to_i
+      if interpolated['uniqueness_look_back'].present?
+        look_back = interpolated['uniqueness_look_back'].to_i
       else
         # Larger of UNIQUENESS_FACTOR * num_events and UNIQUENESS_LOOK_BACK
         look_back = UNIQUENESS_FACTOR * num_events
@@ -245,80 +251,103 @@ module Agents
           look_back = UNIQUENESS_LOOK_BACK
         end
       end
-      events.order("id desc").limit(look_back) if options['mode'].present? && options['mode'].to_s == "on_change"
+      events.order("id desc").limit(look_back) if interpolated['mode'] == "on_change"
     end
 
     def extract_full_json?
-      !options['extract'].present? && extraction_type == "json"
+      !interpolated['extract'].present? && extraction_type == "json"
     end
 
     def extraction_type
-      (options['type'] || begin
-        if options['url'] =~ /\.(rss|xml)$/i
+      (interpolated['type'] || begin
+        case interpolated['url']
+        when /\.(rss|xml)$/i
           "xml"
-        elsif options['url'] =~ /\.json$/i
+        when /\.json$/i
           "json"
+        when /\.(txt|text)$/i
+          "text"
         else
           "html"
         end
       end).to_s
     end
 
+    def extract_each(doc, &block)
+      interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
+        output[name] = block.call(extraction_details)
+      }
+    end
+
+    def extract_json(doc)
+      extract_each(doc) { |extraction_details|
+        result = Utils.values_at(doc, extraction_details['path'])
+        log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
+        result
+      }
+    end
+
+    def extract_text(doc)
+      extract_each(doc) { |extraction_details|
+        regexp = Regexp.new(extraction_details['regexp'])
+        result = []
+        doc.scan(regexp) {
+          result << Regexp.last_match[extraction_details['index']]
+        }
+        log "Extracting #{extraction_type} at #{regexp}: #{result}"
+        result
+      }
+    end
+
+    def extract_xml(doc)
+      extract_each(doc) { |extraction_details|
+        case
+        when css = extraction_details['css']
+          nodes = doc.css(css)
+        when xpath = extraction_details['xpath']
+          doc.remove_namespaces! # ignore xmlns, useful when parsing atom feeds
+          nodes = doc.xpath(xpath)
+        else
+          raise '"css" or "xpath" is required for HTML or XML extraction'
+        end
+        case nodes
+        when Nokogiri::XML::NodeSet
+          result = nodes.map { |node|
+            case value = node.xpath(extraction_details['value'])
+            when Float
+              # Node#xpath() returns any numeric value as float;
+              # convert it to integer as appropriate.
+              value = value.to_i if value.to_i == value
+            end
+            value.to_s
+          }
+        else
+          raise "The result of HTML/XML extraction was not a NodeSet"
+        end
+        log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
+        result
+      }
+    end
+
     def parse(data)
       case extraction_type
-        when "xml"
-          Nokogiri::XML(data)
-        when "json"
-          JSON.parse(data)
-        when "html"
-          Nokogiri::HTML(data)
-        else
-          raise "Unknown extraction type #{extraction_type}"
+      when "xml"
+        Nokogiri::XML(data)
+      when "json"
+        JSON.parse(data)
+      when "html"
+        Nokogiri::HTML(data)
+      when "text"
+        data
+      else
+        raise "Unknown extraction type #{extraction_type}"
       end
     end
 
     def is_positive_integer?(value)
-      begin
-        Integer(value) >= 0
-      rescue
-        false
-      end
-    end
-
-    def faraday
-      @faraday ||= Faraday.new { |builder|
-        if (user_agent = options['user_agent']).present?
-          builder.headers[:user_agent] = user_agent
-        end
-
-        builder.use FaradayMiddleware::FollowRedirects
-        builder.request :url_encoded
-        if userinfo = basic_auth_credentials()
-          builder.request :basic_auth, *userinfo
-        end
-
-        case backend = faraday_backend
-        when :typhoeus
-          require 'typhoeus/adapters/faraday'
-        end
-        builder.adapter backend
-      }
-    end
-
-    def faraday_backend
-      ENV.fetch('FARADAY_HTTP_BACKEND', 'typhoeus').to_sym
-    end
-
-    def basic_auth_credentials
-      case value = options['basic_auth']
-      when nil, ''
-        return nil
-      when Array
-        return value if value.size == 2
-      when /:/
-        return value.split(/:/, 2)
-      end
-      raise "bad value for basic_auth: #{value.inspect}"
+      Integer(value) >= 0
+    rescue
+      false
     end
   end
 end

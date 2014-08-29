@@ -33,6 +33,9 @@ Huginn::Application.configure do
   config.assets.digest = true
   config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
 
+  # Bootstrap fonts
+  config.assets.precompile += %w(*.woff *.eot *.svg *.ttf)
+
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
@@ -58,7 +61,7 @@ Huginn::Application.configure do
   end
 
   # Precompile additional assets (application.js.coffee.erb, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w( graphing.js user_credentials.js )
+  config.assets.precompile += %w( diagram.js graphing.js user_credentials.js )
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

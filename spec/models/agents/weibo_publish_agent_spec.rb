@@ -53,7 +53,7 @@ describe Agents::WeiboPublishAgent do
       Agents::WeiboPublishAgent.async_receive(@checker.id, [event.id])
       @sent_messages.count.should eq(1)
       @checker.events.count.should eq(1)
-      @sent_messages.first.include?("t.co").should_not be_true
+      @sent_messages.first.include?("t.co").should_not be_truthy
     end
   end
 

@@ -13,6 +13,7 @@ describe Agents::TwitterStreamAgent do
     }
 
     @agent = Agents::TwitterStreamAgent.new(:name => "HuginnBot", :options => @opts)
+    @agent.service = services(:generic)
     @agent.user = users(:bob)
     @agent.save!
   end

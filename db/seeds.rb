@@ -1,10 +1,10 @@
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
 
-user = User.find_or_initialize_by(:email => "admin@example.com")
-user.username = "admin"
-user.password = "password"
-user.password_confirmation = "password"
+user = User.find_or_initialize_by(:email => ENV['SEED_EMAIL'] || "admin@example.com")
+user.username = ENV['SEED_USERNAME'] || "admin"
+user.password = ENV['SEED_PASSWORD'] || "password"
+user.password_confirmation = ENV['SEED_PASSWORD'] || "password"
 user.invitation_code = User::INVITATION_CODES.first
 user.admin = true
 user.save!
@@ -31,9 +31,9 @@ unless user.agents.where(:name => "XKCD Source").exists?
                            'mode' => "on_change",
                            'expected_update_period_in_days' => 5,
                            'extract' => {
-                               'url' => { 'css' => "#comic img", 'attr' => "src" },
-                               'title' => { 'css' => "#comic img", 'attr' => "alt" },
-                               'hovertext' => { 'css' => "#comic img", 'attr' => "title" }
+                               'url' => { 'css' => "#comic img", 'value' => "@src" },
+                               'title' => { 'css' => "#comic img", 'value' => "@alt" },
+                               'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
                            }
                        }).save!
 end
@@ -47,8 +47,8 @@ unless user.agents.where(:name => "iTunes Trailer Source").exists?
                            'type' => "xml",
                            'expected_update_period_in_days' => 5,
                            'extract' => {
-                               'title' => { 'css' => "item title", 'text' => true},
-                               'url' => { 'css' => "item link", 'text' => true}
+                               'title' => { 'css' => "item title", 'value' => ".//text()"},
+                               'url' => { 'css' => "item link", 'value' => ".//text()"}
                            }
                        }).save!
 end
@@ -64,12 +64,12 @@ unless user.agents.where(:name => "Rain Notifier").exists?
                                           'value' => "rain|storm",
                                           'path' => "conditions"
                                       }],
-                           'message' => "Just so you know, it looks like '<conditions>' tomorrow in <location>"
+                           'message' => "Just so you know, it looks like '{{conditions}}' tomorrow in {{location}}"
                        }).save!
 end
 
 unless user.agents.where(:name => "Morning Digest").exists?
-  Agent.build_for_type("Agents::DigestEmailAgent", user,
+  Agent.build_for_type("Agents::EmailDigestAgent", user,
                        :name => "Morning Digest",
                        :schedule => "6am",
                        :options => { 'subject' => "Your Morning Digest", 'expected_receive_period_in_days' => "30" },
@@ -77,7 +77,7 @@ unless user.agents.where(:name => "Morning Digest").exists?
 end
 
 unless user.agents.where(:name => "Afternoon Digest").exists?
-  Agent.build_for_type("Agents::DigestEmailAgent", user,
+  Agent.build_for_type("Agents::EmailDigestAgent", user,
                        :name => "Afternoon Digest",
                        :schedule => "5pm",
                        :options => { 'subject' => "Your Afternoon Digest", 'expected_receive_period_in_days' => "7" },

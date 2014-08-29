@@ -1,42 +1,46 @@
-<div class='container'>
-  <div class='row'>
-    <div class='span8 offset2'>
-      <div class='well'>
+<div class='row'>
+  <div class='col-md-6 col-md-offset-3'>
+    <div class='well'>
 
-        <h2>Sign in</h2>
+      <h2>Sign in</h2>
 
-        <%= form_for(resource, :as => resource_name, :url => session_path(resource_name), :html => { :class => 'form-horizontal' }) do |f| %>
-          <div class="control-group">
-            <%= f.label :login, :class => 'control-label' %>
-            <div class="controls">
-              <%= f.text_field :login, :class => 'span4' %>
-            </div>
+      <%= form_for(resource, :as => resource_name, :url => session_path(resource_name), :html => { :class => 'form-horizontal', :role => 'form'}) do |f| %>
+        <div class="form-group">
+          <%= f.label :login, :class => 'col-md-2 col-md-offset-2 control-label' %>
+          <div class="col-md-6">
+            <%= f.text_field :login, :class => 'form-control' %>
           </div>
+        </div>
 
-          <div class="control-group">
-            <%= f.label :password, :class => 'control-label' %>
-            <div class="controls">
-              <%= f.password_field :password, :class => 'span4' %>
-            </div>
+        <div class="form-group">
+          <%= f.label :password, :class => 'col-md-2 col-md-offset-2 control-label' %>
+          <div class="col-md-6">
+            <%= f.password_field :password, :class => 'form-control' %>
           </div>
+        </div>
 
-          <div class="control-group">
+        <div class="form-group">
+          <div class="col-md-offset-4 col-md-10">
             <% if devise_mapping.rememberable? %>
-              <div class='controls'>
-                <label class='checkbox'>
+              <div class="checkbox">
+                <label>
                   <%= f.check_box :remember_me %> Remember me
                 </label>
               </div>
             <% end -%>
           </div>
+        </div>
 
-          <div class='form-actions'>
-            <%= f.submit "Sign in", :class => "btn btn-primary" %>
+        <div class="form-group">
+          <div class="col-md-offset-4 col-md-10">
+            <%= f.submit "Sign in", :class => "btn btn-default" %>
           </div>
-        <% end %>
+        </div>
+      <% end %>
 
-        <%= render "devise/shared/links" %>
-      </div>
+      <hr>
+
+      <%= render "devise/shared/links" %>
     </div>
   </div>
 </div>

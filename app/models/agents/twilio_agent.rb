@@ -39,18 +39,18 @@ module Agents
     end
 
     def receive(incoming_events)
-      @client = Twilio::REST::Client.new options['account_sid'], options['auth_token']
+      @client = Twilio::REST::Client.new interpolated['account_sid'], interpolated['auth_token']
       memory['pending_calls'] ||= {}
       incoming_events.each do |event|
         message = (event.payload['message'].presence || event.payload['text'].presence || event.payload['sms'].presence).to_s
         if message.present?
-          if options['receive_call'].to_s == 'true'
+          if boolify(interpolated(event)['receive_call'])
             secret = SecureRandom.hex 3
             memory['pending_calls'][secret] = message
             make_call secret
           end
 
-          if options['receive_text'].to_s == 'true'
+          if boolify(interpolated(event)['receive_text'])
             message = message.slice 0..160
             send_message message
           end
@@ -59,19 +59,19 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def send_message(message)
-      @client.account.sms.messages.create :from => options['sender_cell'],
-                                          :to => options['receiver_cell'],
+      @client.account.sms.messages.create :from => interpolated['sender_cell'],
+                                          :to => interpolated['receiver_cell'],
                                           :body => message
     end
 
     def make_call(secret)
-      @client.account.calls.create :from => options['sender_cell'],
-                                   :to => options['receiver_cell'],
-                                   :url => post_url(options['server_url'], secret)
+      @client.account.calls.create :from => interpolated['sender_cell'],
+                                   :to => interpolated['receiver_cell'],
+                                   :url => post_url(interpolated['server_url'], secret)
     end
 
     def post_url(server_url, secret)

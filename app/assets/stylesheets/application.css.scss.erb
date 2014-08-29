@@ -9,14 +9,13 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require select2
+ *= require select2-bootstrap
  *= require jquery.json-editor
  *= require rickshaw
+ *= require spectrum
  *= require_tree .
  *= require_self
  */
-
-$glyphicons-halflings-url: "<%= image_path "glyphicons-halflings.png" %>";
-$glyphicons-halflings-white-url: "<%= image_path "glyphicons-halflings-white.png" %>";
 
 @import "bootstrap";
 
@@ -63,6 +62,7 @@ img.odin {
 
 img.spinner {
   display: none;
+  vertical-align: bottom;
 }
 
 .hidden {
@@ -99,6 +99,12 @@ span.not-applicable:after {
   right: 1px;
 }
 
+.navbar {
+  .dropdown.dropdown-hover:hover .dropdown-menu {
+    display: block;
+  }
+}
+
 // Flash
 
 .flash {
@@ -133,4 +139,65 @@ span.not-applicable:after {
   position: relative;
   width: 940px;
   height: 400px;
+}
+
+// Disabled
+
+.agent-disabled {
+  opacity: 0.5;
+}
+
+// JSON Editor
+
+.live-json-editor {
+  font-family: "Courier New", Courier, monospace;
+}
+
+.json-editor blockquote {
+  font-size: 14px;
+}
+
+// Position tweeks
+
+.hover-help {
+  top: 2px;
+}
+
+.popover {
+  dd {
+    margin-left: 1em;
+  }
+}
+
+h2 .scenario, a span.label.scenario {
+  position: relative;
+  top: -2px;
+}
+
+// Bootstrappy color styles
+
+.color-danger {
+  color: #d9534f;
+}
+
+.color-warning {
+  color: #f0ad4e;
+}
+
+.color-success {
+  color: #5cb85c;
+}
+
+.form-group {
+  .sp-replacer {
+    @extend .form-control;
+  }
+
+  .sp-preview {
+    width: 100%;
+  }
+
+  .sp-dd {
+    display: none;
+  }
 }

@@ -1,0 +1,32 @@
+<div class='container scenario-import'>
+  <div class="row">
+    <div class="col-md-12">
+      <% if @scenario_import.errors.any? %>
+        <div class="row well">
+          <h2><%= pluralize(@scenario_import.errors.count, "error") %> prohibited this Scenario from being imported:</h2>
+          <% @scenario_import.errors.full_messages.each do |msg| %>
+            <p class='text-warning'><%= msg %></p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_for @scenario_import, :multipart => true do |f| %>
+    <%= f.hidden_field :data %>
+
+    <% if @scenario_import.step_one? %>
+      <%= render 'step_one', :f => f %>
+    <% elsif @scenario_import.step_two? %>
+      <%= render 'step_two', :f => f %>
+    <% end %>
+  <% end %>
+
+  <hr />
+
+  <div class="row">
+    <div class="col-md-12">
+      <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, scenarios_path, class: "btn btn-default" %>
+    </div>
+  </div>
+</div>

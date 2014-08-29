@@ -1,12 +1,14 @@
 require 'spec_helper'
 
 describe Agents::EmailAgent do
+  it_behaves_like EmailConcern
+
   def get_message_part(mail, content_type)
     mail.body.parts.find { |p| p.content_type.match content_type }.body.raw_source
   end
 
   before do
-    @checker = Agents::EmailAgent.new(:name => "something", :options => { :expected_receive_period_in_days => 2, :subject => "something interesting" })
+    @checker = Agents::EmailAgent.new(:name => "something", :options => { :expected_receive_period_in_days => "2", :subject => "something interesting" })
     @checker.user = users(:bob)
     @checker.save!
   end
@@ -54,6 +56,5 @@ describe Agents::EmailAgent do
       plain_email_text.should =~ /avehumidity/
       html_email_text.should =~ /avehumidity/
     end
-
   end
 end

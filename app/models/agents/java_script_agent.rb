@@ -35,12 +35,12 @@ module Agents
     def working?
       return false if recent_error_logs?
 
-      if options['expected_update_period_in_days'].present?
-        return false unless event_created_within?(options['expected_update_period_in_days'])
+      if interpolated['expected_update_period_in_days'].present?
+        return false unless event_created_within?(interpolated['expected_update_period_in_days'])
       end
 
-      if options['expected_receive_period_in_days'].present?
-        return false unless last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago
+      if interpolated['expected_receive_period_in_days'].present?
+        return false unless last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago
       end
 
       true
@@ -92,7 +92,7 @@ module Agents
 
       context["doCreateEvent"] = lambda { |a, y| create_event(payload: clean_nans(JSON.parse(y))).payload.to_json }
       context["getIncomingEvents"] = lambda { |a| incoming_events.to_json }
-      context["getOptions"] = lambda { |a, x| options.to_json }
+      context["getOptions"] = lambda { |a, x| interpolated.to_json }
       context["doLog"] = lambda { |a, x| log x }
       context["doError"] = lambda { |a, x| error x }
       context["getMemory"] = lambda do |a, x, y|
@@ -112,12 +112,12 @@ module Agents
       if cred
         credential(cred) || 'Agent.check = function() { this.error("Unable to find credential"); };'
       else
-        options['code']
+        interpolated['code']
       end
     end
 
     def credential_referenced_by_code
-      options['code'] =~ /\Acredential:(.*)\Z/ && $1
+      interpolated['code'] =~ /\Acredential:(.*)\Z/ && $1
     end
 
     def setup_javascript

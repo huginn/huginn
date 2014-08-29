@@ -76,3 +76,54 @@ describe Event do
     end
   end
 end
+
+describe EventDrop do
+  def interpolate(string, event)
+    event.agent.interpolate_string(string, event.to_liquid)
+  end
+
+  before do
+    @event = Event.new
+    @event.agent = agents(:jane_weather_agent)
+    @event.created_at = Time.now
+    @event.payload = {
+      'title' => 'some title',
+      'url' => 'http://some.site.example.org/',
+    }
+    @event.save!
+  end
+
+  it 'should be created via Agent#to_liquid' do
+    @event.to_liquid.class.should be(EventDrop)
+  end
+
+  it 'should have attributes of its payload' do
+    t = '{{title}}: {{url}}'
+    interpolate(t, @event).should eq('some title: http://some.site.example.org/')
+  end
+
+  it 'should use created_at from the payload if it exists' do
+    created_at = @event.created_at - 86400
+    # Avoid timezone issue by using %s
+    @event.payload['created_at'] = created_at.strftime("%s")
+    @event.save!
+    t = '{{created_at | date:"%s" }}'
+    interpolate(t, @event).should eq(created_at.strftime("%s"))
+  end
+
+  it 'should be iteratable' do
+    # to_liquid returns self
+    t = "{% for pair in to_liquid %}{{pair | join:':' }}\n{% endfor %}"
+    interpolate(t, @event).should eq("title:some title\nurl:http://some.site.example.org/\n")
+  end
+
+  it 'should have agent' do
+    t = '{{agent.name}}'
+    interpolate(t, @event).should eq('SF Weather')
+  end
+
+  it 'should have created_at' do
+    t = '{{created_at | date:"%FT%T%z" }}'
+    interpolate(t, @event).should eq(@event.created_at.strftime("%FT%T%z"))
+  end
+end

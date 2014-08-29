@@ -10,8 +10,8 @@ describe Agents::TranslationAgent do
                 :to            => "fi",
                 :expected_receive_period_in_days => 1,
                 :content       => {
-                    :text => "$.message",
-                    :content => "$.xyz"
+                    :text => "{{message}}",
+                    :content => "{{xyz}}"
                 }
             }
         }
