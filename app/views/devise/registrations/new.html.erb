@@ -9,7 +9,7 @@
           <%= devise_error_messages! %>
           <% if ENV['ON_HEROKU'] && User.count.zero? %>
           <div class="heroku-instruction">
-            <% app_name = request.host[/\A.+/] %>
+            <% app_name = request.host[/\A[^.]+/] %>
             <p>If you are the owner of this application, run the following commands to complete the setup.</p>
             <%= content_tag :pre do -%>
 heroku git:clone <%= app_name %>
