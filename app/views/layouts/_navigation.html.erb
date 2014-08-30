@@ -36,17 +36,17 @@
       </form>
       
       <li class='job-indicator' role='pending'>
-        <%= link_to jobs_path do %>
+        <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><span class="glyphicon glyphicon-refresh icon-white"></span> <span class='number'>0</span></span>
         <% end %>
       </li>
       <li class='job-indicator' role='awaiting_retry'>
-        <%= link_to jobs_path do %>
+        <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><span class="glyphicon glyphicon-question-sign icon-yellow"></span> <span class='number'>0</span></span>
         <% end %>
       </li>
       <li class='job-indicator' role='recent_failures'>
-        <%= link_to jobs_path do %>
+        <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><span class="glyphicon glyphicon-exclamation-sign icon-white"></span> <span class='number'>0</span></span>
         <% end %>
       </li>

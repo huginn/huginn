@@ -32,6 +32,11 @@ class HuginnScheduler
     end
   end
 
+  def cleanup_failed_jobs!
+    first_to_delete = Delayed::Job.where.not(failed_at: nil).order("failed_at DESC").offset(ENV['FAILED_JOBS_TO_KEEP'].try(:to_i) || 100).limit(ENV['FAILED_JOBS_TO_KEEP'].try(:to_i) || 100).pluck(:failed_at).first
+    Delayed::Job.where(["failed_at <= ?", first_to_delete]).delete_all if first_to_delete.present?
+  end
+
   def with_mutex
     ActiveRecord::Base.connection_pool.with_connection do
       mutex.synchronize do
@@ -56,6 +61,13 @@ class HuginnScheduler
     @rufus_scheduler.cron "0 0 * * * " + tzinfo_friendly_timezone do
       cleanup_expired_events!
     end
+
+    # Schedule failed job cleanup.
+
+    @rufus_scheduler.every '1h' do
+      cleanup_failed_jobs!
+    end
+
 
     # Schedule repeating events.
 

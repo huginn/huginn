@@ -38,7 +38,9 @@
                       <h4 class="modal-title" id="myModalLabel">Error Backtrace</h4>
                     </div>
                     <div class="modal-body">
-                      <%= raw html_escape(job.last_error).split("\n").join('<br/>') %>
+                      <pre>
+                        <%= raw html_escape(job.last_error).split("\n").join('<br/>') %>
+                      </pre>
                     </div>
                   </div>
                 </div>

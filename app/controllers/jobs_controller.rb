@@ -40,7 +40,7 @@ class JobsController < ApplicationController
   end
 
   def destroy_failed
-    Delayed::Job.where.not(failed_at: nil).destroy_all
+    Delayed::Job.where.not(failed_at: nil).delete_all
 
     respond_to do |format|
       format.html { redirect_to jobs_path, notice: "Failed jobs removed." }

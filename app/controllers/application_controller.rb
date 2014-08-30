@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_admin!
-    redirect_to root_path unless current_user && current_user.admin
+    redirect_to(root_path, alert: 'Admin access required to view that page.') unless current_user && current_user.admin
   end
 
   def upgrade_warning

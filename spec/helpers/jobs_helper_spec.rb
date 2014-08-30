@@ -25,7 +25,7 @@ describe JobsHelper do
       relative_distance_of_time_in_words(Time.now-5.minutes).should == '5m ago'
     end
 
-    it "in the furute" do
+    it "in the future" do
       relative_distance_of_time_in_words(Time.now+5.minutes).should == 'in 5m'
     end
   end
