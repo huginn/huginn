@@ -75,6 +75,18 @@ describe Event do
       Event.find_by_id(event.id).should_not be_nil
     end
   end
+
+  describe "after destroy" do
+    it "nullifies any dependent AgentLogs" do
+      agent_logs(:log_for_jane_website_agent).outbound_event_id.should be_present
+      agent_logs(:log_for_bob_website_agent).outbound_event_id.should be_present
+
+      agent_logs(:log_for_bob_website_agent).outbound_event.destroy
+
+      agent_logs(:log_for_jane_website_agent).reload.outbound_event_id.should be_present
+      agent_logs(:log_for_bob_website_agent).reload.outbound_event_id.should be_nil
+    end
+  end
 end
 
 describe EventDrop do

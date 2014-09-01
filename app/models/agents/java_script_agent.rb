@@ -13,7 +13,7 @@ module Agents
       You can implement `Agent.check` and `Agent.receive` as you see fit.  The following methods will be available on Agent in the JavaScript environment:
 
       * `this.createEvent(payload)`
-      * `this.incomingEvents()`
+      * `this.incomingEvents()` (the returned event objects will each have a `payload` property)
       * `this.memory()`
       * `this.memory(key)`
       * `this.memory(keyToSet, valueToSet)`
