@@ -48,21 +48,28 @@ class Event < ActiveRecord::Base
 end
 
 class EventDrop
-  def initialize(object, locals = nil)
-    locals = object.payload.merge(locals || {})
+  def initialize(object)
+    @payload = object.payload
     super
   end
 
+  def before_method(key)
+    @payload[key]
+  end
+
   def each(&block)
-    return to_enum(__method__) unless block
-    @locals.each(&block)
+    @payload.each(&block)
   end
 
   def agent
-    @object.agent
+    @payload.fetch(__method__) {
+      @object.agent
+    }
   end
 
   def created_at
-    @object.created_at
+    @payload.fetch(__method__) {
+      @object.created_at
+    }
   end
 end
