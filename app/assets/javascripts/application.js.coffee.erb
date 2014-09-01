@@ -43,15 +43,15 @@ showLinks = ->
   $(".link-region .cannot-receive-events").hide()
   showEventDescriptions()
 
-hideChains = ->
-  $(".chain-region .select2-container").hide()
-  $(".chain-region .propagate-immediately").hide()
-  $(".chain-region .cannot-receive-events").show()
+hideControlLinks = ->
+  $(".control-link-region .select2-container").hide()
+  $(".control-link-region .propagate-immediately").hide()
+  $(".control-link-region .cannot-receive-events").show()
 
-showChains = ->
-  $(".chain-region .select2-container").show()
-  $(".chain-region .propagate-immediately").show()
-  $(".chain-region .cannot-receive-events").hide()
+showControlLinks = ->
+  $(".control-link-region .select2-container").show()
+  $(".control-link-region .propagate-immediately").show()
+  $(".control-link-region .cannot-receive-events").hide()
 
 hideEventCreation = ->
   $(".event-related-region").hide()
@@ -172,9 +172,9 @@ $(document).ready ->
           hideLinks()
 
         if json.can_control_other_agents
-          showChains()
+          showControlLinks()
         else
-          hideChains()
+          hideControlLinks()
 
         if json.can_create_events
           showEventCreation()
@@ -208,11 +208,11 @@ $(document).ready ->
     else
       hideLinks()
 
-  if $(".chain-region")
-    if $(".chain-region").data("can-control-other-agents") == true
-      showChains()
+  if $(".control-link-region")
+    if $(".control-link-region").data("can-control-other-agents") == true
+      showControlLinks()
     else
-      hideChains()
+      hideControlLinks()
 
   if $(".event-related-region")
     if $(".event-related-region").data("can-create-events") == true

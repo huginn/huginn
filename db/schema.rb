@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140829081212) do
+ActiveRecord::Schema.define(version: 20140901143732) do
 
   create_table "agent_logs", force: true do |t|
     t.integer  "agent_id",                      null: false
@@ -51,15 +51,15 @@ ActiveRecord::Schema.define(version: 20140829081212) do
   add_index "agents", ["type"], name: "index_agents_on_type", using: :btree
   add_index "agents", ["user_id", "created_at"], name: "index_agents_on_user_id_and_created_at", using: :btree
 
-  create_table "chains", force: true do |t|
+  create_table "control_links", force: true do |t|
     t.integer  "controller_id"
     t.integer  "control_target_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "chains", ["control_target_id"], name: "index_chains_on_control_target_id", using: :btree
-  add_index "chains", ["controller_id", "control_target_id"], name: "index_chains_on_controller_id_and_control_target_id", unique: true, using: :btree
+  add_index "control_links", ["control_target_id"], name: "index_control_links_on_control_target_id", using: :btree
+  add_index "control_links", ["controller_id", "control_target_id"], name: "index_control_links_on_controller_id_and_control_target_id", unique: true, using: :btree
 
   create_table "delayed_jobs", force: true do |t|
     t.integer  "priority",                    default: 0

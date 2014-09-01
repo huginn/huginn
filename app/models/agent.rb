@@ -55,10 +55,10 @@ class Agent < ActiveRecord::Base
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
   has_many :receivers, :through => :links_as_source, :class_name => "Agent", :inverse_of => :sources
-  has_many :chains_as_controller, dependent: :delete_all, foreign_key: 'controller_id', class_name: 'Chain', inverse_of: :controller
-  has_many :chains_as_control_target, dependent: :delete_all, foreign_key: 'control_target_id', class_name: 'Chain', inverse_of: :control_target
-  has_many :controllers, through: :chains_as_control_target, class_name: "Agent", inverse_of: :control_targets
-  has_many :control_targets, through: :chains_as_controller, class_name: "Agent", inverse_of: :controllers
+  has_many :control_links_as_controller, dependent: :delete_all, foreign_key: 'controller_id', class_name: 'ControlLink', inverse_of: :controller
+  has_many :control_links_as_control_target, dependent: :delete_all, foreign_key: 'control_target_id', class_name: 'ControlLink', inverse_of: :control_target
+  has_many :controllers, through: :control_links_as_control_target, class_name: "Agent", inverse_of: :control_targets
+  has_many :control_targets, through: :control_links_as_controller, class_name: "Agent", inverse_of: :controllers
   has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :agent
   has_many :scenarios, :through => :scenario_memberships, :inverse_of => :agents
 
