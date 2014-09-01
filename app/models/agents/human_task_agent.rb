@@ -62,6 +62,8 @@ module Agents
       which contain `key` and `text`.  For _free\\_text_, the special configuration options are all optional, and are
       `default`, `min_length`, and `max_length`.
 
+      By default, all answers are emitted in a single event.  If you'd like separate events for each answer, set `separate_answers` to `true`.
+
       # Combining answers
 
       There are a couple of ways to combine HITs that have multiple `assignments`, all of which involve setting `combination_mode` at the top level.
@@ -105,7 +107,7 @@ module Agents
             }
           }
 
-      Resulting events will have the original `answers`, as well as the `poll` results, and a field called `best_answer` that contains the best answer as determined by the poll.
+      Resulting events will have the original `answers`, as well as the `poll` results, and a field called `best_answer` that contains the best answer as determined by the poll.  (Note that `separate_answers` won't work when doing a poll.)
 
       # Other settings
 
@@ -351,8 +353,18 @@ module Agents
 
               log "Poll HIT created with ID #{poll_hit.id} and URL #{poll_hit.url}.  Original HIT: #{hit_id}", :inbound_event => inbound_event
             else
-              event = create_event :payload => payload
-              log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => inbound_event
+              if options[:separate_answers]
+                payload['answers'].each.with_index do |answer, index|
+                  sub_payload = payload.dup
+                  sub_payload.delete('answers')
+                  sub_payload['answer'] = answer
+                  event = create_event :payload => sub_payload
+                  log "Event emitted with answer ##{index}", :outbound_event => event, :inbound_event => inbound_event
+                end
+              else
+                event = create_event :payload => payload
+                log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => inbound_event
+              end
             end
           end
 
