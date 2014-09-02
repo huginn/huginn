@@ -116,6 +116,22 @@ module LiquidInterpolatable
       CGI.escape(string) rescue string
     end
 
+    # Parse an input into a URI object, optionally resolving it
+    # against a base URI if given.
+    #
+    # A URI object will have the following properties: scheme,
+    # userinfo, host, port, registry, path, opaque, query, and
+    # fragment.
+    def to_uri(uri, base_uri = nil)
+      if base_uri
+        URI(base_uri) + uri.to_s
+      else
+        URI(uri.to_s)
+      end
+    rescue URI::Error
+      nil
+    end
+
     # Escape a string for use in XPath expression
     def to_xpath(string)
       subs = string.to_s.scan(/\G(?:\A\z|[^"]+|[^']+)/).map { |x|

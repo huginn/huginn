@@ -59,4 +59,41 @@ describe LiquidInterpolatable::Filters do
       @filter.to_xpath_roundtrip(1).should == '1'
     end
   end
+
+  describe 'to_uri' do
+    before do
+      @agent = Agents::InterpolatableAgent.new(name: "test", options: { 'foo' => '{% assign u = s | to_uri %}{{ u.path }}' })
+      @agent.interpolation_context['s'] = 'http://example.com/dir/1?q=test'
+    end
+
+    it 'should parse an abosule URI' do
+      @filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1').should == URI('http://example.net/index.html')
+    end
+
+    it 'should parse an abosule URI with a base URI specified' do
+      @filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1').should == URI('http://example.net/index.html')
+    end
+
+    it 'should parse a relative URI with a base URI specified' do
+      @filter.to_uri('foo/index.html', 'http://example.com/dir/1').should == URI('http://example.com/dir/foo/index.html')
+    end
+
+    it 'should parse an abosule URI with a base URI specified' do
+      @filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1').should == URI('http://example.net/index.html')
+    end
+
+    it 'should stringify a non-string operand' do
+      @filter.to_uri(123, 'http://example.com/dir/1').should == URI('http://example.com/dir/123')
+    end
+
+    it 'should return a URI value in interpolation' do
+      @agent.interpolated['foo'].should == '/dir/1'
+    end
+
+    it 'should return a URI value resolved against a base URI in interpolation' do
+      @agent.options['foo'] = '{% assign u = s | to_uri:"http://example.com/dir/1" %}{{ u.path }}'
+      @agent.interpolation_context['s'] = 'foo/index.html'
+      @agent.interpolated['foo'].should == '/dir/foo/index.html'
+    end
+  end
 end
