@@ -9,6 +9,10 @@ module LiquidDroppable
       @object = object
     end
 
+    def to_s
+      @object.to_s
+    end
+
     def each
       (public_instance_methods - Drop.public_instance_methods).each { |name|
         yield [name, __send__(name)]
