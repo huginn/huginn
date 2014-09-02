@@ -49,8 +49,17 @@ describe Agents::SchedulerAgent do
       @agent.should be_valid
 
       stub(@agent).second_precision_enabled { false }
-      @agent.options['schedule'] = '*/15 * * * * *'
+      @agent.options['schedule'] = '*/10 * * * * *'
       @agent.should_not be_valid
+
+      @agent.options['schedule'] = '5/30 * * * * *'
+      @agent.should_not be_valid
+
+      @agent.options['schedule'] = '*/15 * * * * *'
+      @agent.should be_valid
+
+      @agent.options['schedule'] = '15,45 * * * * *'
+      @agent.should be_valid
 
       @agent.options['schedule'] = '0 * * * * *'
       @agent.should be_valid
