@@ -5,7 +5,7 @@ class Rufus::Scheduler
 
   class Job
     # Store an ID of SchedulerAgent in this job.
-    def scheduler_agent_id= id
+    def scheduler_agent_id=(id)
       self[:scheduler_agent_id] = id
     end
 
