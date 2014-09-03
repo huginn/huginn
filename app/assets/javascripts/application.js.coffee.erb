@@ -44,14 +44,10 @@ showLinks = ->
   showEventDescriptions()
 
 hideControlLinks = ->
-  $(".control-link-region .select2-container").hide()
-  $(".control-link-region .propagate-immediately").hide()
-  $(".control-link-region .cannot-receive-events").show()
+  $(".control-link-region").hide()
 
 showControlLinks = ->
-  $(".control-link-region .select2-container").show()
-  $(".control-link-region .propagate-immediately").show()
-  $(".control-link-region .cannot-receive-events").hide()
+  $(".control-link-region").show()
 
 hideEventCreation = ->
   $(".event-related-region").hide()
