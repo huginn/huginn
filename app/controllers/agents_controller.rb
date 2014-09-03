@@ -37,6 +37,7 @@ class AgentsController < ApplicationController
         :default_schedule => @agent.default_schedule,
         :can_receive_events => @agent.can_receive_events?,
         :can_create_events => @agent.can_create_events?,
+        :can_control_other_agents => @agent.can_control_other_agents?,
         :options => @agent.default_options,
         :description_html => @agent.html_description,
         :form => render_to_string(partial: 'oauth_dropdown')
