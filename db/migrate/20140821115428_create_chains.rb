@@ -1,8 +1,8 @@
 class CreateChains < ActiveRecord::Migration
   def change
     create_table :chains do |t|
-      t.integer :runner_id
-      t.integer :target_id
+      t.integer :runner_id, null: false
+      t.integer :target_id, null: false
 
       t.timestamps
     end
