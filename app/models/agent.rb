@@ -226,19 +226,19 @@ class Agent < ActiveRecord::Base
   private
   
   def sources_are_owned
-    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
+    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user_id == user_id }
   end
   
   def controllers_are_owned
-    errors.add(:controllers, "must be owned by you") unless controllers.all? {|s| s.user == user }
+    errors.add(:controllers, "must be owned by you") unless controllers.all? {|s| s.user_id == user_id }
   end
 
   def control_targets_are_owned
-    errors.add(:control_targets, "must be owned by you") unless control_targets.all? {|s| s.user == user }
+    errors.add(:control_targets, "must be owned by you") unless control_targets.all? {|s| s.user_id == user_id }
   end
 
   def scenarios_are_owned
-    errors.add(:scenarios, "must be owned by you") unless scenarios.all? {|s| s.user == user }
+    errors.add(:scenarios, "must be owned by you") unless scenarios.all? {|s| s.user_id == user_id }
   end
 
   def validate_schedule
