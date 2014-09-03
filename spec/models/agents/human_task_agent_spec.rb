@@ -345,30 +345,53 @@ describe Agents::HumanTaskAgent do
       @checker.memory['hits'].should == { "JH3132836336DHG" => { 'event_id' => @event.id } }
     end
 
-    it "should create events when all assignments are ready" do
-      @checker.memory['hits'] = { "JH3132836336DHG" => { 'event_id' => @event.id } }
-      mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
-      assignments = [
-        FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "feedback"=>""}),
-        FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
-      ]
-      hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
-      hit.should_not be_disposed
-      mock(RTurk::Hit).new("JH3132836336DHG") { hit }
+    context "emitting events" do
+      before do
+        @checker.memory['hits'] = { "JH3132836336DHG" => { 'event_id' => @event.id } }
+        mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
+        @assignments = [
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "feedback"=>""}),
+          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
+        ]
+        @hit = FakeHit.new(:max_assignments => 2, :assignments => @assignments)
+        @hit.should_not be_disposed
+        mock(RTurk::Hit).new("JH3132836336DHG") { @hit }
+      end
 
-      lambda {
-        @checker.send :review_hits
-      }.should change { Event.count }.by(1)
+      it "should create events when all assignments are ready" do
+        lambda {
+          @checker.send :review_hits
+        }.should change { Event.count }.by(1)
 
-      assignments.all? {|a| a.approved == true }.should be_truthy
-      hit.should be_disposed
+        @assignments.all? {|a| a.approved == true }.should be_truthy
+        @hit.should be_disposed
 
-      @checker.events.last.payload['answers'].should == [
-        {'sentiment' => "neutral", 'feedback' => ""},
-        {'sentiment' => "happy", 'feedback' => "Take 2"}
-      ]
+        @checker.events.last.payload['answers'].should == [
+          {'sentiment' => "neutral", 'feedback' => ""},
+          {'sentiment' => "happy", 'feedback' => "Take 2"}
+        ]
 
-      @checker.memory['hits'].should == {}
+        @checker.memory['hits'].should == {}
+      end
+
+      it "should emit separate answers when options[:separate_answers] is true" do
+        @checker.options[:separate_answers] = true
+
+        lambda {
+          @checker.send :review_hits
+        }.should change { Event.count }.by(2)
+
+        @assignments.all? {|a| a.approved == true }.should be_truthy
+        @hit.should be_disposed
+
+        event1, event2 = @checker.events.last(2)
+        event1.payload.should_not have_key('answers')
+        event2.payload.should_not have_key('answers')
+        event1.payload['answer'].should == { 'sentiment' => "happy", 'feedback' => "Take 2" }
+        event2.payload['answer'].should == { 'sentiment' => "neutral", 'feedback' => "" }
+
+        @checker.memory['hits'].should == {}
+      end
     end
 
     describe "taking majority votes" do
