@@ -21,7 +21,7 @@ module AgentHelper
 
     controllers = agent.controllers
     [
-      *(CGI.escape_html(agent.schedule.humanize.titleize) unless agent.schedule == 'never' && agent.controllers.count > 0),
+      *(CGI.escape_html(agent.schedule.humanize.titleize) unless agent.schedule == 'never' && agent.controllers.length > 0),
       *controllers.map { |agent| link_to(agent.name, agent_path(agent)) },
     ].join(delimiter).html_safe
   end
