@@ -52,8 +52,8 @@ ActiveRecord::Schema.define(version: 20140901143732) do
   add_index "agents", ["user_id", "created_at"], name: "index_agents_on_user_id_and_created_at", using: :btree
 
   create_table "control_links", force: true do |t|
-    t.integer  "controller_id"
-    t.integer  "control_target_id"
+    t.integer  "controller_id",     null: false
+    t.integer  "control_target_id", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
