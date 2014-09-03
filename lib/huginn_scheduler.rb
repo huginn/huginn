@@ -31,7 +31,7 @@ class Rufus::Scheduler
   # Get a job tied to a given SchedulerAgent
   def scheduler_agent_job(agent)
     scheduler_agent_jobs.find { |job|
-      job[:scheduler_agent_id] == agent.id
+      job.scheduler_agent_id == agent.id
     }
   end
 
@@ -67,6 +67,9 @@ class Rufus::Scheduler
           job.unschedule
         end
       end
+      # Make sure the job is associated with a SchedulerAgent before
+      # it is triggered.
+      job.scheduler_agent_id = agent_id
 
       agent.memory['scheduled_at'] = job.scheduled_at.to_i
       agent.save
