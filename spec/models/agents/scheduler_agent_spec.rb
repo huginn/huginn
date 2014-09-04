@@ -78,6 +78,20 @@ describe Agents::SchedulerAgent do
         @agent.control_action.should == action
       }
     end
+
+    it "cannot be 'run' if any of the control targets cannot be scheduled" do
+      @agent.control_action.should == 'run'
+      @agent.control_targets = [agents(:bob_rain_notifier_agent)]
+      @agent.should_not be_valid
+    end
+
+    it "can be 'enable' or 'disable' no matter if control targets can be scheduled or not" do
+      ['enable', 'disable'].each { |action|
+        @agent.options['action'] = action
+        @agent.control_targets = [agents(:bob_rain_notifier_agent)]
+        @agent.should be_valid
+      }
+    end
   end
 
   describe "save" do

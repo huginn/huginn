@@ -17,7 +17,13 @@ module AgentControllerConcern
 
   def validate_control_action
     case control_action
-    when 'run', 'enable', 'disable'
+    when 'run'
+      control_targets.each { |target|
+        if target.cannot_be_scheduled?
+          errors.add(:base, "#{target.name} cannot be scheduled")
+        end
+      }
+    when 'enable', 'disable'
     else
       errors.add(:base, 'invalid action')
     end
