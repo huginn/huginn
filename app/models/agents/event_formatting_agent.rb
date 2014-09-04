@@ -120,11 +120,12 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        payload = perform_matching(event.payload)
-        opts = interpolated(event.to_liquid(payload))
-        formatted_event = opts['mode'].to_s == "merge" ? event.payload.dup : {}
-        formatted_event.merge! opts['instructions']
-        create_event :payload => formatted_event
+        interpolate_with(event) do
+          interpolation_context.merge(perform_matching(event.payload))
+          formatted_event = interpolated['mode'].to_s == "merge" ? event.payload.dup : {}
+          formatted_event.merge! interpolated['instructions']
+          create_event :payload => formatted_event
+        end
       end
     end
 

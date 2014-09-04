@@ -54,6 +54,35 @@ shared_examples_for LiquidInterpolatable do
       @checker.interpolate_string("{{variable}}", @event).should == "hello"
       @checker.interpolate_string("{{variable}} you", @event).should == "hello you"
     end
+
+    it "should use local variables while in a block" do
+      @checker.options['locals'] = '{{_foo_}} {{_bar_}}'
+
+      @checker.interpolation_context.tap { |context|
+        @checker.interpolated['locals'].should == ' '
+
+        context.stack {
+          context['_foo_'] = 'This is'
+          context['_bar_'] = 'great.'
+
+          @checker.interpolated['locals'].should == 'This is great.'
+        }
+
+        @checker.interpolated['locals'].should == ' '
+      }
+    end
+
+    it "should use another self object while in a block" do
+      @checker.options['properties'] = '{{_foo_}} {{_bar_}}'
+
+      @checker.interpolated['properties'].should == ' '
+
+      @checker.interpolate_with({ '_foo_' => 'That was', '_bar_' => 'nice.' }) {
+        @checker.interpolated['properties'].should == 'That was nice.'
+      }
+
+      @checker.interpolated['properties'].should == ' '
+    end
   end
 
   describe "liquid tags" do
