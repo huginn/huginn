@@ -95,7 +95,7 @@ module Agents
       if (spec = options['schedule']).present?
         begin
           cron = Rufus::Scheduler::CronLine.new(spec)
-          unless second_precision_enabled || (cron.seconds - [0, 15, 45, 60]).empty?
+          unless second_precision_enabled || (cron.seconds - [0, 15, 30, 45, 60]).empty?
             errors.add(:base, "second precision schedule is not allowed in this service")
           end
         rescue ArgumentError
