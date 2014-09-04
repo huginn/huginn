@@ -44,16 +44,12 @@
             </div>
           </div>
 
-          <div class="schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
-            <div class="can-be-scheduled">
-              <div class="form-group">
-                <%= f.label :controllers %>
-                <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run or controlled by user-defined Agents."></span>
-                <% eventControllers = current_user.agents.select(&:can_control_other_agents?) %>
-                <%= f.select(:controller_ids,
-                             options_for_select(eventControllers.map {|s| [s.name, s.id] },
-                                                @agent.controller_ids),
-                             {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
+          <div class="controller-region" data-has-controllers="<%= !@agent.controllers.empty? %>">
+            <div class="form-group">
+              <%= f.label :controllers %>
+              <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run or controlled by these user-defined Agents."></span>
+              <div class="controller-list">
+                <%= agent_controllers(@agent) || 'None' %>
               </div>
             </div>
           </div>
