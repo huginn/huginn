@@ -1,0 +1,22 @@
+From: Nanashi <nanashi.gombeh@example.jp>
+Date: Fri, 9 May 2014 16:00:00 +0900
+Message-ID: <foo.123@mail.example.jp>
+Subject: some subject
+To: Jane <jane.doe@example.com>, John <john.doe@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary=d8c92622e09101e4bc833685557b
+
+--d8c92622e09101e4bc833685557b
+Content-Type: text/plain; charset=UTF-8
+
+Some plain text
+Some second line
+
+--d8c92622e09101e4bc833685557b
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Some HTML document<br>
+Some second line of HTML<br></div>
+
+--d8c92622e09101e4bc833685557b--

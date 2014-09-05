@@ -1,0 +1,52 @@
+{
+  "provider": "github",
+  "uid": "12345",
+  "info": {
+    "nickname": "dsander",
+    "email": null,
+    "name": "Dominik Sander",
+    "image": "https://avatars.githubusercontent.com/u/12345?",
+    "urls": {
+      "GitHub": "https://github.com/dsander",
+      "Blog": "http://www.dsander.de"
+    }
+  },
+  "credentials": {
+    "token": "agithubtoken",
+    "expires": false
+  },
+  "extra": {
+    "raw_info": {
+      "login": "dsander",
+      "id": 12345,
+      "avatar_url": "https://avatars.githubusercontent.com/u/12345?",
+      "gravatar_id": "fsdfsdf",
+      "url": "https://api.github.com/users/dsander",
+      "html_url": "https://github.com/dsander",
+      "followers_url": "https://api.github.com/users/dsander/followers",
+      "following_url": "https://api.github.com/users/dsander/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dsander/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dsander/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dsander/subscriptions",
+      "organizations_url": "https://api.github.com/users/dsander/orgs",
+      "repos_url": "https://api.github.com/users/dsander/repos",
+      "events_url": "https://api.github.com/users/dsander/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dsander/received_events",
+      "type": "User",
+      "site_admin": false,
+      "name": "Dominik Sander",
+      "company": null,
+      "blog": "http://www.url.de",
+      "location": null,
+      "email": null,
+      "hireable": false,
+      "bio": null,
+      "public_repos": 29,
+      "public_gists": 2,
+      "followers": 21,
+      "following": 9,
+      "created_at": "2008-08-17T18:17:50Z",
+      "updated_at": "2014-05-19T09:30:08Z"
+    }
+  }
+}

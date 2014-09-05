@@ -60,7 +60,7 @@ describe Agents::GrowlAgent do
       end
       
       @checker.register_growl
-      called.should be_true
+      called.should be_truthy
     end
   end
   
@@ -78,7 +78,7 @@ describe Agents::GrowlAgent do
         mock(obj).notify(@checker.options[:growl_notification_name],subject,message)
       end
       @checker.notify_growl(subject,message)
-      called.should be_true
+      called.should be_truthy
     end
   end
   

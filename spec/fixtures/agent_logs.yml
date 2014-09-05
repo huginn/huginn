@@ -1,9 +1,11 @@
 log_for_jane_website_agent:
   agent: jane_website_agent
+  outbound_event: jane_website_agent_event
   message: "fetching some website data"
 
 log_for_bob_website_agent:
   agent: bob_website_agent
+  outbound_event: bob_website_agent_event
   message: "fetching some other website data"
 
 first_log_for_bob_weather_agent:

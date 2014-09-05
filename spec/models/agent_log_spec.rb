@@ -42,6 +42,13 @@ describe AgentLog do
     end
   end
 
+  it "truncates message to a reasonable length" do
+    log = AgentLog.new(:agent => agents(:jane_website_agent), :level => 3)
+    log.message = "a" * 3000
+    log.save!
+    log.message.length.should == 2048
+  end
+
   describe "#log_for_agent" do
     it "creates AgentLogs" do
       log = AgentLog.log_for_agent(agents(:jane_website_agent), "some message", :level => 4, :outbound_event => events(:jane_website_agent_event))

@@ -1,27 +1,21 @@
-<div class='container'>
-  <div class='row'>
-    <div class='span8 offset2'>
-      <div class='well'>
+<div class='row'>
+  <div class='col-md-8 col-md-offset-2'>
+    <div class='well'>
 
-        <h2>Resend confirmation instructions</h2>
+      <h2>Resend confirmation instructions</h2>
 
-        <%= form_for(resource, :as => resource_name, :url => confirmation_path(resource_name), :html => { :method => :post, :class => 'form-horizontal' }) do |f| %>
-          <%= devise_error_messages! %>
+      <%= form_for(resource, :as => resource_name, :url => confirmation_path(resource_name), :html => { :method => :post, :class => 'form-horizontal' }) do |f| %>
+        <%= devise_error_messages! %>
 
-          <div class="control-group">
-            <%= f.label :email, :class => 'control-label' %>
-            <div class="controls">
-              <%= f.email_field :email, :class => 'span4' %>
-            </div>
-          </div>
+        <div class="form-group">
+          <%= f.label :email %>
+          <%= f.email_field :email, :class => 'form-control' %>
+        </div>
 
-          <div class='form-actions'>
-            <%= f.submit "Resend confirmation instructions", :class => "btn btn-primary" %>
-          </div>
-        <% end %>
+        <%= f.submit "Resend confirmation instructions", :class => "btn btn-primary" %>
+      <% end %>
 
-        <%= render "devise/shared/links" %>
-      </div>
+      <%= render "devise/shared/links" %>
     </div>
   </div>
 </div>

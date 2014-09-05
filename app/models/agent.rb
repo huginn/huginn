@@ -11,23 +11,28 @@ class Agent < ActiveRecord::Base
   include MarkdownClassAttributes
   include JSONSerializedField
   include RDBMSFunctions
+  include WorkingHelpers
+  include LiquidInterpolatable
+  include HasGuid
+  include LiquidDroppable
 
   markdown_class_attributes :description, :event_description
 
   load_types_in "Agents"
 
-  SCHEDULES = %w[every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
+  SCHEDULES = %w[every_1m every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
                  midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm never]
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :source_ids, :keep_events_for, :propagate_immediately
+  attr_accessible :options, :memory, :name, :type, :schedule, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
 
   json_serialize :options, :memory
 
   validates_presence_of :name, :user
   validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
   validate :sources_are_owned
+  validate :scenarios_are_owned
   validate :validate_schedule
   validate :validate_options
 
@@ -39,14 +44,19 @@ class Agent < ActiveRecord::Base
   after_save :possibly_update_event_expirations
 
   belongs_to :user, :inverse_of => :agents
-  has_many :events, :dependent => :delete_all, :inverse_of => :agent, :order => "events.id desc"
+  belongs_to :service, :inverse_of => :agents
+  has_many :events, -> { order("events.id desc") }, :dependent => :delete_all, :inverse_of => :agent
   has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
-  has_many :logs, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog", :order => "agent_logs.id desc"
-  has_many :received_events, :through => :sources, :class_name => "Event", :source => :events, :order => "events.id desc"
+  has_many :logs,  -> { order("agent_logs.id desc") }, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog"
+  has_many :received_events, -> { order("events.id desc") }, :through => :sources, :class_name => "Event", :source => :events
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
   has_many :receivers, :through => :links_as_source, :class_name => "Agent", :inverse_of => :sources
+  has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :agent
+  has_many :scenarios, :through => :scenario_memberships, :inverse_of => :agents
+
+  scope :active, -> { where(disabled: false) }
 
   scope :of_type, lambda { |type|
     type = case type
@@ -59,6 +69,10 @@ class Agent < ActiveRecord::Base
            end
     where(:type => type)
   }
+
+  def short_type
+    type.demodulize
+  end
 
   def check
     # Implement me in your subclass of Agent.
@@ -83,18 +97,10 @@ class Agent < ActiveRecord::Base
     raise "Implement me in your subclass"
   end
 
-  def event_created_within?(days)
-    last_event_at && last_event_at > days.to_i.days.ago
-  end
-
-  def recent_error_logs?
-    last_event_at && last_error_log_at && last_error_log_at > (last_event_at - 2.minutes)
-  end
-
   def create_event(attrs)
     if can_create_events?
-      events.create!({ 
-         :user => user, 
+      events.create!({
+         :user => user,
          :expires_at => new_event_expiration_date
       }.merge(attrs))
     else
@@ -124,12 +130,8 @@ class Agent < ActiveRecord::Base
     if keep_events_for == 0
       events.update_all :expires_at => nil
     else
-      events.update_all "expires_at = " + rdbms_date_add("created_at", "DAY", keep_events_for.to_i) 
+      events.update_all "expires_at = " + rdbms_date_add("created_at", "DAY", keep_events_for.to_i)
     end
-  end
-
-  def make_message(payload, message = options[:message])
-    message.gsub(/<([^>]+)>/) { Utils.value_at(payload, $1) || "??" }
   end
 
   def trigger_web_request(params, method, format)
@@ -217,6 +219,10 @@ class Agent < ActiveRecord::Base
     errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
   end
   
+  def scenarios_are_owned
+    errors.add(:scenarios, "must be owned by you") unless scenarios.all? {|s| s.user == user }
+  end
+
   def validate_schedule
     unless cannot_be_scheduled?
       errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
@@ -227,9 +233,35 @@ class Agent < ActiveRecord::Base
     # Implement me in your subclass to test for valid options.
   end
 
+  # Utility Methods
+
+  def boolify(option_value)
+    case option_value
+    when true, 'true'
+      true
+    when false, 'false'
+      false
+    else
+      nil
+    end
+  end
+
   # Class Methods
 
   class << self
+    def build_clone(original)
+      new(original.slice(:type, :options, :schedule, :source_ids, :keep_events_for, :propagate_immediately)) { |clone|
+        # Give it a unique name
+        2.upto(count) do |i|
+          name = '%s (%d)' % [original.name, i]
+          unless exists?(name: name)
+            clone.name = name
+            break
+          end
+        end
+      }
+    end
+
     def cannot_be_scheduled!
       @cannot_be_scheduled = true
     end
@@ -269,11 +301,11 @@ class Agent < ActiveRecord::Base
                 joins("JOIN links ON (links.receiver_id = agents.id)").
                 joins("JOIN agents AS sources ON (links.source_id = sources.id)").
                 joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)").
-                where("agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id")
+                where("NOT agents.disabled AND (agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id)")
         if options[:only_receivers].present?
           scope = scope.where("agents.id in (?)", options[:only_receivers])
         end
- 
+
         sql = scope.to_sql()
 
         agents_to_events = {}
@@ -304,6 +336,7 @@ class Agent < ActiveRecord::Base
     def async_receive(agent_id, event_ids)
       agent = Agent.find(agent_id)
       begin
+        return if agent.disabled?
         agent.receive(Event.where(:id => event_ids))
         agent.last_receive_at = Time.now
         agent.save!
@@ -328,7 +361,7 @@ class Agent < ActiveRecord::Base
     # per type of agent, so you can override this to define custom bulk check behavior for your custom Agent type.
     def bulk_check(schedule)
       raise "Call #bulk_check on the appropriate subclass of Agent" if self == Agent
-      where(:schedule => schedule).pluck("agents.id").each do |agent_id|
+      where("agents.schedule = ? and disabled = false", schedule).pluck("agents.id").each do |agent_id|
         async_check(agent_id)
       end
     end
@@ -341,6 +374,7 @@ class Agent < ActiveRecord::Base
     def async_check(agent_id)
       agent = Agent.find(agent_id)
       begin
+        return if agent.disabled?
         agent.check
         agent.last_check_at = Time.now
         agent.save!
@@ -351,4 +385,27 @@ class Agent < ActiveRecord::Base
     end
     handle_asynchronously :async_check
   end
+end
+
+class AgentDrop
+  def type
+    @object.short_type
+  end
+
+  [
+    :name,
+    :type,
+    :options,
+    :memory,
+    :sources,
+    :receivers,
+    :schedule,
+    :disabled,
+    :keep_events_for,
+    :propagate_immediately,
+  ].each { |attr|
+    define_method(attr) {
+      @object.__send__(attr)
+    } unless method_defined?(attr)
+  }
 end

@@ -1,4 +1,2 @@
-web: sudo bundle exec unicorn_rails -c config/unicorn.rb
-schedule: sudo bundle exec rails runner bin/schedule.rb
-twitter: sudo bundle exec rails runner bin/twitter_stream.rb
-dj: sudo bundle exec script/delayed_job run
+web: sudo bundle exec unicorn_rails -c config/unicorn.rb -E production
+jobs: sudo RAILS_ENV=production bundle exec rails runner bin/threaded.rb

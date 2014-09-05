@@ -1,0 +1,20 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "diagram" %>
+<% end %>
+
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>Agent Event Flow</h2>
+      </div>
+      <div class="btn-group">
+        <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, (params[:scenario_id] ? scenario_path(params[:scenario_id]) : agents_path), class: "btn btn-default" %>
+      </div>
+
+      <div class='digraph'>
+        <%= render_agents_diagram(@agents) %>
+      </div>
+    </div>
+  </div>
+</div>

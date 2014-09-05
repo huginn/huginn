@@ -1,0 +1,43 @@
+{
+  "provider": "37signals",
+  "uid": 12345,
+  "info": {
+    "email": "basecamp@none.de",
+    "first_name": "Dominik",
+    "last_name": "Sander",
+    "name": "Dominik Sander"
+  },
+  "credentials": {
+    "token": "abcde",
+    "refresh_token": "fghrefresh",
+    "expires_at": 1401554352,
+    "expires": true
+  },
+  "extra": {
+    "accounts": [
+      {
+        "product": "bcx",
+        "name": "Dominik Sander's Basecamp",
+        "id": 12345,
+        "href": "https://basecamp.com/12345/api/v1"
+      }
+    ],
+    "raw_info": {
+      "expires_at": "2014-05-31T16:39:12Z",
+      "identity": {
+        "first_name": "Dominik",
+        "last_name": "Sander",
+        "email_address": "basecamp@none.de",
+        "id": 12345
+      },
+      "accounts": [
+        {
+          "product": "bcx",
+          "name": "Dominik Sander's Basecamp",
+          "id": 12345,
+          "href": "https://basecamp.com/12345/api/v1"
+        }
+      ]
+    }
+  }
+}

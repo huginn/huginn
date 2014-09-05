@@ -1,0 +1,58 @@
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>
+          Your Services
+        </h2>
+      </div>
+      <p>
+        Before you can authenticate with a service, you need to set it up. Have a look at the Huginn
+        <%= link_to 'wiki', 'https://github.com/cantino/huginn/wiki/Configuring-OAuth-applications', target: :_blank %>
+        for guidance.
+      </p>
+      <% if has_oauth_configuration_for('twitter') %>
+        <p><%= link_to "Authenticate with Twitter", "/auth/twitter" %></p>
+      <% end %>
+      <% if has_oauth_configuration_for('thirty_seven_signals') %>
+        <p><%= link_to "Authenticate with 37Signals (Basecamp)", "/auth/37signals" %></p>
+      <% end -%>
+      <% if has_oauth_configuration_for('github') %>
+        <p><%= link_to "Authenticate with Github", "/auth/github" %></p>
+      <% end -%>
+      <hr>
+
+      <div class='table-responsive'>
+        <table class='table table-striped events'>
+          <tr>
+            <th>Provider</th>
+            <th>Username</th>
+            <th>Global?</th>
+            <th></th>
+          </tr>
+
+        <% @services.each do |service| %>
+          <tr>
+            <td><%= service.provider %></td>
+            <td><%= service.name %></td>
+            <td><%= service.global ? 'Yes' : 'No' %></td>
+            <td>
+              <div class="btn-group btn-group-xs">
+                <% if service.global %>
+                  <%= link_to 'Make private', toggle_availability_service_path(service), method: :post, data: { confirm: 'Are you sure you want to remove access to your data on this service for other users?'}, class: "btn btn-default" %>
+                <% else %>
+                   <%= link_to 'Make global', toggle_availability_service_path(service), method: :post, data: { confirm: 'Are you sure you want to grant every user on this system access to your data on this service?'}, class: "btn btn-default" %>
+                <% end %>
+                <%= link_to 'Delete', service_path(service), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default btn-danger" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        </table>
+      </div>
+
+      <%= paginate @services, :theme => 'twitter-bootstrap-3' %>
+    </div>
+  </div>
+</div>
+

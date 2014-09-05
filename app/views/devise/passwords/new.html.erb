@@ -1,27 +1,28 @@
-<div class='container'>
-  <div class='row'>
-    <div class='span8 offset2'>
-      <div class='well'>
-        <h2>Forgot your password?</h2>
+<div class='row'>
+  <div class='col-md-6 col-md-offset-3'>
+    <div class='well'>
+      <h2>Forgot your password?</h2>
 
-        <%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :post, :class => 'form-horizontal' }) do |f| %>
-          <%= devise_error_messages! %>
+      <%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :post, :class => 'form-horizontal' }) do |f| %>
+        <%= devise_error_messages! %>
 
-          <div class="control-group">
-            <%= f.label :login, :class => 'control-label' %>
-            <div class="controls">
-              <%= f.text_field :login, :class => 'span4' %>
-            </div>
+        <div class="form-group">
+          <%= f.label :login, :class => 'col-md-2 col-md-offset-2 control-label' %>
+          <div class="col-md-6">
+            <%= f.text_field :login, :class => 'form-control' %>
           </div>
+        </div>
 
-          <div class='form-actions'>
+        <div class="form-group">
+          <div class="col-md-offset-4 col-md-10">
             <%= f.submit "Send me reset password instructions", :class => "btn btn-primary" %>
           </div>
-        <% end %>
+        </div>
+      <% end %>
 
-        <%= render "devise/shared/links" %>
+      <hr>
 
-      </div>
+      <%= render "devise/shared/links" %>
     </div>
   </div>
 </div>
