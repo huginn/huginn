@@ -6,19 +6,20 @@ describe Agents::EventFormattingAgent do
         :name => "somename",
         :options => {
             :instructions => {
-                :message => "Received <$.content.text.*> from <$.content.name> .",
-                :subject => "Weather looks like <$.conditions> according to the forecast at <$.pretty_date.time>"
+                :message => "Received {{content.text}} from {{content.name}} .",
+                :subject => "Weather looks like {{conditions}} according to the forecast at {{pretty_date.time}}",
+                :agent => "{{agent.type}}",
+                :created_at => "{{created_at}}",
+                :created_at_iso => "{{created_at | date:'%FT%T%:z'}}",
             },
             :mode => "clean",
             :matchers => [
                 {
-                    :path => "$.date.pretty",
+                    :path => "{{date.pretty}}",
                     :regexp => "\\A(?<time>\\d\\d:\\d\\d [AP]M [A-Z]+)",
                     :to => "pretty_date",
                 },
             ],
-            :skip_agent => "false",
-            :skip_created_at => "false"
         }
     }
     @checker = Agents::EventFormattingAgent.new(@valid_params)
@@ -53,28 +54,15 @@ describe Agents::EventFormattingAgent do
       Event.last.payload[:content].should_not == nil
     end
 
-    it "should accept skip_agent" do
-      @checker.receive([@event])
-      Event.last.payload[:agent].should == "WeatherAgent"
-      @checker.options[:skip_agent] = "true"
-      @checker.receive([@event])
-      Event.last.payload[:agent].should == nil
-    end
-
-    it "should accept skip_created_at" do
-      @checker.receive([@event])
-      Event.last.payload[:created_at].should_not == nil
-      @checker.options[:skip_created_at] = "true"
-      @checker.receive([@event])
-      Event.last.payload[:created_at].should == nil
-    end
-
-    it "should handle JSONPaths in instructions" do
+    it "should handle Liquid templating in instructions" do
       @checker.receive([@event])
       Event.last.payload[:message].should == "Received Some Lorem Ipsum from somevalue ."
+      Event.last.payload[:agent].should == "WeatherAgent"
+      Event.last.payload[:created_at].should == @event.created_at.to_s
+      Event.last.payload[:created_at_iso].should == @event.created_at.iso8601
     end
 
-    it "should handle matchers and JSONPaths in instructions" do
+    it "should handle matchers and Liquid templating in instructions" do
       @checker.receive([@event])
       Event.last.payload[:subject].should == "Weather looks like someothervalue according to the forecast at 10:00 PM EST"
     end
@@ -82,7 +70,7 @@ describe Agents::EventFormattingAgent do
     it "should allow escaping" do
       @event.payload[:content][:name] = "escape this!?"
       @event.save!
-      @checker.options[:instructions][:message] = "Escaped: <escape $.content.name>\nNot escaped: <$.content.name>"
+      @checker.options[:instructions][:message] = "Escaped: {{content.name | uri_escape}}\nNot escaped: {{content.name}}"
       @checker.save!
       @checker.receive([@event])
       Event.last.payload[:message].should == "Escaped: escape+this%21%3F\nNot escaped: escape this!?"
@@ -149,16 +137,6 @@ describe Agents::EventFormattingAgent do
 
     it "should validate presence of mode" do
       @checker.options[:mode] = ""
-      @checker.should_not be_valid
-    end
-
-    it "should validate presence of skip_agent" do
-      @checker.options[:skip_agent] = ""
-      @checker.should_not be_valid
-    end
-
-    it "should validate presence of skip_created_at" do
-      @checker.options[:skip_created_at] = ""
       @checker.should_not be_valid
     end
   end

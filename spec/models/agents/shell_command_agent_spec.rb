@@ -17,7 +17,7 @@ describe Agents::ShellCommandAgent do
     @event = Event.new
     @event.agent = agents(:jane_weather_agent)
     @event.payload = {
-      :command => "ls"
+      :cmd => "ls"
     }
     @event.save!
 
@@ -78,13 +78,14 @@ describe Agents::ShellCommandAgent do
 
   describe "#receive" do
     before do
-      stub(@checker).run_command(@valid_path, @event.payload[:command]) { ["fake ls output", "", 0] }
+      stub(@checker).run_command(@valid_path, @event.payload[:cmd]) { ["fake ls output", "", 0] }
     end
 
     it "creates events" do
+      @checker.options[:command] = "{{cmd}}"
       @checker.receive([@event])
       Event.last.payload[:path].should == @valid_path
-      Event.last.payload[:command].should == @event.payload[:command]
+      Event.last.payload[:command].should == @event.payload[:cmd]
       Event.last.payload[:output].should == "fake ls output"
     end
 

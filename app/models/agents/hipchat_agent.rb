@@ -16,27 +16,22 @@ module Agents
       If you want your message to notify the room members change `notify` to "true".
       Modify the background color of your message via the `color` attribute (one of "yellow", "red", "green", "purple", "gray", or "random")
 
-      If you want to specify either of those attributes per event, you can provide a [JSONPath](http://goessner.net/articles/JsonPath/) for each of them (except the `auth_token`).
+      Have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to learn more about liquid templating.
     MD
 
     def default_options
       {
         'auth_token' => '',
         'room_name' => '',
-        'room_name_path' => '',
         'username' => "Huginn",
-        'username_path' => '',
         'message' => "Hello from Huginn!",
-        'message_path' => '',
         'notify' => false,
-        'notify_path' => '',
         'color' => 'yellow',
-        'color_path' => '',
       }
     end
 
     def validate_options
-      errors.add(:base, "you need to specify a hipchat auth_token") unless options['auth_token'].present?
+      errors.add(:base, "you need to specify a hipchat auth_token or provide a credential named hipchat_auth_token") unless options['auth_token'].present? || credential('hipchat_auth_token').present?
       errors.add(:base, "you need to specify a room_name or a room_name_path") if options['room_name'].blank? && options['room_name_path'].blank?
     end
 
@@ -45,31 +40,10 @@ module Agents
     end
 
     def receive(incoming_events)
-      client = HipChat::Client.new(options[:auth_token])
+      client = HipChat::Client.new(interpolated[:auth_token] || credential('hipchat_auth_token'))
       incoming_events.each do |event|
-        mo = merge_options event
-        client[mo[:room_name]].send(mo[:username], mo[:message], :notify => mo[:notify].to_s == 'true' ? 1 : 0, :color => mo[:color])
-      end
-    end
-
-    private
-    def select_option(event, a)
-      if options[a.to_s + '_path'].present?
-        Utils.value_at(event.payload, options[a.to_s + '_path'])
-      else
-        options[a]
-      end
-    end
-
-    def options_with_path
-      [:room_name, :username, :message, :notify, :color]
-    end
-
-    def merge_options event
-      options.select { |k, v| options_with_path.include? k}.tap do |merged_options|
-        options_with_path.each do |a|
-          merged_options[a] = select_option(event, a)
-        end
+        mo = interpolated(event)
+        client[mo[:room_name]].send(mo[:username][0..14], mo[:message], :notify => boolify(mo[:notify]), :color => mo[:color])
       end
     end
   end

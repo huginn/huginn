@@ -5,6 +5,7 @@ require 'json_serialized_field'
 # fields.
 class Event < ActiveRecord::Base
   include JSONSerializedField
+  include LiquidDroppable
 
   attr_accessible :lat, :lng, :payload, :user_id, :user, :expires_at
 
@@ -14,6 +15,9 @@ class Event < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :agent, :counter_cache => true, :touch => :last_event_at
+
+  has_many :agent_logs_as_inbound_event, :class_name => "AgentLog", :foreign_key => :inbound_event_id, :dependent => :nullify
+  has_many :agent_logs_as_outbound_event, :class_name => "AgentLog", :foreign_key => :outbound_event_id, :dependent => :nullify
 
   scope :recent, lambda { |timespan = 12.hours.ago|
     where("events.created_at > ?", timespan)
@@ -35,9 +39,37 @@ class Event < ActiveRecord::Base
   end
 
   protected
+
   def possibly_propagate
     #immediately schedule agents that want immediate updates
     propagate_ids = agent.receivers.where(:propagate_immediately => true).pluck(:id)
     Agent.receive!(:only_receivers => propagate_ids) unless propagate_ids.empty?
+  end
+end
+
+class EventDrop
+  def initialize(object)
+    @payload = object.payload
+    super
+  end
+
+  def before_method(key)
+    @payload[key]
+  end
+
+  def each(&block)
+    @payload.each(&block)
+  end
+
+  def agent
+    @payload.fetch(__method__) {
+      @object.agent
+    }
+  end
+
+  def created_at
+    @payload.fetch(__method__) {
+      @object.created_at
+    }
   end
 end

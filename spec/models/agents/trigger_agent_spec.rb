@@ -11,7 +11,7 @@ describe Agents::TriggerAgent do
                       'value' => "a\\db",
                       'path' => "foo.bar.baz",
                     }],
-        'message' => "I saw '<foo.bar.baz>' from <name>"
+        'message' => "I saw '{{foo.bar.baz}}' from {{name}}"
       }
     }
 
@@ -30,8 +30,31 @@ describe Agents::TriggerAgent do
       @checker.should be_valid
     end
 
-    it "should validate presence of options" do
+    it "should validate presence of message" do
       @checker.options['message'] = nil
+      @checker.should_not be_valid
+
+      @checker.options['message'] = ''
+      @checker.should_not be_valid
+    end
+
+    it "should be valid without a message when 'keep_event' is set" do
+      @checker.options['keep_event'] = 'true'
+      @checker.options['message'] = ''
+      @checker.should be_valid
+    end
+
+    it "if present, 'keep_event' must equal true or false" do
+      @checker.options['keep_event'] = 'true'
+      @checker.should be_valid
+
+      @checker.options['keep_event'] = 'false'
+      @checker.should be_valid
+
+      @checker.options['keep_event'] = ''
+      @checker.should be_valid
+
+      @checker.options['keep_event'] = 'tralse'
       @checker.should_not be_valid
     end
 
@@ -71,6 +94,28 @@ describe Agents::TriggerAgent do
       }.should change { Event.count }.by(1)
     end
 
+    it "handles array of regex" do
+      @event.payload['foo']['bar']['baz'] = "a222b"
+      @checker.options['rules'][0] = {
+        'type' => "regex",
+        'value' => ["a\\db", "a\\Wb"],
+        'path' => "foo.bar.baz",
+      }
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+
+      @event.payload['foo']['bar']['baz'] = "a2b"
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+
+      @event.payload['foo']['bar']['baz'] = "a b"
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+    end
+
     it "handles negated regex" do
       @event.payload['foo']['bar']['baz'] = "a2b"
       @checker.options['rules'][0] = {
@@ -84,6 +129,24 @@ describe Agents::TriggerAgent do
       }.should_not change { Event.count }
 
       @event.payload['foo']['bar']['baz'] = "a22b"
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+    end
+
+    it "handles array of negated regex" do
+      @event.payload['foo']['bar']['baz'] = "a2b"
+      @checker.options['rules'][0] = {
+        'type' => "!regex",
+        'value' => ["a\\db", "a2b"],
+        'path' => "foo.bar.baz",
+      }
+
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+
+      @event.payload['foo']['bar']['baz'] = "a3b"
       lambda {
         @checker.receive([@event])
       }.should change { Event.count }.by(1)
@@ -109,6 +172,21 @@ describe Agents::TriggerAgent do
       }.should_not change { Event.count }
     end
 
+    it "handles array of numerical comparisons" do
+      @event.payload['foo']['bar']['baz'] = "5"
+      @checker.options['rules'].first['value'] = [6, 3]
+      @checker.options['rules'].first['type'] = "field<value"
+
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+
+      @checker.options['rules'].first['value'] = [4, 3]
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+    end
+
     it "handles exact comparisons" do
       @event.payload['foo']['bar']['baz'] = "hello world"
       @checker.options['rules'].first['type'] = "field==value"
@@ -124,6 +202,21 @@ describe Agents::TriggerAgent do
       }.should change { Event.count }.by(1)
     end
 
+    it "handles array of exact comparisons" do
+      @event.payload['foo']['bar']['baz'] = "hello world"
+      @checker.options['rules'].first['type'] = "field==value"
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello universe"]
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+
+      @checker.options['rules'].first['value'] = ["hello world", "hello universe"]
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+    end
+
     it "handles negated comparisons" do
       @event.payload['foo']['bar']['baz'] = "hello world"
       @checker.options['rules'].first['type'] = "field!=value"
@@ -134,6 +227,22 @@ describe Agents::TriggerAgent do
       }.should_not change { Event.count }
 
       @checker.options['rules'].first['value'] = "hello there"
+
+      lambda {
+        @checker.receive([@event])
+      }.should change { Event.count }.by(1)
+    end
+
+    it "handles array of negated comparisons" do
+      @event.payload['foo']['bar']['baz'] = "hello world"
+      @checker.options['rules'].first['type'] = "field!=value"
+      @checker.options['rules'].first['value'] = ["hello world", "hello world"]
+
+      lambda {
+        @checker.receive([@event])
+      }.should_not change { Event.count }
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello world"]
 
       lambda {
         @checker.receive([@event])
@@ -191,6 +300,39 @@ describe Agents::TriggerAgent do
       lambda {
         @checker.receive([@event])
       }.should_not change { Event.count }
+    end
+
+    describe "when 'keep_event' is true" do
+      before do
+        @checker.options['keep_event'] = 'true'
+        @event.payload['foo']['bar']['baz'] = "5"
+        @checker.options['rules'].first['type'] = "field<value"
+      end
+
+      it "can re-emit the origin event" do
+        @checker.options['rules'].first['value'] = 3
+        @checker.options['message'] = ''
+        @event.payload['message'] = 'hi there'
+
+        lambda {
+          @checker.receive([@event])
+        }.should_not change { Event.count }
+
+        @checker.options['rules'].first['value'] = 6
+        lambda {
+          @checker.receive([@event])
+        }.should change { Event.count }.by(1)
+
+        @checker.most_recent_event.payload.should == @event.payload
+      end
+
+      it "merges 'message' into the original event when present" do
+        @checker.options['rules'].first['value'] = 6
+
+        @checker.receive([@event])
+
+        @checker.most_recent_event.payload.should == @event.payload.merge(:message => "I saw '5' from Joe")
+      end
     end
   end
 end

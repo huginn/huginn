@@ -12,41 +12,44 @@
     <%= yield(:head) %>
   </head>
   <body>
-    <header class="navbar navbar-fixed-top">
-      <nav class="navbar-inner">
-        <div class="container">
-          <%= render 'layouts/navigation' %>
-        </div>
-      </nav>
-    </header>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <%= render 'layouts/navigation' %>
+      </div>
+    </nav>
 
     <div id="main" role="main">
       <div class="container">
-        <div class="content">
-           <div class="row">
-            <div class="span12">
-              <%= render 'layouts/messages' %>
-              <%= yield %>
-            </div>
-          </div>
+        <div class="row">
+          <%= render 'layouts/messages' %>
         </div>
       </div>
+      <% if user_signed_in? %>
+        <%= render "upgrade_warning" %>
+      <% end %>
+
+      <%= yield %>
+      
     </div>
 
     <script>
       var agentPaths = {};
-      <% if current_user -%>
-        var myAgents = <%= Utils.jsonify(current_user.agents.select([:name, :id, :schedule]).inject({}) {|m, a| m[a.name] = agent_path(a); m }) %>;
-        $.extend(agentPaths, myAgents);
-      <% end -%>
-      agentPaths["All Agents Index"] = <%= Utils.jsonify agents_path %>;
-      agentPaths["New Agent"] = <%= Utils.jsonify new_agent_path %>;
-      agentPaths["Account"] = <%= Utils.jsonify edit_user_registration_path %>;
-      agentPaths["Events Index"] = <%= Utils.jsonify events_path %>;
-      agentPaths["View Agent Diagram"] = <%= Utils.jsonify diagram_agents_path %>;
-      agentPaths["Run Event Propagation"] = { url: <%= Utils.jsonify propagate_agents_path %>, method: 'POST' };
       var agentNames = [];
-      $.each(agentPaths, function(name, v) { agentNames.push(name); });
+      <% if current_user.present? -%>
+        var myAgents = <%= Utils.jsonify(current_user.agents.pluck(:name, :id).inject({}) {|m, a| m[a.first] = agent_path(a.last); m }) %>;
+        var myScenarios = <%= Utils.jsonify(current_user.scenarios.pluck(:name, :id).inject({}) {|m, s| m[s.first + " Scenario"] = scenario_path(s.last); m }) %>;
+        $.extend(agentPaths, myAgents);
+        $.extend(agentPaths, myScenarios);
+        agentPaths["All Agents Index"] = <%= Utils.jsonify agents_path %>;
+        agentPaths["New Agent"] = <%= Utils.jsonify new_agent_path %>;
+        agentPaths["Account"] = <%= Utils.jsonify edit_user_registration_path %>;
+        agentPaths["Events Index"] = <%= Utils.jsonify events_path %>;
+        agentPaths["View Agent Diagram"] = <%= Utils.jsonify diagram_path %>;
+        agentPaths["Run Event Propagation"] = { url: <%= Utils.jsonify propagate_agents_path %>, method: 'POST' };
+
+
+        $.each(agentPaths, function(name, v) { agentNames.push(name); });
+      <% end -%>
     </script>
   </body>
 </html>

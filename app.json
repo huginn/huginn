@@ -1,0 +1,23 @@
+{
+    "name": "Huginn",
+    "description": "Build agents that monitor and act on your behalf.  Your agents are standing by!",
+    "website": "https://github.com/cantino/huginn",
+    "repository": "https://github.com/cantino/huginn",
+    "env": {
+        "BUILDPACK_URL": "https://github.com/ddollar/heroku-buildpack-multi.git",
+        "APP_SECRET_TOKEN": {
+            "generator": "secret"
+        },
+        "PROCFILE_PATH": "deployment/heroku/Procfile.heroku",
+        "ON_HEROKU": "true",
+        "FORCE_SSL": "true",
+        "INVITATION_CODE": {
+            "generator": "secret"
+        },
+        "USE_GRAPHVIZ_DOT": "dot"
+    },
+    "scripts": {
+      "postdeploy": "bundle exec rake db:migrate"
+    },
+    "success_url": "/users/sign_up"
+}

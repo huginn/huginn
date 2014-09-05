@@ -1,0 +1,15 @@
+jane_weather_agent_scenario_membership:
+  agent: jane_weather_agent
+  scenario: jane_weather
+
+jane_rain_notifier_agent_scenario_membership:
+  agent: jane_rain_notifier_agent
+  scenario: jane_weather
+
+bob_weather_agent_scenario_membership:
+  agent: bob_weather_agent
+  scenario: bob_weather
+
+bob_rain_notifier_agent_scenario_membership:
+  agent: bob_rain_notifier_agent
+  scenario: bob_weather

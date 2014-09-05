@@ -1,44 +1,33 @@
 <div class='container agent-show'>
   <div class='row'>
-    <div class='span12'>
+    <div class='col-md-2'>
+        <ul class="nav nav-pills nav-stacked" id="show-tabs">
+          <li><%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, agents_path %></li>
 
-      <div class="tabbable tabs-left">
-        <ul class="nav nav-tabs" id="show-tabs">
           <% if agent_show_view(@agent).present? %>
-            <li class='active'><a href="#summary" data-toggle="tab"><i class='icon-picture'></i> Summary</a></li>
-            <li><a href="#details" data-toggle="tab"><i class='icon-indent-left'></i> Details</a></li>
+            <li class='active'><a href="#summary" data-toggle="tab"><span class='glyphicon glyphicon-picture'></span> Summary</a></li>
+            <li><a href="#details" data-toggle="tab"><span class='glyphicon glyphicon-indent-left'></span> Details</a></li>
           <% else %>
-            <li class='disabled'><a><i class='icon-picture'></i> Summary</a></li>
-            <li class='active'><a href="#details" data-toggle="tab"><i class='icon-indent-left'></i> Details</a></li>
+            <li class='disabled'><a><span class='glyphicon glyphicon-picture'></span> Summary</a></li>
+            <li class='active'><a href="#details" data-toggle="tab"><span class='glyphicon glyphicon-indent-left'></span> Details</a></li>
           <% end %>
-          <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><i class='icon-list-alt'></i> Logs</a></li>
+
+          <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><span class='glyphicon glyphicon-list-alt'></span> Logs</a></li>
 
           <% if @agent.can_create_events? && @agent.events.count > 0 %>
-            <li><%= link_to '<i class="icon-random"></i> Events'.html_safe, events_path(:agent => @agent.to_param) %></li>
+            <li><%= link_to '<span class="glyphicon glyphicon-random"></span> Events'.html_safe, agent_events_path(@agent) %></li>
+          <% else %>
+            <li class='disabled'><a><span class='glyphicon glyphicon-random'></span> Events</a></li>
           <% end %>
-          <li><%= link_to '<i class="icon-chevron-left"></i> Back'.html_safe, agents_path %></li>
-          <li><%= link_to '<i class="icon-pencil"></i> Edit'.html_safe, edit_agent_path(@agent) %></li>
 
-          <% if @agent.can_be_scheduled? || @agent.events.count > 0 %>
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#">Actions <b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                <% if @agent.can_be_scheduled? %>
-                  <li>
-                    <%= link_to '<i class="icon-refresh"></i> Run'.html_safe, run_agent_path(@agent, :return => "show"), method: :post, :tabindex => "-1" %>
-                  </li>
-                <% end %>
-
-                <% if @agent.can_create_events? && @agent.events.count > 0 %>
-                  <li>
-                    <%= link_to '<i class="icon-trash"></i> Delete all events'.html_safe, remove_events_agent_path(@agent), method: :delete, data: {confirm: 'Are you sure you want to delete ALL events for this Agent?'}, :tabindex => "-1" %>
-                  </li>
-                <% end %>
-              </ul>
-            </li>
-          <% end %>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span></a>
+            <%= render 'agents/action_menu', :agent => @agent, :returnTo => "show" %>
+          </li>
         </ul>
+      </div>
 
+      <div class='col-md-10'>
         <div class="tab-content">
           <div class="tab-pane <%= agent_show_view(@agent).present? ? "active" : "disabled" %>" id="summary">
             <h2><%= @agent.name %> Summary</h2>
@@ -51,14 +40,24 @@
           </div>
 
           <div class="tab-pane" id="logs" data-agent-id="<%= @agent.id %>">
-            <h2>
-              <%= @agent.name %> Logs
-              <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
-              <i class="icon-refresh action-icon refresh"></i>
-              <i class="icon-trash action-icon clear"></i>
-            </h2>
-            <div class='logs'>
-              Just a moment...
+            <div class='row'>
+              <div class='col-md-12'>
+                <h2>
+                  <%= @agent.name %> Logs
+                  <small>
+                    <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
+                    <span class="glyphicon glyphicon-refresh action-icon refresh"></span>
+                    <span class="glyphicon glyphicon-trash action-icon clear"></span>
+                  </small>
+                </h2>
+              </div>
+            </div>
+            <div class='row'>
+              <div class='col-md-12'>
+                <div class='logs'>
+                  Just a moment...
+                </div>
+              </div>
             </div>
           </div>
 
@@ -104,26 +103,31 @@
             <% if @agent.can_create_events? %>
               <p>
                 <b>Events created:</b>
-                <%= link_to @agent.events.count, events_path(:agent => @agent.to_param) %>
+                <%= link_to @agent.events.count, agent_events_path(@agent) %>
               </p>
             <% end %>
 
             <% if @agent.can_receive_events? %>
               <p>
                 <b>Event sources:</b>
-                <% if @agent.sources.length %>
-                  <%= @agent.sources.map { |source_agent| link_to(source_agent.name, agent_path(source_agent)) }.to_sentence.html_safe %>
+                <% if (agents = @agent.sources).length > 0 %>
+                  <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
                 <% else %>
                   None
                 <% end %>
+              </p>
+
+              <p>
+                <b>Propagate immediately:</b>
+                <%= yes_no @agent.propagate_immediately %>
               </p>
             <% end %>
 
             <% if @agent.can_create_events? %>
               <p>
                 <b>Event receivers:</b>
-                <% if @agent.receivers.length %>
-                  <%= @agent.receivers.map { |receiver_agent| link_to(receiver_agent.name, agent_path(receiver_agent)) }.to_sentence.html_safe %>
+                <% if (agents = @agent.receivers).length > 0 %>
+                  <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
                 <% else %>
                   None
                 <% end %>
@@ -147,6 +151,5 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </div>

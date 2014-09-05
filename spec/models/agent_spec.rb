@@ -1,6 +1,25 @@
 require 'spec_helper'
 
 describe Agent do
+  it_behaves_like WorkingHelpers
+
+  describe ".bulk_check" do
+    before do
+      @weather_agent_count = Agents::WeatherAgent.where(:schedule => "midnight", :disabled => false).count
+    end
+
+    it "should run all Agents with the given schedule" do
+      mock(Agents::WeatherAgent).async_check(anything).times(@weather_agent_count)
+      Agents::WeatherAgent.bulk_check("midnight")
+    end
+
+    it "should skip disabled Agents" do
+      agents(:bob_weather_agent).update_attribute :disabled, true
+      mock(Agents::WeatherAgent).async_check(anything).times(@weather_agent_count - 1)
+      Agents::WeatherAgent.bulk_check("midnight")
+    end
+  end
+
   describe ".run_schedule" do
     before do
       Agents::WeatherAgent.count.should > 0
@@ -102,6 +121,24 @@ describe Agent do
       stub(Agents::CannotBeScheduled).valid_type?("Agents::CannotBeScheduled") { true }
     end
 
+    describe Agents::SomethingSource do
+      let(:new_instance) do
+        agent = Agents::SomethingSource.new(:name => "some agent")
+        agent.user = users(:bob)
+        agent
+      end
+
+      it_behaves_like LiquidInterpolatable
+      it_behaves_like HasGuid
+    end
+
+    describe ".short_type" do
+      it "returns a short name without 'Agents::'" do
+        Agents::SomethingSource.new.short_type.should == "SomethingSource"
+        Agents::CannotBeScheduled.new.short_type.should == "CannotBeScheduled"
+      end
+    end
+
     describe ".default_schedule" do
       it "stores the default on the class" do
         Agents::SomethingSource.default_schedule.should == "2pm"
@@ -176,7 +213,7 @@ describe Agent do
         @checker.last_check_at.should be_nil
         Agents::SomethingSource.async_check(@checker.id)
         @checker.reload.last_check_at.should be_within(2).of(Time.now)
-        @checker.reload.options[:new].should be_true # Show that we save options
+        @checker.reload.options[:new].should be_truthy # Show that we save options
       end
 
       it "should log exceptions" do
@@ -191,17 +228,31 @@ describe Agent do
         log.message.should =~ /Exception/
         log.level.should == 4
       end
+
+      it "should not run disabled Agents" do
+        mock(Agent).find(agents(:bob_weather_agent).id) { agents(:bob_weather_agent) }
+        do_not_allow(agents(:bob_weather_agent)).check
+        agents(:bob_weather_agent).update_attribute :disabled, true
+        Agent.async_check(agents(:bob_weather_agent).id)
+      end
     end
 
-    describe ".receive! and .async_receive" do
+    describe ".receive!" do
       before do
         stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
         stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       end
 
       it "should use available events" do
-        mock.any_instance_of(Agents::TriggerAgent).receive(anything).once
         Agent.async_check(agents(:bob_weather_agent).id)
+        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(1)
+        Agent.receive!
+      end
+
+      it "should not propogate to disabled Agents" do
+        Agent.async_check(agents(:bob_weather_agent).id)
+        agents(:bob_rain_notifier_agent).update_attribute :disabled, true
+        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
         Agent.receive!
       end
 
@@ -275,6 +326,15 @@ describe Agent do
         lambda {
           Agent.receive! # and we receive it
         }.should change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+      end
+    end
+
+    describe ".async_receive" do
+      it "should not run disabled Agents" do
+        mock(Agent).find(agents(:bob_rain_notifier_agent).id) { agents(:bob_rain_notifier_agent) }
+        do_not_allow(agents(:bob_rain_notifier_agent)).receive
+        agents(:bob_rain_notifier_agent).update_attribute :disabled, true
+        Agent.async_receive(agents(:bob_rain_notifier_agent).id, [1, 2, 3])
       end
     end
 
@@ -437,6 +497,23 @@ describe Agent do
         agent.should have(0).errors_on(:sources)
       end
 
+      it "should not allow scenarios owned by other people" do
+        agent = Agents::SomethingSource.new(:name => "something")
+        agent.user = users(:bob)
+
+        agent.scenario_ids = [scenarios(:bob_weather).id]
+        agent.should have(0).errors_on(:scenarios)
+
+        agent.scenario_ids = [scenarios(:bob_weather).id, scenarios(:jane_weather).id]
+        agent.should have(1).errors_on(:scenarios)
+
+        agent.scenario_ids = [scenarios(:jane_weather).id]
+        agent.should have(1).errors_on(:scenarios)
+
+        agent.user = users(:jane)
+        agent.should have(0).errors_on(:scenarios)
+      end
+
       it "validates keep_events_for" do
         agent = Agents::SomethingSource.new(:name => "something")
         agent.user = users(:bob)
@@ -514,6 +591,51 @@ describe Agent do
         end
       end
     end
+
+    describe "Agent.build_clone" do
+      before do
+        Event.delete_all
+        @sender = Agents::SomethingSource.new(
+          name: 'Agent (2)',
+          options: { foo: 'bar2' },
+          schedule: '5pm')
+        @sender.user = users(:bob)
+        @sender.save!
+        @sender.create_event :payload => {}
+        @sender.create_event :payload => {}
+        @sender.events.count.should == 2
+
+        @receiver = Agents::CannotBeScheduled.new(
+          name: 'Agent',
+          options: { foo: 'bar3' },
+          keep_events_for: 3,
+          propagate_immediately: true)
+        @receiver.user = users(:bob)
+        @receiver.sources << @sender
+        @receiver.memory[:test] = 1
+        @receiver.save!
+      end
+
+      it "should create a clone of a given agent for editing" do
+        sender_clone = users(:bob).agents.build_clone(@sender)
+
+        sender_clone.attributes.should == Agent.new.attributes.
+          update(@sender.slice(:user_id, :type,
+            :options, :schedule, :keep_events_for, :propagate_immediately)).
+          update('name' => 'Agent (2) (2)', 'options' => { 'foo' => 'bar2' })
+
+        sender_clone.source_ids.should == []
+
+        receiver_clone = users(:bob).agents.build_clone(@receiver)
+
+        receiver_clone.attributes.should == Agent.new.attributes.
+          update(@receiver.slice(:user_id, :type,
+            :options, :schedule, :keep_events_for, :propagate_immediately)).
+          update('name' => 'Agent (3)', 'options' => { 'foo' => 'bar3' })
+
+        receiver_clone.source_ids.should == [@sender.id]
+      end
+    end
   end
 
   describe ".trigger_web_request" do
@@ -565,32 +687,6 @@ describe Agent do
     end
   end
 
-  describe "recent_error_logs?" do
-    it "returns true if last_error_log_at is near last_event_at" do
-      agent = Agent.new
-
-      agent.last_error_log_at = 10.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
-
-      agent.last_error_log_at = 11.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
-
-      agent.last_error_log_at = 5.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_true
-
-      agent.last_error_log_at = 15.minutes.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_false
-
-      agent.last_error_log_at = 2.days.ago
-      agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_false
-    end
-  end
-
   describe "scopes" do
     describe "of_type" do
       it "should accept classes" do
@@ -638,5 +734,100 @@ describe Agent do
         event.expires_at.should be_nil
       end
     end
+  end
+end
+
+describe AgentDrop do
+  def interpolate(string, agent)
+    agent.interpolate_string(string, "agent" => agent)
+  end
+
+  before do
+    @wsa1 = Agents::WebsiteAgent.new(
+      name: 'XKCD',
+      options: {
+        expected_update_period_in_days: 2,
+        type: 'html',
+        url: 'http://xkcd.com/',
+        mode: 'on_change',
+        extract: {
+          url: { css: '#comic img', value: '@src' },
+          title: { css: '#comic img', value: '@alt' },
+        },
+      },
+      schedule: 'every_1h',
+      keep_events_for: 2)
+    @wsa1.user = users(:bob)
+    @wsa1.save!
+
+    @wsa2 = Agents::WebsiteAgent.new(
+      name: 'Dilbert',
+      options: {
+        expected_update_period_in_days: 2,
+        type: 'html',
+        url: 'http://dilbert.com/',
+        mode: 'on_change',
+        extract: {
+          url: { css: '[id^=strip_enlarged_] img', value: '@src' },
+          title: { css: '.STR_DateStrip', value: './/text()' },
+        },
+      },
+      schedule: 'every_12h',
+      keep_events_for: 2)
+    @wsa2.user = users(:bob)
+    @wsa2.save!
+
+    @efa = Agents::EventFormattingAgent.new(
+      name: 'Formatter',
+      options: {
+        instructions: {
+          message: '{{agent.name}}: {{title}} {{url}}',
+          agent: '{{agent.type}}',
+        },
+        mode: 'clean',
+        matchers: [],
+        skip_created_at: 'false',
+      },
+      keep_events_for: 2,
+      propagate_immediately: true)
+    @efa.user = users(:bob)
+    @efa.sources << @wsa1 << @wsa2
+    @efa.memory[:test] = 1
+    @efa.save!
+  end
+
+  it 'should be created via Agent#to_liquid' do
+    @wsa1.to_liquid.class.should be(AgentDrop)
+    @wsa2.to_liquid.class.should be(AgentDrop)
+    @efa.to_liquid.class.should be(AgentDrop)
+  end
+
+  it 'should have .type and .name' do
+    t = '{{agent.type}}: {{agent.name}}'
+    interpolate(t, @wsa1).should eq('WebsiteAgent: XKCD')
+    interpolate(t, @wsa2).should eq('WebsiteAgent: Dilbert')
+    interpolate(t, @efa).should eq('EventFormattingAgent: Formatter')
+  end
+
+  it 'should have .options' do
+    t = '{{agent.options.url}}'
+    interpolate(t, @wsa1).should eq('http://xkcd.com/')
+    interpolate(t, @wsa2).should eq('http://dilbert.com/')
+    interpolate('{{agent.options.instructions.message}}',
+                @efa).should eq('{{agent.name}}: {{title}} {{url}}')
+  end
+
+  it 'should have .sources' do
+    t = '{{agent.sources.size}}: {{agent.sources | map:"name" | join:", "}}'
+    interpolate(t, @wsa1).should eq('0: ')
+    interpolate(t, @wsa2).should eq('0: ')
+    interpolate(t, @efa).should eq('2: XKCD, Dilbert')
+  end
+
+  it 'should have .receivers' do
+    t = '{{agent.receivers.size}}: {{agent.receivers | map:"name" | join:", "}}'
+    interpolate(t, @wsa1).should eq('1: Formatter')
+    interpolate(t, @wsa2).should eq('1: Formatter')
+    interpolate(t, @efa).should eq('0: ')
   end
 end

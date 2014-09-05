@@ -1,0 +1,4 @@
+# This Procfile is intended for Heroku, and is detected by the Gemfile.  DO NOT REMOVE THIS LINE!
+
+# deployment/heroku/unicorn.rb is a special Unicorn config file that also spawns workers.
+web: bundle exec unicorn -p $PORT -c ./deployment/heroku/unicorn.rb

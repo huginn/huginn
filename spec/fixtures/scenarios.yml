@@ -1,0 +1,13 @@
+jane_weather:
+  name: Jane's weather alert Scenario
+  user: jane
+  description: Jane's weather alert system
+  public: false
+  guid: random-guid-generated-by-bob
+
+bob_weather:
+  name: Bob's weather alert Scenario
+  user: bob
+  description: Bob's weather alert system
+  public: false
+  guid: random-guid-generated-by-jane

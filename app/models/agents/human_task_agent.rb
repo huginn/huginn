@@ -16,7 +16,7 @@ module Agents
 
       # Example
 
-      If created with an event, all HIT fields can contain interpolated values via [JSONPaths](http://goessner.net/articles/JsonPath/) placed between < and > characters.
+      If created with an event, all HIT fields can contain interpolated values via [liquid templating](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid).
       For example, if the incoming event was a Twitter event, you could make a HITT to rate its sentiment like this:
 
           {
@@ -25,7 +25,7 @@ module Agents
             "hit": {
               "assignments": 1,
               "title": "Sentiment evaluation",
-              "description": "Please rate the sentiment of this message: '<$.message>'",
+              "description": "Please rate the sentiment of this message: '{{message}}'",
               "reward": 0.05,
               "lifetime_in_seconds": "3600",
               "questions": [
@@ -62,6 +62,8 @@ module Agents
       which contain `key` and `text`.  For _free\\_text_, the special configuration options are all optional, and are
       `default`, `min_length`, and `max_length`.
 
+      By default, all answers are emitted in a single event.  If you'd like separate events for each answer, set `separate_answers` to `true`.
+
       # Combining answers
 
       There are a couple of ways to combine HITs that have multiple `assignments`, all of which involve setting `combination_mode` at the top level.
@@ -83,7 +85,7 @@ module Agents
               "title": "Take a poll about some jokes",
               "instructions": "Please rank these jokes from most funny (5) to least funny (1)",
               "assignments": 3,
-              "row_template": "<$.joke>"
+              "row_template": "{{joke}}"
             },
             "hit": {
               "assignments": 5,
@@ -105,7 +107,7 @@ module Agents
             }
           }
 
-      Resulting events will have the original `answers`, as well as the `poll` results, and a field called `best_answer` that contains the best answer as determined by the poll.
+      Resulting events will have the original `answers`, as well as the `poll` results, and a field called `best_answer` that contains the best answer as determined by the poll.  (Note that `separate_answers` won't work when doing a poll.)
 
       # Other settings
 
@@ -168,7 +170,7 @@ module Agents
           {
             'assignments' => 1,
             'title' => "Sentiment evaluation",
-            'description' => "Please rate the sentiment of this message: '<$.message>'",
+            'description' => "Please rate the sentiment of this message: '{{message}}'",
             'reward' => 0.05,
             'lifetime_in_seconds' => 24 * 60 * 60,
             'questions' =>
@@ -202,20 +204,20 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def check
       review_hits
 
-      if options['trigger_on'] == "schedule" && (memory['last_schedule'] || 0) <= Time.now.to_i - options['submission_period'].to_i * 60 * 60
+      if interpolated['trigger_on'] == "schedule" && (memory['last_schedule'] || 0) <= Time.now.to_i - interpolated['submission_period'].to_i * 60 * 60
         memory['last_schedule'] = Time.now.to_i
         create_basic_hit
       end
     end
 
     def receive(incoming_events)
-      if options['trigger_on'] == "event"
+      if interpolated['trigger_on'] == "event"
         incoming_events.each do |event|
           create_basic_hit event
         end
@@ -225,11 +227,11 @@ module Agents
     protected
 
     def take_majority?
-      options['combination_mode'] == "take_majority" || options['take_majority'] == "true"
+      interpolated['combination_mode'] == "take_majority" || interpolated['take_majority'] == "true"
     end
 
     def create_poll?
-      options['combination_mode'] == "poll"
+      interpolated['combination_mode'] == "poll"
     end
 
     def event_for_hit(hit_id)
@@ -332,7 +334,7 @@ module Agents
                   'name' => "Item #{index + 1}",
                   'key' => index,
                   'required' => "true",
-                  'question' => Utils.interpolate_jsonpaths(options['poll_options']['row_template'], assignments[index].answers),
+                  'question' => interpolate_string(options['poll_options']['row_template'], assignments[index].answers),
                   'selections' => selections
                 }
               end
@@ -351,8 +353,18 @@ module Agents
 
               log "Poll HIT created with ID #{poll_hit.id} and URL #{poll_hit.url}.  Original HIT: #{hit_id}", :inbound_event => inbound_event
             else
-              event = create_event :payload => payload
-              log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => inbound_event
+              if options[:separate_answers]
+                payload['answers'].each.with_index do |answer, index|
+                  sub_payload = payload.dup
+                  sub_payload.delete('answers')
+                  sub_payload['answer'] = answer
+                  event = create_event :payload => sub_payload
+                  log "Event emitted with answer ##{index}", :outbound_event => event, :inbound_event => inbound_event
+                end
+              else
+                event = create_event :payload => payload
+                log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => inbound_event
+              end
             end
           end
 
@@ -365,7 +377,7 @@ module Agents
     end
 
     def all_questions_are_numeric?
-      options['hit']['questions'].all? do |question|
+      interpolated['hit']['questions'].all? do |question|
         question['selections'].all? do |selection|
           selection['key'] == selection['key'].to_f.to_s || selection['key'] == selection['key'].to_i.to_s
         end
@@ -387,9 +399,9 @@ module Agents
 
     def create_hit(opts = {})
       payload = opts['payload'] || {}
-      title = Utils.interpolate_jsonpaths(opts['title'], payload).strip
-      description = Utils.interpolate_jsonpaths(opts['description'], payload).strip
-      questions = Utils.recursively_interpolate_jsonpaths(opts['questions'], payload)
+      title = interpolate_string(opts['title'], payload).strip
+      description = interpolate_string(opts['description'], payload).strip
+      questions = interpolate_options(opts['questions'], payload)
       hit = RTurk::Hit.create(:title => title) do |hit|
         hit.max_assignments = (opts['assignments'] || 1).to_i
         hit.description = description

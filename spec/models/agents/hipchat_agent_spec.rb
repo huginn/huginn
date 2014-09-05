@@ -5,15 +5,10 @@ describe Agents::HipchatAgent do
     @valid_params = {
                       'auth_token' => 'token',
                       'room_name' => 'test',
-                      'room_name_path' => '',
-                      'username' => "Huginn",
-                      'username_path' => '$.username',
-                      'message' => "Hello from Huginn!",
-                      'message_path' => '$.message',
-                      'notify' => false,
-                      'notify_path' => '',
+                      'username' => "{{username}}",
+                      'message' => "{{message}}",
+                      'notify' => 'false',
                       'color' => 'yellow',
-                      'color_path' => '',
                     }
 
     @checker = Agents::HipchatAgent.new(:name => "somename", :options => @valid_params)
@@ -22,7 +17,7 @@ describe Agents::HipchatAgent do
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :room_name => 'test room', :message => 'Looks like its going to rain', username: "Huggin user"}
+    @event.payload = { :room_name => 'test room', :message => 'Looks like its going to rain', username: "Huggin user                  "}
     @event.save!
   end
 
@@ -47,35 +42,18 @@ describe Agents::HipchatAgent do
       @checker.should be_valid
     end
 
-  end
-
-  describe "helpers" do
-    describe "select_option" do
-      it "should use the room_name_path if specified" do
-        @checker.options['room_name_path'] = "$.room_name"
-        @checker.send(:select_option, @event, :room_name).should == "test room"
-      end
-
-      it "should use the normal option when the path option is blank" do
-        @checker.send(:select_option, @event, :room_name).should == "test"
-      end
-    end
-
-    it "should merge all options" do
-      @checker.send(:merge_options, @event).should == {
-        :room_name => "test",
-        :username => "Huggin user",
-        :message => "Looks like its going to rain",
-        :notify => false,
-        :color => "yellow"
-      }
+    it "should also allow a credential" do
+      @checker.options['auth_token'] = nil
+      @checker.should_not be_valid
+      @checker.user.user_credentials.create :credential_name => 'hipchat_auth_token', :credential_value => 'something'
+      @checker.reload.should be_valid
     end
   end
 
   describe "#receive" do
     it "send a message to the hipchat" do
       any_instance_of(HipChat::Room) do |obj|
-        mock(obj).send(@event.payload[:username], @event.payload[:message], {:notify => 0, :color => 'yellow'})
+        mock(obj).send(@event.payload[:username][0..14], @event.payload[:message], {:notify => false, :color => 'yellow'})
       end
       @checker.receive([@event])
     end

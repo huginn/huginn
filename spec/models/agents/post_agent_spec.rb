@@ -1,16 +1,18 @@
 require 'spec_helper'
+require 'ostruct'
 
 describe Agents::PostAgent do
   before do
-    @valid_params = {
-      :name => "somename",
-      :options => {
-        'post_url' => "http://www.example.com",
-        'expected_receive_period_in_days' => 1,
-        'payload' => {
-          'default' => 'value'
-        }
+    @valid_options = {
+      'post_url' => "http://www.example.com",
+      'expected_receive_period_in_days' => 1,
+      'payload' => {
+        'default' => 'value'
       }
+    }
+    @valid_params = {
+      name: "somename",
+      options: @valid_options
     }
 
     @checker = Agents::PostAgent.new(@valid_params)
@@ -25,11 +27,42 @@ describe Agents::PostAgent do
         'somekey' => 'value'
       }
     }
+    @requests = 0
+    @sent_requests = Hash.new { |hash, method| hash[method] = [] }
 
-    @sent_posts = []
-    @sent_gets = []
-    stub.any_instance_of(Agents::PostAgent).post_data { |data| @sent_posts << data }
-    stub.any_instance_of(Agents::PostAgent).get_data { |data| @sent_gets << data }
+    stub_request(:any, /:/).to_return { |request|
+      method = request.method
+      @requests += 1
+      @sent_requests[method] << req = OpenStruct.new(uri: request.uri)
+      case method
+      when :get, :delete
+        req.data = request.uri.query
+      else
+        case request.headers['Content-Type'][/\A[^;\s]+/]
+        when 'application/x-www-form-urlencoded'
+          req.data = request.body
+        when 'application/json'
+          req.data = ActiveSupport::JSON.decode(request.body)
+        else
+          raise "unexpected Content-Type: #{content_type}"
+        end
+      end
+      { status: 200, body: "ok" }
+    }
+  end
+
+  it_behaves_like WebRequestConcern
+
+  describe "making requests" do
+    it "can make requests of each type" do
+      %w[get put post patch delete].each.with_index(1) do |verb, index|
+        @checker.options['method'] = verb
+        @checker.should be_valid
+        @checker.check
+        @requests.should == index
+        @sent_requests[verb.to_sym].length.should == 1
+      end
+    end
   end
 
   describe "#receive" do
@@ -45,11 +78,11 @@ describe Agents::PostAgent do
       lambda {
         lambda {
           @checker.receive([@event, event1])
-        }.should change { @sent_posts.length }.by(2)
-      }.should_not change { @sent_gets.length }
+        }.should change { @sent_requests[:post].length }.by(2)
+      }.should_not change { @sent_requests[:get].length }
 
-      @sent_posts[0].should == @event.payload.merge('default' => 'value')
-      @sent_posts[1].should == event1.payload
+      @sent_requests[:post][0].data.should == @event.payload.merge('default' => 'value').to_query
+      @sent_requests[:post][1].data.should == event1.payload.to_query
     end
 
     it "can make GET requests" do
@@ -58,10 +91,46 @@ describe Agents::PostAgent do
       lambda {
         lambda {
           @checker.receive([@event])
-        }.should change { @sent_gets.length }.by(1)
-      }.should_not change { @sent_posts.length }
+        }.should change { @sent_requests[:get].length }.by(1)
+      }.should_not change { @sent_requests[:post].length }
 
-      @sent_gets[0].should == @event.payload.merge('default' => 'value')
+      @sent_requests[:get][0].data.should == @event.payload.merge('default' => 'value').to_query
+    end
+
+    it "can make a GET request merging params in post_url, payload and event" do
+      @checker.options['method'] = 'get'
+      @checker.options['post_url'] = "http://example.com/a/path?existing_param=existing_value"
+      @event.payload = {
+        "some_param" => "some_value",
+        "another_param" => "another_value"
+      }
+      @checker.receive([@event])
+      uri = @sent_requests[:get].first.uri
+      # parameters are alphabetically sorted by Faraday
+      uri.request_uri.should == "/a/path?another_param=another_value&default=value&existing_param=existing_value&some_param=some_value"
+    end
+
+    it "can skip merging the incoming event when no_merge is set, but it still interpolates" do
+      @checker.options['no_merge'] = 'true'
+      @checker.options['payload'] = {
+        'key' => 'it said: {{ someotherkey.somekey }}'
+      }
+      @checker.receive([@event])
+      @sent_requests[:post].first.data.should == { 'key' => 'it said: value' }.to_query
+    end
+
+    it "interpolates when receiving a payload" do
+      @checker.options['post_url'] = "https://{{ domain }}/{{ variable }}?existing_param=existing_value"
+      @event.payload = {
+        'domain' => 'google.com',
+        'variable' => 'a_variable'
+      }
+      @checker.receive([@event])
+      uri = @sent_requests[:post].first.uri
+      uri.scheme.should == 'https'
+      uri.host.should == 'google.com'
+      uri.path.should == '/a_variable'
+      uri.query.should == "existing_param=existing_value"
     end
   end
 
@@ -69,9 +138,18 @@ describe Agents::PostAgent do
     it "sends options['payload'] as a POST request" do
       lambda {
         @checker.check
-      }.should change { @sent_posts.length }.by(1)
+      }.should change { @sent_requests[:post].length }.by(1)
 
-      @sent_posts[0].should == @checker.options['payload']
+      @sent_requests[:post][0].data.should == @checker.options['payload'].to_query
+    end
+
+    it "sends options['payload'] as JSON as a POST request" do
+      @checker.options['content_type'] = 'json'
+      lambda {
+        @checker.check
+      }.should change { @sent_requests[:post].length }.by(1)
+
+      @sent_requests[:post][0].data.should == @checker.options['payload']
     end
 
     it "sends options['payload'] as a GET request" do
@@ -79,10 +157,10 @@ describe Agents::PostAgent do
       lambda {
         lambda {
           @checker.check
-        }.should change { @sent_gets.length }.by(1)
-      }.should_not change { @sent_posts.length }
+        }.should change { @sent_requests[:get].length }.by(1)
+      }.should_not change { @sent_requests[:post].length }
 
-      @sent_gets[0].should == @checker.options['payload']
+      @sent_requests[:get][0].data.should == @checker.options['payload'].to_query
     end
   end
 
@@ -112,7 +190,7 @@ describe Agents::PostAgent do
       @checker.should_not be_valid
     end
 
-    it "should validate method as post or get, defaulting to post" do
+    it "should validate method as post, get, put, patch, or delete, defaulting to post" do
       @checker.options['method'] = ""
       @checker.method.should == "post"
       @checker.should be_valid
@@ -125,8 +203,32 @@ describe Agents::PostAgent do
       @checker.method.should == "get"
       @checker.should be_valid
 
+      @checker.options['method'] = "patch"
+      @checker.method.should == "patch"
+      @checker.should be_valid
+
       @checker.options['method'] = "wut"
       @checker.method.should == "wut"
+      @checker.should_not be_valid
+    end
+
+    it "should validate that no_merge is 'true' or 'false', if present" do
+      @checker.options['no_merge'] = ""
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = "true"
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = "false"
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = false
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = true
+      @checker.should be_valid
+
+      @checker.options['no_merge'] = 'blarg'
       @checker.should_not be_valid
     end
 
@@ -159,26 +261,6 @@ describe Agents::PostAgent do
 
       @checker.options['headers'] = { "Authorization" => "foo bar" }
       @checker.should be_valid
-    end
-  end
-
-  describe "#generate_uri" do
-    it "merges params with any in the post_url" do
-      @checker.options['post_url'] = "http://example.com/a/path?existing_param=existing_value"
-      uri = @checker.generate_uri("some_param" => "some_value", "another_param" => "another_value")
-      uri.request_uri.should == "/a/path?existing_param=existing_value&some_param=some_value&another_param=another_value"
-    end
-
-    it "works fine with urls that do not have a query" do
-      @checker.options['post_url'] = "http://example.com/a/path"
-      uri = @checker.generate_uri("some_param" => "some_value", "another_param" => "another_value")
-      uri.request_uri.should == "/a/path?some_param=some_value&another_param=another_value"
-    end
-
-    it "just returns the post_uri when no params are given" do
-      @checker.options['post_url'] = "http://example.com/a/path?existing_param=existing_value"
-      uri = @checker.generate_uri
-      uri.request_uri.should == "/a/path?existing_param=existing_value"
     end
   end
 end

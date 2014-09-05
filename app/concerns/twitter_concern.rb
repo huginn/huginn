@@ -1,8 +1,10 @@
 module TwitterConcern
   extend ActiveSupport::Concern
+  include Oauthable
 
   included do
     validate :validate_twitter_options
+    valid_oauth_providers :twitter
   end
 
   def validate_twitter_options
@@ -15,19 +17,19 @@ module TwitterConcern
   end
 
   def twitter_consumer_key
-    options['consumer_key'].presence || credential('twitter_consumer_key')
+    ENV['TWITTER_OAUTH_KEY']
   end
 
   def twitter_consumer_secret
-    options['consumer_secret'].presence || credential('twitter_consumer_secret')
+    ENV['TWITTER_OAUTH_SECRET']
   end
 
   def twitter_oauth_token
-    options['oauth_token'].presence || options['access_key'].presence || credential('twitter_oauth_token')
+    service.token
   end
 
   def twitter_oauth_token_secret
-    options['oauth_token_secret'].presence || options['access_secret'].presence || credential('twitter_oauth_token_secret')
+    service.secret
   end
 
   def twitter

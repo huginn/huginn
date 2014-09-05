@@ -54,9 +54,9 @@ module Agents
     end
 
     def check
-      auth_options = {:basic_auth => {:username =>options[:username], :password=>options['password']}}
-      parse_response = HTTParty.get "http://api.adioso.com/v2/search/parse?q=#{URI.encode(options['from'])}+to+#{URI.encode(options['to'])}", auth_options
-      fare_request = parse_response["search_url"].gsub /(end=)(\d*)([^\d]*)(\d*)/, "\\1#{date_to_unix_epoch(options['end_date'])}\\3#{date_to_unix_epoch(options['start_date'])}"
+      auth_options = {:basic_auth => {:username =>interpolated[:username], :password=>interpolated['password']}}
+      parse_response = HTTParty.get "http://api.adioso.com/v2/search/parse?q=#{URI.encode(interpolated['from'])}+to+#{URI.encode(interpolated['to'])}", auth_options
+      fare_request = parse_response["search_url"].gsub /(end=)(\d*)([^\d]*)(\d*)/, "\\1#{date_to_unix_epoch(interpolated['end_date'])}\\3#{date_to_unix_epoch(interpolated['start_date'])}"
       fare = HTTParty.get fare_request, auth_options
 
 			if fare["warnings"]
@@ -64,7 +64,7 @@ module Agents
 			else
 				event = fare["results"].min {|a,b| a["cost"] <=> b["cost"]}
 				event["date"]  = Time.at(event["date"]).to_date.httpdate[0..15]
-				event["route"] = "#{options['from']} to #{options['to']}"
+				event["route"] = "#{interpolated['from']} to #{interpolated['to']}"
 				create_event :payload => event
 			end
     end
