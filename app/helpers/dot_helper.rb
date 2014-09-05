@@ -38,6 +38,12 @@ module DotHelper
       @dot << string
     end
 
+    ENDL = ';'.freeze
+
+    def endl
+      @dot << ENDL
+    end
+
     def escape(string)
       # Backslash escaping seems to work for the backslash itself,
       # though it's not documented in the DOT language docs.
@@ -82,7 +88,7 @@ module DotHelper
     def node(id, attrs = nil)
       id id
       attr_list attrs
-      raw ';'
+      endl
     end
 
     def edge(from, to, attrs = nil, op = '->')
@@ -90,13 +96,13 @@ module DotHelper
       raw op
       id to
       attr_list attrs
-      raw ';'
+      endl
     end
 
     def statement(ids, attrs = nil)
       ids Array(ids)
       attr_list attrs
-      raw ';'
+      endl
     end
 
     def block(*ids, &block)
