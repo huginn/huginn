@@ -111,6 +111,8 @@ group :development, :test do
   gem 'delorean'
   gem 'webmock', '~> 1.17.4', require: false
   gem 'coveralls', require: false
+  gem 'spring'
+  gem 'spring-commands-rspec'
 end
 
 group :production do
