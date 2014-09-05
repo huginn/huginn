@@ -17,10 +17,11 @@ module DotHelper
   class DotDrawer
     def initialize(vars = {})
       @dot = ''
-      vars.each { |name, value|
-        # Import variables as methods
-        define_singleton_method(name) { value }
-      }
+      @vars = vars.symbolize_keys
+    end
+
+    def method_missing(var, *args)
+      @vars.fetch(var) { super }
     end
 
     def to_s
