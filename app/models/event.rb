@@ -26,6 +26,10 @@ class Event < ActiveRecord::Base
   after_create :update_agent_last_event_at
   after_create :possibly_propagate
 
+  scope :expired, lambda {
+    where("expires_at IS NOT NULL AND expires_at < ?", Time.now)
+  }
+
   # Emit this event again, as a new Event.
   def reemit!
     agent.create_event :payload => payload, :lat => lat, :lng => lng
@@ -34,8 +38,8 @@ class Event < ActiveRecord::Base
   # Look for Events whose `expires_at` is present and in the past.  Remove those events and then update affected Agents'
   # `events_counts` cache columns.  This method is called by bin/schedule.rb periodically.
   def self.cleanup_expired!
-    affected_agents = Event.where("expires_at IS NOT NULL AND expires_at < ?", Time.now).group("agent_id").pluck(:agent_id)
-    Event.where("expires_at IS NOT NULL AND expires_at < ?", Time.now).delete_all
+    affected_agents = Event.expired.group("agent_id").pluck(:agent_id)
+    Event.expired.delete_all
     Agent.where(:id => affected_agents).update_all "events_count = (select count(*) from events where agent_id = agents.id)"
   end
 
