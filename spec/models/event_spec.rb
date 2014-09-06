@@ -99,7 +99,7 @@ describe Event do
       it "updates last_event_at on agent" do
         lambda {
           agents(:jane_weather_agent).events.create!(:user => users(:jane))
-        }.should change { agents(:jane_weather_agent).last_event_at }
+        }.should change { agents(:jane_weather_agent).reload.last_event_at }
       end
     end
 
