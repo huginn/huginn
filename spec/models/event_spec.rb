@@ -87,6 +87,34 @@ describe Event do
       agent_logs(:log_for_bob_website_agent).reload.outbound_event_id.should be_nil
     end
   end
+
+  describe "caches" do
+    describe "when an event is created" do
+      it "updates a counter cache on agent" do
+        lambda {
+          agents(:jane_weather_agent).events.create!(:user => users(:jane))
+        }.should change { agents(:jane_weather_agent).reload.events_count }.by(1)
+      end
+
+      it "updates last_event_at on agent" do
+        lambda {
+          agents(:jane_weather_agent).events.create!(:user => users(:jane))
+        }.should change { agents(:jane_weather_agent).reload.last_event_at }
+      end
+    end
+
+    describe "when an event is updated" do
+      it "does not touch the last_event_at on the agent" do
+        event = agents(:jane_weather_agent).events.create!(:user => users(:jane))
+
+        agents(:jane_weather_agent).update_attribute :last_event_at, 2.days.ago
+
+        lambda {
+          event.update_attribute :payload, { 'hello' => 'world' }
+        }.should_not change { agents(:jane_weather_agent).reload.last_event_at }
+      end
+    end
+  end
 end
 
 describe EventDrop do
