@@ -14,7 +14,7 @@ class Event < ActiveRecord::Base
   json_serialize :payload
 
   belongs_to :user
-  belongs_to :agent, :counter_cache => true, :touch => :last_event_at
+  belongs_to :agent, :counter_cache => true
 
   has_many :agent_logs_as_inbound_event, :class_name => "AgentLog", :foreign_key => :inbound_event_id, :dependent => :nullify
   has_many :agent_logs_as_outbound_event, :class_name => "AgentLog", :foreign_key => :outbound_event_id, :dependent => :nullify
@@ -23,6 +23,7 @@ class Event < ActiveRecord::Base
     where("events.created_at > ?", timespan)
   }
 
+  after_create :update_agent_last_event_at
   after_create :possibly_propagate
 
   # Emit this event again, as a new Event.
@@ -39,6 +40,10 @@ class Event < ActiveRecord::Base
   end
 
   protected
+
+  def update_agent_last_event_at
+    agent.touch :last_event_at
+  end
 
   def possibly_propagate
     #immediately schedule agents that want immediate updates
