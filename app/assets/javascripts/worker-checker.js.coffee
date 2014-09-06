@@ -34,7 +34,7 @@ $ ->
           $("#event-indicator").tooltip('destroy').fadeOut()
 
         currentJobs = [json.pending, json.awaiting_retry, json.recent_failures]
-        if document.location.pathname == '/jobs' && previousJobs? && previousJobs.join(',') != currentJobs.join(',')
+        if document.location.pathname == '/jobs' && $(".modal[aria-hidden=false]").length == 0 && previousJobs? && previousJobs.join(',') != currentJobs.join(',')
           $.get '/jobs', (data) =>
             $("#main-content").html(data)
         previousJobs = currentJobs
