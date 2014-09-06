@@ -60,8 +60,6 @@ class Agent < ActiveRecord::Base
 
   scope :of_type, lambda { |type|
     type = case type
-             when String, Symbol, Class
-               type.to_s
              when Agent
                type.class.to_s
              else
