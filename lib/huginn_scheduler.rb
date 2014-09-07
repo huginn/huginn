@@ -72,7 +72,7 @@ class HuginnScheduler
 
   def cleanup_failed_jobs!
     num_to_keep = (ENV['FAILED_JOBS_TO_KEEP'].presence || FAILED_JOBS_TO_KEEP).to_i
-    first_to_delete = Delayed::Job.where.not(failed_at: nil).order("failed_at DESC").offset(num_to_keep).limit(num_to_keep).pluck(:failed_at).first
+    first_to_delete = Delayed::Job.where.not(failed_at: nil).order("failed_at DESC").offset(num_to_keep).limit(1).pluck(:failed_at).first
     Delayed::Job.where(["failed_at <= ?", first_to_delete]).delete_all if first_to_delete.present?
   end
 

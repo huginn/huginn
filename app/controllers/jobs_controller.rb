@@ -2,7 +2,7 @@ class JobsController < ApplicationController
   before_filter :authenticate_admin!
 
   def index
-    @jobs = Delayed::Job.page(params[:page])
+    @jobs = Delayed::Job.order("coalesce(failed_at,'1000-01-01'), run_at asc").page(params[:page])
 
     respond_to do |format|
       format.html { render layout: !request.xhr? }
@@ -50,6 +50,6 @@ class JobsController < ApplicationController
 
   private
   def running?
-    @job.locked_at || @job.locked_by
+    (@job.locked_at || @job.locked_by) && @job.failed_at.nil?
   end
 end

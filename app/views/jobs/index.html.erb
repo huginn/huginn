@@ -47,9 +47,9 @@
               </div>
             </td>
             <td>
-              <% if !job.locked_at && !job.locked_by %>
+              <% if (!job.locked_at && !job.locked_by) || job.failed_at.present? %>
                 <div class="btn-group btn-group-xs" style="float: right">
-                  <% if job.run_at > Time.now %>
+                  <% if (job.run_at > Time.now) || job.failed_at.present? %>
                     <%= link_to 'Run now', run_job_path(job), class: "btn btn-default", method: :put %>
                   <% end %>
                   <%= link_to 'Delete', job_path(job), class: "btn btn-danger", method: :delete, data: { confirm: 'Really delete this job?' } %>

@@ -4,12 +4,12 @@ describe JobsController do
 
   describe "GET index" do
     before do
-      Delayed::Job.create
-      Delayed::Job.create
+      Delayed::Job.create!
+      Delayed::Job.create!
       Delayed::Job.count.should > 0
     end
 
-    it "does not allow normal users"do
+    it "does not allow normal users" do
       sign_in users(:bob)
       get(:index).should redirect_to(root_path)
     end
@@ -40,11 +40,16 @@ describe JobsController do
     before do
       @not_running = Delayed::Job.create(run_at: Time.now - 1.hour)
       @running = Delayed::Job.create(locked_at: Time.now, locked_by: 'test')
+      @failed = Delayed::Job.create(run_at: Time.now - 1.hour, locked_at: Time.now, failed_at: Time.now)
       sign_in users(:jane)
     end
 
     it "queue a job which is not running" do
       expect { put :run, id: @not_running.id }.to change { @not_running.reload.run_at }
+    end
+
+    it "queue a job that failed" do
+      expect { put :run, id: @failed.id }.to change { @failed.reload.run_at }
     end
 
     it "not queue a running job" do
