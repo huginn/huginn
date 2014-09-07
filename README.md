@@ -85,12 +85,6 @@ See [private development instructions](https://github.com/cantino/huginn/wiki/Pr
 
 In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/). Signup for one and then change the value of `api_key: your-key` in your seeded WeatherAgent.
 
-#### Enable DelayedJobWeb for handy delayed\_job monitoring and control
-
-* Edit `config.ru`, uncomment the DelayedJobWeb section, and change the DelayedJobWeb username and password.
-* Uncomment `match "/delayed_job" => DelayedJobWeb, :anchor => false` in `config/routes.rb`.
-* Uncomment `gem "delayed_job_web"` in Gemfile and run `bundle`.
-
 #### Disable SSL
 
 We assume your deployment will run over SSL. This is a very good idea! However, if you wish to turn this off, you'll probably need to edit `config/initializers/devise.rb` and modify the line containing `config.rememberable_options = { :secure => true }`.  You will also need to edit `config/environments/production.rb` and modify the value of `config.force_ssl`.

@@ -1,0 +1,75 @@
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>
+          Background Jobs
+        </h2>
+      </div>
+
+      <div class='table-responsive'>
+        <table class='table table-striped events'>
+          <tr>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Next Run</th>
+            <th>Attempts</th>
+            <th>Last Error</th>
+            <th></th>
+          </tr>
+
+        <% @jobs.each do |job| %>
+          <tr>
+            <td><%= status(job) %></td>
+            <td title='<%= job.created_at %>'><%= time_ago_in_words job.created_at %> ago</td>
+            <td title='<%= job.run_at %>'>
+              <% if !job.failed_at %>
+                <%= relative_distance_of_time_in_words job.run_at %>
+              <% end %>
+            </td>
+            <td><%= job.attempts %></td>
+            <td>
+              <a data-toggle="modal" data-target="#error<%= job.id %>"><%= truncate job.last_error, :length => 90, :omission => "", :separator => "\n" %></a>
+              <div class="modal fade" id="error<%= job.id %>" tabindex="-1" role="dialog" aria-labelledby="#<%= "error#{job.id}" %>" aria-hidden="true">
+                <div class="modal-dialog big-modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                      <h4 class="modal-title" id="myModalLabel">Error Backtrace</h4>
+                    </div>
+                    <div class="modal-body">
+                      <pre>
+                        <%= raw html_escape(job.last_error).split("\n").join('<br/>') %>
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <% if (!job.locked_at && !job.locked_by) || job.failed_at.present? %>
+                <div class="btn-group btn-group-xs" style="float: right">
+                  <% if (job.run_at > Time.now) || job.failed_at.present? %>
+                    <%= link_to 'Run now', run_job_path(job), class: "btn btn-default", method: :put %>
+                  <% end %>
+                  <%= link_to 'Delete', job_path(job), class: "btn btn-danger", method: :delete, data: { confirm: 'Really delete this job?' } %>
+                </div>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        </table>
+      </div>
+
+      <%= paginate @jobs, :theme => 'twitter-bootstrap-3' %>
+
+      <br />
+      <div class="btn-group">
+        <%= link_to destroy_failed_jobs_path, class: "btn btn-default", method: :delete do %>
+          <span class="glyphicon glyphicon-trash"></span> Remove failed jobs
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+

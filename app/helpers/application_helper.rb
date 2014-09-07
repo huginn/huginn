@@ -38,4 +38,8 @@ module ApplicationHelper
       link_to 'No', agent_path(agent, tab: (agent.recent_error_logs? ? 'logs' : 'details')), class: 'label label-danger'
     end
   end
+
+  def user_is_admin?
+    current_user && current_user.admin == true
+  end
 end

@@ -88,9 +88,10 @@ span.not-applicable:after {
 }
 
 // Navbar
-
-#job-indicator, #event-indicator {
-  display: none;
+.nav > li {
+  &.job-indicator, &#event-indicator {
+    display: none;
+  }
 }
 
 .navbar-search > .spinner {
