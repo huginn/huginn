@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140906030139) do
+ActiveRecord::Schema.define(version: 20140901143732) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,7 +40,7 @@ ActiveRecord::Schema.define(version: 20140906030139) do
     t.datetime "updated_at",                                               null: false
     t.text     "memory",                limit: 2147483647,                              charset: "utf8mb4", collation: "utf8mb4_bin"
     t.datetime "last_web_request_at"
-    t.integer  "keep_events_for",       default: 0,     null: false
+    t.integer  "keep_events_for",                          default: 0,     null: false
     t.datetime "last_event_at"
     t.datetime "last_error_log_at"
     t.boolean  "propagate_immediately", default: false, null: false
@@ -53,6 +53,16 @@ ActiveRecord::Schema.define(version: 20140906030139) do
   add_index "agents", ["schedule"], name: "index_agents_on_schedule", using: :btree
   add_index "agents", ["type"], name: "index_agents_on_type", using: :btree
   add_index "agents", ["user_id", "created_at"], name: "index_agents_on_user_id_and_created_at", using: :btree
+
+  create_table "control_links", force: true do |t|
+    t.integer  "controller_id",     null: false
+    t.integer  "control_target_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "control_links", ["control_target_id"], name: "index_control_links_on_control_target_id", using: :btree
+  add_index "control_links", ["controller_id", "control_target_id"], name: "index_control_links_on_controller_id_and_control_target_id", unique: true, using: :btree
 
   create_table "delayed_jobs", force: true do |t|
     t.integer  "priority",                    default: 0

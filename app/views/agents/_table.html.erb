@@ -25,7 +25,7 @@
         </td>
         <td class='<%= "agent-disabled" if agent.disabled? %>'>
           <% if agent.can_be_scheduled? %>
-            <%= agent.schedule.to_s.humanize.titleize %>
+            <%= agent_schedule(agent, ',<br/>') %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>

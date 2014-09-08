@@ -58,6 +58,7 @@ describe DotHelper do
           \A
           digraph \x20 "Agent \x20 Event \x20 Flow" \{
             node \[ [^\]]+ \];
+            edge \[ [^\]]+ \];
             (?<foo>\w+) \[label=foo\];
             \k<foo> -> (?<bar1>\w+) \[style=dashed\];
             \k<foo> -> (?<bar2>\w+) \[color="\#999999"\];
@@ -75,6 +76,7 @@ describe DotHelper do
           \A
           digraph \x20 "Agent \x20 Event \x20 Flow" \{
             node \[ [^\]]+ \];
+            edge \[ [^\]]+ \];
             (?<foo>\w+) \[label=foo,tooltip="Dot \x20 Foo",URL="#{Regexp.quote(agent_path(@foo))}"\];
             \k<foo> -> (?<bar1>\w+) \[style=dashed\];
             \k<foo> -> (?<bar2>\w+) \[color="\#999999"\];

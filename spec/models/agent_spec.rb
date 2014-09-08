@@ -486,7 +486,7 @@ describe Agent do
         agent.errors_on(:options).should include("cannot be set to an instance of Fixnum")
       end
 
-      it "should not allow agents owned by other people" do
+      it "should not allow source agents owned by other people" do
         agent = Agents::SomethingSource.new(:name => "something")
         agent.user = users(:bob)
         agent.source_ids = [agents(:bob_weather_agent).id]
@@ -495,6 +495,28 @@ describe Agent do
         agent.should have(1).errors_on(:sources)
         agent.user = users(:jane)
         agent.should have(0).errors_on(:sources)
+      end
+
+      it "should not allow controller agents owned by other people" do
+        agent = Agents::SomethingSource.new(:name => "something")
+        agent.user = users(:bob)
+        agent.controller_ids = [agents(:bob_weather_agent).id]
+        agent.should have(0).errors_on(:controllers)
+        agent.controller_ids = [agents(:jane_weather_agent).id]
+        agent.should have(1).errors_on(:controllers)
+        agent.user = users(:jane)
+        agent.should have(0).errors_on(:controllers)
+      end
+
+      it "should not allow control target agents owned by other people" do
+        agent = Agents::CannotBeScheduled.new(:name => "something")
+        agent.user = users(:bob)
+        agent.control_target_ids = [agents(:bob_weather_agent).id]
+        agent.should have(0).errors_on(:control_targets)
+        agent.control_target_ids = [agents(:jane_weather_agent).id]
+        agent.should have(1).errors_on(:control_targets)
+        agent.user = users(:jane)
+        agent.should have(0).errors_on(:control_targets)
       end
 
       it "should not allow scenarios owned by other people" do

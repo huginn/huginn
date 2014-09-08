@@ -25,13 +25,15 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
+  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
 
   json_serialize :options, :memory
 
   validates_presence_of :name, :user
   validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
   validate :sources_are_owned
+  validate :controllers_are_owned
+  validate :control_targets_are_owned
   validate :scenarios_are_owned
   validate :validate_schedule
   validate :validate_options
@@ -53,6 +55,10 @@ class Agent < ActiveRecord::Base
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
   has_many :receivers, :through => :links_as_source, :class_name => "Agent", :inverse_of => :sources
+  has_many :control_links_as_controller, dependent: :delete_all, foreign_key: 'controller_id', class_name: 'ControlLink', inverse_of: :controller
+  has_many :control_links_as_control_target, dependent: :delete_all, foreign_key: 'control_target_id', class_name: 'ControlLink', inverse_of: :control_target
+  has_many :controllers, through: :control_links_as_control_target, class_name: "Agent", inverse_of: :control_targets
+  has_many :control_targets, through: :control_links_as_controller, class_name: "Agent", inverse_of: :controllers
   has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :agent
   has_many :scenarios, :through => :scenario_memberships, :inverse_of => :agents
 
@@ -175,6 +181,10 @@ class Agent < ActiveRecord::Base
     !cannot_create_events?
   end
 
+  def can_control_other_agents?
+    self.class.can_control_other_agents?
+  end
+
   def log(message, options = {})
     puts "Agent##{id}: #{message}" unless Rails.env.test?
     AgentLog.log_for_agent(self, message, options)
@@ -214,11 +224,19 @@ class Agent < ActiveRecord::Base
   private
   
   def sources_are_owned
-    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user == user }
+    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user_id == user_id }
   end
   
+  def controllers_are_owned
+    errors.add(:controllers, "must be owned by you") unless controllers.all? {|s| s.user_id == user_id }
+  end
+
+  def control_targets_are_owned
+    errors.add(:control_targets, "must be owned by you") unless control_targets.all? {|s| s.user_id == user_id }
+  end
+
   def scenarios_are_owned
-    errors.add(:scenarios, "must be owned by you") unless scenarios.all? {|s| s.user == user }
+    errors.add(:scenarios, "must be owned by you") unless scenarios.all? {|s| s.user_id == user_id }
   end
 
   def validate_schedule
@@ -248,7 +266,8 @@ class Agent < ActiveRecord::Base
 
   class << self
     def build_clone(original)
-      new(original.slice(:type, :options, :schedule, :source_ids, :keep_events_for, :propagate_immediately)) { |clone|
+      new(original.slice(:type, :options, :schedule, :controller_ids, :control_target_ids,
+                         :source_ids, :keep_events_for, :propagate_immediately)) { |clone|
         # Give it a unique name
         2.upto(count) do |i|
           name = '%s (%d)' % [original.name, i]
@@ -287,6 +306,10 @@ class Agent < ActiveRecord::Base
 
     def cannot_receive_events?
       !!@cannot_receive_events
+    end
+
+    def can_control_other_agents?
+      include? AgentControllerConcern
     end
 
     # Find all Agents that have received Events since the last execution of this method.  Update those Agents with
@@ -398,6 +421,8 @@ class AgentDrop
     :sources,
     :receivers,
     :schedule,
+    :controllers,
+    :control_targets,
     :disabled,
     :keep_events_for,
     :propagate_immediately,
