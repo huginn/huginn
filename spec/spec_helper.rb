@@ -55,6 +55,8 @@ RSpec.configure do |config|
   config.global_fixtures = :all
   config.treat_symbols_as_metadata_keys_with_true_values = true
 
+  config.render_views
+
   config.include Devise::TestHelpers, :type => :controller
   config.include SpecHelpers
   config.include Delorean

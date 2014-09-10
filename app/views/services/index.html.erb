@@ -25,9 +25,9 @@
       <div class='table-responsive'>
         <table class='table table-striped events'>
           <tr>
-            <th>Provider</th>
-            <th>Username</th>
-            <th>Global?</th>
+            <th><%= sortable_column 'provider', 'Provider', 'asc' %></th>
+            <th><%= sortable_column 'name', 'Name', 'asc' %></th>
+            <th><%= sortable_column 'global', 'Global?' %></th>
             <th></th>
           </tr>
 

@@ -1,8 +1,11 @@
 class AgentsController < ApplicationController
   include DotHelper
+  include SortableTable
 
   def index
-    @agents = current_user.agents.page(params[:page])
+    set_table_sort sorts: %w[name last_check_at last_event_at last_receive_at], default: { name: :asc }
+
+    @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
     respond_to do |format|
       format.html

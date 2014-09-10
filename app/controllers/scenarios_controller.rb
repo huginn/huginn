@@ -1,8 +1,11 @@
 class ScenariosController < ApplicationController
+  include SortableTable
   skip_before_filter :authenticate_user!, :only => :export
 
   def index
-    @scenarios = current_user.scenarios.page(params[:page])
+    set_table_sort sorts: %w[name public], default: { name: :asc }
+
+    @scenarios = current_user.scenarios.reorder(table_sort).page(params[:page])
 
     respond_to do |format|
       format.html
@@ -21,7 +24,9 @@ class ScenariosController < ApplicationController
 
   def show
     @scenario = current_user.scenarios.find(params[:id])
-    @agents = @scenario.agents.preload(:scenarios).page(params[:page])
+
+    set_table_sort sorts: %w[name last_check_at last_event_at last_receive_at], default: { name: :asc }
+    @agents = @scenario.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
     respond_to do |format|
       format.html

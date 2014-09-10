@@ -1,0 +1,31 @@
+// Sortable table headers
+.table th a.selected {
+  position: relative;
+  text-decoration: underline;
+
+  &.asc:after, &.desc:after {
+    text-decoration: none;
+    position: absolute;
+    top: -5px;
+    right: -12px;
+    font-size: 1.2em;
+  }
+
+  &.asc:after {
+    content: '\2193';
+  }
+
+  &.desc:after {
+    content: '\2191';
+  }
+}
+
+table.events {
+  .payload {
+    color: #999;
+    font-size: 12px;
+    //text-align: center;
+    font-family: monospace;
+  }
+}
+

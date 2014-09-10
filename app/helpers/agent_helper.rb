@@ -31,7 +31,7 @@ module AgentHelper
   end
 
   def agent_controllers(agent, delimiter = ', ')
-    unless agent.controllers.empty?
+    if agent.controllers.present?
       agent.controllers.map { |agent|
         link_to(agent.name, agent_path(agent))
       }.join(delimiter).html_safe
