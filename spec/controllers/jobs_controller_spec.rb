@@ -10,10 +10,13 @@ describe JobsController do
     end
 
     it "does not allow normal users" do
+      users(:bob).should_not be_admin
       sign_in users(:bob)
       get(:index).should redirect_to(root_path)
     end
-    it "returns all jobs", focus: true do
+
+    it "returns all jobs" do
+      users(:jane).should be_admin
       sign_in users(:jane)
       get :index
       assigns(:jobs).length.should == 2
