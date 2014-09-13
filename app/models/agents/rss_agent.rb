@@ -55,10 +55,11 @@ module Agents
         feed.clean! if interpolated['clean'] == 'true'
         created_event_count = 0
         feed.entries.each do |entry|
-          if check_and_track(entry.id)
+          entry_id = get_entry_id(entry)
+          if check_and_track(entry_id)
             created_event_count += 1
             create_event(:payload => {
-              :id => entry.id,
+              :id => entry_id,
               :date_published => entry.date_published,
               :last_updated => entry.last_updated,
               :urls => entry.urls,
@@ -77,6 +78,10 @@ module Agents
     end
 
     protected
+
+    def get_entry_id(entry)
+      entry.id.presence || Digest::MD5.hexdigest(entry.content)
+    end
 
     def check_and_track(entry_id)
       memory['seen_ids'] ||= []
