@@ -5,7 +5,7 @@
 * Sep 7, 2014    - Optional delayed\_job\_web replaced by a custom UI for managing failed and queued jobs.
 * Sep 6, 2014    - Agent's `last_event_at` is now updated only on Event creation, not on updates.
 * Sep 4, 2014    - Spring, an application preloader intergated with Rails 4.1, has been added.
-* Sep 3, 2014    - Liquid interpolation in the WebsiteAgent now has a `response` variable available.
+* Sep 3, 2014    - Liquid interpolation in the WebsiteAgent now has a `_response_` variable available.
 * Aug 31, 2014   - Fix a bug where AgentLogs errored after a referenced Event was deleted.
                  - HumanTaskAgent can emit separate events for each answer.
 * Aug 30, 2014   - Set charset/collation properly for each text column if using MySQL.
