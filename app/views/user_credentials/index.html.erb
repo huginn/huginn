@@ -14,8 +14,8 @@
 
       <table class='table table-striped'>
         <tr>
-          <th><%= sortable_column 'credential_name', 'Name', 'asc' %></th>
-          <th><%= sortable_column 'credential_value', 'Value', 'asc' %></th>
+          <th><%= sortable_column 'credential_name', 'asc', name: 'Name'  %></th>
+          <th><%= sortable_column 'credential_value', 'asc', name: 'Value' %></th>
         </tr>
 
         <% @user_credentials.each do |user_credential| %>

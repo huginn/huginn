@@ -15,7 +15,7 @@ module SortableTable
   end
 
   def set_table_sort(sort_options)
-    valid_sorts = sort_options[:sorts] || raise("You must specify :sorts as an array of valid sort attributes.")
+    valid_sorts = sort_options[:sorts] or raise ArgumentError.new("You must specify :sorts as an array of valid sort attributes.")
     default = sort_options[:default] || { valid_sorts.first.to_sym => :desc }
 
     if params[:sort].present?
@@ -37,7 +37,15 @@ module SortableTable
   end
 
   module SortableTableHelper
-    def sortable_column(attribute, name = attribute.humanize, default_direction = 'desc')
+    # :call-seq:
+    #   sortable_column(attribute, default_direction = 'desc', name: attribute.humanize)
+    def sortable_column(attribute, default_direction = nil, options = nil)
+      if options.nil? && (options = Hash.try_convert(default_direction))
+        default_direction = nil
+      end
+      default_direction ||= 'desc'
+      options ||= {}
+      name = options[:name] || attribute.humanize
       selected = @table_sort_info[:attribute].to_s == attribute
       if selected
         direction = @table_sort_info[:direction]
