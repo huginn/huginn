@@ -1,5 +1,6 @@
 # Changes
 
+* Sep 12, 2014   - Make tables sortable by most columns.
 * Sep 8, 2014    - SchedulerAgent added, allowing granular control of Agent schedules.  Agents can now control other Agents via `ControlLinks`.
                  - Liquid filter `to_uri` added.
 * Sep 7, 2014    - Optional delayed\_job\_web replaced by a custom UI for managing failed and queued jobs.
