@@ -27,9 +27,9 @@ There is an exported docker volume of /var/lib/mysql to allow persistence of tha
 
 Additionally, the database variables may be overridden from the above as per the standard Huginn documentation:
 
-    DATABASE_ADAPTER #(must be either 'postgres' or 'mysql2')
-    DATABASE_HOST
-    DATABASE_PORT
+    HUGINN_DATABASE_ADAPTER #(must be either 'postgres' or 'mysql2')
+    HUGINN_DATABASE_HOST
+    HUGINN_DATABASE_PORT
 
 This script will run database migrations (rake db:migrate) which should be idempotent.
 
@@ -52,15 +52,15 @@ Simple stand-alone usage:
 To link to another mysql container, for example:
 
     docker run --rm --name newcentury_mysql -p 3306 \
-        -e MYSQL_DATABASE=huginn \
-        -e MYSQL_USER=huginn \
-        -e MYSQL_PASSWORD=somethingsecret \
-        -e MYSQL_ROOT_PASSWORD=somethingevenmoresecret \
+        -e HUGINN_MYSQL_DATABASE=huginn \
+        -e HUGINN_MYSQL_USER=huginn \
+        -e HUGINN_MYSQL_PASSWORD=somethingsecret \
+        -e HUGINN_MYSQL_ROOT_PASSWORD=somethingevenmoresecret \
         cantino/huginn
     docker run --rm --name huginn --link newcentury_mysql:MYSQL -p 5000:5000 \
-        -e DATABASE_NAME=huginn \
-        -e DATABASE_USER=huginn \
-        -e DATABASE_PASSWORD=somethingsecret \
+        -e HUGINN_DATABASE_NAME=huginn \
+        -e HUGINN_DATABASE_USER=huginn \
+        -e HUGINN_DATABASE_PASSWORD=somethingsecret \
         cantino/huginn
 
 To link to another container named 'postgres':
@@ -69,45 +69,58 @@ To link to another container named 'postgres':
 
 ## Environment Variables
 
-Other Huginn 12factored environment variables of note, as generated and put into the .env file as per Huginn documentation:
+Other Huginn 12factored environment variables of note, as generated and put into the .env file as per Huginn documentation,
+with an additional `HUGINN_` prefix to the variable.
 
-    APP_SECRET_TOKEN=${APP_SECRET_TOKEN:-CHANGEME}
-    DOMAIN=${HUGINN_HOST:-localhost}:${PORT:-5000}
-    ${ASSET_HOST:+ASSET_HOST=${ASSET_HOST}}
-    DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
-    DATABASE_ENCODING=${DATABASE_ENCODING:-utf8}
-    DATABASE_RECONNECT=${DATABASE_RECONNECT:-true}
-    DATABASE_NAME=${DATABASE_NAME:-huginn}
-    DATABASE_POOL=${DATABASE_POOL:-5}
-    DATABASE_USERNAME=${DATABASE_USERNAME:-root}
-    DATABASE_PASSWORD="${DATABASE_PASSWORD}"
-    DATABASE_PORT=${DATABASE_PORT:-3306}
-    DATABASE_HOST=${DATABASE_HOST:-localhost}
-    DATABASE_PORT=${DATABASE_PORT:-3306}
-    ${DATABASE_SOCKET:+DATABASE_SOCKET=${DATABASE_SOCKET:-/tmp/mysql.sock}}
-    ${RAILS_ENV:+RAILS_ENV=${RAILS_ENV:-production}}
-    FORCE_SSL=${FORCE_SSL:-false}
-    INVITATION_CODE=${INVITATION_CODE:-try-huginn}
-    SMTP_DOMAIN=${SMTP_DOMAIM=-example.com}
-    SMTP_USER_NAME=${SMTP_USER_NAME:-you@gmail.com}
-    SMTP_PASSWORD=${SMTP_PASSWORD:-somepassword}
-    SMTP_SERVER=${SMTP_SERVER:-smtp.gmail.com}
-    SMTP_PORT=${SMTP_PORT:-587}
-    SMTP_AUTHENTICATION=${SMTP_AUTHENTICATION:-plain}
-    SMTP_ENABLE_STARTTLS_AUTO=${SMTP_ENABLE_STARTTLS_AUTO:-true}
-    EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS:-huginn@example.com}
-    AGENT_LOG_LENGTH=${AGENT_LOG_LENGTH:-200}
-    AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-your aws access key id}"
-    AWS_ACCESS_KEY="${AWS_ACCESS_KEY:-your aws access key}"
-    AWS_SANDBOX=${AWS_SANDBOX:-false}
-    FARADAY_HTTP_BACKEND=${FARADAY_HTTP_BACKEND:-typhoeus}
-    DEFAULT_HTTP_USER_AGENT="${DEFAULT_HTTP_USER_AGENT:-Huginn - https://github.com/cantino/huginn}"
-    ALLOW_JSONPATH_EVAL=${ALLOW_JSONPATH_EVAL:-false}
-    ENABLE_INSECURE_AGENTS=${ENABLE_INSECURE_AGENTS:-false}
-    ${USE_GRAPHVIZ_DOT:+USE_GRAPHVIZ_DOT=${USE_GRAPHVIZ_DOT:-dot}}
-    TIMEZONE="${TIMEZONE:-Pacific Time (US & Canada)}"
+These are:
 
-The defaults used are the Huginn defaults as per the [.env.example](https://github.com/cantino/huginn/blob/master/.env.example) file.
+    HUGINN_APP_SECRET_TOKEN
+    HUGINN_DOMAIN
+    HUGINN_ASSET_HOST
+    HUGINN_DATABASE_ADAPTER
+    HUGINN_DATABASE_ENCODING
+    HUGINN_DATABASE_RECONNECT
+    HUGINN_DATABASE_NAME
+    HUGINN_DATABASE_POOL
+    HUGINN_DATABASE_USERNAME
+    HUGINN_DATABASE_PASSWORD
+    HUGINN_DATABASE_HOST
+    HUGINN_DATABASE_PORT
+    HUGINN_DATABASE_SOCKET
+    HUGINN_RAILS_ENV
+    HUGINN_FORCE_SSL
+    HUGINN_INVITATION_CODE
+    HUGINN_SMTP_DOMAIM
+    HUGINN_SMTP_USER_NAME
+    HUGINN_SMTP_PASSWORD
+    HUGINN_SMTP_SERVER
+    HUGINN_SMTP_PORT
+    HUGINN_SMTP_AUTHENTICATION
+    HUGINN_SMTP_ENABLE_STARTTLS_AUTO
+    HUGINN_EMAIL_FROM_ADDRESS
+    HUGINN_AGENT_LOG_LENGTH
+    HUGINN_TWITTER_OAUTH_KEY
+    HUGINN_TWITTER_OAUTH_SECRET
+    HUGINN_THIRTY_SEVEN_SIGNALS_OAUTH_KEY
+    HUGINN_THIRTY_SEVEN_SIGNALS_OAUTH_SECRET
+    HUGINN_GITHUB_OAUTH_KEY
+    HUGINN_GITHUB_OAUTH_SECRET
+    HUGINN_AWS_ACCESS_KEY_ID
+    HUGINN_AWS_ACCESS_KEY
+    HUGINN_AWS_SANDBOX
+    HUGINN_FARADAY_HTTP_BACKEND
+    HUGINN_DEFAULT_HTTP_USER_AGENT
+    HUGINN_ALLOW_JSONPATH_EVAL
+    HUGINN_ENABLE_INSECURE_AGENTS
+    HUGGIN_ENABLE_SECOND_PRECISION_SCHEDULE
+    HUGINN_USE_GRAPHVIZ_DOT
+    HUGINN_TIMEZONE
+    HUGGIN_FAILED_JOBS_TO_KEEP
+
+
+The above environment variables will override the defaults. The defaults are read from the [.env.example](https://github.com/cantino/huginn/blob/master/.env.example) file.
+
+For variables in the .env.example that are commented out, the default is to not include that variable in the generated .env file.
 
 ## Building on your own
 
