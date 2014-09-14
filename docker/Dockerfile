@@ -1,5 +1,5 @@
 FROM ubuntu:14.04
-MAINTAINER ian@blenke.com 
+MAINTAINER andrew@andrewcantino.com
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
