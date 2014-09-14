@@ -8,10 +8,11 @@ describe Agents::RssAgent do
     }
 
     stub_request(:any, /github.com/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/github_rss.atom")), :status => 200)
+    stub_request(:any, /SlickdealsnetFP/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/slickdeals.atom")), :status => 200)
   end
 
   let(:agent) do
-    _agent = Agents::RssAgent.new(:name => "github rss feed", :options => @valid_options)
+    _agent = Agents::RssAgent.new(:name => "rss feed", :options => @valid_options)
     _agent.user = users(:bob)
     _agent.save!
     _agent
@@ -76,6 +77,19 @@ describe Agents::RssAgent do
       agent.memory['seen_ids'] = ['x'] * 490
       agent.check
       agent.memory['seen_ids'].length.should == 500
+    end
+  end
+
+  context "when no ids are available" do
+    before do
+      @valid_options['url'] = 'http://feeds.feedburner.com/SlickdealsnetFP?format=atom'
+    end
+
+    it "calculates content MD5 sums" do
+      lambda {
+        agent.check
+      }.should change { agent.events.count }.by(79)
+      agent.memory['seen_ids'].should == agent.events.map {|e| Digest::MD5.hexdigest(e.payload['content']) }
     end
   end
 end
