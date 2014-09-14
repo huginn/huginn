@@ -117,7 +117,7 @@ You don't need to do this on your own, because there is an [automated build](htt
 
 ## Source
 
-The source is [available on GitHub](https://github.com/cantino/docker-huginn/).
+The source is [available on GitHub](https://github.com/cantino/huginn/).
 
 Please feel free to submit pull requests and/or fork at your leisure.
 
