@@ -20,9 +20,9 @@ SITE
       yum (~> 3.0)
 
 GIT
-  remote: git://github.com/mdxp/nodejs-cookbook.git
+  remote: git://github.com/othreed/nodejs-cookbook.git
   ref: master
-  sha: e2415cd8c4e03dccf21d7ef6ca31e1c5c81467ca
+  sha: 3980a88877bf5080e5e12670a99e0edfb7c5ead7
   specs:
     nodejs (1.3.0)
       apt (>= 0.0.0)
