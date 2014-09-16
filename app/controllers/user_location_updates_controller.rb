@@ -6,9 +6,7 @@ class UserLocationUpdatesController < ApplicationController
     if user
       secret = params[:secret]
       user.agents.of_type(Agents::UserLocationAgent).find_all {|agent| agent.options[:secret] == secret }.each do |agent|
-        agent.create_event :payload => params.except(:controller, :action, :secret, :user_id, :format),
-                           :lat => params[:latitude],
-                           :lng => params[:longitude]
+        agent.trigger_web_request(params.except(:action, :controller, :user_id, :format), request.method_symbol.to_s, request.format.to_s)
       end
       render :text => "ok"
     else

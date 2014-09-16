@@ -24,3 +24,13 @@
     No events found.
   </p>
 <% end %>
+
+<h3>POST URL</h3>
+
+<p>
+  Location data containing <code>latitude</code> and <code>longitude</code> can be posted to this URL:<br/>
+
+  <ul>
+    <li><code class="selectable-text"><%= web_requests_url(user_id: @agent.user_id, agent_id: @agent.id, secret: @agent.options['secret']) %></code></li>
+  </ul>
+</p>
