@@ -1,4 +1,5 @@
 require 'thread'
+require 'huginn_scheduler'
 
 def stop
   puts 'Exiting...'
