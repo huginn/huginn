@@ -17,7 +17,7 @@
   </script>
 
   <% events.each do |event| %>
-    <%= render "agents/agent_views/user_location_agent/map_marker", :event => event %>
+    <%= render "shared/map_marker", event: event %>
   <% end %>
 <% else %>
   <p>
