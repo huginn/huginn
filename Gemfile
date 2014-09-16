@@ -92,7 +92,7 @@ gem 'omniauth-github'
 
 group :development do
   gem 'binding_of_caller'
-  gem 'better_errors'
+  gem 'better_errors', '~> 1.1'
   gem 'quiet_assets'
 end
 
