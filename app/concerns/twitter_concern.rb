@@ -1,8 +1,9 @@
 module TwitterConcern
   extend ActiveSupport::Concern
-  include Oauthable
 
   included do
+    include Oauthable
+
     validate :validate_twitter_options
     valid_oauth_providers :twitter
   end
