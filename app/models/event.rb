@@ -1,5 +1,3 @@
-require 'json_serialized_field'
-
 # Events are how Huginn Agents communicate and log information about the world.  Events can be emitted and received by
 # Agents.  They contain a serialized `payload` of arbitrary JSON data, as well as optional `lat`, `lng`, and `expires_at`
 # fields.
