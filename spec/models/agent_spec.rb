@@ -773,6 +773,43 @@ describe Agent do
       agent.reload.drop_pending_events.should == false
     end
   end
+
+  describe ".drop_pending_events" do
+    before do
+      stub_request(:any, /wunderground/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
+      stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
+    end
+
+    it "should drop pending events while the agent was disabled when set to true" do
+      agent1 = agents(:bob_weather_agent)
+      agent2 = agents(:bob_rain_notifier_agent)
+
+      -> {
+        -> {
+          Agent.async_check(agent1.id)
+          Agent.receive!
+        }.should change { agent1.events.count }.by(1)
+      }.should change { agent2.events.count }.by(1)
+
+      agent2.disabled = true
+      agent2.save!
+
+      -> {
+        -> {
+          Agent.async_check(agent1.id)
+          Agent.receive!
+        }.should change { agent1.events.count }.by(1)
+      }.should_not change { agent2.events.count }
+
+      agent2.disabled = false
+      agent2.drop_pending_events = true
+      agent2.save!
+
+      -> {
+        Agent.receive!
+      }.should_not change { agent2.events.count }
+    end
+  end
 end
 
 describe AgentDrop do
