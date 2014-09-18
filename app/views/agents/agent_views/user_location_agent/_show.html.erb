@@ -17,10 +17,20 @@
   </script>
 
   <% events.each do |event| %>
-    <%= render "agents/agent_views/user_location_agent/map_marker", :event => event %>
+    <%= render "shared/map_marker", event: event %>
   <% end %>
 <% else %>
   <p>
     No events found.
   </p>
 <% end %>
+
+<h3>POST URL</h3>
+
+<p>
+  Location data containing <code>latitude</code> and <code>longitude</code> can be posted to this URL:<br/>
+
+  <ul>
+    <li><code class="selectable-text"><%= web_requests_url(user_id: @agent.user_id, agent_id: @agent.id, secret: @agent.options['secret']) %></code></li>
+  </ul>
+</p>

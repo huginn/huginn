@@ -215,3 +215,12 @@ $(document).ready ->
       showEventCreation()
     else
       hideEventCreation()
+
+  $('.selectable-text').each ->
+    $(this).click ->
+      range = document.createRange()
+      range.setStartBefore(this.firstChild)
+      range.setEndAfter(this.lastChild)
+      sel = window.getSelection()
+      sel.removeAllRanges();
+      sel.addRange(range)

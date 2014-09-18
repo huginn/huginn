@@ -62,10 +62,9 @@ Huginn::Application.routes.draw do
 
   get "/worker_status" => "worker_status#show"
 
-  post "/users/:user_id/update_location/:secret" => "user_location_updates#create"
-
-  match  "/users/:user_id/web_requests/:agent_id/:secret" => "web_requests#handle_request", :as => :web_requests, :via => [:get, :post, :put, :delete]
-  post "/users/:user_id/webhooks/:agent_id/:secret" => "web_requests#handle_request" # legacy
+  match "/users/:user_id/web_requests/:agent_id/:secret" => "web_requests#handle_request", :as => :web_requests, :via => [:get, :post, :put, :delete]
+  post  "/users/:user_id/webhooks/:agent_id/:secret" => "web_requests#handle_request" # legacy
+  post  "/users/:user_id/update_location/:secret" => "web_requests#update_location" # legacy
 
   devise_for :users, :sign_out_via => [ :post, :delete ]
   get '/auth/:provider/callback', to: 'services#callback'
