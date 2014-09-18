@@ -215,7 +215,7 @@ class Agent < ActiveRecord::Base
   end
 
   def set_last_checked_event_id
-    if newest_event_id = Event.order("id desc").limit(1).pluck(:id).first
+    if can_receive_events? && newest_event_id = Event.maximum(:id)
       self.last_checked_event_id = newest_event_id
     end
   end
