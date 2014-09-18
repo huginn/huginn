@@ -67,7 +67,7 @@
       </div>
       <div class="modal-footer">
         <%= form_for(agent, as: :agent, url: agent_path(agent, return: returnTo), method: 'PUT') do |f| %>
-          <% if agent.can_receive_events? || true %>
+          <% if agent.can_receive_events? %>
             <div class="form-group">
               <%= check_box_tag check_box_id = "agent#{agent.id}_drop_pending_events", 'true', false, name: :drop_pending_events %>
               <%= label_tag check_box_id, 'Drop pending events' %>
