@@ -20,12 +20,10 @@
   </li>
 
   <li>
-    <% if agent.disabled? %>
-      <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-enable-agent#{agent.id}" do %>
+    <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent#{agent.id}" do %>
+      <% if agent.disabled? %>
         <i class="glyphicon glyphicon-play"></i> Enable agent
-      <% end %>
-    <% else %>
-      <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-disable-agent#{agent.id}" do %>
+      <% else %>
         <i class="glyphicon glyphicon-pause"></i> Disable agent
       <% end %>
     <% end %>
@@ -54,8 +52,7 @@
   </li>
 </ul>
 
-<% if agent.disabled? %>
-<div id="confirm-enable-agent<%= agent.id %>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmEnableAgentLabel" aria-hidden="true">
+<div id="confirm-agent<%= agent.id %>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -63,17 +60,17 @@
         <h4 class="modal-title">Confirm</h4>
       </div>
       <div class="modal-body">
-        <p>Enable &quot;<%= agent.name %>&quot;?</p>
+        <p><% if agent.disabled? %>Enable<% else %>Disable<% end %> &quot;<%= agent.name %>&quot;?</p>
       </div>
       <div class="modal-footer">
         <%= form_for(agent, as: :agent, url: agent_path(agent, return: returnTo), method: 'PUT') do |f| %>
-          <% if agent.can_receive_events? %>
+          <% if agent.disabled && agent.can_receive_events? %>
             <div class="form-group">
               <%= check_box_tag check_box_id = "agent#{agent.id}_drop_pending_events", 'true', false, name: :drop_pending_events %>
               <%= label_tag check_box_id, 'Drop pending events' %>
             </div>
           <% end %>
-          <%= f.hidden_field :disabled, value: 'false' %>
+          <%= f.hidden_field :disabled, value: (!agent.disabled).to_s %>
           <%= f.button 'No', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
           <%= f.submit 'Yes', class: 'btn btn-primary' %>
         <% end %>
@@ -81,25 +78,4 @@
     </div>
   </div>
 </div>
-<% else %>
-<div id="confirm-disable-agent<%= agent.id %>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmDisableAgentLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title">Confirm</h4>
-      </div>
-      <div class="modal-body">
-        <p>Disable &quot;<%= agent.name %>&quot;?</p>
-      </div>
-      <div class="modal-footer">
-        <%= form_for(agent, as: :agent, url: agent_path(agent, return: returnTo), method: 'PUT') do |f| %>
-          <%= f.hidden_field :disabled, value: 'true' %>
-          <%= f.button 'No', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
-          <%= f.submit 'Yes', class: 'btn btn-primary' %>
-        <% end %>
-      </div>
-    </div>
-  </div>
-</div>
-<% end %>
+
