@@ -122,7 +122,13 @@ class AgentsController < ApplicationController
     @agent = current_user.agents.find(params[:id])
 
     respond_to do |format|
-      if @agent.update_attributes(params[:agent])
+      if @agent.with_transaction_returning_status {
+          @agent.attributes = params[:agent]
+          if params[:drop_pending_events] && @agent.can_receive_events?
+            @agent.set_last_checked_event_id
+          end
+          @agent.save
+        }
         format.html { redirect_back "'#{@agent.name}' was successfully updated." }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
