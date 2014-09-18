@@ -52,7 +52,7 @@
   </li>
 </ul>
 
-<div id="confirm-agent<%= agent.id %>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
+<div id="confirm-agent<%= agent.id %>" class="confirm-agent modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -68,6 +68,7 @@
             <div class="form-group">
               <%= check_box_tag check_box_id = "agent#{agent.id}_drop_pending_events", 'true', false, name: :drop_pending_events %>
               <%= label_tag check_box_id, 'Drop pending events' %>
+              <span class="glyphicon glyphicon-question-sign hover-help" data-content="As soon as you enable this agent, it starts to receive pending events that have not been processed while it was disabled.  To prevent that from happening, you can check this option."></span>
             </div>
           <% end %>
           <%= f.hidden_field :disabled, value: (!agent.disabled).to_s %>
