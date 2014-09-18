@@ -2,6 +2,8 @@
 #= require rickshaw
 #= require_self
 
+# This is not included in the core application.js bundle.
+
 window.renderGraph = ($chart, data, peaks, name) ->
   graph = new Rickshaw.Graph
     element: $chart.find(".chart").get(0)

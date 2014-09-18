@@ -1,3 +1,5 @@
+# This is not included in the core application.js bundle.
+
 $ ->
   svg = document.querySelector('.agent-diagram svg.diagram')
   overlay = document.querySelector('.agent-diagram .overlay')
