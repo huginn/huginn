@@ -43,7 +43,7 @@ class AgentsController < ApplicationController
         :can_control_other_agents => @agent.can_control_other_agents?,
         :options => @agent.default_options,
         :description_html => @agent.html_description,
-        :form => render_to_string(partial: 'oauth_dropdown')
+        :form => render_to_string(partial: 'oauth_dropdown', locals: { agent: @agent })
     }
   end
 
