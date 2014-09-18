@@ -258,7 +258,7 @@ describe AgentsController do
       agent.disabled = true
       agent.last_checked_event_id = nil
       agent.save!
-      post :update, id: agents(:bob_website_agent).to_param, agent: { disabled: 'false' }, drop_pending_events: true
+      post :update, id: agents(:bob_website_agent).to_param, agent: { disabled: 'false', drop_pending_events: 'true' }
       agent.reload
       agent.disabled.should == false
       agent.last_checked_event_id.should == Event.maximum(:id)

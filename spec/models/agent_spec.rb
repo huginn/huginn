@@ -852,4 +852,18 @@ describe AgentDrop do
     interpolate(t, @wsa2).should eq('1: Formatter')
     interpolate(t, @efa).should eq('0: ')
   end
+
+  describe 'last_checked_event_id' do
+    it "should be updated by setting drop_pending_events to true" do
+      @wsa1.last_checked_event_id = nil
+      @wsa1.save!
+      @wsa1.update!(drop_pending_events: true)
+      @wsa1.reload.last_checked_event_id.should == Event.maximum(:id)
+    end
+
+    it "should not affect a virtual attribute drop_pending_events" do
+      @wsa1.update!(drop_pending_events: true)
+      @wsa1.reload.drop_pending_events.should == false
+    end
+  end
 end

@@ -66,8 +66,8 @@
         <%= form_for(agent, as: :agent, url: agent_path(agent, return: returnTo), method: 'PUT') do |f| %>
           <% if agent.disabled && agent.can_receive_events? %>
             <div class="form-group">
-              <%= check_box_tag check_box_id = "agent#{agent.id}_drop_pending_events", 'true', false, name: :drop_pending_events %>
-              <%= label_tag check_box_id, 'Drop pending events' %>
+              <%= f.check_box :drop_pending_events %>
+              <%= f.label :drop_pending_events, 'Drop pending events' %>
               <span class="glyphicon glyphicon-question-sign hover-help" data-content="As soon as you enable this agent, it starts to receive pending events that have not been processed while it was disabled.  To prevent that from happening, you can check this option."></span>
             </div>
           <% end %>

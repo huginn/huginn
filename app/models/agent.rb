@@ -22,7 +22,7 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
+  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately, :drop_pending_events
 
   json_serialize :options, :memory
 
@@ -194,6 +194,14 @@ class Agent < ActiveRecord::Base
   def delete_logs!
     logs.delete_all
     update_column :last_error_log_at, nil
+  end
+
+  def drop_pending_events
+    false
+  end
+
+  def drop_pending_events=(bool)
+    set_last_checked_event_id if bool
   end
 
   # Callbacks
