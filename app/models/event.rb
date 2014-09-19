@@ -32,6 +32,38 @@ class Event < ActiveRecord::Base
     where.not(lat: nil).where.not(lng: nil)
   }
 
+  def location
+    @location ||= {
+      # lat and lng are BigDecimal, so convert them to Float
+      lat: (lat.to_f if lat),
+      lng: (lng.to_f if lng),
+      radius:
+        begin
+          h = payload[:horizontal_accuracy].presence
+          v = payload[:vertical_accuracy].presence
+          if h && v
+            (h.to_f + v.to_f) / 2
+          else
+            (h || v || payload[:accuracy]).to_f
+          end
+        end,
+      course:
+        begin
+          if (v = payload[:course].presence) &&
+             (v = v.to_f) >= 0
+            v
+          end
+        end,
+      speed:
+        begin
+          if (v = payload[:speed].presence) &&
+             (v = v.to_f) >= 0
+            v
+          end
+        end,
+    }
+  end
+
   # Emit this event again, as a new Event.
   def reemit!
     agent.create_event :payload => payload, :lat => lat, :lng => lng

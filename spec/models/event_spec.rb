@@ -15,6 +15,56 @@ describe Event do
     end
   end
 
+  describe "#location" do
+    it "returns a default hash when an event does not have a location" do
+      event = events(:bob_website_agent_event)
+      event.location.should == {
+        lat: nil,
+        lng: nil,
+        radius: 0.0,
+        speed: nil,
+        course: nil,
+      }
+    end
+
+    it "returns a hash containing location information" do
+      event = events(:bob_website_agent_event)
+      event.lat = 2
+      event.lng = 3
+      event.payload = {
+        radius: 300,
+        speed: 0.5,
+        course: 90.0,
+      }
+      event.save!
+      event.location.should == {
+        lat: 2.0,
+        lng: 3.0,
+        radius: 0.0,
+        speed: 0.5,
+        course: 90.0,
+      }
+    end
+
+    it "ignores invalid speed and course" do
+      event = events(:bob_website_agent_event)
+      event.lat = 2
+      event.lng = 3
+      event.payload = {
+        speed: -1,
+        course: -1,
+      }
+      event.save!
+      event.location.should == {
+        lat: 2.0,
+        lng: 3.0,
+        radius: 0.0,
+        speed: nil,
+        course: nil,
+      }
+    end
+  end
+
   describe "#reemit" do
     it "creates a new event identical to itself" do
       events(:bob_website_agent_event).lat = 2
