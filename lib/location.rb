@@ -34,6 +34,9 @@ class Location
     }
   end
 
+  alias latitude  lat
+  alias latitude= lat=
+
   def lng=(value)
     self[:lng] = floatify(value) { |f|
       if f.abs <= 180
@@ -43,6 +46,9 @@ class Location
       end
     }
   end
+
+  alias longitude  lng
+  alias longitude= lng=
 
   def radius=(value)
     self[:radius] = floatify(value) { |f| f if f >= 0 }

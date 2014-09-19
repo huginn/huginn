@@ -65,8 +65,10 @@ module Agents
     private
 
     def handle_payload(payload)
-      if payload[:latitude].present? && payload[:longitude].present?
-        create_event payload: payload, lat: payload[:latitude].to_f, lng: payload[:longitude].to_f
+      location = Location.new(payload)
+
+      if location.present?
+        create_event payload: payload, location: location
       end
     end
   end

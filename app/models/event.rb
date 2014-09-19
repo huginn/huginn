@@ -7,7 +7,7 @@ class Event < ActiveRecord::Base
   include JSONSerializedField
   include LiquidDroppable
 
-  attr_accessible :lat, :lng, :payload, :user_id, :user, :expires_at
+  attr_accessible :lat, :lng, :location, :payload, :user_id, :user, :expires_at
 
   acts_as_mappable
 
@@ -51,6 +51,19 @@ class Event < ActiveRecord::Base
         end,
       course: payload[:course],
       speed: payload[:speed].presence)
+  end
+
+  def location=(location)
+    case location
+    when nil
+      self.lat = self.lng = nil
+      return
+    when Location
+    else
+      location = Location.new(location)
+    end
+    self.lat, self.lng = location.lat, location.lng
+    location
   end
 
   # Emit this event again, as a new Event.
