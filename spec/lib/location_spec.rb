@@ -11,16 +11,23 @@ describe Location do
   }
 
   it "converts values to Float" do
-    expect(location.lat).to equal 2.0
-    expect(location.lng).to equal 3.0
-    expect(location.radius).to equal 300.0
-    expect(location.speed).to equal 2.0
-    expect(location.course).to equal 30.0
+    expect(location.lat).to be_a Float
+    expect(location.lat).to be 2.0
+    expect(location.lng).to be_a Float
+    expect(location.lng).to be 3.0
+    expect(location.radius).to be_a Float
+    expect(location.radius).to be 300.0
+    expect(location.speed).to be_a Float
+    expect(location.speed).to be 2.0
+    expect(location.course).to be_a Float
+    expect(location.course).to be 30.0
   end
 
   it "provides hash-style access to its properties with both symbol and string keys" do
-    expect(location[:lat]).to equal 2.0
-    expect(location['lat']).to equal 2.0
+    expect(location[:lat]).to be_a Float
+    expect(location[:lat]).to be 2.0
+    expect(location['lat']).to be_a Float
+    expect(location['lat']).to be 2.0
   end
 
   it "does not allow hash-style assignment" do
