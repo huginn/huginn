@@ -1,3 +1,5 @@
+require 'location'
+
 # Events are how Huginn Agents communicate and log information about the world.  Events can be emitted and received by
 # Agents.  They contain a serialized `payload` of arbitrary JSON data, as well as optional `lat`, `lng`, and `expires_at`
 # fields.
@@ -33,10 +35,10 @@ class Event < ActiveRecord::Base
   }
 
   def location
-    @location ||= {
-      # lat and lng are BigDecimal, so convert them to Float
-      lat: (lat.to_f if lat),
-      lng: (lng.to_f if lng),
+    @location ||= Location.new(
+      # lat and lng are BigDecimal, but converted to Float by the Location class
+      lat: lat,
+      lng: lng,
       radius:
         begin
           h = payload[:horizontal_accuracy].presence
@@ -47,21 +49,8 @@ class Event < ActiveRecord::Base
             (h || v || payload[:accuracy]).to_f
           end
         end,
-      course:
-        begin
-          if (v = payload[:course].presence) &&
-             (v = v.to_f) >= 0
-            v
-          end
-        end,
-      speed:
-        begin
-          if (v = payload[:speed].presence) &&
-             (v = v.to_f) >= 0
-            v
-          end
-        end,
-    }
+      course: payload[:course],
+      speed: payload[:speed].presence)
   end
 
   # Emit this event again, as a new Event.
