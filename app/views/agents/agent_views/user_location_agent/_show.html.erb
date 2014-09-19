@@ -14,11 +14,10 @@
     };
 
     var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+    <% events.each do |event| %>
+      <%= render "shared/map_marker", map: 'map', location: event.location %>
+    <% end %>
   </script>
-
-  <% events.each do |event| %>
-    <%= render "shared/map_marker", event: event %>
-  <% end %>
 <% else %>
   <p>
     No events found.

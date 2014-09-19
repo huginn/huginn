@@ -36,9 +36,9 @@
           };
 
           var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-        </script>
 
-        <%= render "shared/map_marker", event: @event %>
+          <%= render "shared/map_marker", map: 'map', location: @event.location %>
+        </script>
       <% end %>
 
       <br />
