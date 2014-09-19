@@ -1,7 +1,0 @@
-<%- unless @map_marker_included_p -%>
-<%- content_for :head do -%>
-<%= javascript_include_tag "map_marker" %>
-<%- end -%>
-<%- @map_marker_included_p = true -%>
-<%- end -%>
-map_marker(<%= map %>, <%= Utils.jsonify(location) %>)
