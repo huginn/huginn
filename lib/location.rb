@@ -1,6 +1,10 @@
+require 'liquid'
+
 Location = Struct.new(:lat, :lng, :radius, :speed, :course)
 
 class Location
+  include LiquidDroppable
+
   protected :[]=
 
   def initialize(data = {})
@@ -83,6 +87,16 @@ class Location
       else
         float
       end
+    end
+  end
+end
+
+class LocationDrop
+  KEYS = Location.members.map(&:to_s).concat(%w[latitude longitude])
+
+  def before_method(key)
+    if KEYS.include?(key)
+      @object.__send__(key)
     end
   end
 end

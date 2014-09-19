@@ -174,6 +174,8 @@ describe EventDrop do
       'title' => 'some title',
       'url' => 'http://some.site.example.org/',
     }
+    @event.lat = 2
+    @event.lng = 3
     @event.save!
   end
 
@@ -209,5 +211,10 @@ describe EventDrop do
   it 'should have created_at' do
     t = '{{created_at | date:"%FT%T%z" }}'
     interpolate(t, @event).should eq(@event.created_at.strftime("%FT%T%z"))
+  end
+
+  it 'should have _location_' do
+    t = '{{_location_.lat}},{{_location_.lng}}'
+    interpolate(t, @event).should eq("2.0,3.0")
   end
 end

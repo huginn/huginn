@@ -53,4 +53,16 @@ describe Location do
     expect(Location.new(lat: 2, radius: 1).present?).to be_falsy
     expect(Location.new(lng: 3, radius: 1).present?).to be_falsy
   end
+
+  it "is droppable" do
+    {
+      '{{location.lat}}' => '2.0',
+      '{{location.latitude}}' => '2.0',
+      '{{location.lng}}' => '3.0',
+      '{{location.longitude}}' => '3.0',
+    }.each { |template, result|
+      expect(Liquid::Template.parse(template).render('location' => location.to_liquid)).to eq(result),
+        "expected #{template.inspect} to expand to #{result.inspect}"
+    }
+  end
 end

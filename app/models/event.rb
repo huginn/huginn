@@ -117,4 +117,8 @@ class EventDrop
       @object.created_at
     }
   end
+
+  def _location_
+    @object.location
+  end
 end
