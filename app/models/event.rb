@@ -28,6 +28,10 @@ class Event < ActiveRecord::Base
     where("expires_at IS NOT NULL AND expires_at < ?", Time.now)
   }
 
+  scope :with_location, -> {
+    where.not(lat: nil).where.not(lng: nil)
+  }
+
   # Emit this event again, as a new Event.
   def reemit!
     agent.create_event :payload => payload, :lat => lat, :lng => lng

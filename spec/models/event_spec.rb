@@ -1,6 +1,20 @@
 require 'spec_helper'
 
 describe Event do
+  describe ".with_location" do
+    it "selects events with location" do
+      event = events(:bob_website_agent_event)
+      event.lat = 2
+      event.lng = 3
+      event.save!
+      Event.with_location.pluck(:id).should == [event.id]
+
+      event.lat = nil
+      event.save!
+      Event.with_location.should be_empty
+    end
+  end
+
   describe "#reemit" do
     it "creates a new event identical to itself" do
       events(:bob_website_agent_event).lat = 2
