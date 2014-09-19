@@ -19,7 +19,7 @@ window.map_marker = (map, options = {}) ->
 
   if options.course
     p1 = new LatLon(pos.lat(), pos.lng())
-    speed = if options.speed? then options.speed else 1
+    speed = options.speed ? 1
     p2 = p1.destinationPoint(options.course, Math.max(0.2, speed) * 0.1)
 
     lineCoordinates = [
