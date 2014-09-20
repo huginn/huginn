@@ -45,16 +45,24 @@ GEM
       extlib (>= 0.9.15)
       multi_json (>= 1.0.0)
     bcrypt (3.1.7)
+    better_errors (1.1.0)
       coderay (>= 1.0.0)
       erubis (>= 2.6.6)
-      rack (>= 0.9.0)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
-    bootstrap-kaminari-views (0.0.3)
+    bootstrap-kaminari-views (0.0.5)
       kaminari (>= 0.13)
       rails (>= 3.1)
     buftok (0.2.0)
     builder (3.2.2)
+    capistrano (2.15.5)
+      highline
+      net-scp (>= 1.0.0)
+      net-sftp (>= 2.0.0)
+      net-ssh (>= 2.0.14)
+      net-ssh-gateway (>= 1.1.0)
+    capistrano-unicorn (0.1.10)
+      capistrano
     chronic (0.10.2)
     coderay (1.1.0)
     coffee-rails (4.0.1)
@@ -63,7 +71,7 @@ GEM
     coffee-script (2.3.0)
       coffee-script-source
       execjs
-    coffee-script-source (1.7.1)
+    coffee-script-source (1.8.0)
     cookiejar (0.3.2)
     coveralls (0.7.1)
       multi_json (~> 1.3)
@@ -75,7 +83,7 @@ GEM
       safe_yaml (~> 1.0.0)
     daemons (1.1.9)
     debug_inspector (0.0.2)
-    delayed_job (4.0.2)
+    delayed_job (4.0.3)
       activesupport (>= 3.0, < 4.2)
     delayed_job_active_record (4.0.2)
       activerecord (>= 3.0, < 4.2)
@@ -127,6 +135,8 @@ GEM
     foreman (0.63.0)
       dotenv (>= 0.7)
       thor (>= 0.13.6)
+    foreman-export-initscript (0.0.1)
+      foreman
     geokit (1.8.5)
       multi_json (>= 1.3.2)
     geokit-rails (2.0.1)
@@ -144,6 +154,7 @@ GEM
       signet (>= 0.5.0)
       uuidtools (>= 2.1.0)
     hashie (2.0.5)
+    highline (1.6.21)
     hike (1.2.3)
     hipchat (1.2.0)
       httparty
@@ -155,7 +166,7 @@ GEM
       json (~> 1.8)
       multi_xml (>= 0.5.2)
     i18n (0.6.11)
-    jquery-rails (3.1.1)
+    jquery-rails (3.1.2)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
     json (1.8.1)
@@ -169,7 +180,7 @@ GEM
     kramdown (1.3.3)
     launchy (2.4.2)
       addressable (~> 2.3)
-    libv8 (3.16.14.3)
+    libv8 (3.16.14.7)
     liquid (2.6.1)
     macaddr (1.7.1)
       systemu (~> 2.6.2)
@@ -181,14 +192,21 @@ GEM
     method_source (0.8.2)
     mime-types (1.25.1)
     mini_portile (0.6.0)
-    minitest (5.4.0)
-    mqtt (0.2.0)
+    minitest (5.4.1)
+    mqtt (0.3.0)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     mysql2 (0.3.16)
     naught (1.0.0)
     net-ftp-list (3.2.8)
+    net-scp (1.2.1)
+      net-ssh (>= 2.6.5)
+    net-sftp (2.1.2)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.9.1)
+    net-ssh-gateway (1.2.0)
+      net-ssh (>= 2.6.5)
     nokogiri (1.6.3.1)
       mini_portile (= 0.6.0)
     oauth (0.4.7)
@@ -254,7 +272,7 @@ GEM
       thor (>= 0.18.1, < 2.0)
     raindrops (0.13.0)
     rake (10.3.2)
-    rdoc (4.1.1)
+    rdoc (4.1.2)
       json (~> 1.4)
     ref (1.0.5)
     rest-client (1.6.8)
@@ -287,8 +305,10 @@ GEM
       rest-client
     ruby-growl (4.1)
       uuid (~> 2.3, >= 2.3.5)
-    rufus-scheduler (3.0.8)
+    rufus-scheduler (3.0.9)
       tzinfo
+    rvm-capistrano (1.4.4)
+      capistrano (>= 2.15.4)
     safe_yaml (1.0.3)
     sass (3.2.19)
     sass-rails (4.0.3)
@@ -298,7 +318,7 @@ GEM
       sprockets-rails (~> 2.0)
     select2-rails (3.5.9.1)
       thor (~> 0.14)
-    shoulda-matchers (2.6.2)
+    shoulda-matchers (2.7.0)
       activesupport (>= 3.0.0)
     signet (0.5.1)
       addressable (>= 2.2.3)
@@ -324,7 +344,7 @@ GEM
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    sprockets-rails (2.1.3)
+    sprockets-rails (2.1.4)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (~> 2.8)
@@ -337,7 +357,7 @@ GEM
     thor (0.19.1)
     thread_safe (0.3.4)
     tilt (1.4.1)
-    tins (1.3.2)
+    tins (1.3.3)
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
@@ -363,14 +383,14 @@ GEM
     uglifier (2.5.3)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
-    unicorn (4.8.3)
+    unicorn (4.6.3)
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
     uuid (2.3.7)
       macaddr (~> 1.0)
     uuidtools (2.1.5)
-    vcr (2.9.2)
+    vcr (2.9.3)
     warden (1.2.3)
       rack (>= 1.0)
     webmock (1.17.4)
@@ -392,11 +412,13 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap (~> 2.0.1)
-  better_errors
+  better_errors (~> 1.1)
   binding_of_caller
   bootstrap-kaminari-views (~> 0.0.3)
   bundler (>= 1.5.0)
   cantino-twitter-stream!
+  capistrano (~> 2.15.5)
+  capistrano-unicorn (~> 0.1.9)
   coffee-rails (~> 4.0.0)
   coveralls
   daemons (~> 1.1.9)
@@ -412,6 +434,7 @@ DEPENDENCIES
   feed-normalizer
   forecast_io (~> 2.0.0)
   foreman (~> 0.63.0)
+  foreman-export-initscript
   geokit (~> 1.8.4)
   geokit-rails (~> 2.0.1)
   google-api-client
@@ -444,6 +467,7 @@ DEPENDENCIES
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
   rufus-scheduler (~> 3.0.8)
+  rvm-capistrano (~> 1.4.1)
   sass-rails (~> 4.0.0)
   select2-rails (~> 3.5.4)
   shoulda-matchers
@@ -457,7 +481,7 @@ DEPENDENCIES
   typhoeus (~> 0.6.3)
   tzinfo-data
   uglifier (>= 1.3.0)
-  unicorn
+  unicorn (~> 4.6.3)
   vcr
   webmock (~> 1.17.4)
   weibo_2 (~> 0.1.4)
