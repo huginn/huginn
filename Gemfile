@@ -1,132 +1,489 @@
-source 'https://rubygems.org'
+GIT
+  remote: git://github.com/cantino/twitter-stream.git
+  revision: 1c60a1007c50476f23374a8aea796769a088ffe0
+  branch: master
+  specs:
+    cantino-twitter-stream (0.1.15)
+      eventmachine (>= 0.12.8)
+      http_parser.rb (~> 0.6.0)
+      simple_oauth (~> 0.2.0)
 
-# Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
-# Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
-unless Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.5.0')
-  STDERR.puts "Bundler >=1.5.0 is required.  Please upgrade bundler with 'gem install bundler'"
-  exit 1
-end
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ace-rails-ap (2.0.1)
+    actionmailer (4.1.5)
+      actionpack (= 4.1.5)
+      actionview (= 4.1.5)
+      mail (~> 2.5.4)
+    actionpack (4.1.5)
+      actionview (= 4.1.5)
+      activesupport (= 4.1.5)
+      rack (~> 1.5.2)
+      rack-test (~> 0.6.2)
+    actionview (4.1.5)
+      activesupport (= 4.1.5)
+      builder (~> 3.1)
+      erubis (~> 2.7.0)
+    activemodel (4.1.5)
+      activesupport (= 4.1.5)
+      builder (~> 3.1)
+    activerecord (4.1.5)
+      activemodel (= 4.1.5)
+      activesupport (= 4.1.5)
+      arel (~> 5.0.0)
+    activesupport (4.1.5)
+      i18n (~> 0.6, >= 0.6.9)
+      json (~> 1.7, >= 1.7.7)
+      minitest (~> 5.1)
+      thread_safe (~> 0.1)
+      tzinfo (~> 1.1)
+    addressable (2.3.6)
+    arel (5.0.1.20140414130214)
+    autoparse (0.3.3)
+      addressable (>= 2.3.1)
+      extlib (>= 0.9.15)
+      multi_json (>= 1.0.0)
+    bcrypt (3.1.7)
+    better_errors (1.1.0)
+      coderay (>= 1.0.0)
+      erubis (>= 2.6.6)
+    binding_of_caller (0.7.2)
+      debug_inspector (>= 0.0.1)
+    bootstrap-kaminari-views (0.0.5)
+      kaminari (>= 0.13)
+      rails (>= 3.1)
+    buftok (0.2.0)
+    builder (3.2.2)
+    capistrano (2.15.5)
+      highline
+      net-scp (>= 1.0.0)
+      net-sftp (>= 2.0.0)
+      net-ssh (>= 2.0.14)
+      net-ssh-gateway (>= 1.1.0)
+    capistrano-unicorn (0.1.10)
+      capistrano
+    chronic (0.10.2)
+    coderay (1.1.0)
+    coffee-rails (4.0.1)
+      coffee-script (>= 2.2.0)
+      railties (>= 4.0.0, < 5.0)
+    coffee-script (2.3.0)
+      coffee-script-source
+      execjs
+    coffee-script-source (1.8.0)
+    cookiejar (0.3.2)
+    coveralls (0.7.1)
+      multi_json (~> 1.3)
+      rest-client
+      simplecov (>= 0.7)
+      term-ansicolor
+      thor
+    crack (0.4.2)
+      safe_yaml (~> 1.0.0)
+    daemons (1.1.9)
+    debug_inspector (0.0.2)
+    delayed_job (4.0.3)
+      activesupport (>= 3.0, < 4.2)
+    delayed_job_active_record (4.0.2)
+      activerecord (>= 3.0, < 4.2)
+      delayed_job (>= 3.0, < 4.1)
+    delorean (2.1.0)
+      chronic
+    devise (3.2.4)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 3.2.6, < 5)
+      thread_safe (~> 0.1)
+      warden (~> 1.2.3)
+    diff-lcs (1.2.5)
+    docile (1.1.5)
+    dotenv (0.11.1)
+      dotenv-deployment (~> 0.0.2)
+    dotenv-deployment (0.0.2)
+    dotenv-rails (0.11.1)
+      dotenv (= 0.11.1)
+    em-http-request (1.1.2)
+      addressable (>= 2.3.4)
+      cookiejar
+      em-socksify (>= 0.3)
+      eventmachine (>= 1.0.3)
+      http_parser.rb (>= 0.6.0)
+    em-socksify (0.3.0)
+      eventmachine (>= 1.0.0.beta.4)
+    equalizer (0.0.9)
+    erector (0.10.0)
+      treetop (>= 1.2.3)
+    erubis (2.7.0)
+    ethon (0.7.1)
+      ffi (>= 1.3.0)
+    eventmachine (1.0.3)
+    execjs (2.2.1)
+    extlib (0.9.16)
+    faraday (0.9.0)
+      multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.9.1)
+      faraday (>= 0.7.4, < 0.10)
+    feed-normalizer (1.5.2)
+      hpricot (>= 0.6)
+      simple-rss (>= 1.1)
+    ffi (1.9.3)
+    forecast_io (2.0.0)
+      faraday
+      hashie
+      multi_json
+    foreman (0.63.0)
+      dotenv (>= 0.7)
+      thor (>= 0.13.6)
+    foreman-export-initscript (0.0.1)
+      foreman
+    geokit (1.8.5)
+      multi_json (>= 1.3.2)
+    geokit-rails (2.0.1)
+      geokit (~> 1.5)
+      rails (>= 3.0)
+    google-api-client (0.7.1)
+      addressable (>= 2.3.2)
+      autoparse (>= 0.3.3)
+      extlib (>= 0.9.15)
+      faraday (>= 0.9.0)
+      jwt (>= 0.1.5)
+      launchy (>= 2.1.1)
+      multi_json (>= 1.0.0)
+      retriable (>= 1.4)
+      signet (>= 0.5.0)
+      uuidtools (>= 2.1.0)
+    hashie (2.0.5)
+    highline (1.6.21)
+    hike (1.2.3)
+    hipchat (1.2.0)
+      httparty
+    hpricot (0.8.6)
+    http (0.5.1)
+      http_parser.rb
+    http_parser.rb (0.6.0)
+    httparty (0.13.1)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
+    i18n (0.6.11)
+    jquery-rails (3.1.2)
+      railties (>= 3.0, < 5.0)
+      thor (>= 0.14, < 2.0)
+    json (1.8.1)
+    jsonpath (0.5.6)
+      multi_json
+    jwt (1.0.0)
+    kaminari (0.16.1)
+      actionpack (>= 3.0.0)
+      activesupport (>= 3.0.0)
+    kgio (2.9.2)
+    kramdown (1.3.3)
+    launchy (2.4.2)
+      addressable (~> 2.3)
+    libv8 (3.16.14.7)
+    liquid (2.6.1)
+    macaddr (1.7.1)
+      systemu (~> 2.6.2)
+    mail (2.5.4)
+      mime-types (~> 1.16)
+      treetop (~> 1.4.8)
+    memoizable (0.4.2)
+      thread_safe (~> 0.3, >= 0.3.1)
+    method_source (0.8.2)
+    mime-types (1.25.1)
+    mini_portile (0.6.0)
+    minitest (5.4.1)
+    mqtt (0.3.0)
+    multi_json (1.10.1)
+    multi_xml (0.5.5)
+    multipart-post (2.0.0)
+    mysql2 (0.3.16)
+    naught (1.0.0)
+    net-ftp-list (3.2.8)
+    net-scp (1.2.1)
+      net-ssh (>= 2.6.5)
+    net-sftp (2.1.2)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.9.1)
+    net-ssh-gateway (1.2.0)
+      net-ssh (>= 2.6.5)
+    nokogiri (1.6.3.1)
+      mini_portile (= 0.6.0)
+    oauth (0.4.7)
+    oauth2 (0.9.4)
+      faraday (>= 0.8, < 0.10)
+      jwt (~> 1.0)
+      multi_json (~> 1.3)
+      multi_xml (~> 0.5)
+      rack (~> 1.2)
+    omniauth (1.2.2)
+      hashie (>= 1.2, < 4)
+      rack (~> 1.0)
+    omniauth-37signals (1.0.5)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.0)
+    omniauth-github (1.1.2)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.1)
+    omniauth-oauth (1.0.1)
+      oauth
+      omniauth (~> 1.0)
+    omniauth-oauth2 (1.1.2)
+      faraday (>= 0.8, < 0.10)
+      multi_json (~> 1.3)
+      oauth2 (~> 0.9.3)
+      omniauth (~> 1.2)
+    omniauth-twitter (1.0.1)
+      multi_json (~> 1.3)
+      omniauth-oauth (~> 1.0)
+    orm_adapter (0.5.0)
+    pg (0.17.1)
+    polyglot (0.3.5)
+    protected_attributes (1.0.8)
+      activemodel (>= 4.0.1, < 5.0)
+    pry (0.10.1)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    quiet_assets (1.0.3)
+      railties (>= 3.1, < 5.0)
+    rack (1.5.2)
+    rack-test (0.6.2)
+      rack (>= 1.0)
+    rails (4.1.5)
+      actionmailer (= 4.1.5)
+      actionpack (= 4.1.5)
+      actionview (= 4.1.5)
+      activemodel (= 4.1.5)
+      activerecord (= 4.1.5)
+      activesupport (= 4.1.5)
+      bundler (>= 1.3.0, < 2.0)
+      railties (= 4.1.5)
+      sprockets-rails (~> 2.0)
+    rails_12factor (0.0.2)
+      rails_serve_static_assets
+      rails_stdout_logging
+    rails_serve_static_assets (0.0.2)
+    rails_stdout_logging (0.0.3)
+    railties (4.1.5)
+      actionpack (= 4.1.5)
+      activesupport (= 4.1.5)
+      rake (>= 0.8.7)
+      thor (>= 0.18.1, < 2.0)
+    raindrops (0.13.0)
+    rake (10.3.2)
+    rdoc (4.1.2)
+      json (~> 1.4)
+    ref (1.0.5)
+    rest-client (1.6.8)
+      mime-types (~> 1.16)
+      rdoc (>= 2.4.2)
+    retriable (1.4.1)
+    rr (1.1.2)
+    rspec (2.99.0)
+      rspec-core (~> 2.99.0)
+      rspec-expectations (~> 2.99.0)
+      rspec-mocks (~> 2.99.0)
+    rspec-collection_matchers (1.0.0)
+      rspec-expectations (>= 2.99.0.beta1)
+    rspec-core (2.99.2)
+    rspec-expectations (2.99.2)
+      diff-lcs (>= 1.1.3, < 2.0)
+    rspec-mocks (2.99.2)
+    rspec-rails (2.99.0)
+      actionpack (>= 3.0)
+      activemodel (>= 3.0)
+      activesupport (>= 3.0)
+      railties (>= 3.0)
+      rspec-collection_matchers
+      rspec-core (~> 2.99.0)
+      rspec-expectations (~> 2.99.0)
+      rspec-mocks (~> 2.99.0)
+    rturk (2.12.1)
+      erector
+      nokogiri
+      rest-client
+    ruby-growl (4.1)
+      uuid (~> 2.3, >= 2.3.5)
+    rufus-scheduler (3.0.9)
+      tzinfo
+    rvm-capistrano (1.4.4)
+      capistrano (>= 2.15.4)
+    safe_yaml (1.0.3)
+    sass (3.2.19)
+    sass-rails (4.0.3)
+      railties (>= 4.0.0, < 5.0)
+      sass (~> 3.2.0)
+      sprockets (~> 2.8, <= 2.11.0)
+      sprockets-rails (~> 2.0)
+    select2-rails (3.5.9.1)
+      thor (~> 0.14)
+    shoulda-matchers (2.7.0)
+      activesupport (>= 3.0.0)
+    signet (0.5.1)
+      addressable (>= 2.2.3)
+      faraday (>= 0.9.0.rc5)
+      jwt (>= 0.1.5)
+      multi_json (>= 1.0.0)
+    simple-rss (1.3.1)
+    simple_oauth (0.2.0)
+    simplecov (0.9.0)
+      docile (~> 1.1.0)
+      multi_json
+      simplecov-html (~> 0.8.0)
+    simplecov-html (0.8.0)
+    slack-notifier (0.5.0)
+    slop (3.6.0)
+    spectrum-rails (1.3.4)
+      railties (>= 3.1)
+    spring (1.1.3)
+    spring-commands-rspec (1.0.2)
+      spring (>= 0.9.1)
+    sprockets (2.11.0)
+      hike (~> 1.2)
+      multi_json (~> 1.0)
+      rack (~> 1.0)
+      tilt (~> 1.1, != 1.3.0)
+    sprockets-rails (2.1.4)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      sprockets (~> 2.8)
+    systemu (2.6.4)
+    term-ansicolor (1.3.0)
+      tins (~> 1.0)
+    therubyracer (0.12.1)
+      libv8 (~> 3.16.14.0)
+      ref
+    thor (0.19.1)
+    thread_safe (0.3.4)
+    tilt (1.4.1)
+    tins (1.3.3)
+    treetop (1.4.15)
+      polyglot
+      polyglot (>= 0.3.1)
+    twilio-ruby (3.11.6)
+      builder (>= 2.1.2)
+      jwt (>= 0.1.2)
+      multi_json (>= 1.3.0)
+    twitter (5.8.0)
+      addressable (~> 2.3)
+      buftok (~> 0.2.0)
+      equalizer (~> 0.0.9)
+      faraday (~> 0.9.0)
+      http (~> 0.5.0)
+      http_parser.rb (~> 0.6.0)
+      json (~> 1.8)
+      memoizable (~> 0.4.0)
+      naught (~> 1.0)
+      simple_oauth (~> 0.2.0)
+    typhoeus (0.6.9)
+      ethon (>= 0.7.1)
+    tzinfo (1.2.2)
+      thread_safe (~> 0.1)
+    uglifier (2.5.3)
+      execjs (>= 0.3.0)
+      json (>= 1.8.0)
+    unicorn (4.6.3)
+      kgio (~> 2.6)
+      rack
+      raindrops (~> 0.7)
+    uuid (2.3.7)
+      macaddr (~> 1.0)
+    uuidtools (2.1.5)
+    vcr (2.9.3)
+    warden (1.2.3)
+      rack (>= 1.0)
+    webmock (1.17.4)
+      addressable (>= 2.2.7)
+      crack (>= 0.3.2)
+    weibo_2 (0.1.6)
+      hashie (~> 2.0.4)
+      multi_json (~> 1)
+      oauth2 (~> 0.9.1)
+      rest-client (~> 1.6.7)
+    wunderground (1.2.0)
+      addressable
+      httparty (> 0.6.0)
+      json (> 1.4.0)
+    xmpp4r (0.5.6)
 
-gem 'bundler', '>= 1.5.0'
+PLATFORMS
+  ruby
 
-gem 'protected_attributes', '~>1.0.8'
-
-gem 'rails' , '4.1.5'
-
-case RUBY_PLATFORM
-when /freebsd|netbsd|openbsd/
-  # ffi (required by typhoeus via ethon) merged fixes for bugs fatal
-  # on these platforms after 1.9.3; no following release as yet.
-  gem 'ffi', github: 'ffi/ffi', branch: 'master'
-
-  # tzinfo 1.2.0 has added support for reading zoneinfo on these
-  # platforms.
-  gem 'tzinfo', '>= 1.2.0'
-when /solaris/
-  # ditto
-  gem 'tzinfo', '>= 1.2.0'
-end
-
-# Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
-
-gem 'mysql2', '~> 0.3.16'
-gem 'devise', '~> 3.2.4'
-gem 'kaminari', '~> 0.16.1'
-gem 'bootstrap-kaminari-views', '~> 0.0.3'
-gem 'rufus-scheduler', '~> 3.0.8', require: false
-gem 'json', '~> 1.8.1'
-gem 'jsonpath', '~> 0.5.6'
-gem 'twilio-ruby', '~> 3.11.5'
-gem 'ruby-growl', '~> 4.1.0'
-gem 'liquid', '~> 2.6.1'
-
-gem 'delayed_job', '~> 4.0.0'
-gem 'delayed_job_active_record', '~> 4.0.0'
-gem 'daemons', '~> 1.1.9'
-
-gem 'foreman', '~> 0.63.0'
-# export initscript gem needed for using init.d instead of upstart for foreman
-gem 'foreman-export-initscript'
-gem 'sass-rails',   '~> 4.0.0'
-gem 'coffee-rails', '~> 4.0.0'
-gem 'uglifier', '>= 1.3.0'
-gem 'select2-rails', '~> 3.5.4'
-gem 'jquery-rails', '~> 3.1.0'
-gem 'ace-rails-ap', '~> 2.0.1'
-gem 'spectrum-rails'
-
-
-# geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
-# in its own Gemfile.
-gem 'geokit', '~> 1.8.4'
-gem 'geokit-rails', '~> 2.0.1'
-
-gem 'kramdown', '~> 1.3.3'
-gem 'faraday', '~> 0.9.0'
-gem 'faraday_middleware'
-gem 'typhoeus', '~> 0.6.3'
-gem 'nokogiri', '~> 1.6.1'
-gem 'net-ftp-list', '~> 3.2.8'
-
-gem 'wunderground', '~> 1.2.0'
-gem 'forecast_io', '~> 2.0.0'
-gem 'rturk', '~> 2.12.1'
-
-gem "google-api-client"
-
-gem 'twitter', '~> 5.8.0'
-gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
-gem 'em-http-request', '~> 1.1.2'
-gem 'weibo_2', '~> 0.1.4'
-gem 'hipchat', '~> 1.2.0'
-gem 'xmpp4r',  '~> 0.5.6'
-gem 'feed-normalizer'
-gem 'slack-notifier', '~> 0.5.0'
-gem 'therubyracer', '~> 0.12.1'
-gem 'mqtt'
-
-gem 'omniauth'
-gem 'omniauth-twitter'
-gem 'omniauth-37signals'
-gem 'omniauth-github'
-
-group :development do
-  gem 'binding_of_caller'
-  gem 'better_errors'
-  gem 'quiet_assets'
-end
-
-group :development, :test do
-  gem 'vcr'
-  gem 'dotenv-rails'
-  gem 'pry'
-  gem 'rspec-rails', '~> 2.99'
-  gem 'rspec', '~> 2.99'
-  gem 'rspec-collection_matchers'
-  gem 'shoulda-matchers'
-  gem 'rr'
-  gem 'delorean'
-  gem 'webmock', '~> 1.17.4', require: false
-  gem 'coveralls', require: false
-  gem 'spring'
-  gem 'spring-commands-rspec'
-end
-
-group :production do
-  gem 'dotenv-deployment'
-  gem 'rack'
-end
-
-# This hack needs some explanation.  When on Heroku, use the pg, unicorn, and rails12factor gems.
-# When not on Heroku, we still want our Gemfile.lock to include these gems, so we scope them to
-# an unsupported platform.
-if ENV['ON_HEROKU'] || ENV['HEROKU_POSTGRESQL_ROSE_URL'] || File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
-  gem 'pg'
-  gem 'unicorn'
-  gem 'rails_12factor'
-else
-  gem 'pg', platform: :ruby_18
-  gem 'unicorn', platform: :ruby_18
-  gem 'rails_12factor', platform: :ruby_18
-end
+DEPENDENCIES
+  ace-rails-ap (~> 2.0.1)
+  better_errors (~> 1.1)
+  binding_of_caller
+  bootstrap-kaminari-views (~> 0.0.3)
+  bundler (>= 1.5.0)
+  cantino-twitter-stream!
+  capistrano (~> 2.15.5)
+  capistrano-unicorn (~> 0.1.9)
+  coffee-rails (~> 4.0.0)
+  coveralls
+  daemons (~> 1.1.9)
+  delayed_job (~> 4.0.0)
+  delayed_job_active_record (~> 4.0.0)
+  delorean
+  devise (~> 3.2.4)
+  dotenv-deployment
+  dotenv-rails
+  em-http-request (~> 1.1.2)
+  faraday (~> 0.9.0)
+  faraday_middleware
+  feed-normalizer
+  forecast_io (~> 2.0.0)
+  foreman (~> 0.63.0)
+  foreman-export-initscript
+  geokit (~> 1.8.4)
+  geokit-rails (~> 2.0.1)
+  google-api-client
+  hipchat (~> 1.2.0)
+  jquery-rails (~> 3.1.0)
+  json (~> 1.8.1)
+  jsonpath (~> 0.5.6)
+  kaminari (~> 0.16.1)
+  kramdown (~> 1.3.3)
+  liquid (~> 2.6.1)
+  mqtt
+  mysql2 (~> 0.3.16)
+  net-ftp-list (~> 3.2.8)
+  nokogiri (~> 1.6.1)
+  omniauth
+  omniauth-37signals
+  omniauth-github
+  omniauth-twitter
+  pg
+  protected_attributes (~> 1.0.8)
+  pry
+  quiet_assets
+  rack
+  rails (= 4.1.5)
+  rails_12factor
+  rr
+  rspec (~> 2.99)
+  rspec-collection_matchers
+  rspec-rails (~> 2.99)
+  rturk (~> 2.12.1)
+  ruby-growl (~> 4.1.0)
+  rufus-scheduler (~> 3.0.8)
+  rvm-capistrano (~> 1.4.1)
+  sass-rails (~> 4.0.0)
+  select2-rails (~> 3.5.4)
+  shoulda-matchers
+  slack-notifier (~> 0.5.0)
+  spectrum-rails
+  spring
+  spring-commands-rspec
+  therubyracer (~> 0.12.1)
+  twilio-ruby (~> 3.11.5)
+  twitter (~> 5.8.0)
+  typhoeus (~> 0.6.3)
+  tzinfo-data
+  uglifier (>= 1.3.0)
+  unicorn (~> 4.6.3)
+  vcr
+  webmock (~> 1.17.4)
+  weibo_2 (~> 0.1.4)
+  wunderground (~> 1.2.0)
+  xmpp4r (~> 0.5.6)
