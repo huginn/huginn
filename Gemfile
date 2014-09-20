@@ -46,7 +46,8 @@ gem 'delayed_job_active_record', '~> 4.0.0'
 gem 'daemons', '~> 1.1.9'
 
 gem 'foreman', '~> 0.63.0'
-
+# export initscript gem needed for using init.d instead of upstart for foreman
+gem 'foreman-export-initscript'
 gem 'sass-rails',   '~> 4.0.0'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'uglifier', '>= 1.3.0'
