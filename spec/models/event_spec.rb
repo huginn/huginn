@@ -1,6 +1,50 @@
 require 'spec_helper'
 
 describe Event do
+  describe ".with_location" do
+    it "selects events with location" do
+      event = events(:bob_website_agent_event)
+      event.lat = 2
+      event.lng = 3
+      event.save!
+      Event.with_location.pluck(:id).should == [event.id]
+
+      event.lat = nil
+      event.save!
+      Event.with_location.should be_empty
+    end
+  end
+
+  describe "#location" do
+    it "returns a default hash when an event does not have a location" do
+      event = events(:bob_website_agent_event)
+      event.location.should == Location.new(
+        lat: nil,
+        lng: nil,
+        radius: 0.0,
+        speed: nil,
+        course: nil)
+    end
+
+    it "returns a hash containing location information" do
+      event = events(:bob_website_agent_event)
+      event.lat = 2
+      event.lng = 3
+      event.payload = {
+        radius: 300,
+        speed: 0.5,
+        course: 90.0,
+      }
+      event.save!
+      event.location.should == Location.new(
+        lat: 2.0,
+        lng: 3.0,
+        radius: 0.0,
+        speed: 0.5,
+        course: 90.0)
+    end
+  end
+
   describe "#reemit" do
     it "creates a new event identical to itself" do
       events(:bob_website_agent_event).lat = 2
@@ -130,6 +174,8 @@ describe EventDrop do
       'title' => 'some title',
       'url' => 'http://some.site.example.org/',
     }
+    @event.lat = 2
+    @event.lng = 3
     @event.save!
   end
 
@@ -165,5 +211,10 @@ describe EventDrop do
   it 'should have created_at' do
     t = '{{created_at | date:"%FT%T%z" }}'
     interpolate(t, @event).should eq(@event.created_at.strftime("%FT%T%z"))
+  end
+
+  it 'should have _location_' do
+    t = '{{_location_.lat}},{{_location_.lng}}'
+    interpolate(t, @event).should eq("2.0,3.0")
   end
 end
