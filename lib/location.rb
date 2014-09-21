@@ -16,9 +16,17 @@ class Location
       self.lat, self.lng = data
     when Hash, Location
       data.each { |key, value|
-        begin
-          __send__("#{key}=", value)
-        rescue NameError
+        case key.to_sym
+        when :lat, :latitude
+          self.lat = value
+        when :lng, :longitude
+          self.lng = value
+        when :radius
+          self.radius = value
+        when :speed
+          self.speed = value
+        when :course
+          self.course = value
         end
       }
     else
