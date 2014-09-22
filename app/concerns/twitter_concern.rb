@@ -5,7 +5,7 @@ module TwitterConcern
     include Oauthable
 
     validate :validate_twitter_options
-    valid_oauth_providers :twitter
+    valid_oauth_providers 'twitter'
   end
 
   def validate_twitter_options

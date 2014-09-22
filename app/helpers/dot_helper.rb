@@ -137,9 +137,9 @@ module DotHelper
              label: agent_label[agent],
              tooltip: (agent.short_type.titleize if rich),
              URL: (agent_url[agent] if rich),
-             style: ('rounded,dashed' if agent.disabled?),
-             color: (@disabled if agent.disabled?),
-             fontcolor: (@disabled if agent.disabled?))
+             style: ('rounded,dashed' if agent.unavailable?),
+             color: (@disabled if agent.unavailable?),
+             fontcolor: (@disabled if agent.unavailable?))
       end
 
       def agent_edge(agent, receiver)
@@ -148,7 +148,7 @@ module DotHelper
              style: ('dashed' unless receiver.propagate_immediately?),
              label: (" #{agent.control_action}s " if agent.can_control_other_agents?),
              arrowhead: ('empty' if agent.can_control_other_agents?),
-             color: (@disabled if agent.disabled? || receiver.disabled?))
+             color: (@disabled if agent.unavailable? || receiver.unavailable?))
       end
 
       block('digraph', 'Agent Event Flow') {
@@ -218,7 +218,7 @@ module DotHelper
             # a dummy label only to obtain the background color
             label['class'] = [
               'label',
-              if agent.disabled?
+              if agent.unavailable?
                 'label-warning'
               elsif agent.working?
                 'label-success'
