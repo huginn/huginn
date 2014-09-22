@@ -46,6 +46,7 @@ gem 'delayed_job_active_record', '~> 4.0.0'
 gem 'daemons', '~> 1.1.9'
 
 gem 'foreman', '~> 0.63.0'
+gem 'foreman-export-initscript'
 
 gem 'sass-rails',   '~> 4.0.0'
 gem 'coffee-rails', '~> 4.0.0'
@@ -116,16 +117,18 @@ group :production do
   gem 'dotenv-deployment'
   gem 'rack'
 end
+group :production do
+  gem 'unicorn', '~> 4.6.3'
+end
+
+group :development do
+  gem 'capistrano', '~> 2.15.5'
+  gem 'capistrano-unicorn', '~> 0.1.9', :require => false
+  gem 'rvm-capistrano', '~> 1.4.1'
+end
 
 # This hack needs some explanation.  When on Heroku, use the pg, unicorn, and rails12factor gems.
 # When not on Heroku, we still want our Gemfile.lock to include these gems, so we scope them to
 # an unsupported platform.
-if ENV['ON_HEROKU'] || ENV['HEROKU_POSTGRESQL_ROSE_URL'] || File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
-  gem 'pg'
-  gem 'unicorn'
-  gem 'rails_12factor'
-else
   gem 'pg', platform: :ruby_18
-  gem 'unicorn', platform: :ruby_18
   gem 'rails_12factor', platform: :ruby_18
-end
