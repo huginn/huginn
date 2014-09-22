@@ -13,7 +13,7 @@
 
     <% @agents.each do |agent| %>
       <tr>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <%= link_to agent.name, agent_path(agent) %>
           <br/>
           <span class='text-muted'><%= agent.short_type.titleize %></span>
@@ -23,35 +23,35 @@
             </span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_be_scheduled? %>
             <%= agent_schedule(agent, ',<br/>') %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_be_scheduled? %>
             <%= agent.last_check_at ? time_ago_in_words(agent.last_check_at) + " ago" : "never" %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_create_events? %>
             <%= agent.last_event_at ? time_ago_in_words(agent.last_event_at) + " ago" : "never" %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_receive_events? %>
             <%= agent.last_receive_at ? time_ago_in_words(agent.last_receive_at) + " ago" : "never" %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_create_events? %>
             <%= link_to(agent.events_count || 0, agent_events_path(agent)) %>
           <% else %>
