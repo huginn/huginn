@@ -33,10 +33,15 @@ production:
   username: <%= ENV['DATABASE_USERNAME'] || "root" %>
   password: <%= ENV['DATABASE_PASSWORD'] || "" %>
 <<<<<<< HEAD
+<<<<<<< HEAD
   host: <%= ENV['DATABASE_HOST'] || "" %>
   port: <%= ENV['DATABASE_PORT'] || "" %>
 =======
   host: <%= ENV['DATABASE_HOST'] || "" %>
   port: <%= ENV['DATABASE_PORT'] || "" %>
 >>>>>>> 141e050a27a705643b91c91dcbd9f766d498f854
+=======
+  host: <%= ENV['DATABASE_HOST'] || "" %>
+  port: <%= ENV['DATABASE_PORT'] || "" %>
+>>>>>>> 2bb75badad7f45b11196ae848b6da40dfcff800f
   socket: <%= ENV['DATABASE_SOCKET'] || ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>
