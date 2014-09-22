@@ -46,6 +46,7 @@ gem 'foreman', '~> 0.63.0'
 # in its own Gemfile.
 gem 'geokit', '~> 1.8.4'
 gem 'geokit-rails', '~> 2.0.1'
+gem 'httparty', '~> 0.13'
 gem 'jquery-rails', '~> 3.1.0'
 gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.6'

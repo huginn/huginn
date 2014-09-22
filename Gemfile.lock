@@ -413,6 +413,7 @@ DEPENDENCIES
   geokit-rails (~> 2.0.1)
   google-api-client
   hipchat (~> 1.2.0)
+  httparty (~> 0.13)
   jquery-rails (~> 3.1.0)
   json (~> 1.8.1)
   jsonpath (~> 0.5.6)
