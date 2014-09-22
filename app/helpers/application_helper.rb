@@ -32,6 +32,8 @@ module ApplicationHelper
   def working(agent)
     if agent.disabled?
       link_to 'Disabled', agent_path(agent), class: 'label label-warning'
+    elsif agent.dependencies_missing?
+      content_tag :span, 'Missing Gems', class: 'label label-danger'
     elsif agent.working?
       content_tag :span, 'Yes', class: 'label label-success'
     else

@@ -22,7 +22,7 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately
+  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately, :drop_pending_events
 
   json_serialize :options, :memory
 
@@ -150,6 +150,14 @@ class Agent < ActiveRecord::Base
     end
   end
 
+  def unavailable?
+    disabled? || dependencies_missing?
+  end
+
+  def dependencies_missing?
+    self.class.dependencies_missing?
+  end
+
   def default_schedule
     self.class.default_schedule
   end
@@ -196,6 +204,14 @@ class Agent < ActiveRecord::Base
     update_column :last_error_log_at, nil
   end
 
+  def drop_pending_events
+    false
+  end
+
+  def drop_pending_events=(bool)
+    set_last_checked_event_id if bool
+  end
+
   # Callbacks
 
   def set_default_schedule
@@ -207,7 +223,7 @@ class Agent < ActiveRecord::Base
   end
 
   def set_last_checked_event_id
-    if newest_event_id = Event.order("id desc").limit(1).pluck(:id).first
+    if can_receive_events? && newest_event_id = Event.maximum(:id)
       self.last_checked_event_id = newest_event_id
     end
   end
@@ -309,6 +325,15 @@ class Agent < ActiveRecord::Base
       include? AgentControllerConcern
     end
 
+    def gem_dependency_check
+      @gem_dependencies_checked = true
+      @gem_dependencies_met = yield
+    end
+
+    def dependencies_missing?
+      @gem_dependencies_checked && !@gem_dependencies_met
+    end
+
     # Find all Agents that have received Events since the last execution of this method.  Update those Agents with
     # their new `last_checked_event_id` and queue each of the Agents to be called with #receive using `async_receive`.
     # This is called by bin/schedule.rb periodically.
@@ -354,7 +379,7 @@ class Agent < ActiveRecord::Base
     def async_receive(agent_id, event_ids)
       agent = Agent.find(agent_id)
       begin
-        return if agent.disabled?
+        return if agent.unavailable?
         agent.receive(Event.where(:id => event_ids))
         agent.last_receive_at = Time.now
         agent.save!
@@ -392,7 +417,7 @@ class Agent < ActiveRecord::Base
     def async_check(agent_id)
       agent = Agent.find(agent_id)
       begin
-        return if agent.disabled?
+        return if agent.unavailable?
         agent.check
         agent.last_check_at = Time.now
         agent.save!

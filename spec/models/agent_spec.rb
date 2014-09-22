@@ -757,6 +757,59 @@ describe Agent do
       end
     end
   end
+
+  describe '.last_checked_event_id' do
+    it "should be updated by setting drop_pending_events to true" do
+      agent = agents(:bob_rain_notifier_agent)
+      agent.last_checked_event_id = nil
+      agent.save!
+      agent.update!(drop_pending_events: true)
+      agent.reload.last_checked_event_id.should == Event.maximum(:id)
+    end
+
+    it "should not affect a virtual attribute drop_pending_events" do
+      agent = agents(:bob_rain_notifier_agent)
+      agent.update!(drop_pending_events: true)
+      agent.reload.drop_pending_events.should == false
+    end
+  end
+
+  describe ".drop_pending_events" do
+    before do
+      stub_request(:any, /wunderground/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
+      stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
+    end
+
+    it "should drop pending events while the agent was disabled when set to true" do
+      agent1 = agents(:bob_weather_agent)
+      agent2 = agents(:bob_rain_notifier_agent)
+
+      -> {
+        -> {
+          Agent.async_check(agent1.id)
+          Agent.receive!
+        }.should change { agent1.events.count }.by(1)
+      }.should change { agent2.events.count }.by(1)
+
+      agent2.disabled = true
+      agent2.save!
+
+      -> {
+        -> {
+          Agent.async_check(agent1.id)
+          Agent.receive!
+        }.should change { agent1.events.count }.by(1)
+      }.should_not change { agent2.events.count }
+
+      agent2.disabled = false
+      agent2.drop_pending_events = true
+      agent2.save!
+
+      -> {
+        Agent.receive!
+      }.should_not change { agent2.events.count }
+    end
+  end
 end
 
 describe AgentDrop do

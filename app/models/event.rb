@@ -1,3 +1,5 @@
+require 'location'
+
 # Events are how Huginn Agents communicate and log information about the world.  Events can be emitted and received by
 # Agents.  They contain a serialized `payload` of arbitrary JSON data, as well as optional `lat`, `lng`, and `expires_at`
 # fields.
@@ -5,7 +7,7 @@ class Event < ActiveRecord::Base
   include JSONSerializedField
   include LiquidDroppable
 
-  attr_accessible :lat, :lng, :payload, :user_id, :user, :expires_at
+  attr_accessible :lat, :lng, :location, :payload, :user_id, :user, :expires_at
 
   acts_as_mappable
 
@@ -27,6 +29,42 @@ class Event < ActiveRecord::Base
   scope :expired, lambda {
     where("expires_at IS NOT NULL AND expires_at < ?", Time.now)
   }
+
+  scope :with_location, -> {
+    where.not(lat: nil).where.not(lng: nil)
+  }
+
+  def location
+    @location ||= Location.new(
+      # lat and lng are BigDecimal, but converted to Float by the Location class
+      lat: lat,
+      lng: lng,
+      radius:
+        begin
+          h = payload[:horizontal_accuracy].presence
+          v = payload[:vertical_accuracy].presence
+          if h && v
+            (h.to_f + v.to_f) / 2
+          else
+            (h || v || payload[:accuracy]).to_f
+          end
+        end,
+      course: payload[:course],
+      speed: payload[:speed].presence)
+  end
+
+  def location=(location)
+    case location
+    when nil
+      self.lat = self.lng = nil
+      return
+    when Location
+    else
+      location = Location.new(location)
+    end
+    self.lat, self.lng = location.lat, location.lng
+    location
+  end
 
   # Emit this event again, as a new Event.
   def reemit!
@@ -78,5 +116,9 @@ class EventDrop
     @payload.fetch(__method__) {
       @object.created_at
     }
+  end
+
+  def _location_
+    @object.location
   end
 end
