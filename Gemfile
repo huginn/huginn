@@ -2,21 +2,21 @@ source 'https://rubygems.org'
 
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
-gem 'twilio-ruby', '~> 3.11.5'    # TwilioAgent
-gem 'ruby-growl', '~> 4.1.0'      # GrowlAgent
-gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
-gem 'wunderground', '~> 1.2.0'    # WeatherAgent
-gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
-gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'weibo_2', '~> 0.1.4'         # Weibo Agents
-gem 'hipchat', '~> 1.2.0'         # HipchatAgent
-gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
-gem "google-api-client"           # GoogleCalendarPublishAgent
-gem 'mqtt'                        # MQTTAgent
-gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
+#gem 'twilio-ruby', '~> 3.11.5'    # TwilioAgent
+#gem 'ruby-growl', '~> 4.1.0'      # GrowlAgent
+#gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
+#gem 'wunderground', '~> 1.2.0'    # WeatherAgent
+#gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
+#gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
+#gem 'weibo_2', '~> 0.1.4'         # Weibo Agents
+#gem 'hipchat', '~> 1.2.0'         # HipchatAgent
+#gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
+#gem "google-api-client"           # GoogleCalendarPublishAgent
+#gem 'mqtt'                        # MQTTAgent
+#gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
 
 # Optional Services.
-gem 'omniauth-37signals'          # BasecampAgent
+#gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
@@ -40,20 +40,8 @@ gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware'
 gem 'feed-normalizer'
 gem 'foreman', '~> 0.63.0'
-<<<<<<< HEAD
-gem 'foreman-export-initscript'
-
-gem 'sass-rails',   '~> 4.0.0'
-gem 'coffee-rails', '~> 4.0.0'
-gem 'uglifier', '>= 1.3.0'
-gem 'select2-rails', '~> 3.5.4'
-gem 'jquery-rails', '~> 3.1.0'
-gem 'ace-rails-ap', '~> 2.0.1'
-gem 'spectrum-rails'
 
 
-=======
->>>>>>> public/many_gems_are_optional
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
 # in its own Gemfile.
 gem 'geokit', '~> 1.8.4'
