@@ -1,13 +1,12 @@
-require 'ruby-growl'
-
 module Agents
   class GrowlAgent < Agent
-    attr_reader :growler
-
     cannot_be_scheduled!
     cannot_create_events!
 
+    gem_dependency_check { defined?(Growl) }
+
     description <<-MD
+      #{'## Include `ruby-growl` in your Gemfile to use this Agent!' if dependencies_missing?}
       The GrowlAgent sends any events it receives to a Growl GNTP server immediately.
       
       It is assumed that events have a `message` or `text` key, which will hold the body of the growl notification, and a `subject` key, which will have the headline of the Growl notification. You can use Event Formatting Agent if your event does not provide these keys.
@@ -35,18 +34,20 @@ module Agents
       end
     end
     
-    def register_growl
-      @growler = Growl.new interpolated['growl_server'], interpolated['growl_app_name'], "GNTP"
-      @growler.password = interpolated['growl_password']
-      @growler.add_notification interpolated['growl_notification_name']
-    end
-    
     def notify_growl(subject, message)
-      @growler.notify(interpolated['growl_notification_name'], subject, message)
+      growler.notify(interpolated['growl_notification_name'], subject, message)
+    end
+
+    def growler
+      @growler ||= begin
+        growler = Growl.new interpolated['growl_server'], interpolated['growl_app_name'], "GNTP"
+        growler.password = interpolated['growl_password']
+        growler.add_notification interpolated['growl_notification_name']
+        growler
+      end
     end
 
     def receive(incoming_events)
-      register_growl
       incoming_events.each do |event|
         message = (event.payload['message'] || event.payload['text']).to_s
         subject = event.payload['subject'].to_s

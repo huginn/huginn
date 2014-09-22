@@ -1,0 +1,8 @@
+{
+  "run_list": [
+    "role[huginn_production]"
+  ],
+  "automatic": {
+    "ipaddress": "192.168.178.24"
+  }
+}

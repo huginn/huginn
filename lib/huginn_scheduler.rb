@@ -40,7 +40,7 @@ class Rufus::Scheduler
   def schedule_scheduler_agent(agent)
     job = scheduler_agent_job(agent)
 
-    if agent.disabled?
+    if agent.unavailable?
       if job
         puts "Unscheduling SchedulerAgent##{agent.id} (disabled)"
         job.unschedule

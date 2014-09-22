@@ -150,6 +150,14 @@ class Agent < ActiveRecord::Base
     end
   end
 
+  def unavailable?
+    disabled? || dependencies_missing?
+  end
+
+  def dependencies_missing?
+    self.class.dependencies_missing?
+  end
+
   def default_schedule
     self.class.default_schedule
   end
@@ -317,6 +325,15 @@ class Agent < ActiveRecord::Base
       include? AgentControllerConcern
     end
 
+    def gem_dependency_check
+      @gem_dependencies_checked = true
+      @gem_dependencies_met = yield
+    end
+
+    def dependencies_missing?
+      @gem_dependencies_checked && !@gem_dependencies_met
+    end
+
     # Find all Agents that have received Events since the last execution of this method.  Update those Agents with
     # their new `last_checked_event_id` and queue each of the Agents to be called with #receive using `async_receive`.
     # This is called by bin/schedule.rb periodically.
@@ -362,7 +379,7 @@ class Agent < ActiveRecord::Base
     def async_receive(agent_id, event_ids)
       agent = Agent.find(agent_id)
       begin
-        return if agent.disabled?
+        return if agent.unavailable?
         agent.receive(Event.where(:id => event_ids))
         agent.last_receive_at = Time.now
         agent.save!
@@ -400,7 +417,7 @@ class Agent < ActiveRecord::Base
     def async_check(agent_id)
       agent = Agent.find(agent_id)
       begin
-        return if agent.disabled?
+        return if agent.unavailable?
         agent.check
         agent.last_check_at = Time.now
         agent.save!
