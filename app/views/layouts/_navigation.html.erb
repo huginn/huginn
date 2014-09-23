@@ -28,29 +28,29 @@
   
   <ul class="nav navbar-nav navbar-right">
     <% if user_signed_in? %>
-      <form class="navbar-form navbar-left" role="search">
+      <form class="navbar-form navbar-left visible-lg" role="search">
         <div class="form-group">
           <input type="text" class="form-control" id='agent-navigate' autocomplete="off" placeholder="Search">
           <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
         </div>
       </form>
       
-      <li class='job-indicator' role='pending'>
+      <li class='job-indicator visible-lg' role='pending'>
         <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><span class="glyphicon glyphicon-refresh icon-white"></span> <span class='number'>0</span></span>
         <% end %>
       </li>
-      <li class='job-indicator' role='awaiting_retry'>
+      <li class='job-indicator visible-lg' role='awaiting_retry'>
         <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><span class="glyphicon glyphicon-question-sign icon-yellow"></span> <span class='number'>0</span></span>
         <% end %>
       </li>
-      <li class='job-indicator' role='recent_failures'>
+      <li class='job-indicator hidden-sm hidden-xs' role='recent_failures'>
         <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><span class="glyphicon glyphicon-exclamation-sign icon-white"></span> <span class='number'>0</span></span>
         <% end %>
       </li>
-      <li id='event-indicator'>
+      <li id='event-indicator' class='hidden-sm hidden-xs'>
         <a href="#">
           <span class="badge"><span class="glyphicon glyphicon-random icon-white"></span> <span class='number'>0</span> new events</span>
         </a>
