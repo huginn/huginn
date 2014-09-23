@@ -148,7 +148,7 @@ class AgentsController < ApplicationController
     @agent.destroy
 
     respond_to do |format|
-      format.html { redirect_back "'#{@agent.name}' deleted" }
+      format.html { redirect_to agents_path, notice: "'#{@agent.name}' deleted."}
       format.json { head :no_content }
     end
   end
