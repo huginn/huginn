@@ -8,7 +8,9 @@ class UserCredentialsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: @user_credentials }
+      format.json {
+        send_data Utils.pretty_jsonify(@user_credentials.limit(nil).as_json), disposition: 'attachment'
+      }
     end
   end
 
