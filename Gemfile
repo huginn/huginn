@@ -31,6 +31,7 @@ gem 'protected_attributes', '~>1.0.8' # This must be loaded before some other ge
 gem 'ace-rails-ap', '~> 2.0.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
+gem 'twitter', '~> 5.8.0' # needs to be loaded before cantino-twitter-stream.
 gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'daemons', '~> 1.1.9'
@@ -64,7 +65,6 @@ gem 'sass-rails',   '~> 4.0.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
 gem 'therubyracer', '~> 0.12.1'
-gem 'twitter', '~> 5.8.0'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '>= 1.3.0'
 
