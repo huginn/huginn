@@ -42,6 +42,7 @@ gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware'
 gem 'feed-normalizer'
+gem 'font-awesome-sass'
 gem 'foreman', '~> 0.63.0'
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
 # in its own Gemfile.
