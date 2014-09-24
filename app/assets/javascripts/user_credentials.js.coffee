@@ -3,6 +3,8 @@
 #= require ace/mode-markdown.js
 #= require_self
 
+# This is not included in the core application.js bundle.
+
 $ ->
   editor = ace.edit("ace-credential-value")
   editor.getSession().setTabSize(2)
