@@ -2,6 +2,8 @@ module WeiboConcern
   extend ActiveSupport::Concern
 
   included do
+    gem_dependency_check { defined?(WeiboOAuth2) }
+
     self.validate :validate_weibo_options
   end
 
@@ -21,9 +23,5 @@ module WeiboConcern
       @weibo_client.get_token_from_hash :access_token => options['access_token']
     end
     @weibo_client
-  end
-
-  module ClassMethods
-
   end
 end

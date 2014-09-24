@@ -1,10 +1,12 @@
 # encoding: utf-8 
-require "mqtt"
 require "json"
 
 module Agents
   class MqttAgent < Agent
+    gem_dependency_check { defined?(MQTT) }
+
     description <<-MD
+      #{'## Include `mqtt` in your Gemfile to use this Agent!' if dependencies_missing?}
       The MQTT agent allows both publication and subscription to an MQTT topic.
 
       MQTT is a generic transport protocol for machine to machine communication.
