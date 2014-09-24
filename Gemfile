@@ -15,6 +15,11 @@ gem "google-api-client"           # GoogleCalendarPublishAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
 
+# Twitter Agents
+gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
+gem 'omniauth-twitter'
+gem 'twitter', '~> 5.8.0'
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'
@@ -31,7 +36,6 @@ gem 'protected_attributes', '~>1.0.8' # This must be loaded before some other ge
 gem 'ace-rails-ap', '~> 2.0.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
-gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'daemons', '~> 1.1.9'
 gem 'delayed_job', '~> 4.0.0'
@@ -57,14 +61,12 @@ gem 'mysql2', '~> 0.3.16'
 gem 'multi_xml'
 gem 'nokogiri', '~> 1.6.1'
 gem 'omniauth'
-gem 'omniauth-twitter'
 gem 'rails' , '4.1.5'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'sass-rails',   '~> 4.0.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
 gem 'therubyracer', '~> 0.12.1'
-gem 'twitter', '~> 5.8.0'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '>= 1.3.0'
 
