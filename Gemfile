@@ -16,9 +16,9 @@ gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
 
 # Twitter Agents
+gem 'twitter', '~> 5.8.0' # Must to be loaded before cantino-twitter-stream.
 gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'omniauth-twitter'
-gem 'twitter', '~> 5.8.0'
 
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent

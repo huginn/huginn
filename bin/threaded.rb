@@ -1,6 +1,9 @@
 require 'thread'
 require 'huginn_scheduler'
 
+STDOUT.sync = true
+STDERR.sync = true
+
 def stop
   puts 'Exiting...'
   @scheduler.stop
