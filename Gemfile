@@ -14,6 +14,7 @@ gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem "google-api-client"           # GoogleCalendarPublishAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
+gem 'github_api'
 
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
