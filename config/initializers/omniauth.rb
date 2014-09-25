@@ -1,23 +1,35 @@
-LOADED_OMNIAUTH_STRATEGIES = {
-  'twitter'   => defined?(OmniAuth::Strategies::Twitter),
-  '37signals' => defined?(OmniAuth::Strategies::ThirtySevenSignals),
-  'github'    => defined?(OmniAuth::Strategies::GitHub)
+OMNIAUTH_PROVIDERS = {}.tap { |providers|
+  if defined?(OmniAuth::Strategies::Twitter) &&
+     (key = ENV["TWITTER_OAUTH_KEY"]).present? &&
+     (secret = ENV["TWITTER_OAUTH_SECRET"]).present?
+    providers['twitter'] = {
+      omniauth_params: [key, secret, authorize_params: {force_login: 'true', use_authorize: 'true'}]
+    }
+  end
+
+  if defined?(OmniAuth::Strategies::ThirtySevenSignals) &&
+     (key = ENV["THIRTY_SEVEN_SIGNALS_OAUTH_KEY"]).present? &&
+     (secret = ENV["THIRTY_SEVEN_SIGNALS_OAUTH_SECRET"]).present?
+    providers['37signals'] = {
+      omniauth_params: [key, secret]
+    }
+  end
+
+  if defined?(OmniAuth::Strategies::GitHub) &&
+     (key = ENV["GITHUB_OAUTH_KEY"]).present? &&
+     (secret = ENV["GITHUB_OAUTH_SECRET"]).present?
+    providers['github'] = {
+      omniauth_params: [key, secret]
+    }
+  end
 }
 
 def has_oauth_configuration_for?(provider)
-  LOADED_OMNIAUTH_STRATEGIES[provider.to_s] && ENV["#{provider.upcase}_OAUTH_KEY"].present? && ENV["#{provider.upcase}_OAUTH_SECRET"].present?
+  OMNIAUTH_PROVIDERS.key?(provider.to_s)
 end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
-  if has_oauth_configuration_for?('twitter')
-    provider 'twitter', ENV['TWITTER_OAUTH_KEY'], ENV['TWITTER_OAUTH_SECRET'], authorize_params: {force_login: 'true', use_authorize: 'true'}
-  end
-
-  if has_oauth_configuration_for?('37signals')
-    provider '37signals', ENV['THIRTY_SEVEN_SIGNALS_OAUTH_KEY'], ENV['THIRTY_SEVEN_SIGNALS_OAUTH_SECRET']
-  end
-
-  if has_oauth_configuration_for?('github')
-    provider 'github', ENV['GITHUB_OAUTH_KEY'], ENV['GITHUB_OAUTH_SECRET']
-  end
+  OMNIAUTH_PROVIDERS.each { |name, config|
+    provider name, *config[:omniauth_params]
+  }
 end

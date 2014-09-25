@@ -14,7 +14,7 @@
       <% if has_oauth_configuration_for?('twitter') %>
         <p><%= link_to "Authenticate with Twitter", "/auth/twitter" %></p>
       <% end %>
-      <% if has_oauth_configuration_for?('thirty_seven_signals') %>
+      <% if has_oauth_configuration_for?('37signals') %>
         <p><%= link_to "Authenticate with 37Signals (Basecamp)", "/auth/37signals" %></p>
       <% end -%>
       <% if has_oauth_configuration_for?('github') %>
