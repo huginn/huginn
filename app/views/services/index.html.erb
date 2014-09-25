@@ -12,13 +12,13 @@
         for guidance.
       </p>
       <% if has_oauth_configuration_for?('twitter') %>
-        <p><%= link_to "Authenticate with Twitter", "/auth/twitter" %></p>
+        <p><%= link_to "/auth/twitter", class: 'btn btn-default btn-auth btn-auth-twitter' do %><i class='fa fa-twitter'></i><span>Authenticate with Twitter</span><% end %></p>
       <% end %>
       <% if has_oauth_configuration_for?('37signals') %>
-        <p><%= link_to "Authenticate with 37Signals (Basecamp)", "/auth/37signals" %></p>
+        <p><%= link_to "/auth/37signals", class: 'btn btn-default btn-auth btn-auth-37signals' do %><i class='fa fa-lock'></i><span>Authenticate with 37Signals (Basecamp)</span><% end %></p>
       <% end -%>
       <% if has_oauth_configuration_for?('github') %>
-        <p><%= link_to "Authenticate with Github", "/auth/github" %></p>
+        <p><%= link_to "/auth/github", class: 'btn btn-default btn-auth btn-auth-github' do %><i class='fa fa-github'></i><span>Authenticate with Github</span><% end %></p>
       <% end -%>
       <hr>
 

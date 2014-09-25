@@ -120,6 +120,8 @@ GEM
       hpricot (>= 0.6)
       simple-rss (>= 1.1)
     ffi (1.9.4)
+    font-awesome-sass (4.2.0)
+      sass (~> 3.2)
     forecast_io (2.0.0)
       faraday
       hashie
@@ -408,6 +410,7 @@ DEPENDENCIES
   faraday_middleware
   feed-normalizer
   ffi (>= 1.9.4)
+  font-awesome-sass
   forecast_io (~> 2.0.0)
   foreman (~> 0.63.0)
   geokit (~> 1.8.4)
