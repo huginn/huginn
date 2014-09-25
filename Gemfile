@@ -95,20 +95,9 @@ group :production do
   gem 'rack'
 end
 
-case RUBY_PLATFORM
-  when /freebsd|netbsd|openbsd/
-    # ffi (required by typhoeus via ethon) merged fixes for bugs fatal
-    # on these platforms after 1.9.3; no following release as yet.
-    gem 'ffi', github: 'ffi/ffi', branch: 'master'
-
-    # tzinfo 1.2.0 has added support for reading zoneinfo on these
-    # platforms.
-    gem 'tzinfo', '>= 1.2.0'
-  when /solaris/
-    # ditto
-    gem 'tzinfo', '>= 1.2.0'
-end
-
+# Platform requirements.
+gem 'ffi', '>= 1.9.4'		# required by typhoeus; 1.9.4 has fixes for *BSD.
+gem 'tzinfo', '>= 1.2.0'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 
