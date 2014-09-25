@@ -1,5 +1,3 @@
-require "twitter"
-
 module Agents
   class TwitterPublishAgent < Agent
     include TwitterConcern
@@ -7,6 +5,7 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
+      #{twitter_dependencies_missing if dependencies_missing?}
       The TwitterPublishAgent publishes tweets from the events it receives.
 
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.

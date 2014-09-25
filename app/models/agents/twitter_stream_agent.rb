@@ -5,6 +5,7 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
+      #{twitter_dependencies_missing if dependencies_missing?}
       The TwitterStreamAgent follows the Twitter stream in real time, watching for certain keywords, or filters, that you provide.
 
       To follow the Twitter stream, provide an array of `filters`.  Multiple words in a filter must all show up in a tweet, but are independent of order.
