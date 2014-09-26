@@ -20,6 +20,9 @@
       <% if has_oauth_configuration_for('github') %>
         <p><%= link_to "Authenticate with Github", "/auth/github" %></p>
       <% end -%>
+      <% if has_oauth_configuration_for('tumblr') %>
+        <p><%= link_to "Authenticate with Tumblr", "/auth/tumblr" %></p>
+      <% end -%>
       <hr>
 
       <div class='table-responsive'>
