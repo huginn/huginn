@@ -440,6 +440,7 @@ DEPENDENCIES
   nokogiri (~> 1.6.1)
   omniauth
   omniauth-37signals
+  omniauth-tumblr
   omniauth-twitter
   pg
   protected_attributes (~> 1.0.8)
