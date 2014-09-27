@@ -9,50 +9,50 @@ module Agents
     description <<-MD
       The TumblrPublishAgent publishes Tumblr posts from the events it receives.
 
-To be able to use this Agent you need to authenticate with Tumblr in the [Services](/services) section first.
+      To be able to use this Agent you need to authenticate with Tumblr in the [Services](/services) section first.
 
 
 
-**Required fields:**
+      **Required fields:**
 
-`blog_name` Your Tumblr URL (e.g. "mustardhamsters.tumblr.com") 
+      `blog_name` Your Tumblr URL (e.g. "mustardhamsters.tumblr.com") 
 
-`post_type` One of [text, photo, quote, link, chat, audio, video] 
-
-
--------------
-
-You may leave any of the following optional fields blank. Including a field not allowed for the specified `post_type` will cause a failure.
-
-**Any post type**
-
-* `state` published, draft, queue, private
-* `tags` Comma-separated tags for this post
-* `tweet` off, text for tweet
-* `date` GMT date and time of the post as a string
-* `format` html, markdown
-* `slug` short text summary at end of the post URL
-
-**Text** `title` `body` 
-
-**Photo** `caption` `link`  `source`
-
-**Quote** `quote` `source`
-
-**Link** `title` `url` `description` 
-
-**Chat** `title` `conversation`
-
-**Audio** `caption` `external_url`
-
-**Video** `caption` `embed`
+      `post_type` One of [text, photo, quote, link, chat, audio, video] 
 
 
--------------
+      -------------
 
-[Full information on field options](https://www.tumblr.com/docs/en/api/v2#posting)
+      You may leave any of the following optional fields blank. Including a field not allowed for the specified `post_type` will cause a failure.
 
-Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+      **Any post type**
+
+      * `state` published, draft, queue, private
+      * `tags` Comma-separated tags for this post
+      * `tweet` off, text for tweet
+      * `date` GMT date and time of the post as a string
+      * `format` html, markdown
+      * `slug` short text summary at end of the post URL
+
+      **Text** `title` `body` 
+
+      **Photo** `caption` `link`  `source`
+
+      **Quote** `quote` `source`
+
+      **Link** `title` `url` `description` 
+
+      **Chat** `title` `conversation`
+
+      **Audio** `caption` `external_url`
+
+      **Video** `caption` `embed`
+
+
+      -------------
+
+      [Full information on field options](https://www.tumblr.com/docs/en/api/v2#posting)
+
+      Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
 
     def validate_options
@@ -98,7 +98,6 @@ Set `expected_update_period_in_days` to the maximum amount of time that you'd ex
       incoming_events.each do |event|
         blog_name = interpolated(event)['blog_name']
         post_type = interpolated(event)['post_type']
-        logger.error interpolated(event)
         options = interpolated(event)['options']
         begin
           post = publish_post(blog_name, post_type, options)
