@@ -20,8 +20,8 @@
       <% if has_oauth_configuration_for?('github') %>
         <p><%= link_to "/auth/github", class: 'btn btn-default btn-auth btn-auth-github' do %><i class='fa fa-github'></i><span>Authenticate with Github</span><% end %></p>
       <% end -%>
-      <% if has_oauth_configuration_for('tumblr') %>
-        <p><%= link_to "Authenticate with Tumblr", "/auth/tumblr" %></p>
+      <% if has_oauth_configuration_for?('tumblr') %>
+        <p><%= link_to "/auth/tumblr", class: 'btn btn-default btn-auth btn-auth-tumblr' do %><i class='fa fa-tumblr'></i><span>Authenticate with Tumblr</span><% end %></p>
       <% end -%>
       <hr>
 
