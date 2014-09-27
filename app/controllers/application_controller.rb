@@ -22,6 +22,7 @@ class ApplicationController < ActionController::Base
     return unless current_user
     twitter_oauth_check
     basecamp_auth_check
+    tumblr_oauth_check
   end
 
   private
