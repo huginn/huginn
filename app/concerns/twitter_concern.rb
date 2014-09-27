@@ -5,7 +5,9 @@ module TwitterConcern
     include Oauthable
 
     validate :validate_twitter_options
-    valid_oauth_providers :twitter
+    valid_oauth_providers 'twitter'
+
+    gem_dependency_check { defined?(Twitter) && has_oauth_configuration_for?('twitter') }
   end
 
   def validate_twitter_options
@@ -39,6 +41,12 @@ module TwitterConcern
       config.consumer_secret = twitter_consumer_secret
       config.access_token = twitter_oauth_token
       config.access_token_secret = twitter_oauth_token_secret
+    end
+  end
+
+  module ClassMethods
+    def twitter_dependencies_missing
+      "## Include the `twitter`, `omniauth-twitter`, and `cantino-twitter-stream` gems in your Gemfile to use Twitter Agents."
     end
   end
 end

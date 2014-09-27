@@ -138,19 +138,6 @@ unless $config['SMTP_DOMAIN'] && $config['SMTP_USER_NAME'] && $config['SMTP_PASS
   end
 end
 
-if first_time
-  puts "Restarting..."
-  puts capture("heroku restart")
-
-  puts "Done!"
-  puts
-  puts "Visit https://#{app_name}.herokuapp.com/users/sign_up and use the invitation code shown below:"
-  puts
-  puts "\t#{$config['INVITATION_CODE']}"
-
-  exit
-end
-
 branch = capture("git rev-parse --abbrev-ref HEAD")
 if yes?("Should I push your current branch (#{branch}) to heroku?")
   puts "This may take a moment..."
@@ -158,21 +145,44 @@ if yes?("Should I push your current branch (#{branch}) to heroku?")
 
   puts "Running database migrations..."
   puts capture("heroku run rake db:migrate")
+end
 
+if first_time
+  puts "Restarting..."
+  puts capture("heroku restart")
+  puts "Done!"
   puts
   puts
   puts "I can make an admin user on your new Huginn instance and setup some example Agents."
   if yes?("Should I create a new admin user and some example Agents?")
-    seed_email = nag "Okay, what is your email address?"
-    seed_username = nag "And what username would you like to login as?"
-    seed_password = nag "Finally, what password would you like to use?", noecho: true
-    puts "\nJust a moment..."
+    done = false
+    while !done
+      seed_email = nag "Okay, what is your email address?"
+      seed_username = nag "And what username would you like to login as?"
+      seed_password = nag "Finally, what password would you like to use?", noecho: true
+      puts "\nJust a moment..."
 
-    capture("heroku run rake db:seed SEED_EMAIL=#{seed_email} SEED_USERNAME=#{seed_username} SEED_PASSWORD=#{seed_password}")
+      result = capture("heroku run rake db:seed SEED_EMAIL=#{seed_email} SEED_USERNAME=#{seed_username} SEED_PASSWORD=#{seed_password}")
+      if result =~ /Validation failed/
+        puts "ERROR:"
+        puts
+        puts result
+        puts
+      else
+        done = true
+      end
+    end
     puts
     puts
     puts "Okay, you should be all set!  Visit https://#{app_name}.herokuapp.com and login as '#{seed_username}' with your password."
+    puts
+    puts "If you'd like to make more users, you can visit https://#{app_name}.herokuapp.com/users/sign_up and use the invitation code:"
+  else
+    puts
+    puts "Visit https://#{app_name}.herokuapp.com/users/sign_up and use the invitation code shown below:"
   end
+  puts
+  puts "\t#{$config['INVITATION_CODE']}"
 end
 
 puts

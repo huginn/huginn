@@ -1,5 +1,3 @@
-require "twitter"
-
 module Agents
   class TwitterUserAgent < Agent
     include TwitterConcern
@@ -7,6 +5,7 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
+      #{twitter_dependencies_missing if dependencies_missing?}
       The TwitterUserAgent follows the timeline of a specified Twitter user.
 
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.

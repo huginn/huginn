@@ -55,6 +55,7 @@ If you just want to play around, you can simply fork this repository, then perfo
 
 * Run `git remote add upstream https://github.com/cantino/huginn.git` to add the main repository as a remote for your fork.
 * Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` variable.
+* Run `bundle` to install dependencies
 * Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example Agents.
 * Run `foreman start`, visit [http://localhost:3000/][localhost], and login with the username of `admin` and the password of `password`.
 * Setup some Agents!
