@@ -148,7 +148,7 @@ class AgentsController < ApplicationController
     @agent.destroy
 
     respond_to do |format|
-      format.html { redirect_back "'#{@agent.name}' deleted" }
+      format.html { redirect_back "'#{@agent.name}' deleted."}
       format.json { head :no_content }
     end
   end
@@ -159,7 +159,7 @@ class AgentsController < ApplicationController
   def redirect_back(message)
     if params[:return] == "show" && @agent
       path = agent_path(@agent)
-    elsif params[:return] =~ /\A#{Regexp::escape scenarios_path}\/\d+\Z/
+    elsif params[:return] =~ /\A#{Regexp::escape scenarios_path.html_safe}\/\d+\Z/
       path = params[:return]
     else
       path = agents_path
