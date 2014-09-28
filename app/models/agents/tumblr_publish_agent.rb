@@ -101,7 +101,6 @@ module Agents
         options = interpolated(event)['options']
         begin
           post = publish_post(blog_name, post_type, options)
-          puts "[POST] "+JSON.pretty_generate(post)
           create_event :payload => {
             'success' => true,
             'published_post' => "["+blog_name+"] "+post_type,
@@ -113,10 +112,7 @@ module Agents
       end
     end
 
-    def publish_post(blog_name, post_type, options)
-      puts "[BLOG NAME] "+blog_name
-      puts "[POST_TYPE] "+post_type
-      
+    def publish_post(blog_name, post_type, options)      
       options_obj = { 
           :state => options['state'],
           :tags => options['tags'],

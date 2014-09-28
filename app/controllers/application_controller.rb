@@ -22,7 +22,6 @@ class ApplicationController < ActionController::Base
     return unless current_user
     twitter_oauth_check
     basecamp_auth_check
-    tumblr_oauth_check
   end
 
   private
@@ -39,15 +38,6 @@ class ApplicationController < ActionController::Base
   def basecamp_auth_check
     if ENV['THIRTY_SEVEN_SIGNALS_OAUTH_KEY'].blank? || ENV['THIRTY_SEVEN_SIGNALS_OAUTH_SECRET'].blank?
       @basecamp_agent = current_user.agents.where(type: 'Agents::BasecampAgent').first
-    end
-  end
-
-  def tumblr_oauth_check
-    if ENV['TUMBLR_OAUTH_KEY'].blank? || ENV['TUMBLR_OAUTH_SECRET'].blank?
-      if @tumblr_agent = current_user.agents.where("type like 'Agents::Tumblr%'").first
-        @tumblr_oauth_key    = @tumblr_agent.options['consumer_key'].presence || @tumblr_agent.credential('tumblr_consumer_key')
-        @tumblr_oauth_secret = @tumblr_agent.options['consumer_secret'].presence || @tumblr_agent.credential('tumblr_consumer_secret')
-      end
     end
   end
 end
