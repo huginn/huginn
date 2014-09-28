@@ -292,5 +292,19 @@ describe AgentsController do
         delete :destroy, :id => agents(:jane_website_agent).to_param
       }.should raise_error(ActiveRecord::RecordNotFound)
     end
+
+    it "redirects correctly when the Agent is deleted from the Agent itself" do
+      sign_in users(:bob)
+
+      delete :destroy, :id => agents(:bob_website_agent).to_param
+      response.should redirect_to agents_path
+    end
+
+    it "redirects correctly when the Agent is deleted from a Scenario" do
+      sign_in users(:bob)
+
+      delete :destroy, :id => agents(:bob_weather_agent).to_param, :return => scenario_path(scenarios(:bob_weather)).to_param
+      response.should redirect_to scenario_path(scenarios(:bob_weather))
+    end
   end
 end
