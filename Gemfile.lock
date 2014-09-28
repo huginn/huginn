@@ -8,6 +8,13 @@ GIT
       http_parser.rb (~> 0.6.0)
       simple_oauth (~> 0.2.0)
 
+PATH
+  remote: agents/rss_agent
+  specs:
+    rss_agent (0.1)
+      feed-normalizer (~> 1.5.2)
+      huginn_agent
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -156,6 +163,7 @@ GEM
     httparty (0.13.1)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
+    huginn_agent (0.1)
     i18n (0.6.11)
     jquery-rails (3.1.1)
       railties (>= 3.0, < 5.0)
@@ -408,7 +416,6 @@ DEPENDENCIES
   em-http-request (~> 1.1.2)
   faraday (~> 0.9.0)
   faraday_middleware
-  feed-normalizer
   ffi (>= 1.9.4)
   font-awesome-sass
   forecast_io (~> 2.0.0)
@@ -418,6 +425,7 @@ DEPENDENCIES
   google-api-client
   hipchat (~> 1.2.0)
   httparty (~> 0.13)
+  huginn_agent
   jquery-rails (~> 3.1.0)
   json (~> 1.8.1)
   jsonpath (~> 0.5.6)
@@ -443,6 +451,7 @@ DEPENDENCIES
   rspec (~> 2.99)
   rspec-collection_matchers
   rspec-rails (~> 2.99)
+  rss_agent!
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
   rufus-scheduler (~> 3.0.8)
