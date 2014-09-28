@@ -11,6 +11,8 @@ Huginn::Application.routes.draw do
       post :propagate
       get :type_details
       get :event_descriptions
+      post :validate
+      post :complete
     end
 
     resources :logs, :only => [:index] do

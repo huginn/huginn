@@ -88,6 +88,10 @@ class Agent < ActiveRecord::Base
     # Implement me in your subclass of Agent.
   end
 
+  def is_form_configurable?
+    false
+  end
+
   def receive_web_request(params, method, format)
     # Implement me in your subclass of Agent.
     ["not implemented", 404]

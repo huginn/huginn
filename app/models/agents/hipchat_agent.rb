@@ -1,5 +1,7 @@
 module Agents
   class HipchatAgent < Agent
+    include FormConfigurable
+
     cannot_be_scheduled!
     cannot_create_events!
 
@@ -33,6 +35,24 @@ module Agents
       }
     end
 
+    form_configurable :auth_token, roles: :validatable
+    form_configurable :room_name, roles: :completable
+    form_configurable :username
+    form_configurable :message, type: :text
+    form_configurable :notify, type: :boolean
+    form_configurable :color, type: :array, values: ['yellow', 'red', 'green', 'purple', 'gray', 'random']
+
+    def validate_auth_token
+      client.rooms
+      true
+    rescue HipChat::UnknownResponseCode
+      return false
+    end
+
+    def complete_room_name
+      client.rooms.collect { |room| {name: room.name, value: room.name} }
+    end
+
     def validate_options
       errors.add(:base, "you need to specify a hipchat auth_token or provide a credential named hipchat_auth_token") unless options['auth_token'].present? || credential('hipchat_auth_token').present?
       errors.add(:base, "you need to specify a room_name or a room_name_path") if options['room_name'].blank? && options['room_name_path'].blank?
@@ -49,6 +69,7 @@ module Agents
       end
     end
 
+    private
     def client
       @client ||= HipChat::Client.new(interpolated[:auth_token] || credential('hipchat_auth_token'))
     end

@@ -1,5 +1,7 @@
 module Agents
   class BasecampAgent < Agent
+    include FormConfigurable
+
     cannot_receive_events!
 
     include Oauthable
