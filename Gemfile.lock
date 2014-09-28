@@ -59,6 +59,13 @@ GIT
       omniauth-oauth2 (~> 1.1)
 
 PATH
+  remote: agents/rss_agent
+  specs:
+    rss_agent (0.1)
+      feed-normalizer (~> 1.5.2)
+      huginn_agent
+
+PATH
   remote: vendor/gems/dotenv-2.0.1
   specs:
     dotenv (2.0.1)
@@ -281,6 +288,7 @@ GEM
     httparty (0.13.7)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
+    huginn_agent (0.1)
     hypdf (1.0.10)
       httmultiparty (~> 0.3)
       httparty (~> 0.13)
@@ -614,7 +622,6 @@ DEPENDENCIES
   evernote_oauth
   faraday (~> 0.9.0)
   faraday_middleware!
-  feed-normalizer
   ffi (>= 1.9.4)
   font-awesome-sass (~> 4.3.2)
   forecast_io (~> 2.0.0)
@@ -629,6 +636,7 @@ DEPENDENCIES
   hipchat (~> 1.2.0)
   httmultiparty (~> 0.3.16)
   httparty (~> 0.13)
+  huginn_agent
   hypdf (~> 1.0.10)
   jquery-rails (~> 3.1.3)
   json (~> 1.8.1)
@@ -666,6 +674,7 @@ DEPENDENCIES
   rspec-collection_matchers (~> 1.1.0)
   rspec-html-matchers (~> 0.7)
   rspec-rails (~> 3.1)
+  rss_agent!
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
   rufus-scheduler (~> 3.0.8)

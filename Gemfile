@@ -23,6 +23,8 @@ def if_true(condition)
   end
 end
 
+gem 'rss_agent', path: 'agents/rss_agent'
+
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 gem 'twilio-ruby', '~> 3.11.5'    # TwilioAgent
@@ -92,7 +94,6 @@ gem 'devise', '~> 3.5.4'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware', github: 'lostisland/faraday_middleware', branch: 'master'  # '>= 0.10.1'
-gem 'feed-normalizer'
 gem 'font-awesome-sass', '~> 4.3.2'
 gem 'foreman', '~> 0.63.0'
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
@@ -102,6 +103,7 @@ gem 'geokit-rails', '~> 2.0.1'
 gem 'httparty', '~> 0.13'
 gem 'httmultiparty', '~> 0.3.16'
 gem 'jquery-rails', '~> 3.1.3'
+gem 'huginn_agent'
 gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.6'
 gem 'kaminari', '~> 0.16.1'
