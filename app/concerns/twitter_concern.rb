@@ -13,6 +13,7 @@ module TwitterConcern
   def validate_twitter_options
     unless twitter_consumer_key.present? &&
       twitter_consumer_secret.present? &&
+      service &&
       twitter_oauth_token.present? &&
       twitter_oauth_token_secret.present?
       errors.add(:base, "Twitter consumer_key, consumer_secret, oauth_token, and oauth_token_secret are required to authenticate with the Twitter API.  You can provide these as options to this Agent, or as Credentials with the same names, but starting with 'twitter_'.")
