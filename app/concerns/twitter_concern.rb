@@ -28,11 +28,11 @@ module TwitterConcern
   end
 
   def twitter_oauth_token
-    service.token
+    service && service.token
   end
 
   def twitter_oauth_token_secret
-    service.secret
+    service && service.secret
   end
 
   def twitter
