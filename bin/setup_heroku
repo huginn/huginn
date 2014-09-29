@@ -84,6 +84,29 @@ unless yes?("Your Heroku app name is #{app_name}.  Is this correct?")
   exit 1
 end
 
+if (root_id = `git rev-list --max-parents=0 HEAD`.chomp) != '620acffa5a302c6a27165d3214cf3da6be6c1d0d'
+  if (`git remote`.split - %w[heroku]).empty?
+    puts "You don't seem to have cantino/huginn set up as upstream repository."
+    if yes?("Would you like me to set this work tree up for you?")
+      if system('git remote add origin https://github.com/cantino/huginn.git') &&
+         system('git remote update origin')
+        rebase_command = "git rebase #{root_id} --onto origin/master"
+        if system(rebase_command)
+          puts "Done!"
+        else
+          system('git rebase --abort')
+          puts "Rebasing your work tree onto the upstream master failed."
+          puts "Please run the following command and merge your local changes by yourself."
+          puts "\t#{rebase_command}"
+          exit 1
+        end
+      else
+        exit 1
+      end
+    end
+  end
+end
+
 grab_heroku_config!
 
 if $config.length > 0
