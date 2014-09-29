@@ -6,6 +6,8 @@ class @AgentEditPage
     # The type selector is only available on the new agent form.
     if $("#agent_type").length
       $("#agent_type").on "change", => @handleTypeChange(false)
+      $("#agent_type").select2 matcher: (term, text, opt) ->
+        text.toUpperCase().indexOf(term.toUpperCase()) >= 0 or ( opt.data("description") and opt.data("description").toUpperCase().indexOf(term.toUpperCase()) >= 0)
       @handleTypeChange(true)
 
   handleTypeChange: (firstTime) ->
