@@ -57,9 +57,7 @@ module Agents
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
 
-    def gem_dependency_check
-      defined?(Tumblr)
-    end
+    gem_dependency_check { defined?(Tumblr) }
 
     def validate_options
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
