@@ -64,10 +64,10 @@ class Service < ActiveRecord::Base
   end
 
   def self.provider_specific_options(omniauth)
-    case omniauth['provider']
-      when 'twitter', 'github'
+    case omniauth['provider'].to_sym
+      when :twitter, :github
         { name: omniauth['info']['nickname'] }
-      when '37signals'
+      when :'37signals'
         { user_id: omniauth['extra']['accounts'][0]['id'], name: omniauth['info']['name'] }
       else
         { name: omniauth['info']['nickname'] }
