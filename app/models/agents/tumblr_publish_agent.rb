@@ -7,6 +7,8 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
+      #{'## Include `tumblr_client` and `omniauth-tumblr` in your Gemfile to use this Agent!' if dependencies_missing?}
+
       The TumblrPublishAgent publishes Tumblr posts from the events it receives.
 
       To be able to use this Agent you need to authenticate with Tumblr in the [Services](/services) section first.
@@ -54,6 +56,10 @@ module Agents
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
+
+    def gem_dependency_check
+      defined?(Tumblr)
+    end
 
     def validate_options
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
