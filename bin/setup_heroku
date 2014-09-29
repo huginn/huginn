@@ -10,7 +10,11 @@ unless `which heroku` =~ /heroku/
 end
 
 def capture(cmd, opts = {})
-  o, s = Open3.capture2e(cmd, opts)
+  if opts.delete(:no_stderr)
+    o, s = Open3.capture2(cmd, opts)
+  else
+    o, s = Open3.capture2e(cmd, opts)
+  end
   o.strip
 end
 
@@ -33,7 +37,7 @@ def yes?(question)
 end
 
 def grab_heroku_config!
-  config_data = capture("heroku config -s")
+  config_data = capture("heroku config -s", no_stderr: true)
   $config = {}
   if config_data !~ /has no config vars/
     config_data.split("\n").map do |line|
