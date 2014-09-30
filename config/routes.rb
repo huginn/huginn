@@ -67,7 +67,7 @@ Huginn::Application.routes.draw do
   post  "/users/:user_id/update_location/:secret" => "web_requests#update_location" # legacy
 
   match '/auth/:provider/callback', to: 'services#callback',
-        via: [:get, :post], constraints: { provider: Regexp.union(Devise.omniauth_providers.map(&:to_s)) }
+        via: [:get, :post] #, constraints: { provider: Regexp.union(Devise.omniauth_providers.map(&:to_s)) }
   devise_for :users, :sign_out_via => [ :post, :delete ]
 
   get "/about" => "home#about"
