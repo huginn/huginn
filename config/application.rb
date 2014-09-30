@@ -4,6 +4,8 @@ require 'rails/all'
 
 Bundler.require(:default, Rails.env)
 
+Dotenv.overload File.expand_path('../../spec/env.test', __FILE__) if Rails.env.test?
+
 module Huginn
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
