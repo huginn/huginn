@@ -1,6 +1,4 @@
 class Service < ActiveRecord::Base
-  PROVIDER_TO_ENV_MAP = {'37signals' => 'THIRTY_SEVEN_SIGNALS'}
-
   attr_accessible :provider, :name, :token, :secret, :refresh_token, :expires_at, :global, :options, :uid
 
   serialize :options, Hash
@@ -51,16 +49,12 @@ class Service < ActiveRecord::Base
     URI.join(client_options['site'], client_options['token_url'])
   end
 
-  def provider_to_env
-    PROVIDER_TO_ENV_MAP[provider].presence || provider.upcase
-  end
-
   def oauth_key
-    ENV["#{provider_to_env}_OAUTH_KEY"]
+    (config = Devise.omniauth_configs[provider.to_sym]) && config.args[0]
   end
 
   def oauth_secret
-    ENV["#{provider_to_env}_OAUTH_SECRET"]
+    (config = Devise.omniauth_configs[provider.to_sym]) && config.args[1]
   end
 
   def self.provider_specific_options(omniauth)

@@ -20,11 +20,11 @@ module TwitterConcern
   end
 
   def twitter_consumer_key
-    ENV['TWITTER_OAUTH_KEY']
+    (config = Devise.omniauth_configs[:twitter]) && config.strategy.consumer_key
   end
 
   def twitter_consumer_secret
-    ENV['TWITTER_OAUTH_SECRET']
+    (config = Devise.omniauth_configs[:twitter]) && config.strategy.consumer_secret
   end
 
   def twitter_oauth_token
