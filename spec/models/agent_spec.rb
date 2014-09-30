@@ -91,6 +91,7 @@ describe Agent do
     it "should know about available types" do
       Agent.types.should include(Agents::WeatherAgent, Agents::WebsiteAgent)
     end
+
   end
 
   describe "with an example Agent" do

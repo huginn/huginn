@@ -21,7 +21,7 @@
           <% if @agent.new_record? %>
             <div class="form-group type-select">
               <%= f.label :type %>
-              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent']] + Agent.types.sort{|a,b| a.name <=> b.name}.map {|type| [type.name.gsub(/^.*::/, ''), type.name, {'data-description'=>type.description}] }, @agent.type), {}, :class => 'select2 form-control' %>
+              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent']] + agent_types_collection_with_html_descriptions(current_user), @agent.type), {}, :class => 'select2 form-control' %>
             </div>
           <% end %>
         </div>
