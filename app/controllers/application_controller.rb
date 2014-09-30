@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
   private
 
   def twitter_oauth_check
-    if ENV['TWITTER_OAUTH_KEY'].blank? || ENV['TWITTER_OAUTH_SECRET'].blank?
+    unless Devise.omniauth_providers.include?(:twitter)
       if @twitter_agent = current_user.agents.where("type like 'Agents::Twitter%'").first
         @twitter_oauth_key    = @twitter_agent.options['consumer_key'].presence || @twitter_agent.credential('twitter_consumer_key')
         @twitter_oauth_secret = @twitter_agent.options['consumer_secret'].presence || @twitter_agent.credential('twitter_consumer_secret')
@@ -36,7 +36,7 @@ class ApplicationController < ActionController::Base
   end
 
   def basecamp_auth_check
-    if ENV['THIRTY_SEVEN_SIGNALS_OAUTH_KEY'].blank? || ENV['THIRTY_SEVEN_SIGNALS_OAUTH_SECRET'].blank?
+    unless Devise.omniauth_providers.include?(:'37signals')
       @basecamp_agent = current_user.agents.where(type: 'Agents::BasecampAgent').first
     end
   end
