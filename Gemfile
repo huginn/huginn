@@ -14,7 +14,7 @@ gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem "google-api-client"           # GoogleCalendarPublishAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
-gem 'github_api'
+gem 'github_api'      	  	  # GithubEventsAgent  
 
 # Twitter Agents
 gem 'twitter', '~> 5.8.0' # Must to be loaded before cantino-twitter-stream.
