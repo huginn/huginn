@@ -8,10 +8,6 @@ else
   Coveralls.wear!('rails')
 end
 
-# Required ENV variables that are normally set in .env are setup here for the test environment.
-require 'dotenv'
-Dotenv.overload File.join(File.dirname(__FILE__), "env.test")
-
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'rspec/autorun'

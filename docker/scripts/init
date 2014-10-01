@@ -19,10 +19,10 @@ elif [ -n "${POSTGRESQL_PORT_5432_TCP_ADDR}" ]; then
   HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${POSTGRESQL_PORT_5432_TCP_PORT}}
 fi
 
-grep = ../.env.example | sed -e 's/^#//' | grep -v -e '^#' | cut -d= -f1 | \
+grep = /app/.env.example | sed -e 's/^#[^ ]//' | grep -v -e '^#' | cut -d= -f1 | \
   while read var ; do
-    echo "$var=\${HUGINN_$var:-\$$var}"
-  done > /app/.env
+    eval "echo \"$var=\\\"\${HUGINN_$var:-\$$var}\\\"\""
+  done | grep -v -e ^= > /app/.env
 
 chmod ugo+r /app/.env
 source /app/.env

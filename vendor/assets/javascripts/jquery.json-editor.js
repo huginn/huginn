@@ -1,3 +1,4 @@
+
 /*
   Copyright (c) 2014, Andrew Cantino
   Copyright (c) 2009, Andrew Cantino & Kyle Maxwell
@@ -528,7 +529,7 @@
           }
           innerbq.append($('<span class="colon">: </span>'));
           newElem = this.build(jsonvalue, innerbq, json, jsonkey, root);
-          if (newElem && newElem.text() === "??") {
+          if (!elem && newElem && newElem.text() === "??") {
             elem = newElem;
           }
           bq.append(innerbq);

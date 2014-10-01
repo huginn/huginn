@@ -16,6 +16,11 @@ gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
 gem 'github_api'
 
+# Twitter Agents
+gem 'twitter', '~> 5.8.0' # Must to be loaded before cantino-twitter-stream.
+gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
+gem 'omniauth-twitter'
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'
@@ -32,8 +37,6 @@ gem 'protected_attributes', '~>1.0.8' # This must be loaded before some other ge
 gem 'ace-rails-ap', '~> 2.0.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
-gem 'twitter', '~> 5.8.0' # needs to be loaded before cantino-twitter-stream.
-gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'daemons', '~> 1.1.9'
 gem 'delayed_job', '~> 4.0.0'
@@ -43,6 +46,7 @@ gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware'
 gem 'feed-normalizer'
+gem 'font-awesome-sass'
 gem 'foreman', '~> 0.63.0'
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
 # in its own Gemfile.
@@ -59,7 +63,6 @@ gem 'mysql2', '~> 0.3.16'
 gem 'multi_xml'
 gem 'nokogiri', '~> 1.6.1'
 gem 'omniauth'
-gem 'omniauth-twitter'
 gem 'rails' , '4.1.5'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'sass-rails',   '~> 4.0.0'
@@ -96,20 +99,9 @@ group :production do
   gem 'rack'
 end
 
-case RUBY_PLATFORM
-  when /freebsd|netbsd|openbsd/
-    # ffi (required by typhoeus via ethon) merged fixes for bugs fatal
-    # on these platforms after 1.9.3; no following release as yet.
-    gem 'ffi', github: 'ffi/ffi', branch: 'master'
-
-    # tzinfo 1.2.0 has added support for reading zoneinfo on these
-    # platforms.
-    gem 'tzinfo', '>= 1.2.0'
-  when /solaris/
-    # ditto
-    gem 'tzinfo', '>= 1.2.0'
-end
-
+# Platform requirements.
+gem 'ffi', '>= 1.9.4'		# required by typhoeus; 1.9.4 has fixes for *BSD.
+gem 'tzinfo', '>= 1.2.0'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 

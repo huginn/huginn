@@ -18,6 +18,8 @@
  */
 
 @import "bootstrap";
+@import "font-awesome-sprockets";
+@import "font-awesome";
 
 body { padding-top: 60px; }
 
@@ -236,4 +238,39 @@ h2 .scenario, a span.label.scenario {
 
 .confirm-agent .popover {
   width: 200px;
+}
+
+.btn-auth {
+  position: relative;
+  padding-left: 40px;
+  $border-color: rgba(0,0,0,0.2);
+  border-color: $border-color;
+
+  > i:first-child {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    font-size: 24px;
+    border-right: 1px solid $border-color;
+  }
+
+  &.btn-auth-twitter {
+    color: #fff;
+    background-color: #55acee;
+  }
+
+  &.btn-auth-37signals {
+    color: #fff;
+    background-color: #8fc857;
+  }
+
+  &.btn-auth-github {
+    color: #fff;
+    background-color: #444;
+  }
 }

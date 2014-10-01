@@ -11,15 +11,9 @@
         <%= link_to 'wiki', 'https://github.com/cantino/huginn/wiki/Configuring-OAuth-applications', target: :_blank %>
         for guidance.
       </p>
-      <% if has_oauth_configuration_for?('twitter') %>
-        <p><%= link_to "Authenticate with Twitter", "/auth/twitter" %></p>
-      <% end %>
-      <% if has_oauth_configuration_for?('thirty_seven_signals') %>
-        <p><%= link_to "Authenticate with 37Signals (Basecamp)", "/auth/37signals" %></p>
-      <% end -%>
-      <% if has_oauth_configuration_for?('github') %>
-        <p><%= link_to "Authenticate with Github", "/auth/github" %></p>
-      <% end -%>
+      <%- Devise.omniauth_providers.each { |provider| -%>
+        <p><%= link_to user_omniauth_authorize_path(provider), class: "btn btn-default btn-auth btn-auth-#{provider}" do %><%= icon_for_service(provider) %><span>Authenticate with <%= t("devise.omniauth_providers.#{provider}") %></span><% end %></p>
+      <%- } -%>
       <hr>
 
       <div class='table-responsive'>

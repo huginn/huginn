@@ -35,23 +35,23 @@
         </div>
       </form>
       
-      <li class='job-indicator visible-lg' role='pending'>
-        <%= link_to current_user.admin? ? jobs_path : '#' do %>
+      <li class='job-indicator' role='pending'>
+        <%= link_to current_user.admin? ? jobs_path : '#', class: 'visible-lg' do %>
           <span class="badge"><span class="glyphicon glyphicon-refresh icon-white"></span> <span class='number'>0</span></span>
         <% end %>
       </li>
-      <li class='job-indicator visible-lg' role='awaiting_retry'>
-        <%= link_to current_user.admin? ? jobs_path : '#' do %>
+      <li class='job-indicator' role='awaiting_retry'>
+        <%= link_to current_user.admin? ? jobs_path : '#', class: 'visible-lg' do %>
           <span class="badge"><span class="glyphicon glyphicon-question-sign icon-yellow"></span> <span class='number'>0</span></span>
         <% end %>
       </li>
-      <li class='job-indicator hidden-sm hidden-xs' role='recent_failures'>
-        <%= link_to current_user.admin? ? jobs_path : '#' do %>
+      <li class='job-indicator' role='recent_failures'>
+        <%= link_to current_user.admin? ? jobs_path : '#', class: 'hidden-sm hidden-xs' do %>
           <span class="badge"><span class="glyphicon glyphicon-exclamation-sign icon-white"></span> <span class='number'>0</span></span>
         <% end %>
       </li>
-      <li id='event-indicator' class='hidden-sm hidden-xs'>
-        <a href="#">
+      <li id='event-indicator'>
+        <a href="#" class='hidden-sm hidden-xs'>
           <span class="badge"><span class="glyphicon glyphicon-random icon-white"></span> <span class='number'>0</span> new events</span>
         </a>
       </li>

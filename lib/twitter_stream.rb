@@ -1,6 +1,5 @@
 require 'cgi'
 require 'json'
-require 'twitter/json_stream'
 require 'em-http-request'
 require 'pp'
 
@@ -88,6 +87,14 @@ class TwitterStream
   SEPARATOR = /[^\w_\-]+/
 
   def run
+    if Agents::TwitterStreamAgent.dependencies_missing?
+      STDERR.puts Agents::TwitterStreamAgent.twitter_dependencies_missing
+      STDERR.flush
+      return
+    end
+
+    require 'twitter/json_stream'
+
     while @running
       begin
         agents = Agents::TwitterStreamAgent.active.all
