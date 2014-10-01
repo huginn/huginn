@@ -20,6 +20,10 @@ gem 'twitter', '~> 5.8.0' # Must to be loaded before cantino-twitter-stream.
 gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'omniauth-twitter'
 
+# Tumblr Agents
+gem 'tumblr_client'
+gem 'omniauth-tumblr'
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'

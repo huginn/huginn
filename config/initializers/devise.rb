@@ -219,6 +219,12 @@ Devise.setup do |config|
     config.omniauth :twitter, key, secret, authorize_params: {force_login: 'true', use_authorize: 'true'}
   end
 
+  if defined?(OmniAuth::Strategies::Tumblr) &&
+     (key = ENV["TUMBLR_OAUTH_KEY"]).present? &&
+     (secret = ENV["TUMBLR_OAUTH_SECRET"]).present?
+    config.omniauth :'tumblr', key, secret
+  end
+
   if defined?(OmniAuth::Strategies::ThirtySevenSignals) &&
      (key = ENV["THIRTY_SEVEN_SIGNALS_OAUTH_KEY"]).present? &&
      (secret = ENV["THIRTY_SEVEN_SIGNALS_OAUTH_SECRET"]).present?
