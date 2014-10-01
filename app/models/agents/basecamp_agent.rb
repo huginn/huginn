@@ -3,7 +3,7 @@ module Agents
     cannot_receive_events!
 
     include Oauthable
-    valid_oauth_providers '37signals'
+    valid_oauth_providers :'37signals'
 
     description <<-MD
       The BasecampAgent checks a Basecamp project for new Events

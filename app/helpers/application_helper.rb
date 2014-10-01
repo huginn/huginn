@@ -40,4 +40,13 @@ module ApplicationHelper
       link_to 'No', agent_path(agent, tab: (agent.recent_error_logs? ? 'logs' : 'details')), class: 'label label-danger'
     end
   end
+
+  def icon_for_service(service)
+    case service.to_sym
+    when :twitter, :tumblr, :github
+      "<i class='fa fa-#{service}'></i>".html_safe
+    else
+      "<i class='fa fa-lock'></i>".html_safe
+    end
+  end
 end
