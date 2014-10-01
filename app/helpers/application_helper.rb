@@ -43,7 +43,7 @@ module ApplicationHelper
 
   def icon_for_service(service)
     case service.to_sym
-    when :twitter, :github
+    when :twitter, :tumblr, :github
       "<i class='fa fa-#{service}'></i>".html_safe
     else
       "<i class='fa fa-lock'></i>".html_safe
