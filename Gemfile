@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'rss_agent', path: 'agents/rss_agent'
+
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 gem 'twilio-ruby', '~> 3.11.5'    # TwilioAgent
@@ -44,7 +46,6 @@ gem 'devise', '~> 3.2.4'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware'
-gem 'feed-normalizer'
 gem 'font-awesome-sass'
 gem 'foreman', '~> 0.63.0'
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
@@ -52,6 +53,7 @@ gem 'foreman', '~> 0.63.0'
 gem 'geokit', '~> 1.8.4'
 gem 'geokit-rails', '~> 2.0.1'
 gem 'httparty', '~> 0.13'
+gem 'huginn_agent'
 gem 'jquery-rails', '~> 3.1.0'
 gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.6'
