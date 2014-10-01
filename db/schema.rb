@@ -11,14 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140901143732) do
-
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+ActiveRecord::Schema.define(version: 20140906030139) do
 
   create_table "agent_logs", force: true do |t|
     t.integer  "agent_id",                      null: false
-    t.text     "message",           limit: 16777215,             null: false, charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.text     "message",                       null: false, charset: "utf8mb4", collation: "utf8mb4_bin"
     t.integer  "level",             default: 3, null: false
     t.integer  "inbound_event_id"
     t.integer  "outbound_event_id"
@@ -28,7 +25,7 @@ ActiveRecord::Schema.define(version: 20140901143732) do
 
   create_table "agents", force: true do |t|
     t.integer  "user_id"
-    t.text     "options",               limit: 16777215,                                charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.text     "options",                                                               charset: "utf8mb4", collation: "utf8mb4_bin"
     t.string   "type",                                                                                      collation: "utf8_bin"
     t.string   "name",                                                                  charset: "utf8mb4", collation: "utf8mb4_bin"
     t.string   "schedule",                                                                                  collation: "utf8_bin"
@@ -36,17 +33,17 @@ ActiveRecord::Schema.define(version: 20140901143732) do
     t.datetime "last_check_at"
     t.datetime "last_receive_at"
     t.integer  "last_checked_event_id"
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "memory",                limit: 2147483647,                              charset: "utf8mb4", collation: "utf8mb4_bin"
     t.datetime "last_web_request_at"
     t.integer  "keep_events_for",                          default: 0,     null: false
     t.datetime "last_event_at"
     t.datetime "last_error_log_at"
-    t.boolean  "propagate_immediately", default: false, null: false
-    t.boolean  "disabled",              default: false, null: false
-    t.string   "guid",                                                     null: false, charset: "ascii",   collation: "ascii_bin"
+    t.boolean  "propagate_immediately",                    default: false, null: false
+    t.boolean  "disabled",                                 default: false, null: false
     t.integer  "service_id"
+    t.string   "guid",                                                     null: false, charset: "latin1",  collation: "latin1_swedish_ci"
   end
 
   add_index "agents", ["guid"], name: "index_agents_on_guid", using: :btree
@@ -67,8 +64,8 @@ ActiveRecord::Schema.define(version: 20140901143732) do
   create_table "delayed_jobs", force: true do |t|
     t.integer  "priority",                    default: 0
     t.integer  "attempts",                    default: 0
-    t.text     "handler",    limit: 16777215,                          charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.text     "last_error", limit: 16777215,                          charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.text     "handler",    limit: 16777215,             charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.text     "last_error",                              charset: "utf8mb4", collation: "utf8mb4_bin"
     t.datetime "run_at"
     t.datetime "locked_at"
     t.datetime "failed_at"
@@ -83,11 +80,11 @@ ActiveRecord::Schema.define(version: 20140901143732) do
   create_table "events", force: true do |t|
     t.integer  "user_id"
     t.integer  "agent_id"
-    t.decimal  "lat",                           precision: 15, scale: 10
-    t.decimal  "lng",                           precision: 15, scale: 10
-    t.text     "payload",    limit: 2147483647,                                        charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
+    t.decimal  "lat",                         precision: 15, scale: 10
+    t.decimal  "lng",                         precision: 15, scale: 10
+    t.text     "payload",    limit: 16777215,                           charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.datetime "expires_at"
   end
 
@@ -117,13 +114,13 @@ ActiveRecord::Schema.define(version: 20140901143732) do
   add_index "scenario_memberships", ["scenario_id"], name: "index_scenario_memberships_on_scenario_id", using: :btree
 
   create_table "scenarios", force: true do |t|
-    t.string   "name",                        null: false, charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.integer  "user_id",                     null: false
+    t.string   "name",                         null: false, charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.integer  "user_id",                      null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "description",                              charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.boolean  "public",      default: false, null: false
-    t.string   "guid",                        null: false, charset: "ascii",   collation: "ascii_bin"
+    t.text     "description",                               charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.boolean  "public",       default: false, null: false
+    t.string   "guid",                         null: false, charset: "ascii",   collation: "ascii_bin"
     t.string   "source_url"
     t.string   "tag_bg_color"
     t.string   "tag_fg_color"
@@ -133,17 +130,17 @@ ActiveRecord::Schema.define(version: 20140901143732) do
 
   create_table "services", force: true do |t|
     t.integer  "user_id",                       null: false
-    t.string   "provider",                      null: false
-    t.string   "name",                          null: false
-    t.text     "token",                         null: false
-    t.text     "secret"
-    t.text     "refresh_token"
+    t.string   "provider",                      null: false, charset: "latin1", collation: "latin1_swedish_ci"
+    t.string   "name",                          null: false, charset: "latin1", collation: "latin1_swedish_ci"
+    t.text     "token",                         null: false, charset: "latin1", collation: "latin1_swedish_ci"
+    t.text     "secret",                                     charset: "latin1", collation: "latin1_swedish_ci"
+    t.text     "refresh_token",                              charset: "latin1", collation: "latin1_swedish_ci"
     t.datetime "expires_at"
     t.boolean  "global",        default: false
-    t.text     "options"
+    t.text     "options",                                    charset: "latin1", collation: "latin1_swedish_ci"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uid"
+    t.string   "uid",                                        charset: "latin1", collation: "latin1_swedish_ci"
   end
 
   add_index "services", ["provider"], name: "index_services_on_provider", using: :btree
@@ -154,8 +151,8 @@ ActiveRecord::Schema.define(version: 20140901143732) do
     t.integer  "user_id",                           null: false
     t.string   "credential_name",                   null: false
     t.text     "credential_value",                  null: false
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "mode",             default: "text", null: false, collation: "utf8_bin"
   end
 
@@ -172,8 +169,8 @@ ActiveRecord::Schema.define(version: 20140901143732) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "admin",                              default: false, null: false
     t.integer  "failed_attempts",                    default: 0
     t.string   "unlock_token"

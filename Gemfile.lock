@@ -82,6 +82,8 @@ GEM
       delayed_job (>= 3.0, < 4.1)
     delorean (2.1.0)
       chronic
+    descendants_tracker (0.0.4)
+      thread_safe (~> 0.3, >= 0.3.1)
     devise (3.2.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -132,6 +134,14 @@ GEM
     geokit-rails (2.0.1)
       geokit (~> 1.5)
       rails (>= 3.0)
+    github_api (0.11.3)
+      addressable (~> 2.3)
+      descendants_tracker (~> 0.0.1)
+      faraday (~> 0.8, < 0.10)
+      hashie (>= 1.2)
+      multi_json (>= 1.7.5, < 2.0)
+      nokogiri (~> 1.6.0)
+      oauth2
     google-api-client (0.7.1)
       addressable (>= 2.3.2)
       autoparse (>= 0.3.3)
@@ -411,6 +421,7 @@ DEPENDENCIES
   foreman (~> 0.63.0)
   geokit (~> 1.8.4)
   geokit-rails (~> 2.0.1)
+  github_api
   google-api-client
   hipchat (~> 1.2.0)
   httparty (~> 0.13)
