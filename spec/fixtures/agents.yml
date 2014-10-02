@@ -39,12 +39,7 @@ bob_weather_agent:
   name: "SF Weather"
   guid: <%= SecureRandom.hex %>
   keep_events_for: 45
-  options: <%= {
-                 :location => 94102,
-                 :lat => 37.779329,
-                 :lng => -122.41915,
-                 :api_key => 'test'
-               }.to_json.inspect %>
+  options: <%= { :location => 94102, :lat => 37.779329, :lng => -122.41915, :api_key => 'test' }.to_json.inspect %>
 
 jane_weather_agent:
   type: Agents::WeatherAgent
@@ -53,12 +48,7 @@ jane_weather_agent:
   name: "SF Weather"
   guid: <%= SecureRandom.hex %>
   keep_events_for: 30
-  options: <%= {
-                 :location => 94103,
-                 :lat => 37.779329,
-                 :lng => -122.41915,
-                 :api_key => 'test'
-               }.to_json.inspect %>
+  options: <%= { :location => 94103, :lat => 37.779329, :lng => -122.41915, :api_key => 'test' }.to_json.inspect %>
 
 jane_rain_notifier_agent:
   type: Agents::TriggerAgent

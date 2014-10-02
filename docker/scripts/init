@@ -1,0 +1,111 @@
+#!/bin/bash
+set -e
+
+cd /app
+
+# Default to the environment variable values set in .env.example
+source /app/.env.example
+
+# is a mysql or postgresql database linked?
+# requires that the mysql or postgresql containers have exposed
+# port 3306 and 5432 respectively.
+if [ -n "${MYSQL_PORT_3306_TCP_ADDR}" ]; then
+  HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-mysql2}
+  HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
+  HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
+elif [ -n "${POSTGRESQL_PORT_5432_TCP_ADDR}" ]; then
+  HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-postgres}
+  HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${POSTGRESQL_PORT_5432_TCP_ADDR}}
+  HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${POSTGRESQL_PORT_5432_TCP_PORT}}
+fi
+
+grep = /app/.env.example | sed -e 's/^#[^ ]//' | grep -v -e '^#' | cut -d= -f1 | \
+  while read var ; do
+    eval "echo \"$var=\\\"\${HUGINN_$var:-\$$var}\\\"\""
+  done | grep -v -e ^= > /app/.env
+
+chmod ugo+r /app/.env
+source /app/.env
+
+DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
+DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
+USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT}}
+
+# use default port number if it is still not set
+case "${DATABASE_ADAPTER}" in
+  mysql2) DATABASE_PORT=${DATABASE_PORT:-3306} ;;
+  postgres) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
+  *) echo "Unsupported database adapter. Available adapters are mysql2, and postgres." && exit 1 ;;
+esac
+
+# start supervisord
+/usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+
+# start mysql server if ${DATABASE_HOST} is localhost
+if [ "${DATABASE_HOST}" == "localhost" ]; then
+  if [ "${DATABASE_ADAPTER}" == "postgres" ]; then
+    echo "DATABASE_ADAPTER 'postgres' is not supported internally. Please provide DATABASE_HOST."
+    exit 1
+  fi
+
+  # configure supervisord to start mysql (manual)
+  cat > /etc/supervisor/conf.d/mysqld.conf <<EOF
+[program:mysqld]
+priority=20
+directory=/tmp
+command=/usr/bin/mysqld_safe
+user=root
+autostart=false
+autorestart=true
+stdout_logfile=/var/log/supervisor/%(program_name)s.log
+stderr_logfile=/var/log/supervisor/%(program_name)s.log
+EOF
+  supervisorctl reload
+
+  # fix permissions and ownership of /var/lib/mysql
+  chown -R mysql:mysql /var/lib/mysql
+  chmod 700 /var/lib/mysql
+
+  # initialize MySQL data directory
+  if [ ! -d /var/lib/mysql/mysql ]; then
+    mysql_install_db --user=mysql
+  fi
+
+  echo "Starting mysql server..."
+  supervisorctl start mysqld >/dev/null
+
+  # wait for mysql server to start (max 120 seconds)
+  timeout=120
+  while ! mysqladmin -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD} status >/dev/null 2>&1
+  do
+    timeout=$(expr $timeout - 1)
+    if [ $timeout -eq 0 ]; then
+      echo "Failed to start mysql server"
+      exit 1
+    fi
+    sleep 1
+  done
+
+  if ! echo "USE ${DATABASE_NAME}" | mysql -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD} >/dev/null 2>&1; then
+    DB_INIT="yes"
+    echo "CREATE DATABASE IF NOT EXISTS \`${DATABASE_NAME}\` DEFAULT CHARACTER SET \`utf8\` COLLATE \`utf8_unicode_ci\`;" | mysql -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD}
+    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \`${DATABASE_NAME}\`.* TO 'root'@'localhost';" | mysql -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD}
+  fi
+fi
+
+# Assuming we have a created database, run the migrations and seed it idempotently.
+[ -z "${DO_NOT_MIGRATE}" ] && sudo -u huginn -EH bundle exec rake db:migrate
+[ -z "${DO_NOT_SEED}" ] && sudo -u huginn -EH bundle exec rake db:seed
+
+[ -n "$INTENTIONALLY_SLEEP" ] && sleep $INTENTIONALLY_SLEEP
+
+# Fixup the Procfile and prepare the PORT
+[ -z "${DO_NOT_RUN_JOBS}" ] && perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
+perl -pi -e 's/rails server$/rails server -p \$PORT/' /app/Procfile
+export PORT
+
+# Start huginn
+sudo -u huginn -EH bundle exec foreman start
+
+# As the ENTRYPOINT script, when this exits the docker container will Exit.
+exit 0

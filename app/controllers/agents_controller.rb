@@ -1,8 +1,11 @@
 class AgentsController < ApplicationController
   include DotHelper
+  include SortableTable
 
   def index
-    @agents = current_user.agents.page(params[:page])
+    set_table_sort sorts: %w[name last_check_at last_event_at last_receive_at], default: { name: :asc }
+
+    @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
     respond_to do |format|
       format.html
@@ -37,9 +40,10 @@ class AgentsController < ApplicationController
         :default_schedule => @agent.default_schedule,
         :can_receive_events => @agent.can_receive_events?,
         :can_create_events => @agent.can_create_events?,
+        :can_control_other_agents => @agent.can_control_other_agents?,
         :options => @agent.default_options,
         :description_html => @agent.html_description,
-        :form => render_to_string(partial: 'oauth_dropdown')
+        :form => render_to_string(partial: 'oauth_dropdown', locals: { agent: @agent })
     }
   end
 

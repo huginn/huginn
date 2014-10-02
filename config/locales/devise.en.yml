@@ -49,6 +49,11 @@ en:
     omniauth_callbacks:
       success: 'Successfully authenticated from %{kind} account.'
       failure: 'Could not authenticate you from %{kind} because "%{reason}".'
+    omniauth_providers:
+      twitter: 'Twitter'
+      tumblr: 'Tumblr'
+      github: 'GitHub'
+      37signals: '37Signals (Basecamp)'
     mailer:
       confirmation_instructions:
         subject: 'Confirmation instructions'

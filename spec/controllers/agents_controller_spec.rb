@@ -251,6 +251,18 @@ describe AgentsController do
         response.should redirect_to(agents_path)
       end
     end
+
+    it "updates last_checked_event_id when drop_pending_events is given" do
+      sign_in users(:bob)
+      agent = agents(:bob_website_agent)
+      agent.disabled = true
+      agent.last_checked_event_id = nil
+      agent.save!
+      post :update, id: agents(:bob_website_agent).to_param, agent: { disabled: 'false', drop_pending_events: 'true' }
+      agent.reload
+      agent.disabled.should == false
+      agent.last_checked_event_id.should == Event.maximum(:id)
+    end
   end
 
   describe "PUT leave_scenario" do
@@ -279,6 +291,20 @@ describe AgentsController do
       lambda {
         delete :destroy, :id => agents(:jane_website_agent).to_param
       }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "redirects correctly when the Agent is deleted from the Agent itself" do
+      sign_in users(:bob)
+
+      delete :destroy, :id => agents(:bob_website_agent).to_param
+      response.should redirect_to agents_path
+    end
+
+    it "redirects correctly when the Agent is deleted from a Scenario" do
+      sign_in users(:bob)
+
+      delete :destroy, :id => agents(:bob_weather_agent).to_param, :return => scenario_path(scenarios(:bob_weather)).to_param
+      response.should redirect_to scenario_path(scenarios(:bob_weather))
     end
   end
 end

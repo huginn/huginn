@@ -72,7 +72,7 @@
             <% if @agent.can_be_scheduled? %>
               <p>
                 <b>Schedule:</b>
-                <%= (@agent.schedule || "n/a").humanize.titleize %>
+                <%= agent_schedule(@agent) %>
               </p>
 
               <p>
@@ -127,6 +127,17 @@
               <p>
                 <b>Event receivers:</b>
                 <% if (agents = @agent.receivers).length > 0 %>
+                  <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
+                <% else %>
+                  None
+                <% end %>
+              </p>
+            <% end %>
+
+            <% if @agent.can_control_other_agents? %>
+              <p>
+                <b>Control Targets:</b>
+                <% if (agents = @agent.control_targets).length > 0 %>
                   <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
                 <% else %>
                   None

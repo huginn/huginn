@@ -1,5 +1,4 @@
 # encoding: utf-8 
-require "weibo_2"
 
 module Agents
   class WeiboPublishAgent < Agent
@@ -8,6 +7,7 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
+      #{'## Include `weibo_2` in your Gemfile to use this Agent!' if dependencies_missing?}
       The WeiboPublishAgent publishes tweets from the events it receives.
 
       You must first set up a Weibo app and generate an `acess_token` for the user to send statuses as.
@@ -79,8 +79,7 @@ module Agents
       tweet_json[:entities][:urls].each do |url|
         text.gsub! url[:url], url[:expanded_url]
       end
-      return text
+      text
     end
-
   end
 end

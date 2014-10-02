@@ -119,7 +119,9 @@ GEM
     feed-normalizer (1.5.2)
       hpricot (>= 0.6)
       simple-rss (>= 1.1)
-    ffi (1.9.3)
+    ffi (1.9.5)
+    font-awesome-sass (4.2.0)
+      sass (~> 3.2)
     forecast_io (2.0.0)
       faraday
       hashie
@@ -204,9 +206,6 @@ GEM
     omniauth-37signals (1.0.5)
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.0)
-    omniauth-github (1.1.2)
-      omniauth (~> 1.0)
-      omniauth-oauth2 (~> 1.1)
     omniauth-oauth (1.0.1)
       oauth
       omniauth (~> 1.0)
@@ -215,6 +214,8 @@ GEM
       multi_json (~> 1.3)
       oauth2 (~> 0.9.3)
       omniauth (~> 1.2)
+    omniauth-tumblr (1.1)
+      omniauth-oauth (~> 1.0)
     omniauth-twitter (1.0.1)
       multi_json (~> 1.3)
       omniauth-oauth (~> 1.0)
@@ -316,6 +317,9 @@ GEM
     slop (3.6.0)
     spectrum-rails (1.3.4)
       railties (>= 3.1)
+    spring (1.1.3)
+    spring-commands-rspec (1.0.2)
+      spring (>= 0.9.1)
     sprockets (2.11.0)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -338,6 +342,13 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
+    tumblr_client (0.8.4)
+      faraday (~> 0.9.0)
+      faraday_middleware (~> 0.9.0)
+      json
+      mime-types
+      oauth
+      simple_oauth
     twilio-ruby (3.11.6)
       builder (>= 2.1.2)
       jwt (>= 0.1.2)
@@ -389,7 +400,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap (~> 2.0.1)
-  better_errors
+  better_errors (~> 1.1)
   binding_of_caller
   bootstrap-kaminari-views (~> 0.0.3)
   bundler (>= 1.5.0)
@@ -407,12 +418,15 @@ DEPENDENCIES
   faraday (~> 0.9.0)
   faraday_middleware
   feed-normalizer
+  ffi (>= 1.9.4)
+  font-awesome-sass
   forecast_io (~> 2.0.0)
   foreman (~> 0.63.0)
   geokit (~> 1.8.4)
   geokit-rails (~> 2.0.1)
   google-api-client
   hipchat (~> 1.2.0)
+  httparty (~> 0.13)
   jquery-rails (~> 3.1.0)
   json (~> 1.8.1)
   jsonpath (~> 0.5.6)
@@ -420,12 +434,13 @@ DEPENDENCIES
   kramdown (~> 1.3.3)
   liquid (~> 2.6.1)
   mqtt
+  multi_xml
   mysql2 (~> 0.3.16)
   net-ftp-list (~> 3.2.8)
   nokogiri (~> 1.6.1)
   omniauth
   omniauth-37signals
-  omniauth-github
+  omniauth-tumblr
   omniauth-twitter
   pg
   protected_attributes (~> 1.0.8)
@@ -446,10 +461,14 @@ DEPENDENCIES
   shoulda-matchers
   slack-notifier (~> 0.5.0)
   spectrum-rails
+  spring
+  spring-commands-rspec
   therubyracer (~> 0.12.1)
+  tumblr_client
   twilio-ruby (~> 3.11.5)
   twitter (~> 5.8.0)
   typhoeus (~> 0.6.3)
+  tzinfo (>= 1.2.0)
   tzinfo-data
   uglifier (>= 1.3.0)
   unicorn

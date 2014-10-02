@@ -1,5 +1,5 @@
 <% if @agent.errors.any? %>
-  <div class="row well">
+  <div class="row well model-errors">
     <h2><%= pluralize(@agent.errors.count, "error") %> prohibited this Agent from being saved:</h2>
     <% @agent.errors.full_messages.each do |msg| %>
       <p class='text-warning'><%= msg %></p>
@@ -21,74 +21,103 @@
           <% if @agent.new_record? %>
             <div class="form-group type-select">
               <%= f.label :type %>
-              <%= f.select :type, options_for_select(Agent.types.map(&:to_s).sort.map {|type| [type.gsub(/^.*::/, ''), type] }, @agent.type), {}, :class => 'select2 form-control' %>
+              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent']] + Agent.types.map(&:to_s).sort.map {|type| [type.gsub(/^.*::/, ''), type] }, @agent.type), {}, :class => 'select2 form-control' %>
             </div>
           <% end %>
-
-          <div class="form-group type-select">
-            <%= f.label :name %>
-            <%= f.text_field :name, :class => 'form-control' %>
-          </div>
-
-          <div class='oauthable-form'>
-            <%= render partial: 'oauth_dropdown' %>
-          </div>
-
-          <div class="form-group">
-            <%= f.label :schedule, :class => 'control-label' %>
-            <div class="schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
-              <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'form-control' %>
-              <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
-            </div>
-          </div>
-
-          <div class='event-related-region' data-can-create-events="<%= @agent.can_create_events? %>">
-            <div class="form-group">
-              <%= f.label :keep_events_for, "Keep events" %>
-              <span class="glyphicon glyphicon-question-sign hover-help" data-content="In order to conserve disk space, you can choose to have events created by this Agent expire after a certain period of time.  Make sure you keep them long enough to allow any subsequent Agents to make use of them."></span>
-              <%= f.select :keep_events_for, options_for_select(Agent::EVENT_RETENTION_SCHEDULES, @agent.keep_events_for), {}, :class => 'form-control' %>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <%= f.label :sources %>
-            <div class="link-region" data-can-receive-events="<%= @agent.can_receive_events? %>">
-              <% eventSources = (current_user.agents - [@agent]).find_all { |a| a.can_create_events? } %>
-              <%= f.select(:source_ids,
-                           options_for_select(eventSources.map {|s| [s.name, s.id] },
-                                              @agent.source_ids),
-                           {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
-              <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
-              <%= f.label :propagate_immediately, :class => 'propagate-immediately' do %>Propagate immediately
-                <%= f.check_box :propagate_immediately %> 
-              <% end %>
-            </div>
-          </div>
-
-          <% if current_user.scenario_count > 0 %>
-            <div class="form-group">
-              <%= f.label :scenarios %>
-              <span class="glyphicon glyphicon-question-sign hover-help" data-content="Use Scenarios to group sets of Agents, both for organization, and to make them easy to export and share."></span>
-              <%= f.select(:scenario_ids,
-                           options_for_select(current_user.scenarios.pluck(:name, :id), @agent.scenario_ids),
-                           {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
-            </div>
-          <% end %>
-
         </div>
 
-        <!-- Form controls full width -->
-        <div class="col-md-12">
-          <div class="form-group">
-            <%= f.label :options %>
-            <span class="glyphicon glyphicon-question-sign hover-help" data-content="In this JSON hash, interpolation is available in almost all values using the Liquid templating language.<p>Available template variables include the following:<dl><dt><code>message</code>, <code>url</code>, etc.</dt><dd>Refers to the corresponding key's value of each incoming event's payload.</dd><dt><code>agent</code></dt><dd>Refers to the agent that created each incoming event.  It has attributes like <code>type</code>, <code>name</code> and <code>options</code>, so <code>{{agent.type}}</code> will expand to <code>WebsiteAgent</code> if an incoming event is created by that agent.</dd></dl></p><p>To access user credentials, use the <code>credential</code> tag like this: <code>{% credential <em>bare_key_name</em> %}</code></p>"></span>
-            <textarea rows="15" id="agent_options" name="agent[options]" class="form-control live-json-editor <%= (@agent.new_record? && @agent.options == {}) ? "showing-default" : "" %>">
-              <%= Utils.jsonify((@agent.new_record? && @agent.options == {}) ? @agent.default_options : @agent.options) %>
-            </textarea>
+        <div class="agent-settings">
+          <div class="col-md-8">
+            <div class="form-group">
+              <%= f.label :name %>
+              <%= f.text_field :name, :class => 'form-control' %>
+            </div>
+
+            <div class='oauthable-form'>
+              <%= render partial: 'oauth_dropdown', locals: { agent: @agent } %>
+            </div>
+
+            <div class="form-group">
+              <%= f.label :schedule, :class => 'control-label' %>
+              <div class="schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
+                <div class="can-be-scheduled">
+                  <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'form-control' %>
+                </div>
+                <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
+              </div>
+            </div>
+
+            <div class="controller-region" data-has-controllers="<%= !@agent.controllers.empty? %>">
+              <div class="form-group">
+                <%= f.label :controllers %>
+                <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run or controlled by these user-defined Agents."></span>
+                <div class="controller-list">
+                  <%= agent_controllers(@agent) || 'None' %>
+                </div>
+              </div>
+            </div>
+
+            <div class="control-link-region" data-can-control-other-agents="<%= @agent.can_control_other_agents? %>">
+              <div class="can-control-other-agents">
+                <div class="form-group">
+                  <%= f.label :control_targets %>
+                  <% eventControlTargets = current_user.agents.select(&:can_be_scheduled?) %>
+                  <%= f.select(:control_target_ids,
+                               options_for_select(eventControlTargets.map {|s| [s.name, s.id] },
+                                                  @agent.control_target_ids),
+                               {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
+                </div>
+              </div>
+            </div>
+
+            <div class='event-related-region' data-can-create-events="<%= @agent.can_create_events? %>">
+              <div class="form-group">
+                <%= f.label :keep_events_for, "Keep events" %>
+                <span class="glyphicon glyphicon-question-sign hover-help" data-content="In order to conserve disk space, you can choose to have events created by this Agent expire after a certain period of time.  Make sure you keep them long enough to allow any subsequent Agents to make use of them."></span>
+                <%= f.select :keep_events_for, options_for_select(Agent::EVENT_RETENTION_SCHEDULES, @agent.keep_events_for), {}, :class => 'form-control' %>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <%= f.label :sources %>
+              <div class="link-region" data-can-receive-events="<%= @agent.can_receive_events? %>">
+                <% eventSources = (current_user.agents - [@agent]).find_all { |a| a.can_create_events? } %>
+                <%= f.select(:source_ids,
+                             options_for_select(eventSources.map {|s| [s.name, s.id] },
+                                                @agent.source_ids),
+                             {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
+                <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
+                <%= f.label :propagate_immediately, :class => 'propagate-immediately' do %>Propagate immediately
+                  <%= f.check_box :propagate_immediately %>
+                <% end %>
+              </div>
+            </div>
+
+            <% if current_user.scenario_count > 0 %>
+              <div class="form-group">
+                <%= f.label :scenarios %>
+                <span class="glyphicon glyphicon-question-sign hover-help" data-content="Use Scenarios to group sets of Agents, both for organization, and to make them easy to export and share."></span>
+                <%= f.select(:scenario_ids,
+                             options_for_select(current_user.scenarios.pluck(:name, :id), @agent.scenario_ids),
+                             {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
+              </div>
+            <% end %>
+
           </div>
 
-          <div class="form-group">
-            <%= f.submit "Save", :class => "btn btn-primary" %>
+          <!-- Form controls full width -->
+          <div class="col-md-12">
+            <div class="form-group">
+              <%= f.label :options %>
+              <span class="glyphicon glyphicon-question-sign hover-help" data-content="In this JSON hash, interpolation is available in almost all values using the Liquid templating language.<p>Available template variables include the following:<dl><dt><code>message</code>, <code>url</code>, etc.</dt><dd>Refers to the corresponding key's value of each incoming event's payload.</dd><dt><code>agent</code></dt><dd>Refers to the agent that created each incoming event.  It has attributes like <code>type</code>, <code>name</code> and <code>options</code>, so <code>{{agent.type}}</code> will expand to <code>WebsiteAgent</code> if an incoming event is created by that agent.</dd></dl></p><p>To access user credentials, use the <code>credential</code> tag like this: <code>{% credential <em>bare_key_name</em> %}</code></p>"></span>
+              <textarea rows="15" id="agent_options" name="agent[options]" class="form-control live-json-editor">
+                <%= Utils.jsonify((@agent.new_record? && @agent.options == {}) ? @agent.default_options : @agent.options) %>
+              </textarea>
+            </div>
+
+            <div class="form-group">
+              <%= f.submit "Save", :class => "btn btn-primary" %>
+            </div>
           </div>
         </div>
       </div>

@@ -1,4 +1,8 @@
 require 'thread'
+require 'huginn_scheduler'
+
+STDOUT.sync = true
+STDERR.sync = true
 
 def stop
   puts 'Exiting...'
@@ -13,6 +17,7 @@ def safely(&block)
   rescue StandardError => e
     STDERR.puts "\nException #{e.message}:\n#{e.backtrace.join("\n")}\n\n"
     STDERR.puts "Terminating myself ..."
+    STDERR.flush
     stop
   end
 end

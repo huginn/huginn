@@ -1,11 +1,11 @@
 <div class='table-responsive'>
   <table class='table table-striped'>
     <tr>
-      <th>Name</th>
+      <th><%= sortable_column 'name', 'asc' %></th>
       <th>Schedule</th>
-      <th>Last Check</th>
-      <th>Last Event Out</th>
-      <th>Last Event In</th>
+      <th><%= sortable_column 'last_check_at', name: 'Last Check' %></th>
+      <th><%= sortable_column 'last_event_at', name: 'Last Event Out' %></th>
+      <th><%= sortable_column 'last_receive_at', name: 'Last Event In' %></th>
       <th>Events Created</th>
       <th>Working?</th>
       <th></th>
@@ -13,7 +13,7 @@
 
     <% @agents.each do |agent| %>
       <tr>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <%= link_to agent.name, agent_path(agent) %>
           <br/>
           <span class='text-muted'><%= agent.short_type.titleize %></span>
@@ -23,35 +23,35 @@
             </span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_be_scheduled? %>
-            <%= agent.schedule.to_s.humanize.titleize %>
+            <%= agent_schedule(agent, ',<br/>') %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_be_scheduled? %>
             <%= agent.last_check_at ? time_ago_in_words(agent.last_check_at) + " ago" : "never" %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_create_events? %>
             <%= agent.last_event_at ? time_ago_in_words(agent.last_event_at) + " ago" : "never" %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_receive_events? %>
             <%= agent.last_receive_at ? time_ago_in_words(agent.last_receive_at) + " ago" : "never" %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>
         </td>
-        <td class='<%= "agent-disabled" if agent.disabled? %>'>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_create_events? %>
             <%= link_to(agent.events_count || 0, agent_events_path(agent)) %>
           <% else %>

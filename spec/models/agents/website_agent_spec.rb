@@ -3,7 +3,11 @@ require 'spec_helper'
 describe Agents::WebsiteAgent do
   describe "checking without basic auth" do
     before do
-      stub_request(:any, /xkcd/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      stub_request(:any, /xkcd/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")),
+                                           status: 200,
+                                           headers: {
+                                             'X-Status-Message' => 'OK'
+                                           })
       @valid_options = {
         'name' => "XKCD",
         'expected_update_period_in_days' => "2",
@@ -305,6 +309,17 @@ describe Agents::WebsiteAgent do
         event.payload['slogan'].should == "A webcomic of romance, sarcasm, math, and language."
       end
 
+      it "should interpolate _response_" do
+        @valid_options['extract']['response_info'] =
+          @valid_options['extract']['url'].merge(
+            'value' => '"{{ "The reponse was " | append:_response_.status | append:" " | append:_response_.headers.X-Status-Message | append:"." }}"'
+          )
+        @checker.options = @valid_options
+        @checker.check
+        event = Event.last
+        event.payload['response_info'].should == 'The reponse was 200 OK.'
+      end
+
       describe "JSON" do
         it "works with paths" do
           json = {
@@ -489,6 +504,22 @@ fire: hot
           'from' => 'http://xkcd.com',
           'to' => 'http://dynamic.xkcd.com/random/comic/',
         }
+      end
+
+      it "should interpolate values from incoming event payload and _response_" do
+        @event.payload['title'] = 'XKCD'
+
+        lambda {
+          @valid_options['extract'] = {
+            'response_info' => @valid_options['extract']['url'].merge(
+              'value' => '{% capture sentence %}The reponse from {{title}} was {{_response_.status}} {{_response_.headers.X-Status-Message}}.{% endcapture %}{{sentence | to_xpath}}'
+            )
+          }
+          @checker.options = @valid_options
+          @checker.receive([@event])
+        }.should change { Event.count }.by(1)
+
+        Event.last.payload['response_info'].should == 'The reponse from XKCD was 200 OK.'
       end
     end
   end

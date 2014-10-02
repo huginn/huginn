@@ -18,6 +18,8 @@
  */
 
 @import "bootstrap";
+@import "font-awesome-sprockets";
+@import "font-awesome";
 
 body { padding-top: 60px; }
 
@@ -36,15 +38,6 @@ body { padding-top: 60px; }
   @extend .control-group.error;
 }
 
-table.events {
-  .payload {
-    color: #999;
-    font-size: 12px;
-    //text-align: center;
-    font-family: monospace;
-  }
-}
-
 .select2 {
   float: none !important;
   margin-left: 0 !important;
@@ -57,6 +50,10 @@ img.odin {
 
 .link-region .cannot-receive-events,
 .schedule-region .cannot-be-scheduled {
+  display: none;
+}
+
+.controller-region[data-has-controllers=false] {
   display: none;
 }
 
@@ -88,9 +85,15 @@ span.not-applicable:after {
 }
 
 // Navbar
+.nav > li {
+  &.job-indicator, &#event-indicator {
+    display: none;
 
-#job-indicator, #event-indicator {
-  display: none;
+    a {
+      padding-right: 5px;
+      padding-left: 5px;
+    }
+  }
 }
 
 .navbar-search > .spinner {
@@ -114,6 +117,37 @@ span.not-applicable:after {
   right: 20px;
 
   .alert {
+  }
+}
+
+// Heroku
+
+.heroku-instructions {
+  color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(132, 132, 196, 0.8);
+  border: 3px solid rgba(132, 132, 196, 0.5);
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 10px;
+
+  a {
+    text-decoration: underline;
+  }
+
+  a:link {
+    color: inherit;
+  }
+
+  a:hover, a:visited, a:active {
+    color: #fff;
+  }
+
+  pre {
+    background-color: #ffffff;
+    color: #3F3F44;
+    margin: 4px;
   }
 }
 
@@ -143,7 +177,7 @@ span.not-applicable:after {
 
 // Disabled
 
-.agent-disabled {
+.agent-unavailable {
   opacity: 0.5;
 }
 
@@ -199,5 +233,44 @@ h2 .scenario, a span.label.scenario {
 
   .sp-dd {
     display: none;
+  }
+}
+
+.confirm-agent .popover {
+  width: 200px;
+}
+
+.btn-auth {
+  position: relative;
+  padding-left: 40px;
+  $border-color: rgba(0,0,0,0.2);
+  border-color: $border-color;
+
+  > i:first-child {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    font-size: 24px;
+    border-right: 1px solid $border-color;
+  }
+
+  &.btn-auth-twitter {
+    color: #fff;
+    background-color: #55acee;
+  }
+
+  &.btn-auth-37signals {
+    color: #fff;
+    background-color: #8fc857;
+  }
+
+  &.btn-auth-github {
+    color: #fff;
+    background-color: #444;
   }
 }

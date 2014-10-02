@@ -10,7 +10,11 @@ unless `which heroku` =~ /heroku/
 end
 
 def capture(cmd, opts = {})
-  o, s = Open3.capture2e(cmd, opts)
+  if opts.delete(:no_stderr)
+    o, s = Open3.capture2(cmd, opts)
+  else
+    o, s = Open3.capture2e(cmd, opts)
+  end
   o.strip
 end
 
@@ -33,7 +37,7 @@ def yes?(question)
 end
 
 def grab_heroku_config!
-  config_data = capture("heroku config -s")
+  config_data = capture("heroku config -s", no_stderr: true)
   $config = {}
   if config_data !~ /has no config vars/
     config_data.split("\n").map do |line|
@@ -48,6 +52,7 @@ def set_value(key, value, options = {})
   if $config[key].nil? || $config[key] == '' || ($config[key] != value && options[:force] != false)
     puts "Setting #{key} to #{value}" unless options[:silent]
     puts capture("heroku config:set #{key}=#{value}")
+    $config[key] = value
   end
 end
 
@@ -79,6 +84,29 @@ unless yes?("Your Heroku app name is #{app_name}.  Is this correct?")
   exit 1
 end
 
+if (root_id = `git rev-list --max-parents=0 HEAD`.chomp) != '620acffa5a302c6a27165d3214cf3da6be6c1d0d'
+  if (`git remote`.split - %w[heroku]).empty?
+    puts "You don't seem to have cantino/huginn set up as upstream repository."
+    if yes?("Would you like me to set this work tree up for you?")
+      if system('git remote add origin https://github.com/cantino/huginn.git') &&
+         system('git remote update origin')
+        rebase_command = "git rebase #{root_id} --onto origin/master"
+        if system(rebase_command)
+          puts "Done!"
+        else
+          system('git rebase --abort')
+          puts "Rebasing your work tree onto the upstream master failed."
+          puts "Please run the following command and merge your local changes by yourself."
+          puts "\t#{rebase_command}"
+          exit 1
+        end
+      else
+        exit 1
+      end
+    end
+  end
+end
+
 grab_heroku_config!
 
 if $config.length > 0
@@ -94,11 +122,15 @@ unless $config['APP_SECRET_TOKEN']
   puts capture("heroku config:set APP_SECRET_TOKEN=`rake secret`")
 end
 
+unless $config['DOMAIN']
+  set_value 'DOMAIN', "#{app_name}.herokuapp.com", force: false
+  first_time = true
+end
+
 set_value 'BUILDPACK_URL', "https://github.com/ddollar/heroku-buildpack-multi.git"
 set_value 'PROCFILE_PATH', "deployment/heroku/Procfile.heroku", force: false
 set_value 'ON_HEROKU', "true"
 set_value 'FORCE_SSL', "true"
-set_value 'DOMAIN', "#{app_name}.herokuapp.com", force: false
 set_value 'USE_GRAPHVIZ_DOT', 'dot'
 
 unless $config['INVITATION_CODE']
@@ -140,21 +172,44 @@ if yes?("Should I push your current branch (#{branch}) to heroku?")
 
   puts "Running database migrations..."
   puts capture("heroku run rake db:migrate")
+end
 
+if first_time
+  puts "Restarting..."
+  puts capture("heroku restart")
+  puts "Done!"
   puts
   puts
   puts "I can make an admin user on your new Huginn instance and setup some example Agents."
   if yes?("Should I create a new admin user and some example Agents?")
-    seed_email = nag "Okay, what is your email address?"
-    seed_username = nag "And what username would you like to login as?"
-    seed_password = nag "Finally, what password would you like to use?", noecho: true
-    puts "\nJust a moment..."
+    done = false
+    while !done
+      seed_email = nag "Okay, what is your email address?"
+      seed_username = nag "And what username would you like to login as?"
+      seed_password = nag "Finally, what password would you like to use?", noecho: true
+      puts "\nJust a moment..."
 
-    capture("heroku run rake db:seed SEED_EMAIL=#{seed_email} SEED_USERNAME=#{seed_username} SEED_PASSWORD=#{seed_password}")
+      result = capture("heroku run rake db:seed SEED_EMAIL=#{seed_email} SEED_USERNAME=#{seed_username} SEED_PASSWORD=#{seed_password}")
+      if result =~ /Validation failed/
+        puts "ERROR:"
+        puts
+        puts result
+        puts
+      else
+        done = true
+      end
+    end
     puts
     puts
     puts "Okay, you should be all set!  Visit https://#{app_name}.herokuapp.com and login as '#{seed_username}' with your password."
+    puts
+    puts "If you'd like to make more users, you can visit https://#{app_name}.herokuapp.com/users/sign_up and use the invitation code:"
+  else
+    puts
+    puts "Visit https://#{app_name}.herokuapp.com/users/sign_up and use the invitation code shown below:"
   end
+  puts
+  puts "\t#{$config['INVITATION_CODE']}"
 end
 
 puts

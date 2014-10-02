@@ -7,6 +7,28 @@
 
         <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :class => 'form-horizontal' }) do |f| %>
           <%= devise_error_messages! %>
+          <% if ENV['ON_HEROKU'] && User.count.zero? %>
+          <div class="heroku-instructions">
+            <% app_name = request.host[/\A[^.]+/] %>
+            <p>If you are the owner of this application, take the following steps to complete the setup:</p>
+
+            <ul>
+              <li>Read <a href="https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku" target="_target">this document</a> carefully if you are going to try out Huginn for free on <a href="https://id.heroku.com/" target="_target">Heroku</a>.</li>
+
+              <li>Install the <a href="https://toolbelt.heroku.com/" target="_target">Heroku Toolbelt</a> and run <kbd>heroku login</kbd>, if you haven't already.</li>
+
+              <li>Run the following commands:<br />
+                <%= content_tag :pre do -%>
+heroku git:clone <%= content_tag :var, app_name %>
+cd <%= content_tag :var, app_name %>
+bundle
+bin/setup_heroku
+<%- end %>
+
+              <li>This command will create an admin account for you.</li>
+            </ul>
+          </div>
+          <% end %>
 
           <div class="form-group">
             <%= f.label :invitation_code, :class => 'col-md-4 control-label' %>

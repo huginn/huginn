@@ -1,10 +1,16 @@
 class UserCredentialsController < ApplicationController
+  include SortableTable
+
   def index
-    @user_credentials = current_user.user_credentials.page(params[:page])
+    set_table_sort sorts: %w[credential_name credential_value], default: { credential_name: :asc }
+
+    @user_credentials = current_user.user_credentials.reorder(table_sort).page(params[:page])
 
     respond_to do |format|
       format.html
-      format.json { render json: @user_credentials }
+      format.json {
+        send_data Utils.pretty_jsonify(@user_credentials.limit(nil).as_json), disposition: 'attachment'
+      }
     end
   end
 

@@ -19,7 +19,9 @@ module Agents
 
           * `secrets` - An array of tokens that the requestor must provide for light-weight authentication.
           * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
-          * `template` - A JSON object representing a mapping between item output keys and incoming event values. Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values. The `item` key will be repeated for every Event.
+          * `template` - A JSON object representing a mapping between item output keys and incoming event values. Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values. The `item` key will be repeated for every Event. The `pubDate` key for each item will have the creation time of the Event unless given.
+          * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
+          * `ttl` - A value for the <ttl> element in RSS output. (default: `60`)
       MD
     end
 
@@ -85,7 +87,15 @@ module Agents
         items = received_events.order('id desc').limit(events_to_show).map do |event|
           interpolated = interpolate_options(options['template']['item'], event)
           interpolated['guid'] = event.id
-          interpolated['pubDate'] = event.created_at.rfc2822.to_s
+          date_string = interpolated['pubDate'].to_s
+          date =
+            begin
+              Time.zone.parse(date_string)  # may return nil
+            rescue => e
+              error "Error parsing a \"pubDate\" value \"#{date_string}\": #{e.message}"
+              nil
+            end || event.created_at
+          interpolated['pubDate'] = date.rfc2822.to_s
           interpolated
         end
 

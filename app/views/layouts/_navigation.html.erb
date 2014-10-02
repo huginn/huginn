@@ -28,26 +28,30 @@
   
   <ul class="nav navbar-nav navbar-right">
     <% if user_signed_in? %>
-      <form class="navbar-form navbar-left" role="search">
+      <form class="navbar-form navbar-left visible-lg" role="search">
         <div class="form-group">
           <input type="text" class="form-control" id='agent-navigate' autocomplete="off" placeholder="Search">
           <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
         </div>
       </form>
       
-      <li id='job-indicator'>
-        <% if defined?(DelayedJobWeb) %>
-          <a href="/delayed_job">
-            <span class="badge"><span class="glyphicon glyphicon-refresh icon-white"></span> <span class='number'>0</span></span>
-          </a>
-        <% else %>
-          <a href="#" onclick='return false;'>
-            <span class="badge"><span class="glyphicon glyphicon-refresh icon-white"></span> <span class='number'>0</span></span>
-          </a>
+      <li class='job-indicator' role='pending'>
+        <%= link_to current_user.admin? ? jobs_path : '#', class: 'visible-lg' do %>
+          <span class="badge"><span class="glyphicon glyphicon-refresh icon-white"></span> <span class='number'>0</span></span>
+        <% end %>
+      </li>
+      <li class='job-indicator' role='awaiting_retry'>
+        <%= link_to current_user.admin? ? jobs_path : '#', class: 'visible-lg' do %>
+          <span class="badge"><span class="glyphicon glyphicon-question-sign icon-yellow"></span> <span class='number'>0</span></span>
+        <% end %>
+      </li>
+      <li class='job-indicator' role='recent_failures'>
+        <%= link_to current_user.admin? ? jobs_path : '#', class: 'hidden-sm hidden-xs' do %>
+          <span class="badge"><span class="glyphicon glyphicon-exclamation-sign icon-white"></span> <span class='number'>0</span></span>
         <% end %>
       </li>
       <li id='event-indicator'>
-        <a href="#">
+        <a href="#" class='hidden-sm hidden-xs'>
           <span class="badge"><span class="glyphicon glyphicon-random icon-white"></span> <span class='number'>0</span> new events</span>
         </a>
       </li>
@@ -66,7 +70,11 @@
             <%= link_to 'Sign up', new_user_registration_path, :tabindex => "-1" %>
           <% end %>
         </li>
-
+        <% if user_signed_in? && current_user.admin %>
+          <li>
+            <%= link_to 'Job Management', jobs_path, :tabindex => '-1' %>
+          </li>
+        <% end %>
         <li>
           <%= link_to 'About', 'https://github.com/cantino/huginn', :tabindex => "-1" %>
         </li>

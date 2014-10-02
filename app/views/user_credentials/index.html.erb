@@ -14,8 +14,8 @@
 
       <table class='table table-striped'>
         <tr>
-          <th>Name</th>
-          <th>Value</th>
+          <th><%= sortable_column 'credential_name', 'asc', name: 'Name'  %></th>
+          <th><%= sortable_column 'credential_value', 'asc', name: 'Value' %></th>
         </tr>
 
         <% @user_credentials.each do |user_credential| %>
@@ -37,7 +37,8 @@
       <br/>
 
       <div class="btn-group">
-        <%= link_to '<span class="glyphicon glyphicon-plus"></span> New Credential'.html_safe, new_user_credential_path, class: "btn btn-default" %>
+        <%= link_to new_user_credential_path, class: "btn btn-default" do %><span class="glyphicon glyphicon-plus"></span> New Credential<% end %>
+        <%= link_to user_credentials_path(format: :json), class: "btn btn-default" do %><span class="glyphicon glyphicon-download-alt"></span> Download Credentials<% end %>
       </div>
     </div>
   </div>

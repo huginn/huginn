@@ -1,8 +1,11 @@
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<% content_for :head do -%>
+<%= javascript_include_tag "https://maps.googleapis.com/maps/api/js?sensor=false" %>
+<%= javascript_include_tag "map_marker" %>
+<% end -%>
 
 <h3>Recent Event Map</h3>
 
-<% events = @agent.events.where("lat IS NOT null AND lng IS NOT null").order("id desc").limit(500) %>
+<% events = @agent.events.with_location.order("id desc").limit(500) %>
 <% if events.length > 0 %>
   <div id="map_canvas" style="width:800px; height:800px"></div>
 
@@ -14,13 +17,22 @@
     };
 
     var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+    <% events.each do |event| %>
+    map_marker(map, <%= Utils.jsonify(event.location) %>);
+    <% end %>
   </script>
-
-  <% events.each do |event| %>
-    <%= render "agents/agent_views/user_location_agent/map_marker", :event => event %>
-  <% end %>
 <% else %>
   <p>
     No events found.
   </p>
 <% end %>
+
+<h3>POST URL</h3>
+
+<p>
+  Location data containing <code>latitude</code> and <code>longitude</code> can be posted to this URL:<br/>
+
+  <ul>
+    <li><code class="selectable-text"><%= web_requests_url(user_id: @agent.user_id, agent_id: @agent.id, secret: @agent.options['secret']) %></code></li>
+  </ul>
+</p>

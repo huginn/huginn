@@ -75,6 +75,14 @@ module Agents
       The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
 
       The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload.
+
+      In Liquid templating, the following variable is available:
+
+      * `_response_`: A response object with the following keys:
+
+          * `status`: HTTP status as integer. (Almost always 200)
+
+          * `headers`: Reponse headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insentitive to cases and -/_.
     MD
 
     event_description do
@@ -149,7 +157,10 @@ module Agents
       Array(in_url).each do |url|
         log "Fetching #{url}"
         response = faraday.get(url)
-        if response.success?
+        raise "Failed: #{response.inspect}" unless response.success?
+
+        interpolation_context.stack {
+          interpolation_context['_response_'] = ResponseDrop.new(response)
           body = response.body
           if (encoding = interpolated['force_encoding']).present?
             body = body.encode(Encoding::UTF_8, encoding)
@@ -195,9 +206,7 @@ module Agents
               create_event :payload => result
             end
           end
-        else
-          raise "Failed: #{response.inspect}"
-        end
+        }
       end
     rescue => e
       error e.message
@@ -205,16 +214,11 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        Thread.current[:current_event] = event
-        url_to_scrape = event.payload['url']
-        check_url(url_to_scrape) if url_to_scrape =~ /^https?:\/\//i
+        interpolate_with(event) do
+          url_to_scrape = event.payload['url']
+          check_url(url_to_scrape) if url_to_scrape =~ /^https?:\/\//i
+        end
       end
-    ensure
-      Thread.current[:current_event] = nil
-    end
-
-    def interpolated(event = Thread.current[:current_event])
-      super
     end
 
     private
@@ -348,6 +352,25 @@ module Agents
       Integer(value) >= 0
     rescue
       false
+    end
+
+    # Wraps Faraday::Response
+    class ResponseDrop < LiquidDroppable::Drop
+      def headers
+        HeaderDrop.new(@object.headers)
+      end
+
+      # Integer value of HTTP status
+      def status
+        @object.status
+      end
+    end
+
+    # Wraps Faraday::Utilsa::Headers
+    class HeaderDrop < LiquidDroppable::Drop
+      def before_method(name)
+        @object[name.tr('_', '-')]
+      end
     end
   end
 end

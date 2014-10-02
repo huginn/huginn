@@ -3,7 +3,10 @@ module Agents
     cannot_be_scheduled!
     cannot_create_events!
 
+    gem_dependency_check { defined?(HipChat) }
+
     description <<-MD
+      #{'## Include `hipchat` in your Gemfile to use this Agent!' if dependencies_missing?}
       The HipchatAgent sends messages to a Hipchat Room
 
       To authenticate you need to set the `auth_token`, you can get one at your Hipchat Group Admin page which you can find here:
@@ -40,11 +43,14 @@ module Agents
     end
 
     def receive(incoming_events)
-      client = HipChat::Client.new(interpolated[:auth_token] || credential('hipchat_auth_token'))
       incoming_events.each do |event|
         mo = interpolated(event)
         client[mo[:room_name]].send(mo[:username][0..14], mo[:message], :notify => boolify(mo[:notify]), :color => mo[:color])
       end
+    end
+
+    def client
+      @client ||= HipChat::Client.new(interpolated[:auth_token] || credential('hipchat_auth_token'))
     end
   end
 end

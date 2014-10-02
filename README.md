@@ -55,6 +55,7 @@ If you just want to play around, you can simply fork this repository, then perfo
 
 * Run `git remote add upstream https://github.com/cantino/huginn.git` to add the main repository as a remote for your fork.
 * Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` variable.
+* Run `bundle` to install dependencies
 * Run `rake db:create`, `rake db:migrate`, and then `rake db:seed` to create a development MySQL database with some example Agents.
 * Run `foreman start`, visit [http://localhost:3000/][localhost], and login with the username of `admin` and the password of `password`.
 * Setup some Agents!
@@ -71,6 +72,8 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 
 ## Deployment
 
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
 Huginn can run on Heroku for free!  Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
 ### Optional Setup
@@ -82,12 +85,6 @@ See [private development instructions](https://github.com/cantino/huginn/wiki/Pr
 #### Enable the WeatherAgent
 
 In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/). Signup for one and then change the value of `api_key: your-key` in your seeded WeatherAgent.
-
-#### Enable DelayedJobWeb for handy delayed\_job monitoring and control
-
-* Edit `config.ru`, uncomment the DelayedJobWeb section, and change the DelayedJobWeb username and password.
-* Uncomment `match "/delayed_job" => DelayedJobWeb, :anchor => false` in `config/routes.rb`.
-* Uncomment `gem "delayed_job_web"` in Gemfile and run `bundle`.
 
 #### Disable SSL
 

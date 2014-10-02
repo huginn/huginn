@@ -5,7 +5,10 @@ module Agents
   class WeatherAgent < Agent
     cannot_receive_events!
 
+    gem_dependency_check { defined?(Wunderground) && defined?(ForecastIO) }
+
     description <<-MD
+      #{'## Include `forecast_io` and `wunderground` in your Gemfile to use this Agent!' if dependencies_missing?}
       The WeatherAgent creates an event for the day's weather at a given `location`.
 
       You also must select `which_day` you would like to get the weather for where the number 0 is for today and 1 is for tomorrow and so on. Weather is only returned for 1 week at a time.
@@ -14,7 +17,7 @@ module Agents
 
       The `location` can be a US zipcode, or any location that Wunderground supports. To find one, search [wunderground.com](http://wunderground.com) and copy the location part of the URL.  For example, a result for San Francisco gives `http://www.wunderground.com/US/CA/San_Francisco.html` and London, England gives `http://www.wunderground.com/q/zmw:00000.1.03772`.  The locations in each are `US/CA/San_Francisco` and `zmw:00000.1.03772`, respectively.
 
-      If you plan on using ForecastIO, the `location` must be a set of GPS coordinates.
+      If you plan on using ForecastIO, the `location` must be a comma-separated string of co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
 
       You must setup an [API key for Wunderground](http://www.wunderground.com/weather/api/) in order to use this Agent with Wunderground.
 

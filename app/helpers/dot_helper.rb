@@ -17,10 +17,11 @@ module DotHelper
   class DotDrawer
     def initialize(vars = {})
       @dot = ''
-      vars.each { |name, value|
-        # Import variables as methods
-        define_singleton_method(name) { value }
-      }
+      @vars = vars.symbolize_keys
+    end
+
+    def method_missing(var, *args)
+      @vars.fetch(var) { super }
     end
 
     def to_s
@@ -35,6 +36,12 @@ module DotHelper
 
     def raw(string)
       @dot << string
+    end
+
+    ENDL = ';'.freeze
+
+    def endl
+      @dot << ENDL
     end
 
     def escape(string)
@@ -81,7 +88,7 @@ module DotHelper
     def node(id, attrs = nil)
       id id
       attr_list attrs
-      raw ';'
+      endl
     end
 
     def edge(from, to, attrs = nil, op = '->')
@@ -89,13 +96,13 @@ module DotHelper
       raw op
       id to
       attr_list attrs
-      raw ';'
+      endl
     end
 
     def statement(ids, attrs = nil)
       ids Array(ids)
       attr_list attrs
-      raw ';'
+      endl
     end
 
     def block(*ids, &block)
@@ -130,16 +137,18 @@ module DotHelper
              label: agent_label[agent],
              tooltip: (agent.short_type.titleize if rich),
              URL: (agent_url[agent] if rich),
-             style: ('rounded,dashed' if agent.disabled?),
-             color: (@disabled if agent.disabled?),
-             fontcolor: (@disabled if agent.disabled?))
+             style: ('rounded,dashed' if agent.unavailable?),
+             color: (@disabled if agent.unavailable?),
+             fontcolor: (@disabled if agent.unavailable?))
       end
 
       def agent_edge(agent, receiver)
         edge(agent_id[agent],
              agent_id[receiver],
-             style: ('dashed' unless receiver.propagate_immediately),
-             color: (@disabled if agent.disabled? || receiver.disabled?))
+             style: ('dashed' unless receiver.propagate_immediately?),
+             label: (" #{agent.control_action}s " if agent.can_control_other_agents?),
+             arrowhead: ('empty' if agent.can_control_other_agents?),
+             color: (@disabled if agent.unavailable? || receiver.unavailable?))
       end
 
       block('digraph', 'Agent Event Flow') {
@@ -151,10 +160,17 @@ module DotHelper
                   fontsize: 10,
                   fontname: ('Helvetica' if rich)
 
+        statement 'edge',
+                  fontsize: 10,
+                  fontname: ('Helvetica' if rich)
+
         agents.each.with_index { |agent, index|
           agent_node(agent)
 
-          agent.receivers.each { |receiver|
+          [
+            *agent.receivers,
+            *(agent.control_targets if agent.can_control_other_agents?)
+          ].each { |receiver|
             agent_edge(agent, receiver) if agents.include?(receiver)
           }
         }
@@ -202,7 +218,7 @@ module DotHelper
             # a dummy label only to obtain the background color
             label['class'] = [
               'label',
-              if agent.disabled?
+              if agent.unavailable?
                 'label-warning'
               elsif agent.working?
                 'label-success'

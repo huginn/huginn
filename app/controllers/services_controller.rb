@@ -1,8 +1,12 @@
 class ServicesController < ApplicationController
+  include SortableTable
+
   before_filter :upgrade_warning, only: :index
 
   def index
-    @services = current_user.services.page(params[:page])
+    set_table_sort sorts: %w[provider name global], default: { provider: :asc }
+
+    @services = current_user.services.reorder(table_sort).page(params[:page])
 
     respond_to do |format|
       format.html

@@ -1,0 +1,12 @@
+#= require jquery
+#= require jquery_ujs
+#= require typeahead.bundle
+#= require bootstrap
+#= require select2
+#= require json2
+#= require jquery.json-editor
+#= require latlon_and_geo
+#= require spectrum
+#= require_tree ./components
+#= require_tree ./pages
+#= require_self

@@ -1,6 +1,50 @@
 require 'spec_helper'
 
 describe Event do
+  describe ".with_location" do
+    it "selects events with location" do
+      event = events(:bob_website_agent_event)
+      event.lat = 2
+      event.lng = 3
+      event.save!
+      Event.with_location.pluck(:id).should == [event.id]
+
+      event.lat = nil
+      event.save!
+      Event.with_location.should be_empty
+    end
+  end
+
+  describe "#location" do
+    it "returns a default hash when an event does not have a location" do
+      event = events(:bob_website_agent_event)
+      event.location.should == Location.new(
+        lat: nil,
+        lng: nil,
+        radius: 0.0,
+        speed: nil,
+        course: nil)
+    end
+
+    it "returns a hash containing location information" do
+      event = events(:bob_website_agent_event)
+      event.lat = 2
+      event.lng = 3
+      event.payload = {
+        radius: 300,
+        speed: 0.5,
+        course: 90.0,
+      }
+      event.save!
+      event.location.should == Location.new(
+        lat: 2.0,
+        lng: 3.0,
+        radius: 0.0,
+        speed: 0.5,
+        course: 90.0)
+    end
+  end
+
   describe "#reemit" do
     it "creates a new event identical to itself" do
       events(:bob_website_agent_event).lat = 2
@@ -75,6 +119,46 @@ describe Event do
       Event.find_by_id(event.id).should_not be_nil
     end
   end
+
+  describe "after destroy" do
+    it "nullifies any dependent AgentLogs" do
+      agent_logs(:log_for_jane_website_agent).outbound_event_id.should be_present
+      agent_logs(:log_for_bob_website_agent).outbound_event_id.should be_present
+
+      agent_logs(:log_for_bob_website_agent).outbound_event.destroy
+
+      agent_logs(:log_for_jane_website_agent).reload.outbound_event_id.should be_present
+      agent_logs(:log_for_bob_website_agent).reload.outbound_event_id.should be_nil
+    end
+  end
+
+  describe "caches" do
+    describe "when an event is created" do
+      it "updates a counter cache on agent" do
+        lambda {
+          agents(:jane_weather_agent).events.create!(:user => users(:jane))
+        }.should change { agents(:jane_weather_agent).reload.events_count }.by(1)
+      end
+
+      it "updates last_event_at on agent" do
+        lambda {
+          agents(:jane_weather_agent).events.create!(:user => users(:jane))
+        }.should change { agents(:jane_weather_agent).reload.last_event_at }
+      end
+    end
+
+    describe "when an event is updated" do
+      it "does not touch the last_event_at on the agent" do
+        event = agents(:jane_weather_agent).events.create!(:user => users(:jane))
+
+        agents(:jane_weather_agent).update_attribute :last_event_at, 2.days.ago
+
+        lambda {
+          event.update_attribute :payload, { 'hello' => 'world' }
+        }.should_not change { agents(:jane_weather_agent).reload.last_event_at }
+      end
+    end
+  end
 end
 
 describe EventDrop do
@@ -90,6 +174,8 @@ describe EventDrop do
       'title' => 'some title',
       'url' => 'http://some.site.example.org/',
     }
+    @event.lat = 2
+    @event.lng = 3
     @event.save!
   end
 
@@ -125,5 +211,10 @@ describe EventDrop do
   it 'should have created_at' do
     t = '{{created_at | date:"%FT%T%z" }}'
     interpolate(t, @event).should eq(@event.created_at.strftime("%FT%T%z"))
+  end
+
+  it 'should have _location_' do
+    t = '{{_location_.lat}},{{_location_.lng}}'
+    interpolate(t, @event).should eq("2.0,3.0")
   end
 end
