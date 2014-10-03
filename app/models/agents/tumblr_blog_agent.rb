@@ -60,28 +60,16 @@ module Agents
     def validate_options
       errors.add(:base, "blog_name is required") unless options['blog_name'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
-
-      if options[:starting_at].present?
-        Time.parse(options[:starting_at]) rescue errors.add(:base, "Error parsing starting_at")
-      end
-    end
-
-    def starting_at
-      if interpolated[:starting_at].present?
-        Time.parse(interpolated[:starting_at]) rescue created_at
-      else
-        created_at
-      end
     end
 
 
 
     def check
-      since_id = memory['since_id'] || nil
-
-      posts = tumblr.posts(interpolated['blog_name'])
-
-      # p posts
+      if interpolated['tag']
+        posts = tumblr.posts(interpolated['blog_name'], :tag => interpolated['tag'])
+      else
+        posts = tumblr.posts(interpolated['blog_name'])
+      end
 
       posts["posts"].reverse_each do |post|
         if !memory['since_id'] || (post["id"] > memory['since_id'])
