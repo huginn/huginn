@@ -42,9 +42,9 @@ describe Agents::PushoverAgent do
       event2.save!
 
       @checker.receive([@event,event1,event2])
-      @sent_notifications[0]['message'].should == 'Looks like its going to rain'
-      @sent_notifications[1]['message'].should == 'Some message'
-      @sent_notifications[2]['message'].should == 'Some other message'
+      expect(@sent_notifications[0]['message']).to eq('Looks like its going to rain')
+      expect(@sent_notifications[1]['message']).to eq('Some message')
+      expect(@sent_notifications[2]['message']).to eq('Some other message')
     end
 
     it 'should make sure event message overrides default message' do
@@ -54,7 +54,7 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['message'].should == 'Some new message'
+      expect(@sent_notifications[0]['message']).to eq('Some new message')
     end
 
     it 'should make sure event text overrides default message' do
@@ -64,7 +64,7 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['message'].should == 'Some new text'
+      expect(@sent_notifications[0]['message']).to eq('Some new text')
     end
 
     it 'should make sure event title overrides default title' do
@@ -74,7 +74,7 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['title'].should == 'Some new title'
+      expect(@sent_notifications[0]['title']).to eq('Some new title')
     end
 
     it 'should make sure event url overrides default url' do
@@ -84,7 +84,7 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['url'].should == 'Some new url'
+      expect(@sent_notifications[0]['url']).to eq('Some new url')
     end
 
     it 'should make sure event url_title overrides default url_title' do
@@ -94,7 +94,7 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['url_title'].should == 'Some new url_title'
+      expect(@sent_notifications[0]['url_title']).to eq('Some new url_title')
     end
 
     it 'should make sure event priority overrides default priority' do
@@ -104,7 +104,7 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['priority'].should == 1
+      expect(@sent_notifications[0]['priority']).to eq(1)
     end
 
     it 'should make sure event timestamp overrides default timestamp' do
@@ -114,7 +114,7 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['timestamp'].should == 'false'
+      expect(@sent_notifications[0]['timestamp']).to eq('false')
     end
 
     it 'should make sure event sound overrides default sound' do
@@ -124,7 +124,7 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['sound'].should == 'Some new sound'
+      expect(@sent_notifications[0]['sound']).to eq('Some new sound')
     end
 
     it 'should make sure event retry overrides default retry' do
@@ -134,7 +134,7 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['retry'].should == 1
+      expect(@sent_notifications[0]['retry']).to eq(1)
     end
 
     it 'should make sure event expire overrides default expire' do
@@ -144,79 +144,79 @@ describe Agents::PushoverAgent do
       event.save!
 
       @checker.receive([event])
-      @sent_notifications[0]['expire'].should == 60
+      expect(@sent_notifications[0]['expire']).to eq(60)
     end
   end
 
   describe '#working?' do
     it 'checks if events have been received within the expected receive period' do
       # No events received
-      @checker.should_not be_working 
+      expect(@checker).not_to be_working
       Agents::PushoverAgent.async_receive @checker.id, [@event.id]
 
       # Just received events
-      @checker.reload.should be_working 
+      expect(@checker.reload).to be_working
       two_days_from_now = 2.days.from_now
       stub(Time).now { two_days_from_now }
       
       # More time has passed than the expected receive period without any new events
-      @checker.reload.should_not be_working 
+      expect(@checker.reload).not_to be_working
     end
   end
 
   describe "validation" do
     before do
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should validate presence of token" do
       @checker.options[:token] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should validate presence of user" do
       @checker.options[:user] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should validate presence of expected_receive_period_in_days" do
       @checker.options[:expected_receive_period_in_days] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should make sure device is optional" do
       @checker.options[:device] = ""
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should make sure title is optional" do
       @checker.options[:title] = ""
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should make sure url is optional" do
       @checker.options[:url] = ""
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should make sure url_title is optional" do
       @checker.options[:url_title] = ""
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should make sure priority is optional" do
       @checker.options[:priority] = ""
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should make sure timestamp is optional" do
       @checker.options[:timestamp] = ""
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should make sure sound is optional" do
       @checker.options[:sound] = ""
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
   end
 end

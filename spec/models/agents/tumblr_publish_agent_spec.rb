@@ -30,9 +30,9 @@ describe Agents::TumblrPublishAgent do
   describe '#receive' do
     it 'should publish any payload it receives' do
       Agents::TumblrPublishAgent.async_receive(@checker.id, [@event.id])
-      @checker.events.count.should eq(1)
-      @checker.events.first.payload['post_id'].should eq('5')
-      @checker.events.first.payload['published_post'].should eq('[huginnbot.tumblr.com] text')
+      expect(@checker.events.count).to eq(1)
+      expect(@checker.events.first.payload['post_id']).to eq('5')
+      expect(@checker.events.first.payload['published_post']).to eq('[huginnbot.tumblr.com] text')
     end
   end
 end

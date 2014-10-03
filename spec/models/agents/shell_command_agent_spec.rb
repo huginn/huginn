@@ -26,22 +26,22 @@ describe Agents::ShellCommandAgent do
 
   describe "validation" do
     before do
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should validate presence of necessary fields" do
       @checker.options[:command] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should validate path" do
       @checker.options[:path] = 'notarealpath/itreallyisnt'
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should validate path" do
       @checker.options[:path] = '/'
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
   end
 
@@ -49,12 +49,12 @@ describe Agents::ShellCommandAgent do
     it "generating events as scheduled" do
       stub(@checker).run_command(@valid_path, 'pwd') { ["fake pwd output", "", 0] }
 
-      @checker.should_not be_working
+      expect(@checker).not_to be_working
       @checker.check
-      @checker.reload.should be_working
+      expect(@checker.reload).to be_working
       three_days_from_now = 3.days.from_now
       stub(Time).now { three_days_from_now }
-      @checker.should_not be_working
+      expect(@checker).not_to be_working
     end
   end
 
@@ -65,9 +65,9 @@ describe Agents::ShellCommandAgent do
 
     it "should create an event when checking" do
       expect { @checker.check }.to change { Event.count }.by(1)
-      Event.last.payload[:path].should == @valid_path
-      Event.last.payload[:command].should == 'pwd'
-      Event.last.payload[:output].should == "fake pwd output"
+      expect(Event.last.payload[:path]).to eq(@valid_path)
+      expect(Event.last.payload[:command]).to eq('pwd')
+      expect(Event.last.payload[:output]).to eq("fake pwd output")
     end
 
     it "does not run when should_run? is false" do
@@ -84,9 +84,9 @@ describe Agents::ShellCommandAgent do
     it "creates events" do
       @checker.options[:command] = "{{cmd}}"
       @checker.receive([@event])
-      Event.last.payload[:path].should == @valid_path
-      Event.last.payload[:command].should == @event.payload[:cmd]
-      Event.last.payload[:output].should == "fake ls output"
+      expect(Event.last.payload[:path]).to eq(@valid_path)
+      expect(Event.last.payload[:command]).to eq(@event.payload[:cmd])
+      expect(Event.last.payload[:output]).to eq("fake ls output")
     end
 
     it "does not run when should_run? is false" do

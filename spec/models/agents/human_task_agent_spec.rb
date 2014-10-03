@@ -13,143 +13,143 @@ describe Agents::HumanTaskAgent do
                        'name' => "Joe" }
     @event.id = 345
 
-    @checker.should be_valid
+    expect(@checker).to be_valid
   end
 
   describe "validations" do
     it "validates that trigger_on is 'schedule' or 'event'" do
       @checker.options['trigger_on'] = "foo"
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "requires expected_receive_period_in_days when trigger_on is set to 'event'" do
       @checker.options['trigger_on'] = "event"
       @checker.options['expected_receive_period_in_days'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['expected_receive_period_in_days'] = 2
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "requires a positive submission_period when trigger_on is set to 'schedule'" do
       @checker.options['trigger_on'] = "schedule"
       @checker.options['submission_period'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['submission_period'] = 2
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "requires a hit.title" do
       @checker.options['hit']['title'] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "requires a hit.description" do
       @checker.options['hit']['description'] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "requires hit.assignments" do
       @checker.options['hit']['assignments'] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['assignments'] = 0
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['assignments'] = "moose"
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['assignments'] = "2"
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "requires hit.questions" do
       old_questions = @checker.options['hit']['questions']
       @checker.options['hit']['questions'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['questions'] = []
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['questions'] = [old_questions[0]]
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "requires that all questions have key, name, required, type, and question" do
       old_questions = @checker.options['hit']['questions']
       @checker.options['hit']['questions'].first['key'] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
 
       @checker.options['hit']['questions'] = old_questions
       @checker.options['hit']['questions'].first['name'] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
 
       @checker.options['hit']['questions'] = old_questions
       @checker.options['hit']['questions'].first['required'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
 
       @checker.options['hit']['questions'] = old_questions
       @checker.options['hit']['questions'].first['type'] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
 
       @checker.options['hit']['questions'] = old_questions
       @checker.options['hit']['questions'].first['question'] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "requires that all questions of type 'selection' have a selections array with keys and text" do
       @checker.options['hit']['questions'][0]['selections'] = []
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['questions'][0]['selections'] = [{}]
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['questions'][0]['selections'] = [{ 'key' => "", 'text' => "" }]
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['questions'][0]['selections'] = [{ 'key' => "", 'text' => "hi" }]
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['questions'][0]['selections'] = [{ 'key' => "hi", 'text' => "" }]
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['questions'][0]['selections'] = [{ 'key' => "hi", 'text' => "hi" }]
-      @checker.should be_valid
+      expect(@checker).to be_valid
       @checker.options['hit']['questions'][0]['selections'] = [{ 'key' => "hi", 'text' => "hi" }, {}]
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "requires that 'poll_options' be present and populated when 'combination_mode' is set to 'poll'" do
       @checker.options['combination_mode'] = "poll"
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['poll_options'] = {}
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['poll_options'] = { 'title' => "Take a poll about jokes",
                                            'instructions' => "Rank these by how funny they are",
                                            'assignments' => 3,
                                            'row_template' => "{{joke}}" }
-      @checker.should be_valid
+      expect(@checker).to be_valid
       @checker.options['poll_options'] = { 'instructions' => "Rank these by how funny they are",
                                            'assignments' => 3,
                                            'row_template' => "{{joke}}" }
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['poll_options'] = { 'title' => "Take a poll about jokes",
                                            'assignments' => 3,
                                            'row_template' => "{{joke}}" }
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['poll_options'] = { 'title' => "Take a poll about jokes",
                                            'instructions' => "Rank these by how funny they are",
                                            'row_template' => "{{joke}}" }
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['poll_options'] = { 'title' => "Take a poll about jokes",
                                            'instructions' => "Rank these by how funny they are",
                                            'assignments' => 3}
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "requires that all questions be of type 'selection' when 'combination_mode' is 'take_majority'" do
       @checker.options['combination_mode'] = "take_majority"
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['questions'][1]['type'] = "selection"
       @checker.options['hit']['questions'][1]['selections'] = @checker.options['hit']['questions'][0]['selections']
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "accepts 'take_majority': 'true' for legacy support" do
       @checker.options['take_majority'] = "true"
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options['hit']['questions'][1]['type'] = "selection"
       @checker.options['hit']['questions'][1]['selections'] = @checker.options['hit']['questions'][0]['selections']
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
   end
 
@@ -219,16 +219,16 @@ describe Agents::HumanTaskAgent do
 
       @checker.send :create_basic_hit, @event
 
-      hitInterface.max_assignments.should == @checker.options['hit']['assignments']
-      hitInterface.reward.should == @checker.options['hit']['reward']
-      hitInterface.description.should == "Make something for Joe"
+      expect(hitInterface.max_assignments).to eq(@checker.options['hit']['assignments'])
+      expect(hitInterface.reward).to eq(@checker.options['hit']['reward'])
+      expect(hitInterface.description).to eq("Make something for Joe")
 
       xml = question_form.to_xml
-      xml.should include("<Title>Hi Joe</Title>")
-      xml.should include("<Text>Make something for Joe</Text>")
-      xml.should include("<DisplayName>Joe Question 1</DisplayName>")
+      expect(xml).to include("<Title>Hi Joe</Title>")
+      expect(xml).to include("<Text>Make something for Joe</Text>")
+      expect(xml).to include("<DisplayName>Joe Question 1</DisplayName>")
 
-      @checker.memory['hits'][123]['event_id'].should == @event.id
+      expect(@checker.memory['hits'][123]['event_id']).to eq(@event.id)
     end
 
     it "works without an event too" do
@@ -238,8 +238,8 @@ describe Agents::HumanTaskAgent do
       mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm)
       mock(RTurk::Hit).create(:title => "Hi").yields(hitInterface) { hitInterface }
       @checker.send :create_basic_hit
-      hitInterface.max_assignments.should == @checker.options['hit']['assignments']
-      hitInterface.reward.should == @checker.options['hit']['reward']
+      expect(hitInterface.max_assignments).to eq(@checker.options['hit']['assignments'])
+      expect(hitInterface.reward).to eq(@checker.options['hit']['reward'])
     end
   end
 
@@ -323,8 +323,8 @@ describe Agents::HumanTaskAgent do
 
       @checker.send :review_hits
 
-      assignments.all? {|a| a.approved == true }.should be_falsey
-      @checker.memory['hits'].should == { "JH3132836336DHG" => { 'event_id' => @event.id } }
+      expect(assignments.all? {|a| a.approved == true }).to be_falsey
+      expect(@checker.memory['hits']).to eq({ "JH3132836336DHG" => { 'event_id' => @event.id } })
     end
 
     it "shouldn't do anything if an assignment is missing" do
@@ -341,8 +341,8 @@ describe Agents::HumanTaskAgent do
 
       @checker.send :review_hits
 
-      assignments.all? {|a| a.approved == true }.should be_falsey
-      @checker.memory['hits'].should == { "JH3132836336DHG" => { 'event_id' => @event.id } }
+      expect(assignments.all? {|a| a.approved == true }).to be_falsey
+      expect(@checker.memory['hits']).to eq({ "JH3132836336DHG" => { 'event_id' => @event.id } })
     end
 
     context "emitting events" do
@@ -354,43 +354,43 @@ describe Agents::HumanTaskAgent do
           FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
         ]
         @hit = FakeHit.new(:max_assignments => 2, :assignments => @assignments)
-        @hit.should_not be_disposed
+        expect(@hit).not_to be_disposed
         mock(RTurk::Hit).new("JH3132836336DHG") { @hit }
       end
 
       it "should create events when all assignments are ready" do
-        lambda {
+        expect {
           @checker.send :review_hits
-        }.should change { Event.count }.by(1)
+        }.to change { Event.count }.by(1)
 
-        @assignments.all? {|a| a.approved == true }.should be_truthy
-        @hit.should be_disposed
+        expect(@assignments.all? {|a| a.approved == true }).to be_truthy
+        expect(@hit).to be_disposed
 
-        @checker.events.last.payload['answers'].should == [
+        expect(@checker.events.last.payload['answers']).to eq([
           {'sentiment' => "neutral", 'feedback' => ""},
           {'sentiment' => "happy", 'feedback' => "Take 2"}
-        ]
+        ])
 
-        @checker.memory['hits'].should == {}
+        expect(@checker.memory['hits']).to eq({})
       end
 
       it "should emit separate answers when options[:separate_answers] is true" do
         @checker.options[:separate_answers] = true
 
-        lambda {
+        expect {
           @checker.send :review_hits
-        }.should change { Event.count }.by(2)
+        }.to change { Event.count }.by(2)
 
-        @assignments.all? {|a| a.approved == true }.should be_truthy
-        @hit.should be_disposed
+        expect(@assignments.all? {|a| a.approved == true }).to be_truthy
+        expect(@hit).to be_disposed
 
         event1, event2 = @checker.events.last(2)
-        event1.payload.should_not have_key('answers')
-        event2.payload.should_not have_key('answers')
-        event1.payload['answer'].should == { 'sentiment' => "happy", 'feedback' => "Take 2" }
-        event2.payload['answer'].should == { 'sentiment' => "neutral", 'feedback' => "" }
+        expect(event1.payload).not_to have_key('answers')
+        expect(event2.payload).not_to have_key('answers')
+        expect(event1.payload['answer']).to eq({ 'sentiment' => "happy", 'feedback' => "Take 2" })
+        expect(event2.payload['answer']).to eq({ 'sentiment' => "neutral", 'feedback' => "" })
 
-        @checker.memory['hits'].should == {}
+        expect(@checker.memory['hits']).to eq({})
       end
     end
 
@@ -424,24 +424,24 @@ describe Agents::HumanTaskAgent do
         hit = FakeHit.new(:max_assignments => 4, :assignments => assignments)
         mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
-        lambda {
+        expect {
           @checker.send :review_hits
-        }.should change { Event.count }.by(1)
+        }.to change { Event.count }.by(1)
 
-        assignments.all? {|a| a.approved == true }.should be_truthy
+        expect(assignments.all? {|a| a.approved == true }).to be_truthy
 
-        @checker.events.last.payload['answers'].should == [
+        expect(@checker.events.last.payload['answers']).to eq([
           { 'sentiment' => "sad", 'age_range' => "<50" },
           { 'sentiment' => "neutral", 'age_range' => ">50" },
           { 'sentiment' => "happy", 'age_range' => ">50" },
           { 'sentiment' => "happy", 'age_range' => ">50" }
-        ]
+        ])
 
-        @checker.events.last.payload['counts'].should == { 'sentiment' => { 'happy' => 2, 'sad' => 1, 'neutral' => 1 }, 'age_range' => { ">50" => 3, "<50" => 1 } }
-        @checker.events.last.payload['majority_answer'].should == { 'sentiment' => "happy", 'age_range' => ">50" }
-        @checker.events.last.payload.should_not have_key('average_answer')
+        expect(@checker.events.last.payload['counts']).to eq({ 'sentiment' => { 'happy' => 2, 'sad' => 1, 'neutral' => 1 }, 'age_range' => { ">50" => 3, "<50" => 1 } })
+        expect(@checker.events.last.payload['majority_answer']).to eq({ 'sentiment' => "happy", 'age_range' => ">50" })
+        expect(@checker.events.last.payload).not_to have_key('average_answer')
 
-        @checker.memory['hits'].should == {}
+        expect(@checker.memory['hits']).to eq({})
       end
 
       it "should also provide an average answer when all questions are numeric" do
@@ -477,25 +477,25 @@ describe Agents::HumanTaskAgent do
         hit = FakeHit.new(:max_assignments => 5, :assignments => assignments)
         mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
-        lambda {
+        expect {
           @checker.send :review_hits
-        }.should change { Event.count }.by(1)
+        }.to change { Event.count }.by(1)
 
-        assignments.all? {|a| a.approved == true }.should be_truthy
+        expect(assignments.all? {|a| a.approved == true }).to be_truthy
 
-        @checker.events.last.payload['answers'].should == [
+        expect(@checker.events.last.payload['answers']).to eq([
           { 'rating' => "1" },
           { 'rating' => "3" },
           { 'rating' => "5.1" },
           { 'rating' => "2" },
           { 'rating' => "2" }
-        ]
+        ])
 
-        @checker.events.last.payload['counts'].should == { 'rating' => { "1" => 1, "2" => 2, "3" => 1, "4" => 0, "5.1" => 1 } }
-        @checker.events.last.payload['majority_answer'].should == { 'rating' => "2" }
-        @checker.events.last.payload['average_answer'].should == { 'rating' => (1 + 2 + 2 + 3 + 5.1) / 5.0 }
+        expect(@checker.events.last.payload['counts']).to eq({ 'rating' => { "1" => 1, "2" => 2, "3" => 1, "4" => 0, "5.1" => 1 } })
+        expect(@checker.events.last.payload['majority_answer']).to eq({ 'rating' => "2" })
+        expect(@checker.events.last.payload['average_answer']).to eq({ 'rating' => (1 + 2 + 2 + 3 + 5.1) / 5.0 })
 
-        @checker.memory['hits'].should == {}
+        expect(@checker.memory['hits']).to eq({})
       end
     end
 
@@ -525,7 +525,7 @@ describe Agents::HumanTaskAgent do
         hit = FakeHit.new(:max_assignments => 4, :assignments => assignments)
         mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
-        @checker.memory['hits']["JH3132836336DHG"].should be_present
+        expect(@checker.memory['hits']["JH3132836336DHG"]).to be_present
 
         # Setup mocks for HIT creation
 
@@ -537,33 +537,33 @@ describe Agents::HumanTaskAgent do
 
         # And finally, the test.
 
-        lambda {
+        expect {
           @checker.send :review_hits
-        }.should change { Event.count }.by(0) # it does not emit an event until all poll results are in
+        }.to change { Event.count }.by(0) # it does not emit an event until all poll results are in
 
         # it approves the existing assignments
 
-        assignments.all? {|a| a.approved == true }.should be_truthy
-        hit.should be_disposed
+        expect(assignments.all? {|a| a.approved == true }).to be_truthy
+        expect(hit).to be_disposed
 
         # it creates a new HIT for the poll
 
-        hitInterface.max_assignments.should == @checker.options['poll_options']['assignments']
-        hitInterface.description.should == @checker.options['poll_options']['instructions']
+        expect(hitInterface.max_assignments).to eq(@checker.options['poll_options']['assignments'])
+        expect(hitInterface.description).to eq(@checker.options['poll_options']['instructions'])
 
         xml = question_form.to_xml
-        xml.should include("<Text>This is happy</Text>")
-        xml.should include("<Text>This is neutral</Text>")
-        xml.should include("<Text>This is sad</Text>")
+        expect(xml).to include("<Text>This is happy</Text>")
+        expect(xml).to include("<Text>This is neutral</Text>")
+        expect(xml).to include("<Text>This is sad</Text>")
 
         @checker.save
         @checker.reload
-        @checker.memory['hits']["JH3132836336DHG"].should_not be_present
-        @checker.memory['hits']["JH39AA63836DH12345"].should be_present
-        @checker.memory['hits']["JH39AA63836DH12345"]['event_id'].should == @event.id
-        @checker.memory['hits']["JH39AA63836DH12345"]['type'].should == "poll"
-        @checker.memory['hits']["JH39AA63836DH12345"]['original_hit'].should == "JH3132836336DHG"
-        @checker.memory['hits']["JH39AA63836DH12345"]['answers'].length.should == 4
+        expect(@checker.memory['hits']["JH3132836336DHG"]).not_to be_present
+        expect(@checker.memory['hits']["JH39AA63836DH12345"]).to be_present
+        expect(@checker.memory['hits']["JH39AA63836DH12345"]['event_id']).to eq(@event.id)
+        expect(@checker.memory['hits']["JH39AA63836DH12345"]['type']).to eq("poll")
+        expect(@checker.memory['hits']["JH39AA63836DH12345"]['original_hit']).to eq("JH3132836336DHG")
+        expect(@checker.memory['hits']["JH39AA63836DH12345"]['answers'].length).to eq(4)
       end
 
       it "emits an event when all poll results are in, containing the data from the best answer, plus all others" do
@@ -591,24 +591,24 @@ describe Agents::HumanTaskAgent do
         hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
         mock(RTurk::Hit).new("JH39AA63836DH12345") { hit }
 
-        @checker.memory['hits']["JH39AA63836DH12345"].should be_present
+        expect(@checker.memory['hits']["JH39AA63836DH12345"]).to be_present
 
-        lambda {
+        expect {
           @checker.send :review_hits
-        }.should change { Event.count }.by(1)
+        }.to change { Event.count }.by(1)
 
         # It emits an event
 
-        @checker.events.last.payload['answers'].should == original_answers
-        @checker.events.last.payload['poll'].should == [{"1" => "2", "2" => "5", "3" => "3", "4" => "2"}, {"1" => "3", "2" => "4", "3" => "1", "4" => "4"}]
-        @checker.events.last.payload['best_answer'].should == {'sentiment' => "neutral", 'feedback' => "This is my feedback 2"}
+        expect(@checker.events.last.payload['answers']).to eq(original_answers)
+        expect(@checker.events.last.payload['poll']).to eq([{"1" => "2", "2" => "5", "3" => "3", "4" => "2"}, {"1" => "3", "2" => "4", "3" => "1", "4" => "4"}])
+        expect(@checker.events.last.payload['best_answer']).to eq({'sentiment' => "neutral", 'feedback' => "This is my feedback 2"})
 
         # it approves the existing assignments
 
-        assignments.all? {|a| a.approved == true }.should be_truthy
-        hit.should be_disposed
+        expect(assignments.all? {|a| a.approved == true }).to be_truthy
+        expect(hit).to be_disposed
 
-        @checker.memory['hits'].should be_empty
+        expect(@checker.memory['hits']).to be_empty
       end
     end
   end

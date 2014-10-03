@@ -20,48 +20,48 @@ describe Agents::JiraAgent do
 
   describe "validating" do
     before do
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should work without username" do
       @checker.options['username'] = nil
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should require the jira password if username is specified" do
       @checker.options['username'] = 'user'
       @checker.options['password'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should require the jira url" do
       @checker.options['jira_url'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should work without jql" do
       @checker.options['jql'] = nil
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should require the expected_update_period_in_days" do
       @checker.options['expected_update_period_in_days'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should require timeout" do
       @checker.options['timeout'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
   end
 
   describe "helpers" do
     it "should generate a correct request options hash" do
-      @checker.send(:request_options).should == {:basic_auth=>{:username=>"user", :password=>"pass"}, :headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
+      expect(@checker.send(:request_options)).to eq({:basic_auth=>{:username=>"user", :password=>"pass"}, :headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}})
     end
 
     it "should generate a correct request url" do
-      @checker.send(:request_url, 'foo=bar', 10).should == "https://jira.atlassian.com/rest/api/2/search?jql=foo%3Dbar&fields=*all&startAt=10"
+      expect(@checker.send(:request_url, 'foo=bar', 10)).to eq("https://jira.atlassian.com/rest/api/2/search?jql=foo%3Dbar&fields=*all&startAt=10")
     end
 
 
@@ -102,9 +102,9 @@ describe Agents::JiraAgent do
 
   describe "#working?" do
     it "it is working when at least one event was emited" do
-      @checker.should_not be_working
+      expect(@checker).not_to be_working
       @checker.check
-      @checker.reload.should be_working
+      expect(@checker.reload).to be_working
     end
   end
 end

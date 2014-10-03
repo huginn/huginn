@@ -13,27 +13,27 @@ describe Agents::WebhookAgent do
   describe 'receive_web_request' do
     it 'should create event if secret matches' do
       out = nil
-      lambda {
+      expect {
         out = agent.receive_web_request({ 'secret' => 'foobar', 'payload' => payload }, "post", "text/html")
-      }.should change { Event.count }.by(1)
-      out.should eq(['Event Created', 201])
-      Event.last.payload.should eq(payload)
+      }.to change { Event.count }.by(1)
+      expect(out).to eq(['Event Created', 201])
+      expect(Event.last.payload).to eq(payload)
     end
 
     it 'should not create event if secrets dont match' do
       out = nil
-      lambda {
+      expect {
         out = agent.receive_web_request({ 'secret' => 'bazbat', 'payload' => payload }, "post", "text/html")
-      }.should change { Event.count }.by(0)
-      out.should eq(['Not Authorized', 401])
+      }.to change { Event.count }.by(0)
+      expect(out).to eq(['Not Authorized', 401])
     end
 
     it "should only accept POSTs" do
       out = nil
-      lambda {
+      expect {
         out = agent.receive_web_request({ 'secret' => 'foobar', 'payload' => payload }, "get", "text/html")
-      }.should change { Event.count }.by(0)
-      out.should eq(['Please use POST requests only', 401])
+      }.to change { Event.count }.by(0)
+      expect(out).to eq(['Please use POST requests only', 401])
     end
   end
 end

@@ -37,19 +37,19 @@ describe HuginnScheduler do
 
   describe "#hour_to_schedule_name" do
     it "for 0h" do
-      @scheduler.send(:hour_to_schedule_name, 0).should == 'midnight'
+      expect(@scheduler.send(:hour_to_schedule_name, 0)).to eq('midnight')
     end
 
     it "for the forenoon" do
-      @scheduler.send(:hour_to_schedule_name, 6).should == '6am'
+      expect(@scheduler.send(:hour_to_schedule_name, 6)).to eq('6am')
     end
 
     it "for 12h" do
-      @scheduler.send(:hour_to_schedule_name, 12).should == 'noon'
+      expect(@scheduler.send(:hour_to_schedule_name, 12)).to eq('noon')
     end
 
     it "for the afternoon" do
-      @scheduler.send(:hour_to_schedule_name, 17).should == '5pm'
+      expect(@scheduler.send(:hour_to_schedule_name, 17)).to eq('5pm')
     end
   end
 
@@ -64,7 +64,7 @@ describe HuginnScheduler do
     it "work with set FAILED_JOBS_TO_KEEP env variable", focus: true do
       expect { @scheduler.send(:cleanup_failed_jobs!) }.to change(Delayed::Job, :count).by(-1)
       expect { @scheduler.send(:cleanup_failed_jobs!) }.to change(Delayed::Job, :count).by(0)
-      @keep.id.should == Delayed::Job.order(:failed_at)[0].id
+      expect(@keep.id).to eq(Delayed::Job.order(:failed_at)[0].id)
     end
 
 

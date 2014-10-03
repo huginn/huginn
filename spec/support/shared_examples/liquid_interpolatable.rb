@@ -22,72 +22,72 @@ shared_examples_for LiquidInterpolatable do
 
   describe "interpolating liquid templates" do
     it "should work" do
-      @checker.interpolate_options(@checker.options, @event).should == {
+      expect(@checker.interpolate_options(@checker.options, @event)).to eq({
           "normal" => "just some normal text",
           "variable" => "hello",
           "text" => "Some test with an embedded hello",
           "escape" => "This should be Hello+world"
-      }
+      })
     end
 
     it "should work with arrays", focus: true do
       @checker.options = {"value" => ["{{variable}}", "Much array", "Hey, {{hello_world}}"]}
-      @checker.interpolate_options(@checker.options, @event).should == {
+      expect(@checker.interpolate_options(@checker.options, @event)).to eq({
         "value" => ["hello", "Much array", "Hey, Hello world"]
-      }
+      })
     end
 
     it "should work recursively" do
       @checker.options['hash'] = {'recursive' => "{{variable}}"}
       @checker.options['indifferent_hash'] = ActiveSupport::HashWithIndifferentAccess.new({'recursive' => "{{variable}}"})
-      @checker.interpolate_options(@checker.options, @event).should == {
+      expect(@checker.interpolate_options(@checker.options, @event)).to eq({
           "normal" => "just some normal text",
           "variable" => "hello",
           "text" => "Some test with an embedded hello",
           "escape" => "This should be Hello+world",
           "hash" => {'recursive' => 'hello'},
           "indifferent_hash" => {'recursive' => 'hello'},
-      }
+      })
     end
 
     it "should work for strings" do
-      @checker.interpolate_string("{{variable}}", @event).should == "hello"
-      @checker.interpolate_string("{{variable}} you", @event).should == "hello you"
+      expect(@checker.interpolate_string("{{variable}}", @event)).to eq("hello")
+      expect(@checker.interpolate_string("{{variable}} you", @event)).to eq("hello you")
     end
 
     it "should use local variables while in a block" do
       @checker.options['locals'] = '{{_foo_}} {{_bar_}}'
 
       @checker.interpolation_context.tap { |context|
-        @checker.interpolated['locals'].should == ' '
+        expect(@checker.interpolated['locals']).to eq(' ')
 
         context.stack {
           context['_foo_'] = 'This is'
           context['_bar_'] = 'great.'
 
-          @checker.interpolated['locals'].should == 'This is great.'
+          expect(@checker.interpolated['locals']).to eq('This is great.')
         }
 
-        @checker.interpolated['locals'].should == ' '
+        expect(@checker.interpolated['locals']).to eq(' ')
       }
     end
 
     it "should use another self object while in a block" do
       @checker.options['properties'] = '{{_foo_}} {{_bar_}}'
 
-      @checker.interpolated['properties'].should == ' '
+      expect(@checker.interpolated['properties']).to eq(' ')
 
       @checker.interpolate_with({ '_foo_' => 'That was', '_bar_' => 'nice.' }) {
-        @checker.interpolated['properties'].should == 'That was nice.'
+        expect(@checker.interpolated['properties']).to eq('That was nice.')
       }
 
-      @checker.interpolated['properties'].should == ' '
+      expect(@checker.interpolated['properties']).to eq(' ')
     end
   end
 
   describe "liquid tags" do
     it "should work with existing credentials" do
-      @checker.interpolate_string("{% credential aws_key %}", {}).should == '2222222222-jane'
+      expect(@checker.interpolate_string("{% credential aws_key %}", {})).to eq('2222222222-jane')
     end
 
     it "should raise an exception for undefined credentials" do
