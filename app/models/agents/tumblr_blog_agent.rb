@@ -6,40 +6,62 @@ module Agents
 
     description <<-MD
       #{tumblr_dependencies_missing if dependencies_missing?}
-      The TumblrUserAgent follows the timeline of a specified Tumblr user.
+      The TumblrUserAgent follows the timeline of a specified Tumblr blog.
 
       To be able to use this Agent you need to authenticate with Tumblr in the [Services](/services) section first.
 
       You must also provide the `blog_name` of the Tumblr blog to monitor.
 
-      Set `include_reblogs` to `false` to not include reblogs (default: `true`)
-
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
-      Set `starting_at` to the date/time (eg. `Mon Jun 02 00:38:12 +0000 2014`) you want to start receiving posts from (default: agent's `created_at`)
+      Set `tag` to filter blog posts to those with the specified tag.
+
     MD
 
     event_description <<-MD
-      Events are the raw JSON provided by the [Tumblr API](https://dev.tumblr.com/docs/api/1.1/get/statuses/user_timeline). Should look something like:
+      Events are the raw JSON provided by the [Tumblr API](https://www.tumblr.com/docs/en/api/v2#posts). Should look something like:
 
           {
-             ... every Tweet field, including ...
-            "text": "something",
-            "user": {
-              "name": "Mr. Someone",
-              "screen_name": "Someone",
-              "location": "Vancouver BC Canada",
-              "description":  "...",
-              "followers_count": 486,
-              "friends_count": 1983,
-              "created_at": "Mon Aug 29 23:38:14 +0000 2011",
-              "time_zone": "Pacific Time (US & Canada)",
-              "statuses_count": 3807,
-              "lang": "en"
-            },
-            "repost_count": 0,
-            "entities": ...
-            "lang": "en"
+            "blog_name": "mustardhamsters",
+            "id": 98271204078,
+            "post_url": "http://mustardhamsters.tumblr.com/post/98271204078/steven-universe-is-under-pressure",
+            "slug": "steven-universe-is-under-pressure",
+            "type": "photo",
+            "date": "2014-09-24 01:23:01 GMT",
+            "timestamp": 1411521781,
+            "state": "published",
+            "format": "html",
+            "reblog_key": "stSGhPNG",
+            "tags": [
+              "gif",
+              "steven universe"
+            ],
+            "short_url": "http://tmblr.co/Zz_TXy1RXQvBk",
+            "followed": false,
+            "highlighted": [],
+            "liked": false,
+            "note_count": 127,
+            "caption": "<p>Steven Universe is under pressure.<\/p>",
+            "image_permalink": "http://mustardhamsters.tumblr.com/image/98271204078",
+            "photos": [
+              {
+                "caption": "",
+                "alt_sizes": [
+                  {
+                    "width": 500,
+                    "height": 281,
+                    "url": "http://38.media.tumblr.com/670dc67eedb81e231e48008c37884417/tumblr_ncdt6dHY8O1qzgw0so1_500.gif"
+                  },
+                  Etc...
+                ],
+                "original_size": {
+                  "width": 500,
+                  "height": 281,
+                  "url": "http://38.media.tumblr.com/670dc67eedb81e231e48008c37884417/tumblr_ncdt6dHY8O1qzgw0so1_500.gif"
+                }
+              }
+            ],
+            "can_reply": false
           }
     MD
 
