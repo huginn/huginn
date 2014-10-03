@@ -37,31 +37,31 @@ describe Agents::StubhubAgent do
 
     it 'should properly parse the response' do
       event = @stubhub_agent.check
-      event.payload.should == response_payload
+      expect(event.payload).to eq(response_payload)
     end
   end
 
   describe "validations" do
     before do
-      @stubhub_agent.should be_valid
+      expect(@stubhub_agent).to be_valid
     end
 
     it "should require a url" do
       @stubhub_agent.options['url'] = nil
-      @stubhub_agent.should_not be_valid
+      expect(@stubhub_agent).not_to be_valid
     end
 
   end
 
   describe "#working?" do
     it "checks if events have been received within the expected receive period" do
-      @stubhub_agent.should_not be_working
+      expect(@stubhub_agent).not_to be_working
 
       Agents::StubhubAgent.async_check @stubhub_agent.id
-      @stubhub_agent.reload.should be_working
+      expect(@stubhub_agent.reload).to be_working
       two_days_from_now = 2.days.from_now
       stub(Time).now { two_days_from_now }
-      @stubhub_agent.reload.should_not be_working
+      expect(@stubhub_agent.reload).not_to be_working
     end
   end
 end

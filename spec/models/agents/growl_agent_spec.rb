@@ -21,35 +21,35 @@ describe Agents::GrowlAgent do
 
   describe "#working?" do
     it "checks if events have been received within the expected receive period" do
-      @checker.should_not be_working # No events received
+      expect(@checker).not_to be_working # No events received
       Agents::GrowlAgent.async_receive @checker.id, [@event.id]
-      @checker.reload.should be_working # Just received events
+      expect(@checker.reload).to be_working # Just received events
       two_days_from_now = 2.days.from_now
       stub(Time).now { two_days_from_now }
-      @checker.reload.should_not be_working # More time has passed than the expected receive period without any new events
+      expect(@checker.reload).not_to be_working # More time has passed than the expected receive period without any new events
     end
   end
 
   describe "validation" do
     before do
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should validate presence of of growl_server" do
       @checker.options[:growl_server] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should validate presence of expected_receive_period_in_days" do
       @checker.options[:expected_receive_period_in_days] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
   end
   
   describe "register_growl" do
     it "should set the password for the Growl connection from the agent options" do
       @checker.register_growl
-      @checker.growler.password.should eql(@checker.options[:growl_password])
+      expect(@checker.growler.password).to eql(@checker.options[:growl_password])
     end
 
     it "should add a notification to the Growl connection" do
@@ -60,7 +60,7 @@ describe Agents::GrowlAgent do
       end
       
       @checker.register_growl
-      called.should be_truthy
+      expect(called).to be_truthy
     end
   end
   
@@ -78,7 +78,7 @@ describe Agents::GrowlAgent do
         mock(obj).notify(@checker.options[:growl_notification_name],subject,message)
       end
       @checker.notify_growl(subject,message)
-      called.should be_truthy
+      expect(called).to be_truthy
     end
   end
   

@@ -19,7 +19,7 @@ describe Agents::EmailAgent do
 
   describe "#receive" do
     it "immediately sends any payloads it receives" do
-      ActionMailer::Base.deliveries.should == []
+      expect(ActionMailer::Base.deliveries).to eq([])
 
       event1 = Event.new
       event1.agent = agents(:bob_rain_notifier_agent)
@@ -34,11 +34,11 @@ describe Agents::EmailAgent do
       Agents::EmailAgent.async_receive(@checker.id, [event1.id])
       Agents::EmailAgent.async_receive(@checker.id, [event2.id])
 
-      ActionMailer::Base.deliveries.count.should == 2
-      ActionMailer::Base.deliveries.last.to.should == ["bob@example.com"]
-      ActionMailer::Base.deliveries.last.subject.should == "something interesting"
-      get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Event\n  data: Something else you should know about"
-      get_message_part(ActionMailer::Base.deliveries.first, /plain/).strip.should == "Event\n  data: Something you should know about"
+      expect(ActionMailer::Base.deliveries.count).to eq(2)
+      expect(ActionMailer::Base.deliveries.last.to).to eq(["bob@example.com"])
+      expect(ActionMailer::Base.deliveries.last.subject).to eq("something interesting")
+      expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to eq("Event\n  data: Something else you should know about")
+      expect(get_message_part(ActionMailer::Base.deliveries.first, /plain/).strip).to eq("Event\n  data: Something you should know about")
     end
 
     it "can receive complex events and send them on" do
@@ -53,8 +53,8 @@ describe Agents::EmailAgent do
       plain_email_text = get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip
       html_email_text = get_message_part(ActionMailer::Base.deliveries.last, /html/).strip
 
-      plain_email_text.should =~ /avehumidity/
-      html_email_text.should =~ /avehumidity/
+      expect(plain_email_text).to match(/avehumidity/)
+      expect(html_email_text).to match(/avehumidity/)
     end
   end
 end

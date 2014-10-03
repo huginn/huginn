@@ -6,20 +6,20 @@ describe JobsController do
     before do
       Delayed::Job.create!
       Delayed::Job.create!
-      Delayed::Job.count.should > 0
+      expect(Delayed::Job.count).to be > 0
     end
 
     it "does not allow normal users" do
-      users(:bob).should_not be_admin
+      expect(users(:bob)).not_to be_admin
       sign_in users(:bob)
-      get(:index).should redirect_to(root_path)
+      expect(get(:index)).to redirect_to(root_path)
     end
 
     it "returns all jobs" do
-      users(:jane).should be_admin
+      expect(users(:jane)).to be_admin
       sign_in users(:jane)
       get :index
-      assigns(:jobs).length.should == 2
+      expect(assigns(:jobs).length).to eq(2)
     end
   end
 

@@ -12,37 +12,37 @@ describe Agents::UserLocationAgent do
     event.created_at = Time.now
     event.payload = { 'longitude' => 123, 'latitude' => 45, 'something' => 'else' }
 
-    lambda {
+    expect {
       @agent.receive([event])
-    }.should change { @agent.events.count }.by(1)
+    }.to change { @agent.events.count }.by(1)
 
-    @agent.events.last.payload.should == { 'longitude' => 123, 'latitude' => 45, 'something' => 'else' }
-    @agent.events.last.lat.should == 45
-    @agent.events.last.lng.should == 123
+    expect(@agent.events.last.payload).to eq({ 'longitude' => 123, 'latitude' => 45, 'something' => 'else' })
+    expect(@agent.events.last.lat).to eq(45)
+    expect(@agent.events.last.lng).to eq(123)
   end
 
   it 'does not accept a web request that is not POST' do
     %w[get put delete patch].each { |method|
       content, status, content_type = @agent.receive_web_request({ 'secret' => 'my_secret' }, method, 'application/json')
-      status.should == 404
+      expect(status).to eq(404)
     }
   end
 
   it 'requires a valid secret for a web request' do
     content, status, content_type = @agent.receive_web_request({ 'secret' => 'fake' }, 'post', 'application/json')
-    status.should == 401
+    expect(status).to eq(401)
 
     content, status, content_type = @agent.receive_web_request({ 'secret' => 'my_secret' }, 'post', 'application/json')
-    status.should == 200
+    expect(status).to eq(200)
   end
 
   it 'creates an event on a web request' do
-    lambda {
+    expect {
       @agent.receive_web_request({ 'secret' => 'my_secret', 'longitude' => 123, 'latitude' => 45, 'something' => 'else' }, 'post', 'application/json')
-    }.should change { @agent.events.count }.by(1)
+    }.to change { @agent.events.count }.by(1)
 
-    @agent.events.last.payload.should == { 'longitude' => 123, 'latitude' => 45, 'something' => 'else' }
-    @agent.events.last.lat.should == 45
-    @agent.events.last.lng.should == 123
+    expect(@agent.events.last.payload).to eq({ 'longitude' => 123, 'latitude' => 45, 'something' => 'else' })
+    expect(@agent.events.last.lat).to eq(45)
+    expect(@agent.events.last.lng).to eq(123)
   end
 end
