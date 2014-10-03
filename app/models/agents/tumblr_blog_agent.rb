@@ -54,7 +54,6 @@ module Agents
         'blog_name' => 'mustardhamsters.tumblr.com',
         'expected_update_period_in_days' => '2',
         'tag' => '',
-        'type' => '',
       }
     end
 
@@ -84,12 +83,10 @@ module Agents
 
       # p posts
 
-      posts["posts"].each do |post|
-        p post
-        if post['date'] >= starting_at
-          memory['since_id'] = post.id if !memory['since_id'] || (post.id > memory['since_id'])
-
-          create_event :payload => post.attrs
+      posts["posts"].reverse_each do |post|
+        if !memory['since_id'] || (post["id"] > memory['since_id'])
+          create_event :payload => post
+          memory['since_id'] = post["id"]
         end
       end
 
