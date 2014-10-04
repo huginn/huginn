@@ -11,9 +11,11 @@ gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'weibo_2', '~> 0.1.4'         # Weibo Agents
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
-gem "google-api-client"           # GoogleCalendarPublishAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
+
+# GoogleCalendarPublishAgent
+gem "google-api-client", require: 'google/api_client'
 
 # Twitter Agents
 gem 'twitter', '~> 5.8.0' # Must to be loaded before cantino-twitter-stream.

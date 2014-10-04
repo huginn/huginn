@@ -4,7 +4,7 @@ module Agents
   class GoogleCalendarPublishAgent < Agent
     cannot_be_scheduled!
 
-    gem_dependency_check { defined?(GoogleCalendar) }
+    gem_dependency_check { defined?(Google) && defined?(Google::APIClient) }
 
     description <<-MD
       #{'## Include `google-api-client` in your Gemfile to use this Agent!' if dependencies_missing?}
