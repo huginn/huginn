@@ -558,7 +558,7 @@ fire: hot
   describe "checking with headers" do
     before do
       stub_request(:any, /example/).
-        with(headers: { 'foo' => 'bar', 'user_agent' => /Faraday/ }).
+        with(headers: { 'foo' => 'bar' }).
         to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
       @valid_options = {
         'name' => "XKCD",
