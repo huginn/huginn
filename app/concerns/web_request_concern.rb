@@ -66,7 +66,7 @@ module WebRequestConcern
 
   module ClassMethods
     def default_user_agent
-      ENV.fetch('DEFAULT_HTTP_USER_AGENT', Faraday.new.headers[:user_agent])
+      ENV.fetch('DEFAULT_HTTP_USER_AGENT', "Huginn - https://github.com/cantino/huginn")
     end
   end
 end

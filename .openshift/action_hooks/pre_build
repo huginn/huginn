@@ -4,6 +4,8 @@
 # before the build step.  This script gets executed directly, so it
 # could be python, php, ruby, etc.
 
+echo "-> Pre-build step"
+
 STORED_ASSETS="${OPENSHIFT_DATA_DIR}/assets"
 LIVE_ASSETS="${OPENSHIFT_REPO_DIR}/public/assets"
 

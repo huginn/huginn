@@ -4,6 +4,41 @@
 # up again.  This script gets executed directly, so it could be python, php,
 # ruby, etc.
 
+echo "-> Deploy step"
+
 pushd ${OPENSHIFT_REPO_DIR} > /dev/null
+
+if [ -f ${OPENSHIFT_REPO_DIR}/.env.example ]
+then
+    # Default to the environment variable values set in .env.example
+#    source ${OPENSHIFT_REPO_DIR}/.env.example
+#
+#    grep = ${OPENSHIFT_REPO_DIR}/.env.example | sed -e 's/^#[^ ]//' | grep -v -e '^#' | cut -d= -f1 | \
+#      while read var ; do
+#        eval "echo \"$var=\\\"\${HUGINN_$var:-\$$var}\\\"\""
+#      done | grep -v -e ^= > ${OPENSHIFT_REPO_DIR}/.env
+
+    echo "DATABASE_NAME=${OPENSHIFT_APP_NAME}" > ${OPENSHIFT_REPO_DIR}/.env
+    echo "DATABASE_USERNAME=${OPENSHIFT_MYSQL_DB_USERNAME}" >> ${OPENSHIFT_REPO_DIR}/.env
+    echo "DATABASE_PASSWORD=${OPENSHIFT_MYSQL_DB_PASSWORD}" >> ${OPENSHIFT_REPO_DIR}/.env
+    echo "DATABASE_HOST=${OPENSHIFT_MYSQL_DB_HOST}" >> ${OPENSHIFT_REPO_DIR}/.env
+    echo "DATABASE_PORT=${OPENSHIFT_MYSQL_DB_PORT}" >> ${OPENSHIFT_REPO_DIR}/.env
+    echo "DATABASE_SOCKET=${OPENSHIFT_MYSQL_DB_SOCKET}" >> ${OPENSHIFT_REPO_DIR}/.env
+
+		chmod ugo+r ${OPENSHIFT_REPO_DIR}/.env
+
+		source ${OPENSHIFT_REPO_DIR}/.env
+else
+    cat <<EOM
+***
+*
+*  WARNING: No .env.example file found.
+*
+***
+EOM
+fi
+
+gem install bundler
+echo "Migrating"
 RAILS_ENV="production" bundle exec rake db:migrate
 popd > /dev/null
