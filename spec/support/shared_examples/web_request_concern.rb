@@ -74,13 +74,13 @@ shared_examples_for WebRequestConcern do
       ENV['DEFAULT_HTTP_USER_AGENT'] = @default_http_user_agent
     end
 
-    it "should have the default value set by Faraday" do
-      expect(agent.user_agent).to eq(Faraday.new.headers[:user_agent])
+    it "should have the default value of Huginn" do
+      expect(agent.user_agent).to eq('Huginn - https://github.com/cantino/huginn')
     end
 
     it "should be overridden by the environment variable if present" do
-      ENV['DEFAULT_HTTP_USER_AGENT'] = 'Huginn - https://github.com/cantino/huginn'
-      expect(agent.user_agent).to eq('Huginn - https://github.com/cantino/huginn')
+      ENV['DEFAULT_HTTP_USER_AGENT'] = 'Something'
+      expect(agent.user_agent).to eq('Something')
     end
 
     it "should be overriden by the value in options if present" do
