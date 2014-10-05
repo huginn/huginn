@@ -49,7 +49,7 @@ describe Agents::SlackAgent do
                       )
       end
 
-      lambda { @checker.receive([@event]) }.should_not raise_error
+      expect { @checker.receive([@event]) }.not_to raise_error
     end
   end
 

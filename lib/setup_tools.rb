@@ -4,12 +4,16 @@ require 'securerandom'
 
 module SetupTools
   def capture(cmd, opts = {})
-    o, s = Open3.capture2e(cmd, opts)
+    if opts.delete(:no_stderr)
+      o, s = Open3.capture2(cmd, opts)
+    else
+      o, s = Open3.capture2e(cmd, opts)
+    end
     o.strip
   end
 
-  def grab_config_with_cmd!(cmd)
-    config_data = capture(cmd)
+  def grab_config_with_cmd!(cmd, opts = {})
+    config_data = capture(cmd, opts)
     $config = {}
     if config_data !~ /has no config vars/
       config_data.split("\n").map do |line|

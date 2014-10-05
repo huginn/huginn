@@ -23,30 +23,30 @@ describe Agents::HipchatAgent do
 
   describe "validating" do
     before do
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should require the basecamp username" do
       @checker.options['auth_token'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should require the basecamp password" do
       @checker.options['room_name'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should require the basecamp user_id" do
       @checker.options['room_name'] = nil
       @checker.options['room_name_path'] = 'jsonpath'
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should also allow a credential" do
       @checker.options['auth_token'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.user.user_credentials.create :credential_name => 'hipchat_auth_token', :credential_value => 'something'
-      @checker.reload.should be_valid
+      expect(@checker.reload).to be_valid
     end
   end
 
@@ -61,21 +61,21 @@ describe Agents::HipchatAgent do
 
   describe "#working?" do
     it "should not be working until the first event was received" do
-      @checker.should_not be_working
+      expect(@checker).not_to be_working
       @checker.last_receive_at = Time.now
-      @checker.should be_working
+      expect(@checker).to be_working
     end
 
     it "should not be working when the last error occured after the last received event" do
       @checker.last_receive_at = Time.now - 1.minute
       @checker.last_error_log_at = Time.now
-      @checker.should_not be_working
+      expect(@checker).not_to be_working
     end
 
     it "should be working when the last received event occured after the last error" do
       @checker.last_receive_at = Time.now
       @checker.last_error_log_at = Time.now - 1.minute
-      @checker.should be_working
+      expect(@checker).to be_working
     end
   end
 end

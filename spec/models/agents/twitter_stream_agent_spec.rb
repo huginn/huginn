@@ -30,8 +30,8 @@ describe Agents::TwitterStreamAgent do
         @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
 
         @agent.reload
-        @agent.memory[:filter_counts][:keyword1].should == 2
-        @agent.memory[:filter_counts][:keyword2].should == 1
+        expect(@agent.memory[:filter_counts][:keyword1]).to eq(2)
+        expect(@agent.memory[:filter_counts][:keyword2]).to eq(1)
       end
 
       it 'records counts for keyword sets as well' do
@@ -46,44 +46,44 @@ describe Agents::TwitterStreamAgent do
         @agent.process_tweet('keyword1-1', {:text => "something", :user => {:name => "Mr. Someone"}})
 
         @agent.reload
-        @agent.memory[:filter_counts][:'keyword1-1'].should == 4 # it stores on the first keyword
-        @agent.memory[:filter_counts][:keyword2].should == 2
+        expect(@agent.memory[:filter_counts][:'keyword1-1']).to eq(4) # it stores on the first keyword
+        expect(@agent.memory[:filter_counts][:keyword2]).to eq(2)
       end
 
       it 'removes unused keys' do
         @agent.memory[:filter_counts] = {:keyword1 => 2, :keyword2 => 3, :keyword3 => 4}
         @agent.save!
         @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
-        @agent.reload.memory[:filter_counts].should == { 'keyword1' => 3, 'keyword2' => 3 }
+        expect(@agent.reload.memory[:filter_counts]).to eq({ 'keyword1' => 3, 'keyword2' => 3 })
       end
     end
 
     context "when generate is set to 'events'" do
       it 'emits events immediately' do
-        lambda {
+        expect {
           @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
-        }.should change { @agent.events.count }.by(1)
+        }.to change { @agent.events.count }.by(1)
 
-        @agent.events.last.payload.should == {
+        expect(@agent.events.last.payload).to eq({
           'filter' => 'keyword1',
           'text' => "something",
           'user' => { 'name' => "Mr. Someone" }
-        }
+        })
       end
 
       it 'handles keyword sets too' do
         @agent.options[:filters][0] = %w[keyword1-1 keyword1-2 keyword1-3]
         @agent.save!
 
-        lambda {
+        expect {
           @agent.process_tweet('keyword1-2', {:text => "something", :user => {:name => "Mr. Someone"}})
-        }.should change { @agent.events.count }.by(1)
+        }.to change { @agent.events.count }.by(1)
 
-        @agent.events.last.payload.should == {
+        expect(@agent.events.last.payload).to eq({
           'filter' => 'keyword1-1',
           'text' => "something",
           'user' => { 'name' => "Mr. Someone" }
-        }
+        })
       end
     end
   end
@@ -100,17 +100,17 @@ describe Agents::TwitterStreamAgent do
         @agent.process_tweet('keyword2', {:text => "something", :user => {:name => "Mr. Someone"}})
         @agent.process_tweet('keyword1', {:text => "something", :user => {:name => "Mr. Someone"}})
 
-        lambda {
+        expect {
           @agent.reload.check
-        }.should change { @agent.events.count }.by(2)
+        }.to change { @agent.events.count }.by(2)
 
-        @agent.events[-1].payload[:filter].should == 'keyword1'
-        @agent.events[-1].payload[:count].should == 2
+        expect(@agent.events[-1].payload[:filter]).to eq('keyword1')
+        expect(@agent.events[-1].payload[:count]).to eq(2)
 
-        @agent.events[-2].payload[:filter].should == 'keyword2'
-        @agent.events[-2].payload[:count].should == 1
+        expect(@agent.events[-2].payload[:filter]).to eq('keyword2')
+        expect(@agent.events[-2].payload[:count]).to eq(1)
 
-        @agent.memory[:filter_counts].should == {}
+        expect(@agent.memory[:filter_counts]).to eq({})
       end
     end
 
@@ -118,10 +118,10 @@ describe Agents::TwitterStreamAgent do
       it 'does nothing' do
         @agent.memory[:filter_counts] = { :keyword1 => 2 }
         @agent.save!
-        lambda {
+        expect {
           @agent.reload.check
-        }.should_not change { Event.count }
-        @agent.memory[:filter_counts].should == {}
+        }.not_to change { Event.count }
+        expect(@agent.memory[:filter_counts]).to eq({})
       end
     end
   end

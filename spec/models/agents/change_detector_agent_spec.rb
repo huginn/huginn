@@ -26,17 +26,17 @@ describe Agents::ChangeDetectorAgent do
 
   describe "validation" do
     before do
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should validate presence of property" do
       @checker.options[:property] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should validate presence of property" do
       @checker.options[:expected_update_period_in_days] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
   end
 
@@ -49,14 +49,14 @@ describe Agents::ChangeDetectorAgent do
 
     it "is when event created within :expected_update_period_in_days" do
       @checker.options[:expected_update_period_in_days] = 2
-      @checker.should be_working
+      expect(@checker).to be_working
     end
 
     it "isnt when event created outside :expected_update_period_in_days" do
       @checker.options[:expected_update_period_in_days] = 2
 
       time_travel_to 2.days.from_now do
-          @checker.should_not be_working
+          expect(@checker).not_to be_working
       end
     end
   end
@@ -71,8 +71,8 @@ describe Agents::ChangeDetectorAgent do
       expect {
         @checker.receive([@event])
       }.to change(Event, :count).by(1)
-      Event.last.payload[:command].should == @event.payload[:command]
-      Event.last.payload[:output].should == @event.payload[:output]
+      expect(Event.last.payload[:command]).to eq(@event.payload[:command])
+      expect(Event.last.payload[:output]).to eq(@event.payload[:output])
     end
 
     it "creates events when new event changed" do

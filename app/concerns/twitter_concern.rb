@@ -5,9 +5,9 @@ module TwitterConcern
     include Oauthable
 
     validate :validate_twitter_options
-    valid_oauth_providers 'twitter'
+    valid_oauth_providers :twitter
 
-    gem_dependency_check { defined?(Twitter) && has_oauth_configuration_for?('twitter') }
+    gem_dependency_check { defined?(Twitter) && Devise.omniauth_providers.include?(:twitter) }
   end
 
   def validate_twitter_options
@@ -20,19 +20,19 @@ module TwitterConcern
   end
 
   def twitter_consumer_key
-    ENV['TWITTER_OAUTH_KEY']
+    (config = Devise.omniauth_configs[:twitter]) && config.strategy.consumer_key
   end
 
   def twitter_consumer_secret
-    ENV['TWITTER_OAUTH_SECRET']
+    (config = Devise.omniauth_configs[:twitter]) && config.strategy.consumer_secret
   end
 
   def twitter_oauth_token
-    service.token
+    service && service.token
   end
 
   def twitter_oauth_token_secret
-    service.secret
+    service && service.secret
   end
 
   def twitter
@@ -46,7 +46,11 @@ module TwitterConcern
 
   module ClassMethods
     def twitter_dependencies_missing
-      "## Include the `twitter`, `omniauth-twitter`, and `cantino-twitter-stream` gems in your Gemfile to use Twitter Agents."
+      if defined?(Twitter)
+        "## Set TWITTER_OAUTH_KEY and TWITTER_OAUTH_SECRET in your environment to use Twitter Agents."
+      else
+        "## Include the `twitter`, `omniauth-twitter`, and `cantino-twitter-stream` gems in your Gemfile to use Twitter Agents."
+      end
     end
   end
 end

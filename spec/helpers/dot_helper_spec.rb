@@ -54,7 +54,7 @@ describe DotHelper do
       end
 
       it "generates a DOT script" do
-        agents_dot(@agents).should =~ %r{
+        expect(agents_dot(@agents)).to match(%r{
           \A
           digraph \x20 "Agent \x20 Event \x20 Flow" \{
             node \[ [^\]]+ \];
@@ -68,11 +68,11 @@ describe DotHelper do
             \k<bar3> \[label=bar3\];
           \}
           \z
-        }x
+        }x)
       end
 
       it "generates a richer DOT script" do
-        agents_dot(@agents, true).should =~ %r{
+        expect(agents_dot(@agents, true)).to match(%r{
           \A
           digraph \x20 "Agent \x20 Event \x20 Flow" \{
             node \[ [^\]]+ \];
@@ -86,7 +86,7 @@ describe DotHelper do
             \k<bar3> \[label=bar3,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar3))}"\];
           \}
           \z
-        }x
+        }x)
       end
     end
   end
@@ -94,9 +94,9 @@ describe DotHelper do
   describe "DotHelper::DotDrawer" do
     describe "#id" do
       it "properly escapes double quotaion and backslash" do
-        DotHelper::DotDrawer.draw(foo: "") {
+        expect(DotHelper::DotDrawer.draw(foo: "") {
           id('hello\\"')
-        }.should == '"hello\\\\\\""'
+        }).to eq('"hello\\\\\\""')
       end
     end
   end

@@ -11,14 +11,20 @@ gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'weibo_2', '~> 0.1.4'         # Weibo Agents
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
-gem "google-api-client"           # GoogleCalendarPublishAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
+
+# GoogleCalendarPublishAgent
+gem "google-api-client", require: 'google/api_client'
 
 # Twitter Agents
 gem 'twitter', '~> 5.8.0' # Must to be loaded before cantino-twitter-stream.
 gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
 gem 'omniauth-twitter'
+
+# Tumblr Agents
+gem 'tumblr_client'
+gem 'omniauth-tumblr'
 
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
@@ -83,9 +89,9 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'pry'
   gem 'rr'
-  gem 'rspec', '~> 2.99'
-  gem 'rspec-collection_matchers'
-  gem 'rspec-rails', '~> 2.99'
+  gem 'rspec', '~> 3.0'
+  gem 'rspec-collection_matchers', '~> 1.0.0'
+  gem 'rspec-rails', '~> 3.0.1'
   gem 'shoulda-matchers'
   gem 'spring'
   gem 'spring-commands-rspec'

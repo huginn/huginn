@@ -35,33 +35,33 @@ describe Agents::JabberAgent do
 
   describe "#working?" do
     it "checks if events have been received within the expected receive period" do
-      agent.should_not be_working # No events received
+      expect(agent).not_to be_working # No events received
       Agents::JabberAgent.async_receive agent.id, [event.id]
-      agent.reload.should be_working # Just received events
+      expect(agent.reload).to be_working # Just received events
       two_days_from_now = 2.days.from_now
       stub(Time).now { two_days_from_now }
-      agent.reload.should_not be_working # More time has passed than the expected receive period without any new events
+      expect(agent.reload).not_to be_working # More time has passed than the expected receive period without any new events
     end
   end
 
   describe "validation" do
     before do
-      agent.should be_valid
+      expect(agent).to be_valid
     end
 
     it "should validate presence of of jabber_server" do
       agent.options[:jabber_server] = ""
-      agent.should_not be_valid
+      expect(agent).not_to be_valid
     end
 
     it "should validate presence of jabber_sender" do
       agent.options[:jabber_sender] = ""
-      agent.should_not be_valid
+      expect(agent).not_to be_valid
     end
 
     it "should validate presence of jabber_receiver" do
       agent.options[:jabber_receiver] = ""
-      agent.should_not be_valid
+      expect(agent).not_to be_valid
     end
   end
 
@@ -74,8 +74,8 @@ describe Agents::JabberAgent do
       end
 
       agent.receive([event, event2])
-      sent.should == [ 'Warning! Weather Alert! - http://www.weather.com/',
-                       'Warning! Another Weather Alert! - http://www.weather.com/we-are-screwed']
+      expect(sent).to eq([ 'Warning! Weather Alert! - http://www.weather.com/',
+                       'Warning! Another Weather Alert! - http://www.weather.com/we-are-screwed'])
     end
   end
 end

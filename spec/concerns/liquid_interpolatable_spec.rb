@@ -10,11 +10,11 @@ describe LiquidInterpolatable::Filters do
 
   describe 'uri_escape' do
     it 'should escape a string for use in URI' do
-      @filter.uri_escape('abc:/?=').should == 'abc%3A%2F%3F%3D'
+      expect(@filter.uri_escape('abc:/?=')).to eq('abc%3A%2F%3F%3D')
     end
 
     it 'should not raise an error when an operand is nil' do
-      @filter.uri_escape(nil).should be_nil
+      expect(@filter.uri_escape(nil)).to be_nil
     end
   end
 
@@ -33,8 +33,8 @@ describe LiquidInterpolatable::Filters do
 
     it "should finish without raising an exception" do
       agent = Agents::InterpolatableAgent.new(name: "test", options: { 'foo' => '{{bar}' })
-      agent.valid?.should == false
-      agent.errors[:options].first.should =~ /not properly terminated/
+      expect(agent.valid?).to eq(false)
+      expect(agent.errors[:options].first).to match(/not properly terminated/)
     end
   end
 
@@ -50,13 +50,13 @@ describe LiquidInterpolatable::Filters do
         %q{abc}.freeze,
         %q{'a"bc'dfa""fds''fa}.freeze,
       ].each { |string|
-        @filter.to_xpath_roundtrip(string).should == string
+        expect(@filter.to_xpath_roundtrip(string)).to eq(string)
       }
     end
 
     it 'should stringify a non-string operand' do
-      @filter.to_xpath_roundtrip(nil).should == ''
-      @filter.to_xpath_roundtrip(1).should == '1'
+      expect(@filter.to_xpath_roundtrip(nil)).to eq('')
+      expect(@filter.to_xpath_roundtrip(1)).to eq('1')
     end
   end
 
@@ -67,33 +67,33 @@ describe LiquidInterpolatable::Filters do
     end
 
     it 'should parse an abosule URI' do
-      @filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1').should == URI('http://example.net/index.html')
+      expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
     it 'should parse an abosule URI with a base URI specified' do
-      @filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1').should == URI('http://example.net/index.html')
+      expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
     it 'should parse a relative URI with a base URI specified' do
-      @filter.to_uri('foo/index.html', 'http://example.com/dir/1').should == URI('http://example.com/dir/foo/index.html')
+      expect(@filter.to_uri('foo/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.com/dir/foo/index.html'))
     end
 
     it 'should parse an abosule URI with a base URI specified' do
-      @filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1').should == URI('http://example.net/index.html')
+      expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
     it 'should stringify a non-string operand' do
-      @filter.to_uri(123, 'http://example.com/dir/1').should == URI('http://example.com/dir/123')
+      expect(@filter.to_uri(123, 'http://example.com/dir/1')).to eq(URI('http://example.com/dir/123'))
     end
 
     it 'should return a URI value in interpolation' do
-      @agent.interpolated['foo'].should == '/dir/1'
+      expect(@agent.interpolated['foo']).to eq('/dir/1')
     end
 
     it 'should return a URI value resolved against a base URI in interpolation' do
       @agent.options['foo'] = '{% assign u = s | to_uri:"http://example.com/dir/1" %}{{ u.path }}'
       @agent.interpolation_context['s'] = 'foo/index.html'
-      @agent.interpolated['foo'].should == '/dir/foo/index.html'
+      expect(@agent.interpolated['foo']).to eq('/dir/foo/index.html')
     end
   end
 end

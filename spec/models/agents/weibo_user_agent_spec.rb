@@ -21,7 +21,7 @@ describe Agents::WeiboUserAgent do
 
   describe "#check" do
     it "should check for changes" do
-      lambda { @checker.check }.should change { Event.count }.by(1)
+      expect { @checker.check }.to change { Event.count }.by(1)
     end
   end
 

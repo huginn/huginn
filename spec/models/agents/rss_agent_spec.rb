@@ -23,60 +23,60 @@ describe Agents::RssAgent do
   describe "validations" do
     it "should validate the presence of url" do
       agent.options['url'] = "http://google.com"
-      agent.should be_valid
+      expect(agent).to be_valid
 
       agent.options['url'] = ""
-      agent.should_not be_valid
+      expect(agent).not_to be_valid
 
       agent.options['url'] = nil
-      agent.should_not be_valid
+      expect(agent).not_to be_valid
     end
 
     it "should validate the presence and numericality of expected_update_period_in_days" do
       agent.options['expected_update_period_in_days'] = "5"
-      agent.should be_valid
+      expect(agent).to be_valid
 
       agent.options['expected_update_period_in_days'] = "wut?"
-      agent.should_not be_valid
+      expect(agent).not_to be_valid
 
       agent.options['expected_update_period_in_days'] = 0
-      agent.should_not be_valid
+      expect(agent).not_to be_valid
 
       agent.options['expected_update_period_in_days'] = nil
-      agent.should_not be_valid
+      expect(agent).not_to be_valid
 
       agent.options['expected_update_period_in_days'] = ""
-      agent.should_not be_valid
+      expect(agent).not_to be_valid
     end
   end
 
   describe "emitting RSS events" do
     it "should emit items as events" do
-      lambda {
+      expect {
         agent.check
-      }.should change { agent.events.count }.by(20)
+      }.to change { agent.events.count }.by(20)
     end
 
     it "should track ids and not re-emit the same item when seen again" do
       agent.check
-      agent.memory['seen_ids'].should == agent.events.map {|e| e.payload['id'] }
+      expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| e.payload['id'] })
 
       newest_id = agent.memory['seen_ids'][0]
-      agent.events.first.payload['id'].should == newest_id
+      expect(agent.events.first.payload['id']).to eq(newest_id)
       agent.memory['seen_ids'] = agent.memory['seen_ids'][1..-1] # forget the newest id
 
-      lambda {
+      expect {
         agent.check
-      }.should change { agent.events.count }.by(1)
+      }.to change { agent.events.count }.by(1)
 
-      agent.events.first.payload['id'].should == newest_id
-      agent.memory['seen_ids'][0].should == newest_id
+      expect(agent.events.first.payload['id']).to eq(newest_id)
+      expect(agent.memory['seen_ids'][0]).to eq(newest_id)
     end
 
     it "should truncate the seen_ids in memory at 500 items" do
       agent.memory['seen_ids'] = ['x'] * 490
       agent.check
-      agent.memory['seen_ids'].length.should == 500
+      expect(agent.memory['seen_ids'].length).to eq(500)
     end
   end
 
@@ -86,10 +86,10 @@ describe Agents::RssAgent do
     end
 
     it "calculates content MD5 sums" do
-      lambda {
+      expect {
         agent.check
-      }.should change { agent.events.count }.by(79)
-      agent.memory['seen_ids'].should == agent.events.map {|e| Digest::MD5.hexdigest(e.payload['content']) }
+      }.to change { agent.events.count }.by(79)
+      expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| Digest::MD5.hexdigest(e.payload['content']) })
     end
   end
 end

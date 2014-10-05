@@ -63,6 +63,15 @@ module ActiveRecord::ConnectionAdapters
           end
         }
       end
+
+      def create_database(name, options = {})
+        # utf8mb4 is used in column definitions; use utf8 for
+        # databases.
+        if options[:charset] == 'utf8mb4'
+          options = options.merge(charset: 'utf8')
+        end
+        super(name, options)
+      end
     end
 
     prepend CharsetSupport

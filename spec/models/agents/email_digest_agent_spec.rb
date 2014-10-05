@@ -30,14 +30,14 @@ describe Agents::EmailDigestAgent do
       event2.save!
 
       Agents::EmailDigestAgent.async_receive(@checker.id, [event1.id, event2.id])
-      @checker.reload.memory[:queue].should == [{ 'data' => "Something you should know about" }, { 'data' => "Something else you should know about" }]
+      expect(@checker.reload.memory[:queue]).to eq([{ 'data' => "Something you should know about" }, { 'data' => "Something else you should know about" }])
     end
   end
 
   describe "#check" do
     it "should send an email" do
       Agents::EmailDigestAgent.async_check(@checker.id)
-      ActionMailer::Base.deliveries.should == []
+      expect(ActionMailer::Base.deliveries).to eq([])
 
       @checker.memory[:queue] = [{ :data => "Something you should know about" },
                                  { :title => "Foo", :url => "http://google.com", :bar => 2 },
@@ -47,10 +47,10 @@ describe Agents::EmailDigestAgent do
       @checker.save!
 
       Agents::EmailDigestAgent.async_check(@checker.id)
-      ActionMailer::Base.deliveries.last.to.should == ["bob@example.com"]
-      ActionMailer::Base.deliveries.last.subject.should == "something interesting"
-      get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip.should == "Event\n  data: Something you should know about\n\nFoo\n  bar: 2\n  url: http://google.com\n\nhi\n  woah: there\n\nEvent\n  test: 2"
-      @checker.reload.memory[:queue].should be_empty
+      expect(ActionMailer::Base.deliveries.last.to).to eq(["bob@example.com"])
+      expect(ActionMailer::Base.deliveries.last.subject).to eq("something interesting")
+      expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to eq("Event\n  data: Something you should know about\n\nFoo\n  bar: 2\n  url: http://google.com\n\nhi\n  woah: there\n\nEvent\n  test: 2")
+      expect(@checker.reload.memory[:queue]).to be_empty
     end
 
     it "can receive complex events and send them on" do
@@ -61,17 +61,17 @@ describe Agents::EmailDigestAgent do
       Agent.async_check(agents(:bob_weather_agent).id)
 
       Agent.receive!
-      @checker.reload.memory[:queue].should_not be_empty
+      expect(@checker.reload.memory[:queue]).not_to be_empty
 
       Agents::EmailDigestAgent.async_check(@checker.id)
 
       plain_email_text = get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip
       html_email_text = get_message_part(ActionMailer::Base.deliveries.last, /html/).strip
 
-      plain_email_text.should =~ /avehumidity/
-      html_email_text.should =~ /avehumidity/
+      expect(plain_email_text).to match(/avehumidity/)
+      expect(html_email_text).to match(/avehumidity/)
 
-      @checker.reload.memory[:queue].should be_empty
+      expect(@checker.reload.memory[:queue]).to be_empty
     end
   end
 end

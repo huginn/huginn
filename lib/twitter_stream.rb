@@ -13,6 +13,8 @@ class TwitterStream
   end
 
   def stream!(filters, agent, &block)
+    filters = filters.map(&:downcase).uniq
+
     stream = Twitter::JSONStream.connect(
       :path    => "/1/statuses/#{(filters && filters.length > 0) ? 'filter' : 'sample'}.json#{"?track=#{filters.map {|f| CGI::escape(f) }.join(",")}" if filters && filters.length > 0}",
       :ssl     => true,

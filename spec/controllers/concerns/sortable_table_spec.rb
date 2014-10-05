@@ -21,41 +21,41 @@ describe SortableTable do
     it "uses a default when no sort is given" do
       controller.params = {}
       controller.set_table_sort options
-      controller.table_sort.should == default
+      expect(controller.table_sort).to eq(default)
     end
 
     it "applies the given sort when one is passed in" do
       controller.params = { sort: "column1.desc" }
       controller.set_table_sort options
-      controller.table_sort.should == { column1: :desc }
+      expect(controller.table_sort).to eq({ column1: :desc })
 
       controller.params = { sort: "column1.asc" }
       controller.set_table_sort options
-      controller.table_sort.should == { column1: :asc }
+      expect(controller.table_sort).to eq({ column1: :asc })
 
       controller.params = { sort: "column2.desc" }
       controller.set_table_sort options
-      controller.table_sort.should == { column2: :desc }
+      expect(controller.table_sort).to eq({ column2: :desc })
     end
 
     it "ignores unknown directions" do
       controller.params = { sort: "column1.foo" }
       controller.set_table_sort options
-      controller.table_sort.should == { column1: :asc }
+      expect(controller.table_sort).to eq({ column1: :asc })
 
       controller.params = { sort: "column1.foo drop tables" }
       controller.set_table_sort options
-      controller.table_sort.should == { column1: :asc }
+      expect(controller.table_sort).to eq({ column1: :asc })
     end
 
     it "ignores unknown columns" do
       controller.params = { sort: "foo.asc" }
       controller.set_table_sort options
-      controller.table_sort.should == default
+      expect(controller.table_sort).to eq(default)
 
       controller.params = { sort: ";drop table;.asc" }
       controller.set_table_sort options
-      controller.table_sort.should == default
+      expect(controller.table_sort).to eq(default)
     end
   end
 end
