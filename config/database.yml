@@ -3,7 +3,7 @@ development:
   encoding: <%= ENV['DATABASE_ENCODING'] || "utf8" %>
   reconnect: <%= ENV['DATABASE_RECONNECT'] || "true" %>
   database: <%= ENV['DATABASE_NAME'] || "huginn_development" %>
-  pool: <%= ENV['DATABASE_POOL'] || "5" %>
+  pool: <%= ENV['DATABASE_POOL'] || "10" %>
   username: <%= ENV['DATABASE_USERNAME'] || "root" %>
   password: <%= ENV['DATABASE_PASSWORD'] || "" %>
   host: <%= ENV['DATABASE_HOST'] || "" %>
@@ -22,14 +22,14 @@ test:
   encoding: <%= ENV['DATABASE_ENCODING'] || "utf8" %>
   reconnect: <%= ENV['DATABASE_RECONNECT'] || "true" %>
   port: <%= ENV['DATABASE_PORT'] || "" %>
-  pool: <%= ENV['DATABASE_POOL'] || "5" %>
+  pool: <%= ENV['DATABASE_POOL'] || "10" %>
 
 production:
   adapter: <%= ENV['DATABASE_ADAPTER'] || "mysql2" %>
   encoding: <%= ENV['DATABASE_ENCODING'] || "utf8" %>
   reconnect: <%= ENV['DATABASE_RECONNECT'] || "true" %>
   database: <%= ENV['DATABASE_NAME'] || "huginn_production" %>
-  pool: <%= ENV['DATABASE_POOL'] || "5" %>
+  pool: <%= ENV['DATABASE_POOL'] || "10" %>
   username: <%= ENV['DATABASE_USERNAME'] || "root" %>
   password: <%= ENV['DATABASE_PASSWORD'] || "password" %>
   host: <%= ENV['DATABASE_HOST'] || "" %>

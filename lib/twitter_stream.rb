@@ -50,7 +50,7 @@ class TwitterStream
     end
   end
 
-  def load_and_run(agents)
+  def load_and_run(agents, recent_tweets)
     agents.group_by { |agent| agent.twitter_oauth_token }.each do |oauth_token, agents|
       filter_to_agent_map = agents.map { |agent| agent.options[:filters] }.flatten.uniq.compact.map(&:strip).inject({}) { |m, f| m[f] = []; m }
 
@@ -60,11 +60,9 @@ class TwitterStream
         end
       end
 
-      recent_tweets = []
-
       stream!(filter_to_agent_map.keys, agents.first) do |status|
         if status["retweeted_status"].present? && status["retweeted_status"].is_a?(Hash)
-          puts "Skipping retweet: #{status["text"]}"
+          # skip retweets
         elsif recent_tweets.include?(status["id_str"])
           puts "Skipping duplicate tweet: #{status["text"]}"
         else
@@ -85,7 +83,7 @@ class TwitterStream
   end
 
   RELOAD_TIMEOUT = 10.minutes
-  DUPLICATE_DETECTION_LENGTH = 1000
+  DUPLICATE_DETECTION_LENGTH = 5000
   SEPARATOR = /[^\w_\-]+/
 
   def run
@@ -96,6 +94,8 @@ class TwitterStream
     end
 
     require 'twitter/json_stream'
+
+    recent_tweets = []
 
     while @running
       begin
@@ -118,7 +118,7 @@ class TwitterStream
             }
           else
             puts "Found #{agents.length} agent(s).  Loading them now..."
-            load_and_run agents
+            load_and_run agents, recent_tweets
           end
         end
       rescue SignalException, SystemExit
