@@ -15,15 +15,7 @@
 
 echo "-> Pro start ruby step"
 
-if [ -f ${OPENSHIFT_REPO_DIR}/.env.example ]
+if [ -f ${OPENSHIFT_REPO_DIR}/.env ]
 then
 		source ${OPENSHIFT_REPO_DIR}/.env
-else
-    cat <<EOM
-***
-*
-*  WARNING: No .env file found.
-*
-***
-EOM
 fi
