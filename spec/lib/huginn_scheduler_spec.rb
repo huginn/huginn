@@ -86,11 +86,11 @@ describe Rufus::Scheduler do
 
     stub.any_instance_of(Agents::SchedulerAgent).second_precision_enabled { true }
 
-    @agent1 = Agents::SchedulerAgent.new(name: 'Scheduler 1', options: { schedule: '*/1 * * * * *' }).tap { |a|
+    @agent1 = Agents::SchedulerAgent.new(name: 'Scheduler 1', options: { action: 'run', schedule: '*/1 * * * * *' }).tap { |a|
       a.user = users(:bob)
       a.save!
     }
-    @agent2 = Agents::SchedulerAgent.new(name: 'Scheduler 2', options: { schedule: '*/1 * * * * *' }).tap { |a|
+    @agent2 = Agents::SchedulerAgent.new(name: 'Scheduler 2', options: { action: 'run', schedule: '*/1 * * * * *' }).tap { |a|
       a.user = users(:bob)
       a.save!
     }
