@@ -37,6 +37,16 @@ module Agents
       event_created_within?(interpolated[:expected_update_period_in_days]) && !received_event_without_error?
     end
 
+    def check
+      api = DropboxAPI.new(interpolated[:access_token])
+      current_contents = api.dir(interpolated[:dir_to_watch])
+
+      diff = DropboxDirDiff.new(previous_contents, current_contents)
+      create_event(payload: diff.to_hash) unless previous_contents.nil? || diff.empty?
+
+      remember(current_contents)
+    end
+
     private
 
     def is_positive_integer?(value)
@@ -45,5 +55,26 @@ module Agents
       false
     end
 
+    def previous_contents
+      self.memory['contents']
+    end
+
+    def remember(contents)
+      self.memory['contents'] = contents
+    end
+
+    # == Auxiliary classes ==
+
+    class DropboxAPI
+      def initialize(access_token)
+      end
+    end
+
+    class DropboxDirDiff
+      def initialize(previous, current)
+      end
+    end
+
   end
+
 end
