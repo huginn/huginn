@@ -72,6 +72,36 @@ module Agents
 
     class DropboxDirDiff
       def initialize(previous, current)
+        @previous, @current = [previous, current]
+      end
+
+      def empty?
+        (@previous == @current)
+      end
+
+      def to_hash
+        calculate_diff
+        { added: @added, removed: @removed, updated: @updated }
+      end
+
+      private
+
+      def calculate_diff
+        @updated = @current.select do |current_entry|
+          previous_entry = find_by_path(@previous, current_entry[:path])
+          (current_entry != previous_entry) && !previous_entry.nil?
+        end
+
+        updated_entries = @updated + @previous.select do |previous_entry|
+          find_by_path(@updated, previous_entry[:path])
+        end
+
+        @added = @current - @previous - updated_entries
+        @removed = @previous - @current - updated_entries
+      end
+
+      def find_by_path(array, path)
+        array.find { |entry| entry[:path] == path }
       end
     end
 
