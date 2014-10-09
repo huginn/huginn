@@ -30,18 +30,37 @@ module AgentControllerConcern
   end
 
   def control!
-    control_targets.active.each { |target|
+    control_targets.each { |target|
       begin
         case control_action
         when 'run'
-          log "Agent run queued for '#{target.name}'"
-          Agent.async_check(target.id)
+          case
+          when target.cannot_be_scheduled?
+            error "'#{target.name}' cannot run without an incoming event"
+          when target.disabled?
+            log "Agent run ignored for disabled Agent '#{target.name}'"
+          else
+            Agent.async_check(target.id)
+            log "Agent run queued for '#{target.name}'"
+          end
         when 'enable'
-          log "Enabling the Agent '#{target.name}'"
-          target.update!(disable: false) if target.disabled?
+          case
+          when target.disabled?
+            target.update!(disabled: false)
+            log "Agent '#{target.name}' is enabled"
+          else
+            log "Agent '#{target.name}' is already enabled"
+          end
         when 'disable'
-          log "Disabling the Agent '#{target.name}'"
-          target.update!(disable: true) unless target.disabled?
+          case
+          when target.disabled?
+            log "Agent '#{target.name}' is alread disabled"
+          else
+            target.update!(disabled: true)
+            log "Agent '#{target.name}' is disabled"
+          end
+        else
+          error "Unsupported action '#{control_action}' ignored for '#{target.name}'"
         end
       rescue => e
         error "Failed to #{control_action} '#{target.name}': #{e.message}"
