@@ -10,12 +10,12 @@ shared_examples_for AgentControllerConcern do
 
   describe "validation" do
     it "should validate action" do
-      ['run', 'enable', 'disable', '', nil].each { |action|
+      ['run', 'enable', 'disable'].each { |action|
         agent.options['action'] = action
         expect(agent).to be_valid
       }
 
-      ['delete', 1, true].each { |action|
+      ['delete', '', nil, 1, true].each { |action|
         agent.options['action'] = action
         expect(agent).not_to be_valid
       }
@@ -23,18 +23,6 @@ shared_examples_for AgentControllerConcern do
   end
 
   describe 'control_action' do
-    it "should be one of the supported values" do
-      ['run', '', nil].each { |action|
-        agent.options['action'] = action
-        expect(agent.control_action).to eq('run')
-      }
-
-      ['enable', 'disable'].each { |action|
-        agent.options['action'] = action
-        expect(agent.control_action).to eq(action)
-      }
-    end
-
     it "cannot be 'run' if any of the control targets cannot be scheduled" do
       expect(agent.control_action).to eq('run')
       agent.control_targets = [agents(:bob_rain_notifier_agent)]

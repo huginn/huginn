@@ -4,7 +4,10 @@ describe Agents::SchedulerAgent do
   let(:valid_params) {
     {
       name: 'Example',
-      options: { 'schedule' => '0 * * * *' },
+      options: {
+        'action' => 'run',
+        'schedule' => '0 * * * *'
+      },
     }
   }
 
@@ -73,7 +76,10 @@ describe Agents::SchedulerAgent do
 
       agent.memory['scheduled_at'] = time
       # Currently agent.options[]= is not detected
-      agent.options = { 'schedule' => '*/5 * * * *' }
+      agent.options = {
+        'action' => 'run',
+        'schedule' => '*/5 * * * *'
+      }
       agent.save
       expect(agent.memory['scheduled_at']).to be_nil
     end

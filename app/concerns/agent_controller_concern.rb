@@ -12,7 +12,7 @@ module AgentControllerConcern
   end
 
   def control_action
-    options['action'].presence || 'run'
+    options['action']
   end
 
   def validate_control_action
