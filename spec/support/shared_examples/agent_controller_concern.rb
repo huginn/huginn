@@ -9,32 +9,56 @@ shared_examples_for AgentControllerConcern do
   end
 
   describe "validation" do
-    it "should validate action" do
-      ['run', 'enable', 'disable'].each { |action|
-        agent.options['action'] = action
-        expect(agent).to be_valid
-      }
+    describe "of action" do
+      it "should allow certain values" do
+        ['run', 'enable', 'disable', '{{ action }}'].each { |action|
+          agent.options['action'] = action
+          expect(agent).to be_valid
+        }
+      end
 
-      ['delete', '', nil, 1, true].each { |action|
-        agent.options['action'] = action
+      it "should disallow obviously bad values" do
+        ['delete', nil, 1, true].each { |action|
+          agent.options['action'] = action
+          expect(agent).not_to be_valid
+        }
+      end
+
+      it "should accept 'run' if all target agents are schedulable" do
+        agent.control_targets = [agents(:bob_website_agent)]
+        expect(agent).to be_valid
+      end
+
+      it "should reject 'run' if targets include an unschedulable agent" do
+        agent.control_targets = [agents(:bob_rain_notifier_agent)]
         expect(agent).not_to be_valid
-      }
+      end
+
+      it "should not reject 'enable' or 'disable' no matter if targets include an unschedulable agent" do
+        ['enable', 'disable'].each { |action|
+          agent.options['action'] = action
+          agent.control_targets = [agents(:bob_rain_notifier_agent)]
+          expect(agent).to be_valid
+        }
+      end
     end
   end
 
   describe 'control_action' do
-    it "cannot be 'run' if any of the control targets cannot be scheduled" do
+    it "returns options['action']" do
       expect(agent.control_action).to eq('run')
-      agent.control_targets = [agents(:bob_rain_notifier_agent)]
-      expect(agent).not_to be_valid
+
+      ['run', 'enable', 'disable'].each { |action|
+        agent.options['action'] = action
+        expect(agent.control_action).to eq(action)
+      }
     end
 
-    it "can be 'enable' or 'disable' no matter if control targets can be scheduled or not" do
-      ['enable', 'disable'].each { |action|
-        agent.options['action'] = action
-        agent.control_targets = [agents(:bob_rain_notifier_agent)]
-        expect(agent).to be_valid
-      }
+    it "returns the result of interpolation" do
+      expect(agent.control_action).to eq('run')
+
+      agent.options['action'] = '{{ "enable" }}'
+      expect(agent.control_action).to eq('enable')
     end
   end
 

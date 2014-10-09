@@ -12,11 +12,11 @@ module AgentControllerConcern
   end
 
   def control_action
-    options['action']
+    interpolated['action']
   end
 
   def validate_control_action
-    case control_action
+    case options['action']
     when 'run'
       control_targets.each { |target|
         if target.cannot_be_scheduled?
@@ -24,6 +24,10 @@ module AgentControllerConcern
         end
       }
     when 'enable', 'disable'
+    when nil
+      errors.add(:base, "action must be specified")
+    when /\{[%{]/
+      # Liquid template
     else
       errors.add(:base, 'invalid action')
     end
@@ -59,6 +63,8 @@ module AgentControllerConcern
             target.update!(disabled: true)
             log "Agent '#{target.name}' is disabled"
           end
+        when ''
+          # Do nothing
         else
           error "Unsupported action '#{control_action}' ignored for '#{target.name}'"
         end
