@@ -9,14 +9,17 @@ module Agents
     MD
 
     event_description <<-MD
-      The event payload will contain the following fields, when applicable:
-      ```
-      {
-        "added": [ "path/to/new/file" ],
-        "removed": [ "path/to/removed/file" ],
-        "updated": [ "path/to/updated/file" ]
-      }
-      ```
+      The event payload will contain the following fields:
+
+          {
+            "added": [ {
+              "path": "/path/to/added/file",
+              "rev": "1526952fd5",
+              "modified": "Fri, 10 Oct 2014 19:00:43 +0000"
+            } ],
+            "removed": [ … ],
+            "updated": [ … ]
+          }
     MD
 
     def default_options
