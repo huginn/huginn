@@ -1,7 +1,7 @@
 class HomeController < ApplicationController
-  skip_before_filter :authenticate_user!
+  skip_before_action :authenticate_user!
 
-  before_filter :upgrade_warning, only: :index
+  before_action :upgrade_warning, only: :index
 
   def index
   end

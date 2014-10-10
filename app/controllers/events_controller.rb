@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_filter :load_event, :except => :index
+  before_action :load_event, except: :index
 
   def index
     if params[:agent_id]
