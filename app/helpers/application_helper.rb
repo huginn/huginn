@@ -49,4 +49,8 @@ module ApplicationHelper
       content_tag :i, '', class: "fa fa-lock"
     end
   end
+
+  def omniauth_provider_name(provider)
+    t("devise.omniauth_providers.#{provider}")
+  end
 end

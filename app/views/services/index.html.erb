@@ -27,7 +27,7 @@
 
         <% @services.each do |service| %>
           <tr>
-            <td><%= service.provider %></td>
+            <td><%= omniauth_provider_name(service.provider) %></td>
             <td><%= service.name %></td>
             <td><%= service.global ? 'Yes' : 'No' %></td>
             <td>
