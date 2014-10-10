@@ -40,7 +40,6 @@ module Agents
     def check
       api = DropboxAPI.new(interpolated[:access_token])
       current_contents = api.dir(interpolated[:dir_to_watch])
-
       diff = DropboxDirDiff.new(previous_contents, current_contents)
       create_event(payload: diff.to_hash) unless previous_contents.nil? || diff.empty?
 
@@ -66,13 +65,32 @@ module Agents
     # == Auxiliary classes ==
 
     class DropboxAPI
+      class ResourceNotFound < RuntimeError; end
+
+      include HTTParty
+      base_uri 'https://api.dropbox.com/1'
+
       def initialize(access_token)
+        @options = { query: { access_token: access_token } }
+      end
+
+      def dir(to_watch)
+        options = @options.deep_merge({ query: { list: true } })
+        response = self.class.get("/metadata/auto#{to_watch}", options)
+        raise ResourceNotFound.new(to_watch) if response.not_found?
+        JSON.parse(response)['contents'].map { |entry| slice_json(entry, :path, :rev, :modified) }
+      end
+
+      private
+
+      def slice_json(json, *keys)
+        keys.each_with_object({}){|key, hash| hash[key] = json[key.to_s]}
       end
     end
 
     class DropboxDirDiff
       def initialize(previous, current)
-        @previous, @current = [previous, current]
+        @previous, @current = [previous || [], current || []]
       end
 
       def empty?

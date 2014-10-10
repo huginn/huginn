@@ -154,6 +154,88 @@ describe Agents::DropboxWatchAgent do
         expect(diff_hash[:updated]).to eq [ { path: '1.json', rev: '2' } ]
       end
 
+      context 'when the previous value is not defined' do
+        it 'considers all additions' do
+          diff_hash = Agents::DropboxWatchAgent::DropboxDirDiff.new(nil, current).to_hash
+          expect(diff_hash[:added]).to eq current
+          expect(diff_hash[:removed]).to eq []
+          expect(diff_hash[:updated]).to eq []
+        end
+      end
+
+      context 'when the current value is not defined' do
+        it 'considers all removals' do
+          diff_hash = Agents::DropboxWatchAgent::DropboxDirDiff.new(previous, nil).to_hash
+          expect(diff_hash[:added]).to eq []
+          expect(diff_hash[:removed]).to eq previous
+          expect(diff_hash[:updated]).to eq []
+        end
+      end
     end
+  end
+
+  describe Agents::DropboxWatchAgent::DropboxAPI do
+    let(:dir_to_watch) { '/my/dropbox/dir' }
+    let(:access_token) { '70k3n' }
+    let(:api_url) { "https://api.dropbox.com/1/metadata/auto#{dir_to_watch}?access_token=#{access_token}&list=true" }
+
+    describe '#dir' do
+
+      context 'when the provided path exists' do
+        before do
+          stub_request(:get, api_url).to_return(body: JSON.dump({
+            contents: [
+                {
+                    bytes: 0,
+                    icon: "folder",
+                    is_dir: true,
+                    modified: "Mon, 11 Mar 2013 15:41:44 +0000",
+                    path: "#{dir_to_watch}/1.json",
+                    rev: "1",
+                    revision: 14743,
+                    root: "dropbox",
+                    size: "0 bytes",
+                    thumb_exists: false
+                },
+                {
+                    bytes: 0,
+                    icon: "folder",
+                    is_dir: true,
+                    modified: "Mon, 12 Mar 2013 15:41:44 +0000",
+                    path: "#{dir_to_watch}/2.json",
+                    rev: "4",
+                    revision: 113022,
+                    root: "dropbox",
+                    size: "0 bytes",
+                    thumb_exists: false
+                }
+            ],
+            some: "other",
+            things: "we",
+            dont: "need"
+          }))
+        end
+
+        it 'trims down the attributes of the response to our needs' do
+          dir_list = Agents::DropboxWatchAgent::DropboxAPI.new(access_token).dir(dir_to_watch)
+          expect(dir_list).to eq [
+            { path: "#{dir_to_watch}/1.json", rev: '1', modified: 'Mon, 11 Mar 2013 15:41:44 +0000' },
+            { path: "#{dir_to_watch}/2.json", rev: '4', modified: 'Mon, 12 Mar 2013 15:41:44 +0000' }
+          ]
+        end
+      end
+
+      context 'when the provided path does not exist' do
+        before { stub_request(:get, api_url).to_return(status: 404, body: '{"error": "Not Found"}') }
+
+        it 'raises a ResourceNotFound error' do
+          expect {
+            Agents::DropboxWatchAgent::DropboxAPI.new(access_token).dir(dir_to_watch)
+          }.to raise_error(Agents::DropboxWatchAgent::DropboxAPI::ResourceNotFound, dir_to_watch)
+        end
+      end
+
+    end
+
   end
 end
