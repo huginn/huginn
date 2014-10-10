@@ -29,7 +29,7 @@
           <tr>
             <td><%= omniauth_provider_name(service.provider) %></td>
             <td><%= service.name %></td>
-            <td><%= service.global ? 'Yes' : 'No' %></td>
+            <td><%= yes_no(service.global) %></td>
             <td>
               <div class="btn-group btn-group-xs">
                 <% if service.global %>
