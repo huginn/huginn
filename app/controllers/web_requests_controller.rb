@@ -16,8 +16,8 @@
 #   ["not found", 404, 'text/plain']
 
 class WebRequestsController < ApplicationController
-  skip_before_filter :authenticate_user!
   skip_before_action :verify_authenticity_token
+  skip_before_action :authenticate_user!
 
   def handle_request
     user = User.find_by_id(params[:user_id])

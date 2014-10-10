@@ -1,6 +1,6 @@
 class ScenariosController < ApplicationController
   include SortableTable
-  skip_before_filter :authenticate_user!, :only => :export
+  skip_before_action :authenticate_user!, only: :export
 
   def index
     set_table_sort sorts: %w[name public], default: { name: :asc }
