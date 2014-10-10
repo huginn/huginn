@@ -64,4 +64,11 @@ module ApplicationHelper
   def service_label_text(service)
     "#{omniauth_provider_name(service.provider)} - #{service.name}"
   end
+
+  def service_label(service)
+    content_tag :span, [
+      omniauth_provider_icon(service.provider),
+      service_label_text(service)
+    ].join.html_safe, class: "label label-default label-service service-#{service.provider}"
+  end
 end
