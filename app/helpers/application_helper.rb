@@ -41,12 +41,12 @@ module ApplicationHelper
     end
   end
 
-  def icon_for_service(service)
-    case service.to_sym
+  def omniauth_provider_icon(provider)
+    case provider.to_sym
     when :twitter, :tumblr, :github
-      "<i class='fa fa-#{service}'></i>".html_safe
+      content_tag :i, '', class: "fa fa-#{provider}"
     else
-      "<i class='fa fa-lock'></i>".html_safe
+      content_tag :i, '', class: "fa fa-lock"
     end
   end
 end
