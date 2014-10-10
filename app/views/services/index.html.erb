@@ -12,7 +12,7 @@
         for guidance.
       </p>
       <%- Devise.omniauth_providers.each { |provider| -%>
-        <p><%= link_to user_omniauth_authorize_path(provider), class: "btn btn-default btn-auth btn-auth-#{provider}" do %><%= icon_for_service(provider) %><span>Authenticate with <%= t("devise.omniauth_providers.#{provider}") %></span><% end %></p>
+        <p><%= omniauth_button(provider) %></p>
       <%- } -%>
       <hr>
 

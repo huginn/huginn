@@ -53,4 +53,11 @@ module ApplicationHelper
   def omniauth_provider_name(provider)
     t("devise.omniauth_providers.#{provider}")
   end
+
+  def omniauth_button(provider)
+    link_to [
+      omniauth_provider_icon(provider),
+      content_tag(:span, "Authenticate with #{omniauth_provider_name(provider)}")
+    ].join.html_safe, user_omniauth_authorize_path(provider), class: "btn btn-default btn-service service-#{provider}"
+  end
 end
