@@ -12,7 +12,7 @@
         for guidance.
       </p>
       <%- Devise.omniauth_providers.each { |provider| -%>
-        <p><%= link_to user_omniauth_authorize_path(provider), class: "btn btn-default btn-auth btn-auth-#{provider}" do %><%= icon_for_service(provider) %><span>Authenticate with <%= t("devise.omniauth_providers.#{provider}") %></span><% end %></p>
+        <p><%= omniauth_button(provider) %></p>
       <%- } -%>
       <hr>
 
@@ -27,9 +27,9 @@
 
         <% @services.each do |service| %>
           <tr>
-            <td><%= service.provider %></td>
+            <td><%= omniauth_provider_name(service.provider) %></td>
             <td><%= service.name %></td>
-            <td><%= service.global ? 'Yes' : 'No' %></td>
+            <td><%= yes_no(service.global) %></td>
             <td>
               <div class="btn-group btn-group-xs">
                 <% if service.global %>
