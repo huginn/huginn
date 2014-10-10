@@ -113,15 +113,15 @@ describe Agents::DropboxWatchAgent do
   describe Agents::DropboxWatchAgent::DropboxDirDiff do
 
     let(:previous) { [
-      { path: '1.json', rev: '1' },
-      { path: '2.json', rev: '1' },
-      { path: '3.json', rev: '1' }
+      { 'path' => '1.json', 'rev' => '1' },
+      { 'path' => '2.json', 'rev' => '1' },
+      { 'path' => '3.json', 'rev' => '1' }
     ] }
 
     let(:current) { [
-      { path: '1.json', rev: '2' },
-      { path: '3.json', rev: '1' },
-      { path: '4.json', rev: '1' }
+      { 'path' => '1.json', 'rev' => '2' },
+      { 'path' => '3.json', 'rev' => '1' },
+      { 'path' => '4.json', 'rev' => '1' }
     ] }
 
     describe '#empty?' do
@@ -143,15 +143,15 @@ describe Agents::DropboxWatchAgent do
       subject(:diff_hash) { Agents::DropboxWatchAgent::DropboxDirDiff.new(previous, current).to_hash }
 
       it 'detects additions' do
-        expect(diff_hash[:added]).to eq [{ path: '4.json', rev: '1' }]
+        expect(diff_hash[:added]).to eq [{ 'path' => '4.json', 'rev' => '1' }]
       end
 
       it 'detects removals' do
-        expect(diff_hash[:removed]).to eq [ { path: '2.json', rev: '1' } ]
+        expect(diff_hash[:removed]).to eq [ { 'path' => '2.json', 'rev' => '1' } ]
       end
 
       it 'detects updates' do
-        expect(diff_hash[:updated]).to eq [ { path: '1.json', rev: '2' } ]
+        expect(diff_hash[:updated]).to eq [ { 'path' => '1.json', 'rev' => '2' } ]
       end
 
       context 'when the previous value is not defined' do
@@ -219,8 +219,8 @@ describe Agents::DropboxWatchAgent do
         it 'trims down the attributes of the response to our needs' do
           dir_list = Agents::DropboxWatchAgent::DropboxAPI.new(access_token).dir(dir_to_watch)
           expect(dir_list).to eq [
-            { path: "#{dir_to_watch}/1.json", rev: '1', modified: 'Mon, 11 Mar 2013 15:41:44 +0000' },
-            { path: "#{dir_to_watch}/2.json", rev: '4', modified: 'Mon, 12 Mar 2013 15:41:44 +0000' }
+            { 'path' => "#{dir_to_watch}/1.json", 'rev' => '1', 'modified' => 'Mon, 11 Mar 2013 15:41:44 +0000' },
+            { 'path' => "#{dir_to_watch}/2.json", 'rev' => '4', 'modified' => 'Mon, 12 Mar 2013 15:41:44 +0000' }
           ]
         end
       end

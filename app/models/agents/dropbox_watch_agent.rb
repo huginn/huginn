@@ -78,13 +78,13 @@ module Agents
         options = @options.deep_merge({ query: { list: true } })
         response = self.class.get("/metadata/auto#{to_watch}", options)
         raise ResourceNotFound.new(to_watch) if response.not_found?
-        JSON.parse(response)['contents'].map { |entry| slice_json(entry, :path, :rev, :modified) }
+        JSON.parse(response)['contents'].map { |entry| slice_json(entry, 'path', 'rev', 'modified') }
       end
 
       private
 
       def slice_json(json, *keys)
-        keys.each_with_object({}){|key, hash| hash[key] = json[key.to_s]}
+        keys.each_with_object({}){|key, hash| hash[key.to_s] = json[key.to_s]}
       end
     end
 
@@ -106,12 +106,12 @@ module Agents
 
       def calculate_diff
         @updated = @current.select do |current_entry|
-          previous_entry = find_by_path(@previous, current_entry[:path])
+          previous_entry = find_by_path(@previous, current_entry['path'])
           (current_entry != previous_entry) && !previous_entry.nil?
         end
 
         updated_entries = @updated + @previous.select do |previous_entry|
-          find_by_path(@updated, previous_entry[:path])
+          find_by_path(@updated, previous_entry['path'])
         end
 
         @added = @current - @previous - updated_entries
@@ -119,7 +119,7 @@ module Agents
       end
 
       def find_by_path(array, path)
-        array.find { |entry| entry[:path] == path }
+        array.find { |entry| entry['path'] == path }
       end
     end
 
