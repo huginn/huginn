@@ -17,8 +17,8 @@ module Agents
               "rev": "1526952fd5",
               "modified": "Fri, 10 Oct 2014 19:00:43 +0000"
             } ],
-            "removed": [ … ],
-            "updated": [ … ]
+            "removed": [ ... ],
+            "updated": [ ... ]
           }
     MD
 
