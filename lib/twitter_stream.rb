@@ -84,7 +84,7 @@ class TwitterStream
     end
   end
 
-  RELOAD_TIMEOUT = 10.minutes
+  RELOAD_TIMEOUT = 5.minutes
   DUPLICATE_DETECTION_LENGTH = 1000
   SEPARATOR = /[^\w_\-]+/
 
