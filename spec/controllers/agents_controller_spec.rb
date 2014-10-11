@@ -307,4 +307,44 @@ describe AgentsController do
       expect(response).to redirect_to scenario_path(scenarios(:bob_weather))
     end
   end
+
+  describe "#form_configurable actions" do
+    before(:each) do
+      @params = {attribute: 'auth_token', agent: valid_attributes(:type => "Agents::HipchatAgent", options: {auth_token: '12345'})}
+      sign_in users(:bob)
+    end
+    describe "POST validate" do
+
+      it "returns with status 200 when called with a valid option" do
+        any_instance_of(Agents::HipchatAgent) do |klass|
+          stub(klass).validate_option { true }
+        end
+
+        post :validate, @params
+        expect(response.status).to eq 200
+      end
+
+      it "returns with status 403 when called with an invalid option" do
+        any_instance_of(Agents::HipchatAgent) do |klass|
+          stub(klass).validate_option { false }
+        end
+
+        post :validate, @params
+        expect(response.status).to eq 403
+      end
+    end
+
+    describe "POST complete" do
+      it "callsAgent#complete_option and renders json" do
+        any_instance_of(Agents::HipchatAgent) do |klass|
+          stub(klass).complete_option { [{name: 'test', value: 1}] }
+        end
+
+        post :complete, @params
+        expect(response.status).to eq 200
+        expect(response.header['Content-Type']).to include('application/json')
+
+      end
+    end
+  end
 end

@@ -33,7 +33,7 @@ class FormConfigurableAgentPresenter < Decorator
         end)
       end
     when :array
-      @view.select_tag "agent[options][#{attribute}]", @view.options_for_select(data[:values], value), html_options.merge(class: "form-control")
+      @view.select_tag("agent[options][#{attribute}]", @view.options_for_select(data[:values], value), html_options.merge(class: "form-control"))
     when :string
       @view.text_field_tag "agent[options][#{attribute}]", value, html_options.merge(:class => 'form-control')
     end

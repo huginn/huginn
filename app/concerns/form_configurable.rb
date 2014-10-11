@@ -43,15 +43,6 @@ module FormConfigurable
         options[:roles] = [options[:roles]]
       end
 
-      if options[:roles].include?(:completable) && !self.method_defined?("complete_#{name}".to_sym)
-        # Not really sure, but method_defined? does not seem to work because we do not have the 'full' Agent class here
-        #raise ArgumentError.new("'complete_#{name}' needs to be defined to validate '#{name}'")
-      end
-
-      if options[:roles].include?(:validatable) && !self.method_defined?("validate_#{name}".to_sym)
-        #raise ArgumentError.new("'validate_#{name}' needs to be defined to validate '#{name}'")
-      end
-
       _form_configurable_fields[name] = options
     end
 

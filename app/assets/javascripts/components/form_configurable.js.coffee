@@ -51,9 +51,14 @@ $ ->
     $("input[role=validatable], select[role=validatable]").trigger('change')
 
     $.each $("input[role~=completable]"), (i, input) ->
-      $(input).select2
+      $(input).select2(
         data: ->
           completableDefaultOptions(input)
+      ).on("change", (e) ->
+        if e.added && e.added.id == 'manualInput'
+          $(e.currentTarget).select2("destroy")
+          $(e.currentTarget).val(e.removed.id)
+      )
 
     $("input[role~=completable]").on 'select2-open', (e) ->
       form_data = getFormData(e.currentTarget)
