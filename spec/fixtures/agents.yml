@@ -111,9 +111,3 @@ jane_basecamp_agent:
   user: jane
   service: generic
   guid: <%= SecureRandom.hex %>
-
-bob_hipchat_agent:
-  type: Agents::HipchatAgent
-  user: bob
-  service: generic
-  guid: <%= SecureRandom.hex %>
