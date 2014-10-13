@@ -37,12 +37,12 @@ module Agents
     end
 
     def working?
-      event_created_within?(interpolated[:expected_update_period_in_days]) && !received_event_without_error?
+      event_created_within?(interpolated['expected_update_period_in_days']) && !received_event_without_error?
     end
 
     def check
-      api = DropboxAPI.new(interpolated[:access_token])
-      current_contents = api.dir(interpolated[:dir_to_watch])
+      api = DropboxAPI.new(interpolated['access_token'])
+      current_contents = api.dir(interpolated['dir_to_watch'])
       diff = DropboxDirDiff.new(previous_contents, current_contents)
       create_event(payload: diff.to_hash) unless previous_contents.nil? || diff.empty?
 
