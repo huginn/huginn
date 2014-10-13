@@ -24,9 +24,9 @@ module Agents
 
     def default_options
       {
-        access_token: 'your_dropbox_app_access_token',
-        dir_to_watch: '/',
-        expected_update_period_in_days: 1
+        'access_token' => 'your_dropbox_app_access_token',
+        'dir_to_watch' => '/',
+        'expected_update_period_in_days' => 1
       }
     end
 
