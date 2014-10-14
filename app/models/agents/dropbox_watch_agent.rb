@@ -1,11 +1,13 @@
 module Agents
   class DropboxWatchAgent < Agent
+    include DropboxConcern
+
     cannot_receive_events!
     default_schedule "every_1m"
 
     description <<-MD
+      #{'## Include the `dropbox-api` and `omniauth-dropbox` gems in your `Gemfile` and set `DROPBOX_OAUTH_KEY` and `DROPBOX_OAUTH_SECRET` in your environment to use Dropbox Agents.' if dependencies_missing?}
       The _DropboxWatchAgent_ watches the given `dir_to_watch` and emits events with the detected changes.
-      It requires a [Dropbox App](https://www.dropbox.com/developers/apps) and its `access_token`, which will be used to authenticate on your account.
     MD
 
     event_description <<-MD
@@ -24,14 +26,12 @@ module Agents
 
     def default_options
       {
-        'access_token' => 'your_dropbox_app_access_token',
         'dir_to_watch' => '/',
         'expected_update_period_in_days' => 1
       }
     end
 
     def validate_options
-      errors.add(:base, 'The `access_token` property is required.') unless options['access_token'].present?
       errors.add(:base, 'The `dir_to_watch` property is required.') unless options['dir_to_watch'].present?
       errors.add(:base, 'Invalid `expected_update_period_in_days` format.') unless options['expected_update_period_in_days'].present? && is_positive_integer?(options['expected_update_period_in_days'])
     end
@@ -41,8 +41,7 @@ module Agents
     end
 
     def check
-      api = DropboxAPI.new(interpolated['access_token'])
-      current_contents = api.dir(interpolated['dir_to_watch'])
+      current_contents = ls(interpolated['dir_to_watch'])
       diff = DropboxDirDiff.new(previous_contents, current_contents)
       create_event(payload: diff.to_hash) unless previous_contents.nil? || diff.empty?
 
@@ -57,6 +56,14 @@ module Agents
       false
     end
 
+    def ls(dir_to_watch)
+      dropbox.ls(dir_to_watch).map { |entry| slice_json(entry, 'path', 'rev', 'modified') }
+    end
+
+    def slice_json(json, *keys)
+      keys.each_with_object({}){|key, hash| hash[key.to_s] = json[key.to_s]}
+    end
+
     def previous_contents
       self.memory['contents']
     end
@@ -66,30 +73,6 @@ module Agents
     end
 
     # == Auxiliary classes ==
-
-    class DropboxAPI
-      class ResourceNotFound < RuntimeError; end
-
-      include HTTParty
-      base_uri 'https://api.dropbox.com/1'
-
-      def initialize(access_token)
-        @options = { query: { access_token: access_token } }
-      end
-
-      def dir(to_watch)
-        options = @options.deep_merge({ query: { list: true } })
-        response = self.class.get("/metadata/auto#{to_watch}", options)
-        raise ResourceNotFound.new(to_watch) if response.not_found?
-        JSON.parse(response)['contents'].map { |entry| slice_json(entry, 'path', 'rev', 'modified') }
-      end
-
-      private
-
-      def slice_json(json, *keys)
-        keys.each_with_object({}){|key, hash| hash[key.to_s] = json[key.to_s]}
-      end
-    end
 
     class DropboxDirDiff
       def initialize(previous, current)

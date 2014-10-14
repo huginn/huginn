@@ -11,6 +11,7 @@ describe Agents::DropboxWatchAgent do
       }
     )
     @agent.user = users(:bob)
+    @agent.service = services(:generic)
     @agent.save!
   end
 
@@ -28,11 +29,6 @@ describe Agents::DropboxWatchAgent do
 
   describe '#valid?' do
     before(:each) { expect(@agent.valid?).to eq true }
-
-    it 'requires the "access_token"' do
-      @agent.options[:access_token] = nil
-      expect(@agent.valid?).to eq false
-    end
 
     it 'requires a "dir_to_watch"' do
       @agent.options[:dir_to_watch] = nil
@@ -54,11 +50,11 @@ describe Agents::DropboxWatchAgent do
 
   describe '#check' do
 
-    let(:first_result) { 'first_result' }
+    let(:first_result) { [{ 'path' => '1.json', 'rev' => '1', 'modified' => '01-01-01' }] }
 
     before(:each) do
-      stub.proxy(Agents::DropboxWatchAgent::DropboxAPI).new('70k3n') do |api|
-        stub(api).dir('/my/dropbox/dir') { first_result }
+      stub.proxy(Dropbox::API::Client).new do |api|
+        stub(api).ls('/my/dropbox/dir') { first_result }
       end
     end
 
@@ -79,13 +75,13 @@ describe Agents::DropboxWatchAgent do
 
     context 'subsequent calls' do
 
-      let(:second_result) { 'second_result' }
+      let(:second_result) { [{ 'path' => '2.json', 'rev' => '1', 'modified' => '02-02-02' }] }
 
       before(:each) do
         @agent.memory = { 'contents' => 'not_empty' }
 
-        stub.proxy(Agents::DropboxWatchAgent::DropboxAPI).new('70k3n') do |api|
-          stub(api).dir('/my/dropbox/dir') { second_result }
+        stub.proxy(Dropbox::API::Client).new do |api|
+          stub(api).ls('/my/dropbox/dir') { second_result }
         end
       end
 
@@ -174,68 +170,4 @@ describe Agents::DropboxWatchAgent do
     end
   end
 
-  describe Agents::DropboxWatchAgent::DropboxAPI do
-    let(:dir_to_watch) { '/my/dropbox/dir' }
-    let(:access_token) { '70k3n' }
-    let(:api_url) { "https://api.dropbox.com/1/metadata/auto#{dir_to_watch}?access_token=#{access_token}&list=true" }
-
-    describe '#dir' do
-
-      context 'when the provided path exists' do
-        before do
-          stub_request(:get, api_url).to_return(body: JSON.dump({
-            contents: [
-                {
-                    bytes: 0,
-                    icon: "folder",
-                    is_dir: true,
-                    modified: "Mon, 11 Mar 2013 15:41:44 +0000",
-                    path: "#{dir_to_watch}/1.json",
-                    rev: "1",
-                    revision: 14743,
-                    root: "dropbox",
-                    size: "0 bytes",
-                    thumb_exists: false
-                },
-                {
-                    bytes: 0,
-                    icon: "folder",
-                    is_dir: true,
-                    modified: "Mon, 12 Mar 2013 15:41:44 +0000",
-                    path: "#{dir_to_watch}/2.json",
-                    rev: "4",
-                    revision: 113022,
-                    root: "dropbox",
-                    size: "0 bytes",
-                    thumb_exists: false
-                }
-            ],
-            some: "other",
-            things: "we",
-            dont: "need"
-          }))
-        end
-
-        it 'trims down the attributes of the response to our needs' do
-          dir_list = Agents::DropboxWatchAgent::DropboxAPI.new(access_token).dir(dir_to_watch)
-          expect(dir_list).to eq [
-            { 'path' => "#{dir_to_watch}/1.json", 'rev' => '1', 'modified' => 'Mon, 11 Mar 2013 15:41:44 +0000' },
-            { 'path' => "#{dir_to_watch}/2.json", 'rev' => '4', 'modified' => 'Mon, 12 Mar 2013 15:41:44 +0000' }
-          ]
-        end
-      end
-
-      context 'when the provided path does not exist' do
-        before { stub_request(:get, api_url).to_return(status: 404, body: '{"error": "Not Found"}') }
-
-        it 'raises a ResourceNotFound error' do
-          expect {
-            Agents::DropboxWatchAgent::DropboxAPI.new(access_token).dir(dir_to_watch)
-          }.to raise_error(Agents::DropboxWatchAgent::DropboxAPI::ResourceNotFound, dir_to_watch)
-        end
-      end
-
-    end
-
-  end
 end

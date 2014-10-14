@@ -26,6 +26,10 @@ gem 'omniauth-twitter'
 gem 'tumblr_client'
 gem 'omniauth-tumblr'
 
+# Dropbox Agents
+gem 'dropbox-api'
+gem 'omniauth-dropbox'
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'

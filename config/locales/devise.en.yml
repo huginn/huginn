@@ -54,6 +54,7 @@ en:
       tumblr: 'Tumblr'
       github: 'GitHub'
       37signals: '37Signals (Basecamp)'
+      dropbox: 'Dropbox'
     mailer:
       confirmation_instructions:
         subject: 'Confirmation instructions'
