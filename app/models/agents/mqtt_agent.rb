@@ -110,8 +110,6 @@ module Agents
         incoming_events.each do |event|
           c.publish(interpolated(event)['topic'], event)
         end
-
-        c.disconnect
       end
     end
 
@@ -134,8 +132,6 @@ module Agents
           }
         rescue Timeout::Error
         end
-
-        c.disconnect   
       end
     end
 
