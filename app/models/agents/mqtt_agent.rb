@@ -118,20 +118,22 @@ module Agents
 
     def check
       mqtt_client.connect do |c|
+        begin
+          Timeout.timeout((interpolated['max_read_time'].presence || 15).to_i) {
+            c.get(interpolated['topic']) do |topic, message|
 
-        Timeout::timeout((interpolated['max_read_time'].presence || 15).to_i) {
-          c.get(interpolated['topic']) do |topic, message|
+              # A lot of services generate JSON. Try that first
+              payload = JSON.parse(message) rescue message
 
-            # A lot of services generate JSON. Try that first
-            payload = JSON.parse(message) rescue message
-
-            create_event :payload => { 
-              'topic' => topic, 
-              'message' => payload, 
-              'time' => Time.now.to_i 
-            }
-          end
-        } rescue TimeoutError
+              create_event :payload => {
+                'topic' => topic,
+                'message' => payload,
+                'time' => Time.now.to_i
+              }
+            end
+          }
+        rescue Timeout::Error
+        end
 
         c.disconnect   
       end
