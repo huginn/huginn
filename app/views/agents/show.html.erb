@@ -107,6 +107,13 @@
               </p>
             <% end %>
 
+            <% if @agent.try(:oauthable?) %>
+              <p>
+                <b>Service:</b>
+                <%= service_label(@agent.service) %>
+              </p>
+            <% end %>
+
             <% if @agent.can_receive_events? %>
               <p>
                 <b>Event sources:</b>

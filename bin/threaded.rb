@@ -33,7 +33,7 @@ end
 
 threads << Thread.new do
   safely do
-    @scheduler = HuginnScheduler.new
+    @scheduler = HuginnScheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'])
     @scheduler.run!
     puts "Scheduler stopped ..."
   end

@@ -41,12 +41,34 @@ module ApplicationHelper
     end
   end
 
-  def icon_for_service(service)
-    case service.to_sym
+  def omniauth_provider_icon(provider)
+    case provider.to_sym
     when :twitter, :tumblr, :github, :dropbox
-      "<i class='fa fa-#{service}'></i>".html_safe
+      content_tag :i, '', class: "fa fa-#{provider}"
     else
-      "<i class='fa fa-lock'></i>".html_safe
+      content_tag :i, '', class: "fa fa-lock"
     end
+  end
+
+  def omniauth_provider_name(provider)
+    t("devise.omniauth_providers.#{provider}")
+  end
+
+  def omniauth_button(provider)
+    link_to [
+      omniauth_provider_icon(provider),
+      content_tag(:span, "Authenticate with #{omniauth_provider_name(provider)}")
+    ].join.html_safe, user_omniauth_authorize_path(provider), class: "btn btn-default btn-service service-#{provider}"
+  end
+
+  def service_label_text(service)
+    "#{omniauth_provider_name(service.provider)} - #{service.name}"
+  end
+
+  def service_label(service)
+    content_tag :span, [
+      omniauth_provider_icon(service.provider),
+      service_label_text(service)
+    ].join.html_safe, class: "label label-default label-service service-#{service.provider}"
   end
 end

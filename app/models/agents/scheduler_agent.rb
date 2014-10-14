@@ -19,7 +19,7 @@ module Agents
 
       Set `action` to one of the action types below:
 
-      * `run`: This is the default.  Target Agents are run at intervals.
+      * `run`: Target Agents are run at intervals, except for those disabled.
 
       * `disable`: Target Agents are disabled (if not) at intervals.
 
