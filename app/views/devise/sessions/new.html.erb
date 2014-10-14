@@ -2,29 +2,29 @@
   <div class='col-md-6 col-md-offset-3'>
     <div class='well'>
 
-      <h2>Sign in</h2>
+      <h2>Log in</h2>
 
-      <%= form_for(resource, :as => resource_name, :url => session_path(resource_name), :html => { :class => 'form-horizontal', :role => 'form'}) do |f| %>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: 'form-horizontal', role: 'form'}) do |f| %>
         <div class="form-group">
-          <%= f.label :login, :class => 'col-md-2 col-md-offset-2 control-label' %>
+          <%= f.label :login, class: 'col-md-2 col-md-offset-2 control-label' %>
           <div class="col-md-6">
-            <%= f.text_field :login, :class => 'form-control' %>
+            <%= f.text_field :login, autofocus: true, class: 'form-control' %>
           </div>
         </div>
 
         <div class="form-group">
-          <%= f.label :password, :class => 'col-md-2 col-md-offset-2 control-label' %>
+          <%= f.label :password, class: 'col-md-2 col-md-offset-2 control-label' %>
           <div class="col-md-6">
-            <%= f.password_field :password, :class => 'form-control' %>
+            <%= f.password_field :password, class: 'form-control' %>
           </div>
         </div>
 
         <div class="form-group">
           <div class="col-md-offset-4 col-md-10">
-            <% if devise_mapping.rememberable? %>
+            <% if devise_mapping.rememberable? -%>
               <div class="checkbox">
                 <label>
-                  <%= f.check_box :remember_me %> Remember me
+                  <%= f.check_box :remember_me %> <%= f.label :remember_me %>
                 </label>
               </div>
             <% end -%>
@@ -33,7 +33,7 @@
 
         <div class="form-group">
           <div class="col-md-offset-4 col-md-10">
-            <%= f.submit "Sign in", :class => "btn btn-default" %>
+            <%= f.submit "Log in", class: "btn btn-default" %>
           </div>
         </div>
       <% end %>

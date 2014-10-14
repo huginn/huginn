@@ -3,19 +3,19 @@
     <div class='well'>
       <h2>Forgot your password?</h2>
 
-      <%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :post, :class => 'form-horizontal' }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, class: 'form-horizontal' }) do |f| %>
         <%= devise_error_messages! %>
 
         <div class="form-group">
           <%= f.label :login, :class => 'col-md-2 col-md-offset-2 control-label' %>
           <div class="col-md-6">
-            <%= f.text_field :login, :class => 'form-control' %>
+            <%= f.text_field :login, autofocus: true, :class => 'form-control' %>
           </div>
         </div>
 
         <div class="form-group">
           <div class="col-md-offset-4 col-md-10">
-            <%= f.submit "Send me reset password instructions", :class => "btn btn-primary" %>
+            <%= f.submit "Send me reset password instructions", class: "btn btn-primary" %>
           </div>
         </div>
       <% end %>
