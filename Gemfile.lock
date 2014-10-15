@@ -184,7 +184,7 @@ GEM
     mime-types (1.25.1)
     mini_portile (0.6.0)
     minitest (5.4.0)
-    mqtt (0.2.0)
+    mqtt (0.3.1)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
