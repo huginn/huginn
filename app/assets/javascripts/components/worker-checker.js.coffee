@@ -1,10 +1,15 @@
 $ ->
-  firstEventCount = null
+  sinceId = null
   previousJobs = null
 
   if $(".job-indicator").length
     check = ->
-      $.getJSON "/worker_status", (json) ->
+      query =
+        if sinceId?
+          '?since_id=' + sinceId
+        else
+          ''
+      $.getJSON "/worker_status" + query, (json) ->
         for method in ['pending', 'awaiting_retry', 'recent_failures']
           count = json[method]
           elem = $(".job-indicator[role=#{method}]")
@@ -23,16 +28,17 @@ $ ->
             if elem.is(":visible")
               elem.tooltip('destroy').fadeOut()
 
-        firstEventCount = json.event_count unless firstEventCount?
-        if firstEventCount? && json.event_count > firstEventCount
+        if sinceId? && json.event_count > 0
           $("#event-indicator").tooltip('destroy').
-                                tooltip(title: "Click to reload", delay: 0, placement: "bottom", trigger: "hover").
+                                tooltip(title: "Click to see the events", delay: 0, placement: "bottom", trigger: "hover").
+                                find('a').attr(href: json.events_url).end().
                                 fadeIn().
                                 find(".number").
-                                text(json.event_count - firstEventCount)
+                                text(json.event_count)
         else
           $("#event-indicator").tooltip('destroy').fadeOut()
 
+        sinceId ?= json.max_id
         currentJobs = [json.pending, json.awaiting_retry, json.recent_failures]
         if document.location.pathname == '/jobs' && $(".modal[aria-hidden=false]").length == 0 && previousJobs? && previousJobs.join(',') != currentJobs.join(',')
           $.get '/jobs', (data) =>
@@ -42,7 +48,3 @@ $ ->
         window.workerCheckTimeout = setTimeout check, 2000
 
     check()
-
-  $("#event-indicator a").on "click", (e) ->
-    e.preventDefault()
-    window.location.reload()

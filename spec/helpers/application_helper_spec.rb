@@ -143,4 +143,36 @@ describe ApplicationHelper do
       expect(elem).to be_a Nokogiri::XML::Element
     end
   end
+
+  describe '#highlighted?' do
+    it 'understands hl=6-8' do
+      stub(params).[](:hl) { '6-8' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [6, 7, 8]
+    end
+
+    it 'understands hl=1,3-4,9' do
+      stub(params).[](:hl) { '1,3-4,9' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [1, 3, 4, 9]
+    end
+
+    it 'understands hl=8-' do
+      stub(params).[](:hl) { '8-' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [8, 9, 10]
+    end
+
+    it 'understands hl=-2' do
+      stub(params).[](:hl) { '-2' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [1, 2]
+    end
+
+    it 'understands hl=-' do
+      stub(params).[](:hl) { '-' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    end
+
+    it 'is OK with no hl' do
+      stub(params).[](:hl) { nil }
+      expect((1..10).select { |i| highlighted?(i) }).to be_empty
+    end
+  end
 end
