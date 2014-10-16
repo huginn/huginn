@@ -95,6 +95,10 @@ GEM
     dotenv-deployment (0.0.2)
     dotenv-rails (0.11.1)
       dotenv (= 0.11.1)
+    dropbox-api (0.4.2)
+      hashie
+      multi_json
+      oauth
     em-http-request (1.1.2)
       addressable (>= 2.3.4)
       cookiejar
@@ -206,6 +210,8 @@ GEM
     omniauth-37signals (1.0.5)
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.0)
+    omniauth-dropbox (0.2.0)
+      omniauth-oauth (~> 1.0)
     omniauth-oauth (1.0.1)
       oauth
       omniauth (~> 1.0)
@@ -417,6 +423,7 @@ DEPENDENCIES
   devise (~> 3.2.4)
   dotenv-deployment
   dotenv-rails
+  dropbox-api
   em-http-request (~> 1.1.2)
   faraday (~> 0.9.0)
   faraday_middleware
@@ -443,6 +450,7 @@ DEPENDENCIES
   nokogiri (~> 1.6.1)
   omniauth
   omniauth-37signals
+  omniauth-dropbox
   omniauth-tumblr
   omniauth-twitter
   pg
