@@ -110,31 +110,44 @@ module Agents
         incoming_events.each do |event|
           c.publish(interpolated(event)['topic'], event)
         end
-
-        c.disconnect
       end
     end
 
 
     def check
+      last_message = memory['last_message']
+
       mqtt_client.connect do |c|
+        begin
+          Timeout.timeout((interpolated['max_read_time'].presence || 15).to_i) {
+            c.get_packet(interpolated['topic']) do |packet|
+              topic, payload = message = [packet.topic, packet.payload]
 
-        Timeout::timeout((interpolated['max_read_time'].presence || 15).to_i) {
-          c.get(interpolated['topic']) do |topic, message|
+              # Ignore a message if it is previously received
+              next if (packet.retain || packet.duplicate) && message == last_message
 
-            # A lot of services generate JSON. Try that first
-            payload = JSON.parse(message) rescue message
+              last_message = message
 
-            create_event :payload => { 
-              'topic' => topic, 
-              'message' => payload, 
-              'time' => Time.now.to_i 
-            }
-          end
-        } rescue TimeoutError
+              # A lot of services generate JSON, so try that.
+              begin
+                payload = JSON.parse(payload)
+              rescue
+              end
 
-        c.disconnect   
+              create_event payload: {
+                'topic' => topic,
+                'message' => payload,
+                'time' => Time.now.to_i
+              }
+            end
+          }
+        rescue Timeout::Error
+        end
       end
+
+      # Remember the last original (non-retain, non-duplicate) message
+      self.memory['last_message'] = last_message
+      save!
     end
 
   end
