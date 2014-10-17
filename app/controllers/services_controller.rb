@@ -33,13 +33,4 @@ class ServicesController < ApplicationController
       format.json { render json: @service }
     end
   end
-
-  def callback
-    @service = current_user.services.initialize_or_update_via_omniauth(request.env['omniauth.auth'])
-    if @service && @service.save
-      redirect_to services_path, notice: "The service was successfully created."
-    else
-      redirect_to services_path, error: "Error creating the service."
-    end
-  end
 end
