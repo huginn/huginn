@@ -13,6 +13,7 @@ gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
+gem 'github_api'      	  	  # GithubEventsAgent  
 
 # GoogleCalendarPublishAgent
 gem "google-api-client", require: 'google/api_client'
