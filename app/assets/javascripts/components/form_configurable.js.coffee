@@ -31,10 +31,12 @@ $ ->
           form_group.addClass('has-feedback').removeClass('has-error')
           form_group.find('span').addClass('hidden')
           form_group.find('.glyphicon-ok').removeClass('hidden')
+          returnedResults = {}
         error: (data) ->
           form_group.addClass('has-feedback').addClass('has-error')
           form_group.find('span').addClass('hidden')
           form_group.find('.glyphicon-remove').removeClass('hidden')
+          returnedResults = {}
 
     $("input[role=validatable], select[role=validatable]").trigger('change')
 
@@ -48,6 +50,11 @@ $ ->
           $(e.currentTarget).val(e.removed.id)
       )
 
+    updateDropdownData = (form_data, element, data) ->
+      returnedResults[form_data.attribute] = {text: 'Options', children: data}
+      $(element).trigger('change')
+      $(element).select2('open')
+
     $("input[role~=completable]").on 'select2-open', (e) ->
       form_data = getFormData(e.currentTarget)
       return if returnedResults[form_data.attribute]
@@ -56,6 +63,6 @@ $ ->
         type: 'POST',
         data: form_data
         success: (data) ->
-          returnedResults[form_data.attribute] = {text: 'Options', children: $.map(data, (d) -> {id: d.value, text: d.name})}
-          $(e.currentTarget).trigger('change')
-          $(e.currentTarget).select2('open')
+          updateDropdownData(form_data, e.currentTarget, $.map(data, (d) -> {id: d.value, text: d.name}))
+        error: (data) ->
+          updateDropdownData(form_data, e.currentTarget, [{id: undefined, text: 'Error loading data.'}])
