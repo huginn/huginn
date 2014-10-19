@@ -1,16 +1,4 @@
 $ ->
-  $.fn.serializeObject = ->
-    o = {}
-    a = @serializeArray()
-    $.each a, ->
-      if o[@name] isnt `undefined`
-        o[@name] = [o[@name]]  unless o[@name].push
-        o[@name].push @value or ""
-      else
-        o[@name] = @value or ""
-      return
-    o
-
   getFormData = (elem) ->
     form_data = $("#edit_agent, #new_agent").serializeObject()
     attribute = $(elem).data('attribute')
@@ -22,7 +10,7 @@ $ ->
     returnedResults = {}
     completableDefaultOptions = (input) ->
       results: [
-        (returnedResults[$(input).data('attribute')] || {text: 'Options', children: [{id: '', text: 'loading ...'}]})
+        (returnedResults[$(input).data('attribute')] || {text: 'Options', children: [{id: '', text: 'loading ...'}]}),
         {
           text: 'Current',
           children: [id: $(input).val(), text: $(input).val()]
@@ -68,7 +56,6 @@ $ ->
         type: 'POST',
         data: form_data
         success: (data) ->
-          console.log data
           returnedResults[form_data.attribute] = {text: 'Options', children: $.map(data, (d) -> {id: d.value, text: d.name})}
           $(e.currentTarget).trigger('change')
           $(e.currentTarget).select2('open')
