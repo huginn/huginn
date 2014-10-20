@@ -3,7 +3,6 @@ require 'cgi'
 
 module Agents
   class WeatherAgent < Agent
-    cannot_receive_events!
 
     gem_dependency_check { defined?(Wunderground) && defined?(ForecastIO) }
 
@@ -75,12 +74,18 @@ module Agents
       interpolated["service"].presence || "wunderground"
     end
 
+    def receive(incoming_events)
+      incoming_events.each do |event|
+        memory['location'] = event.location.latlng
+      end
+    end
+
     def which_day
       (interpolated["which_day"].presence || 1).to_i
     end
 
     def location
-      interpolated["location"].presence || interpolated["zipcode"]
+      memory['location'] || interpolated["location"].presence || interpolated["zipcode"]
     end
 
     def validate_options
