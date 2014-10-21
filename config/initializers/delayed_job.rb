@@ -7,3 +7,9 @@ Delayed::Worker.delay_jobs = !Rails.env.test?
 
 # Delayed::Worker.logger = Logger.new(Rails.root.join('log', 'delayed_job.log'))
 # Delayed::Worker.logger.level = Logger::DEBUG
+
+class Delayed::Job
+  scope :pending, ->{ where("locked_at IS NULL AND attempts = 0") }
+  scope :awaiting_retry, ->{ where("failed_at IS NULL AND attempts > 0") }
+  scope :failed, -> { where("failed_at IS NOT NULL") }
+end

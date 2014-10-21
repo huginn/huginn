@@ -20,9 +20,9 @@ class WorkerStatusController < ApplicationController
     end
 
     render json: {
-      pending: Delayed::Job.where("run_at <= ? AND locked_at IS NULL AND attempts = 0", start).count,
-      awaiting_retry: Delayed::Job.where("failed_at IS NULL AND attempts > 0").count,
-      recent_failures: Delayed::Job.where("failed_at IS NOT NULL AND failed_at > ?", 5.days.ago).count,
+      pending: Delayed::Job.pending.where("run_at <= ?", start).count,
+      awaiting_retry: Delayed::Job.awaiting_retry.count,
+      recent_failures: Delayed::Job.failed.where('failed_at > ?', 5.days.ago).count,
       event_count: count,
       max_id: max_id || 0,
       events_url: events_url,
