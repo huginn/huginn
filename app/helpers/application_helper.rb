@@ -73,29 +73,23 @@ module ApplicationHelper
   end
 
   def highlighted?(id)
-    (@hl ||=
-     case hl = params[:hl].presence
-     when nil
-       ->x { false }
-     when String
-       values = hl.split(/,/).flat_map { |i|
-         case i
-         when /\A(\d+)\z/
-           i.to_i
-         when /\A(\d+)?-(\d+)?\z/
-           ($1 ? $1.to_i : 1)..($2 ? $2.to_i : Float::INFINITY)
-         else
-           []
-         end
-       }
-       ->x {
-         case x
-         when *values
-           true
-         else
-           false
-         end
-       }
-     end)[id]
+    @highlighted_ranges ||=
+      case value = params[:hl].presence
+      when String
+        value.split(/,/).flat_map { |part|
+          case part
+          when /\A(\d+)\z/
+            (part.to_i)..(part.to_i)
+          when /\A(\d+)?-(\d+)?\z/
+            ($1 ? $1.to_i : 1)..($2 ? $2.to_i : Float::INFINITY)
+          else
+            []
+          end
+        }
+      else
+        []
+      end
+
+    @highlighted_ranges.any? { |range| range.cover?(id) }
   end
 end
