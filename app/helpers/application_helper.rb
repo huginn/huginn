@@ -83,7 +83,7 @@ module ApplicationHelper
          when /\A(\d+)\z/
            i.to_i
          when /\A(\d+)?-(\d+)?\z/
-           ($1 ? $1.to_i : 1)..($2 ? $2.to_i : (1/0.0))
+           ($1 ? $1.to_i : 1)..($2 ? $2.to_i : Float::INFINITY)
          else
            []
          end
