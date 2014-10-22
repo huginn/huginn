@@ -94,42 +94,42 @@ describe Agents::ImapFolderAgent do
 
     describe 'validations' do
       before do
-        @checker.should be_valid
+        expect(@checker).to be_valid
       end
 
       it 'should validate the integer fields' do
         @checker.options['expected_update_period_in_days'] = 'nonsense'
-        @checker.should_not be_valid
+        expect(@checker).not_to be_valid
 
         @checker.options['expected_update_period_in_days'] = '2'
-        @checker.should be_valid
+        expect(@checker).to be_valid
 
         @checker.options['port'] = -1
-        @checker.should_not be_valid
+        expect(@checker).not_to be_valid
 
         @checker.options['port'] = 'imap'
-        @checker.should_not be_valid
+        expect(@checker).not_to be_valid
 
         @checker.options['port'] = '143'
-        @checker.should be_valid
+        expect(@checker).to be_valid
 
         @checker.options['port'] = 993
-        @checker.should be_valid
+        expect(@checker).to be_valid
       end
 
       it 'should validate the boolean fields' do
         %w[ssl mark_as_read].each do |key|
           @checker.options[key] = 1
-          @checker.should_not be_valid
+          expect(@checker).not_to be_valid
 
           @checker.options[key] = false
-          @checker.should be_valid
+          expect(@checker).to be_valid
 
           @checker.options[key] = 'true'
-          @checker.should be_valid
+          expect(@checker).to be_valid
 
           @checker.options[key] = ''
-          @checker.should be_valid
+          expect(@checker).to be_valid
         end
       end
 
@@ -137,46 +137,46 @@ describe Agents::ImapFolderAgent do
         @checker.options['conditions'] = {
           'subject' => '(foo'
         }
-        @checker.should_not be_valid
+        expect(@checker).not_to be_valid
 
         @checker.options['conditions'] = {
           'body' => '***'
         }
-        @checker.should_not be_valid
+        expect(@checker).not_to be_valid
 
         @checker.options['conditions'] = {
           'subject' => '\ARe:',
           'body' => '(?<foo>http://\S+)'
         }
-        @checker.should be_valid
+        expect(@checker).to be_valid
       end
     end
 
     describe '#check' do
       it 'should check for mails and save memory' do
-        lambda { @checker.check }.should change { Event.count }.by(2)
-        @checker.notified.sort.should == @mails.map(&:message_id).sort
-        @checker.lastseen.should == @mails.each_with_object(@checker.make_seen) { |mail, seen|
+        expect { @checker.check }.to change { Event.count }.by(2)
+        expect(@checker.notified.sort).to eq(@mails.map(&:message_id).sort)
+        expect(@checker.lastseen).to eq(@mails.each_with_object(@checker.make_seen) { |mail, seen|
           seen[mail.uidvalidity] = mail.uid
-        }
+        })
 
         Event.last(2).map(&:payload) == @payloads
 
-        lambda { @checker.check }.should_not change { Event.count }
+        expect { @checker.check }.not_to change { Event.count }
       end
 
       it 'should narrow mails by To' do
         @checker.options['conditions']['to'] = 'John.Doe@*'
 
-        lambda { @checker.check }.should change { Event.count }.by(1)
-        @checker.notified.sort.should == [@mails.first.message_id]
-        @checker.lastseen.should == @mails.each_with_object(@checker.make_seen) { |mail, seen|
+        expect { @checker.check }.to change { Event.count }.by(1)
+        expect(@checker.notified.sort).to eq([@mails.first.message_id])
+        expect(@checker.lastseen).to eq(@mails.each_with_object(@checker.make_seen) { |mail, seen|
           seen[mail.uidvalidity] = mail.uid
-        }
+        })
 
-        Event.last.payload.should == @payloads.first
+        expect(Event.last.payload).to eq(@payloads.first)
 
-        lambda { @checker.check }.should_not change { Event.count }
+        expect { @checker.check }.not_to change { Event.count }
       end
 
       it 'should perform regexp matching and save named captures' do
@@ -185,35 +185,35 @@ describe Agents::ImapFolderAgent do
           'body'    => 'Some (?<b>.+) reply',
         )
 
-        lambda { @checker.check }.should change { Event.count }.by(1)
-        @checker.notified.sort.should == [@mails.last.message_id]
-        @checker.lastseen.should == @mails.each_with_object(@checker.make_seen) { |mail, seen|
+        expect { @checker.check }.to change { Event.count }.by(1)
+        expect(@checker.notified.sort).to eq([@mails.last.message_id])
+        expect(@checker.lastseen).to eq(@mails.each_with_object(@checker.make_seen) { |mail, seen|
           seen[mail.uidvalidity] = mail.uid
-        }
+        })
 
-        Event.last.payload.should == @payloads.last.update(
+        expect(Event.last.payload).to eq(@payloads.last.update(
           'body' => "<div dir=\"ltr\">Some HTML reply<br></div>\n",
           'matches' => { 'a' => 'some subject', 'b' => 'HTML' },
           'mime_type' => 'text/html',
-        )
+        ))
 
-        lambda { @checker.check }.should_not change { Event.count }
+        expect { @checker.check }.not_to change { Event.count }
       end
 
       it 'should narrow mails by has_attachment (true)' do
         @checker.options['conditions']['has_attachment'] = true
 
-        lambda { @checker.check }.should change { Event.count }.by(1)
+        expect { @checker.check }.to change { Event.count }.by(1)
 
-        Event.last.payload['subject'].should == 'Re: some subject'
+        expect(Event.last.payload['subject']).to eq('Re: some subject')
       end
 
       it 'should narrow mails by has_attachment (false)' do
         @checker.options['conditions']['has_attachment'] = false
 
-        lambda { @checker.check }.should change { Event.count }.by(1)
+        expect { @checker.check }.to change { Event.count }.by(1)
 
-        Event.last.payload['subject'].should == 'some subject'
+        expect(Event.last.payload['subject']).to eq('some subject')
       end
 
       it 'should narrow mail parts by MIME types' do
@@ -223,18 +223,18 @@ describe Agents::ImapFolderAgent do
           'body'    => 'Some (?<b>.+) reply',
         )
 
-        lambda { @checker.check }.should_not change { Event.count }
-        @checker.notified.sort.should == []
-        @checker.lastseen.should == @mails.each_with_object(@checker.make_seen) { |mail, seen|
+        expect { @checker.check }.not_to change { Event.count }
+        expect(@checker.notified.sort).to eq([])
+        expect(@checker.lastseen).to eq(@mails.each_with_object(@checker.make_seen) { |mail, seen|
           seen[mail.uidvalidity] = mail.uid
-        }
+        })
       end
 
       it 'should never mark mails as read unless mark_as_read is true' do
         @mails.each { |mail|
           stub(mail).mark_as_read.never
         }
-        lambda { @checker.check }.should change { Event.count }.by(2)
+        expect { @checker.check }.to change { Event.count }.by(2)
       end
 
       it 'should mark mails as read if mark_as_read is true' do
@@ -242,7 +242,7 @@ describe Agents::ImapFolderAgent do
         @mails.each { |mail|
           stub(mail).mark_as_read.once
         }
-        lambda { @checker.check }.should change { Event.count }.by(2)
+        expect { @checker.check }.to change { Event.count }.by(2)
       end
 
       it 'should create just one event for multiple mails with the same Message-Id' do
@@ -251,7 +251,7 @@ describe Agents::ImapFolderAgent do
         @mails.each { |mail|
           stub(mail).mark_as_read.once
         }
-        lambda { @checker.check }.should change { Event.count }.by(1)
+        expect { @checker.check }.to change { Event.count }.by(1)
       end
     end
   end

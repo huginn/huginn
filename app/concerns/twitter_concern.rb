@@ -46,7 +46,11 @@ module TwitterConcern
 
   module ClassMethods
     def twitter_dependencies_missing
-      "## Include the `twitter`, `omniauth-twitter`, and `cantino-twitter-stream` gems in your Gemfile to use Twitter Agents."
+      if defined?(Twitter)
+        "## Set TWITTER_OAUTH_KEY and TWITTER_OAUTH_SECRET in your environment to use Twitter Agents."
+      else
+        "## Include the `twitter`, `omniauth-twitter`, and `cantino-twitter-stream` gems in your Gemfile to use Twitter Agents."
+      end
     end
   end
 end

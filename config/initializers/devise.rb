@@ -136,7 +136,7 @@ Devise.setup do |config|
   # The time you want to timeout the user session without activity. After this
   # time the user will be asked for credentials again. Default is 30 minutes.
   # config.timeout_in = 30.minutes
-  
+
   # If true, expires auth token on session timeout.
   # config.expire_auth_token_on_timeout = false
 
@@ -213,6 +213,7 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', :scope => 'user,public_repo'
+
   if defined?(OmniAuth::Strategies::Twitter) &&
      (key = ENV["TWITTER_OAUTH_KEY"]).present? &&
      (secret = ENV["TWITTER_OAUTH_SECRET"]).present?
@@ -235,6 +236,12 @@ Devise.setup do |config|
      (key = ENV["GITHUB_OAUTH_KEY"]).present? &&
      (secret = ENV["GITHUB_OAUTH_SECRET"]).present?
     config.omniauth :github, key, secret
+  end
+
+  if defined?(OmniAuth::Strategies::Dropbox) &&
+     (key = ENV["DROPBOX_OAUTH_KEY"]).present? &&
+     (secret = ENV["DROPBOX_OAUTH_SECRET"]).present?
+    config.omniauth :dropbox, key, secret
   end
 
   # ==> Warden configuration

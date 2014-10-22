@@ -95,6 +95,10 @@ GEM
     dotenv-deployment (0.0.2)
     dotenv-rails (0.11.1)
       dotenv (= 0.11.1)
+    dropbox-api (0.4.2)
+      hashie
+      multi_json
+      oauth
     em-http-request (1.1.2)
       addressable (>= 2.3.4)
       cookiejar
@@ -171,7 +175,7 @@ GEM
     kramdown (1.3.3)
     launchy (2.4.2)
       addressable (~> 2.3)
-    libv8 (3.16.14.3)
+    libv8 (3.16.14.7)
     liquid (2.6.1)
     macaddr (1.7.1)
       systemu (~> 2.6.2)
@@ -184,7 +188,7 @@ GEM
     mime-types (1.25.1)
     mini_portile (0.6.0)
     minitest (5.4.0)
-    mqtt (0.2.0)
+    mqtt (0.3.1)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -206,6 +210,8 @@ GEM
     omniauth-37signals (1.0.5)
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.0)
+    omniauth-dropbox (0.2.0)
+      omniauth-oauth (~> 1.0)
     omniauth-oauth (1.0.1)
       oauth
       omniauth (~> 1.0)
@@ -263,25 +269,28 @@ GEM
       rdoc (>= 2.4.2)
     retriable (1.4.1)
     rr (1.1.2)
-    rspec (2.99.0)
-      rspec-core (~> 2.99.0)
-      rspec-expectations (~> 2.99.0)
-      rspec-mocks (~> 2.99.0)
+    rspec (3.0.0)
+      rspec-core (~> 3.0.0)
+      rspec-expectations (~> 3.0.0)
+      rspec-mocks (~> 3.0.0)
     rspec-collection_matchers (1.0.0)
       rspec-expectations (>= 2.99.0.beta1)
-    rspec-core (2.99.2)
-    rspec-expectations (2.99.2)
-      diff-lcs (>= 1.1.3, < 2.0)
-    rspec-mocks (2.99.2)
-    rspec-rails (2.99.0)
+    rspec-core (3.0.4)
+      rspec-support (~> 3.0.0)
+    rspec-expectations (3.0.4)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.0.0)
+    rspec-mocks (3.0.4)
+      rspec-support (~> 3.0.0)
+    rspec-rails (3.0.2)
       actionpack (>= 3.0)
-      activemodel (>= 3.0)
       activesupport (>= 3.0)
       railties (>= 3.0)
-      rspec-collection_matchers
-      rspec-core (~> 2.99.0)
-      rspec-expectations (~> 2.99.0)
-      rspec-mocks (~> 2.99.0)
+      rspec-core (~> 3.0.0)
+      rspec-expectations (~> 3.0.0)
+      rspec-mocks (~> 3.0.0)
+      rspec-support (~> 3.0.0)
+    rspec-support (3.0.4)
     rturk (2.12.1)
       erector
       nokogiri
@@ -299,7 +308,7 @@ GEM
       sprockets-rails (~> 2.0)
     select2-rails (3.5.9.1)
       thor (~> 0.14)
-    shoulda-matchers (2.6.2)
+    shoulda-matchers (2.7.0)
       activesupport (>= 3.0.0)
     signet (0.5.1)
       addressable (>= 2.2.3)
@@ -414,6 +423,7 @@ DEPENDENCIES
   devise (~> 3.2.4)
   dotenv-deployment
   dotenv-rails
+  dropbox-api
   em-http-request (~> 1.1.2)
   faraday (~> 0.9.0)
   faraday_middleware
@@ -440,6 +450,7 @@ DEPENDENCIES
   nokogiri (~> 1.6.1)
   omniauth
   omniauth-37signals
+  omniauth-dropbox
   omniauth-tumblr
   omniauth-twitter
   pg
@@ -450,9 +461,9 @@ DEPENDENCIES
   rails (= 4.1.5)
   rails_12factor
   rr
-  rspec (~> 2.99)
-  rspec-collection_matchers
-  rspec-rails (~> 2.99)
+  rspec (~> 3.0)
+  rspec-collection_matchers (~> 1.0.0)
+  rspec-rails (~> 3.0.1)
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
   rufus-scheduler (~> 3.0.8)

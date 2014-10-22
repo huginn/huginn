@@ -1,7 +1,4 @@
-require "google/api_client"
-
 class GoogleCalendar
-
   def initialize(config, logger)
     @config = config
     @key = Google::APIClient::PKCS12.load_key(@config['google']['key_file'], @config['google']['key_secret'])
@@ -63,5 +60,4 @@ class GoogleCalendar
     @logger.debug ret.to_yaml
     ret    
   end
-
 end

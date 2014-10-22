@@ -22,17 +22,17 @@ describe Agents::PeakDetectorAgent do
       events = build_events(:keys => ['count', 'filter'],
                             :values => [[1, "something"], [2, "something"], [3, "else"]])
       @agent.receive events
-      @agent.memory['data']['something'].map(&:first).should == [1, 2]
-      @agent.memory['data']['something'].last.last.should be_within(10).of((100 - 1).hours.ago.to_i)
-      @agent.memory['data']['else'].first.first.should == 3
-      @agent.memory['data']['else'].first.last.should be_within(10).of((100 - 2).hours.ago.to_i)
+      expect(@agent.memory['data']['something'].map(&:first)).to eq([1, 2])
+      expect(@agent.memory['data']['something'].last.last).to be_within(10).of((100 - 1).hours.ago.to_i)
+      expect(@agent.memory['data']['else'].first.first).to eq(3)
+      expect(@agent.memory['data']['else'].first.last).to be_within(10).of((100 - 2).hours.ago.to_i)
     end
 
     it "works without a group_by_path as well" do
       @agent.options['group_by_path'] = ""
       events = build_events(:keys => ['count'], :values => [[1], [2]])
       @agent.receive events
-      @agent.memory['data']['no_group'].map(&:first).should == [1, 2]
+      expect(@agent.memory['data']['no_group'].map(&:first)).to eq([1, 2])
     end
 
     it "keeps a rolling window of data" do
@@ -40,7 +40,7 @@ describe Agents::PeakDetectorAgent do
       @agent.receive build_events(:keys => ['count'],
                                   :values => [1, 2, 3, 4, 5, 6, 7, 8].map {|i| [i]},
                                   :pattern => { 'filter' => "something" })
-      @agent.memory['data']['something'].map(&:first).should == [4, 5, 6, 7, 8]
+      expect(@agent.memory['data']['something'].map(&:first)).to eq([4, 5, 6, 7, 8])
     end
 
     it "finds peaks" do
@@ -52,13 +52,13 @@ describe Agents::PeakDetectorAgent do
                                8, 50, # ignored because it's too close to the first peak
                                4, 5].map {|i| [i]},
                    :pattern => { 'filter' => "something" }).each.with_index do |event, index|
-        lambda {
+        expect {
           @agent.receive([event])
-        }.should change { @agent.events.count }.by( index == 6 ? 1 : 0 )
+        }.to change { @agent.events.count }.by( index == 6 ? 1 : 0 )
       end
 
-      @agent.events.last.payload['peak'].should == 15.0
-      @agent.memory['peaks']['something'].length.should == 1
+      expect(@agent.events.last.payload['peak']).to eq(15.0)
+      expect(@agent.memory['peaks']['something'].length).to eq(1)
     end
 
     it "keeps a rolling window of peaks" do
@@ -66,28 +66,28 @@ describe Agents::PeakDetectorAgent do
       @agent.receive build_events(:keys => ['count'],
                                   :values => [1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 10, 1].map {|i| [i]},
                                   :pattern => { 'filter' => "something" })
-      @agent.memory['peaks']['something'].length.should == 2
+      expect(@agent.memory['peaks']['something'].length).to eq(2)
     end
   end
 
   describe "validation" do
     before do
-      @agent.should be_valid
+      expect(@agent).to be_valid
     end
 
     it "should validate presence of message" do
       @agent.options['message'] = nil
-      @agent.should_not be_valid
+      expect(@agent).not_to be_valid
     end
 
     it "should validate presence of expected_receive_period_in_days" do
       @agent.options['expected_receive_period_in_days'] = ""
-      @agent.should_not be_valid
+      expect(@agent).not_to be_valid
     end
 
     it "should validate presence of value_path" do
       @agent.options['value_path'] = ""
-      @agent.should_not be_valid
+      expect(@agent).not_to be_valid
     end
   end
 end

@@ -52,7 +52,9 @@ class MQTT::FakeServer
     @port = @socket.addr[1]
     @thread ||= Thread.new do
       logger.info "Started a fake MQTT server on #{@address}:#{@port}"
+      @times = 0
       loop do
+        @times += 1
         # Wait for a client to connect
         client = @socket.accept
         @pings_received = 0
@@ -103,16 +105,33 @@ class MQTT::FakeServer
             :granted_qos => 0
           )
           topic = packet.topics[0][0]
-          client.write MQTT::Packet::Publish.new(
-            :topic => topic,
-            :payload => "hello #{topic}",
-            :retain => true
-          )
-          client.write MQTT::Packet::Publish.new(
-            :topic => topic,
-            :payload => "did you know about #{topic}",
-            :retain => true
-          )
+          case @times
+          when 1, ->x { x >= 3 }
+            # Deliver retained messages
+            client.write MQTT::Packet::Publish.new(
+              :topic => topic,
+              :payload => "did you know about #{topic}",
+              :retain => true
+            )
+            client.write MQTT::Packet::Publish.new(
+              :topic => topic,
+              :payload => "hello #{topic}",
+              :retain => true
+            )
+          when 2
+            # Deliver a still retained message
+            client.write MQTT::Packet::Publish.new(
+              :topic => topic,
+              :payload => "hello #{topic}",
+              :retain => true
+            )
+            # Deliver a fresh message
+            client.write MQTT::Packet::Publish.new(
+              :topic => topic,
+              :payload => "did you know about #{topic}",
+              :retain => false
+            )
+          end
 
         when MQTT::Packet::Pingreq
           client.write MQTT::Packet::Pingresp.new

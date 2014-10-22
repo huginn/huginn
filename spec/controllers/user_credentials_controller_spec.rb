@@ -15,18 +15,18 @@ describe UserCredentialsController do
   describe "GET index" do
     it "only returns UserCredentials for the current user" do
       get :index
-      assigns(:user_credentials).all? {|i| i.user.should == users(:bob) }.should be_truthy
+      expect(assigns(:user_credentials).all? {|i| expect(i.user).to eq(users(:bob)) }).to be_truthy
     end
   end
 
   describe "GET edit" do
     it "only shows UserCredentials for the current user" do
       get :edit, :id => user_credentials(:bob_aws_secret).to_param
-      assigns(:user_credential).should eq(user_credentials(:bob_aws_secret))
+      expect(assigns(:user_credential)).to eq(user_credentials(:bob_aws_secret))
 
-      lambda {
+      expect {
         get :edit, :id => user_credentials(:jane_aws_secret).to_param
-      }.should raise_error(ActiveRecord::RecordNotFound)
+      }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
@@ -41,8 +41,8 @@ describe UserCredentialsController do
       expect {
         post :create, :user_credential => valid_attributes(:credential_name => "")
       }.not_to change { users(:bob).user_credentials.count }
-      assigns(:user_credential).should have(1).errors_on(:credential_name)
-      response.should render_template("new")
+      expect(assigns(:user_credential)).to have(1).errors_on(:credential_name)
+      expect(response).to render_template("new")
     end
 
     it "will not create UserCredentials for other users" do
@@ -55,19 +55,19 @@ describe UserCredentialsController do
   describe "PUT update" do
     it "updates attributes on UserCredentials for the current user" do
       post :update, :id => user_credentials(:bob_aws_key).to_param, :user_credential => { :credential_name => "new_name" }
-      response.should redirect_to(user_credentials_path)
-      user_credentials(:bob_aws_key).reload.credential_name.should == "new_name"
+      expect(response).to redirect_to(user_credentials_path)
+      expect(user_credentials(:bob_aws_key).reload.credential_name).to eq("new_name")
 
-      lambda {
+      expect {
         post :update, :id => user_credentials(:jane_aws_key).to_param, :user_credential => { :credential_name => "new_name" }
-      }.should raise_error(ActiveRecord::RecordNotFound)
-      user_credentials(:jane_aws_key).reload.credential_name.should_not == "new_name"
+      }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(user_credentials(:jane_aws_key).reload.credential_name).not_to eq("new_name")
     end
 
     it "shows errors" do
       post :update, :id => user_credentials(:bob_aws_key).to_param, :user_credential => { :credential_name => "" }
-      assigns(:user_credential).should have(1).errors_on(:credential_name)
-      response.should render_template("edit")
+      expect(assigns(:user_credential)).to have(1).errors_on(:credential_name)
+      expect(response).to render_template("edit")
     end
   end
 
@@ -77,9 +77,9 @@ describe UserCredentialsController do
         delete :destroy, :id => user_credentials(:bob_aws_key).to_param
       }.to change(UserCredential, :count).by(-1)
 
-      lambda {
+      expect {
         delete :destroy, :id => user_credentials(:jane_aws_key).to_param
-      }.should raise_error(ActiveRecord::RecordNotFound)
+      }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end

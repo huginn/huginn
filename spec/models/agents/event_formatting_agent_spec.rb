@@ -45,26 +45,26 @@ describe Agents::EventFormattingAgent do
   describe "#receive" do
     it "should accept clean mode" do
       @checker.receive([@event])
-      Event.last.payload[:content].should == nil
+      expect(Event.last.payload[:content]).to eq(nil)
     end
 
     it "should accept merge mode" do
       @checker.options[:mode] = "merge"
       @checker.receive([@event])
-      Event.last.payload[:content].should_not == nil
+      expect(Event.last.payload[:content]).not_to eq(nil)
     end
 
     it "should handle Liquid templating in instructions" do
       @checker.receive([@event])
-      Event.last.payload[:message].should == "Received Some Lorem Ipsum from somevalue ."
-      Event.last.payload[:agent].should == "WeatherAgent"
-      Event.last.payload[:created_at].should == @event.created_at.to_s
-      Event.last.payload[:created_at_iso].should == @event.created_at.iso8601
+      expect(Event.last.payload[:message]).to eq("Received Some Lorem Ipsum from somevalue .")
+      expect(Event.last.payload[:agent]).to eq("WeatherAgent")
+      expect(Event.last.payload[:created_at]).to eq(@event.created_at.to_s)
+      expect(Event.last.payload[:created_at_iso]).to eq(@event.created_at.iso8601)
     end
 
     it "should handle matchers and Liquid templating in instructions" do
       @checker.receive([@event])
-      Event.last.payload[:subject].should == "Weather looks like someothervalue according to the forecast at 10:00 PM EST"
+      expect(Event.last.payload[:subject]).to eq("Weather looks like someothervalue according to the forecast at 10:00 PM EST")
     end
 
     it "should allow escaping" do
@@ -73,7 +73,7 @@ describe Agents::EventFormattingAgent do
       @checker.options[:instructions][:message] = "Escaped: {{content.name | uri_escape}}\nNot escaped: {{content.name}}"
       @checker.save!
       @checker.receive([@event])
-      Event.last.payload[:message].should == "Escaped: escape+this%21%3F\nNot escaped: escape this!?"
+      expect(Event.last.payload[:message]).to eq("Escaped: escape+this%21%3F\nNot escaped: escape this!?")
     end
 
     it "should handle multiple events" do
@@ -97,47 +97,47 @@ describe Agents::EventFormattingAgent do
           :conditions => "someothervalue"
       }
 
-      lambda {
+      expect {
         @checker.receive([event2, event1])
-      }.should change { Event.count }.by(2)
+      }.to change { Event.count }.by(2)
     end
   end
 
   describe "validation" do
     before do
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should validate presence of instructions" do
       @checker.options[:instructions] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should validate type of matchers" do
       @checker.options[:matchers] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options[:matchers] = {}
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should validate the contents of matchers" do
       @checker.options[:matchers] = [
         {}
       ]
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options[:matchers] = [
         { :regexp => "(not closed", :path => "text" }
       ]
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
       @checker.options[:matchers] = [
         { :regexp => "(closed)", :path => "text", :to => "foo" }
       ]
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should validate presence of mode" do
       @checker.options[:mode] = ""
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
   end
 end

@@ -157,6 +157,7 @@ span.not-applicable:after {
   height: 16px;
   display: inline-block;
   vertical-align: inherit;
+  cursor: pointer;
 
   &.refresh {
     margin: 0 10px;
@@ -240,7 +241,22 @@ h2 .scenario, a span.label.scenario {
   width: 200px;
 }
 
-.btn-auth {
+$services:            twitter     37signals   github      tumblr      dropbox;
+$service-colors:      #55acee     #8fc857     #444444     #2c4762     #007EE5;
+
+@mixin services {
+  @each $service in $services {
+    $i: index($services, $service);
+    $service-color: nth($service-colors, $i);
+
+    &.service-#{$service} {
+      color: #fff;
+      background-color: $service-color;
+    }
+  }
+}
+
+.btn-service {
   position: relative;
   padding-left: 40px;
   $border-color: rgba(0,0,0,0.2);
@@ -259,18 +275,9 @@ h2 .scenario, a span.label.scenario {
     border-right: 1px solid $border-color;
   }
 
-  &.btn-auth-twitter {
-    color: #fff;
-    background-color: #55acee;
-  }
+  @include services;
+}
 
-  &.btn-auth-37signals {
-    color: #fff;
-    background-color: #8fc857;
-  }
-
-  &.btn-auth-github {
-    color: #fff;
-    background-color: #444;
-  }
+.label-service {
+  @include services;
 }

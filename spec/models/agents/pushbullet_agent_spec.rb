@@ -21,26 +21,26 @@ describe Agents::PushbulletAgent do
 
   describe "validating" do
     before do
-      @checker.should be_valid
+      expect(@checker).to be_valid
     end
 
     it "should require the api_key" do
       @checker.options['api_key'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should require the device_id" do
       @checker.options['device_id'] = nil
-      @checker.should_not be_valid
+      expect(@checker).not_to be_valid
     end
   end
 
   describe "helpers" do
     it "should return the query_options" do
-      @checker.send(:query_options, @event).should == {
+      expect(@checker.send(:query_options, @event)).to eq({
         :body => {:title => 'hello from huginn', :body => 'One two test', :device_iden => @checker.options[:device_id], :type => 'note'},
         :basic_auth => {:username =>@checker.options[:api_key], :password=>''}
-      }
+      })
     end
   end
 
@@ -64,9 +64,9 @@ describe Agents::PushbulletAgent do
 
   describe "#working?" do
     it "should not be working until the first event was received" do
-      @checker.should_not be_working
+      expect(@checker).not_to be_working
       @checker.last_receive_at = Time.now
-      @checker.should be_working
+      expect(@checker).to be_working
     end
   end
 end

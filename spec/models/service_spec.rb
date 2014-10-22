@@ -8,11 +8,11 @@ describe Service do
   describe "#toggle_availability!" do
     it "should toggle the global flag" do
       @service = services(:generic)
-      @service.global.should == false
+      expect(@service.global).to eq(false)
       @service.toggle_availability!
-      @service.global.should == true
+      expect(@service.global).to eq(true)
       @service.toggle_availability!
-      @service.global.should == false
+      expect(@service.global).to eq(false)
     end
 
     it "disconnects agents and disables them if the previously global service is made private again", focus: true do
@@ -21,15 +21,15 @@ describe Service do
 
       service = agent.service
       service.toggle_availability!
-      service.agents.length.should == 2
+      expect(service.agents.length).to eq(2)
 
       service.toggle_availability!
       jane_agent.reload
-      jane_agent.service_id.should be_nil
-      jane_agent.disabled.should be true
+      expect(jane_agent.service_id).to be_nil
+      expect(jane_agent.disabled).to be true
 
       service.reload
-      service.agents.length.should == 1
+      expect(service.agents.length).to eq(1)
     end
   end
 
@@ -38,8 +38,8 @@ describe Service do
     service = agent.service
     service.destroy
     agent.reload
-    agent.service_id.should be_nil
-    agent.disabled.should be true
+    expect(agent.service_id).to be_nil
+    expect(agent.disabled).to be true
   end
 
   describe "preparing for a request" do
@@ -49,18 +49,18 @@ describe Service do
 
     it "should not update the token if the token never expires" do
       @service.expires_at = nil
-      @service.prepare_request.should == nil
+      expect(@service.prepare_request).to eq(nil)
     end
 
     it "should not update the token if the token is still valid" do
       @service.expires_at = Time.now + 1.hour
-      @service.prepare_request.should == nil
+      expect(@service.prepare_request).to eq(nil)
     end
 
     it "should call refresh_token! if the token expired" do
       stub(@service).refresh_token! { @service }
       @service.expires_at = Time.now - 1.hour
-      @service.prepare_request.should == @service
+      expect(@service.prepare_request).to eq(@service)
     end
   end
 
@@ -71,7 +71,7 @@ describe Service do
 
     it "should return the correct endpoint" do
       @service.provider = '37signals'
-      @service.send(:endpoint).to_s.should == "https://launchpad.37signals.com/authorization/token"
+      expect(@service.send(:endpoint).to_s).to eq("https://launchpad.37signals.com/authorization/token")
     end
 
     it "should update the token" do
@@ -80,7 +80,7 @@ describe Service do
       @service.provider = '37signals'
       @service.refresh_token = 'refreshtokentest'
       @service.refresh_token!
-      @service.token.should == 'NEWTOKEN'
+      expect(@service.token).to eq('NEWTOKEN')
     end
   end
 
@@ -92,11 +92,11 @@ describe Service do
         service.save!
       }.to change { @user.services.count }.by(1)
       service = @user.services.first
-      service.name.should == 'johnqpublic'
-      service.uid.should == '123456'
-      service.provider.should == 'twitter'
-      service.token.should == 'a1b2c3d4...'
-      service.secret.should == 'abcdef1234'
+      expect(service.name).to eq('johnqpublic')
+      expect(service.uid).to eq('123456')
+      expect(service.provider).to eq('twitter')
+      expect(service.token).to eq('a1b2c3d4...')
+      expect(service.secret).to eq('abcdef1234')
     end
     it "should work with 37signals services" do
       signals = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/37signals.json')))
@@ -105,12 +105,12 @@ describe Service do
         service.save!
       }.to change { @user.services.count }.by(1)
       service = @user.services.first
-      service.provider.should == '37signals'
-      service.name.should == 'Dominik Sander'
-      service.token.should == 'abcde'
-      service.uid.should == '12345'
-      service.refresh_token.should == 'fghrefresh'
-      service.options[:user_id].should == 12345
+      expect(service.provider).to eq('37signals')
+      expect(service.name).to eq('Dominik Sander')
+      expect(service.token).to eq('abcde')
+      expect(service.uid).to eq('12345')
+      expect(service.refresh_token).to eq('fghrefresh')
+      expect(service.options[:user_id]).to eq(12345)
       service.expires_at = Time.at(1401554352)
     end
     it "should work with github services" do
@@ -120,10 +120,10 @@ describe Service do
         service.save!
       }.to change { @user.services.count }.by(1)
       service = @user.services.first
-      service.provider.should == 'github'
-      service.name.should == 'dsander'
-      service.uid.should == '12345'
-      service.token.should == 'agithubtoken'
+      expect(service.provider).to eq('github')
+      expect(service.name).to eq('dsander')
+      expect(service.uid).to eq('12345')
+      expect(service.token).to eq('agithubtoken')
     end
   end
 end

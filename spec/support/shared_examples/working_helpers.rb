@@ -7,23 +7,23 @@ shared_examples_for WorkingHelpers do
 
       agent.last_error_log_at = 10.minutes.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_truthy
+      expect(agent.recent_error_logs?).to be_truthy
 
       agent.last_error_log_at = 11.minutes.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_truthy
+      expect(agent.recent_error_logs?).to be_truthy
 
       agent.last_error_log_at = 5.minutes.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_truthy
+      expect(agent.recent_error_logs?).to be_truthy
 
       agent.last_error_log_at = 15.minutes.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_falsey
+      expect(agent.recent_error_logs?).to be_falsey
 
       agent.last_error_log_at = 2.days.ago
       agent.last_event_at = 10.minutes.ago
-      agent.recent_error_logs?.should be_falsey
+      expect(agent.recent_error_logs?).to be_falsey
     end
   end
 
@@ -33,21 +33,21 @@ shared_examples_for WorkingHelpers do
     end
 
     it "should return false until the first event was received" do
-      @agent.received_event_without_error?.should == false
+      expect(@agent.received_event_without_error?).to eq(false)
       @agent.last_receive_at = Time.now
-      @agent.received_event_without_error?.should == true
+      expect(@agent.received_event_without_error?).to eq(true)
     end
 
     it "should return false when the last error occured after the last received event" do
       @agent.last_receive_at = Time.now - 1.minute
       @agent.last_error_log_at = Time.now
-      @agent.received_event_without_error?.should == false
+      expect(@agent.received_event_without_error?).to eq(false)
     end
 
     it "should return true when the last received event occured after the last error" do
       @agent.last_receive_at = Time.now
       @agent.last_error_log_at = Time.now - 1.minute
-      @agent.received_event_without_error?.should == true
+      expect(@agent.received_event_without_error?).to eq(true)
     end
   end
 end

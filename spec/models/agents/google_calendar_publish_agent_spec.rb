@@ -37,7 +37,7 @@ describe Agents::GoogleCalendarPublishAgent, :vcr do
 
       @checker.receive([event1])
 
-      @checker.events.count.should eq(1)
+      expect(@checker.events.count).to eq(1)
     end
   end
 end

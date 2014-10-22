@@ -26,9 +26,9 @@ describe LiquidDroppable do
   describe 'test class' do
     it 'should be droppable' do
       five = DroppableTest.new(5)
-      five.to_liquid.class.should == DroppableTestDrop
-      Liquid::Template.parse('{{ x.value | plus:3 }}').render('x' => five).should == '8'
-      Liquid::Template.parse('{{ x }}').render('x' => five).should == '[value:5]'
+      expect(five.to_liquid.class).to eq(DroppableTestDrop)
+      expect(Liquid::Template.parse('{{ x.value | plus:3 }}').render('x' => five)).to eq('8')
+      expect(Liquid::Template.parse('{{ x }}').render('x' => five)).to eq('[value:5]')
     end
   end
 end

@@ -8,7 +8,6 @@ describe Agents::MqttAgent do
     @error_log = StringIO.new
 
     @server = MQTT::FakeServer.new(41234, '127.0.0.1')
-    @server.just_one = true
     @server.logger = Logger.new(@error_log)
     @server.logger.level = Logger::DEBUG
     @server.start
@@ -34,19 +33,26 @@ describe Agents::MqttAgent do
   end
 
   describe "#check" do
-    it "should check that initial run creates an event" do
+    it "should create events in the initial run" do
+      expect { @checker.check }.to change { Event.count }.by(2)
+    end
+
+    it "should ignore retained messages that are previously received" do
+      expect { @checker.check }.to change { Event.count }.by(2)
+      expect { @checker.check }.to change { Event.count }.by(1)
+      expect { @checker.check }.to change { Event.count }.by(1)
       expect { @checker.check }.to change { Event.count }.by(2)
     end
   end
 
   describe "#working?" do
     it "checks if its generating events as scheduled" do
-      @checker.should_not be_working
+      expect(@checker).not_to be_working
       @checker.check
-      @checker.reload.should be_working
+      expect(@checker.reload).to be_working
       three_days_from_now = 3.days.from_now
       stub(Time).now { three_days_from_now }
-      @checker.should_not be_working
+      expect(@checker).not_to be_working
     end
   end
 end

@@ -17,51 +17,51 @@ describe AgentsExporter do
 
     it "outputs a structure containing name, description, the date, all agents & their links" do
       data = exporter.as_json
-      data[:name].should == name
-      data[:description].should == description
-      data[:source_url].should == source_url
-      data[:guid].should == guid
-      data[:tag_fg_color].should == tag_fg_color
-      data[:tag_bg_color].should == tag_bg_color
-      Time.parse(data[:exported_at]).should be_within(2).of(Time.now.utc)
-      data[:links].should == [{ :source => 0, :receiver => 1 }]
-      data[:agents].should == agent_list.map { |agent| exporter.agent_as_json(agent) }
-      data[:agents].all? { |agent_json| agent_json[:guid].present? && agent_json[:type].present? && agent_json[:name].present? }.should be_truthy
+      expect(data[:name]).to eq(name)
+      expect(data[:description]).to eq(description)
+      expect(data[:source_url]).to eq(source_url)
+      expect(data[:guid]).to eq(guid)
+      expect(data[:tag_fg_color]).to eq(tag_fg_color)
+      expect(data[:tag_bg_color]).to eq(tag_bg_color)
+      expect(Time.parse(data[:exported_at])).to be_within(2).of(Time.now.utc)
+      expect(data[:links]).to eq([{ :source => 0, :receiver => 1 }])
+      expect(data[:agents]).to eq(agent_list.map { |agent| exporter.agent_as_json(agent) })
+      expect(data[:agents].all? { |agent_json| agent_json[:guid].present? && agent_json[:type].present? && agent_json[:name].present? }).to be_truthy
 
-      data[:agents][0].should_not have_key(:propagate_immediately) # can't receive events
-      data[:agents][1].should_not have_key(:schedule) # can't be scheduled
+      expect(data[:agents][0]).not_to have_key(:propagate_immediately) # can't receive events
+      expect(data[:agents][1]).not_to have_key(:schedule) # can't be scheduled
     end
 
     it "does not output links to other agents outside of the incoming set" do
       Link.create!(:source_id => agents(:jane_weather_agent).id, :receiver_id => agents(:jane_website_agent).id)
       Link.create!(:source_id => agents(:jane_website_agent).id, :receiver_id => agents(:jane_rain_notifier_agent).id)
 
-      exporter.as_json[:links].should == [{ :source => 0, :receiver => 1 }]
+      expect(exporter.as_json[:links]).to eq([{ :source => 0, :receiver => 1 }])
     end
   end
 
   describe "#filename" do
     it "strips special characters" do
-      AgentsExporter.new(:name => "ƏfooƐƕƺbar").filename.should == "foo-bar.json"
+      expect(AgentsExporter.new(:name => "ƏfooƐƕƺbar").filename).to eq("foo-bar.json")
     end
 
     it "strips punctuation" do
-      AgentsExporter.new(:name => "foo,bar").filename.should == "foo-bar.json"
+      expect(AgentsExporter.new(:name => "foo,bar").filename).to eq("foo-bar.json")
     end
 
     it "strips leading and trailing dashes" do
-      AgentsExporter.new(:name => ",foo,").filename.should == "foo.json"
+      expect(AgentsExporter.new(:name => ",foo,").filename).to eq("foo.json")
     end
 
     it "has a default when options[:name] is nil" do
-      AgentsExporter.new(:name => nil).filename.should == "exported-agents.json"
+      expect(AgentsExporter.new(:name => nil).filename).to eq("exported-agents.json")
     end
 
     it "has a default when the result is empty" do
-      AgentsExporter.new(:name => "").filename.should == "exported-agents.json"
-      AgentsExporter.new(:name => "Ə").filename.should == "exported-agents.json"
-      AgentsExporter.new(:name => "-").filename.should == "exported-agents.json"
-      AgentsExporter.new(:name => ",,").filename.should == "exported-agents.json"
+      expect(AgentsExporter.new(:name => "").filename).to eq("exported-agents.json")
+      expect(AgentsExporter.new(:name => "Ə").filename).to eq("exported-agents.json")
+      expect(AgentsExporter.new(:name => "-").filename).to eq("exported-agents.json")
+      expect(AgentsExporter.new(:name => ",,").filename).to eq("exported-agents.json")
     end
   end
 end

@@ -16,19 +16,19 @@ describe Agents::JavaScriptAgent do
 
   describe "validations" do
     it "requires 'code'" do
-      @agent.should be_valid
+      expect(@agent).to be_valid
       @agent.options['code'] = ''
-      @agent.should_not be_valid
+      expect(@agent).not_to be_valid
       @agent.options.delete('code')
-      @agent.should_not be_valid
+      expect(@agent).not_to be_valid
     end
 
     it "accepts a credential, but it must exist" do
-      @agent.should be_valid
+      expect(@agent).to be_valid
       @agent.options['code'] = 'credential:foo'
-      @agent.should_not be_valid
+      expect(@agent).not_to be_valid
       users(:jane).user_credentials.create! :credential_name => "foo", :credential_value => "bar"
-      @agent.reload.should be_valid
+      expect(@agent.reload).to be_valid
     end
   end
 
@@ -37,12 +37,12 @@ describe Agents::JavaScriptAgent do
       it "returns false when more than expected_update_period_in_days have passed since the last event creation" do
         @agent.options['expected_update_period_in_days'] = 1
         @agent.save!
-        @agent.should_not be_working
+        expect(@agent).not_to be_working
         @agent.check
-        @agent.reload.should be_working
+        expect(@agent.reload).to be_working
         three_days_from_now = 3.days.from_now
         stub(Time).now { three_days_from_now }
-        @agent.should_not be_working
+        expect(@agent).not_to be_working
       end
     end
 
@@ -50,12 +50,12 @@ describe Agents::JavaScriptAgent do
       it "returns false when more than expected_receive_period_in_days have passed since the last event was received" do
         @agent.options['expected_receive_period_in_days'] = 1
         @agent.save!
-        @agent.should_not be_working
+        expect(@agent).not_to be_working
         Agents::JavaScriptAgent.async_receive @agent.id, [events(:bob_website_agent_event).id]
-        @agent.reload.should be_working
+        expect(@agent.reload).to be_working
         two_days_from_now = 2.days.from_now
         stub(Time).now { two_days_from_now }
-        @agent.reload.should_not be_working
+        expect(@agent.reload).not_to be_working
       end
     end
   end
@@ -66,12 +66,12 @@ describe Agents::JavaScriptAgent do
       @agent.options['make_event'] = true
       @agent.save!
 
-      lambda {
-        lambda {
+      expect {
+        expect {
           @agent.receive([events(:bob_website_agent_event)])
           @agent.check
-        }.should_not change { AgentLog.count }
-      }.should change { Event.count }.by(2)
+        }.not_to change { AgentLog.count }
+      }.to change { Event.count }.by(2)
     end
 
 
@@ -84,13 +84,13 @@ describe Agents::JavaScriptAgent do
 
       it "accepts credentials" do
         @agent.check
-        AgentLog.last.message.should == "ran it"
+        expect(AgentLog.last.message).to eq("ran it")
       end
 
       it "logs an error when the credential goes away" do
         @agent.user.user_credentials.delete_all
         @agent.reload.check
-        AgentLog.last.message.should == "Unable to find credential"
+        expect(AgentLog.last.message).to eq("Unable to find credential")
       end
     end
 
@@ -98,34 +98,34 @@ describe Agents::JavaScriptAgent do
       it "should log an error when V8 has issues" do
         @agent.options['code'] = 'syntax error!'
         @agent.save!
-        lambda {
-          lambda {
+        expect {
+          expect {
             @agent.check
-          }.should_not raise_error
-        }.should change { AgentLog.count }.by(1)
-        AgentLog.last.message.should =~ /Unexpected identifier/
-        AgentLog.last.level.should == 4
+          }.not_to raise_error
+        }.to change { AgentLog.count }.by(1)
+        expect(AgentLog.last.message).to match(/Unexpected identifier/)
+        expect(AgentLog.last.level).to eq(4)
       end
 
       it "should log an error when JavaScript throws" do
         @agent.options['code'] = 'Agent.check = function() { throw "oh no"; };'
         @agent.save!
-        lambda {
-          lambda {
+        expect {
+          expect {
             @agent.check
-          }.should_not raise_error
-        }.should change { AgentLog.count }.by(1)
-        AgentLog.last.message.should =~ /oh no/
-        AgentLog.last.level.should == 4
+          }.not_to raise_error
+        }.to change { AgentLog.count }.by(1)
+        expect(AgentLog.last.message).to match(/oh no/)
+        expect(AgentLog.last.level).to eq(4)
       end
 
       it "won't store NaNs" do
         @agent.options['code'] = 'Agent.check = function() { this.memory("foo", NaN); };'
         @agent.save!
         @agent.check
-        @agent.memory['foo'].should == 'NaN' # string
+        expect(@agent.memory['foo']).to eq('NaN') # string
         @agent.save!
-        lambda { @agent.reload.memory }.should_not raise_error
+        expect { @agent.reload.memory }.not_to raise_error
       end
     end
 
@@ -133,13 +133,13 @@ describe Agents::JavaScriptAgent do
       it "creates events with this.createEvent in the JavaScript environment" do
         @agent.options['code'] = 'Agent.check = function() { this.createEvent({ message: "This is an event!", stuff: { foo: 5 } }); };'
         @agent.save!
-        lambda {
-          lambda {
+        expect {
+          expect {
             @agent.check
-          }.should_not change { AgentLog.count }
-        }.should change { Event.count }.by(1)
+          }.not_to change { AgentLog.count }
+        }.to change { Event.count }.by(1)
         created_event = @agent.events.last
-        created_event.payload.should == { 'message' => "This is an event!", 'stuff' => { 'foo' => 5 } }
+        expect(created_event.payload).to eq({ 'message' => "This is an event!", 'stuff' => { 'foo' => 5 } })
       end
     end
 
@@ -147,18 +147,18 @@ describe Agents::JavaScriptAgent do
       it "can output AgentLogs with this.log and this.error in the JavaScript environment" do
         @agent.options['code'] = 'Agent.check = function() { this.log("woah"); this.error("WOAH!"); };'
         @agent.save!
-        lambda {
-          lambda {
+        expect {
+          expect {
             @agent.check
-          }.should_not raise_error
-        }.should change { AgentLog.count }.by(2)
+          }.not_to raise_error
+        }.to change { AgentLog.count }.by(2)
 
         log1, log2 = AgentLog.last(2)
 
-        log1.message.should == "woah"
-        log1.level.should == 3
-        log2.message.should == "WOAH!"
-        log2.level.should == 4
+        expect(log1.message).to eq("woah")
+        expect(log1.level).to eq(3)
+        expect(log2.message).to eq("WOAH!")
+        expect(log2.level).to eq(4)
       end
     end
 
@@ -180,13 +180,13 @@ describe Agents::JavaScriptAgent do
         JS
 
         @agent.save!
-        lambda {
-          lambda {
+        expect {
+          expect {
             @agent.receive([events(:bob_website_agent_event), event])
-          }.should_not change { AgentLog.count }
-        }.should change { Event.count }.by(2)
+          }.not_to change { AgentLog.count }
+        }.to change { Event.count }.by(2)
         created_event = @agent.events.first
-        created_event.payload.should == { 'message' => "I got an event!", 'event_was' => { 'data' => "Something you should know about" } }
+        expect(created_event.payload).to eq({ 'message' => "I got an event!", 'event_was' => { 'data' => "Something you should know about" } })
       end
     end
 
@@ -203,25 +203,25 @@ describe Agents::JavaScriptAgent do
 
         @agent.save!
 
-        lambda {
-          lambda {
+        expect {
+          expect {
 
             @agent.check
-            @agent.memory['callCount'].should_not be_present
+            expect(@agent.memory['callCount']).not_to be_present
 
             @agent.options['make_event'] = true
             @agent.check
-            @agent.memory['callCount'].should == 1
+            expect(@agent.memory['callCount']).to eq(1)
 
             @agent.check
-            @agent.memory['callCount'].should == 2
+            expect(@agent.memory['callCount']).to eq(2)
 
             @agent.memory['callCount'] = 20
             @agent.check
-            @agent.memory['callCount'].should == 21
+            expect(@agent.memory['callCount']).to eq(21)
 
-          }.should_not change { AgentLog.count }
-        }.should_not change { Event.count }
+          }.not_to change { AgentLog.count }
+        }.not_to change { Event.count }
       end
     end
   end

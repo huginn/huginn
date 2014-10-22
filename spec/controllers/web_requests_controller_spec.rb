@@ -25,74 +25,74 @@ describe WebRequestsController do
   end
 
   it "should not require login to receive a web request" do
-    @agent.last_web_request_at.should be_nil
+    expect(@agent.last_web_request_at).to be_nil
     post :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
-    @agent.reload.last_web_request_at.should be_within(2).of(Time.now)
-    response.body.should == "success"
-    response.should be_success
+    expect(@agent.reload.last_web_request_at).to be_within(2).of(Time.now)
+    expect(response.body).to eq("success")
+    expect(response).to be_success
   end
 
   it "should call receive_web_request" do
     post :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
     @agent.reload
-    @agent.memory[:web_request_values].should == { 'key' => "value", 'another_key' => "5" }
-    @agent.memory[:web_request_format].should == "text/html"
-    @agent.memory[:web_request_method].should == "post"
-    response.body.should == "success"
-    response.headers['Content-Type'].should == 'text/plain; charset=utf-8'
-    response.should be_success
+    expect(@agent.memory[:web_request_values]).to eq({ 'key' => "value", 'another_key' => "5" })
+    expect(@agent.memory[:web_request_format]).to eq("text/html")
+    expect(@agent.memory[:web_request_method]).to eq("post")
+    expect(response.body).to eq("success")
+    expect(response.headers['Content-Type']).to eq('text/plain; charset=utf-8')
+    expect(response).to be_success
 
     post :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "not_my_secret", :no => "go"
-    @agent.reload.memory[:web_request_values].should_not == { 'no' => "go" }
-    response.body.should == "failure"
-    response.should be_missing
+    expect(@agent.reload.memory[:web_request_values]).not_to eq({ 'no' => "go" })
+    expect(response.body).to eq("failure")
+    expect(response).to be_missing
   end
 
   it "should accept gets" do
     get :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
     @agent.reload
-    @agent.memory[:web_request_values].should == { 'key' => "value", 'another_key' => "5" }
-    @agent.memory[:web_request_format].should == "text/html"
-    @agent.memory[:web_request_method].should == "get"
-    response.body.should == "success"
-    response.should be_success
+    expect(@agent.memory[:web_request_values]).to eq({ 'key' => "value", 'another_key' => "5" })
+    expect(@agent.memory[:web_request_format]).to eq("text/html")
+    expect(@agent.memory[:web_request_method]).to eq("get")
+    expect(response.body).to eq("success")
+    expect(response).to be_success
   end
 
   it "should pass through the received format" do
     get :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5", :format => :json
     @agent.reload
-    @agent.memory[:web_request_values].should == { 'key' => "value", 'another_key' => "5" }
-    @agent.memory[:web_request_format].should == "application/json"
-    @agent.memory[:web_request_method].should == "get"
+    expect(@agent.memory[:web_request_values]).to eq({ 'key' => "value", 'another_key' => "5" })
+    expect(@agent.memory[:web_request_format]).to eq("application/json")
+    expect(@agent.memory[:web_request_method]).to eq("get")
 
     post :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5", :format => :xml
     @agent.reload
-    @agent.memory[:web_request_values].should == { 'key' => "value", 'another_key' => "5" }
-    @agent.memory[:web_request_format].should == "application/xml"
-    @agent.memory[:web_request_method].should == "post"
+    expect(@agent.memory[:web_request_values]).to eq({ 'key' => "value", 'another_key' => "5" })
+    expect(@agent.memory[:web_request_format]).to eq("application/xml")
+    expect(@agent.memory[:web_request_method]).to eq("post")
 
     put :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5", :format => :atom
     @agent.reload
-    @agent.memory[:web_request_values].should == { 'key' => "value", 'another_key' => "5" }
-    @agent.memory[:web_request_format].should == "application/atom+xml"
-    @agent.memory[:web_request_method].should == "put"
+    expect(@agent.memory[:web_request_values]).to eq({ 'key' => "value", 'another_key' => "5" })
+    expect(@agent.memory[:web_request_format]).to eq("application/atom+xml")
+    expect(@agent.memory[:web_request_method]).to eq("put")
   end
 
   it "can accept a content-type to return" do
     @agent.memory['content_type'] = 'application/json'
     @agent.save!
     get :handle_request, :user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"
-    response.headers['Content-Type'].should == 'application/json; charset=utf-8'
+    expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8')
   end
 
   it "should fail on incorrect users" do
     post :handle_request, :user_id => users(:jane).to_param, :agent_id => @agent.id, :secret => "my_secret", :no => "go"
-    response.should be_missing
+    expect(response).to be_missing
   end
 
   it "should fail on incorrect agents" do
     post :handle_request, :user_id => users(:bob).to_param, :agent_id => 454545, :secret => "my_secret", :no => "go"
-    response.should be_missing
+    expect(response).to be_missing
   end
 
   describe "legacy update_location endpoint" do
@@ -103,9 +103,9 @@ describe WebRequestsController do
 
     it "should create events without requiring login" do
       post :update_location, user_id: users(:bob).to_param, secret: "my_secret", longitude: 123, latitude: 45, something: "else"
-      @agent.events.last.payload.should == { 'longitude' => "123", 'latitude' => "45", 'something' => "else" }
-      @agent.events.last.lat.should == 45
-      @agent.events.last.lng.should == 123
+      expect(@agent.events.last.payload).to eq({ 'longitude' => "123", 'latitude' => "45", 'something' => "else" })
+      expect(@agent.events.last.lat).to eq(45)
+      expect(@agent.events.last.lng).to eq(123)
     end
 
     it "should only consider Agents::UserLocationAgents for the given user" do
@@ -113,23 +113,23 @@ describe WebRequestsController do
       @jane_agent.save!
 
       post :update_location, user_id: users(:bob).to_param, secret: "my_secret", longitude: 123, latitude: 45, something: "else"
-      @agent.events.last.payload.should == { 'longitude' => "123", 'latitude' => "45", 'something' => "else" }
-      @jane_agent.events.should be_empty
+      expect(@agent.events.last.payload).to eq({ 'longitude' => "123", 'latitude' => "45", 'something' => "else" })
+      expect(@jane_agent.events).to be_empty
     end
 
     it "should raise a 404 error when given an invalid user id" do
       post :update_location, user_id: "123", secret: "not_my_secret", longitude: 123, latitude: 45, something: "else"
-      response.should be_missing
+      expect(response).to be_missing
     end
 
     it "should only look at agents with the given secret" do
       @agent2 = Agent.build_for_type("Agents::UserLocationAgent", users(:bob), name: "something", options: { secret: "my_secret2" })
       @agent2.save!
 
-      lambda {
+      expect {
         post :update_location, user_id: users(:bob).to_param, secret: "my_secret2", longitude: 123, latitude: 45, something: "else"
-        @agent2.events.last.payload.should == { 'longitude' => "123", 'latitude' => "45", 'something' => "else" }
-      }.should_not change { @agent.events.count }
+        expect(@agent2.events.last.payload).to eq({ 'longitude' => "123", 'latitude' => "45", 'something' => "else" })
+      }.not_to change { @agent.events.count }
     end
   end
 end
