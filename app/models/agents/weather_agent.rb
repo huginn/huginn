@@ -76,8 +76,16 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        memory['location'] = event.location.latlng
+        handle(event.location.latlng)
       end
+    end
+
+    def check
+      handle interpolated['location']
+    end
+
+    def handle(location)
+      memory['location'] = location
     end
 
     def which_day

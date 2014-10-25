@@ -28,7 +28,7 @@ describe AgentsExporter do
       expect(data[:agents]).to eq(agent_list.map { |agent| exporter.agent_as_json(agent) })
       expect(data[:agents].all? { |agent_json| agent_json[:guid].present? && agent_json[:type].present? && agent_json[:name].present? }).to be_truthy
 
-      expect(data[:agents][0]).not_to have_key(:propagate_immediately) # can't receive events
+      expect(data[:agents][0]).to have_key(:propagate_immediately)
       expect(data[:agents][1]).not_to have_key(:schedule) # can't be scheduled
     end
 
