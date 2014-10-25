@@ -82,10 +82,11 @@ GEM
       delayed_job (>= 3.0, < 4.1)
     delorean (2.1.0)
       chronic
-    devise (3.2.4)
+    devise (3.4.0)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 3.2.6, < 5)
+      responders
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
@@ -264,6 +265,8 @@ GEM
     rdoc (4.1.1)
       json (~> 1.4)
     ref (1.0.5)
+    responders (1.1.1)
+      railties (>= 3.2, < 4.2)
     rest-client (1.6.8)
       mime-types (~> 1.16)
       rdoc (>= 2.4.2)
@@ -420,7 +423,7 @@ DEPENDENCIES
   delayed_job (~> 4.0.0)
   delayed_job_active_record (~> 4.0.0)
   delorean
-  devise (~> 3.2.4)
+  devise (~> 3.4.0)
   dotenv-deployment
   dotenv-rails
   dropbox-api

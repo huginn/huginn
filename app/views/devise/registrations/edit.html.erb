@@ -5,66 +5,70 @@
 
         <h2>Edit <%= resource_name.to_s.humanize %></h2>
 
-        <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :method => :put, :class => 'form-horizontal' }) do |f| %>
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: 'form-horizontal' }) do |f| %>
           <%= devise_error_messages! %>
 
           <div class="form-group">
-            <%= f.label :email, :class => 'col-md-4 control-label' %>
+            <%= f.label :email, class: 'col-md-4 control-label' %>
             <div class="col-md-6">
-              <%= f.email_field :email, :class => 'form-control' %>
+              <%= f.email_field :email, autofocus: true, class: 'form-control' %>
+            </div>
+          </div>
+
+          <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+            <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
+          <% end %>
+
+          <div class="form-group">
+            <%= f.label :username, class: 'col-md-4 control-label' %>
+            <div class="col-md-6">
+              <%= f.text_field :username, class: 'form-control' %>
             </div>
           </div>
 
           <div class="form-group">
-            <%= f.label :username, :class => 'col-md-4 control-label' %>
+            <%= f.label :current_password, class: 'col-md-4 control-label' %>
             <div class="col-md-6">
-              <%= f.text_field :username, :class => 'form-control' %>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <%= f.label :current_password, :class => 'col-md-4 control-label' %>
-            <div class="col-md-6">
-              <%= f.password_field :current_password, :class => 'form-control' %>
+              <%= f.password_field :current_password, class: 'form-control' %>
               <span class='help-inline'>We need your current password to confirm your changes.</span>
             </div>
           </div>
-          
+
           <div class="form-group">
             <div class="col-md-offset-4 col-md-10">
-              <%= f.submit "Update", :class => "btn btn-primary" %>
+              <%= f.submit "Update", class: "btn btn-primary" %>
             </div>
           </div>
         <% end %>
 
         <h3>Change password</h3>
-        <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :method => :put, :class => 'form-horizontal' }) do |f| %>
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: 'form-horizontal' }) do |f| %>
           <%= devise_error_messages! %>
           <div class="form-group">
-            <%= f.label :current_password, :class => 'col-md-4 control-label' %>
+            <%= f.label :current_password, class: 'col-md-4 control-label' %>
             <div class="col-md-6">
-              <%= f.password_field :current_password, :class => 'form-control' %>
+              <%= f.password_field :current_password, class: 'form-control' %>
               <span class='help-inline'>We need your current password to confirm your changes.</span>
             </div>
           </div>
 
           <div class="form-group">
-            <%= f.label :password, :class => 'col-md-4 control-label' %>
+            <%= f.label :password, class: 'col-md-4 control-label' %>
             <div class="col-md-6">
-              <%= f.password_field :password, :autocomplete => "off", :class => 'form-control' %>
+              <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>
             </div>
           </div>
 
           <div class="form-group">
-            <%= f.label :password_confirmation, :class => 'col-md-4 control-label' %>
+            <%= f.label :password_confirmation, class: 'col-md-4 control-label' %>
             <div class="col-md-6">
-              <%= f.password_field :password_confirmation, :class => 'form-control' %>
+              <%= f.password_field :password_confirmation, autocomplete: "off", class: 'form-control' %>
             </div>
           </div>
 
           <div class="form-group">
             <div class="col-md-offset-4 col-md-10">
-              <%= f.submit "Update", :class => "btn btn-primary" %>
+              <%= f.submit "Update", class: "btn btn-primary" %>
             </div>
           </div>
 
@@ -74,7 +78,7 @@
 
         <h3>Cancel my account</h3>
 
-        <p>Unhappy? <%= link_to "Cancel my account", registration_path(resource_name), :data => { :confirm => "Are you sure?" }, :method => :delete %>.</p>
+        <p>Unhappy? <%= link_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete %></p>
 
         <%= link_to "Back", :back %>
       </div>

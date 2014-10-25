@@ -4,15 +4,15 @@
 
       <h2>Resend confirmation instructions</h2>
 
-      <%= form_for(resource, :as => resource_name, :url => confirmation_path(resource_name), :html => { :method => :post, :class => 'form-horizontal' }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, class: 'form-horizontal' }) do |f| %>
         <%= devise_error_messages! %>
 
         <div class="form-group">
           <%= f.label :email %>
-          <%= f.email_field :email, :class => 'form-control' %>
+          <%= f.email_field :email, autofocus: true, class: 'form-control' %>
         </div>
 
-        <%= f.submit "Resend confirmation instructions", :class => "btn btn-primary" %>
+        <%= f.submit "Resend confirmation instructions", class: "btn btn-primary" %>
       <% end %>
 
       <%= render "devise/shared/links" %>
