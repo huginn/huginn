@@ -55,6 +55,10 @@ describe Agents::RssAgent do
       expect {
         agent.check
       }.to change { agent.events.count }.by(20)
+
+      event = agent.events.last
+      expect(event.payload['url']).to eq("https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0")
+      expect(event.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0"])
     end
 
     it "should track ids and not re-emit the same item when seen again" do
