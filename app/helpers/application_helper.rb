@@ -71,4 +71,25 @@ module ApplicationHelper
       service_label_text(service)
     ].join.html_safe, class: "label label-default label-service service-#{service.provider}"
   end
+
+  def highlighted?(id)
+    @highlighted_ranges ||=
+      case value = params[:hl].presence
+      when String
+        value.split(/,/).flat_map { |part|
+          case part
+          when /\A(\d+)\z/
+            (part.to_i)..(part.to_i)
+          when /\A(\d+)?-(\d+)?\z/
+            ($1 ? $1.to_i : 1)..($2 ? $2.to_i : Float::INFINITY)
+          else
+            []
+          end
+        }
+      else
+        []
+      end
+
+    @highlighted_ranges.any? { |range| range.cover?(id) }
+  end
 end
