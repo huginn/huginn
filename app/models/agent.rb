@@ -223,7 +223,7 @@ class Agent < ActiveRecord::Base
   end
 
   def set_last_checked_event_id
-    if can_receive_events? && newest_event_id = Event.maximum(:id)
+    if can_receive_events? && newest_event_id == Event.maximum(:id)
       self.last_checked_event_id = newest_event_id
     end
   end
@@ -231,15 +231,15 @@ class Agent < ActiveRecord::Base
   def possibly_update_event_expirations
     update_event_expirations! if keep_events_for_changed?
   end
-  
+
   #Validation Methods
-  
+
   private
-  
+
   def sources_are_owned
     errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user_id == user_id }
   end
-  
+
   def controllers_are_owned
     errors.add(:controllers, "must be owned by you") unless controllers.all? {|s| s.user_id == user_id }
   end
@@ -257,7 +257,7 @@ class Agent < ActiveRecord::Base
       errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
     end
   end
-  
+
   def validate_options
     # Implement me in your subclass to test for valid options.
   end

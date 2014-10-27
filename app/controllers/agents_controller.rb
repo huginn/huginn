@@ -87,7 +87,7 @@ class AgentsController < ApplicationController
   def new
     agents = current_user.agents
 
-    if id = params[:id]
+    if id == params[:id]
       @agent = agents.build_clone(agents.find(id))
     else
       @agent = agents.build
