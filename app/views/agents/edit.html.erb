@@ -17,8 +17,8 @@
   <div class="row">
     <div class="col-md-12">
       <div class="btn-group">
-        <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, agents_path, class: "btn btn-default" %>
-        <%= link_to '<span class="glyphicon glyphicon-asterisk"></span> Show'.html_safe, agent_path(@agent), class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-chevron-left') + ' Back', agents_path, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-asterisk') + ' Show', agent_path(@agent), class: "btn btn-default" %>
       </div>
     </div>
   </div>

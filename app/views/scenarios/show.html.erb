@@ -15,14 +15,14 @@
       <br/>
 
       <div class="btn-group">
-        <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, scenarios_path, class: "btn btn-default" %>
-        <%= link_to '<span class="glyphicon glyphicon-random"></span> View Diagram'.html_safe, scenario_diagram_path(@scenario), class: "btn btn-default" %>
-        <%= link_to '<span class="glyphicon glyphicon-edit"></span> Edit'.html_safe, edit_scenario_path(@scenario), class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-chevron-left') + ' Back', scenarios_path, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-random') + ' View Diagram', scenario_diagram_path(@scenario), class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-edit') + ' Edit', edit_scenario_path(@scenario), class: "btn btn-default" %>
         <% if @scenario.source_url.present? %>
-          <%= link_to '<span class="glyphicon glyphicon-plus"></span> Update'.html_safe, new_scenario_imports_path(:url => @scenario.source_url), class: "btn btn-default" %>
+          <%= link_to icon_tag('glyphicon-plus') + ' Update', new_scenario_imports_path(url: @scenario.source_url), class: "btn btn-default" %>
         <% end %>
-        <%= link_to '<span class="glyphicon glyphicon-share-alt"></span> Share'.html_safe, share_scenario_path(@scenario), class: "btn btn-default" %>
-        <%= link_to '<span class="glyphicon glyphicon-trash"></span> Delete'.html_safe, scenario_path(@scenario), method: :delete, data: { confirm: "This will remove the '#{@scenario.name}' Scenerio from all Agents and delete it.  Are you sure?" }, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-share-alt') + ' Share', share_scenario_path(@scenario), class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-trash') + ' Delete', scenario_path(@scenario), method: :delete, data: { confirm: "This will remove the '#{@scenario.name}' Scenerio from all Agents and delete it.  Are you sure?" }, class: "btn btn-default" %>
       </div>
     </div>
   </div>
