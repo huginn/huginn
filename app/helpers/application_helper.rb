@@ -1,8 +1,20 @@
 module ApplicationHelper
-  def nav_link(name, path, options = {}, &block)
-    if glyphicon = options.delete(:glyphicon)
-      name = "<span class='glyphicon glyphicon-#{glyphicon}'></span> ".html_safe + name
+  def icon_tag(name, options = {})
+    if dom_class = options[:class]
+      dom_class = ' ' << dom_class
     end
+
+    case name
+    when /\Aglyphicon-/
+      "<span class='glyphicon #{name}#{dom_class}'></span>".html_safe
+    when /\Afa-/
+      "<i class='fa #{name}#{dom_class}'></i>".html_safe
+    else
+      raise "Unrecognized icon name: #{name}"
+    end
+  end
+
+  def nav_link(name, path, options = {}, &block)
     content = link_to(name, path, options)
     active = current_page?(path)
     if block
@@ -44,9 +56,9 @@ module ApplicationHelper
   def omniauth_provider_icon(provider)
     case provider.to_sym
     when :twitter, :tumblr, :github, :dropbox
-      content_tag :i, '', class: "fa fa-#{provider}"
+      icon_tag("fa-#{provider}")
     else
-      content_tag :i, '', class: "fa fa-lock"
+      icon_tag("fa-lock")
     end
   end
 
