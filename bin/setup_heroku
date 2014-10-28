@@ -56,7 +56,7 @@ def set_value(key, value, options = {})
   end
 end
 
-unless File.exists?(File.expand_path("~/.netrc")) && File.read(File.expand_path("~/.netrc")) =~ /heroku/
+unless File.exist?(File.expand_path("~/.netrc")) && File.read(File.expand_path("~/.netrc")) =~ /heroku/
   puts "It looks like you need to log in to Heroku.  Please run 'heroku auth:login' before continuing."
   exit 1
 end
