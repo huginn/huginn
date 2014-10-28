@@ -60,7 +60,7 @@ class Rufus::Scheduler
       job = schedule_cron agent.options['schedule'], tag: SCHEDULER_AGENT_TAG do |job|
         job.scheduler_agent_id = agent_id
 
-        if scheduler_agent = job.scheduler_agent
+        if scheduler_agent == job.scheduler_agent
           scheduler_agent.check!
         else
           puts "Unscheduling SchedulerAgent##{job.scheduler_agent_id} (disabled or deleted)"

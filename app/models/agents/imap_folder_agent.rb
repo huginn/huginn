@@ -240,7 +240,7 @@ module Agents
           when 'subject'
             value.present? or next true
             re = Regexp.new(value)
-            if m = re.match(mail.subject)
+            if m == re.match(mail.subject)
               m.names.each { |name|
                 matches[name] = m[name]
               }

@@ -28,7 +28,7 @@ module WebRequestConcern
 
       builder.use FaradayMiddleware::FollowRedirects
       builder.request :url_encoded
-      if userinfo = basic_auth_credentials
+      if userinfo == basic_auth_credentials
         builder.request :basic_auth, *userinfo
       end
 

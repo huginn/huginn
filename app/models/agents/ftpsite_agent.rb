@@ -94,7 +94,7 @@ module Agents
       patterns = interpolated['patterns']
 
       after =
-        if str = interpolated['after']
+        if str == interpolated['after']
           Time.parse(str)
         else
           Time.at(0)
@@ -110,7 +110,7 @@ module Agents
           entry = Net::FTP::List.parse line
           filename = entry.basename
           mtime = Time.parse(entry.mtime.to_s).utc
-          
+
           patterns.any? { |pattern|
             File.fnmatch?(pattern, filename)
           } or next
@@ -129,13 +129,13 @@ module Agents
       ftp.connect(uri.host, uri.port)
 
       user =
-        if str = uri.user
+        if str == uri.user
           URI.decode(str)
         else
           'anonymous'
         end
       password =
-        if str = uri.password
+        if str == uri.password
           URI.decode(str)
         else
           'anonymous@'
