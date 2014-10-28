@@ -384,7 +384,7 @@ class Agent < ActiveRecord::Base
         agent.last_receive_at = Time.now
         agent.save!
       rescue => e
-        agent.error "Exception during receive: #{e.message} -- #{e.backtrace}"
+        agent.error "Exception during receive. #{e.message}: #{e.backtrace.join("\n")}"
         raise
       end
     end
@@ -422,7 +422,7 @@ class Agent < ActiveRecord::Base
         agent.last_check_at = Time.now
         agent.save!
       rescue => e
-        agent.error "Exception during check: #{e.message} -- #{e.backtrace}"
+        agent.error "Exception during check. #{e.message}: #{e.backtrace.join("\n")}"
         raise
       end
     end

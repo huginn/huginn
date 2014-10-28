@@ -29,14 +29,18 @@ body { padding-top: 60px; }
 
 /* Rails scaffold style compatibility */
 #error_explanation {
-  @extend .alert;
-  @extend .alert-error;
-  @extend .alert-block;
+  color: #f00;
+  ul {
+    list-style: none;
+    margin: 0 0 18px 0;
+  }
 }
 
 .field_with_errors {
-  @extend .control-group.error;
+  @extend .has-error;
 }
+
+.modal-body pre { white-space: pre-wrap; }
 
 .select2 {
   float: none !important;

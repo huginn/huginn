@@ -32,6 +32,6 @@ class AgentLog < ActiveRecord::Base
   protected
 
   def truncate_message
-    self.message = message[0...2048] if message.present?
+    self.message = message[0...10_000] if message.present?
   end
 end

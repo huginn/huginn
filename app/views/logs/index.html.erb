@@ -3,7 +3,7 @@
     <tr>
       <th>Message</th>
       <th>When</th>
-      <th></th>
+      <th width="200px"></th>
     </tr>
 
     <% @logs.each do |log| %>
@@ -24,6 +24,8 @@
             <% else %>
               <%= link_to 'Event Out', '#', class: "btn btn-default disabled" %>
             <% end %>
+
+            <%= link_to 'Details', '#', :class => "btn btn-default show-log-details", :data => { :'modal-title' => log.level >= 4 ? 'Error' : 'Info', :'modal-content' => log.message } %>
           </div>
         </td>
       </tr>
