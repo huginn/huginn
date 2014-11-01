@@ -10,7 +10,7 @@ $ ->
     returnedResults = {}
     completableDefaultOptions = (input) ->
       results: [
-        (returnedResults[$(input).data('attribute')] || {text: 'Options', children: [{id: '', text: 'loading ...'}]}),
+        (returnedResults[$(input).data('attribute')] || {text: 'Options', children: [{id: undefined, text: 'loading ...'}]}),
         {
           text: 'Current',
           children: [id: $(input).val(), text: $(input).val()]
@@ -21,7 +21,7 @@ $ ->
         },
       ]
 
-    $("input[role=validatable], select[role=validatable]").on 'change', (e) =>
+    $("input[role~=validatable], select[role~=validatable]").on 'change', (e) =>
       form_data = getFormData(e.currentTarget)
       form_group = $(e.currentTarget).closest('.form-group')
       $.ajax '/agents/validate',
@@ -38,7 +38,7 @@ $ ->
           form_group.find('.glyphicon-remove').removeClass('hidden')
           returnedResults = {}
 
-    $("input[role=validatable], select[role=validatable]").trigger('change')
+    $("input[role~=validatable], select[role~=validatable]").trigger('change')
 
     $.each $("input[role~=completable]"), (i, input) ->
       $(input).select2(
@@ -63,6 +63,14 @@ $ ->
         type: 'POST',
         data: form_data
         success: (data) ->
-          updateDropdownData(form_data, e.currentTarget, $.map(data, (d) -> {id: d.value, text: d.name}))
+          updateDropdownData(form_data, e.currentTarget, data)
         error: (data) ->
           updateDropdownData(form_data, e.currentTarget, [{id: undefined, text: 'Error loading data.'}])
+
+    $("input[type=radio][role~=form-configurable]").change (e) ->
+      input = $(e.currentTarget).parents().siblings("input[data-attribute=#{$(e.currentTarget).data('attribute')}]")
+      if $(e.currentTarget).val() == 'manual'
+        input.removeClass('hidden')
+      else
+        input.val($(e.currentTarget).val())
+        input.addClass('hidden')

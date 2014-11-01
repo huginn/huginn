@@ -53,7 +53,7 @@ module Agents
     end
 
     def complete_room_name
-      client.rooms.collect { |room| {name: room.name, value: room.name} }
+      client.rooms.collect { |room| {text: room.name, id: room.name} }
     end
 
     def validate_options

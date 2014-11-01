@@ -43,6 +43,15 @@ module FormConfigurable
         options[:roles] = [options[:roles]]
       end
 
+      if options[:type] == :array
+        options[:roles] << :completable
+        class_eval <<-EOF
+          def complete_#{name}
+            #{options[:values]}.map { |v| {text: v, id: v} }
+          end
+        EOF
+      end
+
       _form_configurable_fields[name] = options
     end
 

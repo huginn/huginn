@@ -50,7 +50,7 @@ module Agents
     def complete_project_id
       service.prepare_request
       response = HTTParty.get projects_url, request_options.merge(query_parameters)
-      response.map { |p| {name: "#{p['name']} (#{p['id']})", value: p['id']}}
+      response.map { |p| {text: "#{p['name']} (#{p['id']})", id: p['id']}}
     end
 
     def validate_options

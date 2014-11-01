@@ -16,7 +16,7 @@ class FormConfigurableAgentPresenter < Decorator
   def option_field_for(attribute)
     data = @agent.form_configurable_fields[attribute]
     value = @agent.options[attribute.to_s] || @agent.default_options[attribute.to_s]
-    html_options = {role: data[:roles].join(' '), data: {attribute: attribute}}
+    html_options = {role: (data[:roles] + ['form-configurable']).join(' '), data: {attribute: attribute}}
 
     case data[:type]
     when :text
@@ -24,17 +24,20 @@ class FormConfigurableAgentPresenter < Decorator
     when :boolean
       @view.content_tag 'div' do
         @view.concat(@view.content_tag('label', class: 'radio-inline') do
-          @view.concat @view.radio_button_tag "agent[options][#{attribute}]", 'true', @agent.send(:boolify, value), html_options
-          @view.concat "Yes"
+          @view.concat @view.radio_button_tag "agent[options][#{attribute}_radio]", 'true', @agent.send(:boolify, value) == true, html_options
+          @view.concat "True"
         end)
         @view.concat(@view.content_tag('label', class: 'radio-inline') do
-          @view.concat @view.radio_button_tag "agent[options][#{attribute}]", 'false', !@agent.send(:boolify, value), html_options
-          @view.concat "No"
+          @view.concat @view.radio_button_tag "agent[options][#{attribute}_radio]", 'false', @agent.send(:boolify, value) == false, html_options
+          @view.concat "False"
         end)
+        @view.concat(@view.content_tag('label', class: 'radio-inline') do
+          @view.concat @view.radio_button_tag "agent[options][#{attribute}_radio]", 'manual', @agent.send(:boolify, value) == nil, html_options
+          @view.concat "Manual Input"
+        end)
+        @view.concat(@view.text_field_tag "agent[options][#{attribute}]", value, html_options.merge(:class => "form-control #{@agent.send(:boolify, value) != nil ? 'hidden' : ''}"))
       end
-    when :array
-      @view.select_tag("agent[options][#{attribute}]", @view.options_for_select(data[:values], value), html_options.merge(class: "form-control"))
-    when :string
+    when :array, :string
       @view.text_field_tag "agent[options][#{attribute}]", value, html_options.merge(:class => 'form-control')
     end
   end
