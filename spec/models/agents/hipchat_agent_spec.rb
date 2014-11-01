@@ -71,7 +71,7 @@ describe Agents::HipchatAgent do
       any_instance_of(HipChat::Client) do |klass|
         stub(klass).rooms { [OpenStruct.new(name: 'test'), OpenStruct.new(name: 'test1')] }
       end
-      expect(@checker.complete_room_name).to eq [{name: 'test', value: 'test'},{name: 'test1', value: 'test1'}]
+      expect(@checker.complete_room_name).to eq [{text: 'test', id: 'test'},{text: 'test1', id: 'test1'}]
     end
   end
 

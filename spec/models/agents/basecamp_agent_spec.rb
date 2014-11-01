@@ -67,7 +67,7 @@ describe Agents::BasecampAgent do
 
   describe "#complete_project_id" do
     it "should return a array of hashes" do
-      expect(@checker.complete_project_id).to eq [{name: 'test (1234)', value: 1234}, {name: 'test1 (1235)', value: 1235}]
+      expect(@checker.complete_project_id).to eq [{text: 'test (1234)', id: 1234}, {text: 'test1 (1235)', id: 1235}]
     end
   end
 
