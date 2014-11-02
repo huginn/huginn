@@ -15,7 +15,7 @@ describe Service do
       expect(@service.global).to eq(false)
     end
 
-    it "disconnects agents and disables them if the previously global service is made private again", focus: true do
+    it "disconnects agents and disables them if the previously global service is made private again" do
       agent = agents(:bob_basecamp_agent)
       jane_agent = agents(:jane_basecamp_agent)
 
