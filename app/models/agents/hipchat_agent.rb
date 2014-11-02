@@ -19,7 +19,7 @@ module Agents
 
       You can provide a `username` and a `message`. If you want to use mentions change `format` to "text" ([details](https://www.hipchat.com/docs/api/method/rooms/message)).
 
-      If you want your message to notify the room members change `notify` to "Yes".
+      If you want your message to notify the room members change `notify` to "True".
 
       Modify the background color of your message via the `color` attribute (one of "yellow", "red", "green", "purple", "gray", or "random")
 
@@ -34,6 +34,7 @@ module Agents
         'message' => "Hello from Huginn!",
         'notify' => false,
         'color' => 'yellow',
+        'format' => 'html'
       }
     end
 
