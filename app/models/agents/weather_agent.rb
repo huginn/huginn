@@ -76,15 +76,11 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        handle(event.location.latlng)
+        store_location(event.location.latlng)
       end
     end
 
-    def check
-      handle interpolated['location']
-    end
-
-    def handle(location)
+    def store_location(location)
       memory['location'] = location
     end
 
@@ -93,7 +89,7 @@ module Agents
     end
 
     def location
-      memory['location'] || interpolated["location"].presence || interpolated["zipcode"]
+      memory['location'].presence || interpolated["location"].presence || interpolated["zipcode"]
     end
 
     def validate_options
