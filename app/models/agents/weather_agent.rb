@@ -16,6 +16,8 @@ module Agents
 
       The `location` can be a US zipcode, or any location that Wunderground supports. To find one, search [wunderground.com](http://wunderground.com) and copy the location part of the URL.  For example, a result for San Francisco gives `http://www.wunderground.com/US/CA/San_Francisco.html` and London, England gives `http://www.wunderground.com/q/zmw:00000.1.03772`.  The locations in each are `US/CA/San_Francisco` and `zmw:00000.1.03772`, respectively.
 
+      If you connect the *User Location* as the event source, it will store the user location in memory for each new user location event, and use that when checking the weather.
+
       If you plan on using ForecastIO, the `location` must be a comma-separated string of co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
 
       You must setup an [API key for Wunderground](http://www.wunderground.com/weather/api/) in order to use this Agent with Wunderground.
