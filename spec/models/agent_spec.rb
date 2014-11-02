@@ -561,12 +561,15 @@ describe Agent do
 
     describe "cleaning up now-expired events" do
       before do
-        @agent = Agents::SomethingSource.new(:name => "something")
-        @agent.keep_events_for = 5
-        @agent.user = users(:bob)
-        @agent.save!
-        @event = @agent.create_event :payload => { "hello" => "world" }
-        expect(@event.expires_at.to_i).to be_within(2).of(5.days.from_now.to_i)
+        @time = "2014-01-01 01:00:00 +00:00"
+        time_travel_to @time do
+          @agent = Agents::SomethingSource.new(:name => "something")
+          @agent.keep_events_for = 5
+          @agent.user = users(:bob)
+          @agent.save!
+          @event = @agent.create_event :payload => { "hello" => "world" }
+          expect(@event.expires_at.to_i).to be_within(2).of(5.days.from_now.to_i)
+        end
       end
 
       describe "when keep_events_for has not changed" do
@@ -584,12 +587,14 @@ describe Agent do
 
       describe "when keep_events_for is changed" do
         it "updates events' expires_at" do
-          expect {
-            @agent.options[:foo] = "bar1"
-            @agent.keep_events_for = 3
-            @agent.save!
-          }.to change { @event.reload.expires_at }
-          expect(@event.expires_at.to_i).to be_within(2).of(3.days.from_now.to_i)
+          time_travel_to @time do
+            expect {
+                @agent.options[:foo] = "bar1"
+                @agent.keep_events_for = 3
+                @agent.save!
+            }.to change { @event.reload.expires_at }
+            expect(@event.expires_at.to_i).to be_within(2).of(3.days.from_now.to_i)
+          end
         end
 
         it "updates events relative to their created_at" do

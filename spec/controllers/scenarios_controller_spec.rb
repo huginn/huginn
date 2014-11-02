@@ -28,7 +28,7 @@ describe ScenariosController do
 
     it "loads Agents for the requested Scenario" do
       get :show, :id => scenarios(:bob_weather).to_param
-      expect(assigns(:agents).pluck(:id)).to eq(scenarios(:bob_weather).agents.pluck(:id))
+      expect(assigns(:agents).pluck(:id).sort).to eq(scenarios(:bob_weather).agents.pluck(:id).sort)
     end
   end
 
