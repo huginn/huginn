@@ -69,6 +69,7 @@ module AgentControllerConcern
           end
         when 'configure'
           target.update!(options: target.options.merge(interpolated['configure_options']))
+          log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"
         when ''
           # Do nothing
         else
