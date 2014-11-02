@@ -76,17 +76,17 @@ module Agents
           entry_id = get_entry_id(entry)
           if check_and_track(entry_id)
             created_event_count += 1
-            create_event(payload: {
-              id: entry_id,
+            create_event(:payload => {
+              id: entry_id.force_encoding('UTF-8'),
               date_published: entry.date_published,
               last_updated: entry.last_updated,
-              url: entry.url,
-              urls: entry.urls,
-              description: entry.description,
-              content: entry.content,
-              title: entry.title,
-              authors: entry.authors,
-              categories: entry.categories
+              url: entry.url.force_encoding('UTF-8'),
+              urls: entry.urls.map {|a| a.force_encoding('UTF-8') },
+              description: (entry.description || "").force_encoding('UTF-8'),
+              content: entry.content.force_encoding('UTF-8'),
+              title: (entry.title || "").force_encoding('UTF-8'),
+              authors: entry.authors.map { |a| a.force_encoding('UTF-8') },
+              categories: entry.categories.map {|a| a.force_encoding('UTF-8') }
             })
           end
         end
