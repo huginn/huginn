@@ -1,8 +1,20 @@
 module ApplicationHelper
-  def nav_link(name, path, options = {}, &block)
-    if glyphicon = options.delete(:glyphicon)
-      name = "<span class='glyphicon glyphicon-#{glyphicon}'></span> ".html_safe + name
+  def icon_tag(name, options = {})
+    if dom_class = options[:class]
+      dom_class = ' ' << dom_class
     end
+
+    case name
+    when /\Aglyphicon-/
+      "<span class='glyphicon #{name}#{dom_class}'></span>".html_safe
+    when /\Afa-/
+      "<i class='fa #{name}#{dom_class}'></i>".html_safe
+    else
+      raise "Unrecognized icon name: #{name}"
+    end
+  end
+
+  def nav_link(name, path, options = {}, &block)
     content = link_to(name, path, options)
     active = current_page?(path)
     if block
@@ -41,12 +53,55 @@ module ApplicationHelper
     end
   end
 
-  def icon_for_service(service)
-    case service.to_sym
-    when :twitter, :tumblr, :github
-      "<i class='fa fa-#{service}'></i>".html_safe
+  def omniauth_provider_icon(provider)
+    case provider.to_sym
+    when :twitter, :tumblr, :github, :dropbox
+      icon_tag("fa-#{provider}")
     else
-      "<i class='fa fa-lock'></i>".html_safe
+      icon_tag("fa-lock")
     end
+  end
+
+  def omniauth_provider_name(provider)
+    t("devise.omniauth_providers.#{provider}")
+  end
+
+  def omniauth_button(provider)
+    link_to [
+      omniauth_provider_icon(provider),
+      content_tag(:span, "Authenticate with #{omniauth_provider_name(provider)}")
+    ].join.html_safe, user_omniauth_authorize_path(provider), class: "btn btn-default btn-service service-#{provider}"
+  end
+
+  def service_label_text(service)
+    "#{omniauth_provider_name(service.provider)} - #{service.name}"
+  end
+
+  def service_label(service)
+    content_tag :span, [
+      omniauth_provider_icon(service.provider),
+      service_label_text(service)
+    ].join.html_safe, class: "label label-default label-service service-#{service.provider}"
+  end
+
+  def highlighted?(id)
+    @highlighted_ranges ||=
+      case value = params[:hl].presence
+      when String
+        value.split(/,/).flat_map { |part|
+          case part
+          when /\A(\d+)\z/
+            (part.to_i)..(part.to_i)
+          when /\A(\d+)?-(\d+)?\z/
+            ($1 ? $1.to_i : 1)..($2 ? $2.to_i : Float::INFINITY)
+          else
+            []
+          end
+        }
+      else
+        []
+      end
+
+    @highlighted_ranges.any? { |range| range.cover?(id) }
   end
 end

@@ -88,6 +88,10 @@ class Agent < ActiveRecord::Base
     # Implement me in your subclass of Agent.
   end
 
+  def is_form_configurable?
+    false
+  end
+
   def receive_web_request(params, method, format)
     # Implement me in your subclass of Agent.
     ["not implemented", 404]
@@ -384,7 +388,7 @@ class Agent < ActiveRecord::Base
         agent.last_receive_at = Time.now
         agent.save!
       rescue => e
-        agent.error "Exception during receive: #{e.message} -- #{e.backtrace}"
+        agent.error "Exception during receive. #{e.message}: #{e.backtrace.join("\n")}"
         raise
       end
     end
@@ -422,7 +426,7 @@ class Agent < ActiveRecord::Base
         agent.last_check_at = Time.now
         agent.save!
       rescue => e
-        agent.error "Exception during check: #{e.message} -- #{e.backtrace}"
+        agent.error "Exception during check. #{e.message}: #{e.backtrace.join("\n")}"
         raise
       end
     end

@@ -35,6 +35,8 @@ class AgentsController < ApplicationController
 
   def type_details
     @agent = Agent.build_for_type(params[:type], current_user, {})
+    initialize_presenter
+
     render :json => {
         :can_be_scheduled => @agent.can_be_scheduled?,
         :default_schedule => @agent.default_schedule,
@@ -43,7 +45,8 @@ class AgentsController < ApplicationController
         :can_control_other_agents => @agent.can_control_other_agents?,
         :options => @agent.default_options,
         :description_html => @agent.html_description,
-        :form => render_to_string(partial: 'oauth_dropdown', locals: { agent: @agent })
+        :oauthable => render_to_string(partial: 'oauth_dropdown', locals: { agent: @agent }),
+        :form_options => render_to_string(partial: 'options', locals: { agent: @agent })
     }
   end
 
@@ -92,6 +95,7 @@ class AgentsController < ApplicationController
     else
       @agent = agents.build
     end
+    initialize_presenter
 
     respond_to do |format|
       format.html
@@ -101,17 +105,18 @@ class AgentsController < ApplicationController
 
   def edit
     @agent = current_user.agents.find(params[:id])
+    initialize_presenter
   end
 
   def create
-    @agent = Agent.build_for_type(params[:agent].delete(:type),
-                                  current_user,
-                                  params[:agent])
+    build_agent
+
     respond_to do |format|
       if @agent.save
         format.html { redirect_back "'#{@agent.name}' was successfully created." }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
+        initialize_presenter
         format.html { render action: "new" }
         format.json { render json: @agent.errors, status: :unprocessable_entity }
       end
@@ -126,6 +131,7 @@ class AgentsController < ApplicationController
         format.html { redirect_back "'#{@agent.name}' was successfully updated." }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
+        initialize_presenter
         format.html { render action: "edit" }
         format.json { render json: @agent.errors, status: :unprocessable_entity }
       end
@@ -153,6 +159,22 @@ class AgentsController < ApplicationController
     end
   end
 
+  def validate
+    build_agent
+
+    if @agent.validate_option(params[:attribute])
+      render text: 'ok'
+    else
+      render text: 'error', status: 403
+    end
+  end
+
+  def complete
+    build_agent
+
+    render json: @agent.complete_option(params[:attribute])
+  end
+
   protected
 
   # Sanitize params[:return] to prevent open redirect attacks, a common security issue.
@@ -166,5 +188,17 @@ class AgentsController < ApplicationController
     end
 
     redirect_to path, notice: message
+  end
+
+  def build_agent
+    @agent = Agent.build_for_type(params[:agent].delete(:type),
+                                  current_user,
+                                  params[:agent])
+  end
+
+  def initialize_presenter
+    if @agent.present? && @agent.is_form_configurable?
+      @agent = FormConfigurableAgentPresenter.new(@agent, view_context)
+    end
   end
 end

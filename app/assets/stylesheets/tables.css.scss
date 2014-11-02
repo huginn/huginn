@@ -20,6 +20,20 @@
   }
 }
 
+.table-striped > tbody > tr.hl {
+  &:nth-child(odd) {
+    > td, > th {
+      background-color: #ffeecc;
+    }
+  }
+
+  &:nth-child(even) {
+    > td, > th {
+      background-color: #f9e8c6;
+    }
+  }
+}
+
 table.events {
   .payload {
     color: #999;

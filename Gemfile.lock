@@ -55,6 +55,8 @@ GEM
       rails (>= 3.1)
     buftok (0.2.0)
     builder (3.2.2)
+    celluloid (0.15.2)
+      timers (~> 1.1.0)
     chronic (0.10.2)
     coderay (1.1.0)
     coffee-rails (4.0.1)
@@ -82,10 +84,11 @@ GEM
       delayed_job (>= 3.0, < 4.1)
     delorean (2.1.0)
       chronic
-    devise (3.2.4)
+    devise (3.4.0)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 3.2.6, < 5)
+      responders
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
@@ -95,6 +98,10 @@ GEM
     dotenv-deployment (0.0.2)
     dotenv-rails (0.11.1)
       dotenv (= 0.11.1)
+    dropbox-api (0.4.2)
+      hashie
+      multi_json
+      oauth
     em-http-request (1.1.2)
       addressable (>= 2.3.4)
       cookiejar
@@ -103,6 +110,9 @@ GEM
       http_parser.rb (>= 0.6.0)
     em-socksify (0.3.0)
       eventmachine (>= 1.0.0.beta.4)
+    em-websocket (0.5.1)
+      eventmachine (>= 0.12.9)
+      http_parser.rb (~> 0.6.0)
     equalizer (0.0.9)
     erector (0.10.0)
       treetop (>= 1.2.3)
@@ -129,6 +139,7 @@ GEM
     foreman (0.63.0)
       dotenv (>= 0.7)
       thor (>= 0.13.6)
+    formatador (0.2.5)
     geokit (1.8.5)
       multi_json (>= 1.3.2)
     geokit-rails (2.0.1)
@@ -145,6 +156,19 @@ GEM
       retriable (>= 1.4)
       signet (>= 0.5.0)
       uuidtools (>= 2.1.0)
+    guard (2.6.1)
+      formatador (>= 0.2.4)
+      listen (~> 2.7)
+      lumberjack (~> 1.0)
+      pry (>= 0.9.12)
+      thor (>= 0.18.1)
+    guard-livereload (2.2.0)
+      em-websocket (~> 0.5)
+      guard (~> 2.0)
+      multi_json (~> 1.8)
+    guard-rspec (4.3.1)
+      guard (~> 2.1)
+      rspec (>= 2.14, < 4.0)
     hashie (2.0.5)
     hike (1.2.3)
     hipchat (1.2.0)
@@ -171,8 +195,13 @@ GEM
     kramdown (1.3.3)
     launchy (2.4.2)
       addressable (~> 2.3)
-    libv8 (3.16.14.3)
+    libv8 (3.16.14.7)
     liquid (2.6.1)
+    listen (2.7.9)
+      celluloid (>= 0.15.2)
+      rb-fsevent (>= 0.9.3)
+      rb-inotify (>= 0.9)
+    lumberjack (1.0.9)
     macaddr (1.7.1)
       systemu (~> 2.6.2)
     mail (2.5.4)
@@ -184,7 +213,7 @@ GEM
     mime-types (1.25.1)
     mini_portile (0.6.0)
     minitest (5.4.0)
-    mqtt (0.2.0)
+    mqtt (0.3.1)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -206,6 +235,8 @@ GEM
     omniauth-37signals (1.0.5)
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.0)
+    omniauth-dropbox (0.2.0)
+      omniauth-oauth (~> 1.0)
     omniauth-oauth (1.0.1)
       oauth
       omniauth (~> 1.0)
@@ -255,9 +286,14 @@ GEM
       thor (>= 0.18.1, < 2.0)
     raindrops (0.13.0)
     rake (10.3.2)
+    rb-fsevent (0.9.4)
+    rb-inotify (0.9.5)
+      ffi (>= 0.5.0)
     rdoc (4.1.1)
       json (~> 1.4)
     ref (1.0.5)
+    responders (1.1.1)
+      railties (>= 3.2, < 4.2)
     rest-client (1.6.8)
       mime-types (~> 1.16)
       rdoc (>= 2.4.2)
@@ -274,6 +310,9 @@ GEM
     rspec-expectations (3.0.4)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.0.0)
+    rspec-html-matchers (0.6.1)
+      nokogiri (~> 1)
+      rspec (~> 3)
     rspec-mocks (3.0.4)
       rspec-support (~> 3.0.0)
     rspec-rails (3.0.2)
@@ -341,6 +380,7 @@ GEM
     thor (0.19.1)
     thread_safe (0.3.4)
     tilt (1.4.1)
+    timers (1.1.0)
     tins (1.3.2)
     treetop (1.4.15)
       polyglot
@@ -414,9 +454,10 @@ DEPENDENCIES
   delayed_job (~> 4.0.0)
   delayed_job_active_record (~> 4.0.0)
   delorean
-  devise (~> 3.2.4)
+  devise (~> 3.4.0)
   dotenv-deployment
   dotenv-rails
+  dropbox-api
   em-http-request (~> 1.1.2)
   faraday (~> 0.9.0)
   faraday_middleware
@@ -428,6 +469,9 @@ DEPENDENCIES
   geokit (~> 1.8.4)
   geokit-rails (~> 2.0.1)
   google-api-client
+  guard
+  guard-livereload
+  guard-rspec
   hipchat (~> 1.2.0)
   httparty (~> 0.13)
   jquery-rails (~> 3.1.0)
@@ -443,6 +487,7 @@ DEPENDENCIES
   nokogiri (~> 1.6.1)
   omniauth
   omniauth-37signals
+  omniauth-dropbox
   omniauth-tumblr
   omniauth-twitter
   pg
@@ -455,6 +500,7 @@ DEPENDENCIES
   rr
   rspec (~> 3.0)
   rspec-collection_matchers (~> 1.0.0)
+  rspec-html-matchers (~> 0.6.1)
   rspec-rails (~> 3.0.1)
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)

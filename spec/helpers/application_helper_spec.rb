@@ -1,20 +1,37 @@
 require 'spec_helper'
 
 describe ApplicationHelper do
+  describe '#icon_tag' do
+    it 'returns a Glyphicon icon element' do
+      icon = icon_tag('glyphicon-help')
+      expect(icon).to be_html_safe
+      expect(Nokogiri(icon).at('span.glyphicon.glyphicon-help')).to be_a Nokogiri::XML::Element
+    end
+
+    it 'returns a Glyphicon icon element with an addidional class' do
+      icon = icon_tag('glyphicon-help', class: 'text-info')
+      expect(icon).to be_html_safe
+      expect(Nokogiri(icon).at('span.glyphicon.glyphicon-help.text-info')).to be_a Nokogiri::XML::Element
+    end
+
+    it 'returns a FontAwesome icon element' do
+      icon = icon_tag('fa-copy')
+      expect(icon).to be_html_safe
+      expect(Nokogiri(icon).at('i.fa.fa-copy')).to be_a Nokogiri::XML::Element
+    end
+
+    it 'returns a FontAwesome icon element' do
+      icon = icon_tag('fa-copy', class: 'text-info')
+      expect(icon).to be_html_safe
+      expect(Nokogiri(icon).at('i.fa.fa-copy.text-info')).to be_a Nokogiri::XML::Element
+    end
+  end
+
   describe '#nav_link' do
     it 'returns a nav link' do
       stub(self).current_page?('/things') { false }
       nav = nav_link('Things', '/things')
       a = Nokogiri(nav).at('li:not(.active) > a[href="/things"]')
-      expect(a.text.strip).to eq('Things')
-    end
-
-    it 'returns a nav link with a glyphicon' do
-      stub(self).current_page?('/things') { false }
-      nav = nav_link('Things', '/things', glyphicon: 'help')
-      expect(nav).to be_html_safe
-      a = Nokogiri(nav).at('li:not(.active) > a[href="/things"]')
-      expect(a.at('span.glyphicon.glyphicon-help')).to be_a Nokogiri::XML::Element
       expect(a.text.strip).to eq('Things')
     end
 
@@ -121,26 +138,58 @@ describe ApplicationHelper do
     end
   end
 
-  describe '#icon_for_service' do
+  describe '#omniauth_provider_icon' do
     it 'returns a correct icon tag for Twitter' do
-      icon = icon_for_service(:twitter)
+      icon = omniauth_provider_icon(:twitter)
       expect(icon).to be_html_safe
       elem = Nokogiri(icon).at('i.fa.fa-twitter')
       expect(elem).to be_a Nokogiri::XML::Element
     end
 
     it 'returns a correct icon tag for GitHub' do
-      icon = icon_for_service(:github)
+      icon = omniauth_provider_icon(:github)
       expect(icon).to be_html_safe
       elem = Nokogiri(icon).at('i.fa.fa-github')
       expect(elem).to be_a Nokogiri::XML::Element
     end
 
     it 'returns a correct icon tag for other services' do
-      icon = icon_for_service(:'37signals')
+      icon = omniauth_provider_icon(:'37signals')
       expect(icon).to be_html_safe
       elem = Nokogiri(icon).at('i.fa.fa-lock')
       expect(elem).to be_a Nokogiri::XML::Element
+    end
+  end
+
+  describe '#highlighted?' do
+    it 'understands hl=6-8' do
+      stub(params).[](:hl) { '6-8' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [6, 7, 8]
+    end
+
+    it 'understands hl=1,3-4,9' do
+      stub(params).[](:hl) { '1,3-4,9' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [1, 3, 4, 9]
+    end
+
+    it 'understands hl=8-' do
+      stub(params).[](:hl) { '8-' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [8, 9, 10]
+    end
+
+    it 'understands hl=-2' do
+      stub(params).[](:hl) { '-2' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [1, 2]
+    end
+
+    it 'understands hl=-' do
+      stub(params).[](:hl) { '-' }
+      expect((1..10).select { |i| highlighted?(i) }).to eq [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    end
+
+    it 'is OK with no hl' do
+      stub(params).[](:hl) { nil }
+      expect((1..10).select { |i| highlighted?(i) }).to be_empty
     end
   end
 end

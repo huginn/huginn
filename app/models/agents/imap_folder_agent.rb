@@ -453,6 +453,14 @@ module Agents
         ret
       end
 
+      def fetch(*args)
+        super || []
+      end
+
+      def uid_fetch(*args)
+        super || []
+      end
+
       def uid_fetch_mails(set)
         uid_fetch(set, 'RFC822.HEADER').map { |data|
           Message.new(self, data, folder: @folder, uidvalidity: @uidvalidity)

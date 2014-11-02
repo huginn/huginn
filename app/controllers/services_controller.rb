@@ -1,7 +1,7 @@
 class ServicesController < ApplicationController
   include SortableTable
 
-  before_filter :upgrade_warning, only: :index
+  before_action :upgrade_warning, only: :index
 
   def index
     set_table_sort sorts: %w[provider name global], default: { provider: :asc }
@@ -31,15 +31,6 @@ class ServicesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to services_path }
       format.json { render json: @service }
-    end
-  end
-
-  def callback
-    @service = current_user.services.initialize_or_update_via_omniauth(request.env['omniauth.auth'])
-    if @service && @service.save
-      redirect_to services_path, notice: "The service was successfully created."
-    else
-      redirect_to services_path, error: "Error creating the service."
     end
   end
 end

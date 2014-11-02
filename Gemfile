@@ -26,6 +26,10 @@ gem 'omniauth-twitter'
 gem 'tumblr_client'
 gem 'omniauth-tumblr'
 
+# Dropbox Agents
+gem 'dropbox-api'
+gem 'omniauth-dropbox'
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'
@@ -46,7 +50,7 @@ gem 'coffee-rails', '~> 4.0.0'
 gem 'daemons', '~> 1.1.9'
 gem 'delayed_job', '~> 4.0.0'
 gem 'delayed_job_active_record', '~> 4.0.0'
-gem 'devise', '~> 3.2.4'
+gem 'devise', '~> 3.4.0'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware'
@@ -81,6 +85,9 @@ group :development do
   gem 'better_errors', '~> 1.1'
   gem 'binding_of_caller'
   gem 'quiet_assets'
+  gem 'guard'
+  gem 'guard-livereload'
+  gem 'guard-rspec'
 end
 
 group :development, :test do
@@ -92,6 +99,7 @@ group :development, :test do
   gem 'rspec', '~> 3.0'
   gem 'rspec-collection_matchers', '~> 1.0.0'
   gem 'rspec-rails', '~> 3.0.1'
+  gem 'rspec-html-matchers', '~> 0.6.1'
   gem 'shoulda-matchers'
   gem 'spring'
   gem 'spring-commands-rspec'

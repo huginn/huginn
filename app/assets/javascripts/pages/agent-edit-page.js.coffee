@@ -18,7 +18,6 @@ class @AgentEditPage
     else
       $(".agent-settings").show()
       $("#agent-spinner").fadeIn()
-      $("#agent_source_ids").select2("val", {})
       $(".model-errors").hide() unless firstTime
       $.getJSON "/agents/type_details", { type: type }, (json) =>
         if json.can_be_scheduled
@@ -46,11 +45,12 @@ class @AgentEditPage
 
         $(".description").show().html(json.description_html) if json.description_html?
 
-        $('.oauthable-form').html(json.form) if json.form?
-
         unless firstTime
-          window.jsonEditor.json = json.options
-          window.jsonEditor.rebuild()
+          $('.oauthable-form').html(json.oauthable) if json.oauthable?
+          $('.agent-options').html(json.form_options) if json.form_options?
+          window.jsonEditor = setupJsonEditor()[0]
+
+        window.initializeFormCompletable()
 
         $("#agent-spinner").stop(true, true).fadeOut();
 

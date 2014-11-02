@@ -209,7 +209,7 @@ module Agents
         }
       end
     rescue => e
-      error e.message
+      error "Error when fetching url: #{e.message}\n#{e.backtrace.join("\n")}"
     end
 
     def receive(incoming_events)

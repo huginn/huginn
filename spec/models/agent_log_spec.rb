@@ -44,9 +44,9 @@ describe AgentLog do
 
   it "truncates message to a reasonable length" do
     log = AgentLog.new(:agent => agents(:jane_website_agent), :level => 3)
-    log.message = "a" * 3000
+    log.message = "a" * 11_000
     log.save!
-    expect(log.message.length).to eq(2048)
+    expect(log.message.length).to eq(10_000)
   end
 
   describe "#log_for_agent" do

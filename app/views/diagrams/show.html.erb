@@ -9,7 +9,7 @@
         <h2>Agent Event Flow</h2>
       </div>
       <div class="btn-group">
-        <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, (params[:scenario_id] ? scenario_path(params[:scenario_id]) : agents_path), class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, (params[:scenario_id] ? scenario_path(params[:scenario_id]) : agents_path), class: "btn btn-default" %>
       </div>
 
       <div class='digraph'>

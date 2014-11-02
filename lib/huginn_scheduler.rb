@@ -96,8 +96,8 @@ class HuginnScheduler
   FAILED_JOBS_TO_KEEP = 100
   attr_accessor :mutex
 
-  def initialize
-    @rufus_scheduler = Rufus::Scheduler.new
+  def initialize(options = {})
+    @rufus_scheduler = Rufus::Scheduler.new(options)
     self.mutex = Mutex.new
   end
 
