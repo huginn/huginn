@@ -65,7 +65,7 @@ if (root_id = `git rev-list --max-parents=0 HEAD`.chomp) != '620acffa5a302c6a271
   end
 end
 
-app_name = info.scan(/http:\/\/([\w\d-]+)\.herokuapp\.com/).flatten.first
+app_name = info.scan(/https?:\/\/([\w\d-]+)\.herokuapp\.com/).flatten.first
 confirm_app_name app_name
 grab_heroku_config!
 print_config
@@ -148,6 +148,8 @@ if first_time
   end
   puts
   puts "\t#{$config['INVITATION_CODE']}"
+  puts
+  puts "We recommend that you read https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku and setup Pingdom to keep your app awake!"
 end
 
 puts
