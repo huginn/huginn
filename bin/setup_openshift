@@ -23,8 +23,14 @@ def set_env(key, value)
 end
 
 def check_login!
-  unless Dir[File.join(File.expand_path('~/.openshift'), 'token_*')].length > 0
-    puts "It looks like you need to log in to OpenShift.  Please run 'rhc setup' before continuing a choose the option to 'Generate a token now'."
+  token_file = Dir[File.join(File.expand_path('~/.openshift'), 'token_*')].first
+  unless token_file
+    puts "It looks like you need to log in to OpenShift.  Please run 'rhc setup' before continuing a choose the option to 'Generate a token now', then run bin/setup_openshift again."
+    exit 1
+  end
+
+  unless (Time.now - File.stat(token_file).mtime).to_i < 60 * 60 * 24 * 5
+    puts "Please run 'rhc logout' and then 'rhc account' to refresh your session, then run bin/setup_openshift again."
     exit 1
   end
 
@@ -41,6 +47,7 @@ if info =~ /must specify an application/i
   cmd = "rhc app create huginn ruby-2.0 mysql-5.5 #{foreman_cartridge} -s -r tmp-huginn"
   puts "It looks like you don't have an OpenShift app set up yet for this repo. I can make one for you."
   if yes?("Would you like me to create an OpenShift app for you now in this repo?")
+    puts "Okay, this may take a moment..."
     puts `#{cmd}`
 
     git_config = capture("git config --list -f tmp-huginn/.git/config").split("\n")
@@ -135,6 +142,8 @@ if first_time
   end
   puts
   puts "\t#{$config['INVITATION_CODE']}"
+  puts
+  puts "We recommend that you read https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-OpenShift and setup Pingdom to keep your app awake!"
 end
 
 puts
