@@ -371,6 +371,7 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (~> 2.8)
+    string-scrub (0.0.5)
     systemu (2.6.4)
     term-ansicolor (1.3.0)
       tins (~> 1.0)
@@ -512,6 +513,7 @@ DEPENDENCIES
   spectrum-rails
   spring
   spring-commands-rspec
+  string-scrub
   therubyracer (~> 0.12.1)
   tumblr_client
   twilio-ruby (~> 3.11.5)

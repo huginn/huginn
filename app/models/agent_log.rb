@@ -11,6 +11,7 @@ class AgentLog < ActiveRecord::Base
   validates_presence_of :agent, :message
   validates_numericality_of :level, :only_integer => true, :greater_than_or_equal_to => 0, :less_than => 5
 
+  before_validation :scrub_message
   before_save :truncate_message
 
   def self.log_for_agent(agent, message, options = {})
@@ -30,6 +31,13 @@ class AgentLog < ActiveRecord::Base
   end
 
   protected
+
+  def scrub_message
+    if message_changed?
+      self.message.scrub!{ |bytes| "<#{bytes.unpack('H*')[0]}>" }
+    end
+    true
+  end
 
   def truncate_message
     self.message = message[0...10_000] if message.present?

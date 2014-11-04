@@ -42,6 +42,13 @@ describe AgentLog do
     end
   end
 
+  it "replaces invalid byte sequences in a message" do
+    log = AgentLog.new(:agent => agents(:jane_website_agent), level: 3)
+    log.message = "\u{3042}\xffA\x95"
+    expect { log.save! }.not_to raise_error
+    expect(log.message).to eq("\u{3042}<ff>A\<95>")
+  end
+
   it "truncates message to a reasonable length" do
     log = AgentLog.new(:agent => agents(:jane_website_agent), :level => 3)
     log.message = "a" * 11_000
