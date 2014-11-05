@@ -401,6 +401,28 @@ describe Agents::WebsiteAgent do
           expect(event.payload['thumbnail']).to eq('https://avatars3.githubusercontent.com/u/365751?s=30')
         end
 
+        it "works with XPath with namespaces unstripped" do
+          @checker.options['use_namespaces'] = 'true'
+          @checker.save!
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(0)
+
+          @checker.options['extract'] = {
+            'title' => { 'xpath' => '/xmlns:feed/xmlns:entry', 'value' => 'normalize-space(./xmlns:title)' },
+            'url' => { 'xpath' => '/xmlns:feed/xmlns:entry', 'value' => './xmlns:link[1]/@href' },
+            'thumbnail' => { 'xpath' => '/xmlns:feed/xmlns:entry', 'value' => './media:thumbnail/@url' },
+          }
+          @checker.save!
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(20)
+          event = Event.last
+          expect(event.payload['title']).to eq('Shift to dev group')
+          expect(event.payload['url']).to eq('https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af')
+          expect(event.payload['thumbnail']).to eq('https://avatars3.githubusercontent.com/u/365751?s=30')
+        end
+
         it "works with CSS selectors" do
           @checker.options['extract'] = {
             'title' => { 'css' => 'feed > entry', 'value' => 'normalize-space(./title)' },
@@ -420,6 +442,23 @@ describe Agents::WebsiteAgent do
             'url' => { 'css' => 'feed > entry', 'value' => './xmlns:link[1]/@href' },
             'thumbnail' => { 'css' => 'feed > entry', 'value' => './media:thumbnail/@url' },
           }
+          @checker.save!
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(20)
+          event = Event.last
+          expect(event.payload['title']).to eq('Shift to dev group')
+          expect(event.payload['url']).to eq('https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af')
+          expect(event.payload['thumbnail']).to eq('https://avatars3.githubusercontent.com/u/365751?s=30')
+        end
+
+        it "works with CSS selectors with namespaces stripped" do
+          @checker.options['extract'] = {
+            'title' => { 'css' => 'feed > entry', 'value' => 'normalize-space(./title)' },
+            'url' => { 'css' => 'feed > entry', 'value' => './link[1]/@href' },
+            'thumbnail' => { 'css' => 'feed > entry', 'value' => './thumbnail/@url' },
+          }
+          @checker.options['use_namespaces'] = 'false'
           @checker.save!
           expect {
             @checker.check
