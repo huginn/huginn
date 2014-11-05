@@ -211,7 +211,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     method_source (0.8.2)
     mime-types (1.25.1)
-    mini_portile (0.6.0)
+    mini_portile (0.6.1)
     minitest (5.4.0)
     mqtt (0.3.1)
     multi_json (1.10.1)
@@ -220,8 +220,8 @@ GEM
     mysql2 (0.3.16)
     naught (1.0.0)
     net-ftp-list (3.2.8)
-    nokogiri (1.6.3.1)
-      mini_portile (= 0.6.0)
+    nokogiri (1.6.4)
+      mini_portile (~> 0.6.0)
     oauth (0.4.7)
     oauth2 (0.9.4)
       faraday (>= 0.8, < 0.10)
@@ -485,7 +485,7 @@ DEPENDENCIES
   multi_xml
   mysql2 (~> 0.3.16)
   net-ftp-list (~> 3.2.8)
-  nokogiri (~> 1.6.1)
+  nokogiri (~> 1.6.4)
   omniauth
   omniauth-37signals
   omniauth-dropbox

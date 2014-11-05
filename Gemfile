@@ -70,7 +70,7 @@ gem 'kramdown', '~> 1.3.3'
 gem 'liquid', '~> 2.6.1'
 gem 'mysql2', '~> 0.3.16'
 gem 'multi_xml'
-gem 'nokogiri', '~> 1.6.1'
+gem 'nokogiri', '~> 1.6.4'
 gem 'omniauth'
 gem 'rails' , '~> 4.1.7'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
