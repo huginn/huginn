@@ -310,15 +310,17 @@ module Agents
     end
 
     def extract_xml(doc)
+      cache = {}
       extract_each { |extraction_details|
-        case
-        when css = extraction_details['css']
-          nodes = doc.css(css)
-        when xpath = extraction_details['xpath']
-          nodes = doc.xpath(xpath)
-        else
-          raise '"css" or "xpath" is required for HTML or XML extraction'
-        end
+        nodes =
+          case
+          when css = extraction_details['css']
+            cache[[css, :css]] ||= doc.css(css)
+          when xpath = extraction_details['xpath']
+            cache[[xpath, :xpath]] ||= doc.xpath(xpath)
+          else
+            raise '"css" or "xpath" is required for HTML or XML extraction'
+          end
         case nodes
         when Nokogiri::XML::NodeSet
           result = nodes.map { |node|
