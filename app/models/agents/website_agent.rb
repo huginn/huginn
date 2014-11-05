@@ -277,6 +277,12 @@ module Agents
       end).to_s
     end
 
+    def use_namespaces?
+      interpolated['extract'].none? { |name, extraction_details|
+        extraction_details.key?('xpath')
+      }
+    end
+
     def extract_each(&block)
       interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
         output[name] = block.call(extraction_details)
@@ -309,7 +315,6 @@ module Agents
         when css = extraction_details['css']
           nodes = doc.css(css)
         when xpath = extraction_details['xpath']
-          doc.remove_namespaces! # ignore xmlns, useful when parsing atom feeds
           nodes = doc.xpath(xpath)
         else
           raise '"css" or "xpath" is required for HTML or XML extraction'
@@ -334,9 +339,12 @@ module Agents
     end
 
     def parse(data)
-      case extraction_type
+      case type = extraction_type
       when "xml"
-        Nokogiri::XML(data)
+        doc = Nokogiri::XML(data)
+        # ignore xmlns, useful when parsing atom feeds
+        doc.remove_namespaces! unless use_namespaces?
+        doc
       when "json"
         JSON.parse(data)
       when "html"
@@ -344,7 +352,7 @@ module Agents
       when "text"
         data
       else
-        raise "Unknown extraction type #{extraction_type}"
+        raise "Unknown extraction type: #{type}"
       end
     end
 
