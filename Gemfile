@@ -12,7 +12,7 @@ gem 'weibo_2', '~> 0.1.4'         # Weibo Agents
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
-gem 'slack-notifier', '~> 0.5.0'  # SlackAgent
+gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
 
 # GoogleCalendarPublishAgent
 gem "google-api-client", require: 'google/api_client'
