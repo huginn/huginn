@@ -3,7 +3,6 @@ require 'cgi'
 
 module Agents
   class WeatherAgent < Agent
-    cannot_receive_events!
 
     gem_dependency_check { defined?(Wunderground) && defined?(ForecastIO) }
 
@@ -16,6 +15,8 @@ module Agents
       The weather can be provided by either Wunderground or ForecastIO. To choose which `service` to use, enter either `forecastio` or `wunderground`.
 
       The `location` can be a US zipcode, or any location that Wunderground supports. To find one, search [wunderground.com](http://wunderground.com) and copy the location part of the URL.  For example, a result for San Francisco gives `http://www.wunderground.com/US/CA/San_Francisco.html` and London, England gives `http://www.wunderground.com/q/zmw:00000.1.03772`.  The locations in each are `US/CA/San_Francisco` and `zmw:00000.1.03772`, respectively.
+
+      If you connect the *User Location* as the event source, it will store the user location in memory for each new user location event, and use that when checking the weather.
 
       If you plan on using ForecastIO, the `location` must be a comma-separated string of co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
 
@@ -75,12 +76,22 @@ module Agents
       interpolated["service"].presence || "wunderground"
     end
 
+    def receive(incoming_events)
+      incoming_events.each do |event|
+        store_location(event.location.latlng)
+      end
+    end
+
+    def store_location(location)
+      memory['location'] = location
+    end
+
     def which_day
       (interpolated["which_day"].presence || 1).to_i
     end
 
     def location
-      interpolated["location"].presence || interpolated["zipcode"]
+      memory['location'].presence || interpolated["location"].presence || interpolated["zipcode"]
     end
 
     def validate_options

@@ -82,6 +82,10 @@ class Location
     !present?
   end
 
+  def latlng
+    "#{lat},#{lng}"
+  end
+
   private
 
   def floatify(value)
