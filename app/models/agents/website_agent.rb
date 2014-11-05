@@ -277,14 +277,14 @@ module Agents
       end).to_s
     end
 
-    def extract_each(doc, &block)
+    def extract_each(&block)
       interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
         output[name] = block.call(extraction_details)
       }
     end
 
     def extract_json(doc)
-      extract_each(doc) { |extraction_details|
+      extract_each { |extraction_details|
         result = Utils.values_at(doc, extraction_details['path'])
         log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
         result
@@ -292,7 +292,7 @@ module Agents
     end
 
     def extract_text(doc)
-      extract_each(doc) { |extraction_details|
+      extract_each { |extraction_details|
         regexp = Regexp.new(extraction_details['regexp'])
         result = []
         doc.scan(regexp) {
@@ -304,7 +304,7 @@ module Agents
     end
 
     def extract_xml(doc)
-      extract_each(doc) { |extraction_details|
+      extract_each { |extraction_details|
         case
         when css = extraction_details['css']
           nodes = doc.css(css)
