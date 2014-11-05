@@ -298,11 +298,16 @@ module Agents
     end
 
     def extract_text(doc)
+      regexp_cache = {}
+      matches_cache = {}
       extract_each { |extraction_details|
-        regexp = Regexp.new(extraction_details['regexp'])
-        result = []
-        doc.scan(regexp) {
-          result << Regexp.last_match[extraction_details['index']]
+        src = extraction_details['regexp']
+        regexp = (regexp_cache[src] ||= Regexp.new(src))
+        matches = (matches_cache[src] ||= [].tap { |ms|
+                     doc.scan(regexp) { ms << Regexp.last_match }
+                   })
+        result = matches.map { |match|
+          match[extraction_details['index']]
         }
         log "Extracting #{extraction_type} at #{regexp}: #{result}"
         result
