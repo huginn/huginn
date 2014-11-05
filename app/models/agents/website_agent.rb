@@ -31,7 +31,7 @@ module Agents
 
       "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and ".//text()" is to extract all the enclosed texts.  You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-text(.//text())` should actually be `normalize-text(.)`.
 
-      Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions all namespaces are stripped from the document.
+      Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions all namespaces are stripped from the document unless a toplevel option `use_namespaces` is set to true.
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
@@ -280,9 +280,13 @@ module Agents
     end
 
     def use_namespaces?
-      interpolated['extract'].none? { |name, extraction_details|
-        extraction_details.key?('xpath')
-      }
+      if value = interpolated.key?('use_namespaces')
+        boolify(interpolated['use_namespaces'])
+      else
+        interpolated['extract'].none? { |name, extraction_details|
+          extraction_details.key?('xpath')
+        }
+      end
     end
 
     def extract_each(&block)
