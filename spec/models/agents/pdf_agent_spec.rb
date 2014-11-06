@@ -25,6 +25,8 @@ describe Agents::PdfInfoAgent do
         mock(HyPDF).pdfinfo('data') { {title: "Huginn"} }
         agent.receive([@event])
       }.to change { Event.count }.by(1)
+      event = Event.last
+      expect(event.payload[:title]).to eq('Huginn')
     end
   end
 end
