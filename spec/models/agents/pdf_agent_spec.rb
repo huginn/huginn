@@ -11,12 +11,7 @@ describe Agents::PdfInfoAgent do
 
   describe "#receive" do
     before do
-
-      @event = Event.new
-      # @event.agent = agents(:website_agent)
-      @event.payload = {
-        'url' => 'http://mypdf.com',
-      }
+      @event = Event.new(payload: {'url' => 'http://mypdf.com'})
     end
 
     it "should call HyPDF" do
