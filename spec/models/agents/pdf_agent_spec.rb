@@ -21,7 +21,7 @@ describe Agents::PdfInfoAgent do
 
     it "should call HyPDF" do
       expect {
-        stub(agent).open { "data" }
+        mock(agent).open('http://mypdf.com') { "data" }
         mock(HyPDF).pdfinfo('data') { {title: "Huginn"} }
         agent.receive([@event])
       }.to change { Event.count }.by(1)

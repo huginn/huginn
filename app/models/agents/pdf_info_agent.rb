@@ -58,5 +58,6 @@ module Agents
         create_event :payload => info.merge(payload)
       end
     end
+
   end
 end
