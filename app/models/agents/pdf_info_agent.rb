@@ -9,6 +9,8 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
+      #{'## Include the `hypdf` gem in your `Gemfile` to use PDFInfo Agents.' if dependencies_missing?}
+
       In order for this agent to work, you need to have [HyPDF](https://devcenter.heroku.com/articles/hypdf) running and configured.
 
       It works by acting on events that contain a key `url` in their payload, and runs the [pdfinfo](https://devcenter.heroku.com/articles/hypdf#pdfinfo) command on them.
