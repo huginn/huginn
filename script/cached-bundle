@@ -29,7 +29,8 @@ download() {
 
 bundle_path="vendor/bundle"
 gemfile_hash="$(compute_md5 <"${BUNDLE_GEMFILE:-Gemfile}.lock")"
-cache_name="${TRAVIS_RUBY_VERSION}-${gemfile_hash}.tgz"
+#cache_name="${TRAVIS_RUBY_VERSION}-${gemfile_hash}.tgz"
+cache_name="${TRAVIS_RUBY_VERSION}.tgz"
 fetch_url="http://${AMAZON_S3_BUCKET}.s3.amazonaws.com/${cache_name}"
 
 if download "$fetch_url" "$cache_name"; then
