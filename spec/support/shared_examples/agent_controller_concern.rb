@@ -41,6 +41,15 @@ shared_examples_for AgentControllerConcern do
           expect(agent).to be_valid
         }
       end
+
+      it "should ensure that 'configure_options' exists in options when the action is 'configure'" do
+        agent.options['action'] = 'configure'
+        expect(agent).not_to be_valid
+        agent.options['configure_options'] = {}
+        expect(agent).not_to be_valid
+        agent.options['configure_options'] = { 'key' => 'value' }
+        expect(agent).to be_valid
+      end
     end
   end
 
@@ -106,6 +115,18 @@ shared_examples_for AgentControllerConcern do
 
       agent.control!
       expect(agent.control_targets.reload).to all(satisfy { |a| !a.disabled? })
+    end
+
+    it "should configure targets" do
+      agent.options['action'] = 'configure'
+      agent.options['configure_options'] = { 'url' => 'http://some-new-url.com/{{"something" | upcase}}' }
+      agent.save!
+      old_options = agents(:bob_website_agent).options
+
+      agent.control!
+
+      expect(agent.control_targets.reload).to all(satisfy { |a| a.options['url'] == 'http://some-new-url.com/SOMETHING' })
+      expect(agents(:bob_website_agent).reload.options).to eq(old_options.merge('url' => 'http://some-new-url.com/SOMETHING'))
     end
   end
 end
