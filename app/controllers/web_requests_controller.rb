@@ -17,7 +17,7 @@
 
 class WebRequestsController < ApplicationController
   skip_before_action :verify_authenticity_token
-  skip_before_action :authenticate_user!
+  skip_before_action :custom_authenticate_user!
 
   def handle_request
     user = User.find_by_id(params[:user_id])

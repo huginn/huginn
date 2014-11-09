@@ -93,6 +93,8 @@ GEM
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
     docile (1.1.5)
+    doorkeeper (1.4.0)
+      railties (>= 3.1)
     dotenv (0.11.1)
       dotenv-deployment (~> 0.0.2)
     dotenv-deployment (0.0.2)
@@ -274,7 +276,7 @@ GEM
       bundler (>= 1.3.0, < 2.0)
       railties (= 4.1.7)
       sprockets-rails (~> 2.0)
-    rails_12factor (0.0.2)
+    rails_12factor (0.0.3)
       rails_serve_static_assets
       rails_stdout_logging
     rails_serve_static_assets (0.0.2)
@@ -456,6 +458,7 @@ DEPENDENCIES
   delayed_job_active_record (~> 4.0.0)
   delorean
   devise (~> 3.4.0)
+  doorkeeper (~> 1.4.0)
   dotenv-deployment
   dotenv-rails
   dropbox-api
