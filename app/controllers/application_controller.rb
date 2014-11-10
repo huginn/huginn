@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  alias_method :deivse_current_user, :current_user
+  alias_method :devise_current_user, :current_user
   before_action :custom_authenticate_user!
   before_action :configure_permitted_parameters, if: :devise_controller?
 
@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
     @current_user ||= if doorkeeper_token
       User.find(doorkeeper_token.resource_owner_id)
     else
-      deivse_current_user
+      devise_current_user
     end
   end
 
