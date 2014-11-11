@@ -14,6 +14,10 @@ module Agents
 
       `curl -u <your api key here>: https://api.pushbullet.com/api/devices`
 
+      To register a new device run the following command:
+
+      `curl -u <your api key here>: -X POST https://api.pushbullet.com/v2/devices -d nickname=huginn -d type=stream`
+
       Put one of the retured `iden` strings into the `device_id` field.
 
       You can provide a `title` and a `body`.
