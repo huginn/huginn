@@ -174,12 +174,17 @@ GEM
     hipchat (1.2.0)
       httparty
     hpricot (0.8.6)
+    httmultiparty (0.3.10)
+      httparty (>= 0.7.3)
+      multipart-post
     http (0.5.1)
       http_parser.rb
     http_parser.rb (0.6.0)
     httparty (0.13.1)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
+    hypdf (1.0.7)
+      httmultiparty (= 0.3.10)
     i18n (0.6.11)
     jquery-rails (3.1.1)
       railties (>= 3.0, < 5.0)
@@ -475,6 +480,7 @@ DEPENDENCIES
   guard-rspec
   hipchat (~> 1.2.0)
   httparty (~> 0.13)
+  hypdf (~> 1.0.7)
   jquery-rails (~> 3.1.0)
   json (~> 1.8.1)
   jsonpath (~> 0.5.6)
