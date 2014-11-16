@@ -72,7 +72,7 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 
 ## Deployment
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup.  Be sure to click 'View it' after launch!)
 
 Huginn can run on Heroku for free!  Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
