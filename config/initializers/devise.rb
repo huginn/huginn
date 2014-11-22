@@ -263,6 +263,12 @@ Devise.setup do |config|
     config.omniauth :dropbox, key, secret
   end
 
+  if defined?(OmniAuth::Strategies::Wunderlist) &&
+     (key = ENV["WUNDERLIST_OAUTH_KEY"]).present? &&
+     (secret = ENV["WUNDERLIST_OAUTH_SECRET"]).present?
+    config.omniauth :wunderlist, key, secret
+  end
+
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
   # change the failure app, you can configure them inside the config.warden block.

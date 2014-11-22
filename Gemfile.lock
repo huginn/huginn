@@ -8,6 +8,15 @@ GIT
       http_parser.rb (~> 0.6.0)
       simple_oauth (~> 0.2.0)
 
+GIT
+  remote: git://github.com/wunderlist/omniauth-wunderlist.git
+  revision: d0910d0396107b9302aa1bc50e74bb140990ccb8
+  ref: d0910d0396107b9302aa1bc50e74bb140990ccb8
+  specs:
+    omniauth-wunderlist (0.0.1)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -495,6 +504,7 @@ DEPENDENCIES
   omniauth-dropbox
   omniauth-tumblr
   omniauth-twitter
+  omniauth-wunderlist!
   pg
   protected_attributes (~> 1.0.8)
   pry
