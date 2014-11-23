@@ -148,75 +148,89 @@ module Agents
     end
 
     def check
-      check_url interpolated['url']
+      check_urls(interpolated['url'])
     end
 
-    def check_url(in_url)
+    def check_urls(in_url)
       return unless in_url.present?
 
       Array(in_url).each do |url|
-        log "Fetching #{url}"
-        response = faraday.get(url)
-        raise "Failed: #{response.inspect}" unless response.success?
-
-        interpolation_context.stack {
-          interpolation_context['_response_'] = ResponseDrop.new(response)
-          body = response.body
-          if (encoding = interpolated['force_encoding']).present?
-            body = body.encode(Encoding::UTF_8, encoding)
-          end
-          doc = parse(body)
-
-          if extract_full_json?
-            if store_payload!(previous_payloads(1), doc)
-              log "Storing new result for '#{name}': #{doc.inspect}"
-              create_event :payload => doc
-            end
-            next
-          end
-
-          output =
-            case extraction_type
-            when 'json'
-              extract_json(doc)
-            when 'text'
-              extract_text(doc)
-            else
-              extract_xml(doc)
-            end
-
-          num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
-
-          if num_unique_lengths.length != 1
-            raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
-          end
-
-          old_events = previous_payloads num_unique_lengths.first
-          num_unique_lengths.first.times do |index|
-            result = {}
-            interpolated['extract'].keys.each do |name|
-              result[name] = output[name][index]
-              if name.to_s == 'url'
-                result[name] = (response.env[:url] + result[name]).to_s
-              end
-            end
-
-            if store_payload!(old_events, result)
-              log "Storing new parsed result for '#{name}': #{result.inspect}"
-              create_event :payload => result
-            end
-          end
-        }
+        check_url(url).map do |doc|
+          create_event payload: doc
+        end
       end
+    end
+
+    def check_url(url)
+      log "Fetching #{url}"
+      response = faraday.get(url)
+      raise "Failed: #{response.inspect}" unless response.success?
+
+      interpolation_context.stack {
+        interpolation_context['_response_'] = ResponseDrop.new(response)
+        body = response.body
+        if (encoding = interpolated['force_encoding']).present?
+          body = body.encode(Encoding::UTF_8, encoding)
+        end
+        doc = parse(body)
+
+        results = []
+        if extract_full_json?
+          if store_payload!(previous_payloads(1), doc)
+            log "Storing new result for '#{name}': #{doc.inspect}"
+            results << doc
+          end
+          return results
+        end
+
+        output =
+          case extraction_type
+          when 'json'
+            extract_json(doc)
+          when 'text'
+            extract_text(doc)
+          else
+            extract_xml(doc)
+          end
+
+        num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
+
+        if num_unique_lengths.length != 1
+          raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
+        end
+
+        old_events = previous_payloads num_unique_lengths.first
+        num_unique_lengths.first.times do |index|
+          result = {}
+          interpolated['extract'].keys.each do |name|
+            result[name] = output[name][index]
+            if name.to_s == 'url'
+              result[name] = (response.env[:url] + result[name]).to_s
+            end
+          end
+
+          if store_payload!(old_events, result)
+            log "Storing new parsed result for '#{name}': #{result.inspect}"
+            results << result
+          end
+        end
+
+        results
+      }
     rescue => e
       error "Error when fetching url: #{e.message}\n#{e.backtrace.join("\n")}"
+      return []
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
           url_to_scrape = event.payload['url']
-          check_url(url_to_scrape) if url_to_scrape =~ /^https?:\/\//i
+          valid_url = url_to_scrape =~ /^https?:\/\//i
+          docs = valid_url ? check_url(url_to_scrape) : []
+          docs.each do |doc|
+            create_event payload: doc
+          end
         end
       end
     end
