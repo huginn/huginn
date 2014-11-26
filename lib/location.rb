@@ -82,6 +82,10 @@ class Location
     !present?
   end
 
+  def latlng
+    "#{lat},#{lng}"
+  end
+
   private
 
   def floatify(value)
@@ -100,7 +104,7 @@ class Location
 end
 
 class LocationDrop
-  KEYS = Location.members.map(&:to_s).concat(%w[latitude longitude])
+  KEYS = Location.members.map(&:to_s).concat(%w[latitude longitude latlng])
 
   def before_method(key)
     if KEYS.include?(key)

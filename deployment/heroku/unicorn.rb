@@ -18,7 +18,7 @@ Thread.new do
     sleep 45
 
     if ENV['DOMAIN']
-      force_ssl = ENV['FORCE_SSL'].present? && ENV['FORCE_SSL'] == 'true'
+      force_ssl = ENV['FORCE_SSL'] == 'true'
       Net::HTTP.get_response(URI((force_ssl ? "https://" : "http://") + ENV['DOMAIN']))
     end
 

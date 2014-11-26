@@ -23,6 +23,10 @@ module AgentControllerConcern
           errors.add(:base, "#{target.name} cannot be scheduled")
         end
       }
+    when 'configure'
+      if options['configure_options'].nil? || options['configure_options'].keys.length == 0
+        errors.add(:base, "The 'configure_options' options hash must be supplied when using the 'configure' action.")
+      end
     when 'enable', 'disable'
     when nil
       errors.add(:base, "action must be specified")
@@ -63,6 +67,9 @@ module AgentControllerConcern
             target.update!(disabled: true)
             log "Agent '#{target.name}' is disabled"
           end
+        when 'configure'
+          target.update!(options: target.options.merge(interpolated['configure_options']))
+          log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"
         when ''
           # Do nothing
         else

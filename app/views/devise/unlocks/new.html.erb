@@ -3,19 +3,19 @@
     <div class='well'>
       <h2>Resend unlock instructions</h2>
 
-      <%= form_for(resource, :as => resource_name, :url => unlock_path(resource_name), :html => { :method => :post, :class => 'form-horizontal' }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post, class: 'form-horizontal' }) do |f| %>
         <%= devise_error_messages! %>
 
         <div class="form-group">
-          <%= f.label :email, :class => 'col-md-2 col-md-offset-2 control-label' %>
+         <%= f.label :email, class: 'col-md-2 col-md-offset-2 control-label' %>
           <div class="col-md-6">
-            <%= f.text_field :email, :class => 'form-control' %>
+            <%= f.email_field :email, autofocus: true, class: 'form-control' %>
           </div>
         </div>
 
         <div class="form-group">
           <div class="col-md-offset-4 col-md-10">
-            <%= f.submit "Resend unlock instructions", :class => "btn btn-primary" %>
+            <%= f.submit "Resend unlock instructions", class: "btn btn-primary" %>
           </div>
         </div>
       <% end %>

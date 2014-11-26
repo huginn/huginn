@@ -1,21 +1,16 @@
 module Agents
   class BasecampAgent < Agent
-    cannot_receive_events!
-
+    include FormConfigurable
     include Oauthable
     valid_oauth_providers :'37signals'
+
+    cannot_receive_events!
 
     description <<-MD
       The BasecampAgent checks a Basecamp project for new Events
 
       To be able to use this Agent you need to authenticate with 37signals in the [Services](/services) section first.
 
-      You need to provide the `project_id` of the project you want to monitor.
-      If you have your Basecamp project opened in your browser you can find the user_id and project_id as follows:
-
-      `https://basecamp.com/123456/projects/`
-      project_id
-      `-explore-basecamp`
     MD
 
     event_description <<-MD
@@ -50,6 +45,14 @@ module Agents
       }
     end
 
+    form_configurable :project_id, roles: :completable
+
+    def complete_project_id
+      service.prepare_request
+      response = HTTParty.get projects_url, request_options.merge(query_parameters)
+      response.map { |p| {text: "#{p['name']} (#{p['id']})", id: p['id']}}
+    end
+
     def validate_options
       errors.add(:base, "you need to specify the basecamp project id of which you want to receive events") unless options['project_id'].present?
     end
@@ -60,8 +63,8 @@ module Agents
 
     def check
       service.prepare_request
-      reponse = HTTParty.get request_url, request_options.merge(query_parameters)
-      events = JSON.parse(reponse.body)
+      response = HTTParty.get events_url, request_options.merge(query_parameters)
+      events = JSON.parse(response.body)
       if !memory[:last_event].nil?
         events.each do |event|
           create_event :payload => event
@@ -72,8 +75,16 @@ module Agents
     end
 
   private
-    def request_url
-      "https://basecamp.com/#{URI.encode(service.options[:user_id].to_s)}/api/v1/projects/#{URI.encode(interpolated[:project_id].to_s)}/events.json"
+    def base_url
+      "https://basecamp.com/#{URI.encode(service.options[:user_id].to_s)}/api/v1/"
+    end
+
+    def events_url
+      base_url + "projects/#{URI.encode(interpolated[:project_id].to_s)}/events.json"
+    end
+
+    def projects_url
+      base_url + "projects.json"
     end
 
     def request_options

@@ -1,25 +1,27 @@
 language: ruby
-bundler_args: --without development production --deployment
-cache:
-  directories:
-  - vendor/bundle
 env:
+  matrix:
   - APP_SECRET_TOKEN=b2724973fd81c2f4ac0f92ac48eb3f0152c4a11824c122bcf783419a4c51d8b9bba81c8ba6a66c7de599677c7f486242cf819775c433908e77c739c5c8ae118d
+  global:
+  - AMAZON_S3_BUCKET=huginn-bundle-cache
+  - AMAZON_ACCESS_KEY_ID=AKIAITMDBT3BL3ZWVFGA
+  - secure: JbDX6yVP+Q32FOl7UmB7bBxaEGDNYd3IlfDACmdRHkf23yRa4RvQD1U1Gu8kh8c5Els2VvzUWEkv7VjJWNgxVJFnbGbqbnIrbdEhGMTwXnJjpuzAx2+TWuXUEGFeZVqtNqtxSW1r/CCAFYtWpnX0jW27wLQvRitY1r/BqiXXDgc=
 rvm:
-  - 2.0.0
-  - 2.1.1
-  - 1.9.3
+- 2.0.0
+- 2.1.4
+- 1.9.3
 before_install:
-  - travis_retry gem install bundler
+- travis_retry gem install bundler
+install: travis_retry script/cached-bundle install --without development production --deployment
 before_script:
-  - mysql -e 'create database huginn_test;'
-  - bundle exec rake db:migrate db:test:prepare
-script: "bundle exec rake"
+- mysql -e 'create database huginn_test;'
+- bundle exec rake db:migrate db:test:prepare
+script: bundle exec rake
 notifications:
   irc:
     channels:
-      - "chat.freenode.net#huginn"
+    - chat.freenode.net#huginn
     template:
-      - "<%{author}> %{branch} - %{commit} (%{commit_message}): %{message}"
-      - "Change view : %{compare_url}"
-      - "Build details : %{build_url}"
+    - "<%{author}> %{branch} - %{commit} (%{commit_message}): %{message}"
+    - 'Change view : %{compare_url}'
+    - 'Build details : %{build_url}'

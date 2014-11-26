@@ -3,8 +3,7 @@ require 'spec_helper'
 describe Agents::SlackAgent do
   before(:each) do
     @valid_params = {
-                      'auth_token' => 'token',
-                      'team_name' => 'testteam',
+                      'webhook_url' => 'https://hooks.slack.com/services/random1/random2/token',
                       'channel' => '#random',
                       'username' => "{{username}}",
                       'message' => "{{message}}"
@@ -25,8 +24,8 @@ describe Agents::SlackAgent do
       expect(@checker).to be_valid
     end
 
-    it "should require a auth_token" do
-      @checker.options['auth_token'] = nil
+    it "should require a webhook_url" do
+      @checker.options['webhook_url'] = nil
       expect(@checker).not_to be_valid
     end
 
@@ -34,12 +33,8 @@ describe Agents::SlackAgent do
       @checker.options['channel'] = nil
       expect(@checker).not_to be_valid
     end
-
-    it "should require a team_name" do
-      @checker.options['team_name'] = 'nil'
-      expect(@checker).to be_valid
-    end
   end
+
   describe "#receive" do
     it "receive an event without errors" do
       any_instance_of(Slack::Notifier) do |obj|

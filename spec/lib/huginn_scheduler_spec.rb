@@ -107,7 +107,7 @@ describe Rufus::Scheduler do
     it 'registers active SchedulerAgents' do
       @scheduler.schedule_scheduler_agents
 
-      expect(@scheduler.scheduler_agent_jobs.map(&:scheduler_agent)).to eq([@agent1, @agent2])
+      expect(@scheduler.scheduler_agent_jobs.map(&:scheduler_agent).sort_by(&:id)).to eq([@agent1, @agent2])
     end
 
     it 'unregisters disabled SchedulerAgents' do

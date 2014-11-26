@@ -106,7 +106,7 @@ class HuginnScheduler
   end
 
   def run!
-    tzinfo_friendly_timezone = ActiveSupport::TimeZone::MAPPING[ENV['TIMEZONE'].present? ? ENV['TIMEZONE'] : "Pacific Time (US & Canada)"]
+    tzinfo_friendly_timezone = ActiveSupport::TimeZone::MAPPING[ENV['TIMEZONE'].presence || "Pacific Time (US & Canada)"]
 
     # Schedule event propagation.
     @rufus_scheduler.every '1m' do

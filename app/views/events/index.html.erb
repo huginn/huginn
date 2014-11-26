@@ -18,7 +18,7 @@
 
         <% @events.each do |event| %>
           <% next unless event.agent %>
-          <tr>
+          <%= content_tag :tr, class: (highlighted?(event.id) ? 'hl' : nil) do %>
             <td><%= link_to event.agent.name, agent_path(event.agent) %></td>
             <td title='<%= event.created_at %>'><%= time_ago_in_words event.created_at %> ago</td>
             <td class='payload'><%= truncate event.payload.to_json, :length => 90, :omission => "" %></td>
@@ -29,19 +29,19 @@
                 <%= link_to 'Delete', event_path(event), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default" %>
               </div>
             </td>
-          </tr>
+          <% end %>
         <% end %>
         </table>
       </div>
 
-      <%= paginate @events, :theme => 'twitter-bootstrap-3' %>
+      <%= paginate @events, params: params.slice(:hl), theme: 'twitter-bootstrap-3' %>
 
       <br />
 
       <% if @agent %>
         <div class="btn-group">
-          <%= link_to '<span class="glyphicon glyphicon-chevron-left"></span> Back'.html_safe, agents_path, class: "btn btn-default" %>
-          <%= link_to '<span class="glyphicon glyphicon-random""></span> See all events'.html_safe, events_path, class: "btn btn-default" %>
+          <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, agents_path, class: "btn btn-default" %>
+          <%= link_to icon_tag('glyphicon-random') + ' See all events'.html_safe, events_path, class: "btn btn-default" %>
         </div>
       <% end %>
     </div>

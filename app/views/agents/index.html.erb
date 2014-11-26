@@ -10,9 +10,9 @@
       <br/>
 
       <div class="btn-group">
-        <%= link_to '<span class="glyphicon glyphicon-plus"></span> New Agent'.html_safe, new_agent_path, class: "btn btn-default" %>
-        <%= link_to '<span class="glyphicon glyphicon-refresh"></span> Run event propagation'.html_safe, propagate_agents_path, method: 'post', class: "btn btn-default" %>
-        <%= link_to '<span class="glyphicon glyphicon-random"></span> View diagram'.html_safe, diagram_path, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-plus') + ' New Agent', new_agent_path, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-refresh') + ' Run event propagation', propagate_agents_path, method: 'post', class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-random') + ' View diagram', diagram_path, class: "btn btn-default" %>
       </div>
     </div>
   </div>

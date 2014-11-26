@@ -111,7 +111,7 @@ class ScenarioImport
 
   def parse_file
     if data.blank? && file.present?
-      self.data = file.read
+      self.data = file.read.force_encoding(Encoding::UTF_8)
     end
   end
 
