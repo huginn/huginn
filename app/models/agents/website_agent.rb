@@ -120,7 +120,7 @@ module Agents
 
       # Check for optional fields
       if options['mode'].present?
-        errors.add(:base, "mode must be set to on_change or all") unless %w[on_change all].include?(options['mode'])
+        errors.add(:base, "mode must be set to on_change, all or merge") unless %w[on_change all merge].include?(options['mode'])
       end
 
       if options['expected_update_period_in_days'].present?
@@ -226,10 +226,12 @@ module Agents
       incoming_events.each do |event|
         interpolate_with(event) do
           url_to_scrape = event.payload['url']
-          valid_url = url_to_scrape =~ /^https?:\/\//i
-          docs = valid_url ? check_url(url_to_scrape) : []
+          docs = []
+          docs = check_url(url_to_scrape) if url_to_scrape =~ /^https?:\/\//i
           docs.each do |doc|
-            create_event payload: doc
+            new_payload = interpolated['mode'].to_s == "merge" ? event.payload.dup : {}
+            new_payload.merge! doc
+            create_event payload: new_payload
           end
         end
       end
@@ -252,7 +254,7 @@ module Agents
           end
         end
         true
-      when 'all', ''
+      when 'all', 'merge', ''
         true
       else
         raise "Illegal options[mode]: #{interpolated['mode']}"
