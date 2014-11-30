@@ -74,7 +74,7 @@ module Agents
 
       The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
 
-      The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload.
+      The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload. If you specify `merge` as the mode, it will retain the old payload and update it with the new values.
 
       In Liquid templating, the following variable is available:
 
