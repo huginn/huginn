@@ -29,9 +29,8 @@ module ActiveRecord::ConnectionAdapters
     module CharsetSupport
       def prepare_column_options(column, types)
         spec = super
-        conn = ActiveRecord::Base.connection
-        spec[:charset]   = column.charset.inspect if column.charset && column.charset != conn.charset
-        spec[:collation] = column.collation.inspect if column.collation && column.collation != conn.collation
+        spec[:charset]   = column.charset.inspect if column.charset && column.charset != charset
+        spec[:collation] = column.collation.inspect if column.collation && column.collation != collation
         spec
       end
 
@@ -67,9 +66,12 @@ module ActiveRecord::ConnectionAdapters
       def create_database(name, options = {})
         # utf8mb4 is used in column definitions; use utf8 for
         # databases.
-        if options[:charset] == 'utf8mb4'
-          options = options.merge(charset: 'utf8')
-        end
+        [:charset, :collation].each { |key|
+          case options[key]
+          when /\A(utf8mb4(_\w*)?)\z/
+            options = options.merge(key => "utf8#{$2}")
+          end
+        }
         super(name, options)
       end
     end
