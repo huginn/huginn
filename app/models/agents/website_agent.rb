@@ -155,13 +155,11 @@ module Agents
       return unless in_url.present?
 
       Array(in_url).each do |url|
-        check_url(url).map do |doc|
-          create_event payload: doc
-        end
+        check_url(url)
       end
     end
 
-    def check_url(url)
+    def check_url(url, payload = {})
       log "Fetching #{url}"
       response = faraday.get(url)
       raise "Failed: #{response.inspect}" unless response.success?
@@ -174,13 +172,12 @@ module Agents
         end
         doc = parse(body)
 
-        results = []
         if extract_full_json?
           if store_payload!(previous_payloads(1), doc)
             log "Storing new result for '#{name}': #{doc.inspect}"
-            results << doc
+            create_event payload: payload.merge(doc)
           end
-          return results
+          return
         end
 
         output =
@@ -211,28 +208,21 @@ module Agents
 
           if store_payload!(old_events, result)
             log "Storing new parsed result for '#{name}': #{result.inspect}"
-            results << result
+            create_event payload: payload.merge(result)
           end
         end
-
-        results
       }
     rescue => e
       error "Error when fetching url: #{e.message}\n#{e.backtrace.join("\n")}"
-      return []
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
           url_to_scrape = event.payload['url']
-          docs = []
-          docs = check_url(url_to_scrape) if url_to_scrape =~ /^https?:\/\//i
-          docs.each do |doc|
-            new_payload = interpolated['mode'].to_s == "merge" ? event.payload.dup : {}
-            new_payload.merge! doc
-            create_event payload: new_payload
-          end
+          next unless url_to_scrape =~ /^https?:\/\//i
+          check_url(url_to_scrape,
+                    interpolated['mode'].to_s == "merge" ? event.payload : {})
         end
       end
     end
