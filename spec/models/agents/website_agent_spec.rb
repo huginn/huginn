@@ -521,6 +521,16 @@ fire: hot
 
         expect(Event.last.payload['response_info']).to eq('The reponse from XKCD was 200 OK.')
       end
+
+      it "should support merging of events" do
+        expect {
+          @checker.options = @valid_options
+          @checker.options[:mode] = "merge"
+          @checker.receive([@event])
+        }.to change { Event.count }.by(1)
+        last_payload = Event.last.payload
+        expect(last_payload['link']).to eq('Random')
+      end
     end
   end
 
