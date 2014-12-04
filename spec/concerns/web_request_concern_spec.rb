@@ -19,6 +19,18 @@ describe WebRequestConcern do
       faraday = web_request.faraday
       expect(faraday.builder.handlers).to include(FaradayMiddleware::FollowRedirects)
     end
+
+    it 'should enable SSL verification by default' do
+      web_request = WebRequestConcernTest.new()
+      faraday = web_request.faraday
+      expect(faraday.ssl.verify).to eq(true)
+    end
+
+    it 'should disable SSL verification if disable_ssl_verification option is true' do
+      web_request = WebRequestConcernTest.new(options: { disable_ssl_verification: true })
+      faraday = web_request.faraday
+      expect(faraday.ssl.verify).to eq(false)
+    end
   end
 
   describe '#validate_web_request_options!' do
@@ -67,6 +79,20 @@ describe WebRequestConcern do
       it 'should be invalid if basic_auth_credentials raises error' do
         web_request = WebRequestConcernTest.new(options: { basic_auth: 'invalid' })
         expect { web_request.basic_auth_credentials }.to raise_error(ArgumentError)
+        web_request.validate_web_request_options!
+        expect(web_request.errors[:base]).to_not be_empty
+      end
+    end
+
+    describe 'disable_ssl_verification' do
+      it 'should be a boolean' do
+        web_request = WebRequestConcernTest.new(options: { disable_ssl_verification: true } )
+        web_request.validate_web_request_options!
+        expect(web_request.errors[:base]).to be_empty
+      end
+
+      it 'should be invalid if not a boolean' do
+        web_request = WebRequestConcernTest.new(options: { disable_ssl_verification: 42 } )
         web_request.validate_web_request_options!
         expect(web_request.errors[:base]).to_not be_empty
       end
