@@ -126,7 +126,7 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 if ENV['ON_HEROKU'] || ENV['HEROKU_POSTGRESQL_ROSE_URL'] || File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
   gem 'pg'
   gem 'unicorn'
-  gem 'rails_12factor'
+  gem 'rails_12factor', group: :production
 else
   gem 'pg', platform: :ruby_18
   gem 'unicorn', platform: :ruby_18
