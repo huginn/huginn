@@ -47,6 +47,9 @@
                 Visibility(points, map);
             }
         });
+        if(circles.length > 0){
+            $(".checkbox").removeClass("hidden");
+        }
     });
 
   </script>
@@ -56,7 +59,7 @@
   </p>
 <% end %>
 
-<div class="checkbox">
+<div class="hidden checkbox">
     <label>
         <input id="toggle" type="checkbox" value="">
         Show accuracy of locations
