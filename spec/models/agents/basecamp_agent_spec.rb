@@ -26,6 +26,8 @@ describe Agents::BasecampAgent do
     @checker.service = services(:generic)
     @checker.user = users(:jane)
     @checker.save!
+
+    stub(services(:generic)).refresh_token!
   end
 
   describe "validating" do
