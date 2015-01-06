@@ -41,5 +41,5 @@ window.map_marker = (map, options = {}) ->
           offset: '100%'
         }
       ]
-    
+
     return arrow

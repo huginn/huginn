@@ -28,27 +28,27 @@
     points.push(map_marker(map, loc));
     <% end %>
 
-    function Visibility(group, map) {
+    function toggleAccuracy(group, map) {
         for (var i = 0; i < group.length; i++) {
             group[i].setMap(map);
         }
     }
 
-    Visibility(circles, null);
+    toggleAccuracy(circles, null);
 
     $(document).ready(function() {
         $("input#toggle").on("click", function() {
             if($(this).is(":checked")){
-                Visibility(circles, map);
-                Visibility(points, null);
+                toggleAccuracy(circles, map);
+                toggleAccuracy(points, null);
             }
-            else if($(this).is(":not(:checked)")){
-                Visibility(circles, null);
-                Visibility(points, map);
+            else {
+                toggleAccuracy(circles, null);
+                toggleAccuracy(points, map);
             }
         });
         if(circles.length > 0){
-            $(".checkbox").removeClass("hidden");
+            $(".toggle-accuracy").removeClass("hidden");
         }
     });
 
@@ -59,7 +59,7 @@
   </p>
 <% end %>
 
-<div class="hidden checkbox">
+<div class="hidden toggle-accuracy checkbox">
     <label>
         <input id="toggle" type="checkbox" value="">
         Show accuracy of locations
