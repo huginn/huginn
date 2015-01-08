@@ -12,44 +12,43 @@
   <script type="text/javascript">
     var mapOptions = {
       center: new google.maps.LatLng(<%= events.first.lat %>, <%= events.first.lng %>),
-      zoom:15,
-      mapTypeId:google.maps.MapTypeId.ROADMAP
+      zoom: 15,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
     var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
     var circles = [];
     var points = [];
     <% events.each do |event| %>
-    var loc = <%= Utils.jsonify(event.location) %>;
-    if (loc.radius > 1) {
+      var loc = <%= Utils.jsonify(event.location) %>;
+      if (loc.radius > 1) {
         circles.push(map_marker(map, loc));
-    }
-    delete loc.radius;
-    points.push(map_marker(map, loc));
+      }
+      delete loc.radius;
+      points.push(map_marker(map, loc));
     <% end %>
 
     function toggleAccuracy(group, map) {
-        for (var i = 0; i < group.length; i++) {
-            group[i].setMap(map);
-        }
+      for (var i = 0; i < group.length; i++) {
+        group[i].setMap(map);
+      }
     }
 
     toggleAccuracy(circles, null);
 
     $(document).ready(function() {
-        $("input#toggle").on("click", function() {
-            if($(this).is(":checked")){
-                toggleAccuracy(circles, map);
-                toggleAccuracy(points, null);
-            }
-            else {
-                toggleAccuracy(circles, null);
-                toggleAccuracy(points, map);
-            }
-        });
-        if(circles.length > 0){
-            $(".toggle-accuracy").removeClass("hidden");
+      $("input#toggle").on("click", function() {
+        if($(this).is(":checked")){
+          toggleAccuracy(circles, map);
+          toggleAccuracy(points, null);
+        } else {
+          toggleAccuracy(circles, null);
+          toggleAccuracy(points, map);
         }
+      });
+      if(circles.length > 0){
+        $(".toggle-accuracy").removeClass("hidden");
+      }
     });
 
   </script>
@@ -60,10 +59,10 @@
 <% end %>
 
 <div class="hidden toggle-accuracy checkbox">
-    <label>
-        <input id="toggle" type="checkbox" value="">
-        Show accuracy of locations
-    </label>
+  <label>
+    <input id="toggle" type="checkbox" value="">
+    Show accuracy of locations
+  </label>
 </div>
 
 <h3>POST URL</h3>
