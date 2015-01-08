@@ -2,7 +2,7 @@ window.map_marker = (map, options = {}) ->
   pos = new google.maps.LatLng(options.lat, options.lng)
 
   if options.radius > 0
-    new google.maps.Circle
+    marker = new google.maps.Circle
       map: map
       strokeColor: '#FF0000'
       strokeOpacity: 0.8
@@ -11,11 +11,13 @@ window.map_marker = (map, options = {}) ->
       fillOpacity: 0.35
       center: pos
       radius: options.radius
+    return marker
   else
-    new google.maps.Marker
+    marker = new google.maps.Marker
       map: map
       position: pos
       title: 'Recorded Location'
+    return marker
 
   if options.course
     p1 = new LatLon(pos.lat(), pos.lng())
@@ -30,7 +32,7 @@ window.map_marker = (map, options = {}) ->
     lineSymbol =
       path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
 
-    new google.maps.Polyline
+    arrow = new google.maps.Polyline
       map: map
       path: lineCoordinates
       icons: [
@@ -39,3 +41,5 @@ window.map_marker = (map, options = {}) ->
           offset: '100%'
         }
       ]
+
+    return arrow
