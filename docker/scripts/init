@@ -24,8 +24,6 @@ grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | cut -d=
     eval "echo \"$var=\\\"\${HUGINN_$var:-\$$var}\\\"\""
   done | grep -v -e ^= > /app/.env
 
-cat /app/.env
-
 chmod ugo+r /app/.env
 source /app/.env
 
@@ -62,11 +60,13 @@ EOF
 # prepare the supervisord bootstrap service script
 
 cat <<BOOTSTRAP > /tmp/bootstrap.sh
-#!/bin/bash -xe
+#!/bin/bash -e
 source /app/.env
 
-# start mysql server if \${DATABASE_HOST} is localhost
-if [ "\${DATABASE_HOST}" = "localhost" ]; then
+echo DATABASE_HOST=\${DATABASE_HOST}
+
+# start mysql server if \${DATABASE_HOST} is the .env.example default
+if [ "\${DATABASE_HOST}" = "your-domain-here.com" ]; then
   if [ "\${DATABASE_ADAPTER}" = "postgres" ]; then
     echo "DATABASE_ADAPTER 'postgres' is not supported internally. Please provide DATABASE_HOST."
     exit 1
@@ -107,6 +107,7 @@ EOF
       echo "Failed to start mysql server"
       exit 1
     fi
+    echo -n .
     sleep 1
   done
 
@@ -138,7 +139,7 @@ stopwaitsecs=1
 EOF
 
 cat <<FOREMAN > /tmp/foreman.sh
-#!/bin/bash -xe
+#!/bin/bash -e
 source /app/.env
 
 # Assuming we have a created database, run the migrations and seed it idempotently.
