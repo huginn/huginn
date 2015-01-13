@@ -7,7 +7,7 @@ set -e
 ON_HEROKU=${ON_HEROKU:-true}
 
 # Shallow clone the huginn project repo
-git clone --depth 1 https://github.com/ianblenke/huginn /app
+git clone --depth 1 https://github.com/cantino/huginn /app
 
 cd /app
 
