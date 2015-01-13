@@ -13,9 +13,11 @@ RUN apt-get update && \
       libgdbm-dev libreadline-dev libncurses5-dev libffi-dev \
       libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev \
       graphviz libgraphviz-dev \
-      ruby2.1 ruby2.1-dev supervisor && \
+      ruby2.1 ruby2.1-dev supervisor python-pip && \
     gem install --no-ri --no-rdoc bundler && \
     rm -rf /var/lib/apt/lists/*
+
+RUN pip install supervisor-stdout
 
 ADD scripts/ /scripts
 RUN chmod 755 /scripts/setup /scripts/init
