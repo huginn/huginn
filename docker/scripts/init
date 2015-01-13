@@ -85,6 +85,7 @@ stdout_events_enabled=true
 stderr_events_enabled=true
 EOF
   supervisorctl reread
+  supervisorctl add mysqld
 
   # fix permissions and ownership of /var/lib/mysql
   chown -R mysql:mysql /var/lib/mysql
