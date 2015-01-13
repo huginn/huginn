@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 cd /app
 
@@ -44,7 +44,7 @@ cat > /etc/supervisor/conf.d/supervisord.conf <<EOF
 [supervisord]
 nodaemon = true
 user = root
-logfile = /dev/stdout
+;stdout_logfile = AUTO
 loglevel = debug
 
 [unix_http_server]
@@ -134,7 +134,7 @@ stopwaitsecs=1
 EOF
 
 cat <<FOREMAN > /tmp/foreman.sh
-#!/bin/bash
+#!/bin/bash -xe
 # Assuming we have a created database, run the migrations and seed it idempotently.
 [ -z "${DO_NOT_MIGRATE}" ] && sudo -u huginn -EH bundle exec rake db:migrate
 [ -z "${DO_NOT_SEED}" ] && sudo -u huginn -EH bundle exec rake db:seed
