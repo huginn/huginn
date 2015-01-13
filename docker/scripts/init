@@ -61,9 +61,11 @@ EOF
 
 cat <<BOOTSTRAP > /tmp/bootstrap.sh
 #!/bin/bash -xe
-# start mysql server if ${DATABASE_HOST} is localhost
-if [ "${DATABASE_HOST}" = "localhost" ]; then
-  if [ "${DATABASE_ADAPTER}" = "postgres" ]; then
+source /app/.env
+
+# start mysql server if \${DATABASE_HOST} is localhost
+if [ "\${DATABASE_HOST}" = "localhost" ]; then
+  if [ "\${DATABASE_ADAPTER}" = "postgres" ]; then
     echo "DATABASE_ADAPTER 'postgres' is not supported internally. Please provide DATABASE_HOST."
     exit 1
   fi
@@ -96,20 +98,20 @@ EOF
 
   # wait for mysql server to start (max 120 seconds)
   timeout=120
-  while ! mysqladmin -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD} status >/dev/null 2>&1
+  while ! mysqladmin -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} status >/dev/null 2>&1
   do
     (( timeout = timeout - 1 ))
-    if [ $timeout -eq 0 ]; then
+    if [ \$timeout -eq 0 ]; then
       echo "Failed to start mysql server"
       exit 1
     fi
     sleep 1
   done
 
-  if ! echo "USE ${DATABASE_NAME}" | mysql -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD} >/dev/null 2>&1; then
+  if ! echo "USE \${DATABASE_NAME}" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} >/dev/null 2>&1; then
     DB_INIT="yes"
-    echo "CREATE DATABASE IF NOT EXISTS \`${DATABASE_NAME}\` DEFAULT CHARACTER SET \`utf8\` COLLATE \`utf8_unicode_ci\`;" | mysql -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD}
-    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \`${DATABASE_NAME}\`.* TO 'root'@'localhost';" | mysql -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD}
+    echo "CREATE DATABASE IF NOT EXISTS \\\`\${DATABASE_NAME}\\\` DEFAULT CHARACTER SET \\\`utf8\\\` COLLATE \\\`utf8_unicode_ci\\\`;" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
+    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \\\`${DATABASE_NAME}\\\`.* TO 'root'@'localhost';" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
   fi
 fi
 supervisorctl start huginn >/dev/null
@@ -135,15 +137,17 @@ EOF
 
 cat <<FOREMAN > /tmp/foreman.sh
 #!/bin/bash -xe
-# Assuming we have a created database, run the migrations and seed it idempotently.
-[ -z "${DO_NOT_MIGRATE}" ] && sudo -u huginn -EH bundle exec rake db:migrate
-[ -z "${DO_NOT_SEED}" ] && sudo -u huginn -EH bundle exec rake db:seed
+source /app/.env
 
-[ -n "$INTENTIONALLY_SLEEP" ] && sleep $INTENTIONALLY_SLEEP
+# Assuming we have a created database, run the migrations and seed it idempotently.
+[ -z "\${DO_NOT_MIGRATE}" ] && sudo -u huginn -EH bundle exec rake db:migrate
+[ -z "\${DO_NOT_SEED}" ] && sudo -u huginn -EH bundle exec rake db:seed
+
+[ -n "\$INTENTIONALLY_SLEEP" ] && sleep \$INTENTIONALLY_SLEEP
 
 # Fixup the Procfile and prepare the PORT
-[ -n "${DO_NOT_RUN_JOBS}" ] && perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
-perl -pi -e 's/rails server$/rails server -p \$PORT/' /app/Procfile
+[ -n "\${DO_NOT_RUN_JOBS}" ] && perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
+perl -pi -e 's/rails server\$/rails server -p \\\$PORT/' /app/Procfile
 export PORT
 
 # Start huginn
