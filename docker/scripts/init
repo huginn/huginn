@@ -66,7 +66,7 @@ source /app/.env
 echo DATABASE_HOST=\${DATABASE_HOST}
 
 # start mysql server if \${DATABASE_HOST} is the .env.example default
-if [ "\${DATABASE_HOST}" = "your-domain-here.com" ]; then
+if [ "\${DATABASE_HOST}" = "your-domain-here.com" -o "\${DATABASE_HOST}" = "" ]; then
   if [ "\${DATABASE_ADAPTER}" = "postgres" ]; then
     echo "DATABASE_ADAPTER 'postgres' is not supported internally. Please provide DATABASE_HOST."
     exit 1
