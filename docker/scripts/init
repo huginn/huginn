@@ -45,7 +45,6 @@ cat > /etc/supervisor/conf.d/supervisord.conf <<EOF
 nodaemon = true
 user = root
 stdout_logfile = AUTO
-loglevel = debug
 
 [unix_http_server]
 file=/var/run/supervisor.sock   ; (the path to the socket file)
