@@ -44,11 +44,11 @@ cat > /etc/supervisor/conf.d/supervisord.conf <<EOF
 [supervisord]
 nodaemon = true
 user = root
-;stdout_logfile = AUTO
+stdout_logfile = AUTO
 loglevel = debug
 
 [unix_http_server]
-file=/tmp/supervisor.sock   ; (the path to the socket file)
+file=/var/run/supervisor.sock   ; (the path to the socket file)
 
 [eventlistener:stdout]
 command = supervisor_stdout
@@ -80,7 +80,7 @@ autorestart=true
 stdout_events_enabled=true
 stderr_events_enabled=true
 EOF
-  supervisorctl reload
+  supervisorctl reread
 
   # fix permissions and ownership of /var/lib/mysql
   chown -R mysql:mysql /var/lib/mysql
