@@ -73,7 +73,7 @@ module Agents
     def handle_payload(payload)
       location = Location.new(payload)
 
-      if (location.present? && (payload["accuracy"] < interpolated[:max_accuracy]))
+      if location.present? && (!interpolated[:max_accuracy].present? || payload["accuracy"] < interpolated[:max_accuracy])
         create_event payload: payload, location: location
       end
     end
