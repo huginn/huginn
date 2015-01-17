@@ -2,7 +2,10 @@ require 'spec_helper'
 
 describe Agents::UserLocationAgent do
   before do
-    @agent = Agent.build_for_type('Agents::UserLocationAgent', users(:bob), :name => 'something', :options => { :secret => 'my_secret' })
+    @agent = Agent.build_for_type('Agents::UserLocationAgent', users(:bob),
+                                  :name => 'something',
+                                  :options => { :secret => 'my_secret',
+                                    :max_accuracy => '50' })
     @agent.save!
   end
 
@@ -42,6 +45,32 @@ describe Agents::UserLocationAgent do
     }.to change { @agent.events.count }.by(1)
 
     expect(@agent.events.last.payload).to eq({ 'longitude' => 123, 'latitude' => 45, 'something' => 'else' })
+    expect(@agent.events.last.lat).to eq(45)
+    expect(@agent.events.last.lng).to eq(123)
+  end
+
+  it 'does not create event when too inaccurate' do
+    event = Event.new
+    event.agent = agents(:bob_weather_agent)
+    event.created_at = Time.now
+    event.payload = { 'longitude' => 123, 'latitude' => 45, 'accuracy' => '100', 'something' => 'else' }
+
+    expect {
+      @agent.receive([event])
+    }.to change { @agent.events.count }.by(0)
+  end
+
+  it 'does create event when accurate enough' do
+    event = Event.new
+    event.agent = agents(:bob_weather_agent)
+    event.created_at = Time.now
+    event.payload = { 'longitude' => 123, 'latitude' => 45, 'accuracy' => '20', 'something' => 'else' }
+
+    expect {
+      @agent.receive([event])
+    }.to change { @agent.events.count }.by(1)
+
+    expect(@agent.events.last.payload).to eq({ 'longitude' => 123, 'latitude' => 45, 'accuracy' => '20', 'something' => 'else' })
     expect(@agent.events.last.lat).to eq(45)
     expect(@agent.events.last.lng).to eq(123)
   end
