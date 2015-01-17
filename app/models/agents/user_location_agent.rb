@@ -11,7 +11,7 @@ module Agents
 
         Your POST path will be `https://#{ENV['DOMAIN']}/users/#{user.id}/update_location/:secret` where `:secret` is specified in your options.
 
-        If you want to only keep more precise locations, set `max_accuracy` to the upper bound, in meters.
+        If you want to only keep more precise locations, set `max_accuracy` to the upper bound, in meters. The default name for this field is `accuracy`, but you can change this by setting a value for `accuracy_field`.
       MD
     end
 
@@ -73,8 +73,14 @@ module Agents
     def handle_payload(payload)
       location = Location.new(payload)
 
-      if location.present? && (!interpolated[:max_accuracy].present? || !payload["accuracy"] || payload["accuracy"] < interpolated[:max_accuracy])
-        if !payload["accuracy"]
+      if interpolated[:accuracy_field].present?
+        accuracy_field = interpolated[:accuracy_field]
+      else
+        accuracy_field = 'accuracy'
+      end
+
+      if location.present? && (!interpolated[:max_accuracy].present? || !payload[accuracy_field] || payload[accuracy_field] < interpolated[:max_accuracy])
+        if !payload[accuracy_field]
           log "Accuracy field missing; all locations will be kept"
         end
         create_event payload: payload, location: location
