@@ -74,4 +74,20 @@ describe Agents::UserLocationAgent do
     expect(@agent.events.last.lat).to eq(45)
     expect(@agent.events.last.lng).to eq(123)
   end
+
+  it 'allows a custom accuracy field' do
+    event = Event.new
+    event.agent = agents(:bob_weather_agent)
+    event.created_at = Time.now
+    @agent.options['accuracy_field'] = 'estimated_to'
+    event.payload = { 'longitude' => 123, 'latitude' => 45, 'estimated_to' => '20', 'something' => 'else' }
+
+    expect {
+      @agent.receive([event])
+    }.to change { @agent.events.count }.by(1)
+
+    expect(@agent.events.last.payload).to eq({ 'longitude' => 123, 'latitude' => 45, 'estimated_to' => '20', 'something' => 'else' })
+    expect(@agent.events.last.lat).to eq(45)
+    expect(@agent.events.last.lng).to eq(123)
+  end
 end

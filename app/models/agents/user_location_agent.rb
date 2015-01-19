@@ -73,14 +73,10 @@ module Agents
     def handle_payload(payload)
       location = Location.new(payload)
 
-      if interpolated[:accuracy_field].present?
-        accuracy_field = interpolated[:accuracy_field]
-      else
-        accuracy_field = 'accuracy'
-      end
+      accuracy_field = interpolated[:accuracy_field].presence || 'accuracy'
 
       if location.present? && (!interpolated[:max_accuracy].present? || !payload[accuracy_field] || payload[accuracy_field].to_i < interpolated[:max_accuracy].to_i)
-        if !payload[accuracy_field]
+        if interpolated[:max_accuracy].present? && !payload[accuracy_field].present?
           log "Accuracy field missing; all locations will be kept"
         end
         create_event payload: payload, location: location
