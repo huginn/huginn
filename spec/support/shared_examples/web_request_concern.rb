@@ -73,6 +73,12 @@ shared_examples_for WebRequestConcern do
       agent.options['disable_ssl_verification'] = false
       expect(agent).to be_valid
 
+      agent.options['disable_ssl_verification'] = 'true'
+      expect(agent).to be_valid
+
+      agent.options['disable_ssl_verification'] = 'false'
+      expect(agent).to be_valid
+
       agent.options['disable_ssl_verification'] = 'blah'
       expect(agent).not_to be_valid
 
@@ -111,9 +117,29 @@ shared_examples_for WebRequestConcern do
       expect(agent.faraday.ssl.verify).to eq(true)
     end
 
+    it "should enable SSL verification when nil" do
+      agent.options['disable_ssl_verification'] = nil
+      expect(agent.faraday.ssl.verify).to eq(true)
+    end
+
+    it "should disable SSL verification if disable_ssl_verification option is 'true'" do
+      agent.options['disable_ssl_verification'] = 'true'
+      expect(agent.faraday.ssl.verify).to eq(false)
+    end
+
     it "should disable SSL verification if disable_ssl_verification option is true" do
       agent.options['disable_ssl_verification'] = true
       expect(agent.faraday.ssl.verify).to eq(false)
+    end
+
+    it "should not disable SSL verification if disable_ssl_verification option is 'false'" do
+      agent.options['disable_ssl_verification'] = 'false'
+      expect(agent.faraday.ssl.verify).to eq(true)
+    end
+
+    it "should not disable SSL verification if disable_ssl_verification option is false" do
+      agent.options['disable_ssl_verification'] = false
+      expect(agent.faraday.ssl.verify).to eq(true)
     end
   end
 end
