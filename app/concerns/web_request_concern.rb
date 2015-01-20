@@ -9,7 +9,7 @@ module WebRequestConcern
       errors.add(:base, "user_agent must be a string") unless options['user_agent'].is_a?(String)
     end
 
-    if options['disable_ssl_verification'].present? && ![true, false, 'true', 'false'].include?(options['disable_ssl_verification'])
+    if options['disable_ssl_verification'].present? && boolify(options['disable_ssl_verification']).nil?
       errors.add(:base, "if provided, disable_ssl_verification must be true or false")
     end
 
