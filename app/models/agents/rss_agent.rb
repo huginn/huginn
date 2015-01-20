@@ -22,6 +22,7 @@ module Agents
           * `expected_update_period_in_days` - How often you expect this RSS feed to change.  If more than this amount of time passes without an update, the Agent will mark itself as not working.
           * `headers` - When present, it should be a hash of headers to send with the request.
           * `basic_auth` - Specify HTTP basic auth parameters: `"username:password"`, or `["username", "password"]`.
+          * `disable_ssl_verification` - Set to `true` to disable ssl verification.
           * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
       MD
     end
