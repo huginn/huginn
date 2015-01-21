@@ -10,6 +10,8 @@ module Agents
 
 
         Your POST path will be `https://#{ENV['DOMAIN']}/users/#{user.id}/update_location/:secret` where `:secret` is specified in your options.
+
+        If you want to only keep more precise locations, set `max_accuracy` to the upper bound, in meters. The default name for this field is `accuracy`, but you can change this by setting a value for `accuracy_field`.
       MD
     end
 
@@ -34,7 +36,10 @@ module Agents
     end
 
     def default_options
-      { 'secret' => SecureRandom.hex(7) }
+      {
+        'secret' => SecureRandom.hex(7),
+        'max_accuracy' => ''
+      }
     end
 
     def validate_options
@@ -68,7 +73,12 @@ module Agents
     def handle_payload(payload)
       location = Location.new(payload)
 
-      if location.present?
+      accuracy_field = interpolated[:accuracy_field].presence || 'accuracy'
+
+      if location.present? && (!interpolated[:max_accuracy].present? || !payload[accuracy_field] || payload[accuracy_field].to_i < interpolated[:max_accuracy].to_i)
+        if interpolated[:max_accuracy].present? && !payload[accuracy_field].present?
+          log "Accuracy field missing; all locations will be kept"
+        end
         create_event payload: payload, location: location
       end
     end
