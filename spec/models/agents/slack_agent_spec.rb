@@ -33,6 +33,17 @@ describe Agents::SlackAgent do
       @checker.options['channel'] = nil
       expect(@checker).not_to be_valid
     end
+
+    it "should allow an icon" do
+      @checker.options['icon_emoji'] = nil
+      expect(@checker).to be_valid
+      @checker.options['icon_emoji'] = ":something:"
+      expect(@checker).to be_valid
+      @checker.options['icon_url'] = "http://something.com/image.png"
+      expect(@checker).to be_valid
+      @checker.options['icon_emoji'] = "something"
+      expect(@checker).to be_valid
+    end
   end
 
   describe "#receive" do

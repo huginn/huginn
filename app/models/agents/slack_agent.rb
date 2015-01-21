@@ -20,7 +20,10 @@ module Agents
       Once the webhook has been setup it can be used to post to other channels or ping team members.
       To send a private message to team-mate, assign his username as `@username` to the channel option.
       To communicate with a different webhook on slack, assign your custom webhook name to the webhook option.
-      Messages can also be formatted using [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid)
+      Messages can also be formatted using [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid).
+
+      Finally, you can set a custom icon for this webhook in `icon`, either as [emoji](http://unicodey.com/emoji-data/table.htm) or an URL to an image.
+      Leaving this field blank will use the default icon for a webhook.
     MD
 
     def default_options
@@ -29,6 +32,7 @@ module Agents
         'channel' => '#general',
         'username' => DEFAULT_USERNAME,
         'message' => "Hey there, It's Huginn",
+        'icon' => '',
       }
     end
 
@@ -67,7 +71,11 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         opts = interpolated(event)
-        slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username]
+        if /^:/.match(opts[:icon])
+          slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username], icon_emoji: opts[:icon]
+        else
+          slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username], icon_url: opts[:icon]
+        end
       end
     end
   end
