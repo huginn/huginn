@@ -1,4 +1,5 @@
 require 'securerandom'
+require 'haversine'
 
 module Agents
   class UserLocationAgent < Agent
@@ -38,7 +39,8 @@ module Agents
     def default_options
       {
         'secret' => SecureRandom.hex(7),
-        'max_accuracy' => ''
+        'max_accuracy' => '',
+        'distance' => '',
       }
     end
 
@@ -75,11 +77,25 @@ module Agents
 
       accuracy_field = interpolated[:accuracy_field].presence || 'accuracy'
 
-      if location.present? && (!interpolated[:max_accuracy].present? || !payload[accuracy_field] || payload[accuracy_field].to_i < interpolated[:max_accuracy].to_i)
+      def accurate_enough?(payload, accuracy_field)
+        !interpolated[:max_accuracy].present? || !payload[accuracy_field] || payload[accuracy_field].to_i < interpolated[:max_accuracy].to_i
+      end
+
+      def far_enough?(payload)
+        if memory['last_location'].present?
+          travel = Haversine.distance(memory['last_location']['latitude'].to_i, memory['last_location']['longitude'].to_i, payload['latitude'].to_i, payload['longitude'].to_i).to_meters
+          !interpolated[:distance].present? || travel > interpolated[:distance].to_i
+        else # for the first run, before "last_location" exists
+          true
+        end
+      end
+
+      if location.present? && accurate_enough?(payload, accuracy_field) && far_enough?(payload)
         if interpolated[:max_accuracy].present? && !payload[accuracy_field].present?
           log "Accuracy field missing; all locations will be kept"
         end
         create_event payload: payload, location: location
+        memory["last_location"] = payload
       end
     end
   end

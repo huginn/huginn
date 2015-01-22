@@ -31,6 +31,9 @@ gem 'omniauth-tumblr'
 gem 'dropbox-api'
 gem 'omniauth-dropbox'
 
+# UserLocationAgent
+gem 'haversine'
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'
