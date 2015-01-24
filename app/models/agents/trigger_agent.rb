@@ -13,7 +13,7 @@ module Agents
 
       The `value` can be a single value or an array of values. In the case of an array, if one or more values match then the rule matches. 
 
-      All rules must match for the Agent to match.  The resulting Event will have a payload message of `message`.  You can use liquid templating in the `message, have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
+      All rules must match for the Agent to match.  The resulting Event will have a payload message of `message`, plus any additional keys not one of the TriggerAgent config keys (`rules`, `keep_event`, `expected_receive_period_in_days`).  You can use liquid templating in the `message` and other keys; have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
       Set `keep_event` to `true` if you'd like to re-emit the incoming event, optionally merged with 'message' when provided.
 
@@ -23,7 +23,7 @@ module Agents
     event_description <<-MD
       Events look like this:
 
-          { "message": "Your message" }
+          { "message": "Your message", "key1": "Your key1" }
     MD
 
     def validate_options
@@ -88,12 +88,18 @@ module Agents
           end
         end
 
+        reserved = ['rules', 'keep_event', 'expected_receive_period_in_days']
         if match
           if keep_event?
             payload = event.payload.dup
             payload['message'] = opts['message'] if opts['message'].present?
           else
             payload = { 'message' => opts['message'] }
+          end
+          for key in opts.keys
+            if not(reserved.include? key)
+              payload[key] = opts[key]
+            end
           end
 
           create_event :payload => payload
