@@ -40,7 +40,7 @@ module Agents
 
       Use it with a trigger agent to shape your payload!
 
-      A hash of event details. See the [Google Calendar API docs](https://developers.google.com/google-apps/calendar/v3/reference/events/insert)
+      By default, publish using the `insert` method which requires a hash of event details. See the [Google Calendar API docs](https://developers.google.com/google-apps/calendar/v3/reference/events/insert)
 
       Example payload for trigger agent:
       <pre><code>{
@@ -56,6 +56,15 @@ module Agents
           }
         }
       }</code></pre>
+
+      Alternatively, set the `method` parameter to `quickadd` to use the `quickadd` method, which takes a text string describing what, where, and when.  See the [Google Calendar API docs](https://developers.google.com/google-apps/calendar/v3/reference/events/insert) and [Quick Add synax](https://support.google.com/calendar/answer/36604?hl=en)
+
+      Example payload for trigger agent:
+      <pre><code>{
+        "method": "quickadd",
+        "message": "Brunch with Mom at Java 11am Sunday"
+      }</code></pre>
+
     MD
 
     event_description <<-MD
@@ -93,8 +102,15 @@ module Agents
      incoming_events.each do |event|
         calendar = GoogleCalendar.new(options, Rails.logger)
 
-        calendar_event = JSON.parse(calendar.publish_as(options['calendar_id'], event.payload["message"]).response.body)
-  
+        # publish using quickadd or insert; default insert
+        if event.payload.key?("method") && event.payload["method"] == "quickadd"
+          log "publish - quickadd "+event.payload["message"]
+          response = calendar.quickadd_as(options['calendar_id'], event.payload["message"])
+        else
+          log "publish - insert "+event.payload["message"] 
+          response = calendar.publish_as(options['calendar_id'], event.payload["message"])
+        end
+        calendar_event = JSON.parse(response.response.body)
         create_event :payload => {
           'success' => true,
           'published_calendar_event' => calendar_event,
