@@ -6,7 +6,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 
 ![the origin of the name](doc/imgs/the-name.png)
 
-#### We're just getting started, but here are some of the things that you can do with Huginn right now:
+#### Here are some of the things that you can do with Huginn right now:
 
 * Track the weather and get an email when it's going to rain (or snow) tomorrow ("Don't forget your umbrella!")
 * List terms that you care about and receive emails when their occurrence on Twitter changes.  (For example, want to know when something interesting has happened in the world of Machine Learning?  Huginn will watch the term "machine learning" on Twitter and tell you when there is a large spike.)
@@ -24,7 +24,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cantino/huginn?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in our [Gitter room](https://gitter.im/cantino/huginn) and [IRC channel](https://kiwiirc.com/client/irc.freenode.net/?nick=huginn-user|?#huginn) (\#huginn on Freenode) to discuss the project.
+Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, and join us in our [Gitter room](https://gitter.im/cantino/huginn) to discuss the project.
 
 ### We need your help!
 
