@@ -9,6 +9,10 @@ module WebRequestConcern
       errors.add(:base, "user_agent must be a string") unless options['user_agent'].is_a?(String)
     end
 
+    if options['disable_ssl_verification'].present? && boolify(options['disable_ssl_verification']).nil?
+      errors.add(:base, "if provided, disable_ssl_verification must be true or false")
+    end
+
     unless headers(options['headers']).is_a?(Hash)
       errors.add(:base, "if provided, headers must be a hash")
     end
@@ -21,7 +25,13 @@ module WebRequestConcern
   end
 
   def faraday
-    @faraday ||= Faraday.new { |builder|
+    faraday_options = {
+      ssl: {
+        verify: !boolify(options['disable_ssl_verification'])
+      }
+    }
+
+    @faraday ||= Faraday.new(faraday_options) { |builder|
       builder.headers = headers if headers.length > 0
 
       builder.headers[:user_agent] = user_agent

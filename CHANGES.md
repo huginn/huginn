@@ -1,5 +1,37 @@
 # Changes
 
+* Jan 19, 2015   - WebRequestConcern Agents can supply `disable_ssl_verification` to disable ssl verification.
+* Jan 13, 2015   - Docker image updated.
+* Jan 8, 2015    - Allow toggling of accuracy when displaying locations in the UserLocationAgent map.
+* Dec 26, 2014   - Do not try to monkey patch the mysql adapter on heroku
+* Dec 7, 2014    - Update Rails to 4.1.8
+* Dec 3, 2014    - Access sites with invalid SSL
+* Nov 22, 2014   - Make the website agent support merge events
+* Nov 8, 2014    - Added DeDuplicationAgent
+* Nov 5, 2014    - Made latlng accessible to liquid
+* Nov 4, 2014    - Enable AgentLog to handle a message with invalid byte sequences; upgrade slack-notifier to 1.0.0; use webhook URLs instead of tokens.
+* Nov 2, 2014    - Fixes WorkerStatusController for postgresql; updated rails to 4.1.7; added a PDF info agent; commander agent can configure other Agents.
+* Nov 1, 2014    - Fixes postgres and DST related spec issues
+* Oct 27, 2014   - RSSAgent: Include `url` in addition to `urls` in each event.
+* Oct 23, 2014   - Assume an uploaded scenario file (JSON) is encoded in UTF-8
+* Oct 20, 2014   - Made weather agent dependent on user location
+* Oct 16, 2014   - Make event-indicator a link to the events page, with new events highlighted
+* Oct 15, 2014   - Add dropbox agent to emit urls for the given paths
+* Oct 14, 2014   - Upgrade Devise to 3.4.0; mqttAgent: Ignore a retained message previously received
+* Oct 12, 2014   - Add a button to view full error logs; allow longer than 2000 characters
+* Oct 10, 2014   - Dropbox watch agent
+* Oct 9, 2014    - Make the scheduler frequency tunable via ENV; add CommanderAgent, which controls other agents on a schedule or incoming event; disable the CSRF warning in WebRequestsController.
+* Oct 5, 2014    - OpenShift deployment
+* Oct 1, 2014    - Migrate to Rspec3
+* Sep 29, 2014   - Refactor OmniAuth integration
+* Sep 25, 2014   - TumblrPublishAgent
+* Sep 24, 2014   - Refactor OmniAuth configuration and fix it with 37Signals; introduce FontAwesome; enable download of user credentials; improve docs for ForecastIO in WeatherAgent.
+* Sep 22, 2014   - Improvements to bin/setup_heroku
+* Sep 21, 2014   - Reduce gems to save RAM
+* Sep 17, 2014   - Give user an option to drop pending events when enabling an agent.
+* Sep 16, 2014   - Improvements to UserLocationAgent
+* Sep 14, 2014   - Allow some agents to be configured via HTML forms rather then JSON.
+* Sep 13, 2014   - Calculate IDs in RssAgent if none are available.
 * Sep 12, 2014   - Make tables sortable by most columns.
 * Sep 8, 2014    - SchedulerAgent added, allowing granular control of Agent schedules.  Agents can now control other Agents via `ControlLinks`.
                  - Liquid filter `to_uri` added.

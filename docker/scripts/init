@@ -19,7 +19,7 @@ elif [ -n "${POSTGRESQL_PORT_5432_TCP_ADDR}" ]; then
   HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${POSTGRESQL_PORT_5432_TCP_PORT}}
 fi
 
-grep = /app/.env.example | sed -e 's/^#[^ ]//' | grep -v -e '^#' | cut -d= -f1 | \
+grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | cut -d= -f1 | \
   while read var ; do
     eval "echo \"$var=\\\"\${HUGINN_$var:-\$$var}\\\"\""
   done | grep -v -e ^= > /app/.env
@@ -38,12 +38,35 @@ case "${DATABASE_ADAPTER}" in
   *) echo "Unsupported database adapter. Available adapters are mysql2, and postgres." && exit 1 ;;
 esac
 
-# start supervisord
-/usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+# initialize supervisord config
 
-# start mysql server if ${DATABASE_HOST} is localhost
-if [ "${DATABASE_HOST}" == "localhost" ]; then
-  if [ "${DATABASE_ADAPTER}" == "postgres" ]; then
+cat > /etc/supervisor/conf.d/supervisord.conf <<EOF
+[supervisord]
+nodaemon = true
+user = root
+stdout_logfile = AUTO
+
+[unix_http_server]
+file=/var/run/supervisor.sock   ; (the path to the socket file)
+
+[eventlistener:stdout]
+command = supervisor_stdout
+buffer_size = 100
+events = PROCESS_LOG
+result_handler = supervisor_stdout:event_handler
+EOF
+
+# prepare the supervisord bootstrap service script
+
+cat <<BOOTSTRAP > /tmp/bootstrap.sh
+#!/bin/bash -e
+source /app/.env
+
+echo DATABASE_HOST=\${DATABASE_HOST}
+
+# start mysql server if \${DATABASE_HOST} is the .env.example default
+if [ "\${DATABASE_HOST}" = "your-domain-here.com" -o "\${DATABASE_HOST}" = "" ]; then
+  if [ "\${DATABASE_ADAPTER}" = "postgres" ]; then
     echo "DATABASE_ADAPTER 'postgres' is not supported internally. Please provide DATABASE_HOST."
     exit 1
   fi
@@ -57,10 +80,11 @@ command=/usr/bin/mysqld_safe
 user=root
 autostart=false
 autorestart=true
-stdout_logfile=/var/log/supervisor/%(program_name)s.log
-stderr_logfile=/var/log/supervisor/%(program_name)s.log
+stdout_events_enabled=true
+stderr_events_enabled=true
 EOF
-  supervisorctl reload
+  supervisorctl reread
+  supervisorctl add mysqld
 
   # fix permissions and ownership of /var/lib/mysql
   chown -R mysql:mysql /var/lib/mysql
@@ -76,36 +100,79 @@ EOF
 
   # wait for mysql server to start (max 120 seconds)
   timeout=120
-  while ! mysqladmin -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD} status >/dev/null 2>&1
+  while ! mysqladmin -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} status >/dev/null 2>&1
   do
-    timeout=$(expr $timeout - 1)
-    if [ $timeout -eq 0 ]; then
+    (( timeout = timeout - 1 ))
+    if [ \$timeout -eq 0 ]; then
       echo "Failed to start mysql server"
       exit 1
     fi
+    echo -n .
     sleep 1
   done
 
-  if ! echo "USE ${DATABASE_NAME}" | mysql -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD} >/dev/null 2>&1; then
+  if ! echo "USE \${DATABASE_NAME}" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} >/dev/null 2>&1; then
     DB_INIT="yes"
-    echo "CREATE DATABASE IF NOT EXISTS \`${DATABASE_NAME}\` DEFAULT CHARACTER SET \`utf8\` COLLATE \`utf8_unicode_ci\`;" | mysql -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD}
-    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \`${DATABASE_NAME}\`.* TO 'root'@'localhost';" | mysql -uroot ${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD}
+    echo "CREATE DATABASE IF NOT EXISTS \\\`\${DATABASE_NAME}\\\` DEFAULT CHARACTER SET \\\`utf8\\\` COLLATE \\\`utf8_unicode_ci\\\`;" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
+    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \\\`${DATABASE_NAME}\\\`.* TO 'root'@'localhost';" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
   fi
 fi
+supervisorctl start foreman >/dev/null
+BOOTSTRAP
+
+chmod 755 /tmp/bootstrap.sh
+
+cat > /etc/supervisor/conf.d/bootstrap.conf <<EOF
+[program:bootstrap]
+command=/tmp/bootstrap.sh
+priority=10
+directory=/app
+process_name=%(program_name)s
+autostart=true
+autorestart=false
+stdout_events_enabled=true
+stderr_events_enabled=true
+stopsignal=TERM
+exitcodes=0
+startsecs=0
+stopwaitsecs=1
+EOF
+
+cat <<FOREMAN > /tmp/foreman.sh
+#!/bin/bash -e
+source /app/.env
 
 # Assuming we have a created database, run the migrations and seed it idempotently.
-[ -z "${DO_NOT_MIGRATE}" ] && sudo -u huginn -EH bundle exec rake db:migrate
-[ -z "${DO_NOT_SEED}" ] && sudo -u huginn -EH bundle exec rake db:seed
+[ -z "\${DO_NOT_MIGRATE}" ] && sudo -u huginn -EH bundle exec rake db:migrate
+[ -z "\${DO_NOT_SEED}" ] && sudo -u huginn -EH bundle exec rake db:seed
 
-[ -n "$INTENTIONALLY_SLEEP" ] && sleep $INTENTIONALLY_SLEEP
+[ -n "\$INTENTIONALLY_SLEEP" ] && sleep \$INTENTIONALLY_SLEEP
 
 # Fixup the Procfile and prepare the PORT
-[ -z "${DO_NOT_RUN_JOBS}" ] && perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
-perl -pi -e 's/rails server$/rails server -p \$PORT/' /app/Procfile
+[ -n "\${DO_NOT_RUN_JOBS}" ] && perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
+perl -pi -e 's/rails server\$/rails server -p \\\$PORT/' /app/Procfile
 export PORT
 
 # Start huginn
-sudo -u huginn -EH bundle exec foreman start
+exec sudo -u huginn -EH bundle exec foreman start
+FOREMAN
 
-# As the ENTRYPOINT script, when this exits the docker container will Exit.
-exit 0
+chmod 755 /tmp/foreman.sh
+
+cat > /etc/supervisor/conf.d/foreman.conf <<EOF
+[program:foreman]
+command=/tmp/foreman.sh
+priority=10
+directory=/app
+process_name=%(program_name)s
+autostart=false
+autorestart=false
+stdout_events_enabled=true
+stderr_events_enabled=true
+stopsignal=TERM
+startsecs=0
+stopwaitsecs=1
+EOF
+
+# start supervisord
+exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf

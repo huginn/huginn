@@ -62,6 +62,29 @@ shared_examples_for WebRequestConcern do
       agent.options['basic_auth'] = ["blah"]
       expect(agent).not_to be_valid
     end
+
+    it "should validate disable_ssl_verification" do
+      agent.options['disable_ssl_verification'] = nil
+      expect(agent).to be_valid
+
+      agent.options['disable_ssl_verification'] = true
+      expect(agent).to be_valid
+
+      agent.options['disable_ssl_verification'] = false
+      expect(agent).to be_valid
+
+      agent.options['disable_ssl_verification'] = 'true'
+      expect(agent).to be_valid
+
+      agent.options['disable_ssl_verification'] = 'false'
+      expect(agent).to be_valid
+
+      agent.options['disable_ssl_verification'] = 'blah'
+      expect(agent).not_to be_valid
+
+      agent.options['disable_ssl_verification'] = 51
+      expect(agent).not_to be_valid
+    end
   end
 
   describe "User-Agent" do
@@ -86,6 +109,37 @@ shared_examples_for WebRequestConcern do
     it "should be overriden by the value in options if present" do
       agent.options['user_agent'] = 'Override'
       expect(agent.user_agent).to eq('Override')
+    end
+  end
+
+  describe "#faraday" do
+    it "should enable SSL verification by default" do
+      expect(agent.faraday.ssl.verify).to eq(true)
+    end
+
+    it "should enable SSL verification when nil" do
+      agent.options['disable_ssl_verification'] = nil
+      expect(agent.faraday.ssl.verify).to eq(true)
+    end
+
+    it "should disable SSL verification if disable_ssl_verification option is 'true'" do
+      agent.options['disable_ssl_verification'] = 'true'
+      expect(agent.faraday.ssl.verify).to eq(false)
+    end
+
+    it "should disable SSL verification if disable_ssl_verification option is true" do
+      agent.options['disable_ssl_verification'] = true
+      expect(agent.faraday.ssl.verify).to eq(false)
+    end
+
+    it "should not disable SSL verification if disable_ssl_verification option is 'false'" do
+      agent.options['disable_ssl_verification'] = 'false'
+      expect(agent.faraday.ssl.verify).to eq(true)
+    end
+
+    it "should not disable SSL verification if disable_ssl_verification option is false" do
+      agent.options['disable_ssl_verification'] = false
+      expect(agent.faraday.ssl.verify).to eq(true)
     end
   end
 end

@@ -30,7 +30,12 @@ end
 check_login!
 
 info = capture("heroku info")
-if info =~ /No app specified/i
+if info =~ /Incomplete credentials detected/i
+  puts info
+  puts
+  puts "When this is resolved, please run 'bin/setup_heroku' again."
+  exit
+elsif info =~ /No app specified/i
   puts "It looks like you don't have a Heroku app set up yet for this repo."
   puts "You can either exit now and run 'heroku create', or I can do it for you."
   if yes?("Would you like me to create a Heroku app for you now in this repo?")

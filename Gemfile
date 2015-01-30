@@ -73,7 +73,7 @@ gem 'mysql2', '~> 0.3.16'
 gem 'multi_xml'
 gem 'nokogiri', '~> 1.6.4'
 gem 'omniauth'
-gem 'rails' , '~> 4.1.7'
+gem 'rails' , '4.1.8'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'sass-rails',   '~> 4.0.0'
 gem 'select2-rails', '~> 3.5.4'
@@ -123,10 +123,10 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 # This hack needs some explanation.  When on Heroku, use the pg, unicorn, and rails12factor gems.
 # When not on Heroku, we still want our Gemfile.lock to include these gems, so we scope them to
 # an unsupported platform.
-if ENV['ON_HEROKU'] || ENV['HEROKU_POSTGRESQL_ROSE_URL'] || File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
+if ENV['ON_HEROKU'] || ENV['HEROKU_POSTGRESQL_ROSE_URL'] || ENV['HEROKU_POSTGRESQL_GOLD_URL'] || File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
   gem 'pg'
   gem 'unicorn'
-  gem 'rails_12factor'
+  gem 'rails_12factor', group: :production
 else
   gem 'pg', platform: :ruby_18
   gem 'unicorn', platform: :ruby_18
