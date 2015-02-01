@@ -4,6 +4,7 @@ class SystemMailer < ActionMailer::Base
   def send_message(options)
     @groups = options[:groups]
     @headline = options[:headline]
+    @body = options[:body]
     mail :to => options[:to], :subject => options[:subject]
   end
 end
