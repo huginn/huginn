@@ -6,7 +6,7 @@ describe Agents::UserLocationAgent do
                                   :name => 'something',
                                   :options => { :secret => 'my_secret',
                                     :max_accuracy => '50',
-                                    :distance => '50' })
+                                    :min_distance => '50' })
     @agent.save!
   end
 

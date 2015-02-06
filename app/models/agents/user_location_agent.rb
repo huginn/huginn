@@ -79,7 +79,7 @@ module Agents
     def handle_payload(payload)
       location = Location.new(payload)
 
-      accuracy_field = interpolated[:accuracy_field].presence || 'accuracy'
+      accuracy_field = interpolated[:accuracy_field].presence || "accuracy"
 
       def accurate_enough?(payload, accuracy_field)
         !interpolated[:max_accuracy].present? || !payload[accuracy_field] || payload[accuracy_field].to_i < interpolated[:max_accuracy].to_i
