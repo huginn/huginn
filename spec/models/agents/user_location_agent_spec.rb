@@ -5,7 +5,8 @@ describe Agents::UserLocationAgent do
     @agent = Agent.build_for_type('Agents::UserLocationAgent', users(:bob),
                                   :name => 'something',
                                   :options => { :secret => 'my_secret',
-                                    :max_accuracy => '50' })
+                                    :max_accuracy => '50',
+                                    :min_distance => '50' })
     @agent.save!
   end
 
@@ -89,5 +90,33 @@ describe Agents::UserLocationAgent do
     expect(@agent.events.last.payload).to eq({ 'longitude' => 123, 'latitude' => 45, 'estimated_to' => '20', 'something' => 'else' })
     expect(@agent.events.last.lat).to eq(45)
     expect(@agent.events.last.lng).to eq(123)
+  end
+
+  it 'does create an event when far enough' do
+    @agent.memory["last_location"] = { 'longitude' => 12, 'latitude' => 34, 'something' => 'else' }
+    event = Event.new
+    event.agent = agents(:bob_weather_agent)
+    event.created_at = Time.now
+    event.payload = { 'longitude' => 123, 'latitude' => 45, 'something' => 'else' }
+
+    expect {
+      @agent.receive([event])
+    }.to change { @agent.events.count }.by(1)
+
+    expect(@agent.events.last.payload).to eq({ 'longitude' => 123, 'latitude' => 45, 'something' => 'else' })
+    expect(@agent.events.last.lat).to eq(45)
+    expect(@agent.events.last.lng).to eq(123)
+  end
+
+  it 'does not create an event when too close' do
+    @agent.memory["last_location"] = { 'longitude' => 123, 'latitude' => 45, 'something' => 'else' }
+    event = Event.new
+    event.agent = agents(:bob_weather_agent)
+    event.created_at = Time.now
+    event.payload = { 'longitude' => 123, 'latitude' => 45, 'something' => 'else' }
+
+    expect {
+      @agent.receive([event])
+    }.to change { @agent.events.count }.by(0)
   end
 end

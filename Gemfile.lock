@@ -170,6 +170,7 @@ GEM
       guard (~> 2.1)
       rspec (>= 2.14, < 4.0)
     hashie (2.0.5)
+    haversine (0.3.0)
     hike (1.2.3)
     hipchat (1.2.0)
       httparty
@@ -476,6 +477,7 @@ DEPENDENCIES
   guard
   guard-livereload
   guard-rspec
+  haversine
   hipchat (~> 1.2.0)
   httparty (~> 0.13)
   hypdf (~> 1.0.7)
