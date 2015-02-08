@@ -1,6 +1,8 @@
 require 'open3'
 require 'io/console'
 require 'securerandom'
+require 'shellwords'
+require 'active_support/core_ext/object/blank'
 
 module SetupTools
   def capture(cmd, opts = {})
@@ -54,7 +56,7 @@ module SetupTools
   end
 
   def confirm_app_name(app_name)
-    unless yes?("Your app name is '#{app_name}'.  Is this correct?")
+    unless yes?("Your app name is '#{app_name}'.  Is this correct?", default: :yes)
       puts "Well, then I'm not sure what to do here, sorry."
       exit 1
     end
@@ -83,7 +85,11 @@ module SetupTools
     answer
   end
 
-  def yes?(question)
-    ask(question + " (y/n)") =~ /^y/i
+  def yes?(question, opts = {})
+    if opts[:default].to_s[0...1] == "y"
+      (ask(question + " (Y/n)").presence || "yes") =~ /^y/i
+    else
+      ask(question + " (y/n)") =~ /^y/i
+    end
   end
 end

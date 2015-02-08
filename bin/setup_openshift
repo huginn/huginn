@@ -99,7 +99,7 @@ puts "You'll need to set those environment variables in OpenShift using 'rhc env
 puts
 
 branch = capture("git rev-parse --abbrev-ref HEAD")
-if first_time || yes?("Should I push your current branch (#{branch}) to OpenShift?")
+if first_time || yes?("Should I push your current branch (#{branch}) to OpenShift?", default: :yes)
   puts "This may take a moment..."
   puts capture("git push openshift #{branch}:master -f")
 end
@@ -112,7 +112,7 @@ if first_time
   puts
   puts
   puts "I can make an admin user on your new Huginn instance and setup some example Agents."
-  if yes?("Should I create a new admin user and some example Agents?")
+  if yes?("Should I create a new admin user and some example Agents?", default: :yes)
     done = false
     while !done
       seed_email = nag "Okay, what is your email address?"
