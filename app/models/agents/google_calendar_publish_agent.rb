@@ -103,7 +103,7 @@ module Agents
         calendar = GoogleCalendar.new(options, Rails.logger)
 
         # publish using quickadd or insert; default insert
-        if event.payload.key?("method") && event.payload["method"] == "quickadd"
+        if event.payload["method"] == "quickadd" || interpolated["method"] == "quickadd"
           log "publish - quickadd "+event.payload["message"]
           response = calendar.quickadd_as(options['calendar_id'], event.payload["message"])
         else

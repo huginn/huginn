@@ -96,10 +96,9 @@ module Agents
           else
             payload = { 'message' => opts['message'] }
           end
-          for key in opts.keys
-            if not(reserved.include? key)
-              payload[key] = opts[key]
-            end
+
+          opts.each do |key, value|
+            payload[key] = value unless reserved.include?(key.to_s)
           end
 
           create_event :payload => payload
