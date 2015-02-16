@@ -106,7 +106,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.0.1'
   gem 'rspec-html-matchers', '~> 0.6.1'
   gem 'shoulda-matchers'
-  gem 'spring'
+  gem 'spring', '~> 1.3.2'
   gem 'spring-commands-rspec'
   gem 'vcr'
   gem 'webmock', '~> 1.17.4', require: false
