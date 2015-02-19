@@ -3,10 +3,14 @@ require 'spec_helper'
 describe Agents::PushbulletAgent do
   before(:each) do
     @valid_params = {
-                      'api_key' => 'token',
+                      'api_key'   => 'token',
                       'device_id' => '124',
-                      'body' => '{{body}}',
-                      'title' => 'hello from huginn'
+                      'body'      => '{{body}}',
+                      'url'       => 'url',
+                      'name'      => 'name',
+                      'address'   => 'address',
+                      'title'     => 'hello from huginn',
+                      'type'      => 'note'
                     }
 
     @checker = Agents::PushbulletAgent.new(:name => "somename", :options => @valid_params)
@@ -36,18 +40,42 @@ describe Agents::PushbulletAgent do
   end
 
   describe "helpers" do
-    it "should return the query_options" do
-      expect(@checker.send(:query_options, @event)).to eq({
-        :body => {:title => 'hello from huginn', :body => 'One two test', :device_iden => @checker.options[:device_id], :type => 'note'},
-        :basic_auth => {:username =>@checker.options[:api_key], :password=>''}
-      })
+    before(:each) do
+      @base_options = {
+        body: { device_iden: @checker.options[:device_id] },
+        basic_auth: { username: @checker.options[:api_key], :password=>'' }
+      }
+    end
+    context "#query_options" do
+      it "should work for a note" do
+        options = @base_options.deep_merge({
+          body: {title: 'hello from huginn', body: 'One two test', type: 'note'}
+        })
+        expect(@checker.send(:query_options, @event)).to eq(options)
+      end
+
+      it "should work for a link" do
+        @checker.options['type'] = 'link'
+        options = @base_options.deep_merge({
+          body: {title: 'hello from huginn', body: 'One two test', type: 'link', url: 'url'}
+        })
+        expect(@checker.send(:query_options, @event)).to eq(options)
+      end
+
+      it "should work for an address" do
+        @checker.options['type'] = 'address'
+        options = @base_options.deep_merge({
+          body: {name: 'name', address: 'address', type: 'address'}
+        })
+        expect(@checker.send(:query_options, @event)).to eq(options)
+      end
     end
   end
 
   describe "#receive" do
-    it "send a message to the hipchat" do
+    it "send a note" do
       stub_request(:post, "https://token:@api.pushbullet.com/v2/pushes").
-        with(:body => "device_iden=124&title=hello%20from%20huginn&body=One%20two%20test&type=note").
+        with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
         to_return(:status => 200, :body => "ok", :headers => {})
       dont_allow(@checker).error
       @checker.receive([@event])
@@ -55,7 +83,7 @@ describe Agents::PushbulletAgent do
 
     it "should log resquests which return an error" do
       stub_request(:post, "https://token:@api.pushbullet.com/v2/pushes").
-        with(:body => "device_iden=124&title=hello%20from%20huginn&body=One%20two%20test&type=note").
+        with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
         to_return(:status => 200, :body => "error", :headers => {})
       mock(@checker).error("error")
       @checker.receive([@event])

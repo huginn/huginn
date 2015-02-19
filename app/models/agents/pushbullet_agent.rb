@@ -44,7 +44,7 @@ module Agents
     end
 
     def validate_options
-      errors.add(:base, "you need to specify a pushbullet api_key") unless options['api_key'].present?
+      errors.add(:base, "you need to specify a pushbullet api_key") if options['api_key'].blank?
       errors.add(:base, "you need to specify a device_id") if options['device_id'].blank?
       errors.add(:base, "you need to specify a valid message type") if options['type'].blank? or not ['note', 'link', 'address'].include?(options['type'])
     end
@@ -64,15 +64,16 @@ module Agents
 
     def query_options(event)
       mo = interpolated(event)
-      body = {:device_iden => mo[:device_id], :type => mo[:type]}
-      if mo[:type] == "note"
+      body = {device_iden: mo[:device_id], type: mo[:type]}
+      case mo[:type]
+      when "note"
         body[:title] = mo[:title]
         body[:body] = mo[:body]
-      elsif mo[:type] == "link"
+      when "link"
         body[:title] = mo[:title]
         body[:body] = mo[:body]
         body[:url] = mo[:url]
-      elsif mo[:type] == "address"
+      when "address"
         body[:name] = mo[:name]
         body[:address] = mo[:address]
       end
