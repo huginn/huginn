@@ -4,6 +4,11 @@ module Agents
     cannot_create_events!
 
     API_URL = 'https://api.pushbullet.com/v2/pushes'
+    TYPE_TO_ATTRIBUTES = {
+            'note'    => [:title, :body],
+            'link'    => [:title, :body, :url],
+            'address' => [:name, :address]
+    }
 
     description <<-MD
       The Pushbullet agent sends pushes to a pushbullet device
@@ -61,26 +66,16 @@ module Agents
     end
 
     private
-
     def query_options(event)
       mo = interpolated(event)
-      body = {device_iden: mo[:device_id], type: mo[:type]}
-      case mo[:type]
-      when "note"
-        body[:title] = mo[:title]
-        body[:body] = mo[:body]
-      when "link"
-        body[:title] = mo[:title]
-        body[:body] = mo[:body]
-        body[:url] = mo[:url]
-      when "address"
-        body[:name] = mo[:name]
-        body[:address] = mo[:address]
-      end
       {
-        :basic_auth => {:username => mo[:api_key], :password => ''},
-        :body => body
+        :basic_auth => {username: mo[:api_key], password: ''},
+        :body => {device_iden: mo[:device_id], type: mo[:type]}.merge(payload(mo))
       }
+    end
+
+    def payload(mo)
+      Hash[TYPE_TO_ATTRIBUTES[mo[:type]].map { |k| [k, mo[k]] }]
     end
   end
 end
