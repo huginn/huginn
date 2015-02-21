@@ -1,5 +1,7 @@
 module Agents
   class PushbulletAgent < Agent
+    include FormConfigurable
+
     cannot_be_scheduled!
     cannot_create_events!
 
@@ -48,10 +50,22 @@ module Agents
       }
     end
 
+    form_configurable :api_key
+    form_configurable :device_id
+    form_configurable :type, type: :array, values: ['note', 'link', 'address']
+    form_configurable :title
+    form_configurable :body, type: :text
+    form_configurable :url
+    form_configurable :name
+    form_configurable :address
+
     def validate_options
       errors.add(:base, "you need to specify a pushbullet api_key") if options['api_key'].blank?
       errors.add(:base, "you need to specify a device_id") if options['device_id'].blank?
       errors.add(:base, "you need to specify a valid message type") if options['type'].blank? or not ['note', 'link', 'address'].include?(options['type'])
+      TYPE_TO_ATTRIBUTES[options['type']].each do |attr|
+        errors.add(:base, "you need to specify '#{attr.to_s}' for the type '#{options['type']}'") if options[attr].blank?
+      end
     end
 
     def working?
@@ -69,8 +83,8 @@ module Agents
     def query_options(event)
       mo = interpolated(event)
       {
-        :basic_auth => {username: mo[:api_key], password: ''},
-        :body => {device_iden: mo[:device_id], type: mo[:type]}.merge(payload(mo))
+        basic_auth: {username: mo[:api_key], password: ''},
+        body: {device_iden: mo[:device_id], type: mo[:type]}.merge(payload(mo))
       }
     end
 

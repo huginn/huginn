@@ -37,6 +37,12 @@ describe Agents::PushbulletAgent do
       @checker.options['device_id'] = nil
       expect(@checker).not_to be_valid
     end
+
+    it "should require fields based on the type" do
+      @checker.options['type'] = 'address'
+      @checker.options['address'] = nil
+      expect(@checker).not_to be_valid
+    end
   end
 
   describe "helpers" do
