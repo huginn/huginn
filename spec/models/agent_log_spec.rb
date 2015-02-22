@@ -90,6 +90,11 @@ describe AgentLog do
       AgentLog.log_for_agent(agents(:jane_website_agent), "some message", :level => 4, :outbound_event => events(:jane_website_agent_event))
       expect(agents(:jane_website_agent).reload.last_error_log_at.to_i).to be_within(2).of(Time.now.to_i)
     end
+
+    it "accepts objects as well as strings" do
+      log = AgentLog.log_for_agent(agents(:jane_website_agent), events(:bob_website_agent_event).payload)
+      expect(log.message).to include('"title"=>"foo"')
+    end
   end
 
   describe "#log_length" do

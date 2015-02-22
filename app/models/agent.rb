@@ -195,7 +195,6 @@ class Agent < ActiveRecord::Base
   end
 
   def log(message, options = {})
-    puts "Agent##{id}: #{message}" unless Rails.env.test?
     AgentLog.log_for_agent(self, message, options)
   end
 

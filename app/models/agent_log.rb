@@ -15,6 +15,8 @@ class AgentLog < ActiveRecord::Base
   before_save :truncate_message
 
   def self.log_for_agent(agent, message, options = {})
+    puts "Agent##{agent.id}: #{message}" unless Rails.env.test?
+
     log = agent.logs.create! options.merge(:message => message)
     if agent.logs.count > log_length
       oldest_id_to_keep = agent.logs.limit(1).offset(log_length - 1).pluck("agent_logs.id")
@@ -34,6 +36,7 @@ class AgentLog < ActiveRecord::Base
 
   def scrub_message
     if message_changed?
+      self.message = message.inspect unless message.is_a?(String)
       self.message.scrub!{ |bytes| "<#{bytes.unpack('H*')[0]}>" }
     end
     true
