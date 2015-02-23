@@ -164,6 +164,13 @@ module LiquidInterpolatable
         credential
       end
     end
+
+    class LineBreak < Liquid::Tag
+      def render(context)
+        "\n"
+      end
+    end
   end
   Liquid::Template.register_tag('credential', LiquidInterpolatable::Tags::Credential)
+  Liquid::Template.register_tag('line_break', LiquidInterpolatable::Tags::LineBreak)
 end
