@@ -5,29 +5,22 @@ module Agents
     cannot_be_scheduled!
     cannot_create_events!
 
-    API_URL = 'https://api.pushbullet.com/v2/pushes'
+    API_BASE = 'https://api.pushbullet.com/v2/'
     TYPE_TO_ATTRIBUTES = {
             'note'    => [:title, :body],
             'link'    => [:title, :body, :url],
             'address' => [:name, :address]
     }
+    class Unauthorized < StandardError; end
 
     description <<-MD
       The Pushbullet agent sends pushes to a pushbullet device
 
-      To authenticate you need to set the `api_key`, you can find yours at your account page:
+      To authenticate you need to either the `api_key` or create a `pushbullet_api_key` credential, you can find yours at your account page:
 
       `https://www.pushbullet.com/account`
 
-      Currently you need to get a the device identification manually:
-
-      `curl -u <your api key here>: https://api.pushbullet.com/v2/devices`
-
-      To register a new device run the following command:
-
-      `curl -u <your api key here>: -X POST https://api.pushbullet.com/v2/devices -d nickname=huginn -d type=stream`
-
-      Put one of the retured `iden` strings into the `device_id` field.
+      If you do not select an existing device, Huginn will create a new one with the name 'Huginn'.
 
       You have to provide a message `type` which has to be `note`, `link`, or `address`. The message types `checklist`, and `file` are not supported at the moment.
 
@@ -50,8 +43,8 @@ module Agents
       }
     end
 
-    form_configurable :api_key
-    form_configurable :device_id
+    form_configurable :api_key, roles: :validatable
+    form_configurable :device_id, roles: :completable
     form_configurable :type, type: :array, values: ['note', 'link', 'address']
     form_configurable :title
     form_configurable :body, type: :text
@@ -61,11 +54,22 @@ module Agents
 
     def validate_options
       errors.add(:base, "you need to specify a pushbullet api_key") if options['api_key'].blank?
-      errors.add(:base, "you need to specify a device_id") if options['device_id'].blank?
+      create_device if options['device_id'].blank?
       errors.add(:base, "you need to specify a valid message type") if options['type'].blank? or not ['note', 'link', 'address'].include?(options['type'])
       TYPE_TO_ATTRIBUTES[options['type']].each do |attr|
         errors.add(:base, "you need to specify '#{attr.to_s}' for the type '#{options['type']}'") if options[attr].blank?
       end
+    end
+
+    def validate_api_key
+      devices
+      true
+    rescue Unauthorized
+      false
+    end
+
+    def complete_device_id
+      devices.map { |d| {text: d['nickname'], id: d['iden']} }
     end
 
     def working?
@@ -74,18 +78,47 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        response = HTTParty.post API_URL, query_options(event)
-        error(response.body) if response.body.include? 'error'
+        safely do
+          response = request(:post, 'pushes', query_options(event))
+        end
       end
     end
 
     private
+    def safely
+      yield
+    rescue Unauthorized => e
+      error(e.message)
+    end
+
+    def request(http_method, method, options)
+      response = JSON.parse(HTTParty.send(http_method, API_BASE + method, options).body)
+      raise Unauthorized, response['error']['message'] if response['error'].present?
+      response
+    end
+
+    def devices
+      response = request(:get, 'devices', basic_auth)
+      response['devices'].select { |d| d['pushable'] == true }
+    rescue Unauthorized
+      []
+    end
+
+    def create_device
+      safely do
+        response = request(:post, 'devices', basic_auth.merge(body: {nickname: 'Huginn', type: 'stream'}))
+        self.options[:device_id] = response['iden']
+      end
+    end
+
+
+    def basic_auth
+      {basic_auth: {username: interpolated[:api_key].presence || credential('pushbullet_api_key'), password: ''}}
+    end
+
     def query_options(event)
       mo = interpolated(event)
-      {
-        basic_auth: {username: mo[:api_key], password: ''},
-        body: {device_iden: mo[:device_id], type: mo[:type]}.merge(payload(mo))
-      }
+      basic_auth.merge(body: {device_iden: mo[:device_id], type: mo[:type]}.merge(payload(mo)))
     end
 
     def payload(mo)

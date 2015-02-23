@@ -33,9 +33,10 @@ describe Agents::PushbulletAgent do
       expect(@checker).not_to be_valid
     end
 
-    it "should require the device_id" do
+    it "should try do create a device_id" do
       @checker.options['device_id'] = nil
-      expect(@checker).not_to be_valid
+      mock(@checker).create_device
+      expect(@checker).to be_valid
     end
 
     it "should require fields based on the type" do
@@ -78,11 +79,30 @@ describe Agents::PushbulletAgent do
     end
   end
 
+  describe '#validate_api_key' do
+    it "should return true when working" do
+      mock(@checker).devices
+      expect(@checker.validate_api_key).to be_truthy
+    end
+
+    it "should return true when working" do
+      mock(@checker).devices { raise Agents::PushbulletAgent::Unauthorized }
+      expect(@checker.validate_api_key).to be_falsy
+    end
+  end
+
+  describe '#complete_device_id' do
+    it "should return an array" do
+      mock(@checker).devices { [{'iden' => '12345', 'nickname' => 'huginn'}] }
+      expect(@checker.complete_device_id).to eq([{:text=>"huginn", :id=>"12345"}])
+    end
+  end
+
   describe "#receive" do
     it "send a note" do
       stub_request(:post, "https://token:@api.pushbullet.com/v2/pushes").
         with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
-        to_return(:status => 200, :body => "ok", :headers => {})
+        to_return(:status => 200, :body => "{}", :headers => {})
       dont_allow(@checker).error
       @checker.receive([@event])
     end
@@ -90,7 +110,7 @@ describe Agents::PushbulletAgent do
     it "should log resquests which return an error" do
       stub_request(:post, "https://token:@api.pushbullet.com/v2/pushes").
         with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
-        to_return(:status => 200, :body => "error", :headers => {})
+        to_return(:status => 200, :body => '{"error": {"message": "error"}}', :headers => {})
       mock(@checker).error("error")
       @checker.receive([@event])
     end
@@ -101,6 +121,29 @@ describe Agents::PushbulletAgent do
       expect(@checker).not_to be_working
       @checker.last_receive_at = Time.now
       expect(@checker).to be_working
+    end
+  end
+
+  describe '#devices' do
+    it "should return an array of devices" do
+      stub_request(:get, "https://token:@api.pushbullet.com/v2/devices").
+         to_return(:status => 200, :body => '{"devices": [{"pushable": false}, {"nickname": "test", "iden": "iden", "pushable": true}]}', :headers => {})
+      expect(@checker.send(:devices)).to eq([{"nickname"=>"test", "iden"=>"iden", "pushable"=>true}])
+    end
+
+    it "should return an empty array on error" do
+      stub(@checker).request { raise Agents::PushbulletAgent::Unauthorized }
+      expect(@checker.send(:devices)).to eq([])
+    end
+  end
+
+  describe '#create_device' do
+    it "should create a new device and assign it to the options" do
+      stub_request(:post, "https://token:@api.pushbullet.com/v2/devices").
+         with(:body => "nickname=Huginn&type=stream").
+         to_return(:status => 200, :body => '{"iden": "udm0Tdjz5A7bL4NM"}', :headers => {})
+      @checker.send(:create_device)
+      expect(@checker.options[:device_id]).to eq('udm0Tdjz5A7bL4NM')
     end
   end
 end
