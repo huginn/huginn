@@ -179,7 +179,7 @@ class AgentsController < ApplicationController
 
   # Sanitize params[:return] to prevent open redirect attacks, a common security issue.
   def redirect_back(message)
-    if params[:return] == "show" && message.include?("deleted")
+    if params[:return] == "show" && @agent.destroyed?
       path = agents_path
     elsif params[:return] == "show" && @agent
       path = agent_path(@agent)
