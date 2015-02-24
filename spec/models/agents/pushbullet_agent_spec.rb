@@ -35,8 +35,7 @@ describe Agents::PushbulletAgent do
 
     it "should try do create a device_id" do
       @checker.options['device_id'] = nil
-      mock(@checker).create_device
-      expect(@checker).to be_valid
+      expect(@checker).not_to be_valid
     end
 
     it "should require fields based on the type" do
@@ -142,6 +141,7 @@ describe Agents::PushbulletAgent do
       stub_request(:post, "https://token:@api.pushbullet.com/v2/devices").
          with(:body => "nickname=Huginn&type=stream").
          to_return(:status => 200, :body => '{"iden": "udm0Tdjz5A7bL4NM"}', :headers => {})
+      @checker.options['device_id'] = nil
       @checker.send(:create_device)
       expect(@checker.options[:device_id]).to eq('udm0Tdjz5A7bL4NM')
     end

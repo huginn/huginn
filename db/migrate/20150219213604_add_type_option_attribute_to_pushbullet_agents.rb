@@ -1,6 +1,6 @@
 class AddTypeOptionAttributeToPushbulletAgents < ActiveRecord::Migration
   def up
-    Agents::PushbulletAgent.all.each do |agent|
+    Agents::PushbulletAgent.find_each do |agent|
       if agent.options['type'].nil?
         agent.options['type'] = 'note'
         agent.save!
@@ -9,7 +9,7 @@ class AddTypeOptionAttributeToPushbulletAgents < ActiveRecord::Migration
   end
 
   def down
-    Agents::PushbulletAgent.all.each do |agent|
+    Agents::PushbulletAgent.find_each do |agent|
       if agent.options['type'].present?
         agent.options.delete 'type'
         agent.save(validate: false)
