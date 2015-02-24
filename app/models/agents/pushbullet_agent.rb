@@ -3,6 +3,8 @@ module Agents
     cannot_be_scheduled!
     cannot_create_events!
 
+    API_URL = 'https://api.pushbullet.com/v2/pushes'
+
     description <<-MD
       The Pushbullet agent sends pushes to a pushbullet device
 
@@ -12,7 +14,7 @@ module Agents
 
       Currently you need to get a the device identification manually:
 
-      `curl -u <your api key here>: https://api.pushbullet.com/api/devices`
+      `curl -u <your api key here>: https://api.pushbullet.com/v2/devices`
 
       Put one of the retured `iden` strings into the `device_id` field.
 
@@ -41,7 +43,7 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        response = HTTParty.post "https://api.pushbullet.com/api/pushes", query_options(event)
+        response = HTTParty.post API_URL, query_options(event)
         error(response.body) if response.body.include? 'error'
       end
     end

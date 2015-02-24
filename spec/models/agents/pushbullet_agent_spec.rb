@@ -46,7 +46,7 @@ describe Agents::PushbulletAgent do
 
   describe "#receive" do
     it "send a message to the hipchat" do
-      stub_request(:post, "https://token:@api.pushbullet.com/api/pushes").
+      stub_request(:post, "https://token:@api.pushbullet.com/v2/pushes").
         with(:body => "device_iden=124&title=hello%20from%20huginn&body=One%20two%20test&type=note").
         to_return(:status => 200, :body => "ok", :headers => {})
       dont_allow(@checker).error
@@ -54,7 +54,7 @@ describe Agents::PushbulletAgent do
     end
 
     it "should log resquests which return an error" do
-      stub_request(:post, "https://token:@api.pushbullet.com/api/pushes").
+      stub_request(:post, "https://token:@api.pushbullet.com/v2/pushes").
         with(:body => "device_iden=124&title=hello%20from%20huginn&body=One%20two%20test&type=note").
         to_return(:status => 200, :body => "error", :headers => {})
       mock(@checker).error("error")
