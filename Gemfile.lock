@@ -1,10 +1,10 @@
 GIT
-  remote: git://github.com/cantino/twitter-stream.git
-  revision: 1c60a1007c50476f23374a8aea796769a088ffe0
-  branch: master
+  remote: git://github.com/dsander/twitter-stream.git
+  revision: 1713b4fe5b387580364b39716bb5c26d6601c50f
+  branch: huginn
   specs:
-    cantino-twitter-stream (0.1.15)
-      eventmachine (>= 0.12.8)
+    twitter-stream (0.1.15)
+      eventmachine (~> 1.0.7)
       http_parser.rb (~> 0.6.0)
       simple_oauth (~> 0.2.0)
 
@@ -38,7 +38,7 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
-    addressable (2.3.6)
+    addressable (2.3.7)
     arel (5.0.1.20140414130214)
     autoparse (0.3.3)
       addressable (>= 2.3.1)
@@ -119,8 +119,8 @@ GEM
     erubis (2.7.0)
     ethon (0.7.1)
       ffi (>= 1.3.0)
-    eventmachine (1.0.3)
-    execjs (2.2.1)
+    eventmachine (1.0.7)
+    execjs (2.3.0)
     extlib (0.9.16)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
@@ -337,7 +337,7 @@ GEM
       uuid (~> 2.3, >= 2.3.5)
     rufus-scheduler (3.0.8)
       tzinfo
-    safe_yaml (1.0.3)
+    safe_yaml (1.0.4)
     sass (3.2.19)
     sass-rails (4.0.3)
       railties (>= 4.0.0, < 5.0)
@@ -452,7 +452,6 @@ DEPENDENCIES
   binding_of_caller
   bootstrap-kaminari-views (~> 0.0.3)
   bundler (>= 1.5.0)
-  cantino-twitter-stream!
   coffee-rails (~> 4.0.0)
   coveralls
   daemons (~> 1.1.9)
@@ -524,6 +523,7 @@ DEPENDENCIES
   tumblr_client
   twilio-ruby (~> 3.11.5)
   twitter (~> 5.8.0)
+  twitter-stream!
   typhoeus (~> 0.6.3)
   tzinfo (>= 1.2.0)
   tzinfo-data

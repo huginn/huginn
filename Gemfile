@@ -20,7 +20,7 @@ gem "google-api-client", require: 'google/api_client'
 
 # Twitter Agents
 gem 'twitter', '~> 5.8.0' # Must to be loaded before cantino-twitter-stream.
-gem 'cantino-twitter-stream', github: 'cantino/twitter-stream', branch: 'master'
+gem 'twitter-stream', github: 'dsander/twitter-stream', branch: 'huginn'
 gem 'omniauth-twitter'
 
 # Tumblr Agents

@@ -9,7 +9,7 @@ env:
 rvm:
 - 2.0.0
 - 2.1.5
-- 1.9.3
+- 2.2.0
 cache: bundler
 bundler_args: --without development production
 before_script:
