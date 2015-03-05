@@ -97,6 +97,7 @@ end
 
 group :development, :test do
   gem 'coveralls', require: false
+  gem 'rubocop', require: false
   gem 'delorean'
   gem 'dotenv-rails'
   gem 'pry'
