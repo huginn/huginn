@@ -143,6 +143,7 @@ group :development do
 
   group :test do
     gem 'coveralls', '~> 0.7.4', require: false
+    gem 'rubocop', require: false
     gem 'capybara-select2', require: false
     gem 'delorean'
     gem 'poltergeist'
