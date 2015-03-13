@@ -36,8 +36,12 @@ describe Agents::ImapFolderAgent do
             all_parts.find { |part|
               part.mime_type == type
             }
-          }.compact
+          }.compact.map! { |part|
+            part.extend(Agents::ImapFolderAgent::Message::Scrubbed)
+          }
         end
+
+        include Agents::ImapFolderAgent::Message::Scrubbed
       }
 
       @mails = [
@@ -252,6 +256,31 @@ describe Agents::ImapFolderAgent do
           stub(mail).mark_as_read.once
         }
         expect { @checker.check }.to change { Event.count }.by(1)
+      end
+    end
+  end
+
+  describe 'Agents::ImapFolderAgent::Message::Scrubbed' do
+    before do
+      @class = Class.new do
+        def subject
+          "broken\xB7subject\xB6"
+        end
+
+        def body
+          "broken\xB7body\xB6"
+        end
+
+        include Agents::ImapFolderAgent::Message::Scrubbed
+      end
+
+      @object = @class.new
+    end
+
+    describe '#scrubbed' do
+      it 'should return a scrubbed string' do
+        expect(@object.scrubbed(:subject)).to eq("broken<b7>subject<b6>")
+        expect(@object.scrubbed(:body)).to eq("broken<b7>body<b6>")
       end
     end
   end

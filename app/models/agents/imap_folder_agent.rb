@@ -240,7 +240,7 @@ module Agents
           when 'subject'
             value.present? or next true
             re = Regexp.new(value)
-            if m = re.match(mail.subject)
+            if m = re.match(mail.scrubbed(:subject))
               m.names.each { |name|
                 matches[name] = m[name]
               }
@@ -252,7 +252,7 @@ module Agents
             value.present? or next true
             re = Regexp.new(value)
             matched_part = body_parts.find { |part|
-               if m = re.match(part.decoded)
+               if m = re.match(part.scrubbed(:decoded))
                  m.names.each { |name|
                    matches[name] = m[name]
                  }
@@ -285,7 +285,7 @@ module Agents
 
           if matched_part
             mime_type = matched_part.mime_type
-            body = matched_part.decoded
+            body = matched_part.scrubbed(:decoded)
           else
             mime_type = 'text/plain'
             body = ''
@@ -295,7 +295,7 @@ module Agents
 
           create_event :payload => {
             'folder' => mail.folder,
-            'subject' => mail.subject,
+            'subject' => mail.scrubbed(:subject),
             'from' => mail.from_addrs.first,
             'to' => mail.to_addrs,
             'cc' => mail.cc_addrs,
@@ -504,6 +504,15 @@ module Agents
 
       attr_reader :uid, :folder, :uidvalidity
 
+      module Scrubbed
+        def scrubbed(method)
+          (@scrubbed ||= {})[method.to_sym] ||=
+            __send__(method).scrub { |bytes| "<#{bytes.unpack('H*')[0]}>" }
+        end
+      end
+
+      include Scrubbed
+
       def initialize(client, fetch_data, props = {})
         @client = client
         props.each { |key, value|
@@ -538,9 +547,14 @@ module Agents
           mail.all_parts
         else
           [mail]
-        end.reject { |part|
-          part.multipart? || part.attachment? || !part.text? ||
-            !mime_types.include?(part.mime_type)
+        end.select { |part|
+          if part.multipart? || part.attachment? || !part.text? ||
+             !mime_types.include?(part.mime_type)
+            false
+          else
+            part.extend(Scrubbed)
+            true
+          end
         }
       end
 
