@@ -141,8 +141,10 @@ class @AgentEditPage
     $(".agent-dry-run-button").prop('disabled', true)
     $('body').css(cursor: 'progress')
     $.ajax type: 'POST', url: $(".agent-dry-run-button").data('action-url'), dataType: 'json', data: $(@form).serialize()
+      .always =>
+        $("body").css(cursor: 'auto')
       .done (json) =>
-        $("body").css(cursor: 'auto').append """
+        $("body").append """
           <div class="modal fade" tabindex="-1" id='dynamic-modal' role="dialog" aria-labelledby="dynamic-modal-label" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
@@ -170,6 +172,8 @@ class @AgentEditPage
         $('#dynamic-modal').modal('show').on 'hidden.bs.modal', ->
           $('#dynamic-modal').remove()
           $(".agent-dry-run-button").prop('disabled', false)
+      .fail (xhr, status, error) =>
+        alert('Error: ' + error)
         $(".agent-dry-run-button").prop('disabled', false)
 
 $ ->
