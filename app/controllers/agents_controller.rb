@@ -1,5 +1,6 @@
 class AgentsController < ApplicationController
   include DotHelper
+  include ActionView::Helpers::TextHelper
   include SortableTable
 
   def index
@@ -44,13 +45,25 @@ class AgentsController < ApplicationController
     end
     agent = Agent.build_for_type(type, current_user, attrs)
     agent.name ||= '(Untitled)'
-    results = agent.dry_run!
 
-    render json: {
+    if agent.valid?
+      results = agent.dry_run!
+
+      render json: {
         log: results[:log],
         events: Utils.pretty_print(results[:events], false),
         memory: Utils.pretty_print(results[:memory] || {}, false),
-    }
+      }
+    else
+      render json: {
+        log: [
+          "#{pluralize(agent.errors.count, "error")} prohibited this Agent from being saved:",
+          *agent.errors.full_messages
+        ].join("\n- "),
+        events: '',
+        memory: '',
+      }
+    end
   end
 
   def type_details
