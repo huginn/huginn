@@ -7,8 +7,7 @@ class @AgentEditPage
     if $("#agent_type").length
       $("#agent_type").on "change", => @handleTypeChange(false)
       @handleTypeChange(true)
-
-    unless $('agent-dry-run-button').prop('disabled')
+    else
       @enableDryRunButton()
 
   handleTypeChange: (firstTime) ->
@@ -53,10 +52,7 @@ class @AgentEditPage
           $('.agent-options').html(json.form_options) if json.form_options?
           window.jsonEditor = setupJsonEditor()[0]
 
-        if json.can_dry_run
-          @enableDryRunButton()
-        else
-          @disableDryRunButton()
+        @enableDryRunButton()
 
         window.initializeFormCompletable()
 
@@ -138,9 +134,10 @@ class @AgentEditPage
 
   invokeDryRun: (e) ->
     e.preventDefault()
-    $(".agent-dry-run-button").prop('disabled', true)
+    button = this
+    $(button).prop('disabled', true)
     $('body').css(cursor: 'progress')
-    $.ajax type: 'POST', url: $(".agent-dry-run-button").data('action-url'), dataType: 'json', data: $(@form).serialize()
+    $.ajax type: 'POST', url: $(button).data('action-url'), dataType: 'json', data: $(button.form).serialize()
       .always =>
         $("body").css(cursor: 'auto')
       .done (json) =>
@@ -171,10 +168,10 @@ class @AgentEditPage
           find('.agent-dry-run-memory').text(json.memory)
         $('#dynamic-modal').modal('show').on 'hidden.bs.modal', ->
           $('#dynamic-modal').remove()
-          $(".agent-dry-run-button").prop('disabled', false)
-      .fail (xhr, status, error) =>
+          $(button).prop('disabled', false)
+      .fail (xhr, status, error) ->
         alert('Error: ' + error)
-        $(".agent-dry-run-button").prop('disabled', false)
+        $(button).prop('disabled', false)
 
 $ ->
   Utils.registerPage(AgentEditPage, forPathsMatching: /^agents/)
