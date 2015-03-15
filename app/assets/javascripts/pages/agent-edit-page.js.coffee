@@ -141,34 +141,21 @@ class @AgentEditPage
       .always =>
         $("body").css(cursor: 'auto')
       .done (json) =>
-        $("body").append """
-          <div class="modal fade" tabindex="-1" id='dynamic-modal' role="dialog" aria-labelledby="dynamic-modal-label" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                  <h4 class="modal-title" id="dynamic-modal-label"></h4>
-                </div>
-                <div class="modal-body">
-                  <h5>Log</h5>
-                  <pre class="agent-dry-run-log"></pre>
-                  <h5>Events</h5>
-                  <pre class="agent-dry-run-events"></pre>
-                  <h5>Memory</h5>
-                  <pre class="agent-dry-run-memory"></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        """
-        $('#dynamic-modal').find('.modal-title').text "Dry Run Results"
-        $('#dynamic-modal').find('.modal-body').
-          find('.agent-dry-run-log').text(json.log).end().
-          find('.agent-dry-run-events').text(json.events).end().
-          find('.agent-dry-run-memory').text(json.memory)
-        $('#dynamic-modal').modal('show').on 'hidden.bs.modal', ->
-          $('#dynamic-modal').remove()
-          $(button).prop('disabled', false)
+        Utils.showDynamicModal """
+          <h5>Log</h5>
+          <pre class="agent-dry-run-log"></pre>
+          <h5>Events</h5>
+          <pre class="agent-dry-run-events"></pre>
+          <h5>Memory</h5>
+          <pre class="agent-dry-run-memory"></pre>
+          """,
+          body: (body) ->
+            $(body).
+              find('.agent-dry-run-log').text(json.log).end().
+              find('.agent-dry-run-events').text(json.events).end().
+              find('.agent-dry-run-memory').text(json.memory)
+          title: 'Dry Run Results',
+          onHide: -> $(button).prop('disabled', false)
       .fail (xhr, status, error) ->
         alert('Error: ' + error)
         $(button).prop('disabled', false)
