@@ -1,5 +1,7 @@
 module DryRunnable
   def dry_run!
+    readonly!
+
     class << self
       prepend Sandbox
     end
