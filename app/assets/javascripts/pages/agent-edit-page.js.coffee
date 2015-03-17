@@ -7,6 +7,8 @@ class @AgentEditPage
     if $("#agent_type").length
       $("#agent_type").on "change", => @handleTypeChange(false)
       @handleTypeChange(true)
+    else
+      @enableDryRunButton()
 
   handleTypeChange: (firstTime) ->
     $(".event-descriptions").html("").hide()
@@ -49,6 +51,8 @@ class @AgentEditPage
           $('.oauthable-form').html(json.oauthable) if json.oauthable?
           $('.agent-options').html(json.form_options) if json.form_options?
           window.jsonEditor = setupJsonEditor()[0]
+
+        @enableDryRunButton()
 
         window.initializeFormCompletable()
 
@@ -121,6 +125,40 @@ class @AgentEditPage
         @showEventCreation()
       else
         @hideEventCreation()
+
+  enableDryRunButton: ->
+    $(".agent-dry-run-button").prop('disabled', false).off().on "click", @invokeDryRun
+
+  disableDryRunButton: ->
+    $(".agent-dry-run-button").prop('disabled', true)
+
+  invokeDryRun: (e) ->
+    e.preventDefault()
+    button = this
+    $(button).prop('disabled', true)
+    $('body').css(cursor: 'progress')
+    $.ajax type: 'POST', url: $(button).data('action-url'), dataType: 'json', data: $(button.form).serialize()
+      .always =>
+        $("body").css(cursor: 'auto')
+      .done (json) =>
+        Utils.showDynamicModal """
+          <h5>Log</h5>
+          <pre class="agent-dry-run-log"></pre>
+          <h5>Events</h5>
+          <pre class="agent-dry-run-events"></pre>
+          <h5>Memory</h5>
+          <pre class="agent-dry-run-memory"></pre>
+          """,
+          body: (body) ->
+            $(body).
+              find('.agent-dry-run-log').text(json.log).end().
+              find('.agent-dry-run-events').text(json.events).end().
+              find('.agent-dry-run-memory').text(json.memory)
+          title: 'Dry Run Results',
+          onHide: -> $(button).prop('disabled', false)
+      .fail (xhr, status, error) ->
+        alert('Error: ' + error)
+        $(button).prop('disabled', false)
 
 $ ->
   Utils.registerPage(AgentEditPage, forPathsMatching: /^agents/)

@@ -12,6 +12,7 @@ class Agent < ActiveRecord::Base
   include LiquidInterpolatable
   include HasGuid
   include LiquidDroppable
+  include DryRunnable
 
   markdown_class_attributes :description, :event_description
 
@@ -194,6 +195,10 @@ class Agent < ActiveRecord::Base
     self.class.can_control_other_agents?
   end
 
+  def can_dry_run?
+    self.class.can_dry_run?
+  end
+
   def log(message, options = {})
     AgentLog.log_for_agent(self, message, options)
   end
@@ -326,6 +331,14 @@ class Agent < ActiveRecord::Base
 
     def can_control_other_agents?
       include? AgentControllerConcern
+    end
+
+    def can_dry_run!
+      @can_dry_run = true
+    end
+
+    def can_dry_run?
+      !!@can_dry_run
     end
 
     def gem_dependency_check

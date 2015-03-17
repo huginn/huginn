@@ -5,6 +5,8 @@ module Agents
   class WebsiteAgent < Agent
     include WebRequestConcern
 
+    can_dry_run!
+
     default_schedule "every_12h"
 
     UNIQUENESS_LOOK_BACK = 200
