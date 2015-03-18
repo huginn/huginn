@@ -8,7 +8,7 @@ module DotHelper
         } rescue false)
       decorate_svg(svg, agents).html_safe
     else
-      uriquery=URI.encode_www_form(cht: 'gv', chl: agents_dot(agents))
+      uriquery = URI.encode_www_form(cht: 'gv', chl: agents_dot(agents))
       #Get query maximum length should be under 2048 bytes with including "chart?" of google chart request url
       if uriquery.length > 2042
         "Too many agent to display, please check unused agents"
