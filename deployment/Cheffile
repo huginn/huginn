@@ -3,6 +3,7 @@
 
 site 'http://community.opscode.com/api/v1'
 
+cookbook 'ark'
 cookbook 'runit'
 cookbook 'git', :git => 'git://github.com/opscode-cookbooks/git.git'
 cookbook 'nginx', :git => 'git://github.com/opscode-cookbooks/nginx.git'
