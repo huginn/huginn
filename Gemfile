@@ -76,7 +76,7 @@ gem 'mysql2', '~> 0.3.16'
 gem 'multi_xml'
 gem 'nokogiri', '~> 1.6.4'
 gem 'omniauth'
-gem 'rails' , '4.2.1rc2'
+gem 'rails' , '4.2.1'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'sass-rails',   '~> 5.0'
 gem 'select2-rails', '~> 3.5.4'
