@@ -1,0 +1,54 @@
+AllCops:
+  DisplayCopNames: true
+  RunRailsCops: true
+  Exclude:
+    - '**/*.yml'
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'doc/**/*'
+    - 'deployment/**/*'
+    - 'bin/**/*'
+
+Style/StringLiterals:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Style/Blocks:
+  Exclude:
+    - 'spec/**/*'
+
+Metrics/LineLength:
+  Max: 140
+
+Style/DotPosition:
+  EnforcedStyle: trailing
+
+Style/FormatString:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Style/EmptyLinesAroundAccessModifier:
+  Enabled: false
+
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Style/NumericLiterals:
+  Exclude:
+    - 'spec/**/*'
+
+Style/StringLiteralsInInterpolation:
+  Enabled: false
