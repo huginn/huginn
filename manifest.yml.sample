@@ -14,7 +14,7 @@ applications:
     INVITATION_CODE: "try-huginn"
     DOMAIN: "<app-url>"
     RAILS_ENV: "production"
-    SERVE_STATIC_ASSETS: true
+    RAILS_SERVE_STATIC_FILES: true
     FORCE_SSL: "true"
     SMTP_DOMAIN: "your-domain-here.com"
     SMTP_USER_NAME: "you@gmail.com"
