@@ -9,9 +9,9 @@ module Agents
 
       The `rules` array contains hashes of `path`, `value`, and `type`.  The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax.
 
-      The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.
+      The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.  Note that regex patterns are matched case insensitively.  If you want case sensitive matching, prefix your pattern with `(?-i)`.
 
-      The `value` can be a single value or an array of values. In the case of an array, if one or more values match then the rule matches. 
+      The `value` can be a single value or an array of values. In the case of an array, if one or more values match then the rule matches.
 
       All rules must match for the Agent to match.  The resulting Event will have a payload message of `message`.  You can use liquid templating in the `message, have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
