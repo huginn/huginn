@@ -1,0 +1,45 @@
+---
+applications:
+- name: huginn
+  url: <app-url>
+  path: .
+  memory: 512M
+  command: nohup foreman start --procfile Procfile.CF
+  instances: 1
+  # For the environment setup please have a look into the .evn.example file
+  env:
+    APP_SECRET_TOKEN: "${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}"
+    INVITATION_CODE: "try-huginn"
+    DOMAIN: "<app-url>"
+    RAILS_ENV: "production"
+    SERVE_STATIC_ASSETS: true
+    FORCE_SSL: "true"
+    SMTP_DOMAIN: "your-domain-here.com"
+    SMTP_USER_NAME: "you@gmail.com"
+    SMTP_PASSWORD: "somepassword"
+    SMTP_SERVER: "smtp.gmail.com"
+    SMTP_PORT: 587
+    SMTP_AUTHENTICATION: "plain"
+    SMTP_ENABLE_STARTTLS_AUTO: true
+    EMAIL_FROM_ADDRESS: "from_address@gmail.com"
+    AGENT_LOG_LENGTH: 200
+    TWITTER_OAUTH_KEY: ""
+    TWITTER_OAUTH_SECRET: ""
+    THIRTY_SEVEN_SIGNALS_OAUTH_KEY: ""
+    THIRTY_SEVEN_SIGNALS_OAUTH_SECRET: ""
+    GITHUB_OAUTH_KEY: ""
+    GITHUB_OAUTH_SECRET: ""
+    TUMBLR_OAUTH_KEY: ""
+    TUMBLR_OAUTH_SECRET: ""
+    DROPBOX_OAUTH_KEY: ""
+    DROPBOX_OAUTH_SECRET: ""
+    AWS_ACCESS_KEY_ID: "your aws access key id"
+    AWS_ACCESS_KEY: "your aws access key"
+    AWS_SANDBOX: false
+    FARADAY_HTTP_BACKEND: "typhoeus"
+    DEFAULT_HTTP_USER_AGENT: "Huginn - https://github.com/cantino/huginn"
+    ALLOW_JSONPATH_EVAL: false
+    ENABLE_INSECURE_AGENTS: false
+    ENABLE_SECOND_PRECISION_SCHEDULE: false
+    FAILED_JOBS_TO_KEEP: 100
+    TIMEZONE: "Pacific Time (US & Canada)"
