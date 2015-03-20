@@ -1,4 +1,6 @@
 Huginn::Application.routes.draw do
+  use_doorkeeper
+
   resources :agents do
     member do
       post :run

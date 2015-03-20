@@ -1,12 +1,24 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  before_action :authenticate_user!
+  alias_method :devise_current_user, :current_user
+  before_action :custom_authenticate_user!
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   helper :all
 
+  def current_user
+    @current_user ||= if doorkeeper_token
+      User.find(doorkeeper_token.resource_owner_id)
+    else
+      devise_current_user
+    end
+  end
+
   protected
+  def custom_authenticate_user!
+    authenticate_user! if current_user.nil?
+  end
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.for(:sign_up) { |u| u.permit(:username, :email, :password, :password_confirmation, :remember_me, :invitation_code) }
