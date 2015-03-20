@@ -379,13 +379,12 @@ describe Agents::WebsiteAgent do
             checker.check
           }.to change { Event.count }.by(2)
 
-          event = Event.all[-1]
-          expect(event.payload['version']).to eq(2.5)
-          expect(event.payload['title']).to eq("second")
+          (event2, event1) = Event.last(2)
+          expect(event1.payload['version']).to eq(2.5)
+          expect(event1.payload['title']).to eq("second")
 
-          event = Event.all[-2]
-          expect(event.payload['version']).to eq(2)
-          expect(event.payload['title']).to eq("first")
+          expect(event2.payload['version']).to eq(2)
+          expect(event2.payload['title']).to eq("first")
         end
 
         it "stores the whole object if :extract is not specified" do
