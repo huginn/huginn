@@ -7,6 +7,8 @@ applications:
   command: nohup foreman start --procfile Procfile.CF
   instances: 1
   # For the environment setup please have a look into the .evn.example file
+  services:
+    - huginn-db
   env:
     APP_SECRET_TOKEN: "${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}${random-word}"
     INVITATION_CODE: "try-huginn"
