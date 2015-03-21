@@ -1,3 +1,5 @@
+## This file is used for deployment to cloudfoundry.
+
 ---
 applications:
 - name: huginn
