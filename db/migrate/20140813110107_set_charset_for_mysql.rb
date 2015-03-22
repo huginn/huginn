@@ -15,10 +15,8 @@ class SetCharsetForMysql < ActiveRecord::Migration
   end
 
   def change
-    conn = ActiveRecord::Base.connection
-
     # This is migration is for MySQL only.
-    return unless conn.is_a?(ActiveRecord::ConnectionAdapters::AbstractMysqlAdapter)
+    return unless mysql?
 
     reversible do |dir|
       dir.up do
@@ -63,12 +61,16 @@ class SetCharsetForMysql < ActiveRecord::Migration
           execute 'ALTER TABLE %s CHARACTER SET utf8 COLLATE utf8_unicode_ci' % table_name
         }
 
-        execute 'ALTER DATABASE %s CHARACTER SET utf8 COLLATE utf8_unicode_ci' % conn.current_database
+        execute 'ALTER DATABASE %s CHARACTER SET utf8 COLLATE utf8_unicode_ci' % connection.current_database
       end
 
       dir.down do
         # Do nada; no use to go back
       end
     end
+  end
+
+  def mysql?
+    ActiveRecord::Base.connection.adapter_name =~ /mysql/i
   end
 end

@@ -50,7 +50,7 @@ end
 if (root_id = `git rev-list --max-parents=0 HEAD`.chomp) != '620acffa5a302c6a27165d3214cf3da6be6c1d0d'
   if (`git remote`.split - %w[heroku]).empty?
     puts "You don't seem to have cantino/huginn set up as upstream repository."
-    if yes?("Would you like me to set this working tree up for you?")
+    if yes?("Would you like me to set this working tree up for you?", default: :yes)
       if system('git remote add origin https://github.com/cantino/huginn.git') &&
         system('git remote update origin')
         rebase_command = "git rebase #{root_id} --onto origin/master"
@@ -109,7 +109,7 @@ unless $config['SMTP_DOMAIN'] && $config['SMTP_USER_NAME'] && $config['SMTP_PASS
 end
 
 branch = capture("git rev-parse --abbrev-ref HEAD")
-if yes?("Should I push your current branch (#{branch}) to heroku?")
+if yes?("Should I push your current branch (#{branch}) to heroku?", default: :yes)
   puts "This may take a moment..."
   puts capture("git push heroku #{branch}:master -f")
 
@@ -124,7 +124,7 @@ if first_time
   puts
   puts
   puts "I can make an admin user on your new Huginn instance and setup some example Agents."
-  if yes?("Should I create a new admin user and some example Agents?")
+  if yes?("Should I create a new admin user and some example Agents?", default: :yes)
     done = false
     while !done
       seed_email = nag "Okay, what is your email address?"
@@ -132,7 +132,7 @@ if first_time
       seed_password = nag "Finally, what password would you like to use?", noecho: true
       puts "\nJust a moment..."
 
-      result = capture("heroku run rake db:seed SEED_EMAIL=#{seed_email} SEED_USERNAME=#{seed_username} SEED_PASSWORD=#{seed_password}")
+      result = capture("heroku run rake db:seed SEED_EMAIL=#{Shellwords.escape Shellwords.escape(seed_email)} SEED_USERNAME=#{Shellwords.escape Shellwords.escape(seed_username)} SEED_PASSWORD=#{Shellwords.escape Shellwords.escape(seed_password)}")
       if result =~ /Validation failed/
         puts "ERROR:"
         puts

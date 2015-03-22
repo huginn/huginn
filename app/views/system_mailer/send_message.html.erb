@@ -4,18 +4,22 @@
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
   </head>
   <body>
-    <% if @headline %>
-      <h1><%= sanitize @headline %></h1>
-    <% end %>
-    <% @groups.each do |group| %>
-      <div style='margin-bottom: 10px;'>
-        <div><%= sanitize group[:title] %></div>
-        <% group[:entries].each do |entry| %>
-          <div style='margin-left: 10px;'>
-            <%= sanitize entry %>
-          </div>
-        <% end %>
-      </div>
+    <% if @body.present? %>
+      <%= sanitize @body %>
+    <% else %>
+      <% if @headline %>
+        <h1><%= sanitize @headline %></h1>
+      <% end %>
+      <% @groups.each do |group| %>
+        <div style='margin-bottom: 10px;'>
+          <div><%= sanitize group[:title] %></div>
+          <% group[:entries].each do |entry| %>
+            <div style='margin-left: 10px;'>
+              <%= sanitize entry %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     <% end %>
   </body>
 </html>

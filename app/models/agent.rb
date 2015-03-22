@@ -12,6 +12,7 @@ class Agent < ActiveRecord::Base
   include LiquidInterpolatable
   include HasGuid
   include LiquidDroppable
+  include DryRunnable
 
   markdown_class_attributes :description, :event_description
 
@@ -45,7 +46,7 @@ class Agent < ActiveRecord::Base
   belongs_to :user, :inverse_of => :agents
   belongs_to :service, :inverse_of => :agents
   has_many :events, -> { order("events.id desc") }, :dependent => :delete_all, :inverse_of => :agent
-  has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
+  has_one  :most_recent_event, -> { order("events.id desc") }, :inverse_of => :agent, :class_name => "Event"
   has_many :logs,  -> { order("agent_logs.id desc") }, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog"
   has_many :received_events, -> { order("events.id desc") }, :through => :sources, :class_name => "Event", :source => :events
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
@@ -194,8 +195,11 @@ class Agent < ActiveRecord::Base
     self.class.can_control_other_agents?
   end
 
+  def can_dry_run?
+    self.class.can_dry_run?
+  end
+
   def log(message, options = {})
-    puts "Agent##{id}: #{message}" unless Rails.env.test?
     AgentLog.log_for_agent(self, message, options)
   end
 
@@ -327,6 +331,14 @@ class Agent < ActiveRecord::Base
 
     def can_control_other_agents?
       include? AgentControllerConcern
+    end
+
+    def can_dry_run!
+      @can_dry_run = true
+    end
+
+    def can_dry_run?
+      !!@can_dry_run
     end
 
     def gem_dependency_check

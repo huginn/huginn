@@ -1,5 +1,6 @@
 class AgentsController < ApplicationController
   include DotHelper
+  include ActionView::Helpers::TextHelper
   include SortableTable
 
   def index
@@ -33,20 +34,53 @@ class AgentsController < ApplicationController
     end
   end
 
+  def dry_run
+    attrs = params[:agent]
+    if agent = current_user.agents.find_by(id: params[:id])
+      # PUT /agents/:id/dry_run
+      type = agent.type
+    else
+      # POST /agents/dry_run
+      type = attrs.delete(:type)
+    end
+    agent = Agent.build_for_type(type, current_user, attrs)
+    agent.name ||= '(Untitled)'
+
+    if agent.valid?
+      results = agent.dry_run!
+
+      render json: {
+        log: results[:log],
+        events: Utils.pretty_print(results[:events], false),
+        memory: Utils.pretty_print(results[:memory] || {}, false),
+      }
+    else
+      render json: {
+        log: [
+          "#{pluralize(agent.errors.count, "error")} prohibited this Agent from being saved:",
+          *agent.errors.full_messages
+        ].join("\n- "),
+        events: '',
+        memory: '',
+      }
+    end
+  end
+
   def type_details
     @agent = Agent.build_for_type(params[:type], current_user, {})
     initialize_presenter
 
-    render :json => {
-        :can_be_scheduled => @agent.can_be_scheduled?,
-        :default_schedule => @agent.default_schedule,
-        :can_receive_events => @agent.can_receive_events?,
-        :can_create_events => @agent.can_create_events?,
-        :can_control_other_agents => @agent.can_control_other_agents?,
-        :options => @agent.default_options,
-        :description_html => @agent.html_description,
-        :oauthable => render_to_string(partial: 'oauth_dropdown', locals: { agent: @agent }),
-        :form_options => render_to_string(partial: 'options', locals: { agent: @agent })
+    render json: {
+        can_be_scheduled: @agent.can_be_scheduled?,
+        default_schedule: @agent.default_schedule,
+        can_receive_events: @agent.can_receive_events?,
+        can_create_events: @agent.can_create_events?,
+        can_control_other_agents: @agent.can_control_other_agents?,
+        can_dry_run: @agent.can_dry_run?,
+        options: @agent.default_options,
+        description_html: @agent.html_description,
+        oauthable: render_to_string(partial: 'oauth_dropdown', locals: { agent: @agent }),
+        form_options: render_to_string(partial: 'options', locals: { agent: @agent })
     }
   end
 
@@ -179,7 +213,7 @@ class AgentsController < ApplicationController
 
   # Sanitize params[:return] to prevent open redirect attacks, a common security issue.
   def redirect_back(message)
-    if params[:return] == "show" && @agent
+    if params[:return] == "show" && @agent && !@agent.destroyed?
       path = agent_path(@agent)
     elsif params[:return] =~ /\A#{Regexp::escape scenarios_path}\/\d+\Z/
       path = params[:return]

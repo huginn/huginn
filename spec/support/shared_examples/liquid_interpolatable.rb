@@ -86,14 +86,22 @@ shared_examples_for LiquidInterpolatable do
   end
 
   describe "liquid tags" do
-    it "should work with existing credentials" do
-      expect(@checker.interpolate_string("{% credential aws_key %}", {})).to eq('2222222222-jane')
+    context "%credential" do
+      it "should work with existing credentials" do
+        expect(@checker.interpolate_string("{% credential aws_key %}", {})).to eq('2222222222-jane')
+      end
+
+      it "should raise an exception for undefined credentials" do
+        expect {
+          @checker.interpolate_string("{% credential unknown %}", {})
+        }.to raise_error
+      end
     end
 
-    it "should raise an exception for undefined credentials" do
-      expect {
-        @checker.interpolate_string("{% credential unknown %}", {})
-      }.to raise_error
+    context '%line_break' do
+      it 'should convert {% line_break %} to actual line breaks' do
+        expect(@checker.interpolate_string("test{% line_break %}second line", {})).to eq("test\nsecond line")
+      end
     end
   end
 end

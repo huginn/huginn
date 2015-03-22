@@ -12,8 +12,10 @@ module Agents
       <<-MD
         This Agent consumes RSS feeds and emits events when they change.
 
-        (If you want to *output* an RSS feed, use the DataOutputAgent.  Also, you can technically parse RSS and XML feeds
-        with the WebsiteAgent as well.  See [this example](https://github.com/cantino/huginn/wiki/Agent-configuration-examples#itunes-trailers).)
+        This Agent is fairly simple, using [feed-normalizer](https://github.com/aasmith/feed-normalizer) as a base.  For complex feeds
+        with additional field types, we recommend using a WebsiteAgent.  See [this example](https://github.com/cantino/huginn/wiki/Agent-configuration-examples#itunes-trailers).
+
+        If you want to *output* an RSS feed, use the DataOutputAgent.
 
         Options:
 

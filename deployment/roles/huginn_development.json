@@ -24,7 +24,7 @@
              "recipe[apt]",
              "recipe[mysql::server]",
              "recipe[mysql::client]",
-             "recipe[nodejs::install_from_binary]",
+             "recipe[nodejs::nodejs_from_binary]",
              "recipe[huginn_development]"
            ]
 }

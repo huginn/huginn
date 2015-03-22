@@ -19,8 +19,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Send and receive WebHooks
 * Run arbitrary JavaScript Agents on the server
 * Track your location over time
-* Create Amazon Mechanical Turk workflows as the inputs, or outputs, of agents.  ("Once a day, ask 5 people for a funny cat photo; send the results to 5 more people to be rated; send the top-rated photo to 5 people for a funny caption; send to 5 final people to rate for funniest caption; finally, post the best captioned photo on my blog.")
-
+* Create Amazon Mechanical Turk workflows as the inputs, or outputs, of agents (the Amazon Turk Agent is called the "HumanTaskAgent"). For example: "Once a day, ask 5 people for a funny cat photo; send the results to 5 more people to be rated; send the top-rated photo to 5 people for a funny caption; send to 5 final people to rate for funniest caption; finally, post the best captioned photo on my blog."
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cantino/huginn?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -28,7 +27,7 @@ Follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves, 
 
 ### We need your help!
 
-Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, add new Agents, write documentation and tutorials, or try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
+Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, [add new Agents](https://github.com/cantino/huginn/wiki/Creating-a-new-agent), write documentation and tutorials, or try tackling [issues tagged with #help-wanted](https://github.com/cantino/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).
 
 Really want an issue fixed/feature implemented? Or maybe you just want to solve some community issues and earn some extra coffee money? Then you should take a look at the [current bounties on Bountysource](https://www.bountysource.com/trackers/282580-huginn).
 
@@ -72,6 +71,10 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 [localhost]: http://localhost:3000/
 [wiki]: https://github.com/cantino/huginn/wiki
 [novice-setup-guide]: https://github.com/cantino/huginn/wiki/Novice-setup-guide
+
+### Develop
+
+All agents have specs! Test all specs with `bundle exec rspec`, or test a specific spec with `bundle exec rspec path/to/specific/spec.rb`. Read more about rspec for rails [here](https://github.com/rspec/rspec-rails).
 
 ## Deployment
 
