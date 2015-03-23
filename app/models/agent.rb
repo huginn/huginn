@@ -46,7 +46,7 @@ class Agent < ActiveRecord::Base
   belongs_to :user, :inverse_of => :agents
   belongs_to :service, :inverse_of => :agents
   has_many :events, -> { order("events.id desc") }, :dependent => :delete_all, :inverse_of => :agent
-  has_one  :most_recent_event, -> { order("events.id desc") }, :inverse_of => :agent, :class_name => "Event"
+  has_one  :most_recent_event, :inverse_of => :agent, :class_name => "Event", :order => "events.id desc"
   has_many :logs,  -> { order("agent_logs.id desc") }, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog"
   has_many :received_events, -> { order("events.id desc") }, :through => :sources, :class_name => "Event", :source => :events
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source

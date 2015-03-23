@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe FormConfigurableAgentPresenter do
-  include RSpecHtmlMatchers
   class FormConfigurableAgentPresenterAgent < Agent
     include FormConfigurable
 
