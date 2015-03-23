@@ -41,8 +41,9 @@ $ ->
         sinceId ?= json.max_id
         currentJobs = [json.pending, json.awaiting_retry, json.recent_failures]
         if document.location.pathname == '/jobs' && $(".modal[aria-hidden=false]").length == 0 && previousJobs? && previousJobs.join(',') != currentJobs.join(',')
-          $.get '/jobs', (data) =>
-            $("#main-content").html(data)
+          if !document.location.search || document.location.search == '?page=1'
+            $.get '/jobs', (data) =>
+              $("#main-content").html(data)
         previousJobs = currentJobs
 
         window.workerCheckTimeout = setTimeout check, 2000
