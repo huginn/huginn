@@ -64,7 +64,7 @@ If you just want to play around, you can simply fork this repository, then perfo
 * Read the [wiki][wiki] for usage examples and to get started making new Agents.
 * Periodically run `git fetch upstream` and then `git checkout master && git merge upstream/master` to merge in the newest version of Huginn.
 
-Note: by default, emails are not sent in the `development` Rails environment, which is what you just setup.  If you'd like to enable emails when playing with Huginn locally, edit `config.action_mailer.perform_deliveries` in `config/environments/development.rb`.
+Note: by default, emails are not sent in the `development` Rails environment, which is what you just setup.  If you'd like to enable emails when playing with Huginn locally, set `SEND_EMAIL_IN_DEVELOPMENT` to `true` in your `.env` file.
 
 If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
 
