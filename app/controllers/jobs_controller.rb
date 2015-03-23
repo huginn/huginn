@@ -49,6 +49,7 @@ class JobsController < ApplicationController
   end
 
   private
+
   def running?
     (@job.locked_at || @job.locked_by) && @job.failed_at.nil?
   end
