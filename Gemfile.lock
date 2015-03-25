@@ -236,7 +236,6 @@ GEM
     multi_json (1.11.0)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
-    mysql2 (0.3.16)
     naught (1.0.0)
     net-ftp-list (3.2.8)
     netrc (0.10.3)
@@ -318,8 +317,6 @@ GEM
     rb-fsevent (0.9.4)
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
-    rdoc (4.2.0)
-      json (~> 1.4)
     ref (1.0.5)
     responders (2.1.0)
       railties (>= 4.2.0, < 5)
@@ -515,7 +512,6 @@ DEPENDENCIES
   liquid (~> 2.6.1)
   mqtt
   multi_xml
-  mysql2 (~> 0.3.16)
   net-ftp-list (~> 3.2.8)
   nokogiri (~> 1.6.4)
   omniauth
