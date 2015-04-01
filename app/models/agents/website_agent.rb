@@ -174,6 +174,9 @@ module Agents
         if (encoding = interpolated['force_encoding']).present?
           body = body.encode(Encoding::UTF_8, encoding)
         end
+        if interpolated['unzip'].present?
+          body = ActiveSupport::Gzip.decompress(body)
+        end
         doc = parse(body)
 
         if extract_full_json?
