@@ -40,6 +40,8 @@ module Agents
             "description": { "path": "results.data[*].description" }
           }
 
+      If your JSON is compressed with `gzip`, set the `unzip` option to `true` to inflate it before extraction.
+
       When parsing text, each sub-hash should contain a `regexp` and `index`.  Output text is matched against the regular expression repeatedly from the beginning through to the end, collecting a captured group specified by `index` in each match.  Each index should be either an integer or a string name which corresponds to <code>(?&lt;<em>name</em>&gt;...)</code>.  For example, to parse lines of <code><em>word</em>: <em>definition</em></code>, the following should work:
 
           "extract": {
