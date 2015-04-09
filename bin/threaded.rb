@@ -1,3 +1,4 @@
+Rails.application.config.cache_classes = true
 require 'thread'
 require 'huginn_scheduler'
 
