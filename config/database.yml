@@ -3,7 +3,7 @@ development:
   encoding: <%= ENV['DATABASE_ENCODING'].presence || "utf8" %>
   reconnect: <%= ENV['DATABASE_RECONNECT'].presence || "true" %>
   database: <%= ENV['DATABASE_NAME'].presence || "huginn_development" %>
-  pool: <%= ENV['DATABASE_POOL'].presence || "5" %>
+  pool: <%= ENV['DATABASE_POOL'].presence || "10" %>
   username: <%= ENV['DATABASE_USERNAME'].presence || "root" %>
   password: <%= ENV['DATABASE_PASSWORD'] || "" %>
   host: <%= ENV['DATABASE_HOST'] || "" %>
@@ -29,7 +29,7 @@ production:
   encoding: <%= ENV['DATABASE_ENCODING'].presence || "utf8" %>
   reconnect: <%= ENV['DATABASE_RECONNECT'].presence || "true" %>
   database: <%= ENV['DATABASE_NAME'].presence || "huginn_production" %>
-  pool: <%= ENV['DATABASE_POOL'].presence || "5" %>
+  pool: <%= ENV['DATABASE_POOL'].presence || "10" %>
   username: <%= ENV['DATABASE_USERNAME'].presence || "root" %>
   password: <%= ENV['DATABASE_PASSWORD'].presence || "password" %>
   host: <%= ENV['DATABASE_HOST'] || "" %>
