@@ -134,17 +134,24 @@ class @AgentEditPage
       unless $(this).data('initialized')
         $(this).data('initialized', true)
         $source = $($(this).data('source')).hide()
-        syntax = $(this).data('syntax')
         editor = ace.edit(this)
         $(this).data('ace-editor', editor)
         editor.getSession().setTabSize(2)
         editor.getSession().setUseSoftTabs(true)
         editor.getSession().setUseWrapMode(false)
         editor.setTheme("ace/theme/chrome")
-        if syntax == 'javascript'
-          editor.getSession().setMode("ace/mode/javascript")
-        else
-          editor.getSession().setMode("ace/mode/text")
+
+        setSyntax = ->
+          syntax = $("[name='agent[options][language]']").val()
+          if syntax == 'JavaScript'
+            editor.getSession().setMode("ace/mode/javascript")
+          else if syntax == 'CoffeeScript'
+            editor.getSession().setMode("ace/mode/coffee")
+          else
+            editor.getSession().setMode("ace/mode/text")
+
+        $("[name='agent[options][language]']").on 'change', setSyntax
+        setSyntax()
 
         editor.getSession().setValue($source.val())
 

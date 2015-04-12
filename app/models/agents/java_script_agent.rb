@@ -27,7 +27,8 @@ module Agents
       * `this.error(message)`
     MD
 
-    form_configurable :code, type: :text, syntax: :javascript
+    form_configurable :language, type: :array, values: %w[JavaScript CoffeeScript]
+    form_configurable :code, type: :text, ace: true
     form_configurable :expected_receive_period_in_days
     form_configurable :expected_update_period_in_days
 
@@ -85,9 +86,10 @@ module Agents
       JS
 
       {
-        "code" => Utils.unindent(js_code),
-        'expected_receive_period_in_days' => "2",
-        'expected_update_period_in_days' => "2"
+        'code' => Utils.unindent(js_code),
+        'language' => 'JavaScript',
+        'expected_receive_period_in_days' => '2',
+        'expected_update_period_in_days' => '2'
       }
     end
 
@@ -111,7 +113,11 @@ module Agents
         end
       end
 
-      context.eval(code)
+      if (options['language'] || '').downcase == 'coffeescript'
+        context.eval(CoffeeScript.compile code)
+      else
+        context.eval(code)
+      end
       context.eval("Agent.#{js_function}();")
     end
 
