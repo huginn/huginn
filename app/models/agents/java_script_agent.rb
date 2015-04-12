@@ -39,6 +39,10 @@ module Agents
       else
         errors.add(:base, "The 'code' option is required") unless options['code'].present?
       end
+
+      if interpolated['language'].present? && !interpolated['language'].downcase.in?(%w[javascript coffeescript])
+        errors.add(:base, "The 'language' must be JavaScript or CoffeeScript")
+      end
     end
 
     def working?

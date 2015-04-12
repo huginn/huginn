@@ -23,6 +23,24 @@ describe Agents::JavaScriptAgent do
       expect(@agent).not_to be_valid
     end
 
+    it "checks for a valid 'language', but allows nil" do
+      expect(@agent).to be_valid
+      @agent.options['language'] = ''
+      expect(@agent).to be_valid
+      @agent.options.delete('language')
+      expect(@agent).to be_valid
+      @agent.options['language'] = 'foo'
+      expect(@agent).not_to be_valid
+      @agent.options['language'] = 'javascript'
+      expect(@agent).to be_valid
+      @agent.options['language'] = 'JavaScript'
+      expect(@agent).to be_valid
+      @agent.options['language'] = 'coffeescript'
+      expect(@agent).to be_valid
+      @agent.options['language'] = 'CoffeeScript'
+      expect(@agent).to be_valid
+    end
+
     it "accepts a credential, but it must exist" do
       expect(@agent).to be_valid
       @agent.options['code'] = 'credential:foo'
@@ -73,7 +91,6 @@ describe Agents::JavaScriptAgent do
         }.not_to change { AgentLog.count }
       }.to change { Event.count }.by(2)
     end
-
 
     describe "using credentials as code" do
       before do
@@ -222,6 +239,18 @@ describe Agents::JavaScriptAgent do
 
           }.not_to change { AgentLog.count }
         }.not_to change { Event.count }
+      end
+    end
+
+    describe "using CoffeeScript" do
+      it "will accept a 'language' of 'CoffeeScript'" do
+        @agent.options['code'] = 'Agent.check = -> this.log("hello from coffeescript")'
+        @agent.options['language'] = 'CoffeeScript'
+        @agent.save!
+        expect {
+          @agent.check
+        }.not_to raise_error
+        expect(AgentLog.last.message).to eq("hello from coffeescript")
       end
     end
   end
