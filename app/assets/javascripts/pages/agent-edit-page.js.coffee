@@ -2,6 +2,7 @@ class @AgentEditPage
   constructor: ->
     $("#agent_source_ids").on "change", @showEventDescriptions
     @showCorrectRegionsOnStartup()
+    $("form.agent-form").on "submit", => @updateFromEditors()
 
     # The type selector is only available on the new agent form.
     if $("#agent_type").length
@@ -9,6 +10,7 @@ class @AgentEditPage
       @handleTypeChange(true)
     else
       @enableDryRunButton()
+      @buildAce()
 
   handleTypeChange: (firstTime) ->
     $(".event-descriptions").html("").hide()
@@ -53,6 +55,7 @@ class @AgentEditPage
           window.jsonEditor = setupJsonEditor()[0]
 
         @enableDryRunButton()
+        @buildAce()
 
         window.initializeFormCompletable()
 
@@ -126,17 +129,42 @@ class @AgentEditPage
       else
         @hideEventCreation()
 
+  buildAce: ->
+    $(".ace-editor").each ->
+      unless $(this).data('initialized')
+        $(this).data('initialized', true)
+        $source = $($(this).data('source')).hide()
+        syntax = $(this).data('syntax')
+        editor = ace.edit(this)
+        $(this).data('ace-editor', editor)
+        editor.getSession().setTabSize(2)
+        editor.getSession().setUseSoftTabs(true)
+        editor.getSession().setUseWrapMode(false)
+        editor.setTheme("ace/theme/chrome")
+        if syntax == 'javascript'
+          editor.getSession().setMode("ace/mode/javascript")
+        else
+          editor.getSession().setMode("ace/mode/text")
+
+        editor.getSession().setValue($source.val())
+
+  updateFromEditors: ->
+    $(".ace-editor").each ->
+      $source = $($(this).data('source'))
+      $source.val($(this).data('ace-editor').getSession().getValue())
+
   enableDryRunButton: ->
     $(".agent-dry-run-button").prop('disabled', false).off().on "click", @invokeDryRun
 
   disableDryRunButton: ->
     $(".agent-dry-run-button").prop('disabled', true)
 
-  invokeDryRun: (e) ->
+  invokeDryRun: (e) =>
     e.preventDefault()
-    button = this
+    button = e.target
     $(button).prop('disabled', true)
     $('body').css(cursor: 'progress')
+    @updateFromEditors()
     $.ajax type: 'POST', url: $(button).data('action-url'), dataType: 'json', data: $(button.form).serialize()
       .always =>
         $("body").css(cursor: 'auto')

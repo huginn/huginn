@@ -3,6 +3,10 @@ require 'cgi'
 
 module Agents
   class JavaScriptAgent < Agent
+    include FormConfigurable
+
+    can_dry_run!
+
     default_schedule "never"
 
     description <<-MD
@@ -22,6 +26,10 @@ module Agents
       * `this.log(message)`
       * `this.error(message)`
     MD
+
+    form_configurable :code, type: :text, syntax: :javascript
+    form_configurable :expected_receive_period_in_days
+    form_configurable :expected_update_period_in_days
 
     def validate_options
       cred_name = credential_referenced_by_code
@@ -67,7 +75,7 @@ module Agents
             this.memory('callCount', callCount + 1);
           }
         };
-        
+
         Agent.receive = function() {
           var events = this.incomingEvents();
           for(var i = 0; i < events.length; i++) {
@@ -77,7 +85,7 @@ module Agents
       JS
 
       {
-        "code" => js_code.gsub(/[\n\r\t]/, '').strip,
+        "code" => Utils.unindent(js_code),
         'expected_receive_period_in_days' => "2",
         'expected_update_period_in_days' => "2"
       }

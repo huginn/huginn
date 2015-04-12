@@ -84,6 +84,12 @@ module ApplicationHelper
     ].join.html_safe, class: "label label-default label-service service-#{service.provider}"
   end
 
+  def load_ace_editor!
+    unless content_for?(:ace_editor_script)
+      content_for :ace_editor_script, javascript_include_tag('ace')
+    end
+  end
+
   def highlighted?(id)
     @highlighted_ranges ||=
       case value = params[:hl].presence

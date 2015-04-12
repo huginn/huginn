@@ -63,7 +63,7 @@ Huginn::Application.configure do
   end
 
   # Precompile additional assets (application.js.coffee.erb, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w( diagram.js graphing.js map_marker.js user_credentials.js )
+  config.assets.precompile += %w( diagram.js graphing.js map_marker.js ace.js )
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

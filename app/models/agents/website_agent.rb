@@ -376,7 +376,7 @@ module Agents
       end
     end
 
-    # Wraps Faraday::Utilsa::Headers
+    # Wraps Faraday::Utils::Headers
     class HeaderDrop < LiquidDroppable::Drop
       def before_method(name)
         @object[name.tr('_', '-')]
