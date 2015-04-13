@@ -20,11 +20,11 @@
           </tr>
 
         <% @jobs.each do |job| %>
-          <% agent = Agent.find(YAML.load(job.handler).args[0]) %>
+          <% agent = Agent.find_by_id(YAML.load(job.handler).args[0]) %>
           <tr>
             <td><%= status(job) %></td>
-            <td><%= link_to agent.name, agent_path(agent) %></td>
-            <td title='<%= job.created_at %>'><%= time_ago_in_words job.created_at %> ago for <%= agent.user.username %></td>
+            <td><%= agent ? link_to(agent.name, agent_path(agent)) : "(deleted)" %></td>
+            <td title='<%= job.created_at %>'><%= time_ago_in_words job.created_at %> ago <%= agent ? "for #{agent.user.username}" : '' %></td>
             <td title='<%= job.run_at %>'>
               <% if !job.failed_at %>
                 <%= relative_distance_of_time_in_words job.run_at %>
