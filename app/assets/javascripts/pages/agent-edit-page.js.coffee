@@ -136,24 +136,22 @@ class @AgentEditPage
         $source = $($(this).data('source')).hide()
         editor = ace.edit(this)
         $(this).data('ace-editor', editor)
-        editor.getSession().setTabSize(2)
-        editor.getSession().setUseSoftTabs(true)
-        editor.getSession().setUseWrapMode(false)
+        session = editor.getSession()
+        session.setTabSize(2)
+        session.setUseSoftTabs(true)
+        session.setUseWrapMode(false)
         editor.setTheme("ace/theme/chrome")
 
         setSyntax = ->
-          syntax = $("[name='agent[options][language]']").val()
-          if syntax == 'JavaScript'
-            editor.getSession().setMode("ace/mode/javascript")
-          else if syntax == 'CoffeeScript'
-            editor.getSession().setMode("ace/mode/coffee")
-          else
-            editor.getSession().setMode("ace/mode/text")
+          switch $("[name='agent[options][language]']").val()
+            when 'JavaScript' then session.setMode("ace/mode/javascript")
+            when 'CoffeeScript' then session.setMode("ace/mode/coffee")
+            else session.setMode("ace/mode/text")
 
         $("[name='agent[options][language]']").on 'change', setSyntax
         setSyntax()
 
-        editor.getSession().setValue($source.val())
+        session.setValue($source.val())
 
   updateFromEditors: ->
     $(".ace-editor").each ->

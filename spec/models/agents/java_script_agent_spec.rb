@@ -31,14 +31,11 @@ describe Agents::JavaScriptAgent do
       expect(@agent).to be_valid
       @agent.options['language'] = 'foo'
       expect(@agent).not_to be_valid
-      @agent.options['language'] = 'javascript'
-      expect(@agent).to be_valid
-      @agent.options['language'] = 'JavaScript'
-      expect(@agent).to be_valid
-      @agent.options['language'] = 'coffeescript'
-      expect(@agent).to be_valid
-      @agent.options['language'] = 'CoffeeScript'
-      expect(@agent).to be_valid
+
+      %w[javascript JavaScript coffeescript CoffeeScript].each do |valid_language|
+        @agent.options['language'] = valid_language
+        expect(@agent).to be_valid
+      end
     end
 
     it "accepts a credential, but it must exist" do
