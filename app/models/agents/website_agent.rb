@@ -86,7 +86,7 @@ module Agents
 
           * `status`: HTTP status as integer. (Almost always 200)
 
-          * `headers`: Reponse headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insentitive to cases and -/_.
+          * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
     MD
 
     event_description do
