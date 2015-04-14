@@ -12,8 +12,6 @@ module Agents
            https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret
         ``` where `:secret` is specified in your options.
 
-        The
-
         Options:
 
           * `secret` - A token that the host will provide for authentication.
