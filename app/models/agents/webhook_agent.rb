@@ -63,7 +63,7 @@ module Agents
           if interpolated['folder_name'].present?
             tmp_file = "#{Rails.root}/#{interpolated['folder_name']}/#{orgFilename}#{fileid}.#{extension}"
           else
-            tmp_file = "#{Rails.root}/#{orgFilename}#{fileid}.#{extension}"
+            tmp_file = "#{Rails.root}/public/#{orgFilename}#{fileid}.#{extension}"
           end
           fileid += 1
         end
