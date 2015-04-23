@@ -11,5 +11,7 @@ unless defined?(Rails)
   exit 1
 end
 
+Rails.application.config.cache_classes = true
+
 scheduler = HuginnScheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'].presence || 0.3)
 scheduler.run!
