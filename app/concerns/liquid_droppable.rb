@@ -21,7 +21,7 @@ module LiquidDroppable
   end
 
   included do
-    const_set :Drop, Kernel.const_set("#{name}Drop", Class.new(Drop)) unless const_defined?("#{name}Drop")
+    const_set :Drop, Kernel.const_set("#{name}Drop", Class.new(Drop))
   end
 
   def to_liquid
