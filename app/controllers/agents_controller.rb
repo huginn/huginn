@@ -112,6 +112,16 @@ class AgentsController < ApplicationController
     end
   end
 
+  def destroy_memory
+    @agent = current_user.agents.find(params[:id])
+    @agent.update!(memory: {})
+
+    respond_to do |format|
+      format.html { redirect_back "Memory erased for '#{@agent.name}'" }
+      format.json { head :ok }
+    end
+  end
+
   def show
     @agent = current_user.agents.find(params[:id])
 
