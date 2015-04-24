@@ -40,8 +40,6 @@ module Agents
             "description": { "path": "results.data[*].description" }
           }
 
-      If your JSON is compressed with `gzip`, set the `unzip` option to `true` to inflate it before extraction.
-
       When parsing text, each sub-hash should contain a `regexp` and `index`.  Output text is matched against the regular expression repeatedly from the beginning through to the end, collecting a captured group specified by `index` in each match.  Each index should be either an integer or a string name which corresponds to <code>(?&lt;<em>name</em>&gt;...)</code>.  For example, to parse lines of <code><em>word</em>: <em>definition</em></code>, the following should work:
 
           "extract": {
@@ -79,6 +77,8 @@ module Agents
       The `headers` field is optional.  When present, it should be a hash of headers to send with the request.
 
       Set `disable_ssl_verification` to `true` to disable ssl verification.
+
+      Set `unzip` to `gzip` to inflate the resource using gzip.
 
       The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload. If you specify `merge` as the mode, it will retain the old payload and update it with the new values.
 
@@ -176,7 +176,7 @@ module Agents
         if (encoding = interpolated['force_encoding']).present?
           body = body.encode(Encoding::UTF_8, encoding)
         end
-        if interpolated['unzip'].present?
+        if interpolated['unzip'] == "gzip"
           body = ActiveSupport::Gzip.decompress(body)
         end
         doc = parse(body)
