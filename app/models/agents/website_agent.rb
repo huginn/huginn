@@ -78,6 +78,8 @@ module Agents
 
       Set `disable_ssl_verification` to `true` to disable ssl verification.
 
+      Set `unzip` to `gzip` to inflate the resource using gzip.
+
       The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload. If you specify `merge` as the mode, it will retain the old payload and update it with the new values.
 
       In Liquid templating, the following variable is available:
@@ -173,6 +175,9 @@ module Agents
         body = response.body
         if (encoding = interpolated['force_encoding']).present?
           body = body.encode(Encoding::UTF_8, encoding)
+        end
+        if interpolated['unzip'] == "gzip"
+          body = ActiveSupport::Gzip.decompress(body)
         end
         doc = parse(body)
 
