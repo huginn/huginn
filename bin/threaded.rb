@@ -1,5 +1,6 @@
 require 'thread'
 require 'huginn_scheduler'
+require 'twitter_stream'
 
 STDOUT.sync = true
 STDERR.sync = true
