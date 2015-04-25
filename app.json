@@ -4,7 +4,7 @@
     "website": "https://github.com/cantino/huginn",
     "repository": "https://github.com/cantino/huginn",
     "env": {
-        "BUILDPACK_URL": "https://github.com/ddollar/heroku-buildpack-multi.git",
+        "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-multi.git",
         "APP_SECRET_TOKEN": {
             "generator": "secret"
         },
@@ -19,5 +19,6 @@
     "scripts": {
       "postdeploy": "bundle exec rake db:migrate"
     },
+    "addons": ["heroku-postgresql"],
     "success_url": "/users/sign_up"
 }
