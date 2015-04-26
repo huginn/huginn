@@ -61,7 +61,7 @@ img.odin {
   display: none;
 }
 
-img.spinner {
+.spinner {
   display: none;
   vertical-align: bottom;
 }
@@ -170,6 +170,13 @@ span.not-applicable:after {
 
 #show-tabs li a.recent-errors {
   font-weight: bold;
+}
+
+// Memory
+
+#memory .action-icon {
+  display: inline-block;
+  cursor: pointer;
 }
 
 // Credentials
@@ -284,4 +291,29 @@ $service-colors:      #55acee     #8fc857     #444444     #2c4762     #007EE5;
 
 .label-service {
   @include services;
+}
+
+// Font Awesome Spinner
+
+.fa-spin-custom {
+  @include animation(spin 1000ms infinite linear);
+}
+
+@mixin keyframes($name)
+{
+  @-webkit-keyframes $name {
+    @content;
+  }
+  @keyframes $name {
+    @content;
+  }
+}
+
+@include keyframes(spin) {
+  0% {
+    @include rotate(0deg);
+  }
+  100% {
+    @include rotate(359deg);
+  }
 }
