@@ -23,7 +23,7 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
   if ENV['SCHEDULER_EXPIRATION_CHECK'] == 'frequent'
-    EVENT_RETENTION_SCHEDULES.push(["A minute", 60])
+    EVENT_RETENTION_SCHEDULES.insert(1, ["A minute", 60])
   end
 
   attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately, :drop_pending_events
