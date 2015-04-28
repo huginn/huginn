@@ -20,9 +20,9 @@ module Agents
           * `payload_path` - JSONPath of the attribute in the POST body to be
             used as the Event payload.  If `payload_path` points to an array,
             Events will be created for each element.
-          * `action_type` - Mulitiple function selection of Webhook Agent. This version support file download feature.
-          * `form_name` - It's sub option of file download feature. received form name in http request from client side.
-          * `folder_name` - It's sub option of file download feature. download path when action_type is file download.
+          * `filedownload_action` - Need to set true when webhook agent is used for file download. Default value is false.
+          * `form_name` - It's sub option of filedownload_action. received form name in http request from client side.
+          * `folder_name` - It's sub option of filedownload_action. download path when action_type is file download.
       MD
     end
 
@@ -37,7 +37,7 @@ module Agents
       { "secret" => "supersecretstring",
         "expected_receive_period_in_days" => 1,
         "payload_path" => "some_key",
-        "action_type" => "filedownload",
+        "filedownload_action" => "false",
         "form_name" => "webhookform",
         "folder_name" =>"public"}
     end
@@ -95,7 +95,7 @@ module Agents
       return ["Please use POST requests only", 401] unless method == "post"
       return ["Not Authorized", 401] unless secret == interpolated['secret']
 
-      if interpolated['action_type'] == "filedownload"
+      if interpolated['filedownload_action'].present? && interpolated['filedownload_action'] == "true"
         file_download_action(params)
       else
         [payload_for(params)].flatten.each do |payload|
