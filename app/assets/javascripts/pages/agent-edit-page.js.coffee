@@ -3,6 +3,14 @@ class @AgentEditPage
     $("#agent_source_ids").on "change", @showEventDescriptions
     @showCorrectRegionsOnStartup()
 
+    $("#agent_name").each ->
+      # Select the number suffix if this is a cloned agent.
+      if matches = this.value.match(/ \(\d+\)$/)
+        this.focus()
+        if this.selectionStart?
+          this.selectionStart = matches.index
+          this.selectionEnd = this.value.length
+
     # The type selector is only available on the new agent form.
     if $("#agent_type").length
       $("#agent_type").on "change", => @handleTypeChange(false)
