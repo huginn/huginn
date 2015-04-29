@@ -20,9 +20,9 @@ module Agents
           * `payload_path` - JSONPath of the attribute in the POST body to be
             used as the Event payload.  If `payload_path` points to an array,
             Events will be created for each element.
-          * `filedownload_action` - Need to set true when webhook agent is used for file download. Default value is false.
-          * `form_name` - It's sub option of filedownload_action. received form name in http request from client side.
-          * `folder_name` - It's sub option of filedownload_action. download path when action_type is file download.
+          * `fileupload_action` - Need to set true when webhook agent is used for file upload. Default value is false.
+          * `form_name` - It's sub option of fileupload_action. received form name in http request from client side.
+          * `folder_name` - It's sub option of fileupload_action. upload path when action_type is file upload.
       MD
     end
 
@@ -37,12 +37,12 @@ module Agents
       { "secret" => "supersecretstring",
         "expected_receive_period_in_days" => 1,
         "payload_path" => "some_key",
-        "filedownload_action" => "false",
+        "fileupload_action" => "false",
         "form_name" => "webhookform",
         "folder_name" =>"public"}
     end
 
-    def file_download_action(params)
+    def file_upload_action(params)
       if params[interpolated['form_name']] != nil
         uploadflag = params[interpolated['form_name']].is_a?(String)
         filename = uploadflag  ? params[interpolated['form_name']] : params[interpolated['form_name']].original_filename
@@ -95,8 +95,8 @@ module Agents
       return ["Please use POST requests only", 401] unless method == "post"
       return ["Not Authorized", 401] unless secret == interpolated['secret']
 
-      if interpolated['filedownload_action'].present? && interpolated['filedownload_action'] == "true"
-        file_download_action(params)
+      if interpolated['fileupload_action'].present? && interpolated['fileupload_action'] == "true"
+        file_upload_action(params)
       else
         [payload_for(params)].flatten.each do |payload|
           create_event(payload: payload)
