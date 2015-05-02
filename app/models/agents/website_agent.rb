@@ -245,14 +245,12 @@ module Agents
       case interpolated['mode'].presence
       when 'on_change'
         result_json = result.to_json
-        old_events.each do |old_event|
-          if old_event.payload.to_json == result_json
-            old_event.expires_at = new_event_expiration_date
-            old_event.save!
-            return false
-          end
+        if found = old_events.find { |event| event.payload.to_json == result_json }
+          found.update!(expires_at: new_event_expiration_date)
+          false
+        else
+          true
         end
-        true
       when 'all', 'merge', ''
         true
       else
