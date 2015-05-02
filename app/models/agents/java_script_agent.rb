@@ -102,6 +102,7 @@ module Agents
           memory.to_json
         end
       end
+      context["unescapeHTML"] = lambda { |a, x| CGI.unescapeHTML(x) }
 
       context.eval(code)
       context.eval("Agent.#{js_function}();")
@@ -156,6 +157,10 @@ module Agents
 
         Agent.error = function(message) {
           doError(message);
+        }
+
+        Agent.unescapeHTML = function(html) {
+          return unescapeHTML(html);
         }
 
         Agent.check = function(){};

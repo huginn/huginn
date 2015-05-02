@@ -162,6 +162,20 @@ describe Agents::JavaScriptAgent do
       end
     end
 
+    describe "unescaping HTML" do
+      it "can unescape html with this.unescapeHTML in the javascript environment" do
+        @agent.options['code'] = 'Agent.check = function() { this.createEvent({ message: this.unescapeHTML(\'test &quot;escaping&quot; &lt;characters&gt;\'), stuff: { foo: 5 } }); };'
+        @agent.save!
+        expect {
+          expect {
+            @agent.check
+          }.not_to change { AgentLog.count }
+        }.to change { Event.count}.by(1)
+        created_event = @agent.events.last
+        expect(created_event.payload).to eq({ 'message' => 'test "escaping" <characters>', 'stuff' => { 'foo' => 5 }})
+      end
+    end
+
     describe "getting incoming events" do
       it "can access incoming events in the JavaScript enviroment via this.incomingEvents" do
         event = Event.new
