@@ -162,9 +162,9 @@ describe Agents::JavaScriptAgent do
       end
     end
 
-    describe "unescaping HTML" do
-      it "can unescape html with this.unescapeHTML in the javascript environment" do
-        @agent.options['code'] = 'Agent.check = function() { this.createEvent({ message: this.unescapeHTML(\'test &quot;escaping&quot; &lt;characters&gt;\'), stuff: { foo: 5 } }); };'
+    describe "escaping and unescaping HTML" do
+      it "can escape and unescape html with this.escapeHtml and this.unescapeHtml in the javascript environment" do
+        @agent.options['code'] = 'Agent.check = function() { this.createEvent({ escaped: this.escapeHtml(\'test \"escaping\" <characters>\'), unescaped: this.unescapeHtml(\'test &quot;unescaping&quot; &lt;characters&gt;\')}); };'
         @agent.save!
         expect {
           expect {
@@ -172,7 +172,7 @@ describe Agents::JavaScriptAgent do
           }.not_to change { AgentLog.count }
         }.to change { Event.count}.by(1)
         created_event = @agent.events.last
-        expect(created_event.payload).to eq({ 'message' => 'test "escaping" <characters>', 'stuff' => { 'foo' => 5 }})
+        expect(created_event.payload).to eq({ 'escaped' => 'test &quot;escaping&quot; &lt;characters&gt;', 'unescaped' => 'test "unescaping" <characters>'})
       end
     end
 
