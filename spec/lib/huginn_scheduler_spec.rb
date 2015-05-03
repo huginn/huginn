@@ -4,17 +4,16 @@ require 'huginn_scheduler'
 describe HuginnScheduler do
   before(:each) do
     @scheduler = HuginnScheduler.new
+    stub(@scheduler).setup {}
+    @scheduler.setup!(Rufus::Scheduler.new, Mutex.new)
     stub
-  end
-
-  it "should stop the scheduler" do
-    mock.instance_of(Rufus::Scheduler).stop
-    @scheduler.stop
   end
 
   it "schould register the schedules with the rufus scheduler and run" do
     mock.instance_of(Rufus::Scheduler).join
-    @scheduler.run!
+    scheduler = HuginnScheduler.new
+    scheduler.setup!(Rufus::Scheduler.new, Mutex.new)
+    scheduler.run
   end
 
   it "should run scheduled agents" do
@@ -53,7 +52,7 @@ describe HuginnScheduler do
     end
   end
 
-  describe "cleanup_failed_jobs!" do
+  describe "cleanup_failed_jobs!", focus: true do
     before do
       3.times do |i|
         Delayed::Job.create(failed_at: Time.now - i.minutes)
@@ -73,6 +72,15 @@ describe HuginnScheduler do
       ENV['FAILED_JOBS_TO_KEEP'] = nil
       expect { @scheduler.send(:cleanup_failed_jobs!) }.to change(Delayed::Job, :count).by(0)
       ENV['FAILED_JOBS_TO_KEEP'] = old
+    end
+  end
+
+  context "#setup_worker" do
+    it "should return an array with an instance of itself" do
+      workers = HuginnScheduler.setup_worker
+      expect(workers).to be_a(Array)
+      expect(workers.first).to be_a(HuginnScheduler)
+      expect(workers.first.id).to eq('HuginnScheduler')
     end
   end
 end

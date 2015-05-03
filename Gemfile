@@ -25,7 +25,6 @@ gem "google-api-client", require: 'google/api_client'
 
 # Twitter Agents
 gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
-gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 gem 'omniauth-twitter'
 
 # Tumblr Agents
@@ -43,6 +42,9 @@ gem 'haversine'
 gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'
 gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
+
+# Uncomment to use 'em_http' as FARADAY_HTTP_BACKEND
+# gem 'em-http-request', '~> 1.1.2'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
@@ -62,7 +64,6 @@ gem 'delayed_job', '~> 4.0.0'
 gem 'delayed_job_active_record', :git => 'https://github.com/cantino/delayed_job_active_record', :branch => 'configurable-reserve-sql-strategy'
 gem 'devise', '~> 3.4.0'
 gem 'dotenv-rails', '~> 2.0.1'
-gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware', '>= 0.10.0'
 gem 'feed-normalizer'
