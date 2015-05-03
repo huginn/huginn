@@ -1,6 +1,7 @@
 module Agents
   class TwitterStreamAgent < Agent
     include TwitterConcern
+    include LongRunnable
 
     cannot_receive_events!
 
@@ -119,6 +120,92 @@ module Agents
       if agent.memory[base]
         (agent.memory[base].keys - agent.interpolated['filters'].map {|f| f.is_a?(Array) ? f.first.to_s : f.to_s }).each do |removed_key|
           agent.memory[base].delete(removed_key)
+        end
+      end
+    end
+
+    def self.setup_worker
+      if Agents::TwitterStreamAgent.dependencies_missing?
+        STDERR.puts Agents::TwitterStreamAgent.twitter_dependencies_missing
+        STDERR.flush
+        return false
+      end
+
+      Agents::TwitterStreamAgent.active.group_by { |agent| agent.twitter_oauth_token }.map do |oauth_token, agents|
+        filter_to_agent_map = agents.map { |agent| agent.options[:filters] }.flatten.uniq.compact.map(&:strip).inject({}) { |m, f| m[f] = []; m }
+
+        agents.each do |agent|
+          agent.options[:filters].flatten.uniq.compact.map(&:strip).each do |filter|
+            filter_to_agent_map[filter] << agent
+          end
+        end
+
+        config_hash = filter_to_agent_map.map { |k, v| [k, v.map(&:id)] } << oauth_token
+
+        Worker.new(id: agents.first.worker_id(config_hash),
+                   config: {filter_to_agent_map: filter_to_agent_map},
+                   agent: agents.first)
+      end
+    end
+
+    class Worker < LongRunnable::Worker
+      RELOAD_TIMEOUT = 10.minutes
+      DUPLICATE_DETECTION_LENGTH = 1000
+      SEPARATOR = /[^\w_\-]+/
+
+      def setup
+        @timeout = 0
+      end
+
+      def run
+        recent_tweets = []
+        filter_to_agent_map = @config[:filter_to_agent_map]
+
+        stream!(filter_to_agent_map.keys, @agent) do |status|
+          if status["retweeted_status"].present? && status["retweeted_status"].is_a?(Hash)
+            puts "Skipping retweet: #{status["text"]}"
+          elsif recent_tweets.include?(status["id_str"])
+            puts "Skipping duplicate tweet: #{status["text"]}"
+          else
+            recent_tweets << status["id_str"]
+            recent_tweets.shift if recent_tweets.length > DUPLICATE_DETECTION_LENGTH
+            puts status["text"]
+            filter_to_agent_map.keys.each do |filter|
+              if (filter.downcase.split(SEPARATOR) - status["text"].downcase.split(SEPARATOR)).reject(&:empty?) == [] # Hacky McHackerson
+                filter_to_agent_map[filter].each do |agent|
+                  puts " -> #{agent.name}"
+                  agent.process_tweet(filter, status)
+                end
+              end
+            end
+          end
+        end
+      end
+
+      private
+      def stream!(filters, agent, &block)
+        filters = filters.map(&:downcase).uniq
+
+        method = (filters && filters.length > 0) ? [:filter, track: filters.map {|f| CGI::escape(f) }.join(",")] : [:sample]
+        client.send(*method) do |tweet|
+          @timeout = 0
+          return unless tweet.class == Twitter::Tweet
+          status = ActiveSupport::HashWithIndifferentAccess.new(tweet.to_h)
+          status['text'] = status['text'].gsub(/&lt;/, "<").gsub(/&gt;/, ">").gsub(/[\t\n\r]/, '  ')
+          yield status
+        end
+      rescue Twitter::Error => e
+        @timeout += 60
+        puts "Twitter raised '#{e.class}', sleeping for #{@timeout} seconds"
+        sleep @timeout
+      end
+
+      def client
+        @client ||= Twitter::Streaming::Client.new do |config|
+          config.consumer_key        = @agent.twitter_consumer_key
+          config.consumer_secret     = @agent.twitter_consumer_secret
+          config.access_token        = @agent.twitter_oauth_token
+          config.access_token_secret = @agent.twitter_oauth_token_secret
         end
       end
     end

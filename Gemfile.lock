@@ -1,14 +1,4 @@
 GIT
-  remote: git://github.com/cantino/twitter-stream.git
-  revision: f7e7edb0bae013bffabf3598e7147773d9fd370f
-  branch: huginn
-  specs:
-    twitter-stream (0.1.15)
-      eventmachine (~> 1.0.7)
-      http_parser.rb (~> 0.6.0)
-      simple_oauth (~> 0.3.0)
-
-GIT
   remote: git://github.com/cantino/weibo_2.git
   revision: 00e57d29d8252126014b038cd738b02e05e4cfc5
   branch: master
@@ -148,14 +138,6 @@ GEM
       hashie
       multi_json
       oauth
-    em-http-request (1.1.2)
-      addressable (>= 2.3.4)
-      cookiejar
-      em-socksify (>= 0.3)
-      eventmachine (>= 1.0.3)
-      http_parser.rb (>= 0.6.0)
-    em-socksify (0.3.0)
-      eventmachine (>= 1.0.0.beta.4)
     em-websocket (0.5.1)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.6.0)
@@ -536,7 +518,6 @@ DEPENDENCIES
   devise (~> 3.4.0)
   dotenv-rails (~> 2.0.1)
   dropbox-api
-  em-http-request (~> 1.1.2)
   faraday (~> 0.9.0)
   faraday_middleware
   feed-normalizer
@@ -598,7 +579,6 @@ DEPENDENCIES
   tumblr_client
   twilio-ruby (~> 3.11.5)
   twitter (~> 5.14.0)
-  twitter-stream!
   typhoeus (~> 0.6.3)
   tzinfo (>= 1.2.0)
   tzinfo-data
