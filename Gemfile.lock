@@ -1,12 +1,21 @@
 GIT
-  remote: git://github.com/dsander/twitter-stream.git
-  revision: 1713b4fe5b387580364b39716bb5c26d6601c50f
+  remote: git://github.com/cantino/twitter-stream.git
+  revision: f7e7edb0bae013bffabf3598e7147773d9fd370f
   branch: huginn
   specs:
     twitter-stream (0.1.15)
       eventmachine (~> 1.0.7)
       http_parser.rb (~> 0.6.0)
-      simple_oauth (~> 0.2.0)
+      simple_oauth (~> 0.3.0)
+
+GIT
+  remote: git://github.com/wunderlist/omniauth-wunderlist.git
+  revision: d0910d0396107b9302aa1bc50e74bb140990ccb8
+  ref: d0910d0396107b9302aa1bc50e74bb140990ccb8
+  specs:
+    omniauth-wunderlist (0.0.1)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.1)
 
 GEM
   remote: https://rubygems.org/
@@ -47,7 +56,7 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    addressable (2.3.7)
+    addressable (2.3.8)
     arel (6.0.0)
     autoparse (0.3.3)
       addressable (>= 2.3.1)
@@ -122,7 +131,7 @@ GEM
     em-websocket (0.5.1)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.6.0)
-    equalizer (0.0.9)
+    equalizer (0.0.11)
     erector (0.10.0)
       treetop (>= 1.2.3)
     erubis (2.7.0)
@@ -190,8 +199,8 @@ GEM
     httmultiparty (0.3.10)
       httparty (>= 0.7.3)
       multipart-post
-    http (0.5.1)
-      http_parser.rb
+    http (0.6.4)
+      http_parser.rb (~> 0.6.0)
     http_parser.rb (0.6.0)
     httparty (0.13.1)
       json (~> 1.8)
@@ -229,7 +238,7 @@ GEM
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
     method_source (0.8.2)
-    mime-types (2.4.3)
+    mime-types (2.5)
     mini_portile (0.6.2)
     minitest (5.5.1)
     mqtt (0.3.1)
@@ -318,8 +327,6 @@ GEM
     rb-fsevent (0.9.4)
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
-    rdoc (4.2.0)
-      json (~> 1.4)
     ref (1.0.5)
     responders (2.1.0)
       railties (>= 4.2.0, < 5)
@@ -380,7 +387,7 @@ GEM
       jwt (>= 0.1.5)
       multi_json (>= 1.0.0)
     simple-rss (1.3.1)
-    simple_oauth (0.2.0)
+    simple_oauth (0.3.1)
     simplecov (0.9.2)
       docile (~> 1.1.0)
       multi_json (~> 1.0)
@@ -390,7 +397,7 @@ GEM
     slop (3.6.0)
     spectrum-rails (1.3.4)
       railties (>= 3.1)
-    spring (1.3.3)
+    spring (1.3.4)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     sprockets (2.12.3)
@@ -428,17 +435,17 @@ GEM
       builder (>= 2.1.2)
       jwt (>= 0.1.2)
       multi_json (>= 1.3.0)
-    twitter (5.8.0)
+    twitter (5.14.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
       equalizer (~> 0.0.9)
       faraday (~> 0.9.0)
-      http (~> 0.5.0)
+      http (~> 0.6.0)
       http_parser.rb (~> 0.6.0)
       json (~> 1.8)
       memoizable (~> 0.4.0)
       naught (~> 1.0)
-      simple_oauth (~> 0.2.0)
+      simple_oauth (~> 0.3.0)
     typhoeus (0.6.9)
       ethon (>= 0.7.1)
     tzinfo (1.2.2)
@@ -523,6 +530,7 @@ DEPENDENCIES
   omniauth-dropbox
   omniauth-tumblr
   omniauth-twitter
+  omniauth-wunderlist!
   pg
   protected_attributes (~> 1.0.8)
   pry
@@ -549,7 +557,7 @@ DEPENDENCIES
   therubyracer (~> 0.12.1)
   tumblr_client
   twilio-ruby (~> 3.11.5)
-  twitter (~> 5.8.0)
+  twitter (~> 5.14.0)
   twitter-stream!
   typhoeus (~> 0.6.3)
   tzinfo (>= 1.2.0)

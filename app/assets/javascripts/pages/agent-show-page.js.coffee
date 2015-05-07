@@ -2,6 +2,7 @@ class @AgentShowPage
   constructor: ->
     $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", @fetchLogs
     $(".agent-show #logs .clear").on "click", @clearLogs
+    $(".agent-show #memory .clear").on "click", @clearMemory
 
     # Trigger tabs when navigated to.
     if tab = window.location.href.match(/tab=(\w+)\b/i)?[1]
@@ -38,6 +39,20 @@ class @AgentShowPage
         $("#show-tabs li a.recent-errors").removeClass 'recent-errors'
         $("#logs .spinner").stop(true, true).fadeOut ->
           $("#logs .refresh, #logs .clear").show()
+
+  clearMemory: (e) ->
+    if confirm("Are you sure you want to clear memory of this Agent?")
+      agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
+      e.preventDefault()
+      $("#memory .spinner").css(display: 'inline-block')
+      $("#memory .clear").hide()
+      $.post "/agents/#{agentId}/memory", { "_method": "DELETE" }
+        .done ->
+          $("#memory .spinner").fadeOut ->
+            $("#memory + .memory").text "{\n}\n"
+        .fail ->
+          $("#memory .spinner").fadeOut ->
+            $("#memory .clear").css(display: 'inline-block')
 
 $ ->
   Utils.registerPage(AgentShowPage, forPathsMatching: /^agents\/\d+/)

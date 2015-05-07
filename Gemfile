@@ -19,8 +19,8 @@ gem 'hypdf', '~> 1.0.7'           # PDFInfoAgent
 gem "google-api-client", require: 'google/api_client'
 
 # Twitter Agents
-gem 'twitter', '~> 5.8.0' # Must to be loaded before cantino-twitter-stream.
-gem 'twitter-stream', github: 'dsander/twitter-stream', branch: 'huginn'
+gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
+gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 gem 'omniauth-twitter'
 
 # Tumblr Agents
@@ -37,6 +37,7 @@ gem 'haversine'
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'
+gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
