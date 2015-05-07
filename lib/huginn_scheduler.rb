@@ -114,14 +114,8 @@ class HuginnScheduler
     end
 
     # Schedule event cleanup.
-    if ENV['SCHEDULER_EXPIRATION_CHECK'] == 'normal'
-      @rufus_scheduler.cron "0 0 * * * " + tzinfo_friendly_timezone do
-        cleanup_expired_events!
-      end
-    elsif ENV['SCHEDULER_EXPIRATION_CHECK'] == 'frequent'
-      @rufus_scheduler.every '3m' do
-        cleanup_expired_events!
-      end
+    @rufus_scheduler.every ENV['EVENT_EXPIRATION_CHECK'] do
+      cleanup_expired_events!
     end
 
     # Schedule failed job cleanup.
