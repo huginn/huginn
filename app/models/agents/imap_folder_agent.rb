@@ -525,17 +525,19 @@ module Agents
 
       def has_attachment?
         @has_attachment ||=
-          begin
-            data = @client.uid_fetch(@uid, 'BODYSTRUCTURE').first
+          if data = @client.uid_fetch(@uid, 'BODYSTRUCTURE').first
             struct_has_attachment?(data.attr['BODYSTRUCTURE'])
+          else
+            false
           end
       end
 
       def fetch
         @parsed ||=
-          begin
-            data = @client.uid_fetch(@uid, 'BODY.PEEK[]').first
+          if data = @client.uid_fetch(@uid, 'BODY.PEEK[]').first
             Mail.read_from_string(data.attr['BODY[]'])
+          else
+            Mail.read_from_string('')
           end
       end
 
