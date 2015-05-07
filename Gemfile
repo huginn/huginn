@@ -8,12 +8,14 @@ gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
 gem 'wunderground', '~> 1.2.0'    # WeatherAgent
 gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'weibo_2', '~> 0.1'         # Weibo Agents
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
 gem 'hypdf', '~> 1.0.7'           # PDFInfoAgent
+
+# Weibo Agents
+gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
 
 # GoogleCalendarPublishAgent
 gem "google-api-client", require: 'google/api_client'
