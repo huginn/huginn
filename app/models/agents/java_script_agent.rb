@@ -135,7 +135,7 @@ module Agents
     end
 
     def credential_referenced_by_code
-      interpolated['code'] =~ /\Acredential:(.*)\Z/ && $1
+      interpolated['code'] =~ /\Acredential:(.*)\Z/ && $1.strip
     end
 
     def setup_javascript

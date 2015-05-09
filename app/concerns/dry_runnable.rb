@@ -56,6 +56,7 @@ module DryRunnable
     def create_event(event_hash)
       if can_create_events?
         @dry_run_results[:events] << event_hash[:payload]
+        events.build({ user: user, expires_at: new_event_expiration_date }.merge(event_hash))
       else
         error "This Agent cannot create events!"
       end
