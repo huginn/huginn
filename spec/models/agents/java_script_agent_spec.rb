@@ -92,7 +92,7 @@ describe Agents::JavaScriptAgent do
     describe "using credentials as code" do
       before do
         @agent.user.user_credentials.create :credential_name => 'code-foo', :credential_value => 'Agent.check = function() { this.log("ran it"); };'
-        @agent.options['code'] = 'credential:code-foo'
+        @agent.options['code'] = "credential:code-foo\n\n"
         @agent.save!
       end
 
