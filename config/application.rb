@@ -13,7 +13,7 @@ module Huginn
     # -- all .rb files in that directory are automatically loaded.
 
     # Custom directories with classes and modules you want to be autoloadable.
-    config.autoload_paths += %W(#{config.root}/lib #{config.root}/app/presenters)
+    config.autoload_paths += %W(#{config.root}/lib #{config.root}/app/presenters #{config.root}/app/jobs)
 
     # Activate observers that should always be running.
     # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
@@ -52,5 +52,7 @@ module Huginn
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+    config.active_job.queue_adapter = :delayed_job
   end
 end
