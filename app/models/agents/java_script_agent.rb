@@ -21,6 +21,8 @@ module Agents
       * `this.options(key)`
       * `this.log(message)`
       * `this.error(message)`
+      * `this.escapeHtml(htmlToEscape)`
+      * `this.unescapeHtml(htmlToUnescape)`
     MD
 
     def validate_options
@@ -102,6 +104,8 @@ module Agents
           memory.to_json
         end
       end
+      context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
+      context["unescapeHtml"] = lambda { |a, x| CGI.unescapeHTML(x) }
 
       context.eval(code)
       context.eval("Agent.#{js_function}();")
@@ -156,6 +160,14 @@ module Agents
 
         Agent.error = function(message) {
           doError(message);
+        }
+
+        Agent.escapeHtml = function(html) {
+          return escapeHtml(html);
+        }
+
+        Agent.unescapeHtml = function(html) {
+          return unescapeHtml(html);
         }
 
         Agent.check = function(){};
