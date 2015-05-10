@@ -11,5 +11,5 @@ unless defined?(Rails)
   exit 1
 end
 
-scheduler = HuginnScheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'])
+scheduler = HuginnScheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'].presence || 0.3)
 scheduler.run!

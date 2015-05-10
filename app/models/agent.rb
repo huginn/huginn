@@ -387,24 +387,11 @@ class Agent < ActiveRecord::Base
       end
     end
 
-    # Given an Agent id and an array of Event ids, load the Agent, call #receive on it with the Event objects, and then
-    # save it with an updated `last_receive_at` timestamp.
-    #
-    # This method is tagged with `handle_asynchronously` and will be delayed and run with delayed_job.  It accepts Agent
-    # and Event ids instead of a literal ActiveRecord models because it is preferable to serialize delayed_jobs with ids.
+    # This method will enqueue an AgentReceiveJob job. It accepts Agent and Event ids instead of a literal ActiveRecord
+    # models because it is preferable to serialize jobs with ids.
     def async_receive(agent_id, event_ids)
-      agent = Agent.find(agent_id)
-      begin
-        return if agent.unavailable?
-        agent.receive(Event.where(:id => event_ids))
-        agent.last_receive_at = Time.now
-        agent.save!
-      rescue => e
-        agent.error "Exception during receive. #{e.message}: #{e.backtrace.join("\n")}"
-        raise
-      end
+      AgentReceiveJob.perform_later(agent_id, event_ids)
     end
-    handle_asynchronously :async_receive
 
     # Given a schedule name, run `check` via `bulk_check` on all Agents with that schedule.
     # This is called by bin/schedule.rb for each schedule in `SCHEDULES`.
@@ -425,24 +412,11 @@ class Agent < ActiveRecord::Base
       end
     end
 
-    # Given an Agent id, load the Agent, call #check on it, and then save it with an updated `last_check_at` timestamp.
-    #
-    # This method is tagged with `handle_asynchronously` and will be delayed and run with delayed_job.  It accepts an Agent
-    # id instead of a literal Agent because it is preferable to serialize delayed_jobs with ids, instead of with the full
-    # Agents.
+    # This method will enqueue an AgentCheckJob job. It accepts an Agent id instead of a literal Agent because it is
+    # preferable to serialize job with ids, instead of with the full Agents.
     def async_check(agent_id)
-      agent = Agent.find(agent_id)
-      begin
-        return if agent.unavailable?
-        agent.check
-        agent.last_check_at = Time.now
-        agent.save!
-      rescue => e
-        agent.error "Exception during check. #{e.message}: #{e.backtrace.join("\n")}"
-        raise
-      end
+      AgentCheckJob.perform_later(agent_id)
     end
-    handle_asynchronously :async_check
   end
 end
 

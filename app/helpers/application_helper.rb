@@ -57,6 +57,8 @@ module ApplicationHelper
     case provider.to_sym
     when :twitter, :tumblr, :github, :dropbox
       icon_tag("fa-#{provider}")
+    when :wunderlist
+      icon_tag("fa-list")
     else
       icon_tag("fa-lock")
     end

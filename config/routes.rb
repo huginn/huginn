@@ -6,6 +6,7 @@ Huginn::Application.routes.draw do
       post :handle_details_post
       put :leave_scenario
       delete :remove_events
+      delete :memory, action: :destroy_memory
     end
 
     collection do

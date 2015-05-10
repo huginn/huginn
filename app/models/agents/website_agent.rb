@@ -78,6 +78,8 @@ module Agents
 
       Set `disable_ssl_verification` to `true` to disable ssl verification.
 
+      Set `unzip` to `gzip` to inflate the resource using gzip.
+
       The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload. If you specify `merge` as the mode, it will retain the old payload and update it with the new values.
 
       In Liquid templating, the following variable is available:
@@ -86,7 +88,7 @@ module Agents
 
           * `status`: HTTP status as integer. (Almost always 200)
 
-          * `headers`: Reponse headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insentitive to cases and -/_.
+          * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
     MD
 
     event_description do
@@ -174,6 +176,9 @@ module Agents
         if (encoding = interpolated['force_encoding']).present?
           body = body.encode(Encoding::UTF_8, encoding)
         end
+        if interpolated['unzip'] == "gzip"
+          body = ActiveSupport::Gzip.decompress(body)
+        end
         doc = parse(body)
 
         if extract_full_json?
@@ -240,14 +245,12 @@ module Agents
       case interpolated['mode'].presence
       when 'on_change'
         result_json = result.to_json
-        old_events.each do |old_event|
-          if old_event.payload.to_json == result_json
-            old_event.expires_at = new_event_expiration_date
-            old_event.save!
-            return false
-          end
+        if found = old_events.find { |event| event.payload.to_json == result_json }
+          found.update!(expires_at: new_event_expiration_date)
+          false
+        else
+          true
         end
-        true
       when 'all', 'merge', ''
         true
       else

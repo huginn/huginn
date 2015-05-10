@@ -150,7 +150,7 @@ source /app/.env
 
 # Fixup the Procfile and prepare the PORT
 [ -n "\${DO_NOT_RUN_JOBS}" ] && perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
-perl -pi -e 's/rails server\$/rails server -p \\\$PORT/' /app/Procfile
+perl -pi -e 's/rails server\$/rails server -b 0.0.0.0 -p \\\$PORT/' /app/Procfile
 export PORT
 
 # Start huginn

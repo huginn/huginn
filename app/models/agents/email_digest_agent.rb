@@ -42,7 +42,7 @@ module Agents
         groups = self.memory['queue'].map { |payload| present(payload) }
         log "Sending digest mail to #{user.email} with events [#{ids}]"
         recipients.each do |recipient|
-          SystemMailer.delay.send_message(:to => recipient, :subject => interpolated['subject'], :headline => interpolated['headline'], :groups => groups)
+          SystemMailer.send_message(:to => recipient, :subject => interpolated['subject'], :headline => interpolated['headline'], :groups => groups).deliver_later
         end
         self.memory['queue'] = []
         self.memory['events'] = []

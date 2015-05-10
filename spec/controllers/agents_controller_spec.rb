@@ -374,4 +374,24 @@ describe AgentsController do
       }
     end
   end
+
+  describe "DELETE memory" do
+    it "clears memory of the agent" do
+      agent = agents(:bob_website_agent)
+      agent.update!(memory: { "test" => 42 })
+      sign_in users(:bob)
+      delete :destroy_memory, id: agent.to_param
+      expect(agent.reload.memory).to eq({})
+    end
+
+    it "does not clear memory of an agent not owned by the current user" do
+      agent = agents(:jane_website_agent)
+      agent.update!(memory: { "test" => 42 })
+      sign_in users(:bob)
+      expect {
+        delete :destroy_memory, id: agent.to_param
+      }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(agent.reload.memory).to eq({ "test" => 42})
+    end
+  end
 end

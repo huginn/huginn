@@ -8,19 +8,21 @@ gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
 gem 'wunderground', '~> 1.2.0'    # WeatherAgent
 gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'weibo_2', '~> 0.1'         # Weibo Agents
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
 gem 'hypdf', '~> 1.0.7'           # PDFInfoAgent
 
+# Weibo Agents
+gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
+
 # GoogleCalendarPublishAgent
 gem "google-api-client", require: 'google/api_client'
 
 # Twitter Agents
-gem 'twitter', '~> 5.8.0' # Must to be loaded before cantino-twitter-stream.
-gem 'twitter-stream', github: 'dsander/twitter-stream', branch: 'huginn'
+gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
+gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 gem 'omniauth-twitter'
 
 # Tumblr Agents
@@ -37,6 +39,7 @@ gem 'haversine'
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 # gem 'omniauth-github'
+gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.

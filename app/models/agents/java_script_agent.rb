@@ -25,6 +25,8 @@ module Agents
       * `this.options(key)`
       * `this.log(message)`
       * `this.error(message)`
+      * `this.escapeHtml(htmlToEscape)`
+      * `this.unescapeHtml(htmlToUnescape)`
     MD
 
     form_configurable :language, type: :array, values: %w[JavaScript CoffeeScript]
@@ -116,6 +118,8 @@ module Agents
           memory.to_json
         end
       end
+      context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
+      context["unescapeHtml"] = lambda { |a, x| CGI.unescapeHTML(x) }
 
       if (options['language'] || '').downcase == 'coffeescript'
         context.eval(CoffeeScript.compile code)
@@ -174,6 +178,14 @@ module Agents
 
         Agent.error = function(message) {
           doError(message);
+        }
+
+        Agent.escapeHtml = function(html) {
+          return escapeHtml(html);
+        }
+
+        Agent.unescapeHtml = function(html) {
+          return unescapeHtml(html);
         }
 
         Agent.check = function(){};
