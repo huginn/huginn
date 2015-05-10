@@ -110,6 +110,19 @@ Huginn::Application.routes.draw do
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
 
+  if ENV['RESQUE_WEB'].present? && Rails.configuration.active_job.queue_adapter == :resque
+    require 'resque/server'
+
+    resque_web_constraint = lambda do |request|
+      current_user = request.env['warden'].user
+      current_user.present? && current_user.admin?
+    end
+
+    constraints resque_web_constraint do
+      mount Resque::Server.new, :at => "/resque"
+    end
+  end
+
   get "/about" => "home#about"
   root :to => "home#index"
 end
