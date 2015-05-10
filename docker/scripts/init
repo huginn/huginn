@@ -38,6 +38,9 @@ case "${DATABASE_ADAPTER}" in
   *) echo "Unsupported database adapter. Available adapters are mysql2, and postgres." && exit 1 ;;
 esac
 
+# Remove pid file from previous execution
+test -f /app/tmp/pids/server.pid && rm /app/tmp/pids/server.pid
+
 # initialize supervisord config
 
 cat > /etc/supervisor/conf.d/supervisord.conf <<EOF
