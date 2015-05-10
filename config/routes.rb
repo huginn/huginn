@@ -69,14 +69,27 @@ Huginn::Application.routes.draw do
     end
   end
 
-  resources :jobs, :only => [:index, :destroy] do
-    member do
-      put :run
+  if Rails.configuration.active_job.queue_adapter == :sidekiq
+    admin_constraint = lambda do |request|
+      current_user = request.env['warden'].user
+      current_user.present? && current_user.admin?
     end
-    collection do
-      delete :destroy_failed
-      delete :destroy_all
-      post :retry_queued
+
+    constraints admin_constraint do
+      require 'sidekiq/web'
+
+      mount Sidekiq::Web => '/sidekiq'
+    end
+  else
+    resources :jobs, :only => [:index, :destroy] do
+      member do
+        put :run
+      end
+      collection do
+        delete :destroy_failed
+        delete :destroy_all
+        post :retry_queued
+      end
     end
   end
 

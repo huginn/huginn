@@ -26,5 +26,9 @@ fi
 if [ -z "$1" ]; then
   exec bundle exec unicorn -c config/unicorn.rb
 else
-  exec bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
+  if [[ $1 == sidekiq* ]]; then
+    exec bundle exec "$@" RAILS_ENV=${RAILS_ENV}
+  else
+    exec bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
+  fi
 fi

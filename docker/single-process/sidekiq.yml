@@ -1,0 +1,76 @@
+# This needs at least compose 1.6.0
+version: '2'
+
+services:
+  postgresdata:
+    image: postgres:9.5
+    command: /bin/true
+
+  postgres:
+    image: postgres:9.5
+    volumes_from:
+      - postgresdata
+    environment:
+      POSTGRES_PASSWORD: myhuginnpassword
+      POSTGRES_USER: huginn
+
+  redisdata:
+    image: redis:3.2-alpine
+    command: /bin/true
+
+  redis:
+    volumes_from:
+      - redisdata
+    image: redis:3.2-alpine
+
+  huginn_web:
+    image: cantino/huginn-single-process
+    restart: always
+    extends:
+      file: environment.yml
+      service: huginn_base
+    environment:
+      DATABASE_ADAPTER: postgresql
+      POSTGRES_PORT_5432_TCP_ADDR: postgres
+      POSTGRES_PORT_5432_TCP_PORT: 5432
+      BACKGROUND_JOB_PROCESSOR: sidekiq
+      REDIS_URL: redis://redis:6379/1
+    ports:
+      - 3000:3000
+    links:
+      - postgres
+      - redis
+
+  huginn_threaded:
+    image: cantino/huginn-single-process
+    restart: always
+    extends:
+      file: environment.yml
+      service: huginn_base
+    environment:
+      DATABASE_ADAPTER: postgresql
+      POSTGRES_PORT_5432_TCP_ADDR: postgres
+      POSTGRES_PORT_5432_TCP_PORT: 5432
+      BACKGROUND_JOB_PROCESSOR: sidekiq
+      REDIS_URL: redis://redis:6379/1
+    links:
+      - postgres
+      - redis
+    command: /scripts/init bin/threaded.rb
+
+  huginn_sidekiq:
+    image: cantino/huginn-single-process
+    extends:
+      file: environment.yml
+      service: huginn_base
+    environment:
+      DATABASE_ADAPTER: postgresql
+      POSTGRES_PORT_5432_TCP_ADDR: postgres
+      POSTGRES_PORT_5432_TCP_PORT: 5432
+      BACKGROUND_JOB_PROCESSOR: sidekiq
+      REDIS_URL: redis://redis:6379/1
+    links:
+      - postgres
+      - redis
+    command: /scripts/init sidekiq
+

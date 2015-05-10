@@ -93,9 +93,18 @@ gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
 gem 'coffee-rails', '~> 4.2'
 gem 'daemons', '~> 1.1.9'
-gem 'delayed_job', '~> 4.1.5'
-gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails52'
 gem 'devise', '~> 4.4.3'
+
+if_true(!ENV['BACKGROUND_JOB_PROCESSOR'] || ENV['BACKGROUND_JOB_PROCESSOR'] == 'delayed_job') do
+  gem 'delayed_job', '~> 4.1.5'
+  gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails52'
+end
+
+if_true(ENV['BACKGROUND_JOB_PROCESSOR'] == 'sidekiq') do
+  gem 'sidekiq', '~> 4.2.2', require: false
+  gem 'sidekiq-failures', '~> 0.4.5', require: false
+end
+
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9'
 gem 'faraday_middleware', '~> 0.12.2'

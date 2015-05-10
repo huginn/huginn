@@ -48,3 +48,15 @@ jobs: bundle exec rails runner bin/threaded.rb
 #dj8: bundle exec script/delayed_job -i 8 run
 #dj9: bundle exec script/delayed_job -i 9 run
 #dj10: bundle exec script/delayed_job -i 10 run
+
+###################
+# Sidekiq workers #
+###################
+# WARNING: Using Sidekiq with Huginn is not tested enough in production, only use it when you know how
+# how to set up redis and want to help ensuring everything works.
+#
+# All "dj" workers processes need to be disabled for resque to work.
+#
+# Configure BACKGROUND_JOB_PROCESSOR=sidekiq in your .env file and uncomment the sidekiq worker process
+#
+#sidekiq: bundle exec sidekiq
