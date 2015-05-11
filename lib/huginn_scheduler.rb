@@ -114,7 +114,7 @@ class HuginnScheduler
     end
 
     # Schedule event cleanup.
-    @rufus_scheduler.every ENV['EVENT_EXPIRATION_CHECK'] do
+    @rufus_scheduler.every ENV['EVENT_EXPIRATION_CHECK'].presence || '6h' do
       cleanup_expired_events!
     end
 
