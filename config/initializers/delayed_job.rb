@@ -1,9 +1,10 @@
 Delayed::Worker.destroy_failed_jobs = false
 Delayed::Worker.max_attempts = 5
-Delayed::Worker.max_run_time = 20.minutes
+Delayed::Worker.max_run_time = (ENV['DELAYED_JOB_MAX_RUNTIME'].presence || 20).to_i.minutes
 Delayed::Worker.read_ahead = 5
 Delayed::Worker.default_priority = 10
 Delayed::Worker.delay_jobs = !Rails.env.test?
+Delayed::Worker.sleep_delay = (ENV['DELAYED_JOB_SLEEP_DELAY'].presence || 10).to_f
 
 # Delayed::Worker.logger = Logger.new(Rails.root.join('log', 'delayed_job.log'))
 # Delayed::Worker.logger.level = Logger::DEBUG
