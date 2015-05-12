@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# 20150512 : add static IPv6 address
+ip -6 addr add 2a01:e35:8bce:4151::20/64 dev eth0
+
 set -e
 
 cd /app
