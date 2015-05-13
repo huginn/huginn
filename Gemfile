@@ -97,22 +97,22 @@ group :development do
   gem 'guard'
   gem 'guard-livereload'
   gem 'guard-rspec'
-end
 
-group :development, :test do
-  gem 'coveralls', require: false
-  gem 'delorean'
-  gem 'pry'
-  gem 'rr'
-  gem 'rspec', '~> 3.2'
-  gem 'rspec-collection_matchers', '~> 1.1.0'
-  gem 'rspec-rails', '~> 3.1'
-  gem 'rspec-html-matchers', '~> 0.7'
-  gem 'shoulda-matchers'
-  gem 'spring', '~> 1.3.0'
-  gem 'spring-commands-rspec'
-  gem 'vcr'
-  gem 'webmock', '~> 1.17.4', require: false
+  group :test do
+    gem 'coveralls', require: false
+    gem 'delorean'
+    gem 'pry'
+    gem 'rr'
+    gem 'rspec', '~> 3.2'
+    gem 'rspec-collection_matchers', '~> 1.1.0'
+    gem 'rspec-rails', '~> 3.1'
+    gem 'rspec-html-matchers', '~> 0.7'
+    gem 'shoulda-matchers'
+    gem 'spring', '~> 1.3.0'
+    gem 'spring-commands-rspec'
+    gem 'vcr'
+    gem 'webmock', '~> 1.17.4', require: false
+  end
 end
 
 group :production do
