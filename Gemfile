@@ -1,45 +1,42 @@
+#
+# The default setup of Huginn is pretty large and may not fit on
+# servers with lower RAM.  To conserve RAM, you can turn off some of
+# the Agent types you don't need and avoid loading their dependencies.
+# It is also a good idea to not install gems only for development on
+# production.  To do this, list the gem groups you want to opt out of
+# after `--without` when you run `bundle` on your production
+# environment.  e.g.:
+#
+#     bundle install --deployment --without development test basecamp human_task jabber mqtt weibo
+#
+# Here's the list of gem groups enabled by default but optional:
+#
+# Group         | Use(s)
+# ------------- | --------------------------
+# development   | development
+# test          | running tests
+# basecamp      | BasecampAgent
+# dropbox       | Dropbox Agents
+# ftpsite       | FtpsiteAgent
+# github        | GitHub Agents
+# google_api    | GoogleCalendarPublishAgent
+# growl         | GrowlAgent
+# hipchat       | HipchatAgent
+# human_task    | HumanTaskAgent
+# jabber        | JabberAgent
+# mqtt          | MqttAgent
+# pdf_info      | PdfInfoAgent
+# slack         | SlackAgent
+# tumblr        | Tumblr Agents
+# twilio        | TwilioAgent
+# twitter       | Twitter Agents
+# user_location | UserLocationAgent
+# weather       | WeatherAgent
+# weibo         | Weibo Agents
+# wunderlist    | WunderListAgent
+#
+
 source 'https://rubygems.org'
-
-# Optional libraries.  To conserve RAM, comment out any that you don't need,
-# then run `bundle` and commit the updated Gemfile and Gemfile.lock.
-gem 'twilio-ruby', '~> 3.11.5'    # TwilioAgent
-gem 'ruby-growl', '~> 4.1.0'      # GrowlAgent
-gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
-gem 'wunderground', '~> 1.2.0'    # WeatherAgent
-gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
-gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'hipchat', '~> 1.2.0'         # HipchatAgent
-gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
-gem 'mqtt'                        # MQTTAgent
-gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
-gem 'hypdf', '~> 1.0.7'           # PDFInfoAgent
-
-# Weibo Agents
-gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
-
-# GoogleCalendarPublishAgent
-gem "google-api-client", require: 'google/api_client'
-
-# Twitter Agents
-gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
-gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
-gem 'omniauth-twitter'
-
-# Tumblr Agents
-gem 'tumblr_client'
-gem 'omniauth-tumblr'
-
-# Dropbox Agents
-gem 'dropbox-api'
-gem 'omniauth-dropbox'
-
-# UserLocationAgent
-gem 'haversine'
-
-# Optional Services.
-gem 'omniauth-37signals'          # BasecampAgent
-# gem 'omniauth-github'
-gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
@@ -47,6 +44,15 @@ unless Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.5.0')
   STDERR.puts "Bundler >=1.5.0 is required.  Please upgrade bundler with 'gem install bundler'"
   exit 1
 end
+
+def optional
+  group :optional, &proc
+end
+
+# Let optional gems optional
+Bundler.settings.without |= [:optional]
+
+# Essential gems.
 
 gem 'protected_attributes', '~>1.0.8' # This must be loaded before some other gems, like delayed_job.
 
@@ -91,31 +97,6 @@ gem 'therubyracer', '~> 0.12.2'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '>= 1.3.0'
 
-group :development do
-  gem 'better_errors', '~> 1.1'
-  gem 'binding_of_caller'
-  gem 'quiet_assets'
-  gem 'guard'
-  gem 'guard-livereload'
-  gem 'guard-rspec'
-
-  group :test do
-    gem 'coveralls', require: false
-    gem 'delorean'
-    gem 'pry-rails'
-    gem 'rr'
-    gem 'rspec', '~> 3.2'
-    gem 'rspec-collection_matchers', '~> 1.1.0'
-    gem 'rspec-rails', '~> 3.1'
-    gem 'rspec-html-matchers', '~> 0.7'
-    gem 'shoulda-matchers'
-    gem 'spring', '~> 1.3.0'
-    gem 'spring-commands-rspec'
-    gem 'vcr'
-    gem 'webmock', '~> 1.17.4', require: false
-  end
-end
-
 group :production do
   gem 'rack'
 end
@@ -145,4 +126,93 @@ on_heroku do
   gem 'pg'
   gem 'unicorn'
   gem 'rails_12factor', group: :production
+end
+
+# Development dependencies.
+
+group :development do
+  gem 'better_errors', '~> 1.1'
+  gem 'binding_of_caller'
+  gem 'quiet_assets'
+  gem 'guard'
+  gem 'guard-livereload'
+  gem 'guard-rspec'
+
+  group :test do
+    gem 'coveralls', require: false
+    gem 'delorean'
+    gem 'pry-rails'
+    gem 'rr'
+    gem 'rspec', '~> 3.2'
+    gem 'rspec-collection_matchers', '~> 1.1.0'
+    gem 'rspec-rails', '~> 3.1'
+    gem 'rspec-html-matchers', '~> 0.7'
+    gem 'shoulda-matchers'
+    gem 'spring', '~> 1.3.0'
+    gem 'spring-commands-rspec'
+    gem 'vcr'
+    gem 'webmock', '~> 1.17.4', require: false
+  end
+end
+
+# Optional libraries.
+optional do
+  gem 'twilio-ruby', '~> 3.11.5',   group: :twilio     # TwilioAgent
+  gem 'ruby-growl', '~> 4.1.0',     group: :growl      # GrowlAgent
+  gem 'net-ftp-list', '~> 3.2.8',   group: :ftpsite    # FtpsiteAgent
+  gem 'wunderground', '~> 1.2.0',   group: :weather    # WeatherAgent
+  gem 'forecast_io', '~> 2.0.0',    group: :weather    # WeatherAgent
+  gem 'rturk', '~> 2.12.1',         group: :human_task # HumanTaskAgent
+  gem 'hipchat', '~> 1.2.0',        group: :hipchat    # HipchatAgent
+  gem 'xmpp4r',  '~> 0.5.6',        group: :jabber     # JabberAgent
+  gem 'mqtt',                       group: :mqtt       # MqttAgent
+  gem 'slack-notifier', '~> 1.0.0', group: :slack      # SlackAgent
+  gem 'hypdf', '~> 1.0.7',          group: :pdf_info   # PdfInfoAgent
+
+  # Weibo Agents
+  gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master', group: :weibo
+
+  # GoogleCalendarPublishAgent
+  gem "google-api-client", require: 'google/api_client', group: :google_api
+
+  # Twitter Agents
+  group :twitter do
+    gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
+    gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
+    gem 'omniauth-twitter'
+  end
+
+  # Tumblr Agents
+  group :tumblr do
+    gem 'tumblr_client'
+    gem 'omniauth-tumblr'
+  end
+
+  # Dropbox Agents
+  group :dropbox do
+    gem 'dropbox-api'
+    gem 'omniauth-dropbox'
+  end
+
+  # UserLocationAgent
+  group :user_location do
+    gem 'haversine'
+  end
+
+  # Optional services.
+
+  # BasecampAgent
+  group :basecamp do
+    gem 'omniauth-37signals'
+  end
+
+  # GitHub
+  group :github do
+    gem 'omniauth-github'
+  end
+
+  # WunderListAgent
+  group :wunderlist do
+    gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
+  end
 end
