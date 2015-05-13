@@ -58,6 +58,7 @@ gem 'daemons', '~> 1.1.9'
 gem 'delayed_job', '~> 4.0.0'
 gem 'delayed_job_active_record', '~> 4.0.0'
 gem 'devise', '~> 3.4.0'
+gem 'dotenv-rails', '~> 2.0.1'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware'
@@ -101,7 +102,6 @@ end
 group :development, :test do
   gem 'coveralls', require: false
   gem 'delorean'
-  gem 'dotenv-rails'
   gem 'pry'
   gem 'rr'
   gem 'rspec', '~> 3.2'
@@ -116,7 +116,6 @@ group :development, :test do
 end
 
 group :production do
-  gem 'dotenv-deployment'
   gem 'rack'
 end
 

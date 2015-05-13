@@ -124,11 +124,9 @@ GEM
     docile (1.1.5)
     domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
-    dotenv (0.11.1)
-      dotenv-deployment (~> 0.0.2)
-    dotenv-deployment (0.0.2)
-    dotenv-rails (0.11.1)
-      dotenv (= 0.11.1)
+    dotenv (2.0.1)
+    dotenv-rails (2.0.1)
+      dotenv (= 2.0.1)
     dropbox-api (0.4.2)
       hashie
       multi_json
@@ -507,8 +505,7 @@ DEPENDENCIES
   delayed_job_active_record (~> 4.0.0)
   delorean
   devise (~> 3.4.0)
-  dotenv-deployment
-  dotenv-rails
+  dotenv-rails (~> 2.0.1)
   dropbox-api
   em-http-request (~> 1.1.2)
   faraday (~> 0.9.0)
