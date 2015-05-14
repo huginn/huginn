@@ -25,6 +25,10 @@ module DryRunnable
     )
   end
 
+  def dry_run?
+    is_a? Sandbox
+  end
+
   module Sandbox
     attr_accessor :results
 
