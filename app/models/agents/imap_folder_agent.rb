@@ -6,6 +6,8 @@ module Agents
   class ImapFolderAgent < Agent
     cannot_receive_events!
 
+    can_dry_run!
+
     default_schedule "every_30m"
 
     description <<-MD
@@ -311,7 +313,7 @@ module Agents
 
         if boolify(interpolated['mark_as_read'])
           log 'Marking as read'
-          mail.mark_as_read
+          mail.mark_as_read unless dry_run?
         end
       }
     end
