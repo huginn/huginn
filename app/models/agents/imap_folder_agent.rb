@@ -322,7 +322,7 @@ module Agents
       port = (Integer(port) if port.present?)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
-      Client.open(host, port, ssl) { |imap|
+      Client.open(host, port: port, ssl: ssl) { |imap|
         log "Logging in as #{username}"
         imap.login(username, interpolated[:password])
 
@@ -437,8 +437,8 @@ module Agents
 
     class Client < ::Net::IMAP
       class << self
-        def open(host, port, ssl)
-          imap = new(host, port, ssl)
+        def open(host, *args)
+          imap = new(host, *args)
           yield imap
         ensure
           imap.disconnect unless imap.nil?
