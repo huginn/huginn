@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-TZ="Europe/Paris"
-export $TZ
-
 cd /app
 
 # Default to the environment variable values set in .env.example
