@@ -1,6 +1,9 @@
 FROM ubuntu:14.04
 MAINTAINER Andrew Cantino
 
+ENV http_proxy "http://squid2.tropicoco.fr:3128/"
+ENV https_proxy "http://squid2.tropicoco.fr:3128/"
+
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
