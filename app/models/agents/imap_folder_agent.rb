@@ -12,7 +12,7 @@ module Agents
 
       The ImapFolderAgent checks an IMAP server in specified folders
       and creates Events based on new mails found since the last run.
-      In the first visit to a foler, this agent only checks for the
+      In the first visit to a folder, this agent only checks for the
       initial status and does not create events.
 
       Specify an IMAP server to connect with `host`, and set `ssl` to
@@ -45,8 +45,8 @@ module Agents
           specified, will be chosen as the "body" value in a created
           event.
 
-          Named captues will appear in the "matches" hash in a created
-          event.
+          Named captures will appear in the "matches" hash in a
+          created event.
 
       - "from", "to", "cc"
 
