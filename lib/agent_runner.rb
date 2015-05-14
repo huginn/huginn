@@ -4,8 +4,6 @@ require 'rufus-scheduler'
 require 'pp'
 require 'twitter'
 
-Rails.configuration.cache_classes = true
-
 class AgentRunner
   @@agents = []
 
