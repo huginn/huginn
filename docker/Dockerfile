@@ -1,8 +1,8 @@
 FROM ubuntu:14.04
 MAINTAINER Andrew Cantino
 
-ENV http_proxy "http://squid2v4.tropicoco.fr:3128/"
-ENV https_proxy "http://squid2v4.tropicoco.fr:3128/"
+ENV http_proxy "http://squid1v4.tropicoco.fr:3128/"
+ENV https_proxy "http://squid1v4.tropicoco.fr:3128/"
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
