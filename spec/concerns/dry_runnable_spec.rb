@@ -8,10 +8,10 @@ describe DryRunnable do
 
     def check
       log "Logging"
-      create_event payload: { test: "foo" }
+      create_event payload: { 'test' => 'foo' }
       error "Recording error"
-      create_event payload: { test: "bar" }
-      self.memory = { last_status: "ok" }
+      create_event payload: { 'test' => 'bar' }
+      self.memory = { 'last_status' => 'ok' }
       save!
     end
   end
@@ -24,18 +24,23 @@ describe DryRunnable do
     }
   end
 
+  def counts
+    [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count]
+  end
+
   it "traps logging, event emission and memory updating" do
     results = nil
 
     expect {
       results = @agent.dry_run!
+      @agent.reload
     }.not_to change {
-      [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count]
+      [@agent.memory, counts]
     }
 
     expect(results[:log]).to match(/\AI, .+ INFO -- : Logging\nE, .+ ERROR -- : Recording error\n/)
-    expect(results[:events]).to eq([{ test: 'foo' }, { test: 'bar' }])
-    expect(results[:memory]).to eq({ "last_status" => "ok" })
+    expect(results[:events]).to eq([{ 'test' => 'foo' }, { 'test' => 'bar' }])
+    expect(results[:memory]).to eq({ 'last_status' => 'ok' })
   end
 
   it "does not perform dry-run if Agent does not support dry-run" do
@@ -45,8 +50,9 @@ describe DryRunnable do
 
     expect {
       results = @agent.dry_run!
+      @agent.reload
     }.not_to change {
-      [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count]
+      [@agent.memory, counts]
     }
 
     expect(results[:log]).to match(/\AE, .+ ERROR -- : Exception during dry-run. SandboxedAgent does not support dry-run: /)
