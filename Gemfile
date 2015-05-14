@@ -2,10 +2,13 @@
 # The default setup of Huginn is pretty large and may not fit on
 # servers with lower RAM.  To conserve RAM, you can turn off some of
 # the Agent types you don't need and avoid loading their dependencies.
-# It is also a good idea to not install gems only for development on
-# production.  To do this, list the gem groups you want to opt out of
-# after `--without` when you run `bundle` on your production
-# environment.  e.g.:
+# To do this, list the gem groups you want to opt out of after
+# `--without` when you run `bundle` like this:
+#
+#     bundle --without basecamp human_task jabber mqtt weibo
+#
+# For production deployment, you can also omit gems used only for
+# development like this:
 #
 #     bundle install --deployment --without development test basecamp human_task jabber mqtt weibo
 #
