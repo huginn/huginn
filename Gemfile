@@ -96,6 +96,12 @@ group :development do
   gem 'guard-rspec'
 end
 
+group :development do
+  gem 'capistrano', '~> 2.15.5', :require => false
+  gem 'capistrano-unicorn', '~> 0.1.9', :require => false
+  gem 'rvm-capistrano', '~> 1.4.1', :require => false
+end
+
 group :development, :test do
   gem 'coveralls', require: false
   gem 'delorean'
@@ -116,6 +122,10 @@ end
 group :production do
   gem 'dotenv-deployment'
   gem 'rack'
+end
+
+group :production do
+  gem 'unicorn', '~> 4.6.3'
 end
 
 # Platform requirements.
