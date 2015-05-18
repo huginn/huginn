@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:15.04
 MAINTAINER Andrew Cantino
 
 ENV http_proxy "http://squid1v4.tropicoco.fr:3128/"
@@ -10,7 +10,7 @@ RUN apt-get update && \
     add-apt-repository -y ppa:git-core/ppa && \
     add-apt-repository -y ppa:brightbox/ruby-ng && \
     apt-get update && \
-    apt-get install -y build-essential checkinstall postgresql-client \
+    apt-get install -y build-essential checkinstall \
       git-core mysql-server redis-server python2.7 python-docutils \
       libmysqlclient-dev libpq-dev zlib1g-dev libyaml-dev libssl-dev \
       libgdbm-dev libreadline-dev libncurses5-dev libffi-dev \
