@@ -15,7 +15,7 @@ RUN apt-get update && \
       libmysqlclient-dev libpq-dev zlib1g-dev libyaml-dev libssl-dev \
       libgdbm-dev libreadline-dev libncurses5-dev libffi-dev \
       libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev \
-      graphviz libgraphviz-dev wget \
+      graphviz libgraphviz-dev wget nginx \
       ruby2.1 ruby2.1-dev supervisor python-pip && \
     gem install --no-ri --no-rdoc bundler && \
     rm -rf /var/lib/apt/lists/*
