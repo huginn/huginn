@@ -1,4 +1,4 @@
-FROM ubuntu:15.04
+FROM ubuntu:14.10
 MAINTAINER Andrew Cantino
 
 ENV http_proxy "http://squid1v4.tropicoco.fr:3128/"
