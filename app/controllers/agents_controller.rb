@@ -35,15 +35,18 @@ class AgentsController < ApplicationController
   end
 
   def dry_run
-    attrs = params[:agent]
+    attrs = params[:agent] || {}
     if agent = current_user.agents.find_by(id: params[:id])
       # PUT /agents/:id/dry_run
-      type = agent.type
+      if attrs.present?
+        type = agent.type
+        agent = Agent.build_for_type(type, current_user, attrs)
+      end
     else
       # POST /agents/dry_run
       type = attrs.delete(:type)
+      agent = Agent.build_for_type(type, current_user, attrs)
     end
-    agent = Agent.build_for_type(type, current_user, attrs)
     agent.name ||= '(Untitled)'
 
     if agent.valid?

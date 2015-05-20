@@ -33,3 +33,29 @@ class @Utils
       onHide?()
     body?(modal.querySelector('.modal-body'))
     $(modal).modal('show')
+
+  @handleDryRunButton: (button, data = $(button.form).serialize()) ->
+    $(button).prop('disabled', true)
+    $('body').css(cursor: 'progress')
+    $.ajax type: 'POST', url: $(button).data('action-url'), dataType: 'json', data: data
+      .always =>
+        $('body').css(cursor: 'auto')
+      .done (json) =>
+        Utils.showDynamicModal """
+          <h5>Log</h5>
+          <pre class="agent-dry-run-log"></pre>
+          <h5>Events</h5>
+          <pre class="agent-dry-run-events"></pre>
+          <h5>Memory</h5>
+          <pre class="agent-dry-run-memory"></pre>
+          """,
+          body: (body) ->
+            $(body).
+              find('.agent-dry-run-log').text(json.log).end().
+              find('.agent-dry-run-events').text(json.events).end().
+              find('.agent-dry-run-memory').text(json.memory)
+          title: 'Dry Run Results',
+          onHide: -> $(button).prop('disabled', false)
+      .fail (xhr, status, error) ->
+        alert('Error: ' + error)
+        $(button).prop('disabled', false)
