@@ -1,9 +1,12 @@
 class DiagramsController < ApplicationController
   def show
-    @agents = if params[:scenario_id].present?
-                current_user.scenarios.find(params[:scenario_id]).agents.includes(:receivers)
-              else
-                current_user.agents.includes(:receivers)
-              end
+    if params[:scenario_id].present?
+      @scenario = current_user.scenarios.find(params[:scenario_id])
+      agents = @scenario.agents
+    else
+      agents = current_user.agents
+    end
+    agents = agents.active unless params[:include_disabled].present?
+    @agents = agents.includes(:receivers)
   end
 end

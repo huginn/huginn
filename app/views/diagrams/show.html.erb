@@ -9,7 +9,12 @@
         <h2>Agent Event Flow</h2>
       </div>
       <div class="btn-group">
-        <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, (params[:scenario_id] ? scenario_path(params[:scenario_id]) : agents_path), class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, (@scenario ? scenario_path(@scenario) : agents_path), class: "btn btn-default" %>
+        <% if params[:include_disabled] %>
+          <%= link_to @scenario ? scenario_diagram_path(@scenario) : diagram_path, class: 'btn btn-default' do %><%= icon_tag('glyphicon-eye-close') %> Hide disabled Agents<% end %>
+        <% else %>
+          <%= link_to @scenario ? scenario_diagram_path(@scenario, include_disabled: true) : diagram_path(include_disabled: true), class: 'btn btn-default' do %><%= icon_tag('glyphicon-eye-open') %> Show disabled Agents<% end %>
+        <% end %>
       </div>
 
       <div class='digraph'>
