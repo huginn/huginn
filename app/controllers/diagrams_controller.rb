@@ -7,7 +7,7 @@ class DiagramsController < ApplicationController
       agents = current_user.agents
     end
     @disabled_agents = agents.inactive
-    agents = agents.active unless params[:include_disabled].present?
+    agents = agents.active if params[:exclude_disabled].present?
     @agents = agents.includes(:receivers)
   end
 end
