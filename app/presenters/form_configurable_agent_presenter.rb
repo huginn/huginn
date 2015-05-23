@@ -20,7 +20,12 @@ class FormConfigurableAgentPresenter < Decorator
 
     case data[:type]
     when :text
-      @view.text_area_tag "agent[options][#{attribute}]", value, html_options.merge(class: 'form-control', rows: 3)
+      @view.content_tag 'div' do
+        @view.concat @view.text_area_tag("agent[options][#{attribute}]", value, html_options.merge(class: 'form-control', rows: 3))
+        if data[:ace].present?
+          @view.concat @view.content_tag('div', '', class: 'ace-editor', data: { source: "[name='agent[options][#{attribute}]']" })
+        end
+      end
     when :boolean
       @view.content_tag 'div' do
         @view.concat(@view.content_tag('label', class: 'radio-inline') do

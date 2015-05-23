@@ -86,7 +86,7 @@ gem 'sass-rails',   '~> 5.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
 gem 'string-scrub'	# for ruby <2.1
-gem 'therubyracer', '~> 0.12.1'
+gem 'therubyracer', '~> 0.12.2'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '>= 1.3.0'
 
