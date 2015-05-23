@@ -2,6 +2,8 @@ require 'thread'
 require 'huginn_scheduler'
 require 'twitter_stream'
 
+Rails.configuration.cache_classes = true
+
 STDOUT.sync = true
 STDERR.sync = true
 

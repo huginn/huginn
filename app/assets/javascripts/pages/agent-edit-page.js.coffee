@@ -174,32 +174,7 @@ class @AgentEditPage
 
   invokeDryRun: (e) =>
     e.preventDefault()
-    button = e.target
-    $(button).prop('disabled', true)
-    $('body').css(cursor: 'progress')
-    @updateFromEditors()
-    $.ajax type: 'POST', url: $(button).data('action-url'), dataType: 'json', data: $(button.form).serialize()
-      .always =>
-        $("body").css(cursor: 'auto')
-      .done (json) =>
-        Utils.showDynamicModal """
-          <h5>Log</h5>
-          <pre class="agent-dry-run-log"></pre>
-          <h5>Events</h5>
-          <pre class="agent-dry-run-events"></pre>
-          <h5>Memory</h5>
-          <pre class="agent-dry-run-memory"></pre>
-          """,
-          body: (body) ->
-            $(body).
-              find('.agent-dry-run-log').text(json.log).end().
-              find('.agent-dry-run-events').text(json.events).end().
-              find('.agent-dry-run-memory').text(json.memory)
-          title: 'Dry Run Results',
-          onHide: -> $(button).prop('disabled', false)
-      .fail (xhr, status, error) ->
-        alert('Error: ' + error)
-        $(button).prop('disabled', false)
+    Utils.handleDryRunButton(this)
 
 $ ->
   Utils.registerPage(AgentEditPage, forPathsMatching: /^agents/)
