@@ -140,7 +140,8 @@ module Agents
           end
         end
 
-        config_hash = filter_to_agent_map.map { |k, v| [k, v.map(&:id)] } << oauth_token
+        config_hash = filter_to_agent_map.map { |k, v| [k, v.map(&:id)] }
+        config_hash.push(oauth_token)
 
         Worker.new(id: agents.first.worker_id(config_hash),
                    config: {filter_to_agent_map: filter_to_agent_map},
@@ -154,58 +155,84 @@ module Agents
       SEPARATOR = /[^\w_\-]+/
 
       def setup
-        @timeout = 0
+        require 'twitter/json_stream'
+        @filter_to_agent_map = @config[:filter_to_agent_map]
       end
 
       def run
-        recent_tweets = []
-        filter_to_agent_map = @config[:filter_to_agent_map]
-
-        stream!(filter_to_agent_map.keys, @agent) do |status|
-          if status["retweeted_status"].present? && status["retweeted_status"].is_a?(Hash)
-            puts "Skipping retweet: #{status["text"]}"
-          elsif recent_tweets.include?(status["id_str"])
-            puts "Skipping duplicate tweet: #{status["text"]}"
-          else
-            recent_tweets << status["id_str"]
-            recent_tweets.shift if recent_tweets.length > DUPLICATE_DETECTION_LENGTH
-            puts status["text"]
-            filter_to_agent_map.keys.each do |filter|
-              if (filter.downcase.split(SEPARATOR) - status["text"].downcase.split(SEPARATOR)).reject(&:empty?) == [] # Hacky McHackerson
-                filter_to_agent_map[filter].each do |agent|
-                  puts " -> #{agent.name}"
-                  agent.process_tweet(filter, status)
-                end
-              end
-            end
+        @recent_tweets = []
+        EventMachine.run do
+          stream!(@filter_to_agent_map.keys, @agent) do |status|
+            handle_status(status)
           end
         end
+        Thread.stop
+      end
+
+      def stop
+        EventMachine.stop_event_loop if EventMachine.reactor_running?
+        thread.terminate
       end
 
       private
       def stream!(filters, agent, &block)
         filters = filters.map(&:downcase).uniq
 
-        method = (filters && filters.length > 0) ? [:filter, track: filters.map {|f| CGI::escape(f) }.join(",")] : [:sample]
-        client.send(*method) do |tweet|
-          @timeout = 0
-          return unless tweet.class == Twitter::Tweet
-          status = ActiveSupport::HashWithIndifferentAccess.new(tweet.to_h)
-          status['text'] = status['text'].gsub(/&lt;/, "<").gsub(/&gt;/, ">").gsub(/[\t\n\r]/, '  ')
-          yield status
+        stream = Twitter::JSONStream.connect(
+          :path    => "/1/statuses/#{(filters && filters.length > 0) ? 'filter' : 'sample'}.json#{"?track=#{filters.map {|f| CGI::escape(f) }.join(",")}" if filters && filters.length > 0}",
+          :ssl     => true,
+          :oauth   => {
+            :consumer_key    => agent.twitter_consumer_key,
+            :consumer_secret => agent.twitter_consumer_secret,
+            :access_key      => agent.twitter_oauth_token,
+            :access_secret   => agent.twitter_oauth_token_secret
+          }
+        )
+
+        stream.each_item do |status|
+          block.call(status)
         end
-      rescue Twitter::Error => e
-        @timeout += 60
-        puts "Twitter raised '#{e.class}', sleeping for #{@timeout} seconds"
-        sleep @timeout
+
+        stream.on_error do |message|
+          STDERR.puts " --> Twitter error: #{message} <--"
+        end
+
+        stream.on_no_data do |message|
+          STDERR.puts " --> Got no data for awhile; trying to reconnect."
+          stop
+        end
+
+        stream.on_max_reconnects do |timeout, retries|
+          STDERR.puts " --> Oops, tried too many times! <--"
+          sleep 60
+          stop
+        end
       end
 
-      def client
-        @client ||= Twitter::Streaming::Client.new do |config|
-          config.consumer_key        = @agent.twitter_consumer_key
-          config.consumer_secret     = @agent.twitter_consumer_secret
-          config.access_token        = @agent.twitter_oauth_token
-          config.access_token_secret = @agent.twitter_oauth_token_secret
+      def handle_status(status)
+        status = JSON.parse(status) if status.is_a?(String)
+        return unless status
+        return if status.has_key?('delete')
+        return unless status['text']
+        status['text'] = status['text'].gsub(/&lt;/, "<").gsub(/&gt;/, ">").gsub(/[\t\n\r]/, '  ')
+
+        if status["retweeted_status"].present? && status["retweeted_status"].is_a?(Hash)
+          puts "Skipping retweet: #{status["text"]}"
+          return
+        elsif @recent_tweets.include?(status["id_str"])
+          puts "Skipping duplicate tweet: #{status["text"]}"
+          return
+        end
+
+        @recent_tweets << status["id_str"]
+        @recent_tweets.shift if @recent_tweets.length > DUPLICATE_DETECTION_LENGTH
+        puts status["text"]
+        @filter_to_agent_map.keys.each do |filter|
+          next unless (filter.downcase.split(SEPARATOR) - status["text"].downcase.split(SEPARATOR)).reject(&:empty?) == [] # Hacky McHackerson
+          @filter_to_agent_map[filter].each do |agent|
+            puts " -> #{agent.name}"
+            agent.process_tweet(filter, status)
+          end
         end
       end
     end

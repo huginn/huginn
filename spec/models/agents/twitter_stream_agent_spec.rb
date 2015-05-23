@@ -168,84 +168,104 @@ describe Agents::TwitterStreamAgent do
       @mock_agent = mock!
       @config = {agent: @agent, config: {filter_to_agent_map: {'agent' => [@mock_agent]}}}
       @worker = Agents::TwitterStreamAgent::Worker.new(@config)
+      @worker.instance_variable_set(:@recent_tweets, [])
       @worker.setup
     end
 
     context "#run" do
-      it "calls the agent to process the tweet" do
-        stub.instance_of(IO).puts
-        mock(@mock_agent).name { 'mock' }
-        mock(@mock_agent).process_tweet('agent', {'text' => 'agent'})
-        mock(@worker).stream!(['agent'], @agent).yields({'text' => 'agent'})
-
+      it "starts the stream" do
+        mock(EventMachine).run.yields
+        mock(@worker).stream!(['agent'], @agent)
+        mock(Thread).stop
         @worker.run
       end
+
+      it "yields received tweets" do
+        mock(EventMachine).run.yields
+        mock(@worker).stream!(['agent'], @agent).yields('status' => 'hello')
+        mock(@worker).handle_status('status' => 'hello')
+        mock(Thread).stop
+        @worker.run
+      end
+    end
+
+    context "#stop" do
+      it "stops the thread" do
+        mock(@worker.thread).terminate
+        @worker.stop
+      end
+    end
+
+    context "stream!" do
+      def stub_without(method = nil)
+        stream_stub = stub!
+        stream_stub.each_item if method != :each_item
+        stream_stub.on_error if method != :on_error
+        stream_stub.on_no_data if method != :on_no_data
+        stream_stub.on_max_reconnects if method != :on_max_reconnects
+        stub(Twitter::JSONStream).connect { stream_stub }
+        stream_stub
+      end
+
+      it "initializes Twitter::JSONStream" do
+        mock(Twitter::JSONStream).connect({:path=>"/1/statuses/filter.json?track=agent",
+                                           :ssl=>true, :oauth=>{:consumer_key=>"twitteroauthkey",
+                                           :consumer_secret=>"twitteroauthsecret",
+                                           :access_key=>"1234token",
+                                           :access_secret=>"56789secret"}
+                                          }) { stub_without }
+        @worker.send(:stream!, ['agent'], @agent)
+      end
+
+      context "callback handling" do
+        it "logs error messages" do
+          stub_without(:on_error).on_error.yields('woups')
+          mock(STDERR).puts(" --> Twitter error: woups <--")
+          @worker.send(:stream!, ['agent'], @agent)
+        end
+
+        it "stop when no data was received"do
+          stub_without(:on_no_data).on_no_data.yields
+          mock(@worker).stop
+          mock(STDERR).puts(" --> Got no data for awhile; trying to reconnect.")
+          @worker.send(:stream!, ['agent'], @agent)
+        end
+
+        it "sleeps for 60 seconds on_max_reconnects" do
+          stub_without(:on_max_reconnects).on_max_reconnects.yields
+          mock(STDERR).puts(" --> Oops, tried too many times! <--")
+          mock(@worker).sleep(60)
+          mock(@worker).stop
+          @worker.send(:stream!, ['agent'], @agent)
+        end
+
+        it "yields every status received" do
+          stub_without(:each_item).each_item.yields({'text' => 'hello'})
+          @worker.send(:stream!, ['agent'], @agent) do |status|
+            expect(status).to eq({'text' => 'hello'})
+          end
+        end
+      end
+    end
+
+    context "#handle_status" do
       it "skips retweets" do
         mock.instance_of(IO).puts('Skipping retweet: retweet')
-        mock(@worker).stream!(['agent'], @agent).yields({'retweeted_status' => {'' => true}, 'text' => 'retweet'})
-
-        @worker.run
+        @worker.send(:handle_status, {'text' => 'retweet', 'retweeted_status' => {one: true}})
       end
 
       it "deduplicates tweets" do
         mock.instance_of(IO).puts("dup")
+        @worker.send(:handle_status, {'text' => 'dup', 'id_str' => 1})
         mock.instance_of(IO).puts("Skipping duplicate tweet: dup")
-        # RR does not support multiple yield calls
-        class DoubleYield < Agents::TwitterStreamAgent::Worker
-          def stream!(_, __, &block)
-            yield({'text' => 'dup'})
-            yield({'text' => 'dup'})
-          end
-        end
-        worker = DoubleYield.new(@config)
-
-        worker.run
-      end
-    end
-
-    context "#stream!" do
-      before(:each) do
-        @client_mock = mock!
-        stub(@worker).client { @client_mock }
+        @worker.send(:handle_status, {'text' => 'dup', 'id_str' => 1})
       end
 
-      it "calls the sample method without filters" do
-        @client_mock.sample
-        @worker.send(:stream!, [], @mock_agent)
-      end
-
-      it "calls the filter method when filters are provided" do
-        @client_mock.filter(track: 'filter')
-        @worker.send(:stream!, ['filter'], @mock_agent)
-      end
-
-      it "only handles instances of Twitter::Tweet" do
-        @client_mock.sample.yields(Object.new)
-        expect { |blk| @worker.send(:stream!, [], @mock_agent, &blk) }.not_to yield_control
-      end
-
-      it "yields Hashes for received Twitter:Tweet instances" do
-        @client_mock.sample.yields(Twitter::Tweet.new(id: '1234', text: 'test'))
-        expect { |blk| @worker.send(:stream!, [], @mock_agent, &blk) }.to yield_with_args({'id' => '1234', 'text' => 'test'})
-      end
-
-      it "it backs of 60 seconds for every Twitter::Error::TooManyRequests exception rescued" do
+      it "calls the agent to process the tweet" do
         stub.instance_of(IO).puts
-        mock(@worker).sleep(60)
-        @client_mock.sample { raise Twitter::Error::TooManyRequests }
-        @worker.send(:stream!, [], @mock_agent)
-        @client_mock.sample { raise Twitter::Error::TooManyRequests }
-        mock(@worker).sleep(120)
-        @worker.send(:stream!, [], @mock_agent)
-      end
-    end
-
-    context "#client" do
-      it "initializes the client" do
-        client = @worker.send(:client)
-        expect(client).to be_a(Twitter::Streaming::Client)
-        expect(client.access_token).to eq('1234token')
-        expect(client.access_token_secret).to eq('56789secret')
+        mock(@mock_agent).name { 'mock' }
+        mock(@mock_agent).process_tweet('agent', {'text' => 'agent'})
+        @worker.send(:handle_status, {'text' => 'agent'})
       end
     end
   end
