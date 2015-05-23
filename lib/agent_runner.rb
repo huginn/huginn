@@ -16,7 +16,7 @@ class AgentRunner
     @mutex = Mutex.new
     @scheduler = Rufus::Scheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'].presence || 0.3)
 
-    @scheduler.every 5 do
+    @scheduler.every 1 do
       restart_dead_workers if @running
     end
 
@@ -39,7 +39,6 @@ class AgentRunner
     run_workers
 
     while @running
-      #puts "r"
       if signal = @signal_queue.shift
         handle_signal(signal)
       end

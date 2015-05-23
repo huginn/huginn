@@ -70,8 +70,7 @@ module LongRunnable
         rescue SignalException, SystemExit
           stop!
         rescue StandardError => e
-          message = "Exception #{e.message}:\n#{e.backtrace.first(10).join("\n")}"
-          STDERR.puts "\n#{message}\n\n"
+          message = "#{id} Exception #{e.message}:\n#{e.backtrace.first(10).join("\n")}"
           agent.error(message)
         end
       end
@@ -89,7 +88,7 @@ module LongRunnable
       if respond_to?(:stop)
         stop
       else
-        @thread.terminate
+        thread.terminate
       end
     end
 
