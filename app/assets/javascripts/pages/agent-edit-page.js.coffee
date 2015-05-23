@@ -174,7 +174,8 @@ class @AgentEditPage
 
   invokeDryRun: (e) =>
     e.preventDefault()
-    Utils.handleDryRunButton(this)
+    @updateFromEditors()
+    Utils.handleDryRunButton(e.target)
 
 $ ->
   Utils.registerPage(AgentEditPage, forPathsMatching: /^agents/)
