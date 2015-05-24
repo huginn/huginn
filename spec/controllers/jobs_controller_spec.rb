@@ -5,7 +5,7 @@ describe JobsController do
   describe "GET index" do
     before do
       async_handler_yaml =
-        "--- !ruby/object:Delayed::PerformableMethod\nobject: !ruby/class 'Agent'\nmethod_name: :async_check_without_delay\nargs:\n- %d\n"
+        "--- !ruby/object:ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper\njob_data:\n  job_class: AgentCheckJob\n  job_id: 123id\n  queue_name: default\n  arguments:\n  - %d\n"
 
       Delayed::Job.create!(handler: async_handler_yaml % [agents(:jane_website_agent).id])
       Delayed::Job.create!(handler: async_handler_yaml % [agents(:bob_website_agent).id])
