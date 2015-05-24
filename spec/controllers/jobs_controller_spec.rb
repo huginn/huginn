@@ -4,8 +4,15 @@ describe JobsController do
 
   describe "GET index" do
     before do
-      Delayed::Job.create!
-      Delayed::Job.create!
+      async_handler_yaml =
+        "--- !ruby/object:Delayed::PerformableMethod\nobject: !ruby/class 'Agent'\nmethod_name: :async_check_without_delay\nargs:\n- %d\n"
+
+      Delayed::Job.create!(handler: async_handler_yaml % [agents(:jane_website_agent).id])
+      Delayed::Job.create!(handler: async_handler_yaml % [agents(:bob_website_agent).id])
+      Delayed::Job.create!(handler: async_handler_yaml % [agents(:jane_weather_agent).id])
+      agents(:jane_website_agent).destroy
+      Delayed::Job.create!(handler: async_handler_yaml % [agents(:bob_weather_agent).id], locked_at: Time.now, locked_by: 'test')
+
       expect(Delayed::Job.count).to be > 0
     end
 
@@ -19,7 +26,7 @@ describe JobsController do
       expect(users(:jane)).to be_admin
       sign_in users(:jane)
       get :index
-      expect(assigns(:jobs).length).to eq(2)
+      expect(assigns(:jobs).length).to eq(4)
     end
   end
 
