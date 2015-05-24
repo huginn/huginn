@@ -18,4 +18,18 @@ module JobsHelper
       'in ' + distance_of_time_in_words(time, now)
     end
   end
+
+  # Given an queued job, parse the stored YAML to retrieve the ID of the Agent
+  # meant to be ran.
+  #
+  # Can return nil, or an instance of Agent.
+  def agent_from_job(job)
+    begin
+      Agent.find_by_id(YAML.load(job.handler).args[0])
+    rescue ArgumentError
+      # We can get to this point before all of the agents have loaded (usually,
+      # in development)
+      nil
+    end
+  end
 end

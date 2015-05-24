@@ -20,7 +20,7 @@
           </tr>
 
         <% @jobs.each do |job| %>
-          <% agent = Agent.find_by_id(YAML.load(job.handler).args[0]) %>
+          <% agent = agent_from_job(job) %>
           <tr>
             <td><%= status(job) %></td>
             <td><%= agent ? link_to(agent.name, agent_path(agent)) : "(deleted)" %></td>
