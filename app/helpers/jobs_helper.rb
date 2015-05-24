@@ -25,7 +25,7 @@ module JobsHelper
   # Can return nil, or an instance of Agent.
   def agent_from_job(job)
     begin
-      Agent.find_by_id(YAML.load(job.handler).args[0])
+      Agent.find_by_id(YAML.load(job.handler).job_data['arguments'][0])
     rescue ArgumentError
       # We can get to this point before all of the agents have loaded (usually,
       # in development)
