@@ -142,7 +142,7 @@ class ScenarioImport
   def generate_diff
     @agent_diffs = (parsed_data['agents'] || []).map.with_index do |agent_data, index|
       # AgentDiff is defined at the end of this file.
-      agent_diff = AgentDiff.new(agent_data)
+      agent_diff = AgentDiff.new(agent_data, parsed_data['schema_version'])
       if existing_scenario
         # If this Agent exists already, update the AgentDiff with the local version's information.
         agent_diff.diff_with! existing_scenario.agents.find_by(:guid => agent_data['guid'])
@@ -184,14 +184,16 @@ class ScenarioImport
       end
     end
 
-    def initialize(agent_data)
+    def initialize(agent_data, schema_version)
       super()
+      @schema_version = schema_version
       @requires_merge = false
       self.agent = nil
       store! agent_data
     end
 
     BASE_FIELDS = %w[name schedule keep_events_for propagate_immediately disabled guid]
+    FIELDS_REQUIRING_TRANSLATION = %w[keep_events_for]
 
     def agent_exists?
       !!agent
@@ -209,8 +211,25 @@ class ScenarioImport
       self.type = FieldDiff.new(agent_data["type"].split("::").pop)
       self.options = FieldDiff.new(agent_data['options'] || {})
       BASE_FIELDS.each do |option|
-        self[option] = FieldDiff.new(agent_data[option]) if agent_data.has_key?(option)
+        if agent_data.has_key?(option)
+          value = agent_data[option]
+          value = send(:"translate_#{option}", value) if option.in?(FIELDS_REQUIRING_TRANSLATION)
+          self[option] = FieldDiff.new(value)
+        end
       end
+    end
+
+    def translate_keep_events_for(old_value)
+      if schema_version < 1
+        # Was stored in days, now is stored in seconds.
+        old_value.to_i.days
+      else
+        old_value
+      end
+    end
+
+    def schema_version
+      (@schema_version || 0).to_i
     end
 
     def diff_with!(agent)
