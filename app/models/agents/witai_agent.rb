@@ -3,9 +3,8 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
-
-    `wit.ai` agent receives events, sends text query to your `wit.ai` instance and generates outcome events. Fill in `Server Access Token` of your `wit.ai` instance. Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to fill query field.
-    `expected_receive_period_in_days` is the expected number of days by which agent should receive events. It helps in determining if the agent is working.
+      The `wit.ai` agent receives events, sends text query to your `wit.ai` instance and generates outcome events. Fill in `Server Access Token` of your `wit.ai` instance. Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to fill query field.
+      `expected_receive_period_in_days` is the expected number of days by which agent should receive events. It helps in determining if the agent is working.
     MD
 
     event_description <<-MD

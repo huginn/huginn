@@ -2,28 +2,26 @@ module Agents
   class DataOutputAgent < Agent
     cannot_be_scheduled!
 
-    description  do
-      <<-MD
-        The Agent outputs received events as either RSS or JSON.  Use it to output a public or private stream of Huginn data.
+    description <<-MD
+      The Agent outputs received events as either RSS or JSON.  Use it to output a public or private stream of Huginn data.
 
-        This Agent will output data at:
+      This Agent will output data at:
 
-        `https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret.xml`
+      `https://\#{ENV['DOMAIN']}/users/\#{user.id}/web_requests/\#{id || '<id>'}/:secret.xml`
 
-        where `:secret` is one of the allowed secrets specified in your options and the extension can be `xml` or `json`.
+      where `:secret` is one of the allowed secrets specified in your options and the extension can be `xml` or `json`.
 
-        You can setup multiple secrets so that you can individually authorize external systems to
-        access your Huginn data.
+      You can setup multiple secrets so that you can individually authorize external systems to
+      access your Huginn data.
 
-        Options:
+      Options:
 
-          * `secrets` - An array of tokens that the requestor must provide for light-weight authentication.
-          * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
-          * `template` - A JSON object representing a mapping between item output keys and incoming event values. Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values. The `item` key will be repeated for every Event. The `pubDate` key for each item will have the creation time of the Event unless given.
-          * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
-          * `ttl` - A value for the <ttl> element in RSS output. (default: `60`)
+        * `secrets` - An array of tokens that the requestor must provide for light-weight authentication.
+        * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
+        * `template` - A JSON object representing a mapping between item output keys and incoming event values. Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values. The `item` key will be repeated for every Event. The `pubDate` key for each item will have the creation time of the Event unless given.
+        * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
+        * `ttl` - A value for the <ttl> element in RSS output. (default: `60`)
       MD
-    end
 
     def default_options
       {
@@ -110,7 +108,6 @@ module Agents
           return [content, 200]
         else
           content = Utils.unindent(<<-XML)
-            <?xml version="1.0" encoding="UTF-8" ?>
             <rss version="2.0">
             <channel>
              <title>#{feed_title.encode(:xml => :text)}</title>
@@ -119,10 +116,9 @@ module Agents
              <lastBuildDate>#{Time.now.rfc2822.to_s.encode(:xml => :text)}</lastBuildDate>
              <pubDate>#{Time.now.rfc2822.to_s.encode(:xml => :text)}</pubDate>
              <ttl>#{feed_ttl}</ttl>
-
           XML
 
-          content += items.to_xml(:skip_types => true, :root => "items", :skip_instruct => true, :indent => 1).gsub(/^<\/?items>/, '').strip
+          content += items.to_xml(:skip_instruct => true, :skip_types => true, :root => "items", :indent => 1).gsub(/^<\/?items>/, '').strip
 
           content += Utils.unindent(<<-XML)
             </channel>

@@ -6,19 +6,17 @@ module Agents
 
     gem_dependency_check { defined?(Haversine) }
 
-    description do
-      <<-MD
-        #{'## Include `haversine` in your Gemfile to use this Agent!' if dependencies_missing?}
-        The UserLocationAgent creates events based on WebHook POSTS that contain a `latitude` and `longitude`.  You can use the [POSTLocation](https://github.com/cantino/post_location) or [PostGPS](https://github.com/chriseidhof/PostGPS) iOS app to post your location.
+    description <<-MD
+      The UserLocationAgent creates events based on WebHook POSTS that contain a `latitude` and `longitude`.  You can use the [POSTLocation](https://github.com/cantino/post_location) or [PostGPS](https://github.com/chriseidhof/PostGPS) iOS app to post your location.
 
+      #{'## Include `haversine` in your Gemfile to use this Agent!' if dependencies_missing?}
 
-        Your POST path will be `https://#{ENV['DOMAIN']}/users/#{user.id}/update_location/:secret` where `:secret` is specified in your options.
+      Your POST path will be `https://\#{ENV['DOMAIN']}/users/\#{user.id}/update_location/:secret` where `:secret` is specified in your options.
 
-        If you want to only keep more precise locations, set `max_accuracy` to the upper bound, in meters. The default name for this field is `accuracy`, but you can change this by setting a value for `accuracy_field`.
+      If you want to only keep more precise locations, set `max_accuracy` to the upper bound, in meters. The default name for this field is `accuracy`, but you can change this by setting a value for `accuracy_field`.
 
-        If you want to require a certain distance traveled, set `min_distance` to the minimum distance, in meters. Note that GPS readings and the measurement itself aren't exact, so don't rely on this for precision filtering.
-      MD
-    end
+      If you want to require a certain distance traveled, set `min_distance` to the minimum distance, in meters. Note that GPS readings and the measurement itself aren't exact, so don't rely on this for precision filtering.
+    MD
 
     event_description <<-MD
       Assuming you're using the iOS application, events look like this:
