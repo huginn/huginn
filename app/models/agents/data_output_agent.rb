@@ -108,6 +108,7 @@ module Agents
           return [content, 200]
         else
           content = Utils.unindent(<<-XML)
+            <?xml version="1.0" encoding="UTF-8" ?>
             <rss version="2.0">
             <channel>
              <title>#{feed_title.encode(:xml => :text)}</title>
@@ -116,9 +117,10 @@ module Agents
              <lastBuildDate>#{Time.now.rfc2822.to_s.encode(:xml => :text)}</lastBuildDate>
              <pubDate>#{Time.now.rfc2822.to_s.encode(:xml => :text)}</pubDate>
              <ttl>#{feed_ttl}</ttl>
+
           XML
 
-          content += items.to_xml(:skip_instruct => true, :skip_types => true, :root => "items", :indent => 1).gsub(/^<\/?items>/, '').strip
+          content += items.to_xml(:skip_types => true, :root => "items", :skip_instruct => true, :indent => 1).gsub(/^<\/?items>/, '').strip
 
           content += Utils.unindent(<<-XML)
             </channel>
