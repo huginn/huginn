@@ -23,8 +23,28 @@
           <% if @agent.new_record? %>
             <div class="form-group type-select">
               <%= f.label :type %>
-              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent']] + Agent.types.map(&:to_s).sort.map {|type| [type.gsub(/^.*::/, ''), type] }, @agent.type), {}, :class => 'select2 form-control' %>
+              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [type.name.gsub(/^.*::/, '').underscore.humanize.titleize, type, {title: type.description.to_s.strip.split(/\r?\n/)[0]}] }, @agent.type), {}, :class => 'form-control' %>
             </div>
+            <script>
+              function formatAgentForSelect(agent) {
+                var originalOption = agent.element;
+                var description = $(originalOption).attr('title');
+                description = (/^[a-zA-Z]/.test(description)) ? description : '';
+                return '<strong>' + agent.text + '</strong><br/>' + description;
+              }
+              $(function() {
+                $('#agent_type').select2({
+                  width: 'resolve',
+                  formatResult: formatAgentForSelect,
+                  escapeMarkup: function(m) { return m; },
+                  matcher: function(term, text, opt) {
+                    var description = opt.attr('title');
+                    return text.toUpperCase().indexOf(term.toUpperCase())>=0
+                      || description.toUpperCase().indexOf(term.toUpperCase())>=0;
+                  }
+                });
+              });
+            </script>
           <% end %>
         </div>
 
