@@ -151,6 +151,15 @@ module Agents
       end
 
       validate_web_request_options!
+      validate_extract_options!
+    end
+
+    def validate_extract_options!
+      if extraction_type == "json" && interpolated['extract'].is_a?(Hash)
+        unless interpolated['extract'].all? { |name, details| details.is_a?(Hash) && details['path'].present? }
+          errors.add(:base, 'When type is json, all extractions must have a path attribute.')
+        end
+      end
     end
 
     def check
