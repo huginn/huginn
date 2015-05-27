@@ -2,12 +2,12 @@ module Agents
   class DataOutputAgent < Agent
     cannot_be_scheduled!
 
-    description <<-MD
+    description do <<-MD
       The Agent outputs received events as either RSS or JSON.  Use it to output a public or private stream of Huginn data.
 
       This Agent will output data at:
 
-      `https://\#{ENV['DOMAIN']}/users/\#{user.id}/web_requests/\#{id || '<id>'}/:secret.xml`
+      `https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret.xml`
 
       where `:secret` is one of the allowed secrets specified in your options and the extension can be `xml` or `json`.
 
@@ -22,6 +22,7 @@ module Agents
         * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
         * `ttl` - A value for the <ttl> element in RSS output. (default: `60`)
       MD
+    end
 
     def default_options
       {

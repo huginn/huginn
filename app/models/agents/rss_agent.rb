@@ -8,7 +8,7 @@ module Agents
     cannot_receive_events!
     default_schedule "every_1d"
 
-    description <<-MD
+    description do <<-MD
       This Agent consumes RSS feeds and emits events when they change.
 
       This Agent is fairly simple, using [feed-normalizer](https://github.com/aasmith/feed-normalizer) as a base.  For complex feeds
@@ -24,8 +24,9 @@ module Agents
         * `headers` - When present, it should be a hash of headers to send with the request.
         * `basic_auth` - Specify HTTP basic auth parameters: `"username:password"`, or `["username", "password"]`.
         * `disable_ssl_verification` - Set to `true` to disable ssl verification.
-        * `user_agent` - A custom User-Agent name (default: "Faraday v\#{Faraday::VERSION}").
+        * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
       MD
+    end
 
     def default_options
       {

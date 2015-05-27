@@ -16,9 +16,24 @@ class @AgentEditPage
     if $("#agent_type").length
       $("#agent_type").on "change", => @handleTypeChange(false)
       @handleTypeChange(true)
+      $('#agent_type').select2
+        width: 'resolve'
+        formatResult: formatAgentForSelect
+        escapeMarkup: (m) ->
+          m
+        matcher: (term, text, opt) ->
+          description = opt.attr('title')
+          text.toUpperCase().indexOf(term.toUpperCase()) >= 0 or description.toUpperCase().indexOf(term.toUpperCase()) >= 0
+
     else
       @enableDryRunButton()
       @buildAce()
+
+  formatAgentForSelect = (agent) ->
+    originalOption = agent.element
+    description = $(originalOption).attr('title')
+    description = if /^[a-zA-Z]/.test(description) then description else ''
+    '<strong>' + agent.text + '</strong><br/>' + description
 
   handleTypeChange: (firstTime) ->
     $(".event-descriptions").html("").hide()
