@@ -75,6 +75,23 @@ describe Agents::WebsiteAgent do
         @checker.options['force_encoding'] = 'UTF-42'
         expect(@checker).not_to be_valid
       end
+
+      context "in 'json' type" do
+        it "should ensure that all extractions have a 'path'" do
+          @checker.options['type'] = 'json'
+          @checker.options['extract'] = {
+            'url' => { 'foo' => 'bar' },
+          }
+          expect(@checker).to_not be_valid
+          expect(@checker.errors_on(:base)).to include("When type is json, all extractions must have a path attribute.")
+
+          @checker.options['type'] = 'json'
+          @checker.options['extract'] = {
+            'url' => { 'path' => 'bar' },
+          }
+          expect(@checker).to be_valid
+        end
+      end
     end
 
     describe "#check" do
@@ -179,7 +196,6 @@ describe Agents::WebsiteAgent do
 
         checker.check
         event = Event.last
-        puts event.payload
         expect(event.payload['version']).to eq(2)
       end
     end
