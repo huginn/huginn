@@ -101,7 +101,7 @@ group :development do
   group :test do
     gem 'coveralls', require: false
     gem 'delorean'
-    gem 'pry'
+    gem 'pry-rails'
     gem 'rr'
     gem 'rspec', '~> 3.2'
     gem 'rspec-collection_matchers', '~> 1.1.0'
