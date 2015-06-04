@@ -100,5 +100,6 @@ def convert_image(source, target, options = {})  # width: nil, round: false
     end
   end
 
+  result.strip
   result.write(target)
 end
