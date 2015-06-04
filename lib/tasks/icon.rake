@@ -69,20 +69,20 @@ end
 
 require 'mini_magick'
 
-def convert_image(source, target, width: nil, round: false)
+def convert_image(source, target, options = {})  # width: nil, round: false
   ext = target[/(?<=\.)[^.]+\z/] || 'png'
   original = MiniMagick::Image.open(source)
 
   result = original
   result.format ext
 
-  if width
+  if width = options[:width]
     result.thumbnail '%1$dx%1$d>' % width
   else
     width = result[:width]
   end
 
-  if round
+  if options[:round]
     radius = (Rational(80, 512) * width).round
 
     mask = MiniMagick::Image.create(ext) { |tmp| result.write(tmp) }
@@ -100,5 +100,6 @@ def convert_image(source, target, width: nil, round: false)
     end
   end
 
+  result.strip
   result.write(target)
 end
