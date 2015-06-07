@@ -201,8 +201,7 @@ describe Agents::DataOutputAgent do
           "_attributes" => {
             "type" => "audio/mpeg",
             "url" => "{{media_url}}"
-          },
-          "_self_closing" => "true"
+          }
         }
         agent.options['template']['item']['foo'] = {
           "_attributes" => {
