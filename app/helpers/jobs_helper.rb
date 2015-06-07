@@ -26,9 +26,11 @@ module JobsHelper
   def agent_from_job(job)
     begin
       Agent.find_by_id(YAML.load(job.handler).job_data['arguments'][0])
-    rescue ArgumentError
+    rescue StandardError
       # We can get to this point before all of the agents have loaded (usually,
-      # in development)
+      # in development), or when jobs were created before the introduction of the
+      # ActiveJob interface.
+      logger.error "Could not load Agent information for the jobs page: #{job.handler}"
       nil
     end
   end
