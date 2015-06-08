@@ -33,6 +33,8 @@ module Agents
 
       "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and ".//text()" is to extract all the enclosed texts.  You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-space(.//text())` should actually be `normalize-space(.)`.
 
+      Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions all namespaces are stripped from the document unless a toplevel option `use_namespaces` is set to true.
+
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
           "extract": {
@@ -299,14 +301,24 @@ module Agents
       end).to_s
     end
 
-    def extract_each(doc, &block)
+    def use_namespaces?
+      if value = interpolated.key?('use_namespaces')
+        boolify(interpolated['use_namespaces'])
+      else
+        interpolated['extract'].none? { |name, extraction_details|
+          extraction_details.key?('xpath')
+        }
+      end
+    end
+
+    def extract_each(&block)
       interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
         output[name] = block.call(extraction_details)
       }
     end
 
     def extract_json(doc)
-      extract_each(doc) { |extraction_details|
+      extract_each { |extraction_details|
         result = Utils.values_at(doc, extraction_details['path'])
         log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
         result
@@ -314,11 +326,16 @@ module Agents
     end
 
     def extract_text(doc)
-      extract_each(doc) { |extraction_details|
-        regexp = Regexp.new(extraction_details['regexp'])
-        result = []
-        doc.scan(regexp) {
-          result << Regexp.last_match[extraction_details['index']]
+      regexp_cache = {}
+      matches_cache = {}
+      extract_each { |extraction_details|
+        src = extraction_details['regexp']
+        regexp = (regexp_cache[src] ||= Regexp.new(src))
+        matches = (matches_cache[src] ||= [].tap { |ms|
+                     doc.scan(regexp) { ms << Regexp.last_match }
+                   })
+        result = matches.map { |match|
+          match[extraction_details['index']]
         }
         log "Extracting #{extraction_type} at #{regexp}: #{result}"
         result
@@ -326,16 +343,17 @@ module Agents
     end
 
     def extract_xml(doc)
-      extract_each(doc) { |extraction_details|
-        case
-        when css = extraction_details['css']
-          nodes = doc.css(css)
-        when xpath = extraction_details['xpath']
-          doc.remove_namespaces! # ignore xmlns, useful when parsing atom feeds
-          nodes = doc.xpath(xpath)
-        else
-          raise '"css" or "xpath" is required for HTML or XML extraction'
-        end
+      cache = {}
+      extract_each { |extraction_details|
+        nodes =
+          case
+          when css = extraction_details['css']
+            cache[[css, :css]] ||= doc.css(css)
+          when xpath = extraction_details['xpath']
+            cache[[xpath, :xpath]] ||= doc.xpath(xpath)
+          else
+            raise '"css" or "xpath" is required for HTML or XML extraction'
+          end
         case nodes
         when Nokogiri::XML::NodeSet
           result = nodes.map { |node|
@@ -356,9 +374,12 @@ module Agents
     end
 
     def parse(data)
-      case extraction_type
+      case type = extraction_type
       when "xml"
-        Nokogiri::XML(data)
+        doc = Nokogiri::XML(data)
+        # ignore xmlns, useful when parsing atom feeds
+        doc.remove_namespaces! unless use_namespaces?
+        doc
       when "json"
         JSON.parse(data)
       when "html"
@@ -366,7 +387,7 @@ module Agents
       when "text"
         data
       else
-        raise "Unknown extraction type #{extraction_type}"
+        raise "Unknown extraction type: #{type}"
       end
     end
 
