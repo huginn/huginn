@@ -25,6 +25,9 @@ describe Agents::RssAgent do
       agent.options['url'] = "http://google.com"
       expect(agent).to be_valid
 
+      agent.options['url'] = ["http://google.com", "http://yahoo.com"]
+      expect(agent).to be_valid
+
       agent.options['url'] = ""
       expect(agent).not_to be_valid
 
@@ -81,6 +84,15 @@ describe Agents::RssAgent do
       agent.memory['seen_ids'] = ['x'] * 490
       agent.check
       expect(agent.memory['seen_ids'].length).to eq(500)
+    end
+
+    it "should support an array of URLs" do
+      agent.options['url'] = ["https://github.com/cantino/huginn/commits/master.atom", "http://feeds.feedburner.com/SlickdealsnetFP?format=atom"]
+      agent.save!
+
+      expect {
+        agent.check
+      }.to change { agent.events.count }.by(20 + 79)
     end
   end
 

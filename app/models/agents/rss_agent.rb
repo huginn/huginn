@@ -19,7 +19,7 @@ module Agents
 
         Options:
 
-          * `url` - The URL of the RSS feed.
+          * `url` - The URL of the RSS feed (an array of URLs can also be used; items with identical guids across feeds will be considered duplicates).
           * `clean` - Attempt to use [feed-normalizer](https://github.com/aasmith/feed-normalizer)'s' `clean!` method to cleanup HTML in the feed.  Set to `true` to use.
           * `expected_update_period_in_days` - How often you expect this RSS feed to change.  If more than this amount of time passes without an update, the Agent will mark itself as not working.
           * `headers` - When present, it should be a hash of headers to send with the request.
@@ -70,32 +70,34 @@ module Agents
     end
 
     def check
-      response = faraday.get(interpolated['url'])
-      if response.success?
-        feed = FeedNormalizer::FeedNormalizer.parse(response.body)
-        feed.clean! if interpolated['clean'] == 'true'
-        created_event_count = 0
-        feed.entries.each do |entry|
-          entry_id = get_entry_id(entry)
-          if check_and_track(entry_id)
-            created_event_count += 1
-            create_event(payload: {
-              id: entry_id,
-              date_published: entry.date_published,
-              last_updated: entry.last_updated,
-              url: entry.url,
-              urls: entry.urls,
-              description: entry.description,
-              content: entry.content,
-              title: entry.title,
-              authors: entry.authors,
-              categories: entry.categories
-            })
+      Array(interpolated['url']).each do |url|
+        response = faraday.get(url)
+        if response.success?
+          feed = FeedNormalizer::FeedNormalizer.parse(response.body)
+          feed.clean! if interpolated['clean'] == 'true'
+          created_event_count = 0
+          feed.entries.each do |entry|
+            entry_id = get_entry_id(entry)
+            if check_and_track(entry_id)
+              created_event_count += 1
+              create_event(payload: {
+                id: entry_id,
+                date_published: entry.date_published,
+                last_updated: entry.last_updated,
+                url: entry.url,
+                urls: entry.urls,
+                description: entry.description,
+                content: entry.content,
+                title: entry.title,
+                authors: entry.authors,
+                categories: entry.categories
+              })
+            end
           end
+          log "Fetched #{interpolated['url']} and created #{created_event_count} event(s)."
+        else
+          error "Failed to fetch #{interpolated['url']}: #{response.inspect}"
         end
-        log "Fetched #{interpolated['url']} and created #{created_event_count} event(s)."
-      else
-        error "Failed to fetch #{interpolated['url']}: #{response.inspect}"
       end
     end
 
