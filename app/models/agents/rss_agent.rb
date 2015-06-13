@@ -94,9 +94,9 @@ module Agents
               })
             end
           end
-          log "Fetched #{interpolated['url']} and created #{created_event_count} event(s)."
+          log "Fetched #{url} and created #{created_event_count} event(s)."
         else
-          error "Failed to fetch #{interpolated['url']}: #{response.inspect}"
+          error "Failed to fetch #{url}: #{response.inspect}"
         end
       end
     end
