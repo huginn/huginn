@@ -25,17 +25,19 @@ module Agents
 
         If you'd like to output RSS tags with attributes, such as `enclosure`, use something like the following in your `template`:
 
-            "enclosure" => {
-              "_attributes" => {
-                "type" => "audio/mpeg",
-                "url" => "{{media_url}}"
+            "enclosure": {
+              "_attributes": {
+                "url": "{{media_url}}",
+                "length": "1234456789",
+                "type": "audio/mpeg"
               }
             },
-            "tag" => {
-              "_attributes" => {
-                "key" => "value"
+            "another_tag": {
+              "_attributes": {
+                "key": "value",
+                "another_key": "another_value"
               },
-              "_contents" => "tag contents (can be an object for nesting)"
+              "_contents": "tag contents (can be an object for nesting)"
             }
       MD
     end
