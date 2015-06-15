@@ -509,7 +509,7 @@ module Agents
       module Scrubbed
         def scrubbed(method)
           (@scrubbed ||= {})[method.to_sym] ||=
-            __send__(method).scrub { |bytes| "<#{bytes.unpack('H*')[0]}>" }
+            __send__(method).try(:scrub) { |bytes| "<#{bytes.unpack('H*')[0]}>" }
         end
       end
 
