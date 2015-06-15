@@ -96,4 +96,72 @@ describe LiquidInterpolatable::Filters do
       expect(@agent.interpolated['foo']).to eq('/dir/foo/index.html')
     end
   end
+
+  describe 'uri_expand' do
+    before do
+      stub_request(:head, 'https://t.co.x/aaaa').
+        to_return(status: 301, headers: { Location: 'https://bit.ly.x/bbbb' })
+      stub_request(:head, 'https://bit.ly.x/bbbb').
+        to_return(status: 301, headers: { Location: 'http://tinyurl.com.x/cccc' })
+      stub_request(:head, 'http://tinyurl.com.x/cccc').
+        to_return(status: 301, headers: { Location: 'http://www.example.com/welcome' })
+
+      (1..5).each do |i|
+        stub_request(:head, "http://2many.x/#{i}").
+          to_return(status: 301, headers: { Location: "http://2many.x/#{i+1}" })
+      end
+      stub_request(:head, 'http://2many.x/6').
+        to_return(status: 301, headers: { 'Content-Length' => '5' })
+    end
+
+    it 'should follow redirects' do
+      expect(@filter.uri_expand('https://t.co.x/aaaa')).to eq('http://www.example.com/welcome')
+    end
+
+    it 'should respect the limit for the number of redirects' do
+      expect(@filter.uri_expand('http://2many.x/1')).to eq('http://2many.x/1')
+      expect(@filter.uri_expand('http://2many.x/1', 6)).to eq('http://2many.x/6')
+    end
+
+    it 'should detect a redirect loop' do
+      stub_request(:head, 'http://bad.x/aaaa').
+        to_return(status: 301, headers: { Location: 'http://bad.x/bbbb' })
+      stub_request(:head, 'http://bad.x/bbbb').
+        to_return(status: 301, headers: { Location: 'http://bad.x/aaaa' })
+
+      expect(@filter.uri_expand('http://bad.x/aaaa')).to eq('http://bad.x/aaaa')
+    end
+
+    it 'should be able to handle an FTP URL' do
+      stub_request(:head, 'http://downloads.x/aaaa').
+        to_return(status: 301, headers: { Location: 'http://downloads.x/download?file=aaaa.zip' })
+      stub_request(:head, 'http://downloads.x/download').
+        with(query: { file: 'aaaa.zip' }).
+        to_return(status: 301, headers: { Location: 'ftp://downloads.x/pub/aaaa.zip' })
+
+      expect(@filter.uri_expand('http://downloads.x/aaaa')).to eq('ftp://downloads.x/pub/aaaa.zip')
+    end
+
+    describe 'used in interpolation' do
+      before do
+        @agent = Agents::InterpolatableAgent.new(name: "test")
+      end
+
+      it 'should follow redirects' do
+        @agent.interpolation_context['short_url'] = 'https://t.co.x/aaaa'
+        @agent.options['long_url'] = '{{ short_url | uri_expand }}'
+        expect(@agent.interpolated['long_url']).to eq('http://www.example.com/welcome')
+      end
+
+      it 'should respect the limit for the number of redirects' do
+        @agent.interpolation_context['short_url'] = 'http://2many.x/1'
+        @agent.options['long_url'] = '{{ short_url | uri_expand }}'
+        expect(@agent.interpolated['long_url']).to eq('http://2many.x/1')
+
+        @agent.interpolation_context['short_url'] = 'http://2many.x/1'
+        @agent.options['long_url'] = '{{ short_url | uri_expand:6 }}'
+        expect(@agent.interpolated['long_url']).to eq('http://2many.x/6')
+      end
+    end
+  end
 end

@@ -1,5 +1,6 @@
 # Changes
 
+* Jun 15, 2015   - Liquid filter `uri_expand` added.
 * Jun 12, 2015   - RSSAgent can now accept an array of URLs.
 * Jun 8, 2015    - WebsiteAgent includes a `use_namespaces` option to enable XML namespaces.
 * May 27, 2015   - Validation warns user if they have not provided a `path` when using JSONPath in WebsiteAgent.
