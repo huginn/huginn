@@ -134,8 +134,10 @@ module LiquidInterpolatable
 
     # Get the destination URL of a given URL by recursively following
     # redirects, up to 5 times in a row.  If a given string is not a
-    # valid absolute HTTP URL, or any error occurs while following
-    # redirects, the original string is returned.
+    # valid absolute HTTP URL or in case of too many redirects, the
+    # original string is returned.  If any network/protocol error
+    # occurs while following redirects, the last URL followed is
+    # returned.
     def uri_expand(url, limit = 5)
       uri = URI(url)
 
