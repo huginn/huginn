@@ -132,6 +132,44 @@ module LiquidInterpolatable
       nil
     end
 
+    # Get the destination URL of a given URL by recursively following
+    # redirects, up to 5 times in a row.  If a given string is not a
+    # valid absolute HTTP URL, or any error occurs while following
+    # redirects, the original string is returned.
+    def uri_expand(url, limit = 5)
+      uri = URI(url)
+
+      http = Faraday.new do |builder|
+        builder.adapter :net_http
+        # builder.use FaradayMiddleware::FollowRedirects, limit: limit
+        # ...does not handle non-HTTP URLs.
+      end
+
+      limit.times do
+        begin
+          case uri
+          when URI::HTTP
+            response = http.head(uri)
+            case response.status
+            when 301, 302, 303, 307
+              if location = response['location']
+                uri += location
+                next
+              end
+            end
+          end
+        rescue URI::Error, Faraday::Error, SystemCallError => e
+          logger.error "#{e.class} in #{__method__}(#{url.inspect}) [uri=#{uri.to_s.inspect}]: #{e.message}:\n#{e.backtrace.join("\n")}"
+        end
+
+        return uri.to_s
+      end
+
+      logger.error "Too many rediretions in #{__method__}(#{url.inspect}) [uri=#{uri.to_s.inspect}]"
+
+      url
+    end
+
     # Escape a string for use in XPath expression
     def to_xpath(string)
       subs = string.to_s.scan(/\G(?:\A\z|[^"]+|[^']+)/).map { |x|
@@ -147,6 +185,18 @@ module LiquidInterpolatable
       else
         'concat(' << subs.join(', ') << ')'
       end
+    end
+
+    private
+
+    def logger
+      @@logger ||=
+        if defined?(Rails)
+          Rails.logger
+        else
+          require 'logger'
+          Logger.new(STDERR)
+        end
     end
   end
   Liquid::Template.register_filter(LiquidInterpolatable::Filters)
