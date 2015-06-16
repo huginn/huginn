@@ -158,13 +158,15 @@ module LiquidInterpolatable
               end
             end
           end
-        rescue
+        rescue URI::Error, Faraday::Error, SystemCallError => e
+          logger.error "#{e.class} in #{__method__}(#{url.inspect}) [uri=#{uri.to_s.inspect}]: #{e.message}:\n#{e.backtrace.join("\n")}"
         end
 
         return uri.to_s
       end
 
-      # too many redirections
+      logger.error "Too many rediretions in #{__method__}(#{url.inspect}) [uri=#{uri.to_s.inspect}]"
+
       url
     end
 
@@ -183,6 +185,18 @@ module LiquidInterpolatable
       else
         'concat(' << subs.join(', ') << ')'
       end
+    end
+
+    private
+
+    def logger
+      @@logger ||=
+        if defined?(Rails)
+          Rails.logger
+        else
+          require 'logger'
+          Logger.new(STDERR)
+        end
     end
   end
   Liquid::Template.register_filter(LiquidInterpolatable::Filters)
