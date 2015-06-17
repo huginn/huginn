@@ -6,6 +6,7 @@ module Agents
     include WebRequestConcern
 
     cannot_receive_events!
+    can_dry_run!
     default_schedule "every_1d"
 
     description do
