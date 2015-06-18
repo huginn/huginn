@@ -191,6 +191,10 @@ module Agents
     end
 
     def check_url(url, payload = {})
+      unless /\Ahttps?:\/\//i === url
+        error "Ignoring a non-HTTP url: #{url.inspect}"
+        return
+      end
       log "Fetching #{url}"
       response = faraday.get(url)
       raise "Failed: #{response.inspect}" unless response.success?
@@ -254,7 +258,6 @@ module Agents
       incoming_events.each do |event|
         interpolate_with(event) do
           url_to_scrape = event.payload['url']
-          next unless url_to_scrape =~ /^https?:\/\//i
           check_url(url_to_scrape,
                     interpolated['mode'].to_s == "merge" ? event.payload : {})
         end
