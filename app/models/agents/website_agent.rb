@@ -19,7 +19,7 @@ module Agents
 
       `url` can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape)
 
-      The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload. If you specify `merge` as the `mode`, it will retain the old payload and update it with the new values.
+      The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload, or if you set `url_on_receive` it is used as a Liquid template to generate the url to access. If you specify `merge` as the `mode`, it will retain the old payload and update it with the new values.
 
       # Supported Document Types
 
@@ -135,7 +135,8 @@ module Agents
 
     def validate_options
       # Check for required fields
-      errors.add(:base, "url and expected_update_period_in_days are required") unless options['expected_update_period_in_days'].present? && options['url'].present?
+      errors.add(:base, "either url or url_on_receive is required") unless options['url'].present? || options['url_on_receive'].present?
+      errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       if !options['extract'].present? && extraction_type != "json"
         errors.add(:base, "extract is required for all types except json")
       end
@@ -257,7 +258,12 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          url_to_scrape = event.payload['url']
+          url_to_scrape =
+            if url_template = options['url_on_receive'].presence
+              interpolate_string(url_template)
+            else
+              event.payload['url']
+            end
           check_url(url_to_scrape,
                     interpolated['mode'].to_s == "merge" ? event.payload : {})
         end
