@@ -19,9 +19,17 @@ module Agents
 
       `url` can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape)
 
+      The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload. If you specify `merge` as the `mode`, it will retain the old payload and update it with the new values.
+
+      # Supported Document Types
+
       The `type` value can be `xml`, `html`, `json`, or `text`.
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
+
+      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
+
+      # Scraping HTML and XML
 
       When parsing HTML or XML, these sub-hashes specify how each extraction should be done.  The Agent first selects a node set from the document for each extraction key by evaluating either a CSS selector in `css` or an XPath expression in `xpath`.  It then evaluates an XPath expression in `value` on each node in the node set, converting the result into string.  Here's an example:
 
@@ -37,12 +45,16 @@ module Agents
 
       Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions all namespaces are stripped from the document unless a toplevel option `use_namespaces` is set to true.
 
+      # Scraping JSON
+
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
           "extract": {
             "title": { "path": "results.data[*].title" },
             "description": { "path": "results.data[*].description" }
           }
+
+      # Scraping Text
 
       When parsing text, each sub-hash should contain a `regexp` and `index`.  Output text is matched against the regular expression repeatedly from the beginning through to the end, collecting a captured group specified by `index` in each match.  Each index should be either an integer or a string name which corresponds to <code>(?&lt;<em>name</em>&gt;...)</code>.  For example, to parse lines of <code><em>word</em>: <em>definition</em></code>, the following should work:
 
@@ -66,7 +78,7 @@ module Agents
 
       Beware that `.` does not match the newline character (LF) unless the `m` flag is in effect, and `^`/`$` basically match every line beginning/end.  See [this document](http://ruby-doc.org/core-#{RUBY_VERSION}/doc/regexp_rdoc.html) to learn the regular expression variant used in this service.
 
-      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
+      # General Options
 
       Can be configured to use HTTP basic auth by including the `basic_auth` parameter with `"username:password"`, or `["username", "password"]`.
 
@@ -84,7 +96,7 @@ module Agents
 
       Set `unzip` to `gzip` to inflate the resource using gzip.
 
-      The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload. If you specify `merge` as the mode, it will retain the old payload and update it with the new values.
+      # Liquid Templating
 
       In Liquid templating, the following variable is available:
 
