@@ -77,7 +77,7 @@ module Agents
           feed = FeedNormalizer::FeedNormalizer.parse(response.body)
           feed.clean! if interpolated['clean'] == 'true'
           created_event_count = 0
-          feed.entries.each do |entry|
+          feed.entries.sort_by { |entry| [entry.date_published, entry.last_updated] }.each do |entry|
             entry_id = get_entry_id(entry)
             if check_and_track(entry_id)
               created_event_count += 1
