@@ -26,6 +26,8 @@ module JobsHelper
   def agent_from_job(job)
     if data = YAML.load(job.handler).try(:job_data)
       Agent.find_by_id(data['arguments'][0])
+    else
+      false
     end
   rescue ArgumentError
     # We can get to this point before all of the agents have loaded (usually,
