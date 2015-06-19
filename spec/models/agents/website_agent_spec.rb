@@ -633,11 +633,11 @@ fire: hot
         }.to change { Event.count }.by(1)
       end
 
-      it "should use url_on_receive as url to scrape if it exists when receiving an event" do
+      it "should use url_from_event as url to scrape if it exists when receiving an event" do
         stub = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
 
         @checker.options = @valid_options.merge(
-          'url_on_receive' => 'http://example.org/?url={{url | uri_escape}}'
+          'url_from_event' => 'http://example.org/?url={{url | uri_escape}}'
         )
         @checker.receive([@event])
 
