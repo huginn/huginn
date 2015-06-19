@@ -63,14 +63,14 @@ gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware'
 gem 'feed-normalizer'
-gem 'font-awesome-sass', '~> 4.3'
+gem 'font-awesome-sass', '~> 4.3.2'
 gem 'foreman', '~> 0.63.0'
 # geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
 # in its own Gemfile.
 gem 'geokit', '~> 1.8.4'
 gem 'geokit-rails', '~> 2.0.1'
 gem 'httparty', '~> 0.13'
-gem 'jquery-rails', '~> 3.1.0'
+gem 'jquery-rails', '~> 3.1.3'
 gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.6'
 gem 'kaminari', '~> 0.16.1'
@@ -81,9 +81,9 @@ gem 'mysql2', '~> 0.3.16'
 gem 'multi_xml'
 gem 'nokogiri', '~> 1.6.4'
 gem 'omniauth'
-gem 'rails' , '4.2.1'
+gem 'rails' , '4.2.2'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
-gem 'sass-rails',   '~> 5.0'
+gem 'sass-rails',   '~> 5.0.3'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
 gem 'string-scrub'	# for ruby <2.1
@@ -117,7 +117,7 @@ group :development do
 end
 
 group :production do
-  gem 'rack'
+  gem 'rack', '> 1.5.0'
 end
 
 # Platform requirements.
