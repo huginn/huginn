@@ -633,6 +633,17 @@ fire: hot
         }.to change { Event.count }.by(1)
       end
 
+      it "should use url_from_event as url to scrape if it exists when receiving an event" do
+        stub = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
+
+        @checker.options = @valid_options.merge(
+          'url_from_event' => 'http://example.org/?url={{url | uri_escape}}'
+        )
+        @checker.receive([@event])
+
+        expect(stub).to have_been_requested
+      end
+
       it "should interpolate values from incoming event payload" do
         expect {
           @valid_options['extract'] = {

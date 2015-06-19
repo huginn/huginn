@@ -1,5 +1,6 @@
 # Changes
 
+* Jun 19, 2015   - Add `url_from_event` to WebsiteAgent.
 * Jun 17, 2015   - RssAgent emits events for new feed items in chronological order.
 * Jun 15, 2015   - Liquid filter `uri_expand` added.
 * Jun 12, 2015   - RSSAgent can now accept an array of URLs.
