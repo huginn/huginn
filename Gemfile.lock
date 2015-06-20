@@ -230,7 +230,7 @@ GEM
     kaminari (0.16.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    kgio (2.9.2)
+    kgio (2.9.3)
     kramdown (1.3.3)
     launchy (2.4.2)
       addressable (~> 2.3)
@@ -472,7 +472,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.1)
-    unicorn (4.8.3)
+    unicorn (4.9.0)
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
@@ -576,7 +576,7 @@ DEPENDENCIES
   tzinfo (>= 1.2.0)
   tzinfo-data
   uglifier (>= 1.3.0)
-  unicorn
+  unicorn (~> 4.9.0)
   vcr
   webmock (~> 1.17.4)
   weibo_2!
