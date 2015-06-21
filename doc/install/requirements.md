@@ -2,7 +2,7 @@
 
 ## Operating Systems
 
-### Supported Unix distributions
+### Supported Unix distributions by this guide
 
 - Ubuntu (12.04 and 14.04)
 - Debian (Jessie and Wheezy)
@@ -17,7 +17,7 @@
 - Gentoo
 - FreeBSD
 
-On the above unsupported distributions is still possible to install Huginn. Follow the [installation guide](./installation.md) and substitute the `apt` commands with the corresponding package manager commands of your distribution.
+On the above unsupported distributions is still possible to install Huginn, and many people do. Follow the [installation guide](./installation.md) and substitute the `apt` commands with the corresponding package manager commands of your distribution.
 
 ### Non-Unix operating systems such as Windows
 

@@ -178,15 +178,20 @@ You are done installing the database and can go back to the rest of the installa
 If you are using a local MySQL server the database configuration should look like this (use the password of the huginn MySQL user you created earlier):
 
     DATABASE_ADAPTER=mysql2
-    DATABASE_ENCODING=utf8
     DATABASE_RECONNECT=true
     DATABASE_NAME=huginn_production
     DATABASE_POOL=20
     DATABASE_USERNAME=huginn
-    DATABASE_PASSWORD=""
+    DATABASE_PASSWORD='$password'
     #DATABASE_HOST=your-domain-here.com
     #DATABASE_PORT=3306
     #DATABASE_SOCKET=/tmp/mysql.sock
+
+    DATABASE_ENCODING=utf8
+    # MySQL only: If you are running a MySQL server >=5.5.3, you should
+    # set DATABASE_ENCODING to utf8mb4 instead of utf8 so that the
+    # database can hold 4-byte UTF-8 characters like emoji.
+    #DATABASE_ENCODING=utf8mb4
 
 **Important**: Uncomment the RAILS_ENV setting to run Huginn in the production rails environment
 
