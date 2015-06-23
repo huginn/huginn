@@ -27,7 +27,7 @@ module Agents
           * `basic_auth` - Specify HTTP basic auth parameters: `"username:password"`, or `["username", "password"]`.
           * `disable_ssl_verification` - Set to `true` to disable ssl verification.
           * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
-          * `max_items_per_feed` - Limit number of items parsed (events created) per feed.
+          * `max_events_per_run` - Limit number of events created (items parsed) per run for feed.
       MD
     end
 
@@ -77,12 +77,10 @@ module Agents
         if response.success?
           feed = FeedNormalizer::FeedNormalizer.parse(response.body)
           feed.clean! if interpolated['clean'] == 'true'
-
-          max_events = Integer(interpolated['max_items_per_feed']) if options['max_items_per_feed'].present?
-
+          max_events = (interpolated['max_events_per_run'].presence || 0).to_i
           created_event_count = 0
-          feed.entries.sort_by { |entry| [entry.date_published, entry.last_updated] }.each do |entry|
-            break if (!max_events.nil?) && (max_events >= 0) && (created_event_count >= max_events)
+          feed.entries.sort_by { |entry| [entry.date_published, entry.last_updated] }.each.with_index do |entry, index|
+            break if max_events && max_events > 0 && index >= max_events
             entry_id = get_entry_id(entry)
             if check_and_track(entry_id)
               created_event_count += 1

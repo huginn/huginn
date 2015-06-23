@@ -96,6 +96,29 @@ describe Agents::RssAgent do
         agent.check
       }.to change { agent.events.count }.by(20 + 79)
     end
+    
+    it "should fetch one event per run" do
+      agent.options['url'] = ["https://github.com/cantino/huginn/commits/master.atom"]
+      
+      agent.options['max_events_per_run'] = 1
+      agent.check
+      expect(agent.events.count).to eq(1)
+    end
+
+    it "should fetch all events per run" do
+      agent.options['url'] = ["https://github.com/cantino/huginn/commits/master.atom"]
+      
+      # <= 0 should ignore option and get all
+      agent.options['max_events_per_run'] = 0
+      agent.check
+      expect(agent.events.count).to eq(20)
+
+      agent.options['max_events_per_run'] = -1
+      expect {
+        agent.check
+      }.to_not change { agent.events.count }
+    end
+
   end
 
   context "when no ids are available" do
