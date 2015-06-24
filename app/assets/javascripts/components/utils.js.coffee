@@ -34,7 +34,7 @@ class @Utils
     body?(modal.querySelector('.modal-body'))
     $(modal).modal('show')
 
-  @handleDryRunButton: (button, data = $(button.form).serialize()) ->
+  @handleDryRunButton: (button, data = if button.form then $(':input[name!="_method"]', button.form).serialize() else '') ->
     $(button).prop('disabled', true)
     $('body').css(cursor: 'progress')
     $.ajax type: 'POST', url: $(button).data('action-url'), dataType: 'json', data: data

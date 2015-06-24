@@ -7,7 +7,7 @@
 
   <% if agent.can_dry_run? %>
     <li>
-      <%= link_to icon_tag('glyphicon-refresh') + ' Dry Run', '#', 'data-action-url' => dry_run_agent_path(agent), tabindex: "-1", onclick: "Utils.handleDryRunButton(this, '_method=PUT')" %>
+      <%= link_to icon_tag('glyphicon-refresh') + ' Dry Run', '#', 'data-action-url' => dry_run_agent_path(agent), tabindex: "-1", onclick: "Utils.handleDryRunButton(this)" %>
     </li>
   <% end %>
 

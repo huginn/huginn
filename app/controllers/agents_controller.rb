@@ -37,7 +37,7 @@ class AgentsController < ApplicationController
   def dry_run
     attrs = params[:agent] || {}
     if agent = current_user.agents.find_by(id: params[:id])
-      # PUT /agents/:id/dry_run
+      # POST /agents/:id/dry_run
       if attrs.present?
         type = agent.type
         agent = Agent.build_for_type(type, current_user, attrs)
