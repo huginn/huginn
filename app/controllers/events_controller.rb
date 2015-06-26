@@ -24,7 +24,9 @@ class EventsController < ApplicationController
 
   def reemit
     @event.reemit!
-    redirect_to :back, :notice => "Event re-emitted"
+    respond_to do |format|
+      format.html { redirect_back event_path(@event), notice: 'Event re-emitted.' }
+    end
   end
 
   def destroy
