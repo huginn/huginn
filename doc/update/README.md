@@ -75,13 +75,13 @@ sudo -u huginn -H editor .env
 ```
 
 
-### 6. Export init script and start huginn
+### 6. Export init script and start Huginn
 
 ```
 # Export the init script
 sudo rm /etc/init/huginn*
 sudo foreman export upstart -a huginn /etc/init
-# Start huginn
+# Start Huginn
 sudo start huginn
 ```
 

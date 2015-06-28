@@ -13,6 +13,8 @@ The following steps have been known to work. Please **use caution when you devia
 
 If you find a bug/error in this guide please **submit a merge request**.
 
+If not stated otherwise all commands should be run as user with sudo permissions or as root.
+
 ## Overview
 
 The Huginn installation consists of setting up the following components:
