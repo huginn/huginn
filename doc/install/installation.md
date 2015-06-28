@@ -244,6 +244,7 @@ Edit the `Procfile` and choose one of the suggested versions for production
 
 Export the init scripts using foreman:
 
+    sudo rm /etc/init/huginn*
     sudo foreman export upstart -a huginn /etc/init
 
 **Note:** You have to re-export the init script every time you change the configuration in `.env`!
@@ -332,6 +333,7 @@ Restart Nginx, export the init script and restart Huginn:
 ```
 cd /home/huginn/huginn
 sudo service nginx restart
+sudo rm /etc/init/huginn*
 sudo foreman export upstart -a huginn /etc/init
 sudo restart huginn
 ```
