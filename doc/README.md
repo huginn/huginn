@@ -2,7 +2,7 @@
 
 ## User documentation
 
-- [Check out Huginn with Docker](./tobewritten.md) Run a local Huginn installation using Docker
+- [Check out Huginn with Docker](install/docker.md) Run a local Huginn installation using Docker
 
 
 ## Administrator documentation
