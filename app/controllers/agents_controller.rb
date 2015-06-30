@@ -175,7 +175,7 @@ class AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
-        format.html { redirect_back "'#{@agent.name}' was successfully updated." }
+        format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
         initialize_presenter
@@ -225,13 +225,13 @@ class AgentsController < ApplicationController
   protected
 
   # Sanitize params[:return] to prevent open redirect attacks, a common security issue.
-  def redirect_back(message)
-    case ret = params[:return]
+  def redirect_back(message, options = {})
+    case ret = params[:return] || options[:return]
     when "show"
       if @agent && !@agent.destroyed?
         path = agent_path(@agent)
       end
-    when /\A#{Regexp::escape scenarios_path}\/\d+\Z/
+    when /\A#{Regexp::escape scenarios_path}\/\d+\Z/, agents_path
       path = ret
     end
 
