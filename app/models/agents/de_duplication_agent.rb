@@ -29,10 +29,10 @@ module Agents
     form_configurable :lookback
     form_configurable :expected_update_period_in_days
 
-    before_create :initialize_memory
+    after_initialize :initialize_memory
 
     def initialize_memory
-      memory['properties'] = []
+      memory['properties'] ||= []
     end
 
     def validate_options
