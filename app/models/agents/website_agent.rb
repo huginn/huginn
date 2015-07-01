@@ -137,9 +137,7 @@ module Agents
       # Check for required fields
       errors.add(:base, "either url or url_from_event is required") unless options['url'].present? || options['url_from_event'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
-      if !options['extract'].present? && extraction_type != "json"
-        errors.add(:base, "extract is required for all types except json")
-      end
+      validate_extract_options!
 
       # Check for optional fields
       if options['mode'].present?
@@ -168,14 +166,89 @@ module Agents
       end
 
       validate_web_request_options!
-      validate_extract_options!
     end
 
     def validate_extract_options!
-      if extraction_type == "json" && interpolated['extract'].is_a?(Hash)
-        unless interpolated['extract'].all? { |name, details| details.is_a?(Hash) && details['path'].present? }
-          errors.add(:base, 'When type is json, all extractions must have a path attribute.')
+      case extract = interpolated['extract']
+      when Hash
+        if extract.each_value.any? { |value| !value.is_a?(Hash) }
+          errors.add(:base, 'extract must be a hash of hashes.')
+        else
+          case extraction_type
+          when 'html', 'xml'
+            extract.each do |name, details|
+              case details['css']
+              when String
+                # ok
+              when nil
+                case details['xpath']
+                when String
+                  # ok
+                when nil
+                  errors.add(:base, "When type is html or xml, all extractions must have a css or xpath attribute (bad extraction details for #{name.inspect})")
+                else
+                  errors.add(:base, "Wrong type of \"xpath\" value in extraction details for #{name.inspect}")
+                end
+              else
+                errors.add(:base, "Wrong type of \"css\" value in extraction details for #{name.inspect}")
+              end
+
+              case details['value']
+              when String, nil
+                # ok
+              else
+                errors.add(:base, "Wrong type of \"value\" value in extraction details for #{name.inspect}")
+              end
+            end
+          when 'json'
+            extract.each do |name, details|
+              case details['path']
+              when String
+                # ok
+              when nil
+                errors.add(:base, "When type is json, all extractions must have a path attribute (bad extraction details for #{name.inspect})")
+              else
+                errors.add(:base, "Wrong type of \"path\" value in extraction details for #{name.inspect}")
+              end
+            end
+          when 'text'
+            extract.each do |name, details|
+              case regexp = details['regexp']
+              when String
+                begin
+                  re = Regexp.new(regexp)
+                rescue => e
+                  errors.add(:base, "invalid regexp for #{name.inspect}: #{e.message}")
+                end
+              when nil
+                errors.add(:base, "When type is text, all extractions must have a regexp attribute (bad extraction details for #{name.inspect})")
+              else
+                errors.add(:base, "Wrong type of \"regexp\" value in extraction details for #{name.inspect}")
+              end
+
+              case index = details['index']
+              when Integer
+                # ok
+              when String
+                if re && !re.names.include?(index)
+                  errors.add(:base, "no named capture #{index.inspect} found in regexp for #{name.inspect})")
+                end
+              when nil
+                errors.add(:base, "When type is text, all extractions must have an index attribute (bad extraction details for #{name.inspect})")
+              else
+                errors.add(:base, "Wrong type of \"index\" value in extraction details for #{name.inspect}")
+              end
+            end
+          else
+            errors.add(:base, "Unknown extraction type #{extraction_type.inspect}")
+          end
         end
+      when nil
+        unless extraction_type == 'json'
+          errors.add(:base, 'extract is required for all types except json')
+        end
+      else
+        errors.add(:base, 'extract must be a hash')
       end
     end
 
