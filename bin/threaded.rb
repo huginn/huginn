@@ -1,5 +1,8 @@
 require 'thread'
 require 'huginn_scheduler'
+require 'twitter_stream'
+
+Rails.configuration.cache_classes = true
 
 STDOUT.sync = true
 STDERR.sync = true
@@ -33,7 +36,7 @@ end
 
 threads << Thread.new do
   safely do
-    @scheduler = HuginnScheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'])
+    @scheduler = HuginnScheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'].presence || 0.3)
     @scheduler.run!
     puts "Scheduler stopped ..."
   end

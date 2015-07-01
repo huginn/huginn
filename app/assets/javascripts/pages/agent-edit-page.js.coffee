@@ -2,6 +2,15 @@ class @AgentEditPage
   constructor: ->
     $("#agent_source_ids").on "change", @showEventDescriptions
     @showCorrectRegionsOnStartup()
+    $("form.agent-form").on "submit", => @updateFromEditors()
+
+    $("#agent_name").each ->
+      # Select the number suffix if this is a cloned agent.
+      if matches = this.value.match(/ \(\d+\)$/)
+        this.focus()
+        if this.selectionStart?
+          this.selectionStart = matches.index
+          this.selectionEnd = this.value.length
 
     # The type selector is only available on the new agent form.
     if $("#agent_type").length
@@ -9,6 +18,7 @@ class @AgentEditPage
       @handleTypeChange(true)
     else
       @enableDryRunButton()
+      @buildAce()
 
   handleTypeChange: (firstTime) ->
     $(".event-descriptions").html("").hide()
@@ -53,6 +63,7 @@ class @AgentEditPage
           window.jsonEditor = setupJsonEditor()[0]
 
         @enableDryRunButton()
+        @buildAce()
 
         window.initializeFormCompletable()
 
@@ -126,39 +137,45 @@ class @AgentEditPage
       else
         @hideEventCreation()
 
+  buildAce: ->
+    $(".ace-editor").each ->
+      unless $(this).data('initialized')
+        $(this).data('initialized', true)
+        $source = $($(this).data('source')).hide()
+        editor = ace.edit(this)
+        $(this).data('ace-editor', editor)
+        session = editor.getSession()
+        session.setTabSize(2)
+        session.setUseSoftTabs(true)
+        session.setUseWrapMode(false)
+        editor.setTheme("ace/theme/chrome")
+
+        setSyntax = ->
+          switch $("[name='agent[options][language]']").val()
+            when 'JavaScript' then session.setMode("ace/mode/javascript")
+            when 'CoffeeScript' then session.setMode("ace/mode/coffee")
+            else session.setMode("ace/mode/text")
+
+        $("[name='agent[options][language]']").on 'change', setSyntax
+        setSyntax()
+
+        session.setValue($source.val())
+
+  updateFromEditors: ->
+    $(".ace-editor").each ->
+      $source = $($(this).data('source'))
+      $source.val($(this).data('ace-editor').getSession().getValue())
+
   enableDryRunButton: ->
     $(".agent-dry-run-button").prop('disabled', false).off().on "click", @invokeDryRun
 
   disableDryRunButton: ->
     $(".agent-dry-run-button").prop('disabled', true)
 
-  invokeDryRun: (e) ->
+  invokeDryRun: (e) =>
     e.preventDefault()
-    button = this
-    $(button).prop('disabled', true)
-    $('body').css(cursor: 'progress')
-    $.ajax type: 'POST', url: $(button).data('action-url'), dataType: 'json', data: $(button.form).serialize()
-      .always =>
-        $("body").css(cursor: 'auto')
-      .done (json) =>
-        Utils.showDynamicModal """
-          <h5>Log</h5>
-          <pre class="agent-dry-run-log"></pre>
-          <h5>Events</h5>
-          <pre class="agent-dry-run-events"></pre>
-          <h5>Memory</h5>
-          <pre class="agent-dry-run-memory"></pre>
-          """,
-          body: (body) ->
-            $(body).
-              find('.agent-dry-run-log').text(json.log).end().
-              find('.agent-dry-run-events').text(json.events).end().
-              find('.agent-dry-run-memory').text(json.memory)
-          title: 'Dry Run Results',
-          onHide: -> $(button).prop('disabled', false)
-      .fail (xhr, status, error) ->
-        alert('Error: ' + error)
-        $(button).prop('disabled', false)
+    @updateFromEditors()
+    Utils.handleDryRunButton(e.target)
 
 $ ->
   Utils.registerPage(AgentEditPage, forPathsMatching: /^agents/)

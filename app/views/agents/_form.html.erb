@@ -1,3 +1,5 @@
+<% load_ace_editor! %>
+
 <% if @agent.errors.any? %>
   <div class="row well model-errors">
     <h2><%= pluralize(@agent.errors.count, "error") %> prohibited this Agent from being saved:</h2>
@@ -8,9 +10,10 @@
 <% end %>
 
 <%= form_for(@agent,
-             :as => :agent,
-             :url => @agent.new_record? ? agents_path : agent_path(@agent),
-             :method => @agent.new_record? ? "POST" : "PUT") do |f| %>
+             as: :agent,
+             url: @agent.new_record? ? agents_path : agent_path(@agent),
+             method: @agent.new_record? ? "POST" : "PUT",
+             html: { class: 'agent-form' }) do |f| %>
 
   <div class="row">
     <div class="col-md-6">

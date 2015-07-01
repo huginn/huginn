@@ -22,6 +22,23 @@ module Agents
           * `template` - A JSON object representing a mapping between item output keys and incoming event values. Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values. The `item` key will be repeated for every Event. The `pubDate` key for each item will have the creation time of the Event unless given.
           * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
           * `ttl` - A value for the <ttl> element in RSS output. (default: `60`)
+
+        If you'd like to output RSS tags with attributes, such as `enclosure`, use something like the following in your `template`:
+
+            "enclosure": {
+              "_attributes": {
+                "url": "{{media_url}}",
+                "length": "1234456789",
+                "type": "audio/mpeg"
+              }
+            },
+            "another_tag": {
+              "_attributes": {
+                "key": "value",
+                "another_key": "another_value"
+              },
+              "_contents": "tag contents (can be an object for nesting)"
+            }
       MD
     end
 
@@ -35,14 +52,11 @@ module Agents
           "item" => {
             "title" => "{{title}}",
             "description" => "Secret hovertext: {{hovertext}}",
-            "link" => "{{url}}",
+            "link" => "{{url}}"
           }
         }
       }
     end
-
-    #"guid" => "",
-    #  "pubDate" => ""
 
     def working?
       last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
@@ -104,7 +118,7 @@ module Agents
             'title' => feed_title,
             'description' => feed_description,
             'pubDate' => Time.now,
-            'items' => items
+            'items' => simplify_item_for_json(items)
           }
 
           return [content, 200]
@@ -122,7 +136,7 @@ module Agents
 
           XML
 
-          content += items.to_xml(:skip_types => true, :root => "items", :skip_instruct => true, :indent => 1).gsub(/^<\/?items>/, '').strip
+          content += simplify_item_for_xml(items).to_xml(skip_types: true, root: "items", skip_instruct: true, indent: 1).gsub(/^<\/?items>/, '').strip
 
           content += Utils.unindent(<<-XML)
             </channel>
@@ -137,6 +151,72 @@ module Agents
         else
           return ["Not Authorized", 401]
         end
+      end
+    end
+
+    private
+
+    class XMLNode
+      def initialize(tag_name, attributes, contents)
+        @tag_name, @attributes, @contents = tag_name, attributes, contents
+      end
+
+      def to_xml(options)
+        if @contents.is_a?(Hash)
+          options[:builder].tag! @tag_name, @attributes do
+            @contents.each { |key, value| ActiveSupport::XmlMini.to_tag(key, value, options.merge(skip_instruct: true)) }
+          end
+        else
+          options[:builder].tag! @tag_name, @attributes, @contents
+        end
+      end
+    end
+
+    def simplify_item_for_xml(item)
+      if item.is_a?(Hash)
+        item.each.with_object({}) do |(key, value), memo|
+          if value.is_a?(Hash)
+            if value.key?('_attributes') || value.key?('_contents')
+              memo[key] = XMLNode.new(key, value['_attributes'], simplify_item_for_xml(value['_contents']))
+            else
+              memo[key] = simplify_item_for_xml(value)
+            end
+          else
+            memo[key] = value
+          end
+        end
+      elsif item.is_a?(Array)
+        item.map { |value| simplify_item_for_xml(value) }
+      else
+        item
+      end
+    end
+
+    def simplify_item_for_json(item)
+      if item.is_a?(Hash)
+        item.each.with_object({}) do |(key, value), memo|
+          if value.is_a?(Hash)
+            if value.key?('_attributes') || value.key?('_contents')
+              contents = if value['_contents'] && value['_contents'].is_a?(Hash)
+                           simplify_item_for_json(value['_contents'])
+                         elsif value['_contents']
+                           { "contents" => value['_contents'] }
+                         else
+                           {}
+                         end
+
+              memo[key] = contents.merge(value['_attributes'] || {})
+            else
+              memo[key] = simplify_item_for_json(value)
+            end
+          else
+            memo[key] = value
+          end
+        end
+      elsif item.is_a?(Array)
+        item.map { |value| simplify_item_for_json(value) }
+      else
+        item
       end
     end
   end

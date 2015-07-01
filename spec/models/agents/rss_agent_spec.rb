@@ -25,6 +25,9 @@ describe Agents::RssAgent do
       agent.options['url'] = "http://google.com"
       expect(agent).to be_valid
 
+      agent.options['url'] = ["http://google.com", "http://yahoo.com"]
+      expect(agent).to be_valid
+
       agent.options['url'] = ""
       expect(agent).not_to be_valid
 
@@ -56,9 +59,11 @@ describe Agents::RssAgent do
         agent.check
       }.to change { agent.events.count }.by(20)
 
-      event = agent.events.last
-      expect(event.payload['url']).to eq("https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0")
-      expect(event.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0"])
+      first, *, last = agent.events.last(20)
+      expect(first.payload['url']).to eq("https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0")
+      expect(first.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0"])
+      expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af")
+      expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af"])
     end
 
     it "should track ids and not re-emit the same item when seen again" do
@@ -82,6 +87,38 @@ describe Agents::RssAgent do
       agent.check
       expect(agent.memory['seen_ids'].length).to eq(500)
     end
+
+    it "should support an array of URLs" do
+      agent.options['url'] = ["https://github.com/cantino/huginn/commits/master.atom", "http://feeds.feedburner.com/SlickdealsnetFP?format=atom"]
+      agent.save!
+
+      expect {
+        agent.check
+      }.to change { agent.events.count }.by(20 + 79)
+    end
+    
+    it "should fetch one event per run" do
+      agent.options['url'] = ["https://github.com/cantino/huginn/commits/master.atom"]
+      
+      agent.options['max_events_per_run'] = 1
+      agent.check
+      expect(agent.events.count).to eq(1)
+    end
+
+    it "should fetch all events per run" do
+      agent.options['url'] = ["https://github.com/cantino/huginn/commits/master.atom"]
+      
+      # <= 0 should ignore option and get all
+      agent.options['max_events_per_run'] = 0
+      agent.check
+      expect(agent.events.count).to eq(20)
+
+      agent.options['max_events_per_run'] = -1
+      expect {
+        agent.check
+      }.to_not change { agent.events.count }
+    end
+
   end
 
   context "when no ids are available" do

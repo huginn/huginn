@@ -35,15 +35,18 @@ class AgentsController < ApplicationController
   end
 
   def dry_run
-    attrs = params[:agent]
+    attrs = params[:agent] || {}
     if agent = current_user.agents.find_by(id: params[:id])
       # PUT /agents/:id/dry_run
-      type = agent.type
+      if attrs.present?
+        type = agent.type
+        agent = Agent.build_for_type(type, current_user, attrs)
+      end
     else
       # POST /agents/dry_run
       type = attrs.delete(:type)
+      agent = Agent.build_for_type(type, current_user, attrs)
     end
-    agent = Agent.build_for_type(type, current_user, attrs)
     agent.name ||= '(Untitled)'
 
     if agent.valid?
@@ -112,6 +115,16 @@ class AgentsController < ApplicationController
     end
   end
 
+  def destroy_memory
+    @agent = current_user.agents.find(params[:id])
+    @agent.update!(memory: {})
+
+    respond_to do |format|
+      format.html { redirect_back "Memory erased for '#{@agent.name}'" }
+      format.json { head :ok }
+    end
+  end
+
   def show
     @agent = current_user.agents.find(params[:id])
 
@@ -162,7 +175,7 @@ class AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
-        format.html { redirect_back "'#{@agent.name}' was successfully updated." }
+        format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
         initialize_presenter
@@ -212,16 +225,21 @@ class AgentsController < ApplicationController
   protected
 
   # Sanitize params[:return] to prevent open redirect attacks, a common security issue.
-  def redirect_back(message)
-    if params[:return] == "show" && @agent && !@agent.destroyed?
-      path = agent_path(@agent)
-    elsif params[:return] =~ /\A#{Regexp::escape scenarios_path}\/\d+\Z/
-      path = params[:return]
-    else
-      path = agents_path
+  def redirect_back(message, options = {})
+    case ret = params[:return] || options[:return]
+    when "show"
+      if @agent && !@agent.destroyed?
+        path = agent_path(@agent)
+      end
+    when /\A#{Regexp::escape scenarios_path}\/\d+\Z/, agents_path
+      path = ret
     end
 
-    redirect_to path, notice: message
+    if path
+      redirect_to path, notice: message
+    else
+      super agents_path, notice: message
+    end
   end
 
   def build_agent

@@ -12,21 +12,20 @@ module Agents
            https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret
         ``` where `:secret` is specified in your options.
 
-        The
-
         Options:
 
           * `secret` - A token that the host will provide for authentication.
           * `expected_receive_period_in_days` - How often you expect to receive
             events this way. Used to determine if the agent is working.
           * `payload_path` - JSONPath of the attribute in the POST body to be
-            used as the Event payload.
+            used as the Event payload.  If `payload_path` points to an array,
+            Events will be created for each element.
       MD
     end
 
     event_description do
       <<-MD
-        The event payload is base on the value of the `payload_path` option,
+        The event payload is based on the value of the `payload_path` option,
         which is set to `#{interpolated['payload_path']}`.
       MD
     end
@@ -34,7 +33,8 @@ module Agents
     def default_options
       { "secret" => "supersecretstring",
         "expected_receive_period_in_days" => 1,
-        "payload_path" => "payload"}
+        "payload_path" => "some_key"
+      }
     end
 
     def receive_web_request(params, method, format)
@@ -42,7 +42,9 @@ module Agents
       return ["Please use POST requests only", 401] unless method == "post"
       return ["Not Authorized", 401] unless secret == interpolated['secret']
 
-      create_event(:payload => payload_for(params))
+      [payload_for(params)].flatten.each do |payload|
+        create_event(payload: payload)
+      end
 
       ['Event Created', 201]
     end

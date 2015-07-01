@@ -75,6 +75,23 @@ describe Agents::WebsiteAgent do
         @checker.options['force_encoding'] = 'UTF-42'
         expect(@checker).not_to be_valid
       end
+
+      context "in 'json' type" do
+        it "should ensure that all extractions have a 'path'" do
+          @checker.options['type'] = 'json'
+          @checker.options['extract'] = {
+            'url' => { 'foo' => 'bar' },
+          }
+          expect(@checker).to_not be_valid
+          expect(@checker.errors_on(:base)).to include("When type is json, all extractions must have a path attribute.")
+
+          @checker.options['type'] = 'json'
+          @checker.options['extract'] = {
+            'url' => { 'path' => 'bar' },
+          }
+          expect(@checker).to be_valid
+        end
+      end
     end
 
     describe "#check" do
@@ -149,6 +166,37 @@ describe Agents::WebsiteAgent do
           @checker.options = @valid_options
           @checker.check
         }.to change { Event.count }.by(1)
+      end
+    end
+
+    describe 'unzipping' do
+      it 'should unzip with unzip option' do
+        json = {
+          'response' => {
+            'version' => 2,
+            'title' => "hello!"
+          }
+        }
+        zipped = ActiveSupport::Gzip.compress(json.to_json)
+        stub_request(:any, /gzip/).to_return(:body => zipped, :status => 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://gzip.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'version' => { 'path' => 'response.version' },
+          },
+          'unzip' => 'gzip',
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        expect(event.payload['version']).to eq(2)
       end
     end
 
@@ -320,6 +368,108 @@ describe Agents::WebsiteAgent do
         expect(event.payload['response_info']).to eq('The reponse was 200 OK.')
       end
 
+      describe "XML" do
+        before do
+          stub_request(:any, /github_rss/).to_return(
+            body: File.read(Rails.root.join("spec/data_fixtures/github_rss.atom")),
+            status: 200
+          )
+
+          @checker = Agents::WebsiteAgent.new(name: 'github', options: {
+            'name' => 'GitHub',
+            'expected_update_period_in_days' => '2',
+            'type' => 'xml',
+            'url' => 'http://example.com/github_rss.atom',
+            'mode' => 'on_change',
+            'extract' => {
+              'title' => { 'xpath' => '/feed/entry', 'value' => 'normalize-space(./title)' },
+              'url' => { 'xpath' => '/feed/entry', 'value' => './link[1]/@href' },
+              'thumbnail' => { 'xpath' => '/feed/entry', 'value' => './thumbnail/@url' },
+            }
+          }, keep_events_for: 2)
+          @checker.user = users(:bob)
+          @checker.save!
+        end
+
+        it "works with XPath" do
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(20)
+          event = Event.last
+          expect(event.payload['title']).to eq('Shift to dev group')
+          expect(event.payload['url']).to eq('https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af')
+          expect(event.payload['thumbnail']).to eq('https://avatars3.githubusercontent.com/u/365751?s=30')
+        end
+
+        it "works with XPath with namespaces unstripped" do
+          @checker.options['use_namespaces'] = 'true'
+          @checker.save!
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(0)
+
+          @checker.options['extract'] = {
+            'title' => { 'xpath' => '/xmlns:feed/xmlns:entry', 'value' => 'normalize-space(./xmlns:title)' },
+            'url' => { 'xpath' => '/xmlns:feed/xmlns:entry', 'value' => './xmlns:link[1]/@href' },
+            'thumbnail' => { 'xpath' => '/xmlns:feed/xmlns:entry', 'value' => './media:thumbnail/@url' },
+          }
+          @checker.save!
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(20)
+          event = Event.last
+          expect(event.payload['title']).to eq('Shift to dev group')
+          expect(event.payload['url']).to eq('https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af')
+          expect(event.payload['thumbnail']).to eq('https://avatars3.githubusercontent.com/u/365751?s=30')
+        end
+
+        it "works with CSS selectors" do
+          @checker.options['extract'] = {
+            'title' => { 'css' => 'feed > entry', 'value' => 'normalize-space(./title)' },
+            'url' => { 'css' => 'feed > entry', 'value' => './link[1]/@href' },
+            'thumbnail' => { 'css' => 'feed > entry', 'value' => './thumbnail/@url' },
+          }
+          @checker.save!
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(20)
+          event = Event.last
+          expect(event.payload['title']).to be_empty
+          expect(event.payload['thumbnail']).to be_empty
+
+          @checker.options['extract'] = {
+            'title' => { 'css' => 'feed > entry', 'value' => 'normalize-space(./xmlns:title)' },
+            'url' => { 'css' => 'feed > entry', 'value' => './xmlns:link[1]/@href' },
+            'thumbnail' => { 'css' => 'feed > entry', 'value' => './media:thumbnail/@url' },
+          }
+          @checker.save!
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(20)
+          event = Event.last
+          expect(event.payload['title']).to eq('Shift to dev group')
+          expect(event.payload['url']).to eq('https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af')
+          expect(event.payload['thumbnail']).to eq('https://avatars3.githubusercontent.com/u/365751?s=30')
+        end
+
+        it "works with CSS selectors with namespaces stripped" do
+          @checker.options['extract'] = {
+            'title' => { 'css' => 'feed > entry', 'value' => 'normalize-space(./title)' },
+            'url' => { 'css' => 'feed > entry', 'value' => './link[1]/@href' },
+            'thumbnail' => { 'css' => 'feed > entry', 'value' => './thumbnail/@url' },
+          }
+          @checker.options['use_namespaces'] = 'false'
+          @checker.save!
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(20)
+          event = Event.last
+          expect(event.payload['title']).to eq('Shift to dev group')
+          expect(event.payload['url']).to eq('https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af')
+          expect(event.payload['thumbnail']).to eq('https://avatars3.githubusercontent.com/u/365751?s=30')
+        end
+      end
+
       describe "JSON" do
         it "works with paths" do
           json = {
@@ -481,6 +631,17 @@ fire: hot
           @checker.options = @valid_options
           @checker.receive([@event])
         }.to change { Event.count }.by(1)
+      end
+
+      it "should use url_from_event as url to scrape if it exists when receiving an event" do
+        stub = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
+
+        @checker.options = @valid_options.merge(
+          'url_from_event' => 'http://example.org/?url={{url | uri_escape}}'
+        )
+        @checker.receive([@event])
+
+        expect(stub).to have_been_requested
       end
 
       it "should interpolate values from incoming event payload" do

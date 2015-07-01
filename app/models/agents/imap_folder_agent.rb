@@ -6,13 +6,15 @@ module Agents
   class ImapFolderAgent < Agent
     cannot_receive_events!
 
+    can_dry_run!
+
     default_schedule "every_30m"
 
     description <<-MD
 
       The ImapFolderAgent checks an IMAP server in specified folders
       and creates Events based on new mails found since the last run.
-      In the first visit to a foler, this agent only checks for the
+      In the first visit to a folder, this agent only checks for the
       initial status and does not create events.
 
       Specify an IMAP server to connect with `host`, and set `ssl` to
@@ -45,8 +47,8 @@ module Agents
           specified, will be chosen as the "body" value in a created
           event.
 
-          Named captues will appear in the "matches" hash in a created
-          event.
+          Named captures will appear in the "matches" hash in a
+          created event.
 
       - "from", "to", "cc"
 
@@ -240,7 +242,7 @@ module Agents
           when 'subject'
             value.present? or next true
             re = Regexp.new(value)
-            if m = re.match(mail.subject)
+            if m = re.match(mail.scrubbed(:subject))
               m.names.each { |name|
                 matches[name] = m[name]
               }
@@ -252,7 +254,7 @@ module Agents
             value.present? or next true
             re = Regexp.new(value)
             matched_part = body_parts.find { |part|
-               if m = re.match(part.decoded)
+               if m = re.match(part.scrubbed(:decoded))
                  m.names.each { |name|
                    matches[name] = m[name]
                  }
@@ -285,7 +287,7 @@ module Agents
 
           if matched_part
             mime_type = matched_part.mime_type
-            body = matched_part.decoded
+            body = matched_part.scrubbed(:decoded)
           else
             mime_type = 'text/plain'
             body = ''
@@ -295,7 +297,7 @@ module Agents
 
           create_event :payload => {
             'folder' => mail.folder,
-            'subject' => mail.subject,
+            'subject' => mail.scrubbed(:subject),
             'from' => mail.from_addrs.first,
             'to' => mail.to_addrs,
             'cc' => mail.cc_addrs,
@@ -311,7 +313,7 @@ module Agents
 
         if boolify(interpolated['mark_as_read'])
           log 'Marking as read'
-          mail.mark_as_read
+          mail.mark_as_read unless dry_run?
         end
       }
     end
@@ -322,7 +324,7 @@ module Agents
       port = (Integer(port) if port.present?)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
-      Client.open(host, port, ssl) { |imap|
+      Client.open(host, port: port, ssl: ssl) { |imap|
         log "Logging in as #{username}"
         imap.login(username, interpolated[:password])
 
@@ -437,8 +439,8 @@ module Agents
 
     class Client < ::Net::IMAP
       class << self
-        def open(host, port, ssl)
-          imap = new(host, port, ssl)
+        def open(host, *args)
+          imap = new(host, *args)
           yield imap
         ensure
           imap.disconnect unless imap.nil?
@@ -504,6 +506,15 @@ module Agents
 
       attr_reader :uid, :folder, :uidvalidity
 
+      module Scrubbed
+        def scrubbed(method)
+          (@scrubbed ||= {})[method.to_sym] ||=
+            __send__(method).try(:scrub) { |bytes| "<#{bytes.unpack('H*')[0]}>" }
+        end
+      end
+
+      include Scrubbed
+
       def initialize(client, fetch_data, props = {})
         @client = client
         props.each { |key, value|
@@ -516,17 +527,19 @@ module Agents
 
       def has_attachment?
         @has_attachment ||=
-          begin
-            data = @client.uid_fetch(@uid, 'BODYSTRUCTURE').first
+          if data = @client.uid_fetch(@uid, 'BODYSTRUCTURE').first
             struct_has_attachment?(data.attr['BODYSTRUCTURE'])
+          else
+            false
           end
       end
 
       def fetch
         @parsed ||=
-          begin
-            data = @client.uid_fetch(@uid, 'BODY.PEEK[]').first
+          if data = @client.uid_fetch(@uid, 'BODY.PEEK[]').first
             Mail.read_from_string(data.attr['BODY[]'])
+          else
+            Mail.read_from_string('')
           end
       end
 
@@ -538,9 +551,14 @@ module Agents
           mail.all_parts
         else
           [mail]
-        end.reject { |part|
-          part.multipart? || part.attachment? || !part.text? ||
-            !mime_types.include?(part.mime_type)
+        end.select { |part|
+          if part.multipart? || part.attachment? || !part.text? ||
+             !mime_types.include?(part.mime_type)
+            false
+          else
+            part.extend(Scrubbed)
+            true
+          end
         }
       end
 

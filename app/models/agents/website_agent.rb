@@ -19,9 +19,17 @@ module Agents
 
       `url` can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape)
 
+      The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload, or if you set `url_from_event` it is used as a Liquid template to generate the url to access. If you specify `merge` as the `mode`, it will retain the old payload and update it with the new values.
+
+      # Supported Document Types
+
       The `type` value can be `xml`, `html`, `json`, or `text`.
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
+
+      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
+
+      # Scraping HTML and XML
 
       When parsing HTML or XML, these sub-hashes specify how each extraction should be done.  The Agent first selects a node set from the document for each extraction key by evaluating either a CSS selector in `css` or an XPath expression in `xpath`.  It then evaluates an XPath expression in `value` on each node in the node set, converting the result into string.  Here's an example:
 
@@ -31,7 +39,13 @@ module Agents
             "body_text": { "css": "div.main", "value": ".//text()" }
           }
 
-      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and ".//text()" is to extract all the enclosed texts.  You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-space(.//text())` should actually be `normalize-space(.)`.
+      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and ".//text()" is to extract all the enclosed texts. To extract the innerHTML, use "./node()"; and to extract the outer HTML, use  ".". 
+
+      You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-space(.//text())` should actually be `normalize-space(.)`.
+
+      Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions all namespaces are stripped from the document unless a toplevel option `use_namespaces` is set to true.
+
+      # Scraping JSON
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
 
@@ -39,6 +53,8 @@ module Agents
             "title": { "path": "results.data[*].title" },
             "description": { "path": "results.data[*].description" }
           }
+
+      # Scraping Text
 
       When parsing text, each sub-hash should contain a `regexp` and `index`.  Output text is matched against the regular expression repeatedly from the beginning through to the end, collecting a captured group specified by `index` in each match.  Each index should be either an integer or a string name which corresponds to <code>(?&lt;<em>name</em>&gt;...)</code>.  For example, to parse lines of <code><em>word</em>: <em>definition</em></code>, the following should work:
 
@@ -62,7 +78,7 @@ module Agents
 
       Beware that `.` does not match the newline character (LF) unless the `m` flag is in effect, and `^`/`$` basically match every line beginning/end.  See [this document](http://ruby-doc.org/core-#{RUBY_VERSION}/doc/regexp_rdoc.html) to learn the regular expression variant used in this service.
 
-      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
+      # General Options
 
       Can be configured to use HTTP basic auth by including the `basic_auth` parameter with `"username:password"`, or `["username", "password"]`.
 
@@ -78,7 +94,9 @@ module Agents
 
       Set `disable_ssl_verification` to `true` to disable ssl verification.
 
-      The WebsiteAgent can also scrape based on incoming events. It will scrape the url contained in the `url` key of the incoming event payload. If you specify `merge` as the mode, it will retain the old payload and update it with the new values.
+      Set `unzip` to `gzip` to inflate the resource using gzip.
+
+      # Liquid Templating
 
       In Liquid templating, the following variable is available:
 
@@ -86,7 +104,7 @@ module Agents
 
           * `status`: HTTP status as integer. (Almost always 200)
 
-          * `headers`: Reponse headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insentitive to cases and -/_.
+          * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
     MD
 
     event_description do
@@ -117,7 +135,8 @@ module Agents
 
     def validate_options
       # Check for required fields
-      errors.add(:base, "url and expected_update_period_in_days are required") unless options['expected_update_period_in_days'].present? && options['url'].present?
+      errors.add(:base, "either url or url_from_event is required") unless options['url'].present? || options['url_from_event'].present?
+      errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       if !options['extract'].present? && extraction_type != "json"
         errors.add(:base, "extract is required for all types except json")
       end
@@ -149,6 +168,15 @@ module Agents
       end
 
       validate_web_request_options!
+      validate_extract_options!
+    end
+
+    def validate_extract_options!
+      if extraction_type == "json" && interpolated['extract'].is_a?(Hash)
+        unless interpolated['extract'].all? { |name, details| details.is_a?(Hash) && details['path'].present? }
+          errors.add(:base, 'When type is json, all extractions must have a path attribute.')
+        end
+      end
     end
 
     def check
@@ -164,6 +192,10 @@ module Agents
     end
 
     def check_url(url, payload = {})
+      unless /\Ahttps?:\/\//i === url
+        error "Ignoring a non-HTTP url: #{url.inspect}"
+        return
+      end
       log "Fetching #{url}"
       response = faraday.get(url)
       raise "Failed: #{response.inspect}" unless response.success?
@@ -173,6 +205,9 @@ module Agents
         body = response.body
         if (encoding = interpolated['force_encoding']).present?
           body = body.encode(Encoding::UTF_8, encoding)
+        end
+        if interpolated['unzip'] == "gzip"
+          body = ActiveSupport::Gzip.decompress(body)
         end
         doc = parse(body)
 
@@ -223,8 +258,12 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          url_to_scrape = event.payload['url']
-          next unless url_to_scrape =~ /^https?:\/\//i
+          url_to_scrape =
+            if url_template = options['url_from_event'].presence
+              interpolate_string(url_template)
+            else
+              event.payload['url']
+            end
           check_url(url_to_scrape,
                     interpolated['mode'].to_s == "merge" ? event.payload : {})
         end
@@ -240,14 +279,12 @@ module Agents
       case interpolated['mode'].presence
       when 'on_change'
         result_json = result.to_json
-        old_events.each do |old_event|
-          if old_event.payload.to_json == result_json
-            old_event.expires_at = new_event_expiration_date
-            old_event.save!
-            return false
-          end
+        if found = old_events.find { |event| event.payload.to_json == result_json }
+          found.update!(expires_at: new_event_expiration_date)
+          false
+        else
+          true
         end
-        true
       when 'all', 'merge', ''
         true
       else
@@ -287,14 +324,24 @@ module Agents
       end).to_s
     end
 
-    def extract_each(doc, &block)
+    def use_namespaces?
+      if value = interpolated.key?('use_namespaces')
+        boolify(interpolated['use_namespaces'])
+      else
+        interpolated['extract'].none? { |name, extraction_details|
+          extraction_details.key?('xpath')
+        }
+      end
+    end
+
+    def extract_each(&block)
       interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
         output[name] = block.call(extraction_details)
       }
     end
 
     def extract_json(doc)
-      extract_each(doc) { |extraction_details|
+      extract_each { |extraction_details|
         result = Utils.values_at(doc, extraction_details['path'])
         log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
         result
@@ -302,7 +349,7 @@ module Agents
     end
 
     def extract_text(doc)
-      extract_each(doc) { |extraction_details|
+      extract_each { |extraction_details|
         regexp = Regexp.new(extraction_details['regexp'])
         result = []
         doc.scan(regexp) {
@@ -314,12 +361,11 @@ module Agents
     end
 
     def extract_xml(doc)
-      extract_each(doc) { |extraction_details|
+      extract_each { |extraction_details|
         case
         when css = extraction_details['css']
           nodes = doc.css(css)
         when xpath = extraction_details['xpath']
-          doc.remove_namespaces! # ignore xmlns, useful when parsing atom feeds
           nodes = doc.xpath(xpath)
         else
           raise '"css" or "xpath" is required for HTML or XML extraction'
@@ -344,9 +390,12 @@ module Agents
     end
 
     def parse(data)
-      case extraction_type
+      case type = extraction_type
       when "xml"
-        Nokogiri::XML(data)
+        doc = Nokogiri::XML(data)
+        # ignore xmlns, useful when parsing atom feeds
+        doc.remove_namespaces! unless use_namespaces?
+        doc
       when "json"
         JSON.parse(data)
       when "html"
@@ -354,7 +403,7 @@ module Agents
       when "text"
         data
       else
-        raise "Unknown extraction type #{extraction_type}"
+        raise "Unknown extraction type: #{type}"
       end
     end
 
@@ -376,7 +425,7 @@ module Agents
       end
     end
 
-    # Wraps Faraday::Utilsa::Headers
+    # Wraps Faraday::Utils::Headers
     class HeaderDrop < LiquidDroppable::Drop
       def before_method(name)
         @object[name.tr('_', '-')]

@@ -11,6 +11,7 @@
         <table class='table table-striped events'>
           <tr>
             <th>Status</th>
+            <th>Agent</th>
             <th>Created</th>
             <th>Next Run</th>
             <th>Attempts</th>
@@ -21,7 +22,17 @@
         <% @jobs.each do |job| %>
           <tr>
             <td><%= status(job) %></td>
-            <td title='<%= job.created_at %>'><%= time_ago_in_words job.created_at %> ago</td>
+            <td><% case agent = agent_from_job(job)
+                   when Agent
+                   %><%= link_to(agent.name, agent_path(agent)) %><%
+                   when false
+                   %>(system)<%
+                   when nil
+                   %>(deleted)<%
+                   else
+                   %>(unknown)<%
+                   end %></td>
+            <td title='<%= job.created_at %>'><%= time_ago_in_words job.created_at %> ago<% if user = agent.try(:user) %> for <%= user.username %><% end %></td>
             <td title='<%= job.run_at %>'>
               <% if !job.failed_at %>
                 <%= relative_distance_of_time_in_words job.run_at %>
