@@ -83,7 +83,7 @@ describe Agents::WebsiteAgent do
             'url' => { 'foo' => 'bar' },
           }
           expect(@checker).to_not be_valid
-          expect(@checker.errors_on(:base)).to include("When type is json, all extractions must have a path attribute.")
+          expect(@checker.errors_on(:base)).to include(/When type is json, all extractions must have a path attribute/)
 
           @checker.options['type'] = 'json'
           @checker.options['extract'] = {
