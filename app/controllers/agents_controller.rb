@@ -160,7 +160,7 @@ class AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.save
-        format.html { redirect_back "'#{@agent.name}' was successfully created." }
+        format.html { redirect_back "'#{@agent.name}' was successfully created.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
         initialize_presenter
