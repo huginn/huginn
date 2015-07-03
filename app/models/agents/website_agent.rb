@@ -169,7 +169,8 @@ module Agents
     end
 
     def validate_extract_options!
-      case extract = interpolated['extract']
+      extraction_type = (extraction_type() rescue extraction_type(options))
+      case extract = options['extract']
       when Hash
         if extract.each_value.any? { |value| !value.is_a?(Hash) }
           errors.add(:base, 'extract must be a hash of hashes.')
@@ -239,6 +240,8 @@ module Agents
                 errors.add(:base, "Wrong type of \"index\" value in extraction details for #{name.inspect}")
               end
             end
+          when /\{/
+            # Liquid templating
           else
             errors.add(:base, "Unknown extraction type #{extraction_type.inspect}")
           end
@@ -382,7 +385,7 @@ module Agents
       !interpolated['extract'].present? && extraction_type == "json"
     end
 
-    def extraction_type
+    def extraction_type(interpolated = interpolated())
       (interpolated['type'] || begin
         case interpolated['url']
         when /\.(rss|xml)$/i
