@@ -15,7 +15,9 @@ module LiquidInterpolatable
     interpolated
   rescue Liquid::Error => e
     errors.add(:options, "has an error with Liquid templating: #{e.message}")
-    false
+  rescue
+    # Calling `interpolated` without an incoming may naturally fail
+    # with various errors when an agent expects one.
   end
 
   # Return the current interpolation context.  Use this in your Agent
