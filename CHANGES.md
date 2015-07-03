@@ -1,5 +1,7 @@
 # Changes
 
+* Jul 1, 2015    - DeDuplicationAgent properly handles destruction of memory.
+* Jun 26, 2015   - Add `max_events_per_run` to RssAgent.
 * Jun 19, 2015   - Add `url_from_event` to WebsiteAgent.
 * Jun 17, 2015   - RssAgent emits events for new feed items in chronological order.
 * Jun 15, 2015   - Liquid filter `uri_expand` added.
