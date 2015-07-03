@@ -100,7 +100,8 @@ module Agents
       if interpolated['secrets'].include?(params['secret'])
         items = received_events.order('id desc').limit(events_to_show).map do |event|
           interpolated = interpolate_options(options['template']['item'], event)
-          interpolated['guid'] = event.id
+          interpolated['guid'] = {'_attributes' => {'isPermaLink' => 'false'}, 
+                                  '_contents' => interpolated['guid'].presence || event.id}
           date_string = interpolated['pubDate'].to_s
           date =
             begin
@@ -125,8 +126,9 @@ module Agents
         else
           content = Utils.unindent(<<-XML)
             <?xml version="1.0" encoding="UTF-8" ?>
-            <rss version="2.0">
+            <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
             <channel>
+             <atom:link href="#{feed_link.encode(:xml => :text)}/users/#{user.id}/web_requests/#{id || '<id>'}/#{params['secret']}.xml" rel="self" type="application/rss+xml" />
              <title>#{feed_title.encode(:xml => :text)}</title>
              <description>#{feed_description.encode(:xml => :text)}</description>
              <link>#{feed_link.encode(:xml => :text)}</link>
