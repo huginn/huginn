@@ -4,7 +4,7 @@
 
 ### Supported Unix distributions by this guide
 
-- Ubuntu (12.04 and 14.04)
+- Ubuntu (14.04 and 12.04)
 - Debian (Jessie and Wheezy)
 
 ### Unsupported Unix distributions
