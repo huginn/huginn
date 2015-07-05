@@ -577,7 +577,7 @@ fire: hot
             'mode' => 'on_change',
             'extract' => {
               'word' => { 'regexp' => '^(.+?): (.+)$', index: 1 },
-              'property' => { 'regexp' => '^(.+?): (.+)$', index: 2 },
+              'property' => { 'regexp' => '^(.+?): (.+)$', index: '2' },
             }
           }
           @checker = Agents::WebsiteAgent.new(name: 'Text Site', options: site)
@@ -585,7 +585,7 @@ fire: hot
           @checker.save!
         end
 
-        it "works with regexp" do
+        it "works with regexp with named capture" do
           @checker.options = @checker.options.merge('extract' => {
             'word' => { 'regexp' => '^(?<word>.+?): (?<property>.+)$', index: 'word' },
             'property' => { 'regexp' => '^(?<word>.+?): (?<property>.+)$', index: 'property' },
@@ -602,7 +602,7 @@ fire: hot
           expect(event2.payload['property']).to eq('hot')
         end
 
-        it "works with regexp with named capture" do
+        it "works with regexp" do
           expect {
             @checker.check
           }.to change { Event.count }.by(2)
