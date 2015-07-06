@@ -105,6 +105,8 @@ describe LiquidInterpolatable::Filters do
         to_return(status: 301, headers: { Location: 'http://tinyurl.com.x/cccc' })
       stub_request(:head, 'http://tinyurl.com.x/cccc').
         to_return(status: 301, headers: { Location: 'http://www.example.com/welcome' })
+      stub_request(:head, 'http://www.example.com/welcome').
+        to_return(status: 200)
 
       (1..5).each do |i|
         stub_request(:head, "http://2many.x/#{i}").
