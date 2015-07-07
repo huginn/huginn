@@ -117,6 +117,10 @@ module Agents
                                     format: options[:format])
     end
 
+    def feed_icon
+      interpolated['template']['icon'].presence || feed_link + '/favicon.ico'
+    end
+
     def feed_description
       interpolated['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
     end
@@ -166,6 +170,7 @@ module Agents
             <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
             <channel>
              <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
+             <atom:icon>#{feed_icon.encode(xml: :text)}</atom:icon>
              <title>#{feed_title.encode(xml: :text)}</title>
              <description>#{feed_description.encode(xml: :text)}</description>
              <link>#{feed_link.encode(xml: :text)}</link>
