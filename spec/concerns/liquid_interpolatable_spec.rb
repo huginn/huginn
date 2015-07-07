@@ -116,6 +116,18 @@ describe LiquidInterpolatable::Filters do
         to_return(status: 301, headers: { 'Content-Length' => '5' })
     end
 
+    it 'should handle inaccessible URIs' do
+      expect(@filter.uri_expand(nil)).to eq('')
+      expect(@filter.uri_expand('')).to eq('')
+      expect(@filter.uri_expand(5)).to eq('5')
+      expect(@filter.uri_expand([])).to eq('[]')
+      expect(@filter.uri_expand({})).to eq('{}')
+      expect(@filter.uri_expand(URI('/'))).to eq('/')
+      expect(@filter.uri_expand(URI('http:google.com'))).to eq('http:google.com')
+      expect(@filter.uri_expand(URI('http:/google.com'))).to eq('http:/google.com')
+      expect(@filter.uri_expand(URI('ftp://ftp.freebsd.org/pub/FreeBSD/README.TXT'))).to eq('ftp://ftp.freebsd.org/pub/FreeBSD/README.TXT')
+    end
+
     it 'should follow redirects' do
       expect(@filter.uri_expand('https://t.co.x/aaaa')).to eq('http://www.example.com/welcome')
     end

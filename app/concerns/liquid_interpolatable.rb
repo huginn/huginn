@@ -141,7 +141,17 @@ module LiquidInterpolatable
     # occurs while following redirects, the last URL followed is
     # returned.
     def uri_expand(url, limit = 5)
-      uri = URI(url)
+      case url
+      when URI
+        uri = url
+      else
+        url = url.to_s
+        begin
+          uri = URI(url)
+        rescue URI::Error
+          return url
+        end
+      end
 
       http = Faraday.new do |builder|
         builder.adapter :net_http
@@ -153,6 +163,7 @@ module LiquidInterpolatable
         begin
           case uri
           when URI::HTTP
+            return uri.to_s unless uri.host
             response = http.head(uri)
             case response.status
             when 301, 302, 303, 307
