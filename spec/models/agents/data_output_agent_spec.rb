@@ -93,9 +93,10 @@ describe Agents::DataOutputAgent do
       expect(status).to eq(200)
     end
 
-    describe "outputtng events as RSS and JSON" do
+    describe "outputting events as RSS and JSON" do
       let!(:event1) do
         agents(:bob_website_agent).create_event :payload => {
+          "site_title" => "XKCD",
           "url" => "http://imgs.xkcd.com/comics/evolving.png",
           "title" => "Evolving",
           "hovertext" => "Biologists play reverse Pokemon, trying to avoid putting any one team member on the front lines long enough for the experience to cause evolution."
@@ -104,6 +105,7 @@ describe Agents::DataOutputAgent do
 
       let!(:event2) do
         agents(:bob_website_agent).create_event :payload => {
+          "site_title" => "XKCD",
           "url" => "http://imgs.xkcd.com/comics/evolving2.png",
           "title" => "Evolving again",
           "date" => '',
@@ -113,6 +115,7 @@ describe Agents::DataOutputAgent do
 
       let!(:event3) do
         agents(:bob_website_agent).create_event :payload => {
+          "site_title" => "XKCD",
           "url" => "http://imgs.xkcd.com/comics/evolving0.png",
           "title" => "Evolving yet again with a past date",
           "date" => '2014/05/05',
@@ -203,6 +206,28 @@ describe Agents::DataOutputAgent do
             }
           ]
         })
+      end
+
+      describe "interpolating \"events\"" do
+        before do
+          agent.options['template']['title'] = "XKCD comics as a feed{% if events.first.site_title %} ({{events.first.site_title}}){% endif %}"
+          agent.save!
+        end
+
+        it "can output RSS" do
+          stub(agent).feed_link { "https://yoursite.com" }
+          content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(content_type).to eq('text/xml')
+          expect(Nokogiri(content).at('/rss/channel/title/text()').text).to eq('XKCD comics as a feed (XKCD)')
+        end
+
+        it "can output JSON" do
+          content, status, content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
+          expect(status).to eq(200)
+
+          expect(content['title']).to eq('XKCD comics as a feed (XKCD)')
+        end
       end
     end
 

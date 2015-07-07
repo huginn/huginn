@@ -39,6 +39,13 @@ module Agents
               },
               "_contents": "tag contents (can be an object for nesting)"
             }
+
+        # Liquid Templating
+
+        In Liquid templating, the following variable is available:
+
+        * `events`: An array of events to being output sorted in descending order up to `events_to_show` in number.  For example, if source events contain a site title in the `site_title` key, you can put `{{events.first.site_title}}` at `template.title`.
+
       MD
     end
 
@@ -115,8 +122,20 @@ module Agents
     end
 
     def receive_web_request(params, method, format)
-      if interpolated['secrets'].include?(params['secret'])
-        items = received_events.order('id desc').limit(events_to_show).map do |event|
+      unless interpolated['secrets'].include?(params['secret'])
+        if format =~ /json/
+          return [{ error: "Not Authorized" }, 401]
+        else
+          return ["Not Authorized", 401]
+        end
+      end
+
+      source_events = received_events.order(id: :desc).limit(events_to_show).to_a
+
+      interpolation_context.stack do
+        interpolation_context['events'] = source_events
+
+        items = source_events.map do |event|
           interpolated = interpolate_options(options['template']['item'], event)
           interpolated['guid'] = {'_attributes' => {'isPermaLink' => 'false'},
                                   '_contents' => interpolated['guid'].presence || event.id}
@@ -164,12 +183,6 @@ module Agents
           XML
 
           return [content, 200, 'text/xml']
-        end
-      else
-        if format =~ /json/
-          return [{ error: "Not Authorized" }, 401]
-        else
-          return ["Not Authorized", 401]
         end
       end
     end
