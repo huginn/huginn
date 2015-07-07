@@ -92,6 +92,14 @@ module Agents
       interpolated['template']['link'].presence || "https://#{ENV['DOMAIN']}"
     end
 
+    def feed_url(options = {})
+      feed_link + Rails.application.routes.url_helpers.
+                  web_requests_path(agent_id: id || '<id>',
+                                    user_id: user_id,
+                                    secret: options[:secret],
+                                    format: options[:format])
+    end
+
     def feed_description
       interpolated['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
     end
@@ -100,7 +108,7 @@ module Agents
       if interpolated['secrets'].include?(params['secret'])
         items = received_events.order('id desc').limit(events_to_show).map do |event|
           interpolated = interpolate_options(options['template']['item'], event)
-          interpolated['guid'] = {'_attributes' => {'isPermaLink' => 'false'}, 
+          interpolated['guid'] = {'_attributes' => {'isPermaLink' => 'false'},
                                   '_contents' => interpolated['guid'].presence || event.id}
           date_string = interpolated['pubDate'].to_s
           date =
@@ -128,12 +136,12 @@ module Agents
             <?xml version="1.0" encoding="UTF-8" ?>
             <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
             <channel>
-             <atom:link href="#{feed_link.encode(:xml => :text)}/users/#{user.id}/web_requests/#{id || '<id>'}/#{params['secret']}.xml" rel="self" type="application/rss+xml" />
-             <title>#{feed_title.encode(:xml => :text)}</title>
-             <description>#{feed_description.encode(:xml => :text)}</description>
-             <link>#{feed_link.encode(:xml => :text)}</link>
-             <lastBuildDate>#{Time.now.rfc2822.to_s.encode(:xml => :text)}</lastBuildDate>
-             <pubDate>#{Time.now.rfc2822.to_s.encode(:xml => :text)}</pubDate>
+             <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
+             <title>#{feed_title.encode(xml: :text)}</title>
+             <description>#{feed_description.encode(xml: :text)}</description>
+             <link>#{feed_link.encode(xml: :text)}</link>
+             <lastBuildDate>#{Time.now.rfc2822.to_s.encode(xml: :text)}</lastBuildDate>
+             <pubDate>#{Time.now.rfc2822.to_s.encode(xml: :text)}</pubDate>
              <ttl>#{feed_ttl}</ttl>
 
           XML
@@ -149,7 +157,7 @@ module Agents
         end
       else
         if format =~ /json/
-          return [{ :error => "Not Authorized" }, 401]
+          return [{ error: "Not Authorized" }, 401]
         else
           return ["Not Authorized", 401]
         end
