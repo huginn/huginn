@@ -34,7 +34,17 @@ describe Agents::DataOutputAgent do
       expect(agent).not_to be_valid
       agent.options[:secrets] = "foo"
       expect(agent).not_to be_valid
+      agent.options[:secrets] = "foo/bar"
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = "foo.xml"
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = false
+      expect(agent).not_to be_valid
       agent.options[:secrets] = []
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = ["foo.xml"]
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = ["hello", true]
       expect(agent).not_to be_valid
       agent.options[:secrets] = ["hello"]
       expect(agent).to be_valid

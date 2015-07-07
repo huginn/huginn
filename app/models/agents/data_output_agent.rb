@@ -63,7 +63,17 @@ module Agents
     end
 
     def validate_options
-      unless options['secrets'].is_a?(Array) && options['secrets'].length > 0
+      if options['secrets'].is_a?(Array) && options['secrets'].length > 0
+        options['secrets'].each do |secret|
+          case secret
+          when %r{[/.]}
+            errors.add(:base, "secret may not contain a slash or dot")
+          when String
+          else
+            errors.add(:base, "secret must be a string")
+          end
+        end
+      else
         errors.add(:base, "Please specify one or more secrets for 'authenticating' incoming feed requests")
       end
 
