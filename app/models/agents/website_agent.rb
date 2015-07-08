@@ -228,10 +228,10 @@ module Agents
               end
 
               case index = details['index']
-              when Integer
+              when Integer, /\A\d+\z/
                 # ok
               when String
-                if index.to_i.to_s != index && re && !re.names.include?(index)
+                if re && !re.names.include?(index)
                   errors.add(:base, "no named capture #{index.inspect} found in regexp for #{name.inspect})")
                 end
               when nil
@@ -427,13 +427,13 @@ module Agents
     def extract_text(doc)
       extract_each { |extraction_details|
         regexp = Regexp.new(extraction_details['regexp'])
+        case index = extraction_details['index']
+        when /\A\d+\z/
+          index = index.to_i
+        end
         result = []
         doc.scan(regexp) {
-          index_or_named_group = extraction_details['index']
-          if index_or_named_group.is_a?(String) && index_or_named_group.to_i.to_s == index_or_named_group
-            index_or_named_group = index_or_named_group.to_i
-          end
-          result << Regexp.last_match[index_or_named_group]
+          result << Regexp.last_match[index]
         }
         log "Extracting #{extraction_type} at #{regexp}: #{result}"
         result
