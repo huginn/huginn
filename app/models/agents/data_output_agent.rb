@@ -44,7 +44,7 @@ module Agents
 
         In Liquid templating, the following variable is available:
 
-        * `events`: An array of events to being output sorted in descending order up to `events_to_show` in number.  For example, if source events contain a site title in the `site_title` key, you can put `{{events.first.site_title}}` at `template.title`.
+        * `events`: An array of events being output, sorted in descending order up to `events_to_show` in number.  For example, if source events contain a site title in the `site_title` key, you can refer to it in `template.title` by putting `{{events.first.site_title}}`.
 
       MD
     end
