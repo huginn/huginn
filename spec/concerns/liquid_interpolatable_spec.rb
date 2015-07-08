@@ -165,5 +165,18 @@ describe LiquidInterpolatable::Filters do
         expect(@agent.interpolated['long_url']).to eq('http://2many.x/6')
       end
     end
+    
+    describe 'regex_replace' do
+      it 'should replace all occurences of a string using regex' do
+        expect(@filter.regex_replace('foobar foobar', /\S+bar/, 'foobaz')).to eq('foobaz foobaz')
+      end
+    end
+
+    describe 'regex_replace_first' do
+      it 'should replace the first occurences of a string using regex' do
+        expect(@filter.regex_replace_first('foobar foobar', /\S+bar/, 'foobaz')).to eq('foobaz foobar')
+      end
+    end
+    
   end
 end
