@@ -19,7 +19,7 @@ module Agents
 
           * `secrets` - An array of tokens that the requestor must provide for light-weight authentication.
           * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
-          * `template` - A JSON object representing a mapping between item output keys and incoming event values. Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values. The `item` key will be repeated for every Event. The `pubDate` key for each item will have the creation time of the Event unless given.
+          * `template` - A JSON object representing a mapping between item output keys and incoming event values.  Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values.  Values of the `link`, `title`, `description` and `icon` keys will be put into the <channel> section of RSS output.  The `item` key will be repeated for every Event.  The `pubDate` key for each item will have the creation time of the Event unless given.
           * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
           * `ttl` - A value for the <ttl> element in RSS output. (default: `60`)
 
