@@ -8,7 +8,7 @@ module Agents
 
         This Agent will output data at:
 
-        `https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret.xml`
+        `https://#{ENV['DOMAIN']}#{Rails.application.routes.url_helpers.web_requests_path(agent_id: ':id', user_id: user_id, secret: ':secret', format: :xml)}`
 
         where `:secret` is one of the allowed secrets specified in your options and the extension can be `xml` or `json`.
 
@@ -111,7 +111,7 @@ module Agents
 
     def feed_url(options = {})
       feed_link + Rails.application.routes.url_helpers.
-                  web_requests_path(agent_id: id || '<id>',
+                  web_requests_path(agent_id: id || ':id',
                                     user_id: user_id,
                                     secret: options[:secret],
                                     format: options[:format])
