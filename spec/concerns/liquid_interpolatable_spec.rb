@@ -166,16 +166,21 @@ describe LiquidInterpolatable::Filters do
       end
     end
     
-    describe 'regex_replace' do
-      it 'should replace all occurences of a string using regex' do
-        expect(@filter.regex_replace('foobar foobar', /\S+bar/, 'foobaz')).to eq('foobaz foobaz')
-      end
-    end
+    describe 'regex replace' do
+      let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
 
-    describe 'regex_replace_first' do
-      it 'should replace the first occurences of a string using regex' do
-        expect(@filter.regex_replace_first('foobar foobar', /\S+bar/, 'foobaz')).to eq('foobaz foobar')
+      it 'should replace the first occurrence of a string using regex' do
+        agent.interpolation_context['something'] = 'foobar foobar'
+        agent.options['cleaned'] = '{{ something | regex_replace_first: "\S+bar", "foobaz"  }}'
+        expect(agent.interpolated['cleaned']).to eq('foobaz foobar')
       end
+
+      it 'should replace the all occurrences of a string using regex' do
+        agent.interpolation_context['something'] = 'foobar foobar'
+        agent.options['cleaned'] = '{{ something | regex_replace: "\S+bar", "foobaz"  }}'
+        expect(agent.interpolated['cleaned']).to eq('foobaz foobaz') 
+      end
+    
     end
     
   end
