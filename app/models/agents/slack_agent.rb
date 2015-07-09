@@ -72,9 +72,9 @@ module Agents
       incoming_events.each do |event|
         opts = interpolated(event)
         if /^:/.match(opts[:icon])
-          slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username], icon_emoji: opts[:icon]
+          slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username], icon_emoji: opts[:icon], unfurl_links: opts[:unfurl_links]
         else
-          slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username], icon_url: opts[:icon]
+          slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username], icon_url: opts[:icon], unfurl_links: opts[:unfurl_links]
         end
       end
     end
