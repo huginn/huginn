@@ -6,6 +6,11 @@ cd /app
 # Default to the environment variable values set in .env.example
 source /app/.env.example
 
+# Cleanup any leftover pid file
+if [ -f /app/tmp/pids/server.pid ]; then
+  rm -f /app/tmp/pids/server.pid
+fi
+
 # is a mysql or postgresql database linked?
 # requires that the mysql or postgresql containers have exposed
 # port 3306 and 5432 respectively.
