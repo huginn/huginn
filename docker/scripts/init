@@ -8,7 +8,7 @@ source /app/.env.example
 
 # Cleanup any leftover pid file
 if [ -f /app/tmp/pids/server.pid ]; then
-  rm -f /app/tmp/pids/server.pid
+  rm /app/tmp/pids/server.pid
 fi
 
 # is a mysql or postgresql database linked?
