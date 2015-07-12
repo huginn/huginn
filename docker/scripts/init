@@ -100,7 +100,7 @@ EOF
 
   # wait for mysql server to start (max 120 seconds)
   timeout=120
-  while ! mysqladmin -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} status >/dev/null 2>&1
+  while ! mysqladmin -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} status >/dev/null 2>&1
   do
     (( timeout = timeout - 1 ))
     if [ \$timeout -eq 0 ]; then
@@ -111,10 +111,10 @@ EOF
     sleep 1
   done
 
-  if ! echo "USE \${DATABASE_NAME}" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} >/dev/null 2>&1; then
+  if ! echo "USE \${DATABASE_NAME}" | mysql -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} >/dev/null 2>&1; then
     DB_INIT="yes"
     echo "CREATE DATABASE IF NOT EXISTS \\\`\${DATABASE_NAME}\\\` DEFAULT CHARACTER SET \\\`utf8\\\` COLLATE \\\`utf8_unicode_ci\\\`;" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
-    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \\\`${DATABASE_NAME}\\\`.* TO 'root'@'localhost';" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
+    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \\\`${DATABASE_NAME}\\\`.* TO 'root'@'localhost';" | mysql -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
   fi
 fi
 supervisorctl start foreman >/dev/null
@@ -142,19 +142,46 @@ cat <<FOREMAN > /tmp/foreman.sh
 #!/bin/bash -e
 source /app/.env
 
-# Assuming we have a created database, run the migrations and seed it idempotently.
-[ -z "\${DO_NOT_MIGRATE}" ] && sudo -u huginn -EH bundle exec rake db:migrate
-[ -z "\${DO_NOT_SEED}" ] && sudo -u huginn -EH bundle exec rake db:seed
+# The database may need to start up for a bit first
+if [ -n "\${INTENTIONALLY_SLEEP}" ]; then
+  echo "Intentionally sleeping \${INTENTIONALLY_SLEEP}"
+  sleep \${INTENTIONALLY_SLEEP}
+fi
 
-[ -n "\$INTENTIONALLY_SLEEP" ] && sleep \$INTENTIONALLY_SLEEP
+if [ -n "\${DATABASE_INITIAL_CONNECT_MAX_RETRIES}" ]; then
+  max=\${DATABASE_INITIAL_CONNECT_MAX_RETRIES}
+  count=0
+  while ! rake mysql_test:ping > /dev/null 2>&1 && [[ \$count -le \$max ]] ; do
+    count=\$[\$count+1]
+    echo "Retry \$count of \$max attempting to connect to \$DATABASE_HOST. Sleeping \${DATABASE_INITIAL_CONNECT_SLEEP:5}"
+    sleep \${DATABASE_INITIAL_CONNECT_SLEEP:5}
+  done
+fi
+
+# We may need to try and create a database
+if [ -n "\${CREATE_DB}" ]; then
+ sudo -u huginn -EH bundle exec rake db:create
+fi
+
+# Assuming we have a created database, run the migrations and seed it idempotently.
+if [ -z "\${DO_NOT_MIGRATE}" ]; then
+ sudo -u huginn -EH bundle exec rake db:migrate
+fi
+
+if [ -z "\${DO_NOT_SEED}" ]; then
+  sudo -u huginn -EH bash -xc 'bundle exec rake db:seed &'
+fi
 
 # Fixup the Procfile and prepare the PORT
-[ -n "\${DO_NOT_RUN_JOBS}" ] && perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
+if [ -n "\${DO_NOT_RUN_JOBS}" ]; then
+  perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
+fi
+
 perl -pi -e 's/rails server\$/rails server -b 0.0.0.0 -p \\\$PORT/' /app/Procfile
 export PORT
 
 # Start huginn
-exec sudo -u huginn -EH bundle exec foreman start
+exec sudo -u huginn -EH bash -xc 'exec bundle exec foreman start'
 FOREMAN
 
 chmod 755 /tmp/foreman.sh

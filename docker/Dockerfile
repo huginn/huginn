@@ -19,10 +19,14 @@ RUN apt-get update && \
 
 RUN pip install supervisor-stdout
 
-ADD scripts/ /scripts
-RUN chmod 755 /scripts/setup /scripts/init
-
+ADD scripts/setup /scripts/setup
+RUN chmod 755 /scripts/setup
 RUN /scripts/setup
+
+WORKDIR /app
+
+ADD scripts/init /scripts/init
+RUN chmod 755 /scripts/init
 
 VOLUME /var/lib/mysql
 

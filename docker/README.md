@@ -51,13 +51,15 @@ Simple stand-alone usage:
 
 To link to another mysql container, for example:
 
-    docker run --rm --name newcentury_mysql -p 3306 \
+    docker run --rm --name mysql \
         -e HUGINN_MYSQL_DATABASE=huginn \
         -e HUGINN_MYSQL_USER=huginn \
         -e HUGINN_MYSQL_PASSWORD=somethingsecret \
         -e HUGINN_MYSQL_ROOT_PASSWORD=somethingevenmoresecret \
         cantino/huginn
-    docker run --rm --name huginn --link newcentury_mysql:MYSQL -p 5000:5000 \
+    docker run --rm --name huginn \
+        --link mysql \
+        -p 5000:5000 \
         -e HUGINN_DATABASE_NAME=huginn \
         -e HUGINN_DATABASE_USER=huginn \
         -e HUGINN_DATABASE_PASSWORD=somethingsecret \
@@ -65,7 +67,16 @@ To link to another mysql container, for example:
 
 To link to another container named 'postgres':
 
-    docker run --rm --name huginn --link POSTGRES:mysql -p 5000:5000 -e "DATABASE_USER=huginn" -e "DATABASE_PASSWORD=pass@word" cantino/huginn
+    docker run --rm --name huginn \
+        --link postgres:postgresql \
+        -p 5000:5000 \
+        -e "HUGINN_DATABASE_USER=huginn" \
+        -e "HUGINN_DATABASE_PASSWORD=pass@word" \
+        cantino/huginn
+
+The `docker/` folder also has a `docker-compose.yml` that allows for a sample database formation with a data volume container:
+
+    cd docker ; docker-compose up
 
 ## Environment Variables
 
