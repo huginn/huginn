@@ -187,6 +187,12 @@ describe LiquidInterpolatable::Filters do
       agent.options['cleaned'] = '{{ something | regex_replace_first: "\S+bar", "foobaz"  }}'
       expect(agent.interpolated['cleaned']).to eq('foobaz foobar')
     end
+
+    it 'should support escaped characters' do
+      agent.interpolation_context['something'] = "foo\\1\n\nfoo\\bar\n\nfoo\\baz"
+      agent.options['test'] = "{{ something | regex_replace_first: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace_first: '\\n+', '\\n'  }}"
+      expect(agent.interpolated['test']).to eq("foo\\1\nfoobar\\\n\nfoo\\baz")
+    end
   end
 
   describe 'regex_replace' do
@@ -196,6 +202,12 @@ describe LiquidInterpolatable::Filters do
       agent.interpolation_context['something'] = 'foobar foobar'
       agent.options['cleaned'] = '{{ something | regex_replace: "\S+bar", "foobaz"  }}'
       expect(agent.interpolated['cleaned']).to eq('foobaz foobaz')
+    end
+
+    it 'should support escaped characters' do
+      agent.interpolation_context['something'] = "foo\\1\n\nfoo\\bar\n\nfoo\\baz"
+      agent.options['test'] = "{{ something | regex_replace: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace: '\\n+', '\\n'  }}"
+      expect(agent.interpolated['test']).to eq("foo\\1\nfoobar\\\nfoobaz\\")
     end
   end
 end
