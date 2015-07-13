@@ -224,7 +224,7 @@ GEM
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
     json (1.8.3)
-    jsonpath (0.5.6)
+    jsonpath (0.5.7)
       multi_json
     jwt (1.4.1)
     kaminari (0.16.1)
@@ -255,7 +255,7 @@ GEM
     mini_portile (0.6.2)
     minitest (5.7.0)
     mqtt (0.3.1)
-    multi_json (1.11.1)
+    multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     mysql2 (0.3.16)
