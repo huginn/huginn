@@ -61,7 +61,7 @@ To link to another mysql container, for example:
         --link mysql \
         -p 5000:5000 \
         -e HUGINN_DATABASE_NAME=huginn \
-        -e HUGINN_DATABASE_USER=huginn \
+        -e HUGINN_DATABASE_USERNAME=huginn \
         -e HUGINN_DATABASE_PASSWORD=somethingsecret \
         cantino/huginn
 
@@ -70,7 +70,7 @@ To link to another container named 'postgres':
     docker run --rm --name huginn \
         --link postgres:postgresql \
         -p 5000:5000 \
-        -e "HUGINN_DATABASE_USER=huginn" \
+        -e "HUGINN_DATABASE_USERNAME=huginn" \
         -e "HUGINN_DATABASE_PASSWORD=pass@word" \
         cantino/huginn
 
