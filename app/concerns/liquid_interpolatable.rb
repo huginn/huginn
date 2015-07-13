@@ -201,15 +201,15 @@ module LiquidInterpolatable
         'concat(' << subs.join(', ') << ')'
       end
     end
-    
+
     def regex_replace(input, regex, replacement = ''.freeze)
       input.to_s.gsub(Regexp.new(regex), replacement.to_s)
     end
-    
+
     def regex_replace_first(input, regex, replacement = ''.freeze)
       input.to_s.sub(Regexp.new(regex), replacement.to_s)
     end
-    
+
     private
 
     def logger
