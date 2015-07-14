@@ -236,6 +236,32 @@ module LiquidInterpolatable
       "v" => "\v",
     }
 
+    # Unescape a replacement text for use in the second argument of
+    # gsub/sub.  The following escape sequences are recognized:
+    #
+    # - "\\" (backslash itself)
+    # - "\a" (alert)
+    # - "\b" (backspace)
+    # - "\e" (escape)
+    # - "\f" (form feed)
+    # - "\n" (new line)
+    # - "\r" (carriage return)
+    # - "\s" (space)
+    # - "\t" (horizontal tab)
+    # - "\u{XXXX}" (unicode codepoint)
+    # - "\v" (vertical tab)
+    # - "\xXX" (hexadecimal character)
+    # - "\1".."\9" (numbered capture groups)
+    # - "\+" (last capture group)
+    # - "\k<name>" (named capture group)
+    # - "\&" or "\0" (complete matched text)
+    # - "\`" (string before match)
+    # - "\'" (string after match)
+    #
+    # Octal escape sequences are deliberately unsupported to avoid
+    # conflict with numbered capture groups.  Rather obscure Emacs
+    # style character codes ("\C-x", "\M-\C-x" etc.) are also omitted
+    # from this implementation.
     def unescape_replacement(s)
       s.gsub(/\\(?:([\d+&`'\\]|k<\w+>)|u\{([[:xdigit:]]+)\}|x([[:xdigit:]]{2})|(.))/) {
         if c = $1
