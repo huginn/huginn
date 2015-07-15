@@ -26,17 +26,17 @@ class WebRequestsController < ApplicationController
       if agent
         content, status, content_type = agent.trigger_web_request(params.except(:action, :controller, :agent_id, :user_id, :format), request.method_symbol.to_s, request.format.to_s)
         if content.is_a?(String)
-          render :text => content, :status => status || 200, :content_type => content_type || 'text/plain'
+          render text: content, status: status || 200, content_type: content_type || 'text/plain'
         elsif content.is_a?(Hash)
-          render :json => content, :status => status || 200
+          render json: content, status: status || 200
         else
           head(status || 200)
         end
       else
-        render :text => "agent not found", :status => 404
+        render text: "agent not found", status: 404
       end
     else
-      render :text => "user not found", :status => 404
+      render text: "user not found", status: 404
     end
   end
 
@@ -49,9 +49,9 @@ class WebRequestsController < ApplicationController
           agent.trigger_web_request(params.except(:action, :controller, :user_id, :format), request.method_symbol.to_s, request.format.to_s)
         end
       }
-      render :text => "ok"
+      render text: "ok"
     else
-      render :text => "user not found", :status => :not_found
+      render text: "user not found", status: :not_found
     end
   end
 end

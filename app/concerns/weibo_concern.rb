@@ -20,7 +20,7 @@ module WeiboConcern
       WeiboOAuth2::Config.api_key = options['app_key'] # WEIBO_APP_KEY
       WeiboOAuth2::Config.api_secret = options['app_secret'] # WEIBO_APP_SECRET
       @weibo_client = WeiboOAuth2::Client.new
-      @weibo_client.get_token_from_hash :access_token => options['access_token']
+      @weibo_client.get_token_from_hash access_token: options['access_token']
     end
     @weibo_client
   end

@@ -3,7 +3,7 @@ class AddEventIdAtCreationToLinks < ActiveRecord::Migration
   class Event < ActiveRecord::Base; end
 
   def up
-    add_column :links, :event_id_at_creation, :integer, :null => false, :default => 0
+    add_column :links, :event_id_at_creation, :integer, null: false, default: 0
 
     Link.all.find_each do |link|
       last_event_id = execute(

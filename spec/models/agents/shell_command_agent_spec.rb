@@ -5,19 +5,19 @@ describe Agents::ShellCommandAgent do
     @valid_path = Dir.pwd
 
     @valid_params = {
-        :path  => @valid_path,
-        :command  => "pwd",
-        :expected_update_period_in_days => "1",
+        path: @valid_path,
+        command: "pwd",
+        expected_update_period_in_days: "1",
       }
 
-    @checker = Agents::ShellCommandAgent.new(:name => "somename", :options => @valid_params)
+    @checker = Agents::ShellCommandAgent.new(name: "somename", options: @valid_params)
     @checker.user = users(:jane)
     @checker.save!
 
     @event = Event.new
     @event.agent = agents(:jane_weather_agent)
     @event.payload = {
-      :cmd => "ls"
+      cmd: "ls"
     }
     @event.save!
 

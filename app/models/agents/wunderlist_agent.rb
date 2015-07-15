@@ -71,7 +71,7 @@ module Agents
     end
 
     def request_options
-      {:headers => {'Content-Type' => 'application/json',
+      {headers: {'Content-Type' => 'application/json',
                     'User-Agent' => 'Huginn (https://github.com/cantino/huginn)',
                     'X-Access-Token' => service.token,
                     'X-Client-ID' => ENV["WUNDERLIST_OAUTH_KEY"] }}

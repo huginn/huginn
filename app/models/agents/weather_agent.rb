@@ -176,7 +176,7 @@ module Agents
 
     def check
       if key_setup?
-        create_event :payload => model(service, which_day).merge('location' => location)
+        create_event payload: model(service, which_day).merge('location' => location)
       end
     end
 

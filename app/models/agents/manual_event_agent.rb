@@ -15,10 +15,10 @@ module Agents
 
     def handle_details_post(params)
       if params['payload']
-        create_event(:payload => params['payload'])
-        { :success => true }
+        create_event(payload: params['payload'])
+        { success: true }
       else
-        { :success => false, :error => "You must provide a JSON payload" }
+        { success: false, error: "You must provide a JSON payload" }
       end
     end
 

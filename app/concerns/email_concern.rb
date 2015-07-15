@@ -40,12 +40,12 @@ module EmailConcern
     if payload.is_a?(Hash)
       payload = ActiveSupport::HashWithIndifferentAccess.new(payload)
       MAIN_KEYS.each do |key|
-        return { :title => payload[key].to_s, :entries => present_hash(payload, key) } if payload.has_key?(key)
+        return { title: payload[key].to_s, entries: present_hash(payload, key) } if payload.has_key?(key)
       end
 
-      { :title => "Event", :entries => present_hash(payload) }
+      { title: "Event", entries: present_hash(payload) }
     else
-      { :title => payload.to_s, :entries => [] }
+      { title: payload.to_s, entries: [] }
     end
   end
 

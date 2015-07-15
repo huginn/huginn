@@ -13,13 +13,13 @@ describe Agents::PushbulletAgent do
                       'type'      => 'note'
                     }
 
-    @checker = Agents::PushbulletAgent.new(:name => "somename", :options => @valid_params)
+    @checker = Agents::PushbulletAgent.new(name: "somename", options: @valid_params)
     @checker.user = users(:jane)
     @checker.save!
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :body => 'One two test' }
+    @event.payload = { body: 'One two test' }
     @event.save!
   end
 
@@ -49,7 +49,7 @@ describe Agents::PushbulletAgent do
     before(:each) do
       @base_options = {
         body: { device_iden: @checker.options[:device_id] },
-        basic_auth: { username: @checker.options[:api_key], :password=>'' }
+        basic_auth: { username: @checker.options[:api_key], password:'' }
       }
     end
     context "#query_options" do
@@ -93,23 +93,23 @@ describe Agents::PushbulletAgent do
   describe '#complete_device_id' do
     it "should return an array" do
       mock(@checker).devices { [{'iden' => '12345', 'nickname' => 'huginn'}] }
-      expect(@checker.complete_device_id).to eq([{:text=>"huginn", :id=>"12345"}])
+      expect(@checker.complete_device_id).to eq([{text:"huginn", id:"12345"}])
     end
   end
 
   describe "#receive" do
     it "send a note" do
       stub_request(:post, "https://token:@api.pushbullet.com/v2/pushes").
-        with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
-        to_return(:status => 200, :body => "{}", :headers => {})
+        with(body: "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
+        to_return(status: 200, body: "{}", headers: {})
       dont_allow(@checker).error
       @checker.receive([@event])
     end
 
     it "should log resquests which return an error" do
       stub_request(:post, "https://token:@api.pushbullet.com/v2/pushes").
-        with(:body => "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
-        to_return(:status => 200, :body => '{"error": {"message": "error"}}', :headers => {})
+        with(body: "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
+        to_return(status: 200, body: '{"error": {"message": "error"}}', headers: {})
       mock(@checker).error("error")
       @checker.receive([@event])
     end
@@ -126,7 +126,7 @@ describe Agents::PushbulletAgent do
   describe '#devices' do
     it "should return an array of devices" do
       stub_request(:get, "https://token:@api.pushbullet.com/v2/devices").
-         to_return(:status => 200, :body => '{"devices": [{"pushable": false}, {"nickname": "test", "iden": "iden", "pushable": true}]}', :headers => {})
+         to_return(status: 200, body: '{"devices": [{"pushable": false}, {"nickname": "test", "iden": "iden", "pushable": true}]}', headers: {})
       expect(@checker.send(:devices)).to eq([{"nickname"=>"test", "iden"=>"iden", "pushable"=>true}])
     end
 
@@ -139,8 +139,8 @@ describe Agents::PushbulletAgent do
   describe '#create_device' do
     it "should create a new device and assign it to the options" do
       stub_request(:post, "https://token:@api.pushbullet.com/v2/devices").
-         with(:body => "nickname=Huginn&type=stream").
-         to_return(:status => 200, :body => '{"iden": "udm0Tdjz5A7bL4NM"}', :headers => {})
+         with(body: "nickname=Huginn&type=stream").
+         to_return(status: 200, body: '{"iden": "udm0Tdjz5A7bL4NM"}', headers: {})
       @checker.options['device_id'] = nil
       @checker.send(:create_device)
       expect(@checker.options[:device_id]).to eq('udm0Tdjz5A7bL4NM')

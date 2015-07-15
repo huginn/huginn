@@ -8,7 +8,7 @@ describe Agents::EmailAgent do
   end
 
   before do
-    @checker = Agents::EmailAgent.new(:name => "something", :options => { :expected_receive_period_in_days => "2", :subject => "something interesting" })
+    @checker = Agents::EmailAgent.new(name: "something", options: { expected_receive_period_in_days: "2", subject: "something interesting" })
     @checker.user = users(:bob)
     @checker.save!
     expect(ActionMailer::Base.deliveries).to eq([])
@@ -22,12 +22,12 @@ describe Agents::EmailAgent do
     it "immediately sends any payloads it receives" do
       event1 = Event.new
       event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = { :message => "hi!", :data => "Something you should know about" }
+      event1.payload = { message: "hi!", data: "Something you should know about" }
       event1.save!
 
       event2 = Event.new
       event2.agent = agents(:bob_weather_agent)
-      event2.payload = { :data => "Something else you should know about" }
+      event2.payload = { data: "Something else you should know about" }
       event2.save!
 
       Agents::EmailAgent.async_receive(@checker.id, [event1.id])
@@ -41,7 +41,7 @@ describe Agents::EmailAgent do
     end
 
     it "can receive complex events and send them on" do
-      stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
+      stub_request(:any, /wunderground/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
       stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       @checker.sources << agents(:bob_weather_agent)
 
@@ -57,14 +57,14 @@ describe Agents::EmailAgent do
     end
 
     it "can take body option for selecting the resulting email's body" do
-      @checker.update_attributes :options => @checker.options.merge({
+      @checker.update_attributes options: @checker.options.merge({
         'subject' => '{{foo.subject}}',
         'body' => '{{some_html}}'
       })
 
       event = Event.new
       event.agent = agents(:bob_rain_notifier_agent)
-      event.payload = { :foo => { :subject => "Something you should know about" }, :some_html => "<strong>rain!</strong>" }
+      event.payload = { foo: { subject: "Something you should know about" }, some_html: "<strong>rain!</strong>" }
       event.save!
 
       Agents::EmailAgent.async_receive(@checker.id, [event.id])

@@ -3,7 +3,7 @@ class LogsController < ApplicationController
 
   def index
     @logs = @agent.logs.all
-    render :action => :index, :layout => false
+    render action: :index, layout: false
   end
 
   def clear

@@ -12,15 +12,15 @@ class AgentsExporter
 
   def as_json(opts = {})
     {
-      :name => options[:name].presence || 'No name provided',
-      :description => options[:description].presence || 'No description provided',
-      :source_url => options[:source_url],
-      :guid => options[:guid],
-      :tag_fg_color => options[:tag_fg_color],
-      :tag_bg_color => options[:tag_bg_color],
-      :exported_at => Time.now.utc.iso8601,
-      :agents => agents.map { |agent| agent_as_json(agent) },
-      :links => links
+      name: options[:name].presence || 'No name provided',
+      description: options[:description].presence || 'No description provided',
+      source_url: options[:source_url],
+      guid: options[:guid],
+      tag_fg_color: options[:tag_fg_color],
+      tag_bg_color: options[:tag_bg_color],
+      exported_at: Time.now.utc.iso8601,
+      agents: agents.map { |agent| agent_as_json(agent) },
+      links: links
     }
   end
 
@@ -32,8 +32,8 @@ class AgentsExporter
     agent_ids = agents.map(&:id)
 
     contained_links = agents.map.with_index do |agent, index|
-      agent.links_as_source.where(:receiver_id => agent_ids).map do |link|
-        { :source => index, :receiver => agent_ids.index(link.receiver_id) }
+      agent.links_as_source.where(receiver_id: agent_ids).map do |link|
+        { source: index, receiver: agent_ids.index(link.receiver_id) }
       end
     end
 
@@ -42,11 +42,11 @@ class AgentsExporter
 
   def agent_as_json(agent)
     {
-      :type => agent.type,
-      :name => agent.name,
-      :disabled => agent.disabled,
-      :guid => agent.guid,
-      :options => agent.options
+      type: agent.type,
+      name: agent.name,
+      disabled: agent.disabled,
+      guid: agent.guid,
+      options: agent.options
     }.tap do |options|
       options[:schedule] = agent.schedule if agent.can_be_scheduled?
       options[:keep_events_for] = agent.keep_events_for if agent.can_create_events?

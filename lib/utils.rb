@@ -56,7 +56,7 @@ module Utils
       escape = false
     end
 
-    result = JsonPath.new(path, :allow_eval => ENV['ALLOW_JSONPATH_EVAL'] == "true").on(data.is_a?(String) ? data : data.to_json)
+    result = JsonPath.new(path, allow_eval: ENV['ALLOW_JSONPATH_EVAL'] == "true").on(data.is_a?(String) ? data : data.to_json)
     if escape
       result.map {|r| CGI::escape r }
     else
@@ -66,7 +66,7 @@ module Utils
 
   # Output JSON that is ready for inclusion into HTML.  If you simply use to_json on an object, the
   # presence of </script> in the valid JSON can break the page and allow XSS attacks.
-  # Optionally, pass `:skip_safe => true` to not call html_safe on the output.
+  # Optionally, pass `skip_safe: true` to not call html_safe on the output.
   def self.jsonify(thing, options = {})
     json = thing.to_json.gsub('</', '<\/')
     if !options[:skip_safe]

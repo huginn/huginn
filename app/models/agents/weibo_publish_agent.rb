@@ -53,14 +53,14 @@ module Agents
         end
         begin
           publish_tweet tweet_text
-          create_event :payload => {
+          create_event payload: {
             'success' => true,
             'published_tweet' => tweet_text,
             'agent_id' => event.agent_id,
             'event_id' => event.id
           }
         rescue OAuth2::Error => e
-          create_event :payload => {
+          create_event payload: {
             'success' => false,
             'error' => e.message,
             'failed_tweet' => tweet_text,

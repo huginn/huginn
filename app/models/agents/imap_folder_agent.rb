@@ -295,7 +295,7 @@ module Agents
 
           log 'Emitting an event for mail: %s' % message_id
 
-          create_event :payload => {
+          create_event payload: {
             'folder' => mail.folder,
             'subject' => mail.scrubbed(:subject),
             'from' => mail.from_addrs.first,

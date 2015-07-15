@@ -92,8 +92,8 @@ module Agents
 
     def check
       since_id = memory['since_id'] || nil
-      opts = {:uid => interpolated['uid'].to_i}
-      opts.merge! :since_id => since_id unless since_id.nil?
+      opts = {uid: interpolated['uid'].to_i}
+      opts.merge! since_id: since_id unless since_id.nil?
 
       # http://open.weibo.com/wiki/2/statuses/user_timeline/en
       resp = weibo_client.statuses.user_timeline opts
@@ -103,7 +103,7 @@ module Agents
         resp[:statuses].each do |status|
           memory['since_id'] = status.id if !memory['since_id'] || (status.id > memory['since_id'])
 
-          create_event :payload => status.as_json
+          create_event payload: status.as_json
         end
       end
 

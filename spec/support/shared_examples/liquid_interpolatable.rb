@@ -16,7 +16,7 @@ shared_examples_for LiquidInterpolatable do
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :variable => 'hello', :hello_world => "Hello world"}
+    @event.payload = { variable: 'hello', hello_world: "Hello world"}
     @event.save!
   end
 

@@ -5,7 +5,7 @@ user "huginn" do
   system true
   home "/home/huginn"
   password "$6$ZwO6b.6tij$SMa8UIwtESGDxB37NwHsct.gJfXWmmflNbH.oypwJ9y0KkzMkCdw7D14iK7GX9C4CWSEcpGOFUow7p01rQFu5."
-  supports :manage_home => true
+  supports manage_home: true
   shell "/bin/bash"
   gid "sudo"
 end
@@ -36,7 +36,7 @@ gem_package("rake")
 gem_package("bundle")
 
 service "nginx" do
-  supports :restart => true, :start => true, :stop => true, :reload => true
+  supports restart: true, start: true, stop: true, reload: true
   action :nothing
 end
 
@@ -96,7 +96,7 @@ deploy "/home/huginn" do
       ln -nfs /home/huginn/shared/config/.env ./.env
       ln -nfs /home/huginn/shared/config/unicorn.rb ./config/unicorn.rb
       sudo cp /home/huginn/shared/config/nginx.conf /etc/nginx/
-      echo 'gem "unicorn", :group => :production' >> Gemfile
+      echo 'gem "unicorn", group: :production' >> Gemfile
       sudo bundle install --without=development --without=test
       sed -i s/REPLACE_ME_NOW\!/$(sudo bundle exec rake secret)/ /home/huginn/shared/config/.env
       sudo RAILS_ENV=production bundle exec rake db:create

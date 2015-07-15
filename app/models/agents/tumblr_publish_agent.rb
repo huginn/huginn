@@ -105,7 +105,7 @@ module Agents
         options = interpolated(event)['options']
         begin
           post = publish_post(blog_name, post_type, options)
-          create_event :payload => {
+          create_event payload: {
             'success' => true,
             'published_post' => "["+blog_name+"] "+post_type,
             'post_id' => post["id"],
@@ -118,12 +118,12 @@ module Agents
 
     def publish_post(blog_name, post_type, options)      
       options_obj = { 
-          :state => options['state'],
-          :tags => options['tags'],
-          :tweet => options['tweet'],
-          :date => options['date'],
-          :format => options['format'],
-          :slug => options['slug'],
+          state: options['state'],
+          tags: options['tags'],
+          tweet: options['tweet'],
+          date: options['date'],
+          format: options['format'],
+          slug: options['slug'],
         }
 
       case post_type

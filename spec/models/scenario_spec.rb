@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Scenario do
-  let(:new_instance) { users(:bob).scenarios.build(:name => "some scenario") }
+  let(:new_instance) { users(:bob).scenarios.build(name: "some scenario") }
 
   it_behaves_like HasGuid
 

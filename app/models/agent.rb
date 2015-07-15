@@ -28,7 +28,7 @@ class Agent < ActiveRecord::Base
   json_serialize :options, :memory
 
   validates_presence_of :name, :user
-  validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
+  validates_inclusion_of :keep_events_for, in: EVENT_RETENTION_SCHEDULES.map(&:last)
   validate :sources_are_owned
   validate :controllers_are_owned
   validate :control_targets_are_owned
@@ -43,22 +43,22 @@ class Agent < ActiveRecord::Base
   before_create :set_last_checked_event_id
   after_save :possibly_update_event_expirations
 
-  belongs_to :user, :inverse_of => :agents
-  belongs_to :service, :inverse_of => :agents
-  has_many :events, -> { order("events.id desc") }, :dependent => :delete_all, :inverse_of => :agent
-  has_one  :most_recent_event, -> { order("events.id desc") }, :inverse_of => :agent, :class_name => "Event"
-  has_many :logs,  -> { order("agent_logs.id desc") }, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog"
-  has_many :received_events, -> { order("events.id desc") }, :through => :sources, :class_name => "Event", :source => :events
-  has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
-  has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
-  has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
-  has_many :receivers, :through => :links_as_source, :class_name => "Agent", :inverse_of => :sources
+  belongs_to :user, inverse_of: :agents
+  belongs_to :service, inverse_of: :agents
+  has_many :events, -> { order("events.id desc") }, dependent: :delete_all, inverse_of: :agent
+  has_one  :most_recent_event, -> { order("events.id desc") }, inverse_of: :agent, class_name: "Event"
+  has_many :logs,  -> { order("agent_logs.id desc") }, dependent: :delete_all, inverse_of: :agent, class_name: "AgentLog"
+  has_many :received_events, -> { order("events.id desc") }, through: :sources, class_name: "Event", source: :events
+  has_many :links_as_source, dependent: :delete_all, foreign_key: "source_id", class_name: "Link", inverse_of: :source
+  has_many :links_as_receiver, dependent: :delete_all, foreign_key: "receiver_id", class_name: "Link", inverse_of: :receiver
+  has_many :sources, through: :links_as_receiver, class_name: "Agent", inverse_of: :receivers
+  has_many :receivers, through: :links_as_source, class_name: "Agent", inverse_of: :sources
   has_many :control_links_as_controller, dependent: :delete_all, foreign_key: 'controller_id', class_name: 'ControlLink', inverse_of: :controller
   has_many :control_links_as_control_target, dependent: :delete_all, foreign_key: 'control_target_id', class_name: 'ControlLink', inverse_of: :control_target
   has_many :controllers, through: :control_links_as_control_target, class_name: "Agent", inverse_of: :control_targets
   has_many :control_targets, through: :control_links_as_controller, class_name: "Agent", inverse_of: :controllers
-  has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :agent
-  has_many :scenarios, :through => :scenario_memberships, :inverse_of => :agents
+  has_many :scenario_memberships, dependent: :destroy, inverse_of: :agent
+  has_many :scenarios, through: :scenario_memberships, inverse_of: :agents
 
   scope :active,   -> { where(disabled: false) }
   scope :inactive, -> { where(disabled: true) }
@@ -70,7 +70,7 @@ class Agent < ActiveRecord::Base
              else
                type.to_s
            end
-    where(:type => type)
+    where(type: type)
   }
 
   def short_type
@@ -107,8 +107,8 @@ class Agent < ActiveRecord::Base
   def create_event(attrs)
     if can_create_events?
       events.create!({
-         :user => user,
-         :expires_at => new_event_expiration_date
+         user: user,
+         expires_at: new_event_expiration_date
       }.merge(attrs))
     else
       error "This Agent cannot create events!"
@@ -120,7 +120,7 @@ class Agent < ActiveRecord::Base
     if @credential_cache.has_key?(name)
       @credential_cache[name]
     else
-      @credential_cache[name] = user.user_credentials.where(:credential_name => name).first.try(:credential_value)
+      @credential_cache[name] = user.user_credentials.where(credential_name: name).first.try(:credential_value)
     end
   end
 
@@ -135,7 +135,7 @@ class Agent < ActiveRecord::Base
 
   def update_event_expirations!
     if keep_events_for == 0
-      events.update_all :expires_at => nil
+      events.update_all expires_at: nil
     else
       events.update_all "expires_at = " + rdbms_date_add("created_at", "DAY", keep_events_for.to_i)
     end
@@ -205,7 +205,7 @@ class Agent < ActiveRecord::Base
   end
 
   def error(message, options = {})
-    log(message, options.merge(:level => 4))
+    log(message, options.merge(level: 4))
   end
 
   def delete_logs!
@@ -376,14 +376,14 @@ class Agent < ActiveRecord::Base
 
         event_ids = agents_to_events.values.flatten.uniq.compact
 
-        Agent.where(:id => agents_to_events.keys).each do |agent|
+        Agent.where(id: agents_to_events.keys).each do |agent|
           agent.update_attribute :last_checked_event_id, event_ids.max
           Agent.async_receive(agent.id, agents_to_events[agent.id].uniq)
         end
 
         {
-          :agent_count => agents_to_events.keys.length,
-          :event_count => event_ids.length
+          agent_count: agents_to_events.keys.length,
+          event_count: event_ids.length
         }
       end
     end
@@ -398,7 +398,7 @@ class Agent < ActiveRecord::Base
     # This is called by bin/schedule.rb for each schedule in `SCHEDULES`.
     def run_schedule(schedule)
       return if schedule == 'never'
-      types = where(:schedule => schedule).group(:type).pluck(:type)
+      types = where(schedule: schedule).group(:type).pluck(:type)
       types.each do |type|
         type.constantize.bulk_check(schedule)
       end

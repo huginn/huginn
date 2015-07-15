@@ -23,7 +23,7 @@ describe LiquidInterpolatable::Filters do
       include LiquidInterpolatable
 
       def check
-        create_event :payload => {}
+        create_event payload: {}
       end
 
       def validate_options

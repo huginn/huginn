@@ -79,9 +79,9 @@ module Agents
         result, errors, exit_status = run_command(path, command)
 
         vals = {"command" => command, "path" => path, "exit_status" => exit_status, "errors" => errors, "output" => result}
-        created_event = create_event :payload => vals
+        created_event = create_event payload: vals
 
-        log("Ran '#{command}' under '#{path}'", :outbound_event => created_event, :inbound_event => event)
+        log("Ran '#{command}' under '#{path}'", outbound_event: created_event, inbound_event: event)
       else
         log("Unable to run because insecure agents are not enabled.  Edit ENABLE_INSECURE_AGENTS in the Huginn .env configuration.")
       end

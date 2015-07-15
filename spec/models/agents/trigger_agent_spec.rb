@@ -331,7 +331,7 @@ describe Agents::TriggerAgent do
 
         @checker.receive([@event])
 
-        expect(@checker.most_recent_event.payload).to eq(@event.payload.merge(:message => "I saw '5' from Joe"))
+        expect(@checker.most_recent_event.payload).to eq(@event.payload.merge(message: "I saw '5' from Joe"))
       end
     end
   end

@@ -3,13 +3,13 @@ require 'spec_helper'
 shared_examples_for EmailConcern do
   let(:valid_options) {
     {
-      :subject => "hello!",
-      :expected_receive_period_in_days => "2"
+      subject: "hello!",
+      expected_receive_period_in_days: "2"
     }
   }
 
   let(:agent) do
-    _agent = described_class.new(:name => "some email agent", :options => valid_options)
+    _agent = described_class.new(name: "some email agent", options: valid_options)
     _agent.user = users(:jane)
     _agent
   end
@@ -57,7 +57,7 @@ shared_examples_for EmailConcern do
       agent.options['recipients'] = ['hi!']
       expect(agent).not_to be_valid
 
-      agent.options['recipients'] = { :foo => "bar" }
+      agent.options['recipients'] = { foo: "bar" }
       expect(agent).not_to be_valid
 
       agent.options['recipients'] = "wut"

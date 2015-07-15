@@ -86,7 +86,7 @@ module Agents
           remove_unused_keys!(agent, 'filter_counts')
           agent.save!
         else
-          create_event :payload => status.merge('filter' => filter)
+          create_event payload: status.merge('filter' => filter)
         end
       end
     end
@@ -94,7 +94,7 @@ module Agents
     def check
       if interpolated['generate'] == "counts" && memory['filter_counts'] && memory['filter_counts'].length > 0
         memory['filter_counts'].each do |filter, count|
-          create_event :payload => { 'filter' => filter, 'count' => count, 'time' => Time.now.to_i }
+          create_event payload: { 'filter' => filter, 'count' => count, 'time' => Time.now.to_i }
         end
       end
       memory['filter_counts'] = {}

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Agents::HumanTaskAgent do
   before do
-    @checker = Agents::HumanTaskAgent.new(:name => "my human task agent")
+    @checker = Agents::HumanTaskAgent.new(name: "my human task agent")
     @checker.options = @checker.default_options
     @checker.user = users(:bob)
     @checker.save!
@@ -215,7 +215,7 @@ describe Agents::HumanTaskAgent do
       hitInterface = OpenStruct.new
       hitInterface.id = 123
       mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm) { |agent_question_form_instance| question_form = agent_question_form_instance }
-      mock(RTurk::Hit).create(:title => "Hi Joe").yields(hitInterface) { hitInterface }
+      mock(RTurk::Hit).create(title: "Hi Joe").yields(hitInterface) { hitInterface }
 
       @checker.send :create_basic_hit, @event
 
@@ -236,7 +236,7 @@ describe Agents::HumanTaskAgent do
       hitInterface = OpenStruct.new
       hitInterface.id = 123
       mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm)
-      mock(RTurk::Hit).create(:title => "Hi").yields(hitInterface) { hitInterface }
+      mock(RTurk::Hit).create(title: "Hi").yields(hitInterface) { hitInterface }
       @checker.send :create_basic_hit
       expect(hitInterface.max_assignments).to eq(@checker.options['hit']['assignments'])
       expect(hitInterface.reward).to eq(@checker.options['hit']['reward'])
@@ -312,10 +312,10 @@ describe Agents::HumanTaskAgent do
       @checker.memory['hits'] = { "JH3132836336DHG" => { 'event_id' => @event.id } }
       mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
       assignments = [
-        FakeAssignment.new(:status => "Accepted", :answers => {}),
-        FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
+        FakeAssignment.new(status: "Accepted", answers: {}),
+        FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"happy", "feedback"=>"Take 2"})
       ]
-      hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
+      hit = FakeHit.new(max_assignments: 2, assignments: assignments)
       mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
       # One of the assignments isn't set to "Submitted", so this should get skipped for now.
@@ -331,9 +331,9 @@ describe Agents::HumanTaskAgent do
       @checker.memory['hits'] = { "JH3132836336DHG" => { 'event_id' => @event.id } }
       mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
       assignments = [
-        FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
+        FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"happy", "feedback"=>"Take 2"})
       ]
-      hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
+      hit = FakeHit.new(max_assignments: 2, assignments: assignments)
       mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
       # One of the assignments hasn't shown up yet, so this should get skipped for now.
@@ -350,10 +350,10 @@ describe Agents::HumanTaskAgent do
         @checker.memory['hits'] = { "JH3132836336DHG" => { 'event_id' => @event.id } }
         mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
         @assignments = [
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "feedback"=>""}),
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"neutral", "feedback"=>""}),
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"happy", "feedback"=>"Take 2"})
         ]
-        @hit = FakeHit.new(:max_assignments => 2, :assignments => @assignments)
+        @hit = FakeHit.new(max_assignments: 2, assignments: @assignments)
         expect(@hit).not_to be_disposed
         mock(RTurk::Hit).new("JH3132836336DHG") { @hit }
       end
@@ -416,12 +416,12 @@ describe Agents::HumanTaskAgent do
         }
 
         assignments = [
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"sad", "age_range"=>"<50"}),
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "age_range"=>">50"}),
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "age_range"=>">50"}),
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "age_range"=>">50"})
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"sad", "age_range"=>"<50"}),
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"neutral", "age_range"=>">50"}),
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"happy", "age_range"=>">50"}),
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"happy", "age_range"=>">50"})
         ]
-        hit = FakeHit.new(:max_assignments => 4, :assignments => assignments)
+        hit = FakeHit.new(max_assignments: 4, assignments: assignments)
         mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
         expect {
@@ -468,13 +468,13 @@ describe Agents::HumanTaskAgent do
         ]
 
         assignments = [
-          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"1" }),
-          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"3" }),
-          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"5.1" }),
-          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"2" }),
-          FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"2" })
+          FakeAssignment.new(status: "Submitted", answers: { "rating"=>"1" }),
+          FakeAssignment.new(status: "Submitted", answers: { "rating"=>"3" }),
+          FakeAssignment.new(status: "Submitted", answers: { "rating"=>"5.1" }),
+          FakeAssignment.new(status: "Submitted", answers: { "rating"=>"2" }),
+          FakeAssignment.new(status: "Submitted", answers: { "rating"=>"2" })
         ]
-        hit = FakeHit.new(:max_assignments => 5, :assignments => assignments)
+        hit = FakeHit.new(max_assignments: 5, assignments: assignments)
         mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
         expect {
@@ -517,12 +517,12 @@ describe Agents::HumanTaskAgent do
 
         # Mock out the HIT's submitted assignments.
         assignments = [
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"sad",     "feedback"=>"This is my feedback 1"}),
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "feedback"=>"This is my feedback 2"}),
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy",   "feedback"=>"This is my feedback 3"}),
-          FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy",   "feedback"=>"This is my feedback 4"})
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"sad",     "feedback"=>"This is my feedback 1"}),
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"neutral", "feedback"=>"This is my feedback 2"}),
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"happy",   "feedback"=>"This is my feedback 3"}),
+          FakeAssignment.new(status: "Submitted", answers: {"sentiment"=>"happy",   "feedback"=>"This is my feedback 4"})
         ]
-        hit = FakeHit.new(:max_assignments => 4, :assignments => assignments)
+        hit = FakeHit.new(max_assignments: 4, assignments: assignments)
         mock(RTurk::Hit).new("JH3132836336DHG") { hit }
 
         expect(@checker.memory['hits']["JH3132836336DHG"]).to be_present
@@ -533,7 +533,7 @@ describe Agents::HumanTaskAgent do
         hitInterface = OpenStruct.new
         hitInterface.id = "JH39AA63836DH12345"
         mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm) { |agent_question_form_instance| question_form = agent_question_form_instance }
-        mock(RTurk::Hit).create(:title => "Hi!").yields(hitInterface) { hitInterface }
+        mock(RTurk::Hit).create(title: "Hi!").yields(hitInterface) { hitInterface }
 
         # And finally, the test.
 
@@ -585,10 +585,10 @@ describe Agents::HumanTaskAgent do
 
         # Mock out the HIT's submitted assignments.
         assignments = [
-          FakeAssignment.new(:status => "Submitted", :answers => {"1" => "2", "2" => "5", "3" => "3", "4" => "2"}),
-          FakeAssignment.new(:status => "Submitted", :answers => {"1" => "3", "2" => "4", "3" => "1", "4" => "4"})
+          FakeAssignment.new(status: "Submitted", answers: {"1" => "2", "2" => "5", "3" => "3", "4" => "2"}),
+          FakeAssignment.new(status: "Submitted", answers: {"1" => "3", "2" => "4", "3" => "1", "4" => "4"})
         ]
-        hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
+        hit = FakeHit.new(max_assignments: 2, assignments: assignments)
         mock(RTurk::Hit).new("JH39AA63836DH12345") { hit }
 
         expect(@checker.memory['hits']["JH39AA63836DH12345"]).to be_present

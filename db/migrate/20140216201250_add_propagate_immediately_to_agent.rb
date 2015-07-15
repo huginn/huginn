@@ -1,6 +1,6 @@
 class AddPropagateImmediatelyToAgent < ActiveRecord::Migration
   def up
-    add_column :agents, :propagate_immediately, :boolean, :default => false, :null => false
+    add_column :agents, :propagate_immediately, :boolean, default: false, null: false
   end
 
   def down

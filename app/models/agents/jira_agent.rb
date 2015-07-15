@@ -72,7 +72,7 @@ module Agents
         # this check is more precise than in get_issues()
         # see get_issues() for explanation
         if not last_run or updated > last_run
-          create_event :payload => issue
+          create_event payload: issue
         end
       end
 
@@ -85,10 +85,10 @@ module Agents
     end
 
     def request_options
-      ropts = {:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
+      ropts = {headers: {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
 
       if !interpolated[:username].empty?
-        ropts = ropts.merge({:basic_auth => {:username =>interpolated[:username], :password=>interpolated[:password]}})
+        ropts = ropts.merge({basic_auth: {username:interpolated[:username], password:interpolated[:password]}})
       end
 
       ropts

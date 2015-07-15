@@ -19,7 +19,7 @@ puts "    Deploying #{branch}"
 
 set :bundle_without, [:development]
 
-server "yourdomain.com", :app, :web, :db, :primary => true
+server "yourdomain.com", :app, :web, :db, primary: true
 
 set :sync_backups, 3
 
@@ -34,7 +34,7 @@ after 'deploy:update', 'foreman:restart'
 
 namespace :deploy do
   desc 'Link the .env environment and Procfile from shared/config into the new deploy directory'
-  task :symlink_configs, :roles => :app do
+  task :symlink_configs, roles: :app do
     run <<-CMD
       cd #{latest_release} && ln -nfs #{shared_path}/config/.env #{latest_release}/.env
     CMD
@@ -47,22 +47,22 @@ end
 
 namespace :foreman do
   desc "Export the Procfile to Ubuntu's upstart scripts"
-  task :export, :roles => :app do
+  task :export, roles: :app do
     run "cd #{latest_release} && rvmsudo bundle exec foreman export upstart /etc/init -a #{application} -u #{user} -l #{deploy_to}/upstart_logs"
   end
 
   desc 'Start the application services'
-  task :start, :roles => :app do
+  task :start, roles: :app do
     sudo "sudo start #{application}"
   end
 
   desc 'Stop the application services'
-  task :stop, :roles => :app do
+  task :stop, roles: :app do
     sudo "sudo stop #{application}"
   end
 
   desc 'Restart the application services'
-  task :restart, :roles => :app do
+  task :restart, roles: :app do
     run "sudo start #{application} || sudo restart #{application}"
   end
 end

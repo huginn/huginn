@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Agents::DataOutputAgent do
   let(:agent) do
-    _agent = Agents::DataOutputAgent.new(:name => 'My Data Output Agent')
+    _agent = Agents::DataOutputAgent.new(name: 'My Data Output Agent')
     _agent.options = _agent.default_options.merge('secrets' => ['secret1', 'secret2'], 'events_to_show' => 3)
     _agent.options['template']['item']['pubDate'] = "{{date}}"
     _agent.user = users(:bob)
@@ -87,7 +87,7 @@ describe Agents::DataOutputAgent do
 
       content, status, content_type = agent.receive_web_request({ 'secret' => 'fake' }, 'get', 'application/json')
       expect(status).to eq(401)
-      expect(content).to eq({ :error => "Not Authorized" })
+      expect(content).to eq({ error: "Not Authorized" })
 
       content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'application/json')
       expect(status).to eq(200)
@@ -95,7 +95,7 @@ describe Agents::DataOutputAgent do
 
     describe "outputting events as RSS and JSON" do
       let!(:event1) do
-        agents(:bob_website_agent).create_event :payload => {
+        agents(:bob_website_agent).create_event payload: {
           "site_title" => "XKCD",
           "url" => "http://imgs.xkcd.com/comics/evolving.png",
           "title" => "Evolving",
@@ -104,7 +104,7 @@ describe Agents::DataOutputAgent do
       end
 
       let!(:event2) do
-        agents(:bob_website_agent).create_event :payload => {
+        agents(:bob_website_agent).create_event payload: {
           "site_title" => "XKCD",
           "url" => "http://imgs.xkcd.com/comics/evolving2.png",
           "title" => "Evolving again",
@@ -114,7 +114,7 @@ describe Agents::DataOutputAgent do
       end
 
       let!(:event3) do
-        agents(:bob_website_agent).create_event :payload => {
+        agents(:bob_website_agent).create_event payload: {
           "site_title" => "XKCD",
           "url" => "http://imgs.xkcd.com/comics/evolving0.png",
           "title" => "Evolving yet again with a past date",
@@ -291,7 +291,7 @@ describe Agents::DataOutputAgent do
       end
 
       let!(:event) do
-        agents(:bob_website_agent).create_event :payload => {
+        agents(:bob_website_agent).create_event payload: {
           "url" => "http://imgs.xkcd.com/comics/evolving.png",
           "title" => "Evolving",
           "hovertext" => "Biologists play reverse Pokemon, trying to avoid putting any one team member on the front lines long enough for the experience to cause evolution.",

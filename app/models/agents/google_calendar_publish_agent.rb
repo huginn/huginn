@@ -95,7 +95,7 @@ module Agents
 
         calendar_event = JSON.parse(calendar.publish_as(options['calendar_id'], event.payload["message"]).response.body)
   
-        create_event :payload => {
+        create_event payload: {
           'success' => true,
           'published_calendar_event' => calendar_event,
           'agent_id' => event.agent_id,

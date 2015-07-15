@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe Agents::GrowlAgent do
   before do
-    @checker = Agents::GrowlAgent.new(:name => 'a growl agent',
-                                      :options => { :growl_server => 'localhost',
-                                                    :growl_app_name => 'HuginnGrowlApp',
-                                                    :growl_password => 'mypassword',
-                                                    :growl_notification_name => 'Notification',
-                                                    :expected_receive_period_in_days => '1' })
+    @checker = Agents::GrowlAgent.new(name: 'a growl agent',
+                                      options: { growl_server: 'localhost',
+                                                    growl_app_name: 'HuginnGrowlApp',
+                                                    growl_password: 'mypassword',
+                                                    growl_notification_name: 'Notification',
+                                                    expected_receive_period_in_days: '1' })
     @checker.user = users(:bob)
     @checker.save!
     
@@ -15,7 +15,7 @@ describe Agents::GrowlAgent do
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :subject => 'Weather Alert!', :message => 'Looks like its going to rain' }
+    @event.payload = { subject: 'Weather Alert!', message: 'Looks like its going to rain' }
     @event.save!
   end
 
@@ -107,12 +107,12 @@ describe Agents::GrowlAgent do
     it "should not call notify_growl if message or subject are missing" do
       event_without_a_subject = Event.new
       event_without_a_subject.agent = agents(:bob_weather_agent)
-      event_without_a_subject.payload = { :message => 'Looks like its going to rain' }
+      event_without_a_subject.payload = { message: 'Looks like its going to rain' }
       event_without_a_subject.save!
       
       event_without_a_message = Event.new
       event_without_a_message.agent = agents(:bob_weather_agent)
-      event_without_a_message.payload = { :subject => 'Weather Alert YO!' }
+      event_without_a_message.payload = { subject: 'Weather Alert YO!' }
       event_without_a_message.save!
       
       mock.proxy(@checker).notify_growl.never

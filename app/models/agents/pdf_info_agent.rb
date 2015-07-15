@@ -57,7 +57,7 @@ module Agents
       Array(in_url).each do |url|
         log "Fetching #{url}"
         info = HyPDF.pdfinfo(open(url))
-        create_event :payload => info.merge(payload)
+        create_event payload: info.merge(payload)
       end
     end
 

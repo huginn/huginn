@@ -54,15 +54,15 @@ module Agents
     def postform(uri, params)
       req = Net::HTTP::Post.new(uri.request_uri)
       req.form_data = params
-      Net::HTTP.start(uri.hostname, uri.port, :use_ssl => true) { |http| http.request(req) }
+      Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
     end
 
     def receive(incoming_events)
       auth_uri = URI "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
-      response = postform auth_uri, :client_id => interpolated['client_id'],
-                                    :client_secret => interpolated['client_secret'],
-                                    :scope => "http://api.microsofttranslator.com",
-                                    :grant_type => "client_credentials"
+      response = postform auth_uri, client_id: interpolated['client_id'],
+                                    client_secret: interpolated['client_secret'],
+                                    scope: "http://api.microsofttranslator.com",
+                                    grant_type: "client_credentials"
       access_token = JSON.parse(response.body)["access_token"]
       incoming_events.each do |event|
         translated_event = {}
@@ -70,7 +70,7 @@ module Agents
         opts['content'].each_pair do |key, value|
           translated_event[key] = translate(value.first, opts['to'], access_token)
         end
-        create_event :payload => translated_event
+        create_event payload: translated_event
       end
     end
   end

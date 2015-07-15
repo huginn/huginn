@@ -61,13 +61,13 @@ module Agents
       memory['peaks'][group] ||= []
 
       if memory['data'][group].length > 4 && (memory['peaks'][group].empty? || memory['peaks'][group].last < event.created_at.to_i - peak_spacing)
-        average_value, standard_deviation = stats_for(group, :skip_last => 1)
+        average_value, standard_deviation = stats_for(group, skip_last: 1)
         newest_value, newest_time = memory['data'][group][-1].map(&:to_f)
 
         if newest_value > average_value + std_multiple * standard_deviation
           memory['peaks'][group] << newest_time
           memory['peaks'][group].reject! { |p| p <= newest_time - window_duration }
-          create_event :payload => { 'message' => interpolated(event)['message'], 'peak' => newest_value, 'peak_time' => newest_time, 'grouped_by' => group.to_s }
+          create_event payload: { 'message' => interpolated(event)['message'], 'peak' => newest_value, 'peak_time' => newest_time, 'grouped_by' => group.to_s }
         end
       end
     end

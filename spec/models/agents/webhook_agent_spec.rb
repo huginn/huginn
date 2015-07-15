@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Agents::WebhookAgent do
   let(:agent) do
-    _agent = Agents::WebhookAgent.new(:name => 'webhook',
-                                      :options => { 'secret' => 'foobar', 'payload_path' => 'some_key' })
+    _agent = Agents::WebhookAgent.new(name: 'webhook',
+                                      options: { 'secret' => 'foobar', 'payload_path' => 'some_key' })
     _agent.user = users(:bob)
     _agent.save!
     _agent

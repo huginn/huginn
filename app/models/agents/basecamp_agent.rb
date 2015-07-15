@@ -67,7 +67,7 @@ module Agents
       events = JSON.parse(response.body)
       if !memory[:last_event].nil?
         events.each do |event|
-          create_event :payload => event
+          create_event payload: event
         end
       end
       memory[:last_event] = events.first['created_at'] if events.length > 0
@@ -88,11 +88,11 @@ module Agents
     end
 
     def request_options
-      {:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "Authorization" => "Bearer \"#{service.token}\""}}
+      {headers: {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "Authorization" => "Bearer \"#{service.token}\""}}
     end
 
     def query_parameters
-      memory[:last_event].present? ? { :query => {:since => memory[:last_event]} } : {}
+      memory[:last_event].present? ? { query: {since: memory[:last_event]} } : {}
     end
   end
 end

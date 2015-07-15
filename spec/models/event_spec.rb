@@ -63,10 +63,10 @@ describe Event do
 
   describe ".cleanup_expired!" do
     it "removes any Events whose expired_at date is non-null and in the past, updating Agent counter caches" do
-      half_hour_event = agents(:jane_weather_agent).create_event :expires_at => 20.minutes.from_now
-      one_hour_event = agents(:bob_weather_agent).create_event :expires_at => 1.hours.from_now
-      two_hour_event = agents(:jane_weather_agent).create_event :expires_at => 2.hours.from_now
-      three_hour_event = agents(:jane_weather_agent).create_event :expires_at => 3.hours.from_now
+      half_hour_event = agents(:jane_weather_agent).create_event expires_at: 20.minutes.from_now
+      one_hour_event = agents(:bob_weather_agent).create_event expires_at: 1.hours.from_now
+      two_hour_event = agents(:jane_weather_agent).create_event expires_at: 2.hours.from_now
+      three_hour_event = agents(:jane_weather_agent).create_event expires_at: 3.hours.from_now
       non_expiring_event = agents(:bob_weather_agent).create_event({})
 
       initial_bob_count = agents(:bob_weather_agent).reload.events_count
@@ -136,20 +136,20 @@ describe Event do
     describe "when an event is created" do
       it "updates a counter cache on agent" do
         expect {
-          agents(:jane_weather_agent).events.create!(:user => users(:jane))
+          agents(:jane_weather_agent).events.create!(user: users(:jane))
         }.to change { agents(:jane_weather_agent).reload.events_count }.by(1)
       end
 
       it "updates last_event_at on agent" do
         expect {
-          agents(:jane_weather_agent).events.create!(:user => users(:jane))
+          agents(:jane_weather_agent).events.create!(user: users(:jane))
         }.to change { agents(:jane_weather_agent).reload.last_event_at }
       end
     end
 
     describe "when an event is updated" do
       it "does not touch the last_event_at on the agent" do
-        event = agents(:jane_weather_agent).events.create!(:user => users(:jane))
+        event = agents(:jane_weather_agent).events.create!(user: users(:jane))
 
         agents(:jane_weather_agent).update_attribute :last_event_at, 2.days.ago
 

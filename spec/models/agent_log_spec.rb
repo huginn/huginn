@@ -4,7 +4,7 @@ require 'spec_helper'
 describe AgentLog do
   describe "validations" do
     before do
-      @log = AgentLog.new(:agent => agents(:jane_website_agent), :message => "The agent did something", :level => 3)
+      @log = AgentLog.new(agent: agents(:jane_website_agent), message: "The agent did something", level: 3)
       expect(@log).to be_valid
     end
 
@@ -44,14 +44,14 @@ describe AgentLog do
   end
 
   it "replaces invalid byte sequences in a message" do
-    log = AgentLog.new(:agent => agents(:jane_website_agent), level: 3)
+    log = AgentLog.new(agent: agents(:jane_website_agent), level: 3)
     log.message = "\u{3042}\xffA\x95"
     expect { log.save! }.not_to raise_error
     expect(log.message).to eq("\u{3042}<ff>A\<95>")
   end
 
   it "truncates message to a reasonable length" do
-    log = AgentLog.new(:agent => agents(:jane_website_agent), :level => 3)
+    log = AgentLog.new(agent: agents(:jane_website_agent), level: 3)
     log.message = "a" * 11_000
     log.save!
     expect(log.message.length).to eq(10_000)
@@ -59,7 +59,7 @@ describe AgentLog do
 
   describe "#log_for_agent" do
     it "creates AgentLogs" do
-      log = AgentLog.log_for_agent(agents(:jane_website_agent), "some message", :level => 4, :outbound_event => events(:jane_website_agent_event))
+      log = AgentLog.log_for_agent(agents(:jane_website_agent), "some message", level: 4, outbound_event: events(:jane_website_agent_event))
       expect(log).not_to be_new_record
       expect(log.agent).to eq(agents(:jane_website_agent))
       expect(log.outbound_event).to eq(events(:jane_website_agent_event))
@@ -84,10 +84,10 @@ describe AgentLog do
     end
 
     it "updates Agents' last_error_log_at when an error is logged" do
-      AgentLog.log_for_agent(agents(:jane_website_agent), "some message", :level => 3, :outbound_event => events(:jane_website_agent_event))
+      AgentLog.log_for_agent(agents(:jane_website_agent), "some message", level: 3, outbound_event: events(:jane_website_agent_event))
       expect(agents(:jane_website_agent).reload.last_error_log_at).to be_nil
 
-      AgentLog.log_for_agent(agents(:jane_website_agent), "some message", :level => 4, :outbound_event => events(:jane_website_agent_event))
+      AgentLog.log_for_agent(agents(:jane_website_agent), "some message", level: 4, outbound_event: events(:jane_website_agent_event))
       expect(agents(:jane_website_agent).reload.last_error_log_at.to_i).to be_within(2).of(Time.now.to_i)
     end
 

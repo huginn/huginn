@@ -33,7 +33,7 @@ namespace :sync do
       dump will be kept within the shared sync directory. The amount of backups that will be kept is
       declared in the sync_backups variable and defaults to 5.
     DESC
-    task :down, :roles => :db, :only => {:primary => true} do
+    task :down, roles: :db, only: {primary: true} do
       run "mkdir -p #{shared_path}/sync"
 
       env = fetch :rails_env, 'production'
@@ -72,7 +72,7 @@ namespace :sync do
       Sync declared remote directories to the local development environment. The synced directories must be declared
       as an array of Strings with the sync_directories variable. The path is relative to the rails root.
     DESC
-    task :down, :roles => :web, :once => true do
+    task :down, roles: :web, once: true do
 
       server, port = host_and_port
 

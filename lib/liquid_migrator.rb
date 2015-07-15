@@ -1,11 +1,11 @@
 module LiquidMigrator
   def self.convert_all_agent_options(agent)
-    agent.options = self.convert_hash(agent.options, {:merge_path_attributes => true, :leading_dollarsign_is_jsonpath => true})
+    agent.options = self.convert_hash(agent.options, {merge_path_attributes: true, leading_dollarsign_is_jsonpath: true})
     agent.save!
   end
 
   def self.convert_hash(hash, options={})
-    options = {:merge_path_attributes => false, :leading_dollarsign_is_jsonpath => false}.merge options
+    options = {merge_path_attributes: false, leading_dollarsign_is_jsonpath: false}.merge options
     keys_to_remove = []
     hash.tap do |hash|
       hash.each_pair do |key, value|

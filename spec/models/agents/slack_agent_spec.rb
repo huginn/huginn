@@ -9,13 +9,13 @@ describe Agents::SlackAgent do
                       'message' => "{{message}}"
                     }
 
-    @checker = Agents::SlackAgent.new(:name => "slacker", :options => @valid_params)
+    @checker = Agents::SlackAgent.new(name: "slacker", options: @valid_params)
     @checker.user = users(:jane)
     @checker.save!
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :channel => '#random', :message => 'Looks like its going to rain', username: "Huggin user"}
+    @event.payload = { channel: '#random', message: 'Looks like its going to rain', username: "Huggin user"}
     @event.save!
   end
 

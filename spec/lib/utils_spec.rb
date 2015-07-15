@@ -28,7 +28,7 @@ describe Utils do
   end
 
   describe "#interpolate_jsonpaths" do
-    let(:payload) { { :there => { :world => "WORLD" }, :works => "should work" } }
+    let(:payload) { { there: { world: "WORLD" }, works: "should work" } }
 
     it "interpolates jsonpath expressions between matching <>'s" do
       expect(Utils.interpolate_jsonpaths("hello <$.there.world> this <escape works>", payload)).to eq("hello WORLD this should+work")
@@ -36,29 +36,29 @@ describe Utils do
 
     it "optionally supports treating values that start with '$' as raw JSONPath" do
       expect(Utils.interpolate_jsonpaths("$.there.world", payload)).to eq("$.there.world")
-      expect(Utils.interpolate_jsonpaths("$.there.world", payload, :leading_dollarsign_is_jsonpath => true)).to eq("WORLD")
+      expect(Utils.interpolate_jsonpaths("$.there.world", payload, leading_dollarsign_is_jsonpath: true)).to eq("WORLD")
     end
   end
 
   describe "#recursively_interpolate_jsonpaths" do
     it "interpolates all string values in a structure" do
       struct = {
-        :int => 5,
-        :string => "this <escape $.works>",
-        :array => ["<works>", "now", "<$.there.world>"],
-        :deep => {
-          :string => "hello <there.world>",
-          :hello => :world
+        int: 5,
+        string: "this <escape $.works>",
+        array: ["<works>", "now", "<$.there.world>"],
+        deep: {
+          string: "hello <there.world>",
+          hello: :world
         }
       }
-      data = { :there => { :world => "WORLD" }, :works => "should work" }
+      data = { there: { world: "WORLD" }, works: "should work" }
       expect(Utils.recursively_interpolate_jsonpaths(struct, data)).to eq({
-        :int => 5,
-        :string => "this should+work",
-        :array => ["should work", "now", "WORLD"],
-        :deep => {
-          :string => "hello WORLD",
-          :hello => :world
+        int: 5,
+        string: "this should+work",
+        array: ["should work", "now", "WORLD"],
+        deep: {
+          string: "hello WORLD",
+          hello: :world
         }
       })
     end
@@ -66,50 +66,50 @@ describe Utils do
 
   describe "#value_at" do
     it "returns the value at a JSON path" do
-      expect(Utils.value_at({ :foo => { :bar => :baz }}.to_json, "foo.bar")).to eq("baz")
-      expect(Utils.value_at({ :foo => { :bar => { :bing => 2 } }}, "foo.bar.bing")).to eq(2)
+      expect(Utils.value_at({ foo: { bar: :baz }}.to_json, "foo.bar")).to eq("baz")
+      expect(Utils.value_at({ foo: { bar: { bing: 2 } }}, "foo.bar.bing")).to eq(2)
     end
 
     it "returns nil when the path cannot be followed" do
-      expect(Utils.value_at({ :foo => { :bar => :baz }}, "foo.bing")).to be_nil
+      expect(Utils.value_at({ foo: { bar: :baz }}, "foo.bing")).to be_nil
     end
 
     it "does not eval" do
       expect {
-        Utils.value_at({ :foo => 2 }, "foo[?(@ > 1)]")
+        Utils.value_at({ foo: 2 }, "foo[?(@ > 1)]")
       }.to raise_error(RuntimeError, /Cannot use .*? eval/)
     end
   end
 
   describe "#values_at" do
     it "returns arrays of matching values" do
-      expect(Utils.values_at({ :foo => { :bar => :baz }}, "foo.bar")).to eq(%w[baz])
-      expect(Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "foo[*].bar")).to eq(%w[baz bing])
-      expect(Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "foo[*].bar")).to eq(%w[baz bing])
+      expect(Utils.values_at({ foo: { bar: :baz }}, "foo.bar")).to eq(%w[baz])
+      expect(Utils.values_at({ foo: [ { bar: :baz }, { bar: :bing } ]}, "foo[*].bar")).to eq(%w[baz bing])
+      expect(Utils.values_at({ foo: [ { bar: :baz }, { bar: :bing } ]}, "foo[*].bar")).to eq(%w[baz bing])
     end
 
     it "should allow escaping" do
-      expect(Utils.values_at({ :foo => { :bar => "escape this!?" }}, "escape $.foo.bar")).to eq(["escape+this%21%3F"])
+      expect(Utils.values_at({ foo: { bar: "escape this!?" }}, "escape $.foo.bar")).to eq(["escape+this%21%3F"])
     end
   end
 
   describe "#jsonify" do
     it "escapes </script> tags in the output JSON" do
-      cleaned_json = Utils.jsonify(:foo => "bar", :xss => "</script><script>alert('oh no!')</script>")
+      cleaned_json = Utils.jsonify(foo: "bar", xss: "</script><script>alert('oh no!')</script>")
       expect(cleaned_json).not_to include("</script>")
       expect(cleaned_json).to include('\\u003c/script\\u003e')
     end
 
     it "html_safes the output unless :skip_safe is passed in" do
-      expect(Utils.jsonify({:foo => "bar"})).to be_html_safe
-      expect(Utils.jsonify({:foo => "bar"}, :skip_safe => false)).to be_html_safe
-      expect(Utils.jsonify({:foo => "bar"}, :skip_safe => true)).not_to be_html_safe
+      expect(Utils.jsonify({foo: "bar"})).to be_html_safe
+      expect(Utils.jsonify({foo: "bar"}, skip_safe: false)).to be_html_safe
+      expect(Utils.jsonify({foo: "bar"}, skip_safe: true)).not_to be_html_safe
     end
   end
 
   describe "#pretty_jsonify" do
     it "escapes </script> tags in the output JSON" do
-      cleaned_json = Utils.pretty_jsonify(:foo => "bar", :xss => "</script><script>alert('oh no!')</script>")
+      cleaned_json = Utils.pretty_jsonify(foo: "bar", xss: "</script><script>alert('oh no!')</script>")
       expect(cleaned_json).not_to include("</script>")
       expect(cleaned_json).to include("<\\/script>")
     end

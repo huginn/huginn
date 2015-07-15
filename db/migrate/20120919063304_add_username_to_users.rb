@@ -9,8 +9,8 @@ class AddUsernameToUsers < ActiveRecord::Migration
       user.update_attribute :username, user.email.gsub(/@.*$/, '')
     end
 
-    change_column :users, :username, :string, :null => false
-    add_index :users, :username, :unique => true
+    change_column :users, :username, :string, null: false
+    add_index :users, :username, unique: true
   end
 
   def down

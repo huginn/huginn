@@ -8,7 +8,7 @@ end
 
 shared_examples_for Oauthable do
   before(:each) do
-    @agent = described_class.new(:name => "somename")
+    @agent = described_class.new(name: "somename")
     @agent.user = users(:jane)
   end
 

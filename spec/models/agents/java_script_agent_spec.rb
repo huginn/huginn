@@ -3,9 +3,9 @@ require 'spec_helper'
 describe Agents::JavaScriptAgent do
   before do
     @valid_params = {
-      :name => "somename",
-      :options => {
-        :code => "Agent.check = function() { this.createEvent({ 'message': 'hi' }); };",
+      name: "somename",
+      options: {
+        code: "Agent.check = function() { this.createEvent({ 'message': 'hi' }); };",
       }
     }
 
@@ -42,7 +42,7 @@ describe Agents::JavaScriptAgent do
       expect(@agent).to be_valid
       @agent.options['code'] = 'credential:foo'
       expect(@agent).not_to be_valid
-      users(:jane).user_credentials.create! :credential_name => "foo", :credential_value => "bar"
+      users(:jane).user_credentials.create! credential_name: "foo", credential_value: "bar"
       expect(@agent.reload).to be_valid
     end
   end
@@ -91,7 +91,7 @@ describe Agents::JavaScriptAgent do
 
     describe "using credentials as code" do
       before do
-        @agent.user.user_credentials.create :credential_name => 'code-foo', :credential_value => 'Agent.check = function() { this.log("ran it"); };'
+        @agent.user.user_credentials.create credential_name: 'code-foo', credential_value: 'Agent.check = function() { this.log("ran it"); };'
         @agent.options['code'] = "credential:code-foo\n\n"
         @agent.save!
       end
@@ -194,7 +194,7 @@ describe Agents::JavaScriptAgent do
       it "can access incoming events in the JavaScript enviroment via this.incomingEvents" do
         event = Event.new
         event.agent = agents(:bob_rain_notifier_agent)
-        event.payload = { :data => "Something you should know about" }
+        event.payload = { data: "Something you should know about" }
         event.save!
         event.reload
 

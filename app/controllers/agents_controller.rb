@@ -17,7 +17,7 @@ class AgentsController < ApplicationController
   def handle_details_post
     @agent = current_user.agents.find(params[:id])
     if @agent.respond_to?(:handle_details_post)
-      render :json => @agent.handle_details_post(params) || {}
+      render json: @agent.handle_details_post(params) || {}
     else
       @agent.error "#handle_details_post called on an instance of #{@agent.class} that does not define it."
       head 500
@@ -93,7 +93,7 @@ class AgentsController < ApplicationController
         "<p><strong>#{type}</strong><br />" + desc + "</p>"
       }
     }.flatten.join()
-    render :json => { :description_html => html }
+    render json: { description_html: html }
   end
 
   def remove_events

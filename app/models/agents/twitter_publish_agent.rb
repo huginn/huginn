@@ -39,7 +39,7 @@ module Agents
         tweet_text = interpolated(event)['message']
         begin
           tweet = publish_tweet tweet_text
-          create_event :payload => {
+          create_event payload: {
             'success' => true,
             'published_tweet' => tweet_text,
             'tweet_id' => tweet.id,
@@ -47,7 +47,7 @@ module Agents
             'event_id' => event.id
           }
         rescue Twitter::Error => e
-          create_event :payload => {
+          create_event payload: {
             'success' => false,
             'error' => e.message,
             'failed_tweet' => tweet_text,
