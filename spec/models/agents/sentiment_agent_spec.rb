@@ -3,10 +3,10 @@ require 'spec_helper'
 describe Agents::SentimentAgent do
     before do
         @valid_params = {
-            :name => "somename",
-            :options => {
-                :content => "$.message",
-                :expected_receive_period_in_days => 1
+            name: "somename",
+            options: {
+                content: "$.message",
+                expected_receive_period_in_days: 1
             }
         }
 
@@ -17,7 +17,7 @@ describe Agents::SentimentAgent do
         @event = Event.new
         @event.agent = agents(:jane_weather_agent)
         @event.payload = {
-            :message => "value1"
+            message: "value1"
         }
         @event.save!
     end
@@ -59,13 +59,13 @@ describe Agents::SentimentAgent do
             event1 = Event.new
             event1.agent = agents(:bob_weather_agent)
             event1.payload = {
-                :message => "The quick brown fox jumps over the lazy dog"
+                message: "The quick brown fox jumps over the lazy dog"
             }
 
             event2 = Event.new
             event2.agent = agents(:jane_weather_agent)
             event2.payload = {
-                :message => "The quick brown fox jumps over the lazy dog"
+                message: "The quick brown fox jumps over the lazy dog"
             }
 
             expect {

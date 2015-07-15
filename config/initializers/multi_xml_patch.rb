@@ -112,7 +112,7 @@ module MultiXml
             hash
           end
 
-          # Turn {:files => {:file => #<StringIO>} into {:files => #<StringIO>} so it is compatible with
+          # Turn {files: {file: #<StringIO>} into {files: #<StringIO>} so it is compatible with
           # how multipart uploaded files from HTML appear
           xml_value['file'].is_a?(StringIO) ? xml_value['file'] : xml_value
         end

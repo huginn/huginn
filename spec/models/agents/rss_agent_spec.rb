@@ -7,12 +7,12 @@ describe Agents::RssAgent do
       'url' => "https://github.com/cantino/huginn/commits/master.atom",
     }
 
-    stub_request(:any, /github.com/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/github_rss.atom")), :status => 200)
-    stub_request(:any, /SlickdealsnetFP/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/slickdeals.atom")), :status => 200)
+    stub_request(:any, /github.com/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/github_rss.atom")), status: 200)
+    stub_request(:any, /SlickdealsnetFP/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/slickdeals.atom")), status: 200)
   end
 
   let(:agent) do
-    _agent = Agents::RssAgent.new(:name => "rss feed", :options => @valid_options)
+    _agent = Agents::RssAgent.new(name: "rss feed", options: @valid_options)
     _agent.user = users(:bob)
     _agent.save!
     _agent

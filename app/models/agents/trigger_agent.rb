@@ -96,7 +96,7 @@ module Agents
             payload = { 'message' => opts['message'] }
           end
 
-          create_event :payload => payload
+          create_event payload: payload
         end
       end
     end

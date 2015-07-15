@@ -124,7 +124,7 @@ module Agents
           interpolation_context.merge(perform_matching(event.payload))
           formatted_event = interpolated['mode'].to_s == "merge" ? event.payload.dup : {}
           formatted_event.merge! interpolated['instructions']
-          create_event :payload => formatted_event
+          create_event payload: formatted_event
         end
       end
     end

@@ -14,10 +14,10 @@ class Event < ActiveRecord::Base
   json_serialize :payload
 
   belongs_to :user
-  belongs_to :agent, :counter_cache => true
+  belongs_to :agent, counter_cache: true
 
-  has_many :agent_logs_as_inbound_event, :class_name => "AgentLog", :foreign_key => :inbound_event_id, :dependent => :nullify
-  has_many :agent_logs_as_outbound_event, :class_name => "AgentLog", :foreign_key => :outbound_event_id, :dependent => :nullify
+  has_many :agent_logs_as_inbound_event, class_name: "AgentLog", foreign_key: :inbound_event_id, dependent: :nullify
+  has_many :agent_logs_as_outbound_event, class_name: "AgentLog", foreign_key: :outbound_event_id, dependent: :nullify
 
   scope :recent, lambda { |timespan = 12.hours.ago|
     where("events.created_at > ?", timespan)
@@ -68,7 +68,7 @@ class Event < ActiveRecord::Base
 
   # Emit this event again, as a new Event.
   def reemit!
-    agent.create_event :payload => payload, :lat => lat, :lng => lng
+    agent.create_event payload: payload, lat: lat, lng: lng
   end
 
   # Look for Events whose `expires_at` is present and in the past.  Remove those events and then update affected Agents'
@@ -76,7 +76,7 @@ class Event < ActiveRecord::Base
   def self.cleanup_expired!
     affected_agents = Event.expired.group("agent_id").pluck(:agent_id)
     Event.expired.delete_all
-    Agent.where(:id => affected_agents).update_all "events_count = (select count(*) from events where agent_id = agents.id)"
+    Agent.where(id: affected_agents).update_all "events_count = (select count(*) from events where agent_id = agents.id)"
   end
 
   protected
@@ -87,8 +87,8 @@ class Event < ActiveRecord::Base
 
   def possibly_propagate
     #immediately schedule agents that want immediate updates
-    propagate_ids = agent.receivers.where(:propagate_immediately => true).pluck(:id)
-    Agent.receive!(:only_receivers => propagate_ids) unless propagate_ids.empty?
+    propagate_ids = agent.receivers.where(propagate_immediately: true).pluck(:id)
+    Agent.receive!(only_receivers: propagate_ids) unless propagate_ids.empty?
   end
 end
 

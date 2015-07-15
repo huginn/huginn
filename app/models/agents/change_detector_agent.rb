@@ -52,12 +52,12 @@ module Agents
     def handle(opts, event = nil)
       property = opts['property']
       if has_changed?(property)
-        created_event = create_event :payload => event.payload
+        created_event = create_event payload: event.payload
 
-        log("Propagating new event as property has changed to #{property} from #{last_property}", :outbound_event => created_event, :inbound_event => event )
+        log("Propagating new event as property has changed to #{property} from #{last_property}", outbound_event: created_event, inbound_event: event )
         update_memory(property)
       else
-        log("Not propagating as incoming event has not changed from #{last_property}.", :inbound_event => event )
+        log("Not propagating as incoming event has not changed from #{last_property}.", inbound_event: event )
       end
     end
 

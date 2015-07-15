@@ -18,7 +18,7 @@ class ScenarioImport
   before_validation :fetch_url
 
   validate :validate_presence_of_file_url_or_data
-  validates_format_of :url, :with => URL_REGEX, :allow_nil => true, :allow_blank => true, :message => "appears to be invalid"
+  validates_format_of :url, with: URL_REGEX, allow_nil: true, allow_blank: true, message: "appears to be invalid"
   validate :validate_data
   validate :generate_diff
 
@@ -35,7 +35,7 @@ class ScenarioImport
   end
 
   def existing_scenario
-    @existing_scenario ||= user.scenarios.find_by(:guid => parsed_data["guid"])
+    @existing_scenario ||= user.scenarios.find_by(guid: parsed_data["guid"])
   end
 
   def dangerous?
@@ -63,20 +63,20 @@ class ScenarioImport
     tag_fg_color = parsed_data['tag_fg_color']
     tag_bg_color = parsed_data['tag_bg_color']
     source_url = parsed_data['source_url'].presence || nil
-    @scenario = user.scenarios.where(:guid => guid).first_or_initialize
-    @scenario.update_attributes!(:name => name, :description => description,
-                                 :source_url => source_url, :public => false,
-                                 :tag_fg_color => tag_fg_color,
-                                 :tag_bg_color => tag_bg_color)
+    @scenario = user.scenarios.where(guid: guid).first_or_initialize
+    @scenario.update_attributes!(name: name, description: description,
+                                 source_url: source_url, public: false,
+                                 tag_fg_color: tag_fg_color,
+                                 tag_bg_color: tag_bg_color)
 
     unless options[:skip_agents]
       created_agents = agent_diffs.map do |agent_diff|
         agent = agent_diff.agent || Agent.build_for_type("Agents::" + agent_diff.type.incoming, user)
         agent.guid = agent_diff.guid.incoming
-        agent.attributes = { :name => agent_diff.name.updated,
-                             :disabled => agent_diff.disabled.updated, # == "true"
-                             :options => agent_diff.options.updated,
-                             :scenario_ids => [@scenario.id] }
+        agent.attributes = { name: agent_diff.name.updated,
+                             disabled: agent_diff.disabled.updated, # == "true"
+                             options: agent_diff.options.updated,
+                             scenario_ids: [@scenario.id] }
         agent.schedule = agent_diff.schedule.updated if agent_diff.schedule.present?
         agent.keep_events_for = agent_diff.keep_events_for.updated if agent_diff.keep_events_for.present?
         agent.propagate_immediately = agent_diff.propagate_immediately.updated if agent_diff.propagate_immediately.present? # == "true"
@@ -145,7 +145,7 @@ class ScenarioImport
       agent_diff = AgentDiff.new(agent_data)
       if existing_scenario
         # If this Agent exists already, update the AgentDiff with the local version's information.
-        agent_diff.diff_with! existing_scenario.agents.find_by(:guid => agent_data['guid'])
+        agent_diff.diff_with! existing_scenario.agents.find_by(guid: agent_data['guid'])
 
         begin
           # Update the AgentDiff with any hand-merged changes coming from the UI.  This only happens when this

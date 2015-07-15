@@ -11,7 +11,7 @@ describe Agents::WunderlistAgent do
                       'title' => '{{title}}: {{url}}',
                     }
 
-    @checker = Agents::WunderlistAgent.new(:name => "somename", :options => @valid_params)
+    @checker = Agents::WunderlistAgent.new(name: "somename", options: @valid_params)
     @checker.user = users(:jane)
     @checker.service = services(:generic)
     @checker.save!
@@ -39,16 +39,16 @@ describe Agents::WunderlistAgent do
   end
 
   it "should generate the request_options" do
-    expect(@checker.send(:request_options)).to eq({:headers=>{"Content-Type"=>"application/json", "User-Agent"=>"Huginn (https://github.com/cantino/huginn)", "X-Access-Token"=>"1234token", "X-Client-ID"=>"wunderoauthkey"}})
+    expect(@checker.send(:request_options)).to eq({headers:{"Content-Type"=>"application/json", "User-Agent"=>"Huginn (https://github.com/cantino/huginn)", "X-Access-Token"=>"1234token", "X-Client-ID"=>"wunderoauthkey"}})
   end
 
   describe "#complete_list_id" do
     it "should return a array of hashes" do
       stub_request(:get, 'https://a.wunderlist.com/api/v1/lists').to_return(
-        :body => JSON.dump([{title: 'test', id: 12345}]),
-        :headers => {"Content-Type" => "text/json"}
+        body: JSON.dump([{title: 'test', id: 12345}]),
+        headers: {"Content-Type" => "text/json"}
       )
-      expect(@checker.complete_list_id).to eq([{:text=>"test (12345)", :id=>12345}])
+      expect(@checker.complete_list_id).to eq([{text:"test (12345)", id:12345}])
     end
   end
 

@@ -3,8 +3,8 @@ class CreateEvents < ActiveRecord::Migration
     create_table :events do |t|
       t.integer :user_id
       t.integer :agent_id
-      t.decimal :lat, :precision => 15, :scale => 10
-      t.decimal :lng, :precision => 15, :scale => 10
+      t.decimal :lat, precision: 15, scale: 10
+      t.decimal :lng, precision: 15, scale: 10
       t.text :payload
 
       t.timestamps

@@ -76,7 +76,7 @@ describe Service do
 
     it "should update the token" do
       stub_request(:post, "https://launchpad.37signals.com/authorization/token?client_id=TESTKEY&client_secret=TESTSECRET&refresh_token=refreshtokentest&type=refresh").
-        to_return(:status => 200, :body => '{"expires_in":1209600,"access_token": "NEWTOKEN"}', :headers => {})
+        to_return(status: 200, body: '{"expires_in":1209600,"access_token": "NEWTOKEN"}', headers: {})
       @service.provider = '37signals'
       @service.refresh_token = 'refreshtokentest'
       @service.refresh_token!

@@ -20,9 +20,9 @@ describe Agents::MqttAgent do
     }
 
     @checker = Agents::MqttAgent.new(
-      :name => "somename", 
-      :options => @valid_params, 
-      :schedule => "midnight",
+      name: "somename", 
+      options: @valid_params, 
+      schedule: "midnight",
     )
     @checker.user = users(:jane)
     @checker.save!

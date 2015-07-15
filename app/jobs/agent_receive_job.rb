@@ -5,7 +5,7 @@ class AgentReceiveJob < ActiveJob::Base
     agent = Agent.find(agent_id)
     begin
       return if agent.unavailable?
-      agent.receive(Event.where(:id => event_ids).order(:id))
+      agent.receive(Event.where(id: event_ids).order(:id))
       agent.last_receive_at = Time.now
       agent.save!
     rescue => e

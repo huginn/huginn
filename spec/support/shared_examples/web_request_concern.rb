@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples_for WebRequestConcern do
   let(:agent) do
-    _agent = described_class.new(:name => "some agent", :options => @valid_options || {})
+    _agent = described_class.new(name: "some agent", options: @valid_options || {})
     _agent.user = users(:jane)
     _agent
   end

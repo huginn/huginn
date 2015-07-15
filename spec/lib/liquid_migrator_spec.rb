@@ -85,7 +85,7 @@ describe LiquidMigrator do
                         'color_path' => '',
                       }
 
-      @agent = Agents::HipchatAgent.new(:name => "somename", :options => valid_params)
+      @agent = Agents::HipchatAgent.new(name: "somename", options: valid_params)
       @agent.user = users(:jane)
       @agent.save!
     end
@@ -152,7 +152,7 @@ describe LiquidMigrator do
               ]
           }
       }
-      @agent = Agents::HumanTaskAgent.new(:name => "somename", :options => valid_params)
+      @agent = Agents::HumanTaskAgent.new(name: "somename", options: valid_params)
       @agent.user = users(:jane)
       LiquidMigrator.convert_all_agent_options(@agent)
       expect(@agent.reload.options['hit']['description']).to eq("Please rate the sentiment of this message: '{{message}}'")

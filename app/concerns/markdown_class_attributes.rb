@@ -6,7 +6,7 @@ module MarkdownClassAttributes
       attributes.each do |attribute|
         class_eval <<-RUBY
           def html_#{attribute}
-            Kramdown::Document.new(#{attribute}, :auto_ids => false).to_html.html_safe
+            Kramdown::Document.new(#{attribute}, auto_ids: false).to_html.html_safe
           end
 
           def #{attribute}

@@ -6,7 +6,7 @@ user "huginn" do
   system true
   home "/home/huginn"
   password "$6$ZwO6b.6tij$SMa8UIwtESGDxB37NwHsct.gJfXWmmflNbH.oypwJ9y0KkzMkCdw7D14iK7GX9C4CWSEcpGOFUow7p01rQFu5."
-  supports :manage_home => true
+  supports manage_home: true
   gid "sudo"
   shell "/bin/bash"
 end

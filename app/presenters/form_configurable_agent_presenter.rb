@@ -40,10 +40,10 @@ class FormConfigurableAgentPresenter < Decorator
           @view.concat @view.radio_button_tag "agent[options][#{attribute}_radio]", 'manual', @agent.send(:boolify, value) == nil, html_options
           @view.concat "Manual Input"
         end)
-        @view.concat(@view.text_field_tag "agent[options][#{attribute}]", value, html_options.merge(:class => "form-control #{@agent.send(:boolify, value) != nil ? 'hidden' : ''}"))
+        @view.concat(@view.text_field_tag "agent[options][#{attribute}]", value, html_options.merge(class: "form-control #{@agent.send(:boolify, value) != nil ? 'hidden' : ''}"))
       end
     when :array, :string
-      @view.text_field_tag "agent[options][#{attribute}]", value, html_options.merge(:class => 'form-control')
+      @view.text_field_tag "agent[options][#{attribute}]", value, html_options.merge(class: 'form-control')
     end
   end
 end

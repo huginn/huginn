@@ -5,8 +5,8 @@ describe Agents::ChangeDetectorAgent do
     event = Event.new
     event.agent = agents(:jane_weather_agent)
     event.payload = {
-      :command => 'some-command',
-      :output => output
+      command: 'some-command',
+      output: output
     }
     event.save!
 
@@ -15,11 +15,11 @@ describe Agents::ChangeDetectorAgent do
 
   before do
     @valid_params = {
-        :property  => "{{output}}",
-        :expected_update_period_in_days => "1",
+        property: "{{output}}",
+        expected_update_period_in_days: "1",
       }
 
-    @checker = Agents::ChangeDetectorAgent.new(:name => "somename", :options => @valid_params)
+    @checker = Agents::ChangeDetectorAgent.new(name: "somename", options: @valid_params)
     @checker.user = users(:jane)
     @checker.save!
   end

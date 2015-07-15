@@ -21,7 +21,7 @@ describe Agents::StubhubAgent do
 
   before do
       stub_request(:get, "http://www.stubhub.com/listingCatalog/select/?q=%2B%20stubhubDocumentType:event%0D%0A%2B%20event_id:#{stubhub_event_id}%0D%0A&rows=10&start=0&wt=json").
-         to_return(:status => 200, :body => body, :headers => {})
+         to_return(status: 200, body: body, headers: {})
 
     @stubhub_agent = described_class.new(name: name, options: valid_params)
     @stubhub_agent.user = users(:jane)

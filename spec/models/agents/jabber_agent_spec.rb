@@ -24,7 +24,7 @@ describe Agents::JabberAgent do
   let(:event) do
     Event.new.tap do |e|
       e.agent = agents(:bob_weather_agent)
-      e.payload = { :title => 'Weather Alert!', :url => 'http://www.weather.com/' }
+      e.payload = { title: 'Weather Alert!', url: 'http://www.weather.com/' }
       e.save!
     end
   end
@@ -69,7 +69,7 @@ describe Agents::JabberAgent do
     it "should send an IM for each event" do
       event2 = Event.new.tap do |e|
         e.agent = agents(:bob_weather_agent)
-        e.payload = { :title => 'Another Weather Alert!', :url => 'http://www.weather.com/we-are-screwed' }
+        e.payload = { title: 'Another Weather Alert!', url: 'http://www.weather.com/we-are-screwed' }
         e.save!
       end
 

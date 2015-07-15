@@ -42,7 +42,7 @@ module Agents
       incoming_events.each do |event|
         Utils.values_at(event.payload, interpolated['content']).each do |content|
           sent_values = sentiment_values anew, content
-          create_event :payload => { 'content' => content,
+          create_event payload: { 'content' => content,
                                      'valence' => sent_values[0],
                                      'arousal' => sent_values[1],
                                      'dominance' => sent_values[2],

@@ -8,7 +8,7 @@ describe Agents::EmailDigestAgent do
   end
 
   before do
-    @checker = Agents::EmailDigestAgent.new(:name => "something", :options => { :expected_receive_period_in_days => "2", :subject => "something interesting" })
+    @checker = Agents::EmailDigestAgent.new(name: "something", options: { expected_receive_period_in_days: "2", subject: "something interesting" })
     @checker.user = users(:bob)
     @checker.save!
   end
@@ -21,12 +21,12 @@ describe Agents::EmailDigestAgent do
     it "queues any payloads it receives" do
       event1 = Event.new
       event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = { :data => "Something you should know about" }
+      event1.payload = { data: "Something you should know about" }
       event1.save!
 
       event2 = Event.new
       event2.agent = agents(:bob_weather_agent)
-      event2.payload = { :data => "Something else you should know about" }
+      event2.payload = { data: "Something else you should know about" }
       event2.save!
 
       Agents::EmailDigestAgent.async_receive(@checker.id, [event1.id, event2.id])
@@ -39,9 +39,9 @@ describe Agents::EmailDigestAgent do
       Agents::EmailDigestAgent.async_check(@checker.id)
       expect(ActionMailer::Base.deliveries).to eq([])
 
-      @checker.memory[:queue] = [{ :data => "Something you should know about" },
-                                 { :title => "Foo", :url => "http://google.com", :bar => 2 },
-                                 { "message" => "hi", :woah => "there" },
+      @checker.memory[:queue] = [{ data: "Something you should know about" },
+                                 { title: "Foo", url: "http://google.com", bar: 2 },
+                                 { "message" => "hi", woah: "there" },
                                  { "test" => 2 }]
       @checker.memory[:events] = [1,2,3,4]
       @checker.save!
@@ -54,7 +54,7 @@ describe Agents::EmailDigestAgent do
     end
 
     it "can receive complex events and send them on" do
-      stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
+      stub_request(:any, /wunderground/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
       stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       @checker.sources << agents(:bob_weather_agent)
 

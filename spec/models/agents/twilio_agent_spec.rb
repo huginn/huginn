@@ -2,21 +2,21 @@ require 'spec_helper'
 
 describe Agents::TwilioAgent do
   before do
-    @checker = Agents::TwilioAgent.new(:name => 'somename',
-                                       :options => { :account_sid => 'x',
-                                                     :auth_token => 'x',
-                                                     :sender_cell => 'x',
-                                                     :receiver_cell => 'x',
-                                                     :server_url    => 'http://somename.com:3000',
-                                                     :receive_text  => 'true',
-                                                     :receive_call  => 'true',
-                                                     :expected_receive_period_in_days => '1' })
+    @checker = Agents::TwilioAgent.new(name: 'somename',
+                                       options: { account_sid: 'x',
+                                                     auth_token: 'x',
+                                                     sender_cell: 'x',
+                                                     receiver_cell: 'x',
+                                                     server_url: 'http://somename.com:3000',
+                                                     receive_text: 'true',
+                                                     receive_call: 'true',
+                                                     expected_receive_period_in_days: '1' })
     @checker.user = users(:bob)
     @checker.save!
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :message => 'Looks like its going to rain' }
+    @event.payload = { message: 'Looks like its going to rain' }
     @event.save!
 
     @sent_messages = []
@@ -28,12 +28,12 @@ describe Agents::TwilioAgent do
     it 'should make sure multiple events are being received' do
       event1 = Event.new
       event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = { :message => 'Some message' }
+      event1.payload = { message: 'Some message' }
       event1.save!
 
       event2 = Event.new
       event2.agent = agents(:bob_weather_agent)
-      event2.payload = { :message => 'Some other message' }
+      event2.payload = { message: 'Some other message' }
       event2.save!
 
       @checker.receive([@event,event1,event2])

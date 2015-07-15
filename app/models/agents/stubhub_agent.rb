@@ -39,7 +39,7 @@ module Agents
     end
 
     def check
-      create_event :payload => fetch_stubhub_data(url)
+      create_event payload: fetch_stubhub_data(url)
     end
 
     def fetch_stubhub_data(url)

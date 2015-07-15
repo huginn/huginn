@@ -3,23 +3,23 @@ require 'spec_helper'
 describe Agents::TumblrPublishAgent do
   before do
     @opts = {
-      :blog_name => "huginnbot.tumblr.com",
-      :post_type => "text",
-      :expected_update_period_in_days => "2",
-      :options => {
-        :title => "{{title}}",
-        :body => "{{body}}",
+      blog_name: "huginnbot.tumblr.com",
+      post_type: "text",
+      expected_update_period_in_days: "2",
+      options: {
+        title: "{{title}}",
+        body: "{{body}}",
       },
     }
 
-    @checker = Agents::TumblrPublishAgent.new(:name => "HuginnBot", :options => @opts)
+    @checker = Agents::TumblrPublishAgent.new(name: "HuginnBot", options: @opts)
     @checker.service = services(:generic)
     @checker.user = users(:bob)
     @checker.save!
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :title => "Gonna rain...", :body => 'San Francisco is gonna get wet' }
+    @event.payload = { title: "Gonna rain...", body: 'San Francisco is gonna get wet' }
     @event.save!
 
     stub.any_instance_of(Agents::TumblrPublishAgent).tumblr {

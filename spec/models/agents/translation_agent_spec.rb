@@ -3,15 +3,15 @@ require 'spec_helper'
 describe Agents::TranslationAgent do
     before do
         @valid_params = {
-            :name    => "somename",
-            :options => {           
-                :client_id     => "xxxxxx",
-                :client_secret => "xxxxxx" ,
-                :to            => "fi",
-                :expected_receive_period_in_days => 1,
-                :content       => {
-                    :text => "{{message}}",
-                    :content => "{{xyz}}"
+            name: "somename",
+            options: {           
+                client_id: "xxxxxx",
+                client_secret: "xxxxxx" ,
+                to: "fi",
+                expected_receive_period_in_days: 1,
+                content: {
+                    text: "{{message}}",
+                    content: "{{xyz}}"
                 }
             }
         }
@@ -23,13 +23,13 @@ describe Agents::TranslationAgent do
         @event = Event.new
         @event.agent = agents(:jane_weather_agent)
         @event.payload = {
-            :message => "somevalue",
-            :xyz => "someothervalue"
+            message: "somevalue",
+            xyz: "someothervalue"
         }
 
-        stub_request(:any, /microsoft/).to_return(:body => "response", :status => 200)
-        stub_request(:any, /windows/).to_return(:body => JSON.dump({
-            :access_token => 'xxx'}), :status => 200)
+        stub_request(:any, /microsoft/).to_return(body: "response", status: 200)
+        stub_request(:any, /windows/).to_return(body: JSON.dump({
+            access_token: 'xxx'}), status: 200)
 
     end
 
@@ -38,8 +38,8 @@ describe Agents::TranslationAgent do
             event1 = Event.new
             event1.agent = agents(:bob_weather_agent)
             event1.payload = {
-                :xyz => "value1",
-                :message => "value2"
+                xyz: "value1",
+                message: "value2"
             }
 
             expect {

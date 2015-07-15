@@ -289,8 +289,8 @@ module Agents
                 'best_answer' => memory['hits'][hit_id]['answers'][top_answer.to_i - 1]
               }
 
-              event = create_event :payload => payload
-              log "Event emitted with answer(s) for poll", :outbound_event => event, :inbound_event => inbound_event
+              event = create_event payload: payload
+              log "Event emitted with answer(s) for poll", outbound_event: event, inbound_event: inbound_event
             else
               # handle normal completed HITs
               payload = { 'answers' => assignments.map(&:answers) }
@@ -354,19 +354,19 @@ module Agents
                                                       'answers' => assignments.map(&:answers),
                                                       'event_id' => inbound_event && inbound_event.id }
 
-                log "Poll HIT created with ID #{poll_hit.id} and URL #{poll_hit.url}.  Original HIT: #{hit_id}", :inbound_event => inbound_event
+                log "Poll HIT created with ID #{poll_hit.id} and URL #{poll_hit.url}.  Original HIT: #{hit_id}", inbound_event: inbound_event
               else
                 if options[:separate_answers]
                   payload['answers'].each.with_index do |answer, index|
                     sub_payload = payload.dup
                     sub_payload.delete('answers')
                     sub_payload['answer'] = answer
-                    event = create_event :payload => sub_payload
-                    log "Event emitted with answer ##{index}", :outbound_event => event, :inbound_event => inbound_event
+                    event = create_event payload: sub_payload
+                    log "Event emitted with answer ##{index}", outbound_event: event, inbound_event: inbound_event
                   end
                 else
-                  event = create_event :payload => payload
-                  log "Event emitted with answer(s)", :outbound_event => event, :inbound_event => inbound_event
+                  event = create_event payload: payload
+                  log "Event emitted with answer(s)", outbound_event: event, inbound_event: inbound_event
                 end
               end
             end
@@ -397,7 +397,7 @@ module Agents
                          'payload' => event && event.payload,
                          'metadata' => { 'event_id' => event && event.id }
 
-        log "HIT created with ID #{hit.id} and URL #{hit.url}", :inbound_event => event
+        log "HIT created with ID #{hit.id} and URL #{hit.url}", inbound_event: event
       end
 
       def create_hit(opts = {})
@@ -405,13 +405,13 @@ module Agents
         title = interpolate_string(opts['title'], payload).strip
         description = interpolate_string(opts['description'], payload).strip
         questions = interpolate_options(opts['questions'], payload)
-        hit = RTurk::Hit.create(:title => title) do |hit|
+        hit = RTurk::Hit.create(title: title) do |hit|
           hit.max_assignments = (opts['assignments'] || 1).to_i
           hit.description = description
           hit.lifetime = (opts['lifetime_in_seconds'] || 24 * 60 * 60).to_i
-          hit.question_form AgentQuestionForm.new(:title => title, :description => description, :questions => questions)
+          hit.question_form AgentQuestionForm.new(title: title, description: description, questions: questions)
           hit.reward = (opts['reward'] || 0.05).to_f
-          #hit.qualifications.add :approval_rate, { :gt => 80 }
+          #hit.qualifications.add :approval_rate, { gt: 80 }
         end
         memory['hits'] ||= {}
         memory['hits'][hit.id] = opts['metadata'] || {}

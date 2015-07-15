@@ -11,7 +11,7 @@ describe Agents::GoogleCalendarPublishAgent, :vcr do
           'service_account_email' => '1029936966326-ncjd7776pcspc98hsg82gsb56t3217ef@developer.gserviceaccount.com'
         }
       }
-    @checker = Agents::GoogleCalendarPublishAgent.new(:name => "somename", :options => @valid_params)
+    @checker = Agents::GoogleCalendarPublishAgent.new(name: "somename", options: @valid_params)
     @checker.user = users(:jane)
     @checker.save!
   end

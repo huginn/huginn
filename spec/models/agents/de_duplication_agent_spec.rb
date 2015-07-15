@@ -5,7 +5,7 @@ describe Agents::DeDuplicationAgent do
     event = Event.new
     event.agent = agents(:jane_weather_agent)
     event.payload = {
-      :output => output
+      output: output
     }
     event.save!
 
@@ -14,12 +14,12 @@ describe Agents::DeDuplicationAgent do
 
   before do
     @valid_params = {
-      :property  => "{{output}}",
-      :lookback => 3,
-      :expected_update_period_in_days => "1",
+      property: "{{output}}",
+      lookback: 3,
+      expected_update_period_in_days: "1",
     }
 
-    @checker = Agents::DeDuplicationAgent.new(:name => "somename", :options => @valid_params)
+    @checker = Agents::DeDuplicationAgent.new(name: "somename", options: @valid_params)
     @checker.user = users(:jane)
     @checker.save!
   end

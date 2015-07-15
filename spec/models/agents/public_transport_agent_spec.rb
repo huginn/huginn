@@ -17,8 +17,8 @@ describe Agents::PublicTransportAgent do
   describe "#check" do
     before do
       stub_request(:get, "http://webservices.nextbus.com/service/publicXMLFeed?a=sf-muni&command=predictionsForMultiStops&stops=N%7C5215").
-         with(:headers => {'User-Agent'=>'Typhoeus - https://github.com/typhoeus/typhoeus'}).
-         to_return(:status => 200, :body => File.read(Rails.root.join("spec/data_fixtures/public_transport_agent.xml")), :headers => {})
+         with(headers: {'User-Agent'=>'Typhoeus - https://github.com/typhoeus/typhoeus'}).
+         to_return(status: 200, body: File.read(Rails.root.join("spec/data_fixtures/public_transport_agent.xml")), headers: {})
     end
 
     it "should create 4 events" do

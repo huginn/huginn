@@ -71,7 +71,7 @@ module Agents
 
       def headers
         #oauth
-        {:headers => {'Authorization' => 'Bearer ' + interpolated[:server_access_token]}}
+        {headers: {'Authorization' => 'Bearer ' + interpolated[:server_access_token]}}
       end
   end
 end

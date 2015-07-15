@@ -4,21 +4,21 @@ require 'spec_helper'
 describe Agents::WeiboPublishAgent do
   before do
     @opts = {
-      :uid => "1234567",
-      :expected_update_period_in_days => "2",
-      :app_key => "---",
-      :app_secret => "---",
-      :access_token => "---",
-      :message_path => "text"
+      uid: "1234567",
+      expected_update_period_in_days: "2",
+      app_key: "---",
+      app_secret: "---",
+      access_token: "---",
+      message_path: "text"
     }
 
-    @checker = Agents::WeiboPublishAgent.new(:name => "Weibo Publisher", :options => @opts)
+    @checker = Agents::WeiboPublishAgent.new(name: "Weibo Publisher", options: @opts)
     @checker.user = users(:bob)
     @checker.save!
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :text => 'Gonna rain..' }
+    @event.payload = { text: 'Gonna rain..' }
     @event.save!
 
     @sent_messages = []
@@ -29,12 +29,12 @@ describe Agents::WeiboPublishAgent do
     it 'should publish any payload it receives' do
       event1 = Event.new
       event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = { :text => 'Gonna rain..' }
+      event1.payload = { text: 'Gonna rain..' }
       event1.save!
 
       event2 = Event.new
       event2.agent = agents(:bob_weather_agent)
-      event2.payload = { :text => 'More payload' }
+      event2.payload = { text: 'More payload' }
       event2.save!
 
       Agents::WeiboPublishAgent.async_receive(@checker.id, [event1.id, event2.id])

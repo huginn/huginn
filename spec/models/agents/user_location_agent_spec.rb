@@ -3,10 +3,10 @@ require 'spec_helper'
 describe Agents::UserLocationAgent do
   before do
     @agent = Agent.build_for_type('Agents::UserLocationAgent', users(:bob),
-                                  :name => 'something',
-                                  :options => { :secret => 'my_secret',
-                                    :max_accuracy => '50',
-                                    :min_distance => '50' })
+                                  name: 'something',
+                                  options: { secret: 'my_secret',
+                                    max_accuracy: '50',
+                                    min_distance: '50' })
     @agent.save!
   end
 

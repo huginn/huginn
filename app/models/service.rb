@@ -3,8 +3,8 @@ class Service < ActiveRecord::Base
 
   serialize :options, Hash
 
-  belongs_to :user, :inverse_of => :services
-  has_many :agents, :inverse_of => :service
+  belongs_to :user, inverse_of: :services
+  has_many :agents, inverse_of: :service
 
   validates_presence_of :user_id, :provider, :name, :token
 

@@ -58,7 +58,7 @@ module Agents
 
     def check
       hydra = Typhoeus::Hydra.new
-      request = Typhoeus::Request.new(check_url, :followlocation => true)
+      request = Typhoeus::Request.new(check_url, followlocation: true)
       request.on_success do |response|
         page = Nokogiri::XML response.body
         predictions = page.css("//prediction")
@@ -68,7 +68,7 @@ module Agents
           if pr["minutes"] && pr["minutes"].to_i < interpolated["alert_window_in_minutes"].to_i
             vals = vals.merge Hash.from_xml(pr.to_xml)
             if not_already_in_memory?(vals)
-              create_event(:payload => vals)
+              create_event(payload: vals)
               log "creating event..."
               update_memory(vals)
             else

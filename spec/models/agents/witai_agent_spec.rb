@@ -2,24 +2,24 @@ require 'spec_helper'
 
 describe Agents::WitaiAgent do
   before do
-    stub_request(:get, /wit/).to_return(:body => File.read(Rails.root.join('spec/data_fixtures/witai.json')), :status => 200, :headers => {'Content-Type' => 'text/json'})
+    stub_request(:get, /wit/).to_return(body: File.read(Rails.root.join('spec/data_fixtures/witai.json')), status: 200, headers: {'Content-Type' => 'text/json'})
 
     @valid_params = {
-      :server_access_token => 'x',
-      :expected_receive_period_in_days => '2',
-      :query => '{{message.content}}'
+      server_access_token: 'x',
+      expected_receive_period_in_days: '2',
+      query: '{{message.content}}'
     }
 
-    @checker = Agents::WitaiAgent.new :name => 'wit.ai agent',
-                                      :options => @valid_params
+    @checker = Agents::WitaiAgent.new name: 'wit.ai agent',
+                                      options: @valid_params
 
     @checker.user = users :jane
     @checker.save!
 
     @event = Event.new
     @event.agent = agents :jane_weather_agent
-    @event.payload = {:message => {
-      :content => 'set the temperature to 22 degrees at 7 PM'
+    @event.payload = {message: {
+      content: 'set the temperature to 22 degrees at 7 PM'
     }}
     @event.save!
   end

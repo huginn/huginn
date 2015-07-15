@@ -6,23 +6,23 @@ describe Agents::BasecampAgent do
 
   before(:each) do
     stub_request(:get, /events.json$/).to_return(
-      :body => File.read(Rails.root.join("spec/data_fixtures/basecamp.json")),
-      :status => 200,
-      :headers => {"Content-Type" => "text/json"}
+      body: File.read(Rails.root.join("spec/data_fixtures/basecamp.json")),
+      status: 200,
+      headers: {"Content-Type" => "text/json"}
     )
     stub_request(:get, /projects.json$/).to_return(
-      :body => JSON.dump([{name: 'test', id: 1234},{name: 'test1', id: 1235}]),
-      :status => 200,
-      :headers => {"Content-Type" => "text/json"}
+      body: JSON.dump([{name: 'test', id: 1234},{name: 'test1', id: 1235}]),
+      status: 200,
+      headers: {"Content-Type" => "text/json"}
     )
     stub_request(:get, /02:00$/).to_return(
-      :body => File.read(Rails.root.join("spec/data_fixtures/basecamp.json")),
-      :status => 200,
-      :headers => {"Content-Type" => "text/json"}
+      body: File.read(Rails.root.join("spec/data_fixtures/basecamp.json")),
+      status: 200,
+      headers: {"Content-Type" => "text/json"}
     )
-    @valid_params = { :project_id => 6789 }
+    @valid_params = { project_id: 6789 }
 
-    @checker = Agents::BasecampAgent.new(:name => "somename", :options => @valid_params)
+    @checker = Agents::BasecampAgent.new(name: "somename", options: @valid_params)
     @checker.service = services(:generic)
     @checker.user = users(:jane)
     @checker.save!
@@ -44,7 +44,7 @@ describe Agents::BasecampAgent do
 
   describe "helpers" do
     it "should generate a correct request options hash" do
-      expect(@checker.send(:request_options)).to eq({:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "Authorization" => 'Bearer "1234token"'}})
+      expect(@checker.send(:request_options)).to eq({headers: {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "Authorization" => 'Bearer "1234token"'}})
     end
 
     it "should generate the correct events url" do
@@ -63,7 +63,7 @@ describe Agents::BasecampAgent do
       time = (Time.now-1.minute).iso8601
       @checker.memory[:last_event] = time
       @checker.save
-      expect(@checker.reload.send(:query_parameters)).to eq({:query => {:since => time}})
+      expect(@checker.reload.send(:query_parameters)).to eq({query: {since: time}})
     end
   end
 

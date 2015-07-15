@@ -3,29 +3,29 @@ require 'spec_helper'
 describe Agents::TwitterPublishAgent do
   before do
     @opts = {
-      :username => "HuginnBot",
-      :expected_update_period_in_days => "2",
-      :consumer_key => "---",
-      :consumer_secret => "---",
-      :oauth_token => "---",
-      :oauth_token_secret => "---",
-      :message => "{{text}}"
+      username: "HuginnBot",
+      expected_update_period_in_days: "2",
+      consumer_key: "---",
+      consumer_secret: "---",
+      oauth_token: "---",
+      oauth_token_secret: "---",
+      message: "{{text}}"
     }
 
-    @checker = Agents::TwitterPublishAgent.new(:name => "HuginnBot", :options => @opts)
+    @checker = Agents::TwitterPublishAgent.new(name: "HuginnBot", options: @opts)
     @checker.service = services(:generic)
     @checker.user = users(:bob)
     @checker.save!
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :text => 'Gonna rain..' }
+    @event.payload = { text: 'Gonna rain..' }
     @event.save!
 
     @sent_messages = []
     stub.any_instance_of(Agents::TwitterPublishAgent).publish_tweet { |message|
       @sent_messages << message
-      OpenStruct.new(:id => 454209588376502272)
+      OpenStruct.new(id: 454209588376502272)
     }
   end
 
@@ -33,12 +33,12 @@ describe Agents::TwitterPublishAgent do
     it 'should publish any payload it receives' do
       event1 = Event.new
       event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = { :text => 'Gonna rain..' }
+      event1.payload = { text: 'Gonna rain..' }
       event1.save!
 
       event2 = Event.new
       event2.agent = agents(:bob_weather_agent)
-      event2.payload = { :text => 'More payload' }
+      event2.payload = { text: 'More payload' }
       event2.save!
 
       Agents::TwitterPublishAgent.async_receive(@checker.id, [event1.id, event2.id])
