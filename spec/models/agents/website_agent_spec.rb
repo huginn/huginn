@@ -386,7 +386,7 @@ describe Agents::WebsiteAgent do
               'url' => { 'xpath' => '/feed/entry', 'value' => './link[1]/@href' },
               'thumbnail' => { 'xpath' => '/feed/entry', 'value' => './thumbnail/@url' },
             }
-          }, keep_events_for: 2)
+          }, keep_events_for: 2.days)
           @checker.user = users(:bob)
           @checker.save!
         end
