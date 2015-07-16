@@ -201,15 +201,15 @@ module LiquidInterpolatable
         'concat(' << subs.join(', ') << ')'
       end
     end
-    
-    def regex_replace(input, regex, replacement = ''.freeze)
-      input.to_s.gsub(Regexp.new(regex), replacement.to_s)
+
+    def regex_replace(input, regex, replacement = nil)
+      input.to_s.gsub(Regexp.new(regex), unescape_replacement(replacement.to_s))
     end
-    
-    def regex_replace_first(input, regex, replacement = ''.freeze)
-      input.to_s.sub(Regexp.new(regex), replacement.to_s)
+
+    def regex_replace_first(input, regex, replacement = nil)
+      input.to_s.sub(Regexp.new(regex), unescape_replacement(replacement.to_s))
     end
-    
+
     private
 
     def logger
@@ -220,6 +220,63 @@ module LiquidInterpolatable
           require 'logger'
           Logger.new(STDERR)
         end
+    end
+
+    BACKSLASH = "\\".freeze
+
+    UNESCAPE = {
+      "a" => "\a",
+      "b" => "\b",
+      "e" => "\e",
+      "f" => "\f",
+      "n" => "\n",
+      "r" => "\r",
+      "s" => " ",
+      "t" => "\t",
+      "v" => "\v",
+    }
+
+    # Unescape a replacement text for use in the second argument of
+    # gsub/sub.  The following escape sequences are recognized:
+    #
+    # - "\\" (backslash itself)
+    # - "\a" (alert)
+    # - "\b" (backspace)
+    # - "\e" (escape)
+    # - "\f" (form feed)
+    # - "\n" (new line)
+    # - "\r" (carriage return)
+    # - "\s" (space)
+    # - "\t" (horizontal tab)
+    # - "\u{XXXX}" (unicode codepoint)
+    # - "\v" (vertical tab)
+    # - "\xXX" (hexadecimal character)
+    # - "\1".."\9" (numbered capture groups)
+    # - "\+" (last capture group)
+    # - "\k<name>" (named capture group)
+    # - "\&" or "\0" (complete matched text)
+    # - "\`" (string before match)
+    # - "\'" (string after match)
+    #
+    # Octal escape sequences are deliberately unsupported to avoid
+    # conflict with numbered capture groups.  Rather obscure Emacs
+    # style character codes ("\C-x", "\M-\C-x" etc.) are also omitted
+    # from this implementation.
+    def unescape_replacement(s)
+      s.gsub(/\\(?:([\d+&`'\\]|k<\w+>)|u\{([[:xdigit:]]+)\}|x([[:xdigit:]]{2})|(.))/) {
+        if c = $1
+          BACKSLASH + c
+        elsif c = ($2 && [$2.to_i(16)].pack('U')) ||
+                  ($3 && [$3.to_i(16)].pack('C'))
+          if c == BACKSLASH
+            BACKSLASH + c
+          else
+            c
+          end
+        else
+          UNESCAPE[$4] || $4
+        end
+      }
     end
   end
   Liquid::Template.register_filter(LiquidInterpolatable::Filters)
