@@ -349,6 +349,10 @@ describe AgentsController do
   end
 
   describe "POST dry_run" do
+    before do
+      stub_request(:any, /xkcd/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+    end
+
     it "does not actually create any agent, event or log" do
       sign_in users(:bob)
       expect {
