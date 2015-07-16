@@ -21,7 +21,7 @@ class Agent < ActiveRecord::Base
   SCHEDULES = %w[every_1m every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
                  midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm never]
 
-  EVENT_RETENTION_SCHEDULES = [["Forever", 0], ["1 day", 1], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n] })]
+  EVENT_RETENTION_SCHEDULES = [["Forever", 0], ['1 hour', 1.hour], ['6 hours', 6.hours], ["1 day", 1.day], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n.days] })]
 
   attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately, :drop_pending_events
 
@@ -130,14 +130,14 @@ class Agent < ActiveRecord::Base
   end
 
   def new_event_expiration_date
-    keep_events_for > 0 ? keep_events_for.days.from_now : nil
+    keep_events_for > 0 ? keep_events_for.seconds.from_now : nil
   end
 
   def update_event_expirations!
     if keep_events_for == 0
       events.update_all :expires_at => nil
     else
-      events.update_all "expires_at = " + rdbms_date_add("created_at", "DAY", keep_events_for.to_i)
+      events.update_all "expires_at = " + rdbms_date_add("created_at", "SECOND", keep_events_for.to_i)
     end
   end
 
