@@ -38,6 +38,16 @@ describe LiquidInterpolatable::Filters do
     end
   end
 
+  describe 'unescape' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should unescape basic HTML entities' do
+      agent.interpolation_context['something'] = '&#39;&lt;foo&gt; &amp; bar&#x27;'
+      agent.options['cleaned'] = '{{ something | unescape }}'
+      expect(agent.interpolated['cleaned']).to eq("'<foo> & bar'")
+    end
+  end
+
   describe 'to_xpath' do
     before do
       def @filter.to_xpath_roundtrip(string)

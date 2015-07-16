@@ -185,6 +185,14 @@ module LiquidInterpolatable
       url
     end
 
+    # Unescape (basic) HTML entities in a string
+    #
+    # This currently decodes the following entities only: "&apos;",
+    # "&quot;", "&lt;", "&gt;", "&amp;", "&#dd;" and "&#xhh;".
+    def unescape(input)
+      CGI.unescapeHTML(input) rescue input
+    end
+
     # Escape a string for use in XPath expression
     def to_xpath(string)
       subs = string.to_s.scan(/\G(?:\A\z|[^"]+|[^']+)/).map { |x|
