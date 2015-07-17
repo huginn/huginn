@@ -9,7 +9,7 @@ describe Agents::FtpsiteAgent do
         'url' => "ftp://ftp.example.org/pub/releases/",
         'patterns' => ["example*.tar.gz"],
       }
-      @checker = Agents::FtpsiteAgent.new(:name => "Example", :options => @site, :keep_events_for => 2)
+      @checker = Agents::FtpsiteAgent.new(:name => "Example", :options => @site, :keep_events_for => 2.days)
       @checker.user = users(:bob)
       @checker.save!
     end

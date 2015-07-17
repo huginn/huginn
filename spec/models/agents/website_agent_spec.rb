@@ -20,7 +20,7 @@ describe Agents::WebsiteAgent do
           'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
         }
       }
-      @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @valid_options, :keep_events_for => 2)
+      @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @valid_options, :keep_events_for => 2.days)
       @checker.user = users(:bob)
       @checker.save!
     end
