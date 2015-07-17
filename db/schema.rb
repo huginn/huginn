@@ -14,18 +14,18 @@
 ActiveRecord::Schema.define(version: 20150507153436) do
 
   create_table "agent_logs", force: :cascade do |t|
-    t.integer  "agent_id",          limit: 4,                    null: false
-    t.text     "message",           limit: 16777215,             null: false, charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.integer  "level",             limit: 4,        default: 3, null: false
+    t.integer  "agent_id",          limit: 4,                 null: false
+    t.text     "message",           limit: 65535,             null: false, charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.integer  "level",             limit: 4,     default: 3, null: false
     t.integer  "inbound_event_id",  limit: 4
     t.integer  "outbound_event_id", limit: 4
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "agents", force: :cascade do |t|
     t.integer  "user_id",               limit: 4
-    t.text     "options",               limit: 16777215,                                charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.text     "options",               limit: 65535,                                   charset: "utf8mb4", collation: "utf8mb4_bin"
     t.string   "type",                  limit: 255,                                                         collation: "utf8_bin"
     t.string   "name",                  limit: 255,                                     charset: "utf8mb4", collation: "utf8mb4_bin"
     t.string   "schedule",              limit: 255,                                                         collation: "utf8_bin"
@@ -33,13 +33,13 @@ ActiveRecord::Schema.define(version: 20150507153436) do
     t.datetime "last_check_at"
     t.datetime "last_receive_at"
     t.integer  "last_checked_event_id", limit: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "memory",                limit: 4294967295,                              charset: "utf8mb4", collation: "utf8mb4_bin"
     t.datetime "last_web_request_at"
+    t.integer  "keep_events_for",       limit: 4,          default: 0,     null: false
     t.datetime "last_event_at"
     t.datetime "last_error_log_at"
-    t.integer  "keep_events_for",       limit: 4,          default: 0,     null: false
     t.boolean  "propagate_immediately", limit: 1,          default: false, null: false
     t.boolean  "disabled",              limit: 1,          default: false, null: false
     t.string   "guid",                  limit: 255,                        null: false, charset: "ascii",   collation: "ascii_bin"
@@ -50,14 +50,6 @@ ActiveRecord::Schema.define(version: 20150507153436) do
   add_index "agents", ["schedule"], name: "index_agents_on_schedule", using: :btree
   add_index "agents", ["type"], name: "index_agents_on_type", using: :btree
   add_index "agents", ["user_id", "created_at"], name: "index_agents_on_user_id_and_created_at", using: :btree
-
-  create_table "contacts", force: :cascade do |t|
-    t.text     "message",    limit: 65535,              charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.string   "name",       limit: 255,                charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.string   "email",      limit: 255,                                    collation: "utf8_bin"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-  end
 
   create_table "control_links", force: :cascade do |t|
     t.integer  "controller_id",     limit: 4, null: false
@@ -72,15 +64,15 @@ ActiveRecord::Schema.define(version: 20150507153436) do
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer  "priority",   limit: 4,        default: 0
     t.integer  "attempts",   limit: 4,        default: 0
-    t.text     "handler",    limit: 16777215,                          charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.text     "last_error", limit: 16777215,                          charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.text     "handler",    limit: 16777215,             charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.text     "last_error", limit: 65535,                charset: "utf8mb4", collation: "utf8mb4_bin"
     t.datetime "run_at"
     t.datetime "locked_at"
     t.datetime "failed_at"
     t.string   "locked_by",  limit: 255
     t.string   "queue",      limit: 255
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
@@ -88,11 +80,11 @@ ActiveRecord::Schema.define(version: 20150507153436) do
   create_table "events", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
     t.integer  "agent_id",   limit: 4
-    t.decimal  "lat",                           precision: 15, scale: 10
-    t.decimal  "lng",                           precision: 15, scale: 10
-    t.text     "payload",    limit: 4294967295,                                        charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
+    t.decimal  "lat",                         precision: 15, scale: 10
+    t.decimal  "lng",                         precision: 15, scale: 10
+    t.text     "payload",    limit: 16777215,                           charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.datetime "expires_at"
   end
 
@@ -103,26 +95,13 @@ ActiveRecord::Schema.define(version: 20150507153436) do
   create_table "links", force: :cascade do |t|
     t.integer  "source_id",            limit: 4
     t.integer  "receiver_id",          limit: 4
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "event_id_at_creation", limit: 4, default: 0, null: false
   end
 
   add_index "links", ["receiver_id", "source_id"], name: "index_links_on_receiver_id_and_source_id", using: :btree
   add_index "links", ["source_id", "receiver_id"], name: "index_links_on_source_id_and_receiver_id", using: :btree
-
-  create_table "rails_admin_histories", force: :cascade do |t|
-    t.text     "message",    limit: 65535,              charset: "latin1", collation: "latin1_swedish_ci"
-    t.string   "username",   limit: 255,                charset: "latin1", collation: "latin1_swedish_ci"
-    t.integer  "item",       limit: 4
-    t.string   "table",      limit: 255,                charset: "latin1", collation: "latin1_swedish_ci"
-    t.integer  "month",      limit: 2
-    t.integer  "year",       limit: 8
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-  end
-
-  add_index "rails_admin_histories", ["item", "table", "month", "year"], name: "index_rails_admin_histories", using: :btree
 
   create_table "scenario_memberships", force: :cascade do |t|
     t.integer  "agent_id",    limit: 4, null: false
@@ -151,46 +130,29 @@ ActiveRecord::Schema.define(version: 20150507153436) do
 
   create_table "services", force: :cascade do |t|
     t.integer  "user_id",       limit: 4,                     null: false
-    t.string   "provider",      limit: 255,                   null: false, charset: "latin1", collation: "latin1_swedish_ci"
-    t.string   "name",          limit: 255,                   null: false, charset: "latin1", collation: "latin1_swedish_ci"
-    t.text     "token",         limit: 65535,                 null: false, charset: "latin1", collation: "latin1_swedish_ci"
-    t.text     "secret",        limit: 65535,                              charset: "latin1", collation: "latin1_swedish_ci"
-    t.text     "refresh_token", limit: 65535,                              charset: "latin1", collation: "latin1_swedish_ci"
+    t.string   "provider",      limit: 255,                   null: false, collation: "utf8_general_ci"
+    t.string   "name",          limit: 255,                   null: false, collation: "utf8_general_ci"
+    t.text     "token",         limit: 65535,                 null: false, collation: "utf8_general_ci"
+    t.text     "secret",        limit: 65535,                              collation: "utf8_general_ci"
+    t.text     "refresh_token", limit: 65535,                              collation: "utf8_general_ci"
     t.datetime "expires_at"
     t.boolean  "global",        limit: 1,     default: false
-    t.text     "options",       limit: 65535,                              charset: "latin1", collation: "latin1_swedish_ci"
+    t.text     "options",       limit: 65535,                              collation: "utf8_general_ci"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uid",           limit: 255,                                charset: "latin1", collation: "latin1_swedish_ci"
+    t.string   "uid",           limit: 255,                                collation: "utf8_general_ci"
   end
 
   add_index "services", ["provider"], name: "index_services_on_provider", using: :btree
   add_index "services", ["uid"], name: "index_services_on_uid", using: :btree
   add_index "services", ["user_id", "global"], name: "index_services_on_user_id_and_global", using: :btree
 
-  create_table "taggings", force: :cascade do |t|
-    t.integer  "tag_id",        limit: 4
-    t.integer  "taggable_id",   limit: 4
-    t.string   "taggable_type", limit: 255, collation: "utf8_general_ci"
-    t.integer  "tagger_id",     limit: 4
-    t.string   "tagger_type",   limit: 255, collation: "utf8_general_ci"
-    t.string   "context",       limit: 128, collation: "utf8_general_ci"
-    t.datetime "created_at"
-  end
-
-  add_index "taggings", ["tag_id"], name: "index_taggings_on_tag_id", using: :btree
-  add_index "taggings", ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context", using: :btree
-
-  create_table "tags", force: :cascade do |t|
-    t.string "name", limit: 255, collation: "utf8_general_ci"
-  end
-
   create_table "user_credentials", force: :cascade do |t|
     t.integer  "user_id",          limit: 4,                      null: false
     t.string   "credential_name",  limit: 255,                    null: false
     t.text     "credential_value", limit: 65535,                  null: false
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "mode",             limit: 255,   default: "text", null: false, collation: "utf8_bin"
   end
 
@@ -207,8 +169,8 @@ ActiveRecord::Schema.define(version: 20150507153436) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip",     limit: 255
     t.string   "last_sign_in_ip",        limit: 255
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "admin",                  limit: 1,   default: false, null: false
     t.integer  "failed_attempts",        limit: 4,   default: 0
     t.string   "unlock_token",           limit: 255
