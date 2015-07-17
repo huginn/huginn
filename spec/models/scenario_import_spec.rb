@@ -348,7 +348,7 @@ describe ScenarioImport do
             "0" => {
               "name" => "updated name",
               "schedule" => "6pm",
-              "keep_events_for" => 2.days.to_i,
+              "keep_events_for" => 2.days.to_i.to_s,
               "disabled" => "false",
               "options" => weather_agent_options.merge("api_key" => "foo").to_json
             }
@@ -361,7 +361,7 @@ describe ScenarioImport do
           weather_agent = existing_scenario.agents.find_by(:guid => "a-weather-agent")
           expect(weather_agent.name).to eq("updated name")
           expect(weather_agent.schedule).to eq("6pm")
-          expect(weather_agent.keep_events_for).to eq(2.days)
+          expect(weather_agent.keep_events_for).to eq(2.days.to_i)
           expect(weather_agent).not_to be_disabled
           expect(weather_agent.options).to eq(weather_agent_options.merge("api_key" => "foo"))
         end
