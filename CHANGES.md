@@ -1,5 +1,7 @@
 # Changes
 
+* Jul 20, 2015   - Control Links (used by the SchedularAgent) are correctly exported in Scenarios.
+* Jul 20, 2015   - keep\_events\_for was moved from days to seconds; Scenarios have a schema verison.
 * Jul 1, 2015    - DeDuplicationAgent properly handles destruction of memory.
 * Jun 26, 2015   - Add `max_events_per_run` to RssAgent.
 * Jun 19, 2015   - Add `url_from_event` to WebsiteAgent.

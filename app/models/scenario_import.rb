@@ -60,6 +60,7 @@ class ScenarioImport
     description = parsed_data['description']
     name = parsed_data['name']
     links = parsed_data['links']
+    control_links = parsed_data['control_links'] || []
     tag_fg_color = parsed_data['tag_fg_color']
     tag_bg_color = parsed_data['tag_bg_color']
     source_url = parsed_data['source_url'].presence || nil
@@ -87,11 +88,18 @@ class ScenarioImport
         end
         agent
       end
+
       if success
         links.each do |link|
           receiver = created_agents[link['receiver']]
           source = created_agents[link['source']]
           receiver.sources << source unless receiver.sources.include?(source)
+        end
+
+        control_links.each do |control_link|
+          controller = created_agents[control_link['controller']]
+          control_target = created_agents[control_link['control_target']]
+          controller.control_targets << control_target unless controller.control_targets.include?(control_target)
         end
       end
     end

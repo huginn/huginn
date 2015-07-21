@@ -75,7 +75,8 @@ describe ScenarioImport do
       ],
       :links => [
         { :source => 0, :receiver => 1 }
-      ]
+      ],
+      :control_links => []
     }
   end
   let(:valid_data) { valid_parsed_data.to_json }
@@ -242,6 +243,38 @@ describe ScenarioImport do
 
             expect(weather_agent.keep_events_for).to eq(2.days)
             expect(trigger_agent.keep_events_for).to eq(0)
+          end
+        end
+
+        describe "with control links" do
+          it 'creates the links' do
+            valid_parsed_data[:control_links] = [
+              { :controller => 1, :control_target => 0 }
+            ]
+
+            expect {
+              scenario_import.import
+            }.to change { users(:bob).agents.count }.by(2)
+
+            weather_agent = scenario_import.scenario.agents.find_by(:guid => "a-weather-agent")
+            trigger_agent = scenario_import.scenario.agents.find_by(:guid => "a-trigger-agent")
+
+            expect(trigger_agent.sources).to eq([weather_agent])
+            expect(weather_agent.controllers.to_a).to eq([trigger_agent])
+            expect(trigger_agent.control_targets.to_a).to eq([weather_agent])
+          end
+
+          it "doesn't crash without any control links" do
+            valid_parsed_data.delete(:control_links)
+
+            expect {
+              scenario_import.import
+            }.to change { users(:bob).agents.count }.by(2)
+
+            weather_agent = scenario_import.scenario.agents.find_by(:guid => "a-weather-agent")
+            trigger_agent = scenario_import.scenario.agents.find_by(:guid => "a-trigger-agent")
+
+            expect(trigger_agent.sources).to eq([weather_agent])
           end
         end
       end
