@@ -30,14 +30,14 @@ GIT
 
 GIT
   remote: git@github.com:darrencauthon/huginn_agent.git
-  revision: 021fb14918aede94df37f08d189e4c447fb79d49
+  revision: 9b9906019b7ab76fbe7c493097f79eb903274439
   specs:
     huginn_agent (0.0.1)
       activesupport
 
 GIT
   remote: git@github.com:darrencauthon/proof_of_concept_huginn_agents.git
-  revision: c5b6560467714bf0e8a74667efc61d0ed0a7c9eb
+  revision: fd672d52766230fb2ba137fb64c747fea25c4460
   specs:
     proof_of_concept_huginn_agents (0.0.1)
 
