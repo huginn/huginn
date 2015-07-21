@@ -12,6 +12,7 @@ class AgentsExporter
 
   def as_json(opts = {})
     {
+      :schema_version => 1,
       :name => options[:name].presence || 'No name provided',
       :description => options[:description].presence || 'No description provided',
       :source_url => options[:source_url],

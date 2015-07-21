@@ -14,7 +14,7 @@ describe Agents::ImapFolderAgent do
         'conditions' => {
         }
       }
-      @checker = Agents::ImapFolderAgent.new(:name => 'Example', :options => @site, :keep_events_for => 2)
+      @checker = Agents::ImapFolderAgent.new(:name => 'Example', :options => @site, :keep_events_for => 2.days)
       @checker.user = users(:bob)
       @checker.save!
 
