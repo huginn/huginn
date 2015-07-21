@@ -21,6 +21,7 @@ describe AgentsExporter do
       expect(data[:description]).to eq(description)
       expect(data[:source_url]).to eq(source_url)
       expect(data[:guid]).to eq(guid)
+      expect(data[:schema_version]).to eq(1)
       expect(data[:tag_fg_color]).to eq(tag_fg_color)
       expect(data[:tag_bg_color]).to eq(tag_bg_color)
       expect(Time.parse(data[:exported_at])).to be_within(2).of(Time.now.utc)
