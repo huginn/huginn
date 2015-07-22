@@ -82,4 +82,4 @@ class Module
     include mod
   end
   private :prepend
-end unless Module.method_defined?(:prepend)
+end unless Module.method_defined?(:prepend) || Module.private_method_defined?(:prepend)
