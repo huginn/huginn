@@ -151,4 +151,26 @@ module SortableEvents
       orders
     ).collect!(&:last)
   end
+
+  # The emulation of Module#prepend provided by lib/prepend.rb does
+  # not work for methods defined after a call of prepend.
+  if Module.method(:prepend).source_location
+    module ClassMethods
+      def can_order_created_events!
+        raise if cannot_create_events?
+        @can_order_created_events = true
+      end
+
+      def can_order_created_events?
+        !!@can_order_created_events
+      end
+    end
+
+    def initialize(*args)
+      if self.class.instance_variable_get(:@can_order_created_events)
+        self.class.__send__ :prepend, SortableEvents::AutomaticSorter
+      end
+      super
+    end
+  end
 end
