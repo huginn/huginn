@@ -1,10 +1,8 @@
 module DryRunnable
-  def dry_run!
-    readonly!
+  extend ActiveSupport::Concern
 
-    class << self
-      prepend Sandbox
-    end
+  def dry_run!
+    @dry_run = true
 
     log = StringIO.new
     @dry_run_logger = Logger.new(log)
@@ -14,6 +12,7 @@ module DryRunnable
 
     begin
       raise "#{short_type} does not support dry-run" unless can_dry_run?
+      readonly!
       check
     rescue => e
       error "Exception during dry-run. #{e.message}: #{e.backtrace.join("\n")}"
@@ -23,28 +22,38 @@ module DryRunnable
       memory: memory,
       log: log.string,
     )
+  ensure
+    @dry_run = false
   end
 
   def dry_run?
-    is_a? Sandbox
+    !!@dry_run
   end
 
-  module Sandbox
+  included do
+    prepend Wrapper
+  end
+
+  module Wrapper
     attr_accessor :results
 
     def logger
+      return super unless dry_run?
       @dry_run_logger
     end
 
-    def save
-      valid?
+    def save(options = {})
+      return super unless dry_run?
+      perform_validations(options)
     end
 
-    def save!
-      save or raise ActiveRecord::RecordNotSaved
+    def save!(options = {})
+      return super unless dry_run?
+      save(options) or raise_record_invalid
     end
 
     def log(message, options = {})
+      return super unless dry_run?
       case options[:level] || 3
       when 0..2
         sev = Logger::DEBUG
@@ -58,6 +67,7 @@ module DryRunnable
     end
 
     def create_event(event)
+      return super unless dry_run?
       if can_create_events?
         event = build_event(event)
         @dry_run_results[:events] << event.payload
