@@ -5,20 +5,8 @@ module SortableEvents
     validate :validate_events_order
   end
 
-  def description_events_order(events = 'events created in each run')
-    <<-MD.lstrip
-        To specify the order of #{events}, set `events_order` to an array of sort keys, each of which looks like either `expression` or `[expression, type, descending]`, as described as follows:
-
-        * _expression_ is a Liquid template to generate a string to be used as sort key.
-
-        * _type_ (optional) is one of `string` (default), `number` and `time`, which specifies how to evaluate _expression_ for comparison.
-
-        * _descending_ (optional) is a boolean value to determine if comparison should be done in descending (reverse) order, which defaults to `false`.
-
-        Sort keys listed eariler take precedence over ones listed later.  For example, if you want to sort articles by the date and then by the author, specify `[["{{date}}", "time"], "{{author}}"]`.
-
-        Sorting is done stably, so even if all events have the same set of sort key values the original order is retained.  Also, a special Liquid variable `_index_` is provided, which contains the zero-based index number of each event, which means you can exactly reverse the order of events by specifying `[["{{_index_}}", "number", true]]`.
-    MD
+  def description_events_order(*args)
+    self.class.description_events_order(*args)
   end
 
   module ClassMethods
@@ -33,6 +21,22 @@ module SortableEvents
 
     def cannot_order_created_events?
       !can_order_created_events?
+    end
+
+    def description_events_order(events = 'events created in each run')
+      <<-MD.lstrip
+        To specify the order of #{events}, set `events_order` to an array of sort keys, each of which looks like either `expression` or `[expression, type, descending]`, as described as follows:
+
+        * _expression_ is a Liquid template to generate a string to be used as sort key.
+
+        * _type_ (optional) is one of `string` (default), `number` and `time`, which specifies how to evaluate _expression_ for comparison.
+
+        * _descending_ (optional) is a boolean value to determine if comparison should be done in descending (reverse) order, which defaults to `false`.
+
+        Sort keys listed eariler take precedence over ones listed later.  For example, if you want to sort articles by the date and then by the author, specify `[["{{date}}", "time"], "{{author}}"]`.
+
+        Sorting is done stably, so even if all events have the same set of sort key values the original order is retained.  Also, a special Liquid variable `_index_` is provided, which contains the zero-based index number of each event, which means you can exactly reverse the order of events by specifying `[["{{_index_}}", "number", true]]`.
+      MD
     end
   end
 
