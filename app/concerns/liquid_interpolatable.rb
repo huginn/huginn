@@ -218,6 +218,12 @@ module LiquidInterpolatable
       input.to_s.sub(Regexp.new(regex), unescape_replacement(replacement.to_s))
     end
 
+    def date(input, format)
+      super
+    rescue ArgumentError
+      input
+    end
+
     private
 
     def logger
