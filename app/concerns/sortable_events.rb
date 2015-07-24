@@ -66,9 +66,11 @@ module SortableEvents
       end
     end
 
-    def create_event(attrs)
+    def create_event(event)
       if @sortable_events
-        @sortable_events << events.build({ user: user }.merge(attrs))
+        event = build_event(event)
+        @sortable_events << event
+        event
       else
         super
       end
@@ -82,8 +84,7 @@ module SortableEvents
     ensure
       events, @sortable_events = @sortable_events, nil
       sort_events(events).each do |event|
-        event.expires_at ||= new_event_expiration_date
-        event.save!
+        create_event(event)
       end
     end
   end

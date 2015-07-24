@@ -57,10 +57,11 @@ module DryRunnable
       logger.log(sev, message)
     end
 
-    def create_event(event_hash)
+    def create_event(event)
       if can_create_events?
-        @dry_run_results[:events] << event_hash[:payload]
-        events.build({ user: user, expires_at: new_event_expiration_date }.merge(event_hash))
+        event = build_event(event)
+        @dry_run_results[:events] << event.payload
+        event
       else
         error "This Agent cannot create events!"
       end

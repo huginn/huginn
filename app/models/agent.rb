@@ -105,12 +105,18 @@ class Agent < ActiveRecord::Base
     raise "Implement me in your subclass"
   end
 
-  def create_event(attrs)
+  def build_event(event)
+    event = events.build(event) if event.is_a?(Hash)
+    event.user = user
+    event.expires_at ||= new_event_expiration_date
+    event
+  end
+
+  def create_event(event)
     if can_create_events?
-      events.create!({
-         :user => user,
-         :expires_at => new_event_expiration_date
-      }.merge(attrs))
+      event = build_event(event)
+      event.save!
+      event
     else
       error "This Agent cannot create events!"
     end
