@@ -372,7 +372,7 @@ describe AgentsController do
       sign_in users(:bob)
       agent = agents(:bob_weather_agent)
       expect {
-        post :dry_run, id: agents(:bob_website_agent), agent: valid_attributes(name: 'New Name')
+        post :dry_run, id: agent, agent: valid_attributes(name: 'New Name')
       }.not_to change {
         [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
       }
