@@ -41,11 +41,11 @@ module SortableEvents
   end
 
   def can_order_created_events?
-    self.class.__send__(__callee__)
+    self.class.can_order_created_events?
   end
 
   def cannot_order_created_events?
-    self.class.__send__(__callee__)
+    self.class.cannot_order_created_events?
   end
 
   def events_order
