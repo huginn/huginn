@@ -2,7 +2,7 @@ require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
 
-Bundler.require(:default, Rails.env)
+Bundler.require(:default, :optional, Rails.env)
 
 module Huginn
   class Application < Rails::Application

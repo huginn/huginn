@@ -279,6 +279,9 @@ GEM
       omniauth-oauth2 (~> 1.0)
     omniauth-dropbox (0.2.0)
       omniauth-oauth (~> 1.0)
+    omniauth-github (1.1.2)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.1)
     omniauth-oauth (1.0.1)
       oauth
       omniauth (~> 1.0)
@@ -539,6 +542,7 @@ DEPENDENCIES
   omniauth
   omniauth-37signals
   omniauth-dropbox
+  omniauth-github
   omniauth-tumblr
   omniauth-twitter
   omniauth-wunderlist!
