@@ -74,39 +74,45 @@ module Agents
 
     def check
       Array(interpolated['url']).each do |url|
-        response = faraday.get(url)
-        if response.success?
-          feed = FeedNormalizer::FeedNormalizer.parse(response.body)
-          feed.clean! if interpolated['clean'] == 'true'
-          max_events = (interpolated['max_events_per_run'].presence || 0).to_i
-          created_event_count = 0
-          feed.entries.sort_by { |entry| [entry.date_published, entry.last_updated] }.each.with_index do |entry, index|
-            break if max_events && max_events > 0 && index >= max_events
-            entry_id = get_entry_id(entry)
-            if check_and_track(entry_id)
-              created_event_count += 1
-              create_event(payload: {
-                id: entry_id,
-                date_published: entry.date_published,
-                last_updated: entry.last_updated,
-                url: entry.url,
-                urls: entry.urls,
-                description: entry.description,
-                content: entry.content,
-                title: entry.title,
-                authors: entry.authors,
-                categories: entry.categories
-              })
-            end
-          end
-          log "Fetched #{url} and created #{created_event_count} event(s)."
-        else
-          error "Failed to fetch #{url}: #{response.inspect}"
-        end
+        check_url(url)
       end
     end
 
     protected
+
+    def check_url(url)
+      response = faraday.get(url)
+      if response.success?
+        feed = FeedNormalizer::FeedNormalizer.parse(response.body)
+        feed.clean! if interpolated['clean'] == 'true'
+        max_events = (interpolated['max_events_per_run'].presence || 0).to_i
+        created_event_count = 0
+        feed.entries.sort_by { |entry| [entry.date_published, entry.last_updated] }.each.with_index do |entry, index|
+          break if max_events && max_events > 0 && index >= max_events
+          entry_id = get_entry_id(entry)
+          if check_and_track(entry_id)
+            created_event_count += 1
+            create_event(payload: {
+                           id: entry_id,
+                           date_published: entry.date_published,
+                           last_updated: entry.last_updated,
+                           url: entry.url,
+                           urls: entry.urls,
+                           description: entry.description,
+                           content: entry.content,
+                           title: entry.title,
+                           authors: entry.authors,
+                           categories: entry.categories
+                         })
+          end
+        end
+        log "Fetched #{url} and created #{created_event_count} event(s)."
+      else
+        error "Failed to fetch #{url}: #{response.inspect}"
+      end
+    rescue => e
+      error "Failed to fetch #{url} with message '#{e.message}': #{e.backtrace}"
+    end
 
     def get_entry_id(entry)
       entry.id.presence || Digest::MD5.hexdigest(entry.content)
