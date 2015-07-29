@@ -107,6 +107,7 @@ class Agent < ActiveRecord::Base
 
   def build_event(event)
     event = events.build(event) if event.is_a?(Hash)
+    event.agent = self
     event.user = user
     event.expires_at ||= new_event_expiration_date
     event
