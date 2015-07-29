@@ -150,13 +150,18 @@ module Agents
     end
 
     class Worker < LongRunnable::Worker
-      RELOAD_TIMEOUT = 10.minutes
+      RELOAD_TIMEOUT = 60.minutes
       DUPLICATE_DETECTION_LENGTH = 1000
       SEPARATOR = /[^\w_\-]+/
 
       def setup
         require 'twitter/json_stream'
         @filter_to_agent_map = @config[:filter_to_agent_map]
+
+        schedule_in RELOAD_TIMEOUT do
+          puts "--> Restarting TwitterStream #{id}"
+          restart!
+        end
       end
 
       def run
@@ -199,13 +204,13 @@ module Agents
 
         stream.on_no_data do |message|
           STDERR.puts " --> Got no data for awhile; trying to reconnect."
-          stop
+          restart!
         end
 
         stream.on_max_reconnects do |timeout, retries|
           STDERR.puts " --> Oops, tried too many times! <--"
           sleep 60
-          stop
+          restart!
         end
       end
 
