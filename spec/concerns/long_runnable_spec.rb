@@ -40,7 +40,7 @@ describe LongRunnable do
   describe LongRunnable::Worker do
     before(:each) do
       @agent = Object.new
-      @worker = LongRunnable::Worker.new(agent: @agent)
+      @worker = LongRunnable::Worker.new(agent: @agent, id: 'test1234')
       @worker.setup!(Rufus::Scheduler.new, Mutex.new)
     end
 
@@ -82,6 +82,32 @@ describe LongRunnable do
       it "gracefully stops the worker" do
         mock(@worker).stop
         @worker.stop!
+      end
+    end
+
+    context "#restart!" do
+      it "stops, setups and starts the worker" do
+        mock(@worker).stop!
+        mock(@worker).setup!(@worker.scheduler, @worker.mutex)
+        mock(@worker).run!
+        @worker.restart!
+      end
+    end
+
+    context "scheduling" do
+      it "schedules tasks once" do
+        mock(@worker.scheduler).send(:schedule_in, 1.hour, tag: 'test1234')
+        @worker.schedule_in 1.hour do noop; end
+      end
+
+      it "schedules repeating tasks" do
+        mock(@worker.scheduler).send(:every, 1.hour, tag: 'test1234')
+        @worker.every 1.hour do noop; end
+      end
+
+      it "allows the cron syntax" do
+        mock(@worker.scheduler).send(:cron, '0 * * * *', tag: 'test1234')
+        @worker.cron '0 * * * *' do noop; end
       end
     end
   end

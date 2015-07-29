@@ -51,7 +51,7 @@ module LongRunnable
   end
 
   class Worker
-    attr_reader :thread, :id, :agent, :config, :mutex
+    attr_reader :thread, :id, :agent, :config, :mutex, :scheduler
 
     def initialize(options = {})
       @id = options[:id]
@@ -92,12 +92,22 @@ module LongRunnable
       end
     end
 
+    def restart!
+      stop!
+      setup!(scheduler, mutex)
+      run!
+    end
+
     def every(*args, &blk)
       schedule(:every, args, &blk)
     end
 
     def cron(*args, &blk)
       schedule(:cron, args, &blk)
+    end
+
+    def schedule_in(*args, &blk)
+      schedule(:schedule_in, args, &blk)
     end
 
     def boolify(value)

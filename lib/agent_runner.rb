@@ -16,7 +16,7 @@ class AgentRunner
     @mutex = Mutex.new
     @scheduler = Rufus::Scheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'].presence || 0.3)
 
-    @scheduler.every 1 do
+    @scheduler.every 5 do
       restart_dead_workers if @running
     end
 

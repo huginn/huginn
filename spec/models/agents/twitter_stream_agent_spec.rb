@@ -169,7 +169,8 @@ describe Agents::TwitterStreamAgent do
       @config = {agent: @agent, config: {filter_to_agent_map: {'agent' => [@mock_agent]}}}
       @worker = Agents::TwitterStreamAgent::Worker.new(@config)
       @worker.instance_variable_set(:@recent_tweets, [])
-      @worker.setup
+      mock(@worker).schedule_in(Agents::TwitterStreamAgent::Worker::RELOAD_TIMEOUT)
+      @worker.setup!(nil, Mutex.new)
     end
 
     context "#run" do
@@ -226,7 +227,7 @@ describe Agents::TwitterStreamAgent do
 
         it "stop when no data was received"do
           stub_without(:on_no_data).on_no_data.yields
-          mock(@worker).stop
+          mock(@worker).restart!
           mock(STDERR).puts(" --> Got no data for awhile; trying to reconnect.")
           @worker.send(:stream!, ['agent'], @agent)
         end
@@ -235,7 +236,7 @@ describe Agents::TwitterStreamAgent do
           stub_without(:on_max_reconnects).on_max_reconnects.yields
           mock(STDERR).puts(" --> Oops, tried too many times! <--")
           mock(@worker).sleep(60)
-          mock(@worker).stop
+          mock(@worker).restart!
           @worker.send(:stream!, ['agent'], @agent)
         end
 
