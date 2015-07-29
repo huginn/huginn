@@ -1,6 +1,7 @@
 # Changes
 
-* Jul 22, 2015   - DataOutputAgent can configure the order of events in the output via `events_order`.
+* Jul 29, 2015   - WebsiteAgent can configure the order of events created via `events_order`.
+* Jul 29, 2015   - DataOutputAgent can configure the order of events in the output via `events_order`.
 * Jul 20, 2015   - Control Links (used by the SchedularAgent) are correctly exported in Scenarios.
 * Jul 20, 2015   - keep\_events\_for was moved from days to seconds; Scenarios have a schema verison.
 * Jul 8, 2015    - DataOutputAgent supports feed icon, and a new template variable `events`.
