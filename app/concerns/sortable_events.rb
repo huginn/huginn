@@ -103,7 +103,7 @@ module SortableEvents
   EXPRESSION_TYPES = EXPRESSION_PARSER.keys.freeze
 
   def validate_events_order
-    case order_by = events_order()
+    case order_by = events_order
     when nil
     when Array
       # Each tuple may be either [expression, type, desc] or just
@@ -135,7 +135,9 @@ module SortableEvents
 
   # Sort given events in order specified by the "events_order" option
   def sort_events(events)
-    order_by = events_order().presence or return events
+    order_by = events_order.presence or
+      return events
+
     orders = order_by.map { |_, _, desc = false| boolify(desc) }
 
     Utils.sort_tuples!(
