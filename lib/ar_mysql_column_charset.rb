@@ -1,6 +1,3 @@
-# Module#prepend support for Ruby 1.9
-require 'prepend' unless Module.method_defined?(:prepend)
-
 require 'active_support'
 
 ActiveSupport.on_load :active_record do
