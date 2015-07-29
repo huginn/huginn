@@ -94,9 +94,8 @@ module Utils
       def <=> other
         other = other.array
         @array.each_with_index do |e, i|
-          case cmp = e <=> other[i]
-          when nil
-            return nil
+          o = other[i]
+          case cmp = e <=> o || e.to_s <=> o.to_s
           when 0
             next
           else

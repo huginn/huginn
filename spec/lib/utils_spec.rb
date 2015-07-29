@@ -153,5 +153,23 @@ describe Utils do
       Utils.sort_tuples!(tuples, orders)
       expect(tuples).to eq expected
     end
+
+    it "always succeeds in sorting even if it finds pairs of incomparable objects" do
+      time = Time.now
+      tuples = [
+        [2,   "a", time - 1],  # 0
+        [1,   "b", nil],       # 1
+        [1,   "b", time],      # 2
+        ["2", nil, time],      # 3
+        [1,   nil, time],      # 4
+        [nil, "a", time + 1],  # 5
+        [2,   "a", time],      # 6
+      ]
+      orders = [true, false, true]
+      expected = tuples.values_at(3, 6, 0, 4, 2, 1, 5)
+
+      Utils.sort_tuples!(tuples, orders)
+      expect(tuples).to eq expected
+    end
   end
 end
