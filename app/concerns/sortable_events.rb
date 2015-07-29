@@ -33,7 +33,7 @@ module SortableEvents
 
         * _descending_ (optional) is a boolean value to determine if comparison should be done in descending (reverse) order, which defaults to `false`.
 
-        Sort keys listed eariler take precedence over ones listed later.  For example, if you want to sort articles by the date and then by the author, specify `[["{{date}}", "time"], "{{author}}"]`.
+        Sort keys listed earlier take precedence over ones listed later.  For example, if you want to sort articles by the date and then by the author, specify `[["{{date}}", "time"], "{{author}}"]`.
 
         Sorting is done stably, so even if all events have the same set of sort key values the original order is retained.  Also, a special Liquid variable `_index_` is provided, which contains the zero-based index number of each event, which means you can exactly reverse the order of events by specifying `[["{{_index_}}", "number", true]]`.
       MD
