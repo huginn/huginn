@@ -37,4 +37,15 @@ module AgentHelper
       }.join(delimiter).html_safe
     end
   end
+
+  def agent_types_collection_with_html_descriptions(user)
+    Agent.types.sort{|a,b| a.name <=> b.name}.map { |type|
+      [
+        type.name.gsub(/^.*::/, ''),
+        type.name,
+        {'data-description'=> Base64.encode64(Agent.build_for_type(type.to_s, user).html_description) }
+      ]
+    }
+  end
+
 end

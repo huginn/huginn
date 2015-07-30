@@ -15,6 +15,13 @@ class @AgentEditPage
     # The type selector is only available on the new agent form.
     if $("#agent_type").length
       $("#agent_type").on "change", => @handleTypeChange(false)
+      $("#agent_type").select2 matcher: (term, text, opt) ->
+        text.toUpperCase().indexOf(term.toUpperCase()) >= 0 or ( opt.data("description") and atob(opt.data("description")).toUpperCase().indexOf(term.toUpperCase()) >= 0)
+      $("#agent_type").on "select2-highlight", (e) => 
+        $(".description").html(atob($(e.choice.element).data("description"))).show()
+      $("#agent_type").on "select2-close", (e) => 
+        description = $($("#agent_type").select2("data").element).data("description") or ''
+        $(".description").html(atob(description))
       @handleTypeChange(true)
     else
       @enableDryRunButton()
