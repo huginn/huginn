@@ -1,5 +1,6 @@
 # Changes
 
+* Jul 30, 2015   - RssAgent can configure the order of events created via `events_order`.
 * Jul 29, 2015   - WebsiteAgent can configure the order of events created via `events_order`.
 * Jul 29, 2015   - DataOutputAgent can configure the order of events in the output via `events_order`.
 * Jul 20, 2015   - Control Links (used by the SchedularAgent) are correctly exported in Scenarios.

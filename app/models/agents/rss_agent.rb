@@ -9,6 +9,8 @@ module Agents
     can_dry_run!
     default_schedule "every_1d"
 
+    DEFAULT_EVENTS_ORDER = [['{{date_published}}', 'time'], ['{{last_updated}}', 'time']]
+
     description do
       <<-MD
         This Agent consumes RSS feeds and emits events when they change.
@@ -29,6 +31,12 @@ module Agents
           * `disable_url_encoding` - Set to `true` to disable url encoding.
           * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
           * `max_events_per_run` - Limit number of events created (items parsed) per run for feed.
+
+        # Ordering Events
+
+        #{description_events_order}
+
+        In this Agent, the default value for `events_order` is `#{DEFAULT_EVENTS_ORDER.to_json}`.
       MD
     end
 
@@ -70,6 +78,11 @@ module Agents
       end
 
       validate_web_request_options!
+      validate_events_order
+    end
+
+    def events_order
+      super.presence || DEFAULT_EVENTS_ORDER
     end
 
     def check
@@ -77,26 +90,15 @@ module Agents
         response = faraday.get(url)
         if response.success?
           feed = FeedNormalizer::FeedNormalizer.parse(response.body)
-          feed.clean! if interpolated['clean'] == 'true'
+          feed.clean! if boolify(interpolated['clean'])
           max_events = (interpolated['max_events_per_run'].presence || 0).to_i
           created_event_count = 0
-          feed.entries.sort_by { |entry| [entry.date_published, entry.last_updated] }.each.with_index do |entry, index|
+          sort_events(feed_to_events(feed)).each.with_index do |event, index|
             break if max_events && max_events > 0 && index >= max_events
-            entry_id = get_entry_id(entry)
+            entry_id = event.payload[:id]
             if check_and_track(entry_id)
               created_event_count += 1
-              create_event(payload: {
-                id: entry_id,
-                date_published: entry.date_published,
-                last_updated: entry.last_updated,
-                url: entry.url,
-                urls: entry.urls,
-                description: entry.description,
-                content: entry.content,
-                title: entry.title,
-                authors: entry.authors,
-                categories: entry.categories
-              })
+              create_event(event)
             end
           end
           log "Fetched #{url} and created #{created_event_count} event(s)."
@@ -121,6 +123,23 @@ module Agents
         memory['seen_ids'].pop if memory['seen_ids'].length > 500
         true
       end
+    end
+
+    def feed_to_events(feed)
+      feed.entries.map { |entry|
+        Event.new(payload: {
+                    id: get_entry_id(entry),
+                    date_published: entry.date_published,
+                    last_updated: entry.last_updated,
+                    url: entry.url,
+                    urls: entry.urls,
+                    description: entry.description,
+                    content: entry.content,
+                    title: entry.title,
+                    authors: entry.authors,
+                    categories: entry.categories
+                  })
+      }
     end
   end
 end
