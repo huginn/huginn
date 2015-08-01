@@ -53,7 +53,11 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ## Getting Started
 
-### Quick Start
+### Docker
+
+The quickest and easiest way to check out Huginn is to use the offical Docker image. Have a look at the [documentation](./doc/docker/install.md).
+
+### Local Installation
 
 If you just want to play around, you can simply fork this repository, then perform the following steps:
 
@@ -82,11 +86,17 @@ All agents have specs! Test all specs with `bundle exec rspec`, or test a specif
 
 ## Deployment
 
-Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup.  Be sure to click 'View it' after launch!)
+### Heroku
+
+Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup. Read the [documentation](./doc/heroku/install.md) while you are waiting and be sure to click 'View it' after launch!)
 
 Huginn works on the free version of Heroku [with limitations](https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku). For non-experimental use, we recommend Heroku's cheapest paid plan or our Docker container.
 
 Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
+
+### Manual installation on any server
+
+Have a look at the [installation guide](./doc/manual/README.md).
 
 ### Optional Setup
 
