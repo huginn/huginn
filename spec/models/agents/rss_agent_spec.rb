@@ -148,4 +148,14 @@ describe Agents::RssAgent do
       expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| Digest::MD5.hexdigest(e.payload['content']) })
     end
   end
+
+  describe 'logging errors with the feed url' do
+    it 'includes the feed URL when an exception is raised' do
+      mock(FeedNormalizer::FeedNormalizer).parse(anything) { raise StandardError.new("Some error!") }
+      expect(lambda {
+        agent.check
+      }).not_to raise_error
+      expect(agent.logs.last.message).to match(%r[Failed to fetch https://github.com])
+    end
+  end
 end
