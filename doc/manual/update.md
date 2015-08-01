@@ -1,19 +1,25 @@
 # Update
 
-### 0. Stop server
-
-```
-sudo stop huginn
-```
-
-### 1. Store the current version
+### 0. Ensure depencies are up to date
 
 ```
 cd /home/huginn/huginn
+sudo rake production:check
+```
+
+### 1. Stop server
+
+```
+sudo rake production:stop
+```
+
+### 2. Store the current version
+
+```
 export OLD_VERSION=`git rev-parse HEAD`
 ```
 
-### 2. Update the code
+### 3. Update the code
 
 Back up changed files
 
@@ -35,7 +41,7 @@ Restore backed up files
 sudo -u huginn -H cp Procfile.bak Procfile
 ```
 
-### 3. Install gems, migrate and precompile assets
+### 4. Install gems, migrate and precompile assets
 
 ```
 cd /home/huginn/huginn
@@ -46,11 +52,11 @@ sudo -u huginn -H bundle install --deployment --without development test
 sudo -u huginn -H bundle exec rake db:migrate RAILS_ENV=production
 
 # Clean up assets and cache
-sudo -u huginn -H bundle exec rake assets:clean assets:precompile cache:clear RAILS_ENV=production
+sudo -u huginn -H bundle exec rake assets:clean assets:precompile tmp:cache:clear RAILS_ENV=production
 
 ```
 
-### 4. Update the Procfile
+### 5. Update the Procfile
 
 Check for changes made to the default `Procfile`
 ```
@@ -62,7 +68,7 @@ Update your `Procfile` if the default options of the version you are using chang
 sudo -u huginn -H editor Procfile
 ```
 
-### 5. Update the .env file
+### 6. Update the .env file
 
 Check for changes made to the example `.env`
 ```
@@ -75,13 +81,10 @@ sudo -u huginn -H editor .env
 ```
 
 
-### 6. Export init script and start Huginn
+### 7. Export init script and start Huginn
 
 ```
 # Export the init script
-sudo rm /etc/init/huginn*
-sudo foreman export upstart -a huginn /etc/init
-# Start Huginn
-sudo start huginn
+sudo rake production:export
 ```
 

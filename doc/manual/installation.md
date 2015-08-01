@@ -48,7 +48,7 @@ Import node.js repository (can be skipped on Ubuntu and Debian Jessie):
 
 Install the required packages (needed to compile Ruby and native extensions to Ruby gems):
 
-    sudo apt-get install -y build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz
+    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz
 
 
 ## 2. Ruby
@@ -229,6 +229,10 @@ When done you see `See the Huginn Wiki for more Agent examples!  https://github.
 
     sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=admin SEED_PASSWORD=yourpassword
 
+### Compile Assets
+
+    sudo -u huginn -H bundle exec rake assets:precompile RAILS_ENV=production
+
 ### Install Init Script
 
 Huginn uses foreman to generate the init scripts based on a `Procfile`
@@ -237,31 +241,20 @@ Edit the `Procfile` and choose one of the suggested versions for production
 
     sudo -u huginn -H editor Procfile
 
-**Debian only** Install upstart and reboot the system (skip this step on Ubuntu):
+Export the init scripts:
 
-    sudo apt-get install -y --force-yes upstart
-    sudo reboot
-    # After you you logged back in go to Huginn installation folder
-    cd /home/huginn/huginn
+    sudo rake production:export
 
-Export the init scripts using foreman:
-
-    sudo rm /etc/init/huginn*
-    sudo foreman export upstart -a huginn /etc/init
-
-**Note:** You have to re-export the init script every time you change the configuration in `.env`!
+**Note:** You have to re-export the init script every time you change the configuration in `.env` or your `Procfile`!
 
 ### Setup Logrotate
 
     sudo cp lib/support/logrotate/huginn /etc/logrotate.d/huginn
 
-### Compile Assets
 
-    sudo -u huginn -H bundle exec rake assets:precompile RAILS_ENV=production
+### Ensure Your Huginn Instance Is Running
 
-### Start Your Huginn Instance
-
-    sudo start huginn
+    sudo rake production:status
 
 ## 7. Nginx
 
@@ -335,9 +328,7 @@ Restart Nginx, export the init script and restart Huginn:
 ```
 cd /home/huginn/huginn
 sudo service nginx restart
-sudo rm /etc/init/huginn*
-sudo foreman export upstart -a huginn /etc/init
-sudo restart huginn
+sudo rake production:export
 ```
 
 Using a self-signed certificate is discouraged, but if you must use it follow the normal directions. Then generate the certificate:
