@@ -6,6 +6,7 @@ module Agents
     include WebRequestConcern
 
     can_dry_run!
+    can_order_created_events!
 
     default_schedule "every_12h"
 
@@ -105,6 +106,10 @@ module Agents
           * `status`: HTTP status as integer. (Almost always 200)
 
           * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
+
+      # Ordering Events
+
+      #{description_events_order}
     MD
 
     event_description do

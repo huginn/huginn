@@ -80,6 +80,7 @@ module ApplicationHelper
   end
 
   def service_label(service)
+    return if service.nil?
     content_tag :span, [
       omniauth_provider_icon(service.provider),
       service_label_text(service)

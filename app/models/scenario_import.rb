@@ -278,21 +278,6 @@ class ScenarioImport
       yield 'disabled', disabled, boolean if disabled.requires_merge?
     end
 
-    # Unfortunately Ruby 1.9's OpenStruct doesn't expose [] and []=.
-    unless instance_methods.include?(:[]=)
-      def [](key)
-        self.send(sanitize key)
-      end
-
-      def []=(key, val)
-        self.send("#{sanitize key}=", val)
-      end
-
-      def sanitize(key)
-        key.gsub(/[^a-zA-Z0-9_-]/, '')
-      end
-    end
-
     def agent_instance
       "Agents::#{self.type.updated}".constantize.new
     end

@@ -235,7 +235,7 @@ GEM
     launchy (2.4.2)
       addressable (~> 2.3)
     libv8 (3.16.14.7)
-    liquid (3.0.3)
+    liquid (3.0.6)
     listen (2.7.9)
       celluloid (>= 0.15.2)
       rb-fsevent (>= 0.9.3)
@@ -580,6 +580,3 @@ DEPENDENCIES
   weibo_2!
   wunderground (~> 1.2.0)
   xmpp4r (~> 0.5.6)
-
-BUNDLED WITH
-   1.10.5

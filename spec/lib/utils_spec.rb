@@ -114,4 +114,62 @@ describe Utils do
       expect(cleaned_json).to include("<\\/script>")
     end
   end
+
+  describe "#sort_tuples!" do
+    let(:tuples) {
+      time = Time.now
+      [
+        [2, "a", time - 1],  # 0
+        [2, "b", time - 1],  # 1
+        [1, "b", time - 1],  # 2
+        [1, "b", time],      # 3
+        [1, "a", time],      # 4
+        [2, "a", time + 1],  # 5
+        [2, "a", time],      # 6
+      ]
+    }
+
+    it "sorts tuples like arrays by default" do
+      expected = tuples.values_at(4, 2, 3, 0, 6, 5, 1)
+
+      Utils.sort_tuples!(tuples)
+      expect(tuples).to eq expected
+    end
+
+    it "sorts tuples in order specified: case 1" do
+      # order by x1 asc, x2 desc, c3 asc
+      orders = [false, true, false]
+      expected = tuples.values_at(2, 3, 4, 1, 0, 6, 5)
+
+      Utils.sort_tuples!(tuples, orders)
+      expect(tuples).to eq expected
+    end
+
+    it "sorts tuples in order specified: case 2" do
+      # order by x1 desc, x2 asc, c3 desc
+      orders = [true, false, true]
+      expected = tuples.values_at(5, 6, 0, 1, 4, 3, 2)
+
+      Utils.sort_tuples!(tuples, orders)
+      expect(tuples).to eq expected
+    end
+
+    it "always succeeds in sorting even if it finds pairs of incomparable objects" do
+      time = Time.now
+      tuples = [
+        [2,   "a", time - 1],  # 0
+        [1,   "b", nil],       # 1
+        [1,   "b", time],      # 2
+        ["2", nil, time],      # 3
+        [1,   nil, time],      # 4
+        [nil, "a", time + 1],  # 5
+        [2,   "a", time],      # 6
+      ]
+      orders = [true, false, true]
+      expected = tuples.values_at(3, 6, 0, 4, 2, 1, 5)
+
+      Utils.sort_tuples!(tuples, orders)
+      expect(tuples).to eq expected
+    end
+  end
 end

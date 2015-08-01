@@ -40,11 +40,15 @@ module Agents
               "_contents": "tag contents (can be an object for nesting)"
             }
 
+        # Ordering events in the output
+
+        #{description_events_order('events in the output')}
+
         # Liquid Templating
 
         In Liquid templating, the following variable is available:
 
-        * `events`: An array of events being output, sorted in descending order up to `events_to_show` in number.  For example, if source events contain a site title in the `site_title` key, you can refer to it in `template.title` by putting `{{events.first.site_title}}`.
+        * `events`: An array of events being output, sorted in the given order, up to `events_to_show` in number.  For example, if source events contain a site title in the `site_title` key, you can refer to it in `template.title` by putting `{{events.first.site_title}}`.
 
       MD
     end
@@ -134,7 +138,7 @@ module Agents
         end
       end
 
-      source_events = received_events.order(id: :desc).limit(events_to_show).to_a
+      source_events = sort_events(received_events.order(id: :desc).limit(events_to_show).to_a)
 
       interpolation_context.stack do
         interpolation_context['events'] = source_events

@@ -66,6 +66,21 @@ describe Agents::RssAgent do
       expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af"])
     end
 
+    it "should emit items as events in the order specified in the events_order option" do
+      expect {
+        agent.options['events_order'] = ['{{title | replace_regex: "^[[:space:]]+", "" }}']
+        agent.check
+      }.to change { agent.events.count }.by(20)
+
+      first, *, last = agent.events.last(20)
+      expect(first.payload['title'].strip).to eq('upgrade rails and gems')
+      expect(first.payload['url']).to eq("https://github.com/cantino/huginn/commit/87a7abda23a82305d7050ac0bb400ce36c863d01")
+      expect(first.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/87a7abda23a82305d7050ac0bb400ce36c863d01"])
+      expect(last.payload['title'].strip).to eq('Dashed line in a diagram indicates propagate_immediately being false.')
+      expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535")
+      expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535"])
+    end
+
     it "should track ids and not re-emit the same item when seen again" do
       agent.check
       expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| e.payload['id'] })
