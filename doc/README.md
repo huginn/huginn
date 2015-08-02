@@ -12,6 +12,7 @@ Manual installation which will guide through the steps to install Huginn on any 
 
 - [Install](manual/README.md) Requirements, directory structures and installation from source.
 - [Update](manual/update.md) Update your installation.
+- Deploy updates via [Capistrano](manual/capistrano.md).
 
 ### Heroku
 
