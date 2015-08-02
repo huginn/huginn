@@ -1,8 +1,9 @@
 ## Deploy to Heroku
 
-### Important things to keep in mind
+### Important things to keep in mindd on the free plan
 
-* Heroku's [Free plan](https://www.heroku.com/pricing) now requires your application to sleep for at least 6 hours a day, thus the `Hobby` plan is recommended.
+* Heroku's [free plan](https://www.heroku.com/pricing) limits total runtime per day to 18 hours. This means that Huginn must sleep some of the time, and so recurring tasks will only run if their recurrence frequency fits within the free plan's awake time, which is 30 minutes. Therefore, we recommend that you only use the every 1 minute, every 2 minute, and every 5 minute Agent scheduling options.
+* When setting up Pingdom, set the `Check interval` to '60 minutes' so that your Huginn instance is up half the time.
 * Heroku's free Postgres plan limits the number of database rows that you can have to 10,000, so you should be sure to set a low event retention schedule for your agents.
 * The `setup_heroku` command points Heroku at a special Procfile (`deployment/heroku/Procfile.heroku`) that is designed to be run on only one Heroku web worker.  If you want to run multiple workers, change the Heroku config variable `PROCFILE_PATH` with `heroku config:set PROCFILE_PATH=./Procfile` and switch back to the standard Huginn Procfile configuration.
 
@@ -13,8 +14,7 @@
 * Now, run the magic setup wizard: `bin/setup_heroku`
 * That's it!
 * If you make changes, you can re-run `bin/setup_heroku`, or just do `git push heroku master`.
-* Signup for a free [Pingdom](https://www.pingdom.com/free/) account and have it ping your Huginn URL instance on Heroku. This should help keep your Heroku instance awake and watching the world for you. Keep in mind the Heroku's Free plan needs your application to sleep for 6 hours a day.
-
+* Signup for a free [Pingdom](https://www.pingdom.com/free/) account and have it ping your Huginn URL on Heroku once an hour.
 
 ### Using your own mail server
 
