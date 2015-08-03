@@ -171,7 +171,7 @@ module Agents
         else
           content = Utils.unindent(<<-XML)
             <?xml version="1.0" encoding="UTF-8" ?>
-            <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+            <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
             <channel>
              <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
              <atom:icon>#{feed_icon.encode(xml: :text)}</atom:icon>
