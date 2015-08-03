@@ -59,7 +59,10 @@ class @Utils
       """,
       body: (body) =>
         form = $(body).find('.dry-run-form')
-        window.setupJsonEditor(form.find('.payload-editor'))
+        payload_editor = form.find('.payload-editor')
+        if previous = $(button).data('payload')
+          payload_editor.text(previous)
+        window.setupJsonEditor(payload_editor)
         form.submit (e) =>
           e.preventDefault()
           json = $(e.target).find('.payload-editor').val()
@@ -79,8 +82,10 @@ class @Utils
               alert 'Event is required for this agent to run.'
               return
             dry_run_data = data
+            $(button).data('payload', null)
           else
             dry_run_data = "event=#{encodeURIComponent(json)}&#{data}"
+            $(button).data('payload', json)
           $(body).closest('[role=dialog]').on 'hidden.bs.modal', =>
             @invokeDryRun(url, dry_run_data, cleanup)
           .modal('hide')
