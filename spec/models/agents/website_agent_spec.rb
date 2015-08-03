@@ -170,6 +170,35 @@ describe Agents::WebsiteAgent do
     end
 
     describe 'unzipping' do
+      it 'should unzip automatically if the response has Content-Encoding: gzip' do
+        json = {
+          'response' => {
+            'version' => 2,
+            'title' => "hello!"
+          }
+        }
+        zipped = ActiveSupport::Gzip.compress(json.to_json)
+        stub_request(:any, /gzip/).to_return(body: zipped, headers: { 'Content-Encoding' => 'gzip' }, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://gzip.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'version' => { 'path' => 'response.version' },
+          },
+          # no unzip option
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        expect(event.payload['version']).to eq(2)
+      end
+
       it 'should unzip with unzip option' do
         json = {
           'response' => {
@@ -178,7 +207,7 @@ describe Agents::WebsiteAgent do
           }
         }
         zipped = ActiveSupport::Gzip.compress(json.to_json)
-        stub_request(:any, /gzip/).to_return(:body => zipped, :status => 200)
+        stub_request(:any, /gzip/).to_return(body: zipped, status: 200)
         site = {
           'name' => "Some JSON Response",
           'expected_update_period_in_days' => "2",
