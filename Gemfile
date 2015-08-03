@@ -112,8 +112,10 @@ group :development do
     gem 'rspec-rails', '~> 3.1'
     gem 'rspec-html-matchers', '~> 0.7'
     gem 'shoulda-matchers'
-    gem 'spring', '~> 1.3.0'
-    gem 'spring-commands-rspec'
+    group :spring, optional: true do
+      gem 'spring', '~> 1.3.0'
+      gem 'spring-commands-rspec'
+    end
     gem 'vcr'
     gem 'webmock', '~> 1.17.4', require: false
   end
