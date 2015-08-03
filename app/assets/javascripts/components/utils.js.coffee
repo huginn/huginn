@@ -34,10 +34,67 @@ class @Utils
     body?(modal.querySelector('.modal-body'))
     $(modal).modal('show')
 
-  @handleDryRunButton: (button, data = $(button.form).serialize()) ->
+  @handleDryRunButton: (button, data = if button.form then $(':input[name!="_method"]', button.form).serialize() else '') ->
     $(button).prop('disabled', true)
+    cleanup = -> $(button).prop('disabled', false)
+
+    url = $(button).data('action-url')
+    with_event_mode = $(button).data('with-event-mode')
+
+    if with_event_mode is 'no'
+      return @invokeDryRun(url, data, cleanup)
+
+    Utils.showDynamicModal """
+      <h5>Event to send#{if with_event_mode is 'maybe' then ' (Optional)' else ''}</h5>
+      <form class="dry-run-form" method="post">
+        <div class="form-group">
+          <textarea rows="10" name="event" class="payload-editor" data-height="200">
+            {}
+          </textarea>
+        </div>
+        <div class="form-group">
+          <input value="Dry Run" class="btn btn-primary" type="submit" />
+        </div>
+      </form>
+      """,
+      body: (body) =>
+        form = $(body).find('.dry-run-form')
+        payload_editor = form.find('.payload-editor')
+        if previous = $(button).data('payload')
+          payload_editor.text(previous)
+        window.setupJsonEditor(payload_editor)
+        form.submit (e) =>
+          e.preventDefault()
+          json = $(e.target).find('.payload-editor').val()
+          json = '{}' if json == ''
+          try
+            payload = JSON.parse(json)
+            throw true unless payload.constructor is Object
+            if Object.keys(payload).length == 0
+              json = ''
+            else
+              json = JSON.stringify(payload)
+          catch
+            alert 'Invalid JSON object.'
+            return
+          if json == ''
+            if with_event_mode is 'yes'
+              alert 'Event is required for this agent to run.'
+              return
+            dry_run_data = data
+            $(button).data('payload', null)
+          else
+            dry_run_data = "event=#{encodeURIComponent(json)}&#{data}"
+            $(button).data('payload', json)
+          $(body).closest('[role=dialog]').on 'hidden.bs.modal', =>
+            @invokeDryRun(url, dry_run_data, cleanup)
+          .modal('hide')
+      title: 'Dry Run'
+      onHide: cleanup
+
+  @invokeDryRun: (url, data, callback) ->
     $('body').css(cursor: 'progress')
-    $.ajax type: 'POST', url: $(button).data('action-url'), dataType: 'json', data: data
+    $.ajax type: 'POST', url: url, dataType: 'json', data: data
       .always =>
         $('body').css(cursor: 'auto')
       .done (json) =>
@@ -55,7 +112,7 @@ class @Utils
               find('.agent-dry-run-events').text(json.events).end().
               find('.agent-dry-run-memory').text(json.memory)
           title: 'Dry Run Results',
-          onHide: -> $(button).prop('disabled', false)
+          onHide: callback
       .fail (xhr, status, error) ->
         alert('Error: ' + error)
-        $(button).prop('disabled', false)
+        callback()

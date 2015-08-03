@@ -2,7 +2,7 @@ Huginn::Application.routes.draw do
   resources :agents do
     member do
       post :run
-      put :dry_run
+      post :dry_run
       post :handle_details_post
       put :leave_scenario
       delete :remove_events

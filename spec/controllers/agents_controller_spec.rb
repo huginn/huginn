@@ -377,6 +377,19 @@ describe AgentsController do
         [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
       }
     end
+
+    it "accepts an event" do
+      sign_in users(:bob)
+      agent = agents(:bob_website_agent)
+      url_from_event = "http://xkcd.com/?from_event=1".freeze
+      expect {
+        post :dry_run, id: agent, event: { url: url_from_event }
+      }.not_to change {
+        [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
+      }
+      json = JSON.parse(response.body)
+      expect(json['log']).to match(/^I, .* : Fetching #{Regexp.quote(url_from_event)}$/)
+    end
   end
 
   describe "DELETE memory" do

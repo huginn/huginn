@@ -25,6 +25,6 @@
 <div class="form-group">
   <%= submit_tag "Save", :class => "btn btn-primary" %>
   <% if agent.can_dry_run? %>
-    <%= button_tag class: 'btn btn-default agent-dry-run-button', type: 'button', 'data-action-url' => agent.persisted? ? dry_run_agent_path(agent) : dry_run_agents_path do %><%= icon_tag('glyphicon-refresh') %> Dry Run<% end %>
+    <%= button_tag class: 'btn btn-default agent-dry-run-button', type: 'button', 'data-action-url' => agent.persisted? ? dry_run_agent_path(agent) : dry_run_agents_path, 'data-with-event-mode' => agent_dry_run_with_event_mode(agent) do %><%= icon_tag('glyphicon-refresh') %> Dry Run<% end %>
   <% end %>
 </div>

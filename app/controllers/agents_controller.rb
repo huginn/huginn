@@ -37,7 +37,7 @@ class AgentsController < ApplicationController
   def dry_run
     attrs = params[:agent] || {}
     if agent = current_user.agents.find_by(id: params[:id])
-      # PUT /agents/:id/dry_run
+      # POST /agents/:id/dry_run
       if attrs.present?
         type = agent.type
         agent = Agent.build_for_type(type, current_user, attrs)
@@ -50,7 +50,13 @@ class AgentsController < ApplicationController
     agent.name ||= '(Untitled)'
 
     if agent.valid?
-      results = agent.dry_run!
+      if event_payload = params[:event]
+        dummy_agent = Agent.build_for_type('ManualEventAgent', current_user, name: 'Dry-Runner')
+        dummy_agent.readonly!
+        event = dummy_agent.events.build(user: current_user, payload: event_payload)
+      end
+
+      results = agent.dry_run!(event)
 
       render json: {
         log: results[:log],
