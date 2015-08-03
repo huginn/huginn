@@ -29,6 +29,7 @@ module Agents
           * `basic_auth` - Specify HTTP basic auth parameters: `"username:password"`, or `["username", "password"]`.
           * `disable_ssl_verification` - Set to `true` to disable ssl verification.
           * `disable_url_encoding` - Set to `true` to disable url encoding.
+          * `force_encoding` - Set `force_encoding` to an encoding name if the website is known to respond with a missing, invalid or wrong charset in the Content-Type header.  Note that a text content without a charset is taken as encoded in UTF-8 (not ISO-8859-1).
           * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
           * `max_events_per_run` - Limit number of events created (items parsed) per run for feed.
 
