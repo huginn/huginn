@@ -23,7 +23,7 @@ On the above unsupported distributions is still possible to install Huginn, and 
 
 Huginn is developed for Unix operating systems.
 Huginn does **not** run on Windows and we have no plans of supporting it in the near future.
-Please consider using a virtual machine to run Huginn.
+Please consider using a virtual machine to run Huginn on Windows.
 
 ## Ruby versions
 

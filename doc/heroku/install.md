@@ -1,6 +1,6 @@
 ## Deploy to Heroku
 
-### Important things to keep in mindd on the free plan
+### Important things to keep in mind on the free plan
 
 * Heroku's [free plan](https://www.heroku.com/pricing) limits total runtime per day to 18 hours. This means that Huginn must sleep some of the time, and so recurring tasks will only run if their recurrence frequency fits within the free plan's awake time, which is 30 minutes. Therefore, we recommend that you only use the every 1 minute, every 2 minute, and every 5 minute Agent scheduling options.
 * When setting up Pingdom, set the `Check interval` to '60 minutes' so that your Huginn instance is up half the time.

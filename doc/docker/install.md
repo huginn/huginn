@@ -21,15 +21,15 @@ Getting Huginn up and running using docker is quick and painless once you have d
 1. Download [docker machine](https://docs.docker.com/machine/#installation) for your OS
 * Follow the installation instructions untill you can successfully run `docker ps`
 * Get the the IP of the VM running docker by running `docker-machine ls`
-* Start your Huginn container using `docker run -it -p 5000:5000 cantino/huginn`
-* Open Huginn in the browser [http://docker-machine ip:5000](http://<docker-machine ip>:5000)
+* Start your Huginn container using `docker run -it -p 3000:3000 cantino/huginn`
+* Open Huginn in the browser [http://docker-machine ip:3000](http://<docker-machine ip>:3000)
 * Log in to your Huginn instance using the username `admin` and password `password`
 
 #### Linux
 
 1. Install docker using the [install instructions](https://docs.docker.com/installation/)
-* Start your Huginn container using `docker run -it -p 5000:5000 cantino/huginn`
-* Open Huginn in the browser [http://localhost:5000](http://localhost:5000)
+* Start your Huginn container using `docker run -it -p 3000:3000 cantino/huginn`
+* Open Huginn in the browser [http://localhost:3000](http://localhost:3000)
 * Log in to your Huginn instance using the username `admin` and password `password`
 
 ## Configuration and linking to a database container

@@ -11,7 +11,7 @@ This is the official installation guide to set up a production server. To set up
 
 The following steps have been known to work. Please **use caution when you deviate** from this guide. Make sure you don't violate any assumptions Huginn makes about its environment. For example many people run into permission problems because they change the location of directories or run services as the wrong user.
 
-If you find a bug/error in this guide please **submit a merge request**.
+If you find a bug/error in this guide please **submit a pull request**.
 
 If not stated otherwise all commands should be run as user with sudo permissions or as root.
 
@@ -136,7 +136,7 @@ You are done installing the database and can go back to the rest of the installa
 
 ### Clone the Source
 
-    # We'll install Huginn into home directory of the user "huginn"
+    # We'll install Huginn into the home directory of the user "huginn"
     cd /home/huginn
 
     # Clone Huginn repository
@@ -209,7 +209,7 @@ Change the Unicorn config if needed, the [requirements.md](./requirements.md#uni
 
 **Important Note:** Make sure to edit both `.env` and `unicorn.rb` to match your setup.
 
-**Note:** If you want to use HTTPS, see [Using HTTPS](#using-https) for the additional steps.
+**Note:** If you want to use HTTPS, which is what we recommend, see [Using HTTPS](#using-https) for the additional steps.
 
 
 ### Initialize Database
@@ -225,7 +225,7 @@ Change the Unicorn config if needed, the [requirements.md](./requirements.md#uni
 
 When done you see `See the Huginn Wiki for more Agent examples!  https://github.com/cantino/huginn/wiki`
 
-**Note:** This will create an initial user, you can set the username and password by supplying it in environmental variables `SEED_USERNAME` and`SEED_PASSWORD` as seen below. If you don't set the password (and it is set to the default one) please wait with exposing Huginn to the public internet until the installation is done and you've logged into the server and changed your password.
+**Note:** This will create an initial user, you can set the username and password by supplying it in environmental variables `SEED_USERNAME` and `SEED_PASSWORD` as seen below. If you don't set the password (and it is set to the default one) please wait with exposing Huginn to the public internet until the installation is done and you've logged into the server and changed your password.
 
     sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=admin SEED_PASSWORD=yourpassword
 
@@ -235,7 +235,7 @@ When done you see `See the Huginn Wiki for more Agent examples!  https://github.
 
 ### Install Init Script
 
-Huginn uses foreman to generate the init scripts based on a `Procfile`
+Huginn uses [foreman](http://ddollar.github.io/foreman/) to generate the init scripts based on a `Procfile`
 
 Edit the `Procfile` and choose one of the suggested versions for production
 
@@ -281,7 +281,7 @@ Remove the default nginx site, **if huginn is the only enabled nginx site**:
 
     sudo rm /etc/nginx/sites-enabled/default
 
-**Note:** If you want to use HTTPS, replace the `huginn` Nginx config with `huginn-ssl`. See [Using HTTPS](#using-https) for HTTPS configuration details.
+**Note:** If you want to use HTTPS, which is what we recommend, replace the `huginn` Nginx config with `huginn-ssl`. See [Using HTTPS](#using-https) for HTTPS configuration details.
 
 ### Test Configuration
 
@@ -307,7 +307,9 @@ Visit YOUR_SERVER in your web browser for your first Huginn login. The setup has
 
 **Enjoy!**
 
-You can use `sudo start huginn` and `sudo stop huginn` to start and stop Huginn.
+You can use `cd /home/huginn/huginn && sudo rake production:start` and `cd /home/huginn/huginn && sudo rake production:stop` to start and stop Huginn.
+
+Be sure to read the section about how to [update](./update.md) your Huginn installation as well! You can also use [Capistrano](./capistrano.md) to keep your installation up to date.
 
 ## Advanced Setup Tips
 

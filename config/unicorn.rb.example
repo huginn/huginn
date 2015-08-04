@@ -1,4 +1,4 @@
-wd = "/home/huginn/huginn"
+wd = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 app_path = wd
 
