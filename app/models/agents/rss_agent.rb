@@ -1,5 +1,4 @@
 require 'rss'
-require 'feed-normalizer'
 
 module Agents
   class RssAgent < Agent
@@ -15,15 +14,13 @@ module Agents
       <<-MD
         This Agent consumes RSS feeds and emits events when they change.
 
-        This Agent is fairly simple, using [feed-normalizer](https://github.com/aasmith/feed-normalizer) as a base.  For complex feeds
-        with additional field types, we recommend using a WebsiteAgent.  See [this example](https://github.com/cantino/huginn/wiki/Agent-configuration-examples#itunes-trailers).
+        For complex feeds with additional field types, we recommend using a WebsiteAgent.  See [this example](https://github.com/cantino/huginn/wiki/Agent-configuration-examples#itunes-trailers).
 
         If you want to *output* an RSS feed, use the DataOutputAgent.
 
         Options:
 
           * `url` - The URL of the RSS feed (an array of URLs can also be used; items with identical guids across feeds will be considered duplicates).
-          * `clean` - Attempt to use [feed-normalizer](https://github.com/aasmith/feed-normalizer)'s' `clean!` method to cleanup HTML in the feed.  Set to `true` to use.
           * `expected_update_period_in_days` - How often you expect this RSS feed to change.  If more than this amount of time passes without an update, the Agent will mark itself as not working.
           * `headers` - When present, it should be a hash of headers to send with the request.
           * `basic_auth` - Specify HTTP basic auth parameters: `"username:password"`, or `["username", "password"]`.
@@ -44,7 +41,6 @@ module Agents
     def default_options
       {
         'expected_update_period_in_days' => "5",
-        'clean' => 'false',
         'url' => "https://github.com/cantino/huginn/commits/master.atom"
       }
     end
@@ -53,9 +49,26 @@ module Agents
       Events look like:
 
           {
+            "feed": {
+              "type": "atom",
+              "generator": "...",
+              "title": "Some site title",
+              "urls": ["http://example.com/"],
+              "url": "http://example.com/",
+              "description": "Some site description",
+              "copyright": "...",
+              "authors": [ ... ],
+              "last_updated": "Thu, 11 Sep 2014 01:30:00 -0700",
+              "id": "...",
+              "icon": "http://example.com/icon.png"
+            },
             "id": "829f845279611d7925146725317b868d",
             "date_published": "2014-09-11 01:30:00 -0700",
             "last_updated": "Thu, 11 Sep 2014 01:30:00 -0700",
+            "links": [
+              { "href": "http://example.com/", "rel": "alternate", "type": "text/html" },
+              { "href": "http://example.com/index.atom", "rel": "self", "type": "application/atom+xml" }
+            ],
             "url": "http://example.com/...",
             "urls": [ "http://example.com/..." ],
             "description": "Some description",
@@ -97,8 +110,12 @@ module Agents
     def check_url(url)
       response = faraday.get(url)
       if response.success?
-        feed = FeedNormalizer::FeedNormalizer.parse(response.body)
-        feed.clean! if boolify(interpolated['clean'])
+        feed =
+          begin
+            RSS::Parser.parse(response.body)
+          rescue RSS::InvalidRSSError
+            RSS::Parser.parse(response.body, false)
+          end
         max_events = (interpolated['max_events_per_run'].presence || 0).to_i
         created_event_count = 0
         sort_events(feed_to_events(feed)).each.with_index do |event, index|
@@ -117,10 +134,6 @@ module Agents
       error "Failed to fetch #{url} with message '#{e.message}': #{e.backtrace}"
     end
 
-    def get_entry_id(entry)
-      entry.id.presence || Digest::MD5.hexdigest(entry.content)
-    end
-
     def check_and_track(entry_id)
       memory['seen_ids'] ||= []
       if memory['seen_ids'].include?(entry_id)
@@ -132,20 +145,102 @@ module Agents
       end
     end
 
+    def feed_data(feed)
+      case type = feed.feed_type
+      when 'rss'.freeze
+        channel = feed.channel
+        url = channel.link
+        {
+          type: type,
+          generator: channel.generator,
+          title: channel.title,
+          urls: Array(url),
+          url: url,
+          description: channel.description,
+          copyright: channel.copyright,
+          authors: Array(channel.managingEditor),
+          last_updated: channel.lastBuildDate || channel.pubDate || channel.dc_date,
+          id: channel.try(:guid),
+          icon: channel.image.try(:url),
+        }
+      when 'atom'.freeze
+        urls = feed.links.map(&:href)
+        {
+          type: type,
+          generator: feed.generator.try(:content),
+          title: feed.title.try(:content),
+          links: feed.links.map { |link| link_to_hash(link) },
+          urls: urls,
+          url: urls.first,
+          description: feed.subtitle.try(:content),
+          copyright: feed.rights.try(:first).try(:content),
+          authors: feed.authors.map { |author| author.name.try(:content) }.compact,
+          last_updated: feed.updated.try(:content),
+          id: feed.id.try(:content),
+          icon: feed.icon.try(:content),
+        }
+      end
+    end
+
+    def link_to_hash(link)
+      %i[href rel type hreflang title length].each_with_object({}) { |attr, hash|
+        hash[attr] = link.__send__(attr)
+      }
+    end
+
+    def entry_data(entry)
+      case entry
+      when RSS::Rss::Channel::Item
+        url = entry.link
+        description = entry.description
+        content = entry.content_encoded || description
+        date_published = entry.pubDate || entry.dc_date
+        id = entry.try(:guid).try(:content) || Digest::MD5.hexdigest(content || '')
+        authors = [entry.dc_creator, entry.author].compact
+        categories = entry.categories.map(&:content)
+        {
+          id: id,
+          date_published: date_published,
+          last_updated: date_published,
+          url: url,
+          urls: Array(url),
+          description: description,
+          content: content,
+          title: entry.title,
+          authors: authors,
+          categories: categories,
+        }
+      when RSS::Atom::Feed::Entry
+        url = entry.link.try(:href)
+        summary = entry.summary.try(:content)
+        content = entry.content.try(:content) || summary
+        description = summary || content
+        date_published = entry.published.try(:content)
+        id = entry.id.try(:content) || Digest::MD5.hexdigest(content || '')
+        categories = entry.categories.map(&:content)
+        {
+          id: id,
+          date_published: date_published,
+          last_updated: entry.updated.try(:content) || date_published,
+          links: entry.links.map { |link| link_to_hash(link) },
+          url: url,
+          urls: Array(url),
+          description: description,
+          content: content,
+          title: entry.title.try(:content),
+          authors: entry.authors.map { |author| author.name.try(:content) }.compact,
+          categories: categories,
+        }
+      end
+    end
+
     def feed_to_events(feed)
-      feed.entries.map { |entry|
-        Event.new(payload: {
-                    id: get_entry_id(entry),
-                    date_published: entry.date_published,
-                    last_updated: entry.last_updated,
-                    url: entry.url,
-                    urls: entry.urls,
-                    description: entry.description,
-                    content: entry.content,
-                    title: entry.title,
-                    authors: entry.authors,
-                    categories: entry.categories
-                  })
+      payload_base = {
+        feed: feed_data(feed)
+      }
+
+      feed.items.map { |entry|
+        Event.new(payload: payload_base.merge(entry_data(entry)))
       }
     end
   end
