@@ -1,6 +1,7 @@
 require 'nokogiri'
 require 'date'
 require 'uri'
+require 'addressable/uri'
 
 module Agents
   class WebsiteAgent < Agent
@@ -261,7 +262,12 @@ module Agents
     end
 
     def get_valid_url(url)
-      return (url =~ URI::ABS_URI) ? url : URI.escape(url)
+      if (url =~ URI::ABS_URI) 
+      	return url
+      end
+
+      parsed = Addressable::URI.parse(url)      
+      return parsed.normalize.to_s
     end
 
     def check_url(url, payload = {})
