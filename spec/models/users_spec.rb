@@ -14,6 +14,13 @@ describe User do
           is_expected.not_to allow_value(v).for(:invitation_code)
         end
       end
+
+      it "skips this validation if configured to do so" do
+        stub(User).using_invitation_code? {false}
+        %w['foo', 'bar', nil, ''].each do |v|
+          is_expected.to allow_value(v).for(:invitation_code)
+        end
+      end
     end
   end
 end
