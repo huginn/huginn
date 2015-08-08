@@ -18,7 +18,7 @@ class User < ActiveRecord::Base
   validates_presence_of :username
   validates_uniqueness_of :username
   validates_format_of :username, :with => /\A[a-zA-Z0-9_-]{3,15}\Z/, :message => "can only contain letters, numbers, underscores, and dashes, and must be between 3 and 15 characters in length."
-  validates_inclusion_of :invitation_code, :on => :create, :in => INVITATION_CODES, :message => "is not valid"
+  validates_inclusion_of :invitation_code, :on => :create, :in => INVITATION_CODES, :message => "is not valid", if: ->{ User.using_invitation_code? }
 
   has_many :user_credentials, :dependent => :destroy, :inverse_of => :user
   has_many :events, -> { order("events.created_at desc") }, :dependent => :delete_all, :inverse_of => :user
@@ -39,5 +39,9 @@ class User < ActiveRecord::Base
     else
       where(conditions).first
     end
+  end
+
+  def self.using_invitation_code?
+    ENV['SKIP_INVITATION_CODE'] != 'true'
   end
 end

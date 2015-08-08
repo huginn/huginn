@@ -30,13 +30,15 @@ bin/setup_heroku
           </div>
           <% end %>
 
-          <div class="form-group">
-            <%= f.label :invitation_code, class: 'col-md-4 control-label' %>
-            <div class="col-md-6">
-              <%= f.text_field :invitation_code, class: 'form-control' %>
-              <span class="help-inline">We are not yet open to the public.  If you have an invitation code, please enter it here.</span>
+          <% if User.using_invitation_code? %>
+            <div class="form-group">
+              <%= f.label :invitation_code, class: 'col-md-4 control-label' %>
+              <div class="col-md-6">
+                <%= f.text_field :invitation_code, class: 'form-control' %>
+                <span class="help-inline">We are not yet open to the public.  If you have an invitation code, please enter it here.</span>
+              </div>
             </div>
-          </div>
+          <% end %>
 
           <div class="form-group">
             <%= f.label :email, class: 'col-md-4 control-label' %>
