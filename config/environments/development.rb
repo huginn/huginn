@@ -39,8 +39,11 @@ Huginn::Application.configure do
 
   config.action_mailer.default_url_options = { :host => ENV['DOMAIN'] }
   config.action_mailer.asset_host = ENV['DOMAIN']
-  config.action_mailer.perform_deliveries = ENV['SEND_EMAIL_IN_DEVELOPMENT'] == 'true'
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.delivery_method = :smtp
+  if ENV['SEND_EMAIL_IN_DEVELOPMENT'] == 'true'
+    config.action_mailer.delivery_method = :smtp
+  else
+    config.action_mailer.delivery_method = :letter_opener
+  end
   # smtp_settings moved to config/initializers/action_mailer.rb
 end
