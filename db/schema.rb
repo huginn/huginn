@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150507153436) do
+ActiveRecord::Schema.define(version: 20150808115436) do
 
   create_table "agent_logs", force: :cascade do |t|
     t.integer  "agent_id",          limit: 4,                 null: false
@@ -176,7 +176,7 @@ ActiveRecord::Schema.define(version: 20150507153436) do
     t.string   "unlock_token",           limit: 255
     t.datetime "locked_at"
     t.string   "username",               limit: 191,                 null: false, charset: "utf8mb4", collation: "utf8mb4_unicode_ci"
-    t.string   "invitation_code",        limit: 255,                 null: false,                     collation: "utf8_bin"
+    t.string   "invitation_code",        limit: 255,                                                  collation: "utf8_bin"
     t.integer  "scenario_count",         limit: 4,   default: 0,     null: false
   end
 
