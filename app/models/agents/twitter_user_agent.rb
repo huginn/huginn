@@ -13,6 +13,8 @@ module Agents
       You must also provide the `username` of the Twitter user to monitor.
 
       Set `include_retweets` to `false` to not include retweets (default: `true`)
+      
+      Set `exclude_replies` to `true` to exclude replies (default: `false`)
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -53,6 +55,7 @@ module Agents
       {
         'username' => 'tectonic',
         'include_retweets' => 'true',
+        'exclude_replies' => 'false',
         'expected_update_period_in_days' => '2'
       }
     end
@@ -63,6 +66,10 @@ module Agents
 
       if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
         errors.add(:base, "include_retweets must be a boolean value string (true/false)")
+      end
+      
+      if options[:exclude_replies].present? && !%w[true false].include?(options[:exclude_replies])
+        errors.add(:base, "exclude_replies must be a boolean value string (true/false)")
       end
 
       if options[:starting_at].present?
@@ -81,10 +88,14 @@ module Agents
     def include_retweets?
       interpolated[:include_retweets] != "false"
     end
+    
+    def exclude_replies?
+      interpolated[:exclude_replies] != "false"
+    end
 
     def check
       since_id = memory['since_id'] || nil
-      opts = {:count => 200, :include_rts => include_retweets?, :exclude_replies => false, :include_entities => true, :contributor_details => true}
+      opts = {:count => 200, :include_rts => include_retweets?, :exclude_replies => exclude_replies?, :include_entities => true, :contributor_details => true}
       opts.merge! :since_id => since_id unless since_id.nil?
 
       # http://rdoc.info/gems/twitter/Twitter/REST/Timelines#user_timeline-instance_method
