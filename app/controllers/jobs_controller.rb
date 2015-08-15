@@ -48,6 +48,15 @@ class JobsController < ApplicationController
     end
   end
 
+  def destroy_all
+    Delayed::Job.delete_all
+
+    respond_to do |format|
+      format.html { redirect_to jobs_path, notice: "All jobs removed." }
+      format.json { render json: '', status: :ok }
+    end
+  end
+
   private
 
   def running?
