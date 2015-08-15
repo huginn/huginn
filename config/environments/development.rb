@@ -43,7 +43,7 @@ Huginn::Application.configure do
   if ENV['SEND_EMAIL_IN_DEVELOPMENT'] == 'true'
     config.action_mailer.delivery_method = :smtp
   else
-    config.action_mailer.delivery_method = :letter_opener
+    config.action_mailer.delivery_method = :letter_opener_web
   end
   # smtp_settings moved to config/initializers/action_mailer.rb
 end
