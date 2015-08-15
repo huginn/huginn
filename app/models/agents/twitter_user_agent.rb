@@ -90,7 +90,7 @@ module Agents
     end
     
     def exclude_replies?
-      interpolated[:exclude_replies] != "false"
+      boolify(interpolated[:exclude_replies]) || false
     end
 
     def check
