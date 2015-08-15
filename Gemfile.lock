@@ -413,9 +413,6 @@ GEM
     slop (3.6.0)
     spectrum-rails (1.3.4)
       railties (>= 3.1)
-    spring (1.3.6)
-    spring-commands-rspec (1.0.4)
-      spring (>= 0.9.1)
     sprockets (3.2.0)
       rack (~> 1.0)
     sprockets-rails (2.3.1)
@@ -562,8 +559,6 @@ DEPENDENCIES
   shoulda-matchers
   slack-notifier (~> 1.0.0)
   spectrum-rails
-  spring (~> 1.3.0)
-  spring-commands-rspec
   string-scrub
   therubyracer (~> 0.12.2)
   tumblr_client
@@ -582,4 +577,4 @@ DEPENDENCIES
   xmpp4r (~> 0.5.6)
 
 BUNDLED WITH
-   1.10.5
+   1.10.6
