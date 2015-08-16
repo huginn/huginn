@@ -1,7 +1,3 @@
 #!/usr/bin/env ruby
-begin
-  load File.expand_path("../spring", __FILE__)
-rescue LoadError
-end
 require 'bundler/setup'
 load Gem.bin_path('rspec-core', 'rspec')
