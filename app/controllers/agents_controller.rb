@@ -239,6 +239,8 @@ class AgentsController < ApplicationController
     when "show"
       if @agent && !@agent.destroyed?
         path = agent_path(@agent)
+      else
+        path = agents_path
       end
     when /\A#{Regexp::escape scenarios_path}\/\d+\z/, agents_path
       path = ret
@@ -247,7 +249,7 @@ class AgentsController < ApplicationController
     if path
       redirect_to path, notice: message
     else
-      redirect_to agents_path, notice: message
+      super agents_path, notice: message
     end
   end
 
