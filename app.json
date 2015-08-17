@@ -3,6 +3,7 @@
     "description": "Build agents that monitor and act on your behalf.  Your agents are standing by!",
     "website": "https://github.com/cantino/huginn",
     "repository": "https://github.com/cantino/huginn",
+    "logo": "https://raw.githubusercontent.com/cantino/huginn/master/media/huginn-icon-64.png",
     "env": {
         "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-multi.git",
         "APP_SECRET_TOKEN": {

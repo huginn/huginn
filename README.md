@@ -80,9 +80,11 @@ All agents have specs! Test all specs with `bundle exec rspec`, or test a specif
 
 ## Deployment
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup.  Be sure to click 'View it' after launch!)
+Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup.  Be sure to click 'View it' after launch!)
 
-Huginn can run on Heroku for free!  Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
+Huginn works on the free version of Heroku [with limitations](https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku). For non-experimental use, we recommend Heroku's cheapest paid plan or our Docker container.
+
+Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
 ### Optional Setup
 

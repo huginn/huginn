@@ -60,6 +60,7 @@ class ScenarioImport
     description = parsed_data['description']
     name = parsed_data['name']
     links = parsed_data['links']
+    control_links = parsed_data['control_links'] || []
     tag_fg_color = parsed_data['tag_fg_color']
     tag_bg_color = parsed_data['tag_bg_color']
     source_url = parsed_data['source_url'].presence || nil
@@ -87,11 +88,18 @@ class ScenarioImport
         end
         agent
       end
+
       if success
         links.each do |link|
           receiver = created_agents[link['receiver']]
           source = created_agents[link['source']]
           receiver.sources << source unless receiver.sources.include?(source)
+        end
+
+        control_links.each do |control_link|
+          controller = created_agents[control_link['controller']]
+          control_target = created_agents[control_link['control_target']]
+          controller.control_targets << control_target unless controller.control_targets.include?(control_target)
         end
       end
     end
@@ -142,7 +150,7 @@ class ScenarioImport
   def generate_diff
     @agent_diffs = (parsed_data['agents'] || []).map.with_index do |agent_data, index|
       # AgentDiff is defined at the end of this file.
-      agent_diff = AgentDiff.new(agent_data)
+      agent_diff = AgentDiff.new(agent_data, parsed_data['schema_version'])
       if existing_scenario
         # If this Agent exists already, update the AgentDiff with the local version's information.
         agent_diff.diff_with! existing_scenario.agents.find_by(:guid => agent_data['guid'])
@@ -184,14 +192,16 @@ class ScenarioImport
       end
     end
 
-    def initialize(agent_data)
+    def initialize(agent_data, schema_version)
       super()
+      @schema_version = schema_version
       @requires_merge = false
       self.agent = nil
       store! agent_data
     end
 
     BASE_FIELDS = %w[name schedule keep_events_for propagate_immediately disabled guid]
+    FIELDS_REQUIRING_TRANSLATION = %w[keep_events_for]
 
     def agent_exists?
       !!agent
@@ -209,8 +219,25 @@ class ScenarioImport
       self.type = FieldDiff.new(agent_data["type"].split("::").pop)
       self.options = FieldDiff.new(agent_data['options'] || {})
       BASE_FIELDS.each do |option|
-        self[option] = FieldDiff.new(agent_data[option]) if agent_data.has_key?(option)
+        if agent_data.has_key?(option)
+          value = agent_data[option]
+          value = send(:"translate_#{option}", value) if option.in?(FIELDS_REQUIRING_TRANSLATION)
+          self[option] = FieldDiff.new(value)
+        end
       end
+    end
+
+    def translate_keep_events_for(old_value)
+      if schema_version < 1
+        # Was stored in days, now is stored in seconds.
+        old_value.to_i.days
+      else
+        old_value
+      end
+    end
+
+    def schema_version
+      (@schema_version || 0).to_i
     end
 
     def diff_with!(agent)
@@ -249,21 +276,6 @@ class ScenarioImport
       yield 'keep_events_for', keep_events_for, Agent::EVENT_RETENTION_SCHEDULES if self['keep_events_for'].present? && keep_events_for.requires_merge?
       yield 'propagate_immediately', propagate_immediately, boolean if self['propagate_immediately'].present? && propagate_immediately.requires_merge?
       yield 'disabled', disabled, boolean if disabled.requires_merge?
-    end
-
-    # Unfortunately Ruby 1.9's OpenStruct doesn't expose [] and []=.
-    unless instance_methods.include?(:[]=)
-      def [](key)
-        self.send(sanitize key)
-      end
-
-      def []=(key, val)
-        self.send("#{sanitize key}=", val)
-      end
-
-      def sanitize(key)
-        key.gsub(/[^a-zA-Z0-9_-]/, '')
-      end
     end
 
     def agent_instance

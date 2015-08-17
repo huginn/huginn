@@ -6,6 +6,7 @@ module Agents
     include WebRequestConcern
 
     can_dry_run!
+    can_order_created_events!
 
     default_schedule "every_12h"
 
@@ -86,7 +87,7 @@ module Agents
 
       Set `uniqueness_look_back` to limit the number of events checked for uniqueness (typically for performance).  This defaults to the larger of #{UNIQUENESS_LOOK_BACK} or #{UNIQUENESS_FACTOR}x the number of detected received results.
 
-      Set `force_encoding` to an encoding name if the website does not return a Content-Type header with a proper charset.
+      Set `force_encoding` to an encoding name if the website is known to respond with a missing, invalid or wrong charset in the Content-Type header.  Note that a text content without a charset is taken as encoded in UTF-8 (not ISO-8859-1).
 
       Set `user_agent` to a custom User-Agent name if the website does not like the default value (`#{default_user_agent}`).
 
@@ -105,6 +106,10 @@ module Agents
           * `status`: HTTP status as integer. (Almost always 200)
 
           * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
+
+      # Ordering Events
+
+      #{description_events_order}
     MD
 
     event_description do
@@ -150,19 +155,6 @@ module Agents
 
       if options['uniqueness_look_back'].present?
         errors.add(:base, "Invalid uniqueness_look_back format") unless is_positive_integer?(options['uniqueness_look_back'])
-      end
-
-      if (encoding = options['force_encoding']).present?
-        case encoding
-        when String
-          begin
-            Encoding.find(encoding)
-          rescue ArgumentError
-            errors.add(:base, "Unknown encoding: #{encoding.inspect}")
-          end
-        else
-          errors.add(:base, "force_encoding must be a string")
-        end
       end
 
       validate_web_request_options!
@@ -279,12 +271,6 @@ module Agents
       interpolation_context.stack {
         interpolation_context['_response_'] = ResponseDrop.new(response)
         body = response.body
-        if (encoding = interpolated['force_encoding']).present?
-          body = body.encode(Encoding::UTF_8, encoding)
-        end
-        if interpolated['unzip'] == "gzip"
-          body = ActiveSupport::Gzip.decompress(body)
-        end
         doc = parse(body)
 
         if extract_full_json?

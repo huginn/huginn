@@ -21,10 +21,12 @@ describe AgentsExporter do
       expect(data[:description]).to eq(description)
       expect(data[:source_url]).to eq(source_url)
       expect(data[:guid]).to eq(guid)
+      expect(data[:schema_version]).to eq(1)
       expect(data[:tag_fg_color]).to eq(tag_fg_color)
       expect(data[:tag_bg_color]).to eq(tag_bg_color)
       expect(Time.parse(data[:exported_at])).to be_within(2).of(Time.now.utc)
       expect(data[:links]).to eq([{ :source => 0, :receiver => 1 }])
+      expect(data[:control_links]).to eq([])
       expect(data[:agents]).to eq(agent_list.map { |agent| exporter.agent_as_json(agent) })
       expect(data[:agents].all? { |agent_json| agent_json[:guid].present? && agent_json[:type].present? && agent_json[:name].present? }).to be_truthy
 
@@ -37,6 +39,13 @@ describe AgentsExporter do
       Link.create!(:source_id => agents(:jane_website_agent).id, :receiver_id => agents(:jane_rain_notifier_agent).id)
 
       expect(exporter.as_json[:links]).to eq([{ :source => 0, :receiver => 1 }])
+    end
+
+    it "outputs control links to agents within the incoming set, but not outside it" do
+      agents(:jane_rain_notifier_agent).control_targets = [agents(:jane_weather_agent), agents(:jane_basecamp_agent)]
+      agents(:jane_rain_notifier_agent).save!
+
+      expect(exporter.as_json[:control_links]).to eq([{ :controller => 1, :control_target => 0 }])
     end
   end
 

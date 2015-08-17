@@ -12,6 +12,7 @@ class AgentsExporter
 
   def as_json(opts = {})
     {
+      :schema_version => 1,
       :name => options[:name].presence || 'No name provided',
       :description => options[:description].presence || 'No description provided',
       :source_url => options[:source_url],
@@ -20,7 +21,8 @@ class AgentsExporter
       :tag_bg_color => options[:tag_bg_color],
       :exported_at => Time.now.utc.iso8601,
       :agents => agents.map { |agent| agent_as_json(agent) },
-      :links => links
+      :links => links,
+      :control_links => control_links
     }
   end
 
@@ -32,12 +34,24 @@ class AgentsExporter
     agent_ids = agents.map(&:id)
 
     contained_links = agents.map.with_index do |agent, index|
-      agent.links_as_source.where(:receiver_id => agent_ids).map do |link|
-        { :source => index, :receiver => agent_ids.index(link.receiver_id) }
+      agent.links_as_source.where(receiver_id: agent_ids).map do |link|
+        { source: index, receiver: agent_ids.index(link.receiver_id) }
       end
     end
 
     contained_links.flatten.compact
+  end
+
+  def control_links
+    agent_ids = agents.map(&:id)
+
+    contained_controller_links = agents.map.with_index do |agent, index|
+      agent.control_links_as_controller.where(control_target_id: agent_ids).map do |control_link|
+        { controller: index, control_target: agent_ids.index(control_link.control_target_id) }
+      end
+    end
+
+    contained_controller_links.flatten.compact
   end
 
   def agent_as_json(agent)

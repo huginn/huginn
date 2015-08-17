@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
 
+# Ruby 2.0 is the minimum requirement
+ruby ['2.0.0', RUBY_VERSION].max
+
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 gem 'twilio-ruby', '~> 3.11.5'    # TwilioAgent
@@ -75,7 +78,7 @@ gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.6'
 gem 'kaminari', '~> 0.16.1'
 gem 'kramdown', '~> 1.3.3'
-gem 'liquid', '~> 2.6.1'
+gem 'liquid', '~> 3.0.3'
 gem 'mini_magick'
 gem 'mysql2', '~> 0.3.16'
 gem 'multi_xml'

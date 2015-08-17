@@ -1,10 +1,19 @@
 # Changes
 
+* Jul 30, 2015   - RssAgent can configure the order of events created via `events_order`.
+* Jul 29, 2015   - WebsiteAgent can configure the order of events created via `events_order`.
+* Jul 29, 2015   - DataOutputAgent can configure the order of events in the output via `events_order`.
+* Jul 20, 2015   - Control Links (used by the SchedularAgent) are correctly exported in Scenarios.
+* Jul 20, 2015   - keep\_events\_for was moved from days to seconds; Scenarios have a schema verison.
+* Jul 8, 2015    - DataOutputAgent supports feed icon, and a new template variable `events`.
 * Jul 1, 2015    - DeDuplicationAgent properly handles destruction of memory.
 * Jun 26, 2015   - Add `max_events_per_run` to RssAgent.
 * Jun 19, 2015   - Add `url_from_event` to WebsiteAgent.
 * Jun 17, 2015   - RssAgent emits events for new feed items in chronological order.
+* Jun 17, 2015   - Liquid filter `unescape` added.
+* Jun 17, 2015   - Liquid filter `regex_replace` and `regex_replace_first` added, with escape sequence support.
 * Jun 15, 2015   - Liquid filter `uri_expand` added.
+* Jun 13, 2015   - Liquid templating engine is upgraded to version 3.
 * Jun 12, 2015   - RSSAgent can now accept an array of URLs.
 * Jun 8, 2015    - WebsiteAgent includes a `use_namespaces` option to enable XML namespaces.
 * May 27, 2015   - Validation warns user if they have not provided a `path` when using JSONPath in WebsiteAgent.

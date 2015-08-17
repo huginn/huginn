@@ -38,6 +38,16 @@ describe LiquidInterpolatable::Filters do
     end
   end
 
+  describe 'unescape' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should unescape basic HTML entities' do
+      agent.interpolation_context['something'] = '&#39;&lt;foo&gt; &amp; bar&#x27;'
+      agent.options['cleaned'] = '{{ something | unescape }}'
+      expect(agent.interpolated['cleaned']).to eq("'<foo> & bar'")
+    end
+  end
+
   describe 'to_xpath' do
     before do
       def @filter.to_xpath_roundtrip(string)
@@ -177,23 +187,37 @@ describe LiquidInterpolatable::Filters do
         expect(@agent.interpolated['long_url']).to eq('http://2many.x/6')
       end
     end
-    
-    describe 'regex replace' do
-      let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+  end
 
-      it 'should replace the first occurrence of a string using regex' do
-        agent.interpolation_context['something'] = 'foobar foobar'
-        agent.options['cleaned'] = '{{ something | regex_replace_first: "\S+bar", "foobaz"  }}'
-        expect(agent.interpolated['cleaned']).to eq('foobaz foobar')
-      end
+  describe 'regex_replace_first' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
 
-      it 'should replace the all occurrences of a string using regex' do
-        agent.interpolation_context['something'] = 'foobar foobar'
-        agent.options['cleaned'] = '{{ something | regex_replace: "\S+bar", "foobaz"  }}'
-        expect(agent.interpolated['cleaned']).to eq('foobaz foobaz') 
-      end
-    
+    it 'should replace the first occurrence of a string using regex' do
+      agent.interpolation_context['something'] = 'foobar foobar'
+      agent.options['cleaned'] = '{{ something | regex_replace_first: "\S+bar", "foobaz"  }}'
+      expect(agent.interpolated['cleaned']).to eq('foobaz foobar')
     end
-    
+
+    it 'should support escaped characters' do
+      agent.interpolation_context['something'] = "foo\\1\n\nfoo\\bar\n\nfoo\\baz"
+      agent.options['test'] = "{{ something | regex_replace_first: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace_first: '\\n+', '\\n'  }}"
+      expect(agent.interpolated['test']).to eq("foo\\1\nfoobar\\\n\nfoo\\baz")
+    end
+  end
+
+  describe 'regex_replace' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should replace the all occurrences of a string using regex' do
+      agent.interpolation_context['something'] = 'foobar foobar'
+      agent.options['cleaned'] = '{{ something | regex_replace: "\S+bar", "foobaz"  }}'
+      expect(agent.interpolated['cleaned']).to eq('foobaz foobaz')
+    end
+
+    it 'should support escaped characters' do
+      agent.interpolation_context['something'] = "foo\\1\n\nfoo\\bar\n\nfoo\\baz"
+      agent.options['test'] = "{{ something | regex_replace: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace: '\\n+', '\\n'  }}"
+      expect(agent.interpolated['test']).to eq("foo\\1\nfoobar\\\nfoobaz\\")
+    end
   end
 end

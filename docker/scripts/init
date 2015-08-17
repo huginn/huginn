@@ -6,6 +6,11 @@ cd /app
 # Default to the environment variable values set in .env.example
 source /app/.env.example
 
+# Cleanup any leftover pid file
+if [ -f /app/tmp/pids/server.pid ]; then
+  rm /app/tmp/pids/server.pid
+fi
+
 # is a mysql or postgresql database linked?
 # requires that the mysql or postgresql containers have exposed
 # port 3306 and 5432 respectively.
@@ -177,8 +182,8 @@ if [ -n "\${DO_NOT_RUN_JOBS}" ]; then
   perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
 fi
 
-perl -pi -e 's/rails server\$/rails server -b 0.0.0.0 -p \\\$PORT/' /app/Procfile
-export PORT
+perl -pi -e 's/rails server -b0.0.0.0\$/rails server -b 0.0.0.0 -p \\\$PORT/' /app/Procfile
+export PORT="\${PORT:-3000}"
 
 # Start huginn
 exec sudo -u huginn -EH bash -xc 'exec bundle exec foreman start'
