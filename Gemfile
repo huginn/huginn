@@ -101,6 +101,7 @@ group :development do
   gem 'guard'
   gem 'guard-livereload'
   gem 'guard-rspec'
+  gem 'letter_opener_web'
 
   group :test do
     gem 'coveralls', require: false
