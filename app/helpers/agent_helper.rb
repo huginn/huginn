@@ -37,4 +37,16 @@ module AgentHelper
       }.join(delimiter).html_safe
     end
   end
+
+  def agent_dry_run_with_event_mode(agent)
+    case
+    when agent.cannot_receive_events?
+      'no'.freeze
+    when agent.cannot_be_scheduled?
+      # incoming event is the only trigger for the agent
+      'yes'.freeze
+    else
+      'maybe'.freeze
+    end
+  end
 end

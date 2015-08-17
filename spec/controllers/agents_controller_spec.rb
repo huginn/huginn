@@ -87,19 +87,35 @@ describe AgentsController do
     end
   end
 
-  describe "GET new with :id" do
-    it "opens a clone of a given Agent" do
-      sign_in users(:bob)
-      get :new, :id => agents(:bob_website_agent).to_param
-      expect(assigns(:agent).attributes).to eq(users(:bob).agents.build_clone(agents(:bob_website_agent)).attributes)
+  describe "GET new" do
+    describe "with :id" do
+      it "opens a clone of a given Agent" do
+        sign_in users(:bob)
+        get :new, :id => agents(:bob_website_agent).to_param
+        expect(assigns(:agent).attributes).to eq(users(:bob).agents.build_clone(agents(:bob_website_agent)).attributes)
+      end
+
+      it "only allows the current user to clone his own Agent" do
+        sign_in users(:bob)
+
+        expect {
+          get :new, :id => agents(:jane_website_agent).to_param
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
 
-    it "only allows the current user to clone his own Agent" do
-      sign_in users(:bob)
+    describe "with a scenario_id" do
+      it 'populates the assigned agent with the scenario' do
+        sign_in users(:bob)
+        get :new, :scenario_id => scenarios(:bob_weather).id
+        expect(assigns(:agent).scenario_ids).to eq([scenarios(:bob_weather).id])
+      end
 
-      expect {
-        get :new, :id => agents(:jane_website_agent).to_param
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      it "does not see other user's scenarios" do
+        sign_in users(:bob)
+        get :new, :scenario_id => scenarios(:jane_weather).id
+        expect(assigns(:agent).scenario_ids).to eq([])
+      end
     end
   end
 
@@ -349,6 +365,10 @@ describe AgentsController do
   end
 
   describe "POST dry_run" do
+    before do
+      stub_request(:any, /xkcd/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+    end
+
     it "does not actually create any agent, event or log" do
       sign_in users(:bob)
       expect {
@@ -368,10 +388,23 @@ describe AgentsController do
       sign_in users(:bob)
       agent = agents(:bob_weather_agent)
       expect {
-        post :dry_run, id: agents(:bob_website_agent), agent: valid_attributes(name: 'New Name')
+        post :dry_run, id: agent, agent: valid_attributes(name: 'New Name')
       }.not_to change {
         [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
       }
+    end
+
+    it "accepts an event" do
+      sign_in users(:bob)
+      agent = agents(:bob_website_agent)
+      url_from_event = "http://xkcd.com/?from_event=1".freeze
+      expect {
+        post :dry_run, id: agent, event: { url: url_from_event }
+      }.not_to change {
+        [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
+      }
+      json = JSON.parse(response.body)
+      expect(json['log']).to match(/^I, .* : Fetching #{Regexp.quote(url_from_event)}$/)
     end
   end
 

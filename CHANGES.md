@@ -1,5 +1,43 @@
 # Changes
 
+* Jul 30, 2015   - RssAgent can configure the order of events created via `events_order`.
+* Jul 29, 2015   - WebsiteAgent can configure the order of events created via `events_order`.
+* Jul 29, 2015   - DataOutputAgent can configure the order of events in the output via `events_order`.
+* Jul 20, 2015   - Control Links (used by the SchedularAgent) are correctly exported in Scenarios.
+* Jul 20, 2015   - keep\_events\_for was moved from days to seconds; Scenarios have a schema verison.
+* Jul 8, 2015    - DataOutputAgent supports feed icon, and a new template variable `events`.
+* Jul 1, 2015    - DeDuplicationAgent properly handles destruction of memory.
+* Jun 26, 2015   - Add `max_events_per_run` to RssAgent.
+* Jun 19, 2015   - Add `url_from_event` to WebsiteAgent.
+* Jun 17, 2015   - RssAgent emits events for new feed items in chronological order.
+* Jun 17, 2015   - Liquid filter `unescape` added.
+* Jun 17, 2015   - Liquid filter `regex_replace` and `regex_replace_first` added, with escape sequence support.
+* Jun 15, 2015   - Liquid filter `uri_expand` added.
+* Jun 13, 2015   - Liquid templating engine is upgraded to version 3.
+* Jun 12, 2015   - RSSAgent can now accept an array of URLs.
+* Jun 8, 2015    - WebsiteAgent includes a `use_namespaces` option to enable XML namespaces.
+* May 27, 2015   - Validation warns user if they have not provided a `path` when using JSONPath in WebsiteAgent.
+* May 24, 2015   - Show Agents' name and user in the jobs panel.
+* May 19, 2015   - Add "Dry Run" to the action menu.
+* May 23, 2015   - JavaScriptAgent has dry run and inline syntax highlighting JavaScript and CoffeeScript.
+* May 11, 2015   - Make delayed\_job sleep\_delay and max\_run\_time .env configurable.
+* May 9, 2015    - Add 'unescapeHTML' functionality to the javascript agent.
+* May 3, 2015    - Use ActiveJobs interface. 
+* Apr 28, 2015   - Adds Wunderlist agent.
+* Apr 25, 2015   - Allow user to clear memory of an agent.
+* Apr 25, 2015   - Allow WebsiteAgent to unzip compressed JSON.
+* Apr 12, 2015   - Allow the webhook agent to loop over returned results if the payload\_path points to an array.
+* Mar 27, 2015   - Add wit.ai Agent.
+* Mar 24, 2015   - CloudFoundry integration.
+* Mar 20, 2015   - Upgrade to Rails 4.2.
+* Mar 17, 2015   - Add new "Dry Run" feature for some Agents.
+* Feb 26, 2015   - Update to PushBullet API version 2.
+* Feb 22, 2015   - Allow Agents to request immediate propagation of Events.
+* Feb 18, 2015   - Convert \n to actual line breaks after interpolating liquid and add `line_break_tag`.
+* Feb 6, 2015    - Allow UserLocationAgent to accept `min_distance` to require a certain distance traveled.
+* Feb 1, 2015    - Allow a `body` key to be provided to set email body in the EmailAgent.
+* Jan 21, 2015   - Allow custom icon for Slack webhooks.
+* Jan 20, 2015   - Add `max_accuracy` to UserLocationAgent.
 * Jan 19, 2015   - WebRequestConcern Agents can supply `disable_ssl_verification` to disable ssl verification.
 * Jan 13, 2015   - Docker image updated.
 * Jan 8, 2015    - Allow toggling of accuracy when displaying locations in the UserLocationAgent map.

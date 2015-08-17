@@ -38,6 +38,16 @@ describe LiquidInterpolatable::Filters do
     end
   end
 
+  describe 'unescape' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should unescape basic HTML entities' do
+      agent.interpolation_context['something'] = '&#39;&lt;foo&gt; &amp; bar&#x27;'
+      agent.options['cleaned'] = '{{ something | unescape }}'
+      expect(agent.interpolated['cleaned']).to eq("'<foo> & bar'")
+    end
+  end
+
   describe 'to_xpath' do
     before do
       def @filter.to_xpath_roundtrip(string)
@@ -94,6 +104,120 @@ describe LiquidInterpolatable::Filters do
       @agent.options['foo'] = '{% assign u = s | to_uri:"http://example.com/dir/1" %}{{ u.path }}'
       @agent.interpolation_context['s'] = 'foo/index.html'
       expect(@agent.interpolated['foo']).to eq('/dir/foo/index.html')
+    end
+  end
+
+  describe 'uri_expand' do
+    before do
+      stub_request(:head, 'https://t.co.x/aaaa').
+        to_return(status: 301, headers: { Location: 'https://bit.ly.x/bbbb' })
+      stub_request(:head, 'https://bit.ly.x/bbbb').
+        to_return(status: 301, headers: { Location: 'http://tinyurl.com.x/cccc' })
+      stub_request(:head, 'http://tinyurl.com.x/cccc').
+        to_return(status: 301, headers: { Location: 'http://www.example.com/welcome' })
+      stub_request(:head, 'http://www.example.com/welcome').
+        to_return(status: 200)
+
+      (1..5).each do |i|
+        stub_request(:head, "http://2many.x/#{i}").
+          to_return(status: 301, headers: { Location: "http://2many.x/#{i+1}" })
+      end
+      stub_request(:head, 'http://2many.x/6').
+        to_return(status: 301, headers: { 'Content-Length' => '5' })
+    end
+
+    it 'should handle inaccessible URIs' do
+      expect(@filter.uri_expand(nil)).to eq('')
+      expect(@filter.uri_expand('')).to eq('')
+      expect(@filter.uri_expand(5)).to eq('5')
+      expect(@filter.uri_expand([])).to eq('[]')
+      expect(@filter.uri_expand({})).to eq('{}')
+      expect(@filter.uri_expand(URI('/'))).to eq('/')
+      expect(@filter.uri_expand(URI('http:google.com'))).to eq('http:google.com')
+      expect(@filter.uri_expand(URI('http:/google.com'))).to eq('http:/google.com')
+      expect(@filter.uri_expand(URI('ftp://ftp.freebsd.org/pub/FreeBSD/README.TXT'))).to eq('ftp://ftp.freebsd.org/pub/FreeBSD/README.TXT')
+    end
+
+    it 'should follow redirects' do
+      expect(@filter.uri_expand('https://t.co.x/aaaa')).to eq('http://www.example.com/welcome')
+    end
+
+    it 'should respect the limit for the number of redirects' do
+      expect(@filter.uri_expand('http://2many.x/1')).to eq('http://2many.x/1')
+      expect(@filter.uri_expand('http://2many.x/1', 6)).to eq('http://2many.x/6')
+    end
+
+    it 'should detect a redirect loop' do
+      stub_request(:head, 'http://bad.x/aaaa').
+        to_return(status: 301, headers: { Location: 'http://bad.x/bbbb' })
+      stub_request(:head, 'http://bad.x/bbbb').
+        to_return(status: 301, headers: { Location: 'http://bad.x/aaaa' })
+
+      expect(@filter.uri_expand('http://bad.x/aaaa')).to eq('http://bad.x/aaaa')
+    end
+
+    it 'should be able to handle an FTP URL' do
+      stub_request(:head, 'http://downloads.x/aaaa').
+        to_return(status: 301, headers: { Location: 'http://downloads.x/download?file=aaaa.zip' })
+      stub_request(:head, 'http://downloads.x/download').
+        with(query: { file: 'aaaa.zip' }).
+        to_return(status: 301, headers: { Location: 'ftp://downloads.x/pub/aaaa.zip' })
+
+      expect(@filter.uri_expand('http://downloads.x/aaaa')).to eq('ftp://downloads.x/pub/aaaa.zip')
+    end
+
+    describe 'used in interpolation' do
+      before do
+        @agent = Agents::InterpolatableAgent.new(name: "test")
+      end
+
+      it 'should follow redirects' do
+        @agent.interpolation_context['short_url'] = 'https://t.co.x/aaaa'
+        @agent.options['long_url'] = '{{ short_url | uri_expand }}'
+        expect(@agent.interpolated['long_url']).to eq('http://www.example.com/welcome')
+      end
+
+      it 'should respect the limit for the number of redirects' do
+        @agent.interpolation_context['short_url'] = 'http://2many.x/1'
+        @agent.options['long_url'] = '{{ short_url | uri_expand }}'
+        expect(@agent.interpolated['long_url']).to eq('http://2many.x/1')
+
+        @agent.interpolation_context['short_url'] = 'http://2many.x/1'
+        @agent.options['long_url'] = '{{ short_url | uri_expand:6 }}'
+        expect(@agent.interpolated['long_url']).to eq('http://2many.x/6')
+      end
+    end
+  end
+
+  describe 'regex_replace_first' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should replace the first occurrence of a string using regex' do
+      agent.interpolation_context['something'] = 'foobar foobar'
+      agent.options['cleaned'] = '{{ something | regex_replace_first: "\S+bar", "foobaz"  }}'
+      expect(agent.interpolated['cleaned']).to eq('foobaz foobar')
+    end
+
+    it 'should support escaped characters' do
+      agent.interpolation_context['something'] = "foo\\1\n\nfoo\\bar\n\nfoo\\baz"
+      agent.options['test'] = "{{ something | regex_replace_first: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace_first: '\\n+', '\\n'  }}"
+      expect(agent.interpolated['test']).to eq("foo\\1\nfoobar\\\n\nfoo\\baz")
+    end
+  end
+
+  describe 'regex_replace' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should replace the all occurrences of a string using regex' do
+      agent.interpolation_context['something'] = 'foobar foobar'
+      agent.options['cleaned'] = '{{ something | regex_replace: "\S+bar", "foobaz"  }}'
+      expect(agent.interpolated['cleaned']).to eq('foobaz foobaz')
+    end
+
+    it 'should support escaped characters' do
+      agent.interpolation_context['something'] = "foo\\1\n\nfoo\\bar\n\nfoo\\baz"
+      agent.options['test'] = "{{ something | regex_replace: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace: '\\n+', '\\n'  }}"
+      expect(agent.interpolated['test']).to eq("foo\\1\nfoobar\\\nfoobaz\\")
     end
   end
 end

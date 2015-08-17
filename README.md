@@ -66,7 +66,9 @@ If you just want to play around, you can simply fork this repository, then perfo
 * Read the [wiki][wiki] for usage examples and to get started making new Agents.
 * Periodically run `git fetch upstream` and then `git checkout master && git merge upstream/master` to merge in the newest version of Huginn.
 
-Note: by default, emails are not sent in the `development` Rails environment, which is what you just setup.  If you'd like to enable emails when playing with Huginn locally, set `SEND_EMAIL_IN_DEVELOPMENT` to `true` in your `.env` file.
+Note: By default, emails are intercepted in the `development` Rails environment, which is what you just setup.  You can view 
+them at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener). If you'd like to send real emails via SMTP when playing 
+with Huginn locally, set `SEND_EMAIL_IN_DEVELOPMENT` to `true` in your `.env` file.
 
 If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
 
@@ -80,9 +82,11 @@ All agents have specs! Test all specs with `bundle exec rspec`, or test a specif
 
 ## Deployment
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup.  Be sure to click 'View it' after launch!)
+Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup.  Be sure to click 'View it' after launch!)
 
-Huginn can run on Heroku for free!  Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
+Huginn works on the free version of Heroku [with limitations](https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku). For non-experimental use, we recommend Heroku's cheapest paid plan or our Docker container.
+
+Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
 ### Optional Setup
 

@@ -79,4 +79,43 @@ module Utils
   def self.pretty_jsonify(thing)
     JSON.pretty_generate(thing).gsub('</', '<\/')
   end
+
+  class TupleSorter
+    class SortableTuple
+      attr_reader :array
+
+      # The <=> method will call orders[n] to determine if the nth element
+      # should be compared in descending order.
+      def initialize(array, orders = [])
+        @array = array
+        @orders = orders
+      end
+
+      def <=> other
+        other = other.array
+        @array.each_with_index do |e, i|
+          o = other[i]
+          case cmp = e <=> o || e.to_s <=> o.to_s
+          when 0
+            next
+          else
+            return @orders[i] ? -cmp : cmp
+          end
+        end
+        0
+      end
+    end
+
+    class << self
+      def sort!(array, orders = [])
+        array.sort_by! do |e|
+          SortableTuple.new(e, orders)
+        end
+      end
+    end
+  end
+
+  def self.sort_tuples!(array, orders = [])
+    TupleSorter.sort!(array, orders)
+  end
 end

@@ -114,7 +114,7 @@ class HuginnScheduler
     end
 
     # Schedule event cleanup.
-    @rufus_scheduler.cron "0 0 * * * " + tzinfo_friendly_timezone do
+    @rufus_scheduler.every ENV['EVENT_EXPIRATION_CHECK'].presence || '6h' do
       cleanup_expired_events!
     end
 

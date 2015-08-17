@@ -30,7 +30,7 @@ describe ScenarioImport do
       :type => "Agents::WeatherAgent",
       :name => "a weather agent",
       :schedule => "5pm",
-      :keep_events_for => 14,
+      :keep_events_for => 14.days,
       :disabled => true,
       :guid => "a-weather-agent",
       :options => weather_agent_options
@@ -61,6 +61,7 @@ describe ScenarioImport do
   end
   let(:valid_parsed_data) do
     {
+      :schema_version => 1,
       :name => name,
       :description => description,
       :guid => guid,
@@ -74,7 +75,8 @@ describe ScenarioImport do
       ],
       :links => [
         { :source => 0, :receiver => 1 }
-      ]
+      ],
+      :control_links => []
     }
   end
   let(:valid_data) { valid_parsed_data.to_json }
@@ -203,7 +205,7 @@ describe ScenarioImport do
 
           expect(weather_agent.name).to eq("a weather agent")
           expect(weather_agent.schedule).to eq("5pm")
-          expect(weather_agent.keep_events_for).to eq(14)
+          expect(weather_agent.keep_events_for).to eq(14.days)
           expect(weather_agent.propagate_immediately).to be_falsey
           expect(weather_agent).to be_disabled
           expect(weather_agent.memory).to be_empty
@@ -225,6 +227,55 @@ describe ScenarioImport do
           expect {
             scenario_import.import
           }.to change { users(:bob).agents.count }.by(2)
+        end
+
+        context "when the schema_version is less than 1" do
+          before do
+            valid_parsed_weather_agent_data[:keep_events_for] = 2
+            valid_parsed_data.delete(:schema_version)
+          end
+
+          it "translates keep_events_for from days to seconds" do
+            scenario_import.import
+            expect(scenario_import.errors).to be_empty
+            weather_agent = scenario_import.scenario.agents.find_by(:guid => "a-weather-agent")
+            trigger_agent = scenario_import.scenario.agents.find_by(:guid => "a-trigger-agent")
+
+            expect(weather_agent.keep_events_for).to eq(2.days)
+            expect(trigger_agent.keep_events_for).to eq(0)
+          end
+        end
+
+        describe "with control links" do
+          it 'creates the links' do
+            valid_parsed_data[:control_links] = [
+              { :controller => 1, :control_target => 0 }
+            ]
+
+            expect {
+              scenario_import.import
+            }.to change { users(:bob).agents.count }.by(2)
+
+            weather_agent = scenario_import.scenario.agents.find_by(:guid => "a-weather-agent")
+            trigger_agent = scenario_import.scenario.agents.find_by(:guid => "a-trigger-agent")
+
+            expect(trigger_agent.sources).to eq([weather_agent])
+            expect(weather_agent.controllers.to_a).to eq([trigger_agent])
+            expect(trigger_agent.control_targets.to_a).to eq([weather_agent])
+          end
+
+          it "doesn't crash without any control links" do
+            valid_parsed_data.delete(:control_links)
+
+            expect {
+              scenario_import.import
+            }.to change { users(:bob).agents.count }.by(2)
+
+            weather_agent = scenario_import.scenario.agents.find_by(:guid => "a-weather-agent")
+            trigger_agent = scenario_import.scenario.agents.find_by(:guid => "a-trigger-agent")
+
+            expect(trigger_agent.sources).to eq([weather_agent])
+          end
         end
       end
 
@@ -309,7 +360,7 @@ describe ScenarioImport do
 
           expect(weather_agent.name).to eq("a weather agent")
           expect(weather_agent.schedule).to eq("5pm")
-          expect(weather_agent.keep_events_for).to eq(14)
+          expect(weather_agent.keep_events_for).to eq(14.days)
           expect(weather_agent.propagate_immediately).to be_falsey
           expect(weather_agent).to be_disabled
           expect(weather_agent.memory).to be_empty
@@ -330,7 +381,7 @@ describe ScenarioImport do
             "0" => {
               "name" => "updated name",
               "schedule" => "6pm",
-              "keep_events_for" => "2",
+              "keep_events_for" => 2.days.to_i.to_s,
               "disabled" => "false",
               "options" => weather_agent_options.merge("api_key" => "foo").to_json
             }
@@ -343,7 +394,7 @@ describe ScenarioImport do
           weather_agent = existing_scenario.agents.find_by(:guid => "a-weather-agent")
           expect(weather_agent.name).to eq("updated name")
           expect(weather_agent.schedule).to eq("6pm")
-          expect(weather_agent.keep_events_for).to eq(2)
+          expect(weather_agent.keep_events_for).to eq(2.days.to_i)
           expect(weather_agent).not_to be_disabled
           expect(weather_agent.options).to eq(weather_agent_options.merge("api_key" => "foo"))
         end
@@ -353,7 +404,7 @@ describe ScenarioImport do
             "0" => {
               "name" => "",
               "schedule" => "foo",
-              "keep_events_for" => "2",
+              "keep_events_for" => 2.days.to_i.to_s,
               "options" => weather_agent_options.merge("api_key" => "").to_json
             }
           }
@@ -386,12 +437,40 @@ describe ScenarioImport do
           end
         end
 
+        context "when the schema_version is less than 1" do
+          it "translates keep_events_for from days to seconds" do
+            valid_parsed_data.delete(:schema_version)
+            valid_parsed_data[:agents] = [valid_parsed_weather_agent_data.merge(keep_events_for: 5)]
+
+            scenario_import.merges = {
+              "0" => {
+                "name" => "a new name",
+                "schedule" => "6pm",
+                "keep_events_for" => 2.days.to_i.to_s,
+                "disabled" => "true",
+                "options" => weather_agent_options.merge("api_key" => "foo").to_json
+              }
+            }
+
+            expect(scenario_import).to be_valid
+
+            weather_agent_diff = scenario_import.agent_diffs[0]
+
+            expect(weather_agent_diff.name.current).to eq(agents(:bob_weather_agent).name)
+            expect(weather_agent_diff.name.incoming).to eq('a weather agent')
+            expect(weather_agent_diff.name.updated).to eq('a new name')
+            expect(weather_agent_diff.keep_events_for.current).to eq(45.days.to_i)
+            expect(weather_agent_diff.keep_events_for.incoming).to eq(5.days.to_i)
+            expect(weather_agent_diff.keep_events_for.updated).to eq(2.days.to_i.to_s)
+          end
+        end
+
         it "sets the 'updated' FieldDiff values based on any feedback from the user" do
           scenario_import.merges = {
             "0" => {
               "name" => "a new name",
               "schedule" => "6pm",
-              "keep_events_for" => "2",
+              "keep_events_for" => 2.days.to_s,
               "disabled" => "true",
               "options" => weather_agent_options.merge("api_key" => "foo").to_json
             },
@@ -411,7 +490,8 @@ describe ScenarioImport do
           expect(weather_agent_diff.name.updated).to eq("a new name")
 
           expect(weather_agent_diff.schedule.updated).to eq("6pm")
-          expect(weather_agent_diff.keep_events_for.updated).to eq("2")
+          expect(weather_agent_diff.keep_events_for.current).to eq(45.days)
+          expect(weather_agent_diff.keep_events_for.updated).to eq(2.days.to_s)
           expect(weather_agent_diff.disabled.updated).to eq("true")
           expect(weather_agent_diff.options.updated).to eq(weather_agent_options.merge("api_key" => "foo"))
         end

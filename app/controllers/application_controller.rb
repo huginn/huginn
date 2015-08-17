@@ -6,6 +6,12 @@ class ApplicationController < ActionController::Base
 
   helper :all
 
+  def redirect_back(fallback_path, *args)
+    redirect_to :back, *args
+  rescue ActionController::RedirectBackError
+    redirect_to fallback_path, *args
+  end
+
   protected
 
   def configure_permitted_parameters

@@ -52,7 +52,9 @@ module Agents
         end
       end
     end
-  private
+
+    private
+
     def request_guard(&blk)
       response = yield
       error("Error during http request: #{response.body}") if response.code > 400

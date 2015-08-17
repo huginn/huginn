@@ -2,7 +2,7 @@ Huginn::Application.routes.draw do
   resources :agents do
     member do
       post :run
-      put :dry_run
+      post :dry_run
       post :handle_details_post
       put :leave_scenario
       delete :remove_events
@@ -62,6 +62,7 @@ Huginn::Application.routes.draw do
     end
     collection do
       delete :destroy_failed
+      delete :destroy_all
     end
   end
 
@@ -74,6 +75,10 @@ Huginn::Application.routes.draw do
   devise_for :users,
              controllers: { omniauth_callbacks: 'omniauth_callbacks' },
              sign_out_via: [:post, :delete]
+  
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
 
   get "/about" => "home#about"
   root :to => "home#index"

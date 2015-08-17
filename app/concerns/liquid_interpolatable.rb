@@ -15,7 +15,9 @@ module LiquidInterpolatable
     interpolated
   rescue Liquid::Error => e
     errors.add(:options, "has an error with Liquid templating: #{e.message}")
-    false
+  rescue
+    # Calling `interpolated` without an incoming may naturally fail
+    # with various errors when an agent expects one.
   end
 
   # Return the current interpolation context.  Use this in your Agent
@@ -132,6 +134,65 @@ module LiquidInterpolatable
       nil
     end
 
+    # Get the destination URL of a given URL by recursively following
+    # redirects, up to 5 times in a row.  If a given string is not a
+    # valid absolute HTTP URL or in case of too many redirects, the
+    # original string is returned.  If any network/protocol error
+    # occurs while following redirects, the last URL followed is
+    # returned.
+    def uri_expand(url, limit = 5)
+      case url
+      when URI
+        uri = url
+      else
+        url = url.to_s
+        begin
+          uri = URI(url)
+        rescue URI::Error
+          return url
+        end
+      end
+
+      http = Faraday.new do |builder|
+        builder.adapter :net_http
+        # builder.use FaradayMiddleware::FollowRedirects, limit: limit
+        # ...does not handle non-HTTP URLs.
+      end
+
+      limit.times do
+        begin
+          case uri
+          when URI::HTTP
+            return uri.to_s unless uri.host
+            response = http.head(uri)
+            case response.status
+            when 301, 302, 303, 307
+              if location = response['location']
+                uri += location
+                next
+              end
+            end
+          end
+        rescue URI::Error, Faraday::Error, SystemCallError => e
+          logger.error "#{e.class} in #{__method__}(#{url.inspect}) [uri=#{uri.to_s.inspect}]: #{e.message}:\n#{e.backtrace.join("\n")}"
+        end
+
+        return uri.to_s
+      end
+
+      logger.error "Too many rediretions in #{__method__}(#{url.inspect}) [uri=#{uri.to_s.inspect}]"
+
+      url
+    end
+
+    # Unescape (basic) HTML entities in a string
+    #
+    # This currently decodes the following entities only: "&apos;",
+    # "&quot;", "&lt;", "&gt;", "&amp;", "&#dd;" and "&#xhh;".
+    def unescape(input)
+      CGI.unescapeHTML(input) rescue input
+    end
+
     # Escape a string for use in XPath expression
     def to_xpath(string)
       subs = string.to_s.scan(/\G(?:\A\z|[^"]+|[^']+)/).map { |x|
@@ -147,6 +208,83 @@ module LiquidInterpolatable
       else
         'concat(' << subs.join(', ') << ')'
       end
+    end
+
+    def regex_replace(input, regex, replacement = nil)
+      input.to_s.gsub(Regexp.new(regex), unescape_replacement(replacement.to_s))
+    end
+
+    def regex_replace_first(input, regex, replacement = nil)
+      input.to_s.sub(Regexp.new(regex), unescape_replacement(replacement.to_s))
+    end
+
+    private
+
+    def logger
+      @@logger ||=
+        if defined?(Rails)
+          Rails.logger
+        else
+          require 'logger'
+          Logger.new(STDERR)
+        end
+    end
+
+    BACKSLASH = "\\".freeze
+
+    UNESCAPE = {
+      "a" => "\a",
+      "b" => "\b",
+      "e" => "\e",
+      "f" => "\f",
+      "n" => "\n",
+      "r" => "\r",
+      "s" => " ",
+      "t" => "\t",
+      "v" => "\v",
+    }
+
+    # Unescape a replacement text for use in the second argument of
+    # gsub/sub.  The following escape sequences are recognized:
+    #
+    # - "\\" (backslash itself)
+    # - "\a" (alert)
+    # - "\b" (backspace)
+    # - "\e" (escape)
+    # - "\f" (form feed)
+    # - "\n" (new line)
+    # - "\r" (carriage return)
+    # - "\s" (space)
+    # - "\t" (horizontal tab)
+    # - "\u{XXXX}" (unicode codepoint)
+    # - "\v" (vertical tab)
+    # - "\xXX" (hexadecimal character)
+    # - "\1".."\9" (numbered capture groups)
+    # - "\+" (last capture group)
+    # - "\k<name>" (named capture group)
+    # - "\&" or "\0" (complete matched text)
+    # - "\`" (string before match)
+    # - "\'" (string after match)
+    #
+    # Octal escape sequences are deliberately unsupported to avoid
+    # conflict with numbered capture groups.  Rather obscure Emacs
+    # style character codes ("\C-x", "\M-\C-x" etc.) are also omitted
+    # from this implementation.
+    def unescape_replacement(s)
+      s.gsub(/\\(?:([\d+&`'\\]|k<\w+>)|u\{([[:xdigit:]]+)\}|x([[:xdigit:]]{2})|(.))/) {
+        if c = $1
+          BACKSLASH + c
+        elsif c = ($2 && [$2.to_i(16)].pack('U')) ||
+                  ($3 && [$3.to_i(16)].pack('C'))
+          if c == BACKSLASH
+            BACKSLASH + c
+          else
+            c
+          end
+        else
+          UNESCAPE[$4] || $4
+        end
+      }
     end
   end
   Liquid::Template.register_filter(LiquidInterpolatable::Filters)

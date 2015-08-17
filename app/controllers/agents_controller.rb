@@ -37,7 +37,7 @@ class AgentsController < ApplicationController
   def dry_run
     attrs = params[:agent] || {}
     if agent = current_user.agents.find_by(id: params[:id])
-      # PUT /agents/:id/dry_run
+      # POST /agents/:id/dry_run
       if attrs.present?
         type = agent.type
         agent = Agent.build_for_type(type, current_user, attrs)
@@ -50,7 +50,13 @@ class AgentsController < ApplicationController
     agent.name ||= '(Untitled)'
 
     if agent.valid?
-      results = agent.dry_run!
+      if event_payload = params[:event]
+        dummy_agent = Agent.build_for_type('ManualEventAgent', current_user, name: 'Dry-Runner')
+        dummy_agent.readonly!
+        event = dummy_agent.events.build(user: current_user, payload: event_payload)
+      end
+
+      results = agent.dry_run!(event)
 
       render json: {
         log: results[:log],
@@ -142,6 +148,9 @@ class AgentsController < ApplicationController
     else
       @agent = agents.build
     end
+
+    @agent.scenario_ids = [params[:scenario_id]] if params[:scenario_id] && current_user.scenarios.find_by(id: params[:scenario_id])
+
     initialize_presenter
 
     respond_to do |format|
@@ -160,7 +169,7 @@ class AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.save
-        format.html { redirect_back "'#{@agent.name}' was successfully created." }
+        format.html { redirect_back "'#{@agent.name}' was successfully created.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
         initialize_presenter
@@ -175,7 +184,7 @@ class AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
-        format.html { redirect_back "'#{@agent.name}' was successfully updated." }
+        format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
         initialize_presenter
@@ -225,16 +234,23 @@ class AgentsController < ApplicationController
   protected
 
   # Sanitize params[:return] to prevent open redirect attacks, a common security issue.
-  def redirect_back(message)
-    if params[:return] == "show" && @agent && !@agent.destroyed?
-      path = agent_path(@agent)
-    elsif params[:return] =~ /\A#{Regexp::escape scenarios_path}\/\d+\Z/
-      path = params[:return]
-    else
-      path = agents_path
+  def redirect_back(message, options = {})
+    case ret = params[:return] || options[:return]
+    when "show"
+      if @agent && !@agent.destroyed?
+        path = agent_path(@agent)
+      else
+        path = agents_path
+      end
+    when /\A#{Regexp::escape scenarios_path}\/\d+\z/, agents_path
+      path = ret
     end
 
-    redirect_to path, notice: message
+    if path
+      redirect_to path, notice: message
+    else
+      super agents_path, notice: message
+    end
   end
 
   def build_agent
