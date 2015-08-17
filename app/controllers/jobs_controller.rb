@@ -49,7 +49,7 @@ class JobsController < ApplicationController
   end
 
   def destroy_all
-    Delayed::Job.delete_all
+    Delayed::Job.where(locked_at: nil).delete_all
 
     respond_to do |format|
       format.html { redirect_to jobs_path, notice: "All jobs removed." }

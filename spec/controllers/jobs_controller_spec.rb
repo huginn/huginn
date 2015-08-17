@@ -70,6 +70,7 @@ describe JobsController do
     before do
       @failed = Delayed::Job.create(failed_at: Time.now - 1.minute)
       @running = Delayed::Job.create(locked_at: Time.now, locked_by: 'test')
+      @pending = Delayed::Job.create
       sign_in users(:jane)
     end
 
@@ -82,11 +83,13 @@ describe JobsController do
     before do
       @failed = Delayed::Job.create(failed_at: Time.now - 1.minute)
       @running = Delayed::Job.create(locked_at: Time.now, locked_by: 'test')
+      @pending = Delayed::Job.create
       sign_in users(:jane)
     end
 
     it "destroys all jobs" do
       expect { delete :destroy_all }.to change(Delayed::Job, :count).by(-2)
+      expect(Delayed::Job.find(@running.id)).to be
     end
   end
 end
