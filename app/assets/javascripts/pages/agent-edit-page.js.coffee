@@ -16,6 +16,8 @@ class @AgentEditPage
     if $("#agent_type").length
       $("#agent_type").on "change", => @handleTypeChange(false)
       @handleTypeChange(true)
+
+      # Update the dropdown to match agent description as well as agent name
       $('#agent_type').select2
         width: 'resolve'
         formatResult: formatAgentForSelect
@@ -28,12 +30,6 @@ class @AgentEditPage
     else
       @enableDryRunButton()
       @buildAce()
-
-  formatAgentForSelect = (agent) ->
-    originalOption = agent.element
-    description = $(originalOption).attr('title')
-    description = if /^[a-zA-Z]/.test(description) then description else ''
-    '<strong>' + agent.text + '</strong><br/>' + description
 
   handleTypeChange: (firstTime) ->
     $(".event-descriptions").html("").hide()
@@ -191,6 +187,11 @@ class @AgentEditPage
     e.preventDefault()
     @updateFromEditors()
     Utils.handleDryRunButton(e.target)
+
+  formatAgentForSelect = (agent) ->
+    originalOption = agent.element
+    description = agent.element[0].title
+    '<strong>' + agent.text + '</strong><br/>' + description
 
 $ ->
   Utils.registerPage(AgentEditPage, forPathsMatching: /^agents/)
