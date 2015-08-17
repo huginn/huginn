@@ -67,10 +67,6 @@ module Agents
       if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
         errors.add(:base, "include_retweets must be a boolean value string (true/false)")
       end
-      
-      if options[:exclude_replies].present? && !%w[true false].include?(options[:exclude_replies])
-        errors.add(:base, "exclude_replies must be a boolean value string (true/false)")
-      end
 
       if options[:starting_at].present?
         Time.parse(options[:starting_at]) rescue errors.add(:base, "Error parsing starting_at")
