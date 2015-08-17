@@ -47,7 +47,7 @@ The CMD launches Huginn via the scripts/init script. This may become the ENTRYPO
 
 Simple stand-alone usage:
 
-    docker run -it -p 5000:5000 cantino/huginn
+    docker run -it -p 3000:3000 cantino/huginn
 
 To link to another mysql container, for example:
 
@@ -59,7 +59,7 @@ To link to another mysql container, for example:
         cantino/huginn
     docker run --rm --name huginn \
         --link mysql \
-        -p 5000:5000 \
+        -p 3000:3000 \
         -e HUGINN_DATABASE_NAME=huginn \
         -e HUGINN_DATABASE_USERNAME=huginn \
         -e HUGINN_DATABASE_PASSWORD=somethingsecret \
@@ -69,7 +69,7 @@ To link to another container named 'postgres':
 
     docker run --rm --name huginn \
         --link postgres:postgresql \
-        -p 5000:5000 \
+        -p 3000:3000 \
         -e "HUGINN_DATABASE_USERNAME=huginn" \
         -e "HUGINN_DATABASE_PASSWORD=pass@word" \
         cantino/huginn

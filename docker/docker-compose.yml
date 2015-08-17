@@ -15,14 +15,14 @@ mysql:
 huginn:
   build: .
   ports:
-    - 5000:5000
+    - 3000:3000
   environment:
     HUGINN_DATABASE_NAME: huginn
     HUGINN_DATABASE_USERNAME: root
     HUGINN_DATABASE_PASSWORD: myrootpassword
     INTENTIONALLY_SLEEP: 10
     #DATABASE_INITIAL_CONNECT_MAX_RETRIES: 5
-    PORT: 5000
+    PORT: 3000
   links:
     - mysql
 
