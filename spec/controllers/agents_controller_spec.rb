@@ -87,19 +87,35 @@ describe AgentsController do
     end
   end
 
-  describe "GET new with :id" do
-    it "opens a clone of a given Agent" do
-      sign_in users(:bob)
-      get :new, :id => agents(:bob_website_agent).to_param
-      expect(assigns(:agent).attributes).to eq(users(:bob).agents.build_clone(agents(:bob_website_agent)).attributes)
+  describe "GET new" do
+    describe "with :id" do
+      it "opens a clone of a given Agent" do
+        sign_in users(:bob)
+        get :new, :id => agents(:bob_website_agent).to_param
+        expect(assigns(:agent).attributes).to eq(users(:bob).agents.build_clone(agents(:bob_website_agent)).attributes)
+      end
+
+      it "only allows the current user to clone his own Agent" do
+        sign_in users(:bob)
+
+        expect {
+          get :new, :id => agents(:jane_website_agent).to_param
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
 
-    it "only allows the current user to clone his own Agent" do
-      sign_in users(:bob)
+    describe "with a scenario_id" do
+      it 'populates the assigned agent with the scenario' do
+        sign_in users(:bob)
+        get :new, :scenario_id => scenarios(:bob_weather).id
+        expect(assigns(:agent).scenario_ids).to eq([scenarios(:bob_weather).id])
+      end
 
-      expect {
-        get :new, :id => agents(:jane_website_agent).to_param
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      it "does not see other user's scenarios" do
+        sign_in users(:bob)
+        get :new, :scenario_id => scenarios(:jane_weather).id
+        expect(assigns(:agent).scenario_ids).to eq([])
+      end
     end
   end
 

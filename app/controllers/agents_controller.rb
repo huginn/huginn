@@ -148,6 +148,9 @@ class AgentsController < ApplicationController
     else
       @agent = agents.build
     end
+
+    @agent.scenario_ids = [params[:scenario_id]] if params[:scenario_id] && current_user.scenarios.find_by(id: params[:scenario_id])
+
     initialize_presenter
 
     respond_to do |format|
@@ -236,8 +239,10 @@ class AgentsController < ApplicationController
     when "show"
       if @agent && !@agent.destroyed?
         path = agent_path(@agent)
+      else
+        path = agents_path
       end
-    when /\A#{Regexp::escape scenarios_path}\/\d+\Z/, agents_path
+    when /\A#{Regexp::escape scenarios_path}\/\d+\z/, agents_path
       path = ret
     end
 

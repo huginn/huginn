@@ -62,6 +62,7 @@ Huginn::Application.routes.draw do
     end
     collection do
       delete :destroy_failed
+      delete :destroy_all
     end
   end
 
