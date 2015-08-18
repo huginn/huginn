@@ -20,6 +20,9 @@ module Agents
           * `payload_path` - JSONPath of the attribute in the POST body to be
             used as the Event payload.  If `payload_path` points to an array,
             Events will be created for each element.
+          * `fileupload_action` - Need to set true when webhook agent is used for file upload. Default value is false.
+          * `form_name` - It's sub option of fileupload_action. received form name in http request from client side.
+          * `folder_name` - It's sub option of fileupload_action. upload path when action_type is file upload.
       MD
     end
 
@@ -33,8 +36,58 @@ module Agents
     def default_options
       { "secret" => "supersecretstring",
         "expected_receive_period_in_days" => 1,
-        "payload_path" => "some_key"
-      }
+        "payload_path" => "some_key",
+        "fileupload_action" => "false",
+        "form_name" => "webhookform",
+        "folder_name" =>"public"}
+    end
+
+    def file_upload_action(params)
+      if params[interpolated['form_name']] != nil
+        uploadflag = params[interpolated['form_name']].is_a?(String)
+        filename = uploadflag  ? params[interpolated['form_name']] : params[interpolated['form_name']].original_filename
+
+        orgFilename = filename.split('.').first
+        extension = filename.split('.').last
+
+        if interpolated['folder_name'].present?
+          dir = Rails.root.join(interpolated['folder_name'])
+          Dir.mkdir(dir) unless File.exists?(dir)
+          tmp_file = "#{Rails.root}/#{interpolated['folder_name']}/#{filename}"
+        else
+          tmp_file = "#{Rails.root}/public/#{filename}"
+        end
+
+        fileid = 0
+        while File.exists?(tmp_file) do
+          if interpolated['folder_name'].present?
+            tmp_file = "#{Rails.root}/#{interpolated['folder_name']}/#{orgFilename}#{fileid}.#{extension}"
+          else
+            tmp_file = "#{Rails.root}/public/#{orgFilename}#{fileid}.#{extension}"
+          end
+          fileid += 1
+        end
+
+        File.open(tmp_file, 'wb') do |f|
+          if uploadflag
+            f.write  request.body.read
+          else
+            f.write params[interpolated['form_name']].read
+          end
+        end
+
+        senddata = {
+            :fileName => filename,
+            :path => tmp_file
+        }
+      else
+        senddata = {
+            :fileName => "No file",
+            :path => ""
+        }
+      end
+
+      create_event(:payload => senddata)
     end
 
     def receive_web_request(params, method, format)
@@ -42,8 +95,12 @@ module Agents
       return ["Please use POST requests only", 401] unless method == "post"
       return ["Not Authorized", 401] unless secret == interpolated['secret']
 
-      [payload_for(params)].flatten.each do |payload|
-        create_event(payload: payload)
+      if interpolated['fileupload_action'].present? && interpolated['fileupload_action'] == "true"
+        file_upload_action(params)
+      else
+        [payload_for(params)].flatten.each do |payload|
+          create_event(payload: payload)
+        end
       end
 
       ['Event Created', 201]
