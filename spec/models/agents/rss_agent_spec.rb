@@ -151,7 +151,7 @@ describe Agents::RssAgent do
 
   describe 'logging errors with the feed url' do
     it 'includes the feed URL when an exception is raised' do
-      mock(FeedNormalizer::FeedNormalizer).parse(anything) { raise StandardError.new("Some error!") }
+      mock(FeedNormalizer::FeedNormalizer).parse(anything, :loose => true) { raise StandardError.new("Some error!") }
       expect(lambda {
         agent.check
       }).not_to raise_error
