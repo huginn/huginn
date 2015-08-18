@@ -15,6 +15,8 @@ If you find a bug/error in this guide please **submit a pull request**.
 
 If not stated otherwise all commands should be run as user with sudo permissions or as root.
 
+When having problems during the installation please check the [troubleshooting](#troubleshooting) section.
+
 ## Overview
 
 The Huginn installation consists of setting up the following components:
@@ -305,11 +307,13 @@ Visit YOUR_SERVER in your web browser for your first Huginn login. The setup has
     password
 
 
-**Enjoy!**
+**Enjoy!** :sparkles: :star: :fireworks:
 
 You can use `cd /home/huginn/huginn && sudo rake production:start` and `cd /home/huginn/huginn && sudo rake production:stop` to start and stop Huginn.
 
 Be sure to read the section about how to [update](./update.md) your Huginn installation as well! You can also use [Capistrano](./capistrano.md) to keep your installation up to date.
+
+**Note:** We also recommend applying standard security practices to your server, including installing a firewall ([ufw](https://wiki.ubuntu.com/UncomplicatedFirewall) is good on Ubuntu and also available for Debian).
 
 ## Advanced Setup Tips
 
@@ -341,3 +345,59 @@ cd /etc/nginx/ssl/
 sudo openssl req -newkey rsa:2048 -x509 -nodes -days 3560 -out huginn.crt -keyout huginn.key
 sudo chmod o-r huginn.key
 ```
+
+## Troubleshooting
+
+If something went wrong during the installation please make sure you followed the instructions and did not miss a step.
+
+When your Huginn instance still is not working first run the self check:
+
+    cd /home/huginn/huginn
+    sudo rake production:check
+
+We are sorry when you are still having issues, now please check the various log files for error messages:
+
+#### Nginx error log `/var/log/nginx/huginn_error.log`
+
+This file should be empty, it is the first place to look because `nginx` is the first application handling the request your are sending to Huginn.
+
+Common problems:
+
+* `connect() to unix:/home/huginn/huginn/tmp/sockets/unicorn.socket failed`: The Unicorn application server is not running, ensure you uncommented one of the example configuration below the `PRODUCTION` label in your [Profile](#install-init-script) and the unicorn config file (`/home/huginn/huginn/config/unicorn.rb`) exists.
+* `138 open() "/home/huginn/huginn/public/..." failed (13: Permission denied)`: The `/home/huginn/huginn/public` directory needs to be readable by the nginx user (which is per default `www-data`)
+
+
+#### Unicorn log `/home/huginn/huginn/log/unicorn.log`
+
+Should only contain HTTP request log entries like: `10.0.2.2 - - [18/Aug/2015:21:15:12 +0000] "GET / HTTP/1.0" 200 - 0.0110`
+
+If you see ruby exception backtraces or other error messages the problem could be one of the following:
+
+* The configuration file `/home/huginn/huginn/config/unicorn.rb` does not exist
+* Gem dependencies where not [installed](#install-gems)
+
+#### Rails Application log `/home/huginn/huginn/log/production.log`
+
+This file is pretty verbose, you want to look at it if you are getting the `We're sorry, but something went wrong.` error message when using Huginn. This is an example backtrace that can help you or other huginn developers locate the issue:
+
+```
+NoMethodError (undefined method `name' for nil:NilClass):
+  app/controllers/jobs_controller.rb:6:in `index'
+  config/initializers/silence_worker_status_logger.rb:5:in `call_with_silence_worker_status'
+```
+
+#### Runit/Background Worker logs `/home/huginn/huginn/log/*/current`
+
+Those files will contain error messages or backtraces if one of your agent is not performing as they should. The easiest way to debug an Agent is to watch all your log files for changes and trigger the agent to run via the Huginn web interface.
+
+The log file location depends your `Procfile` configuration, this command will give you a list of the available logs:
+
+    ls -al /home/huginn/huginn/log/*/current
+
+When you want to monitor the background processes you can easily watch all the files for changes:
+
+    tail -f /home/huginn/huginn/log/*/current
+
+### Still having problems? :crying_cat_face:
+
+You probably found an error message or exception backtrace you could not resolve. Please create a new [issue](https://github.com/cantino/huginn/issues) and include as much information as you could gather about the problem your are experiencing.
