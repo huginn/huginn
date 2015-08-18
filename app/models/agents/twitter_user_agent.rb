@@ -5,7 +5,7 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      The TwitterUserAgent follows the timeline of a specified Twitter user.
+      The Twitter User Agent follows the timeline of a specified Twitter user.
 
       #{twitter_dependencies_missing if dependencies_missing?}
 

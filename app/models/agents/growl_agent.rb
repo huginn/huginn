@@ -8,8 +8,9 @@ module Agents
     gem_dependency_check { defined?(Growl) }
 
     description <<-MD
+      The Growl Agent sends any events it receives to a Growl GNTP server immediately.
+
       #{'## Include `ruby-growl` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The GrowlAgent sends any events it receives to a Growl GNTP server immediately.
       
       It is assumed that events have a `message` or `text` key, which will hold the body of the growl notification, and a `subject` key, which will have the headline of the Growl notification. You can use Event Formatting Agent if your event does not provide these keys.
 

@@ -7,7 +7,7 @@ module Agents
     cannot_create_events!
 
     description <<-MD
-      The EmailDigestAgent collects any Events sent to it and sends them all via email when scheduled.
+      The Email Digest Agent collects any Events sent to it and sends them all via email when scheduled.
 
       By default, the will have a `subject` and an optional `headline` before listing the Events.  If the Events'
       payloads contain a `message`, that will be highlighted, otherwise everything in

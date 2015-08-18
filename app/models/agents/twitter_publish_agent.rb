@@ -5,7 +5,7 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
-      The TwitterPublishAgent publishes tweets from the events it receives.
+      The Twitter Publish Agent publishes tweets from the events it receives.
 
       #{twitter_dependencies_missing if dependencies_missing?}
 

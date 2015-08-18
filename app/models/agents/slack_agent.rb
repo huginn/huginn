@@ -8,22 +8,19 @@ module Agents
     gem_dependency_check { defined?(Slack) }
 
     description <<-MD
+      The Slack Agent lets you receive events and send notifications to [Slack](https://slack.com/).
+
       #{'## Include `slack-notifier` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The SlackAgent lets you receive events and send notifications to [Slack](https://slack.com/).
 
-      To get started, you will first need to setup an incoming webhook.
-      Go to, <code>https://<em>your_team_name</em>.slack.com/services/new/incoming-webhook</code>,
-      choose a default channel and add the integration.
+      To get started, you will first need to configure an incoming webhook.
+      
+      - Go to `https://my.slack.com/services/new/incoming-webhook`, choose a default channel and add the integration.
 
-      Your webhook URL will look like: <code>https://hooks.slack.com/services/<em>random1</em>/<em>random2</em>/<em>token</em></code>
+      Your webhook URL will look like: `https://hooks.slack.com/services/some/random/characters`
 
-      Once the webhook has been setup it can be used to post to other channels or ping team members.
-      To send a private message to team-mate, assign his username as `@username` to the channel option.
-      To communicate with a different webhook on slack, assign your custom webhook name to the webhook option.
-      Messages can also be formatted using [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid).
+      Once the webhook has been configured, it can be used to post to other channels or direct to team members. To send a private message to team member, use their @username as the channel. Messages can be formatted using [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid).
 
-      Finally, you can set a custom icon for this webhook in `icon`, either as [emoji](http://unicodey.com/emoji-data/table.htm) or an URL to an image.
-      Leaving this field blank will use the default icon for a webhook.
+      Finally, you can set a custom icon for this webhook in `icon`, either as [emoji](http://www.emoji-cheat-sheet.com) or an URL to an image. Leaving this field blank will use the default icon for a webhook.
     MD
 
     def default_options

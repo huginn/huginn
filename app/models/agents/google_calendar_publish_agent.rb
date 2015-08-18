@@ -7,8 +7,9 @@ module Agents
     gem_dependency_check { defined?(Google) && defined?(Google::APIClient) }
 
     description <<-MD
+      The Google Calendar Publish Agent creates events on your Google Calendar.
+
       #{'## Include `google-api-client` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The GoogleCalendarPublishAgent creates events on your google calendar.
 
       This agent relies on service accounts, rather than oauth.
 

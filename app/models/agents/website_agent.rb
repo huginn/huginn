@@ -14,7 +14,7 @@ module Agents
     UNIQUENESS_FACTOR = 3
 
     description <<-MD
-      The WebsiteAgent scrapes a website, XML document, or JSON feed and creates Events based on the results.
+      The Website Agent scrapes a website, XML document, or JSON feed and creates Events based on the results.
 
       Specify a `url` and select a `mode` for when to create Events based on the scraped data, either `all` or `on_change`.
 

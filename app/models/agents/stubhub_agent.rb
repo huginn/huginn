@@ -3,7 +3,9 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      This StubHubAgent creates an event for a given StubHub Event. It can be used to track how many tickets are available for the event and the minimum and maximum price. All that is required is that you paste in the url from the actual event, e.g. http://www.stubhub.com/outside-lands-music-festival-tickets/outside-lands-music-festival-3-day-pass-san-francisco-golden-gate-park-polo-fields-8-8-2014-9020701/
+      The StubHub Agent creates an event for a given StubHub Event.
+
+      It can be used to track how many tickets are available for the event and the minimum and maximum price. All that is required is that you paste in the url from the actual event, e.g. http://www.stubhub.com/outside-lands-music-festival-tickets/outside-lands-music-festival-3-day-pass-san-francisco-golden-gate-park-polo-fields-8-8-2014-9020701/
     MD
 
     event_description <<-MD

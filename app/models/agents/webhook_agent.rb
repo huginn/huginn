@@ -4,12 +4,13 @@ module Agents
     cannot_receive_events!
 
     description do <<-MD
-      Use this Agent to create events by receiving webhooks from any source.
-      In order to create events with this agent, make a POST request to:
+      The Webhook Agent will create events by receiving webhooks from any source. In order to create events with this agent, make a POST request to:
 
       ```
-         https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret
-      ``` where `:secret` is specified in your options.
+         https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || ':id'}/#{options['secret'] || ':secret'}
+      ```
+
+      #{'The placeholder symbols above will be replaced by their values once the agent is saved.' unless id}
 
       Options:
 

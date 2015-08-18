@@ -6,8 +6,9 @@ module Agents
     gem_dependency_check { defined?(Jabber) }
 
     description <<-MD
+      The Jabber Agent will send any events it receives to your Jabber/XMPP IM account.
+
       #{'## Include `xmpp4r` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The JabberAgent will send any events it receives to your Jabber/XMPP IM account.
 
       Specify the `jabber_server` and `jabber_port` for your Jabber server.
 

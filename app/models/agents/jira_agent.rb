@@ -11,12 +11,13 @@ module Agents
     description <<-MD
       The Jira Agent subscribes to Jira issue updates.
 
-      `jira_url` specifies the full URL of the jira installation, including https://
-      `jql` is an optional Jira Query Language-based filter to limit the flow of events. See [JQL Docs](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) for details. 
-      `username` and `password` are optional, and may need to be specified if your Jira instance is read-protected
-      `timeout` is an optional parameter that specifies how long the request processing may take in minutes.
+      - `jira_url` specifies the full URL of the jira installation, including https://
+      - `jql` is an optional Jira Query Language-based filter to limit the flow of events. See [JQL Docs](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) for details. 
+      - `username` and `password` are optional, and may need to be specified if your Jira instance is read-protected
+      - `timeout` is an optional parameter that specifies how long the request processing may take in minutes.
 
       The agent does periodic queries and emits the events containing the updated issues in JSON format.
+
       NOTE: upon the first execution, the agent will fetch everything available by the JQL query. So if it's not desirable, limit the `jql` query by date.
     MD
 

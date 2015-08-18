@@ -8,8 +8,9 @@ module Agents
     gem_dependency_check { defined?(HipChat) }
 
     description <<-MD
+      The Hipchat Agent sends messages to a Hipchat Room
+
       #{'## Include `hipchat` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The HipchatAgent sends messages to a Hipchat Room
 
       To authenticate you need to set the `auth_token`, you can get one at your Hipchat Group Admin page which you can find here:
 

@@ -3,7 +3,7 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
-      An Event Formatting Agent allows you to format incoming Events, adding new fields as needed.
+      The Event Formatting Agent allows you to format incoming Events, adding new fields as needed.
 
       For example, here is a possible Event:
 
