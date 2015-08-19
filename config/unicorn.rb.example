@@ -1,24 +1,25 @@
-app_path = "/home/huginn/current"
+wd = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+
+app_path = wd
 
 worker_processes 2
 preload_app true
 timeout 180
-listen '/home/huginn/shared/tmp/sockets/unicorn.sock'
+listen "#{wd}/tmp/sockets/unicorn.socket"
 
 working_directory app_path
 
 rails_env = ENV['RAILS_ENV'] || 'production'
 
 # Log everything to one file
-stderr_path "log/unicorn_out.log"
-stdout_path "log/unicorn_err.log"
+stderr_path "log/unicorn.log"
+stdout_path "log/unicorn.log"
 
 # Set master PID location
-pid '/home/huginn/shared/tmp/pids/unicorn.pid'
+pid "#{wd}/tmp/pids/unicorn.pid"
 
 before_fork do |server, worker|
-  defined?(ActiveRecord::Base) and
-    ActiveRecord::Base.connection.disconnect!
+  ActiveRecord::Base.connection.disconnect!
   old_pid = "#{server.config[:pid]}.oldbin"
   if File.exist?(old_pid) && server.pid != old_pid
     begin
@@ -30,6 +31,5 @@ before_fork do |server, worker|
 end
 
 after_fork do |server, worker|
-  defined?(ActiveRecord::Base) and
-    ActiveRecord::Base.establish_connection
+  ActiveRecord::Base.establish_connection
 end
