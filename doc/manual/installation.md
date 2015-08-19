@@ -65,8 +65,8 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.2.tar.bz2 | tar xj
-    cd ruby-2.2.2
+    curl -L --progress http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.3.tar.bz2 | tar xj
+    cd ruby-2.2.3
     ./configure --disable-install-rdoc
     make -j`nproc`
     sudo make install
@@ -142,9 +142,7 @@ You are done installing the database and can go back to the rest of the installa
     cd /home/huginn
 
     # Clone Huginn repository
-    #sudo -u huginn -H git clone https://github.com/cantino/huginn.git -b master huginn
-    # **FIXME**
-    sudo -u huginn -H git clone https://github.com/dsander/huginn.git -b deployment-guide huginn
+    sudo -u huginn -H git clone https://github.com/cantino/huginn.git -b master huginn
 
     # Go to Huginn installation folder
     cd /home/huginn/huginn
@@ -251,7 +249,7 @@ Export the init scripts:
 
 ### Setup Logrotate
 
-    sudo cp lib/support/logrotate/huginn /etc/logrotate.d/huginn
+    sudo cp deployment/logrotate/huginn /etc/logrotate.d/huginn
 
 
 ### Ensure Your Huginn Instance Is Running
@@ -270,7 +268,7 @@ Export the init scripts:
 
 Copy the example site config:
 
-    sudo cp lib/support/nginx/huginn /etc/nginx/sites-available/huginn
+    sudo cp deployment/nginx/huginn /etc/nginx/sites-available/huginn
     sudo ln -s /etc/nginx/sites-available/huginn /etc/nginx/sites-enabled/huginn
 
 Make sure to edit the config file to match your setup, if you are running multiple nginx sites remove the `default_server` argument from the `listen` directives:
@@ -324,7 +322,7 @@ To use Huginn with HTTPS:
 1. In `.env`:
     1. Set the `FORCE_SSL` option to `true`.
 1. Use the `huginn-ssl` Nginx example config instead of the `huginn` config:
-    1. `sudo cp lib/support/nginx/huginn-ssl /etc/nginx/sites-available/huginn`
+    1. `sudo cp deployment/nginx/huginn-ssl /etc/nginx/sites-available/huginn`
     1. Update `YOUR_SERVER_FQDN`.
     1. Update `ssl_certificate` and `ssl_certificate_key`.
     1. Review the configuration file and consider applying other security and performance enhancing features.
