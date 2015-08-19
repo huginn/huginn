@@ -5,8 +5,9 @@ module Agents
     gem_dependency_check { defined?(RTurk) }
 
     description <<-MD
+      The Human Task Agent is used to create Human Intelligence Tasks (HITs) on Mechanical Turk.
+
       #{'## Include `rturk` in your Gemfile to use this Agent!' if dependencies_missing?}
-      You can use a HumanTaskAgent to create Human Intelligence Tasks (HITs) on Mechanical Turk.
 
       HITs can be created in response to events, or on a schedule.  Set `trigger_on` to either `schedule` or `event`.
 

@@ -6,7 +6,7 @@ module Agents
     API_URL = 'https://api.pushover.net/1/messages.json'
 
     description <<-MD
-      The PushoverAgent receives and collects events and sends them via push notification to a user/group.
+      The Pushover Agent receives and collects events and sends them via push notification to a user/group.
 
       **You need a Pushover API Token:** [https://pushover.net/apps/build](https://pushover.net/apps/build)
 

@@ -8,8 +8,9 @@ module Agents
     gem_dependency_check { defined?(Twilio) }
 
     description <<-MD
+      The Twilio Agent receives and collects events and sends them via text message (up to 160 characters) or gives you a call when scheduled.
+
       #{'## Include `twilio-ruby` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The TwilioAgent receives and collects events and sends them via text message (up to 160 characters) or gives you a call when scheduled.
 
       It is assumed that events have a `message`, `text`, or `sms` key, the value of which is sent as the content of the text message/call. You can use the EventFormattingAgent if your event does not provide these keys.
 

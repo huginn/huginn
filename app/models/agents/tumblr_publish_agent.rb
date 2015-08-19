@@ -7,9 +7,9 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
-      #{'## Include `tumblr_client` and `omniauth-tumblr` in your Gemfile to use this Agent!' if dependencies_missing?}
+      The Tumblr Publish Agent publishes Tumblr posts from the events it receives.
 
-      The TumblrPublishAgent publishes Tumblr posts from the events it receives.
+      #{'## Include `tumblr_client` and `omniauth-tumblr` in your Gemfile to use this Agent!' if dependencies_missing?}
 
       To be able to use this Agent you need to authenticate with Tumblr in the [Services](/services) section first.
 

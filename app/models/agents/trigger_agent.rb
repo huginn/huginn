@@ -5,7 +5,7 @@ module Agents
     VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value field!=value field>=value field>value]
 
     description <<-MD
-      Use a TriggerAgent to watch for a specific value in an Event payload.
+      The Trigger Agent will watch for a specific value in an Event payload.
 
       The `rules` array contains hashes of `path`, `value`, and `type`.  The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax.
 

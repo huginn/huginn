@@ -13,7 +13,7 @@ module Agents
     cattr_reader :second_precision_enabled
 
     description <<-MD
-      This agent periodically takes an action on target Agents according to a user-defined schedule.
+      The Scheduler Agent periodically takes an action on target Agents according to a user-defined schedule.
 
       # Action types
 

@@ -3,23 +3,23 @@ module Agents
     cannot_be_scheduled!
     cannot_receive_events!
 
-    description  do
-        <<-MD
-        Use this Agent to create events by receiving webhooks from any source.
+    description do <<-MD
+      The Webhook Agent will create events by receiving webhooks from any source. In order to create events with this agent, make a POST request to:
 
-        In order to create events with this agent, make a POST request to:
-        ```
-           https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || '<id>'}/:secret
-        ``` where `:secret` is specified in your options.
+      ```
+         https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || ':id'}/#{options['secret'] || ':secret'}
+      ```
 
-        Options:
+      #{'The placeholder symbols above will be replaced by their values once the agent is saved.' unless id}
 
-          * `secret` - A token that the host will provide for authentication.
-          * `expected_receive_period_in_days` - How often you expect to receive
-            events this way. Used to determine if the agent is working.
-          * `payload_path` - JSONPath of the attribute in the POST body to be
-            used as the Event payload.  If `payload_path` points to an array,
-            Events will be created for each element.
+      Options:
+
+        * `secret` - A token that the host will provide for authentication.
+        * `expected_receive_period_in_days` - How often you expect to receive
+          events this way. Used to determine if the agent is working.
+        * `payload_path` - JSONPath of the attribute in the POST body to be
+          used as the Event payload.  If `payload_path` points to an array,
+          Events will be created for each element.
       MD
     end
 

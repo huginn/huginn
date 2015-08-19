@@ -5,9 +5,9 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
+      The Dropbox File Url Agent is used to work with Dropbox. It takes a file path (or multiple file paths) and emits events with [temporary links](https://www.dropbox.com/developers/core/docs#media).
+
       #{'## Include the `dropbox-api` and `omniauth-dropbox` gems in your `Gemfile` and set `DROPBOX_OAUTH_KEY` and `DROPBOX_OAUTH_SECRET` in your environment to use Dropbox Agents.' if dependencies_missing?}
-      The _DropboxFileUrlAgent_ is used to work with Dropbox. It takes a file path (or multiple files paths) and emits
-      events with [temporary links](https://www.dropbox.com/developers/core/docs#media).
 
       The incoming event payload needs to have a `paths` key, with a comma-separated list of files you want the URL for. For example:
 

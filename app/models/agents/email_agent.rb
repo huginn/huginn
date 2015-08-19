@@ -6,7 +6,7 @@ module Agents
     cannot_create_events!
 
     description <<-MD
-      The EmailAgent sends any events it receives via email immediately.
+      The Email Agent sends any events it receives via email immediately.
 
       You can specify the email's subject line by providing a `subject` option, which can contain Liquid formatting.  E.g.,
       you could provide `"Huginn email"` to set a simple subject, or `{{subject}}` to use the `subject` key from the incoming Event.

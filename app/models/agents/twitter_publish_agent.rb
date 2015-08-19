@@ -5,8 +5,9 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
+      The Twitter Publish Agent publishes tweets from the events it receives.
+
       #{twitter_dependencies_missing if dependencies_missing?}
-      The TwitterPublishAgent publishes tweets from the events it receives.
 
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
 

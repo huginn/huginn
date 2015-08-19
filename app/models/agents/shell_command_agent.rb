@@ -9,7 +9,7 @@ module Agents
     end
 
     description <<-MD
-      The ShellCommandAgent can execute commands on your local system, returning the output.
+      The Shell Command Agent will execute commands on your local system, returning the output.
 
       `command` specifies the command to be executed, and `path` will tell ShellCommandAgent in what directory to run this command.
 

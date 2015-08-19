@@ -3,7 +3,7 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
-      The ChangeDetectorAgent receives a stream of events and emits a new event when a property of the received event changes.
+      The Change Detector Agent receives a stream of events and emits a new event when a property of the received event changes.
 
       `property` specifies the property to be watched.
 
