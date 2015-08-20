@@ -542,7 +542,7 @@ DEPENDENCIES
   geokit-rails (~> 2.0.1)
   google-api-client
   guard
-  guard-livereload
+  guard-livereload (~> 2.2)
   guard-rspec
   haversine
   hipchat (~> 1.2.0)
