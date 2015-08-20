@@ -9,6 +9,7 @@ describe Agents::RssAgent do
 
     stub_request(:any, /github.com/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/github_rss.atom")), :status => 200)
     stub_request(:any, /SlickdealsnetFP/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/slickdeals.atom")), :status => 200)
+    stub_request(:any, /onethingwell.org/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/onethingwell.atom")), :status => 200)
   end
 
   let(:agent) do
@@ -111,10 +112,10 @@ describe Agents::RssAgent do
         agent.check
       }.to change { agent.events.count }.by(20 + 79)
     end
-    
+
     it "should fetch one event per run" do
       agent.options['url'] = ["https://github.com/cantino/huginn/commits/master.atom"]
-      
+
       agent.options['max_events_per_run'] = 1
       agent.check
       expect(agent.events.count).to eq(1)
@@ -122,7 +123,7 @@ describe Agents::RssAgent do
 
     it "should fetch all events per run" do
       agent.options['url'] = ["https://github.com/cantino/huginn/commits/master.atom"]
-      
+
       # <= 0 should ignore option and get all
       agent.options['max_events_per_run'] = 0
       agent.check
@@ -149,9 +150,23 @@ describe Agents::RssAgent do
     end
   end
 
+  context "parsing feeds" do
+    before do
+      @valid_options['url'] = 'http://onethingwell.org/rss'
+    end
+
+    it "captures multiple categories" do
+      agent.check
+      first, second, third = agent.events.take(3)
+      expect(first.payload['categories'].count).to eq(3)
+      expect(second.payload['categories'].count).to eq(2)
+      expect(third.payload['categories'].count).to eq(1)
+    end
+  end
+
   describe 'logging errors with the feed url' do
     it 'includes the feed URL when an exception is raised' do
-      mock(FeedNormalizer::FeedNormalizer).parse(anything, :loose => true) { raise StandardError.new("Some error!") }
+      mock(FeedNormalizer::FeedNormalizer).parse(anything, loose: true) { raise StandardError.new("Some error!") }
       expect(lambda {
         agent.check
       }).not_to raise_error
