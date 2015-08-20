@@ -99,7 +99,7 @@ group :development do
   gem 'binding_of_caller'
   gem 'quiet_assets'
   gem 'guard'
-  gem 'guard-livereload'
+  gem 'guard-livereload', '~> 2.2'
   gem 'guard-rspec'
   gem 'letter_opener_web'
 
