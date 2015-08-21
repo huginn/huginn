@@ -13,7 +13,7 @@ module Agents
 
       The `method` used can be any of `get`, `post`, `put`, `patch`, and `delete`.
 
-      By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).  Change `content_type` to `json` to send JSON instead.
+      By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).  Change `content_type` to `json` to send JSON instead.  Change `content_type` to `xml` to send XML, where the name of the root element may be specified using `xml_root`, defaulting to `post`.
 
       Other Options:
 
@@ -102,6 +102,9 @@ module Agents
         when 'json'
           headers['Content-Type'] = 'application/json; charset=utf-8'
           body = data.to_json
+        when 'xml'
+          headers['Content-Type'] = 'text/xml; charset=utf-8'
+          body = data.to_xml(root: (interpolated(payload)[:xml_root] || 'post'))
         else
           body = data
         end

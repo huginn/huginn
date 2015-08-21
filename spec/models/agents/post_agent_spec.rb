@@ -38,11 +38,14 @@ describe Agents::PostAgent do
       when :get, :delete
         req.data = request.uri.query
       else
-        case request.headers['Content-Type'][/\A[^;\s]+/]
+        content_type = request.headers['Content-Type'][/\A[^;\s]+/]
+        case content_type
         when 'application/x-www-form-urlencoded'
           req.data = request.body
         when 'application/json'
           req.data = ActiveSupport::JSON.decode(request.body)
+        when 'text/xml'
+          req.data = Hash.from_xml(request.body)
         else
           raise "unexpected Content-Type: #{content_type}"
         end
@@ -150,6 +153,27 @@ describe Agents::PostAgent do
       }.to change { @sent_requests[:post].length }.by(1)
 
       expect(@sent_requests[:post][0].data).to eq(@checker.options['payload'])
+    end
+
+    it "sends options['payload'] as XML as a POST request" do
+      @checker.options['content_type'] = 'xml'
+      expect {
+        @checker.check
+      }.to change { @sent_requests[:post].length }.by(1)
+
+      expect(@sent_requests[:post][0].data.keys).to eq([ 'post' ])
+      expect(@sent_requests[:post][0].data['post']).to eq(@checker.options['payload'])
+    end
+
+    it "sends options['payload'] as XML with custom root element name, as a POST request" do
+      @checker.options['content_type'] = 'xml'
+      @checker.options['xml_root'] = 'foobar'
+      expect {
+        @checker.check
+      }.to change { @sent_requests[:post].length }.by(1)
+
+      expect(@sent_requests[:post][0].data.keys).to eq([ 'foobar' ])
+      expect(@sent_requests[:post][0].data['foobar']).to eq(@checker.options['payload'])
     end
 
     it "sends options['payload'] as a GET request" do
