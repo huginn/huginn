@@ -26,7 +26,7 @@ RUN /scripts/setup
 
 VOLUME /var/lib/mysql
 
-EXPOSE 5000
+EXPOSE 3000
 
 CMD ["/scripts/init"]
 
