@@ -54,14 +54,24 @@ describe Agents::RssAgent do
   end
 
   describe "emitting RSS events" do
-    it "should emit items as events" do
+    it "should emit items as events for an Atom feed" do
       expect {
         agent.check
       }.to change { agent.events.count }.by(20)
 
       first, *, last = agent.events.last(20)
+      expect(first.payload['feed']).to include({
+                                                 "type" => "atom",
+                                                 "title" => "Recent Commits to huginn:master",
+                                                 "url" => "https://github.com/cantino/huginn/commits/master",
+                                               })
       expect(first.payload['url']).to eq("https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0")
       expect(first.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0"])
+      expect(last.payload['feed']).to include({
+                                                "type" => "atom",
+                                                "title" => "Recent Commits to huginn:master",
+                                                "url" => "https://github.com/cantino/huginn/commits/master",
+                                              })
       expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af")
       expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af"])
     end
@@ -79,6 +89,33 @@ describe Agents::RssAgent do
       expect(last.payload['title'].strip).to eq('Dashed line in a diagram indicates propagate_immediately being false.')
       expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535")
       expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535"])
+    end
+
+    it "should emit items as events for an RSS 2.0 feed" do
+      agent.options['url'] = "http://feeds.feedburner.com/SlickdealsnetFP?format=atom" # This is actually RSS 2.0 w/ Atom extension
+      agent.save!
+
+      expect {
+        agent.check
+      }.to change { agent.events.count }.by(79)
+
+      first, *, last = agent.events.last(79)
+      expect(first.payload['feed']).to include({
+                                                 "type" => "rss",
+                                                 "title" => "SlickDeals.net",
+                                                 "description" => "Slick online shopping deals.",
+                                                 "url" => "http://slickdeals.net/",
+                                               })
+      expect(first.payload['url']).to eq("http://feedproxy.google.com/~r/SlickdealsnetFP/~3/tojFMKcc-zM/green-man-gaming---pc-games-tomb-raider-game-of-the-year-6-hitman-absolution-elite-edition")
+      expect(first.payload['urls']).to eq(["http://feedproxy.google.com/~r/SlickdealsnetFP/~3/tojFMKcc-zM/green-man-gaming---pc-games-tomb-raider-game-of-the-year-6-hitman-absolution-elite-edition"])
+      expect(last.payload['feed']).to include({
+                                                "type" => "rss",
+                                                "title" => "SlickDeals.net",
+                                                "description" => "Slick online shopping deals.",
+                                                "url" => "http://slickdeals.net/",
+                                              })
+      expect(last.payload['url']).to eq("http://feedproxy.google.com/~r/SlickdealsnetFP/~3/4YGYcbtUW6U/amazon---rearth-ringke-fusion-bumper-hybrid-case-for-iphone-6")
+      expect(last.payload['urls']).to eq(["http://feedproxy.google.com/~r/SlickdealsnetFP/~3/4YGYcbtUW6U/amazon---rearth-ringke-fusion-bumper-hybrid-case-for-iphone-6"])
     end
 
     it "should track ids and not re-emit the same item when seen again" do
@@ -151,7 +188,7 @@ describe Agents::RssAgent do
 
   describe 'logging errors with the feed url' do
     it 'includes the feed URL when an exception is raised' do
-      mock(FeedNormalizer::FeedNormalizer).parse(anything) { raise StandardError.new("Some error!") }
+      mock(RSS::Parser).parse(anything) { raise StandardError.new("Some error!") }
       expect(lambda {
         agent.check
       }).not_to raise_error
