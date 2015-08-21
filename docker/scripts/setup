@@ -29,7 +29,7 @@ if [ -d "/scripts/cache" ]; then
   mv /scripts/cache vendor/
   chown -R huginn:huginn vendor/cache
 fi
-sudo -u huginn -H bundle install --deployment --without development test
+sudo -u huginn -H bundle install --deployment --without test
 
 # silence setlocale message (THANKS DEBIAN!)
 cat > /etc/default/locale <<EOF
