@@ -97,7 +97,7 @@ module Agents
     def check_url(url)
       response = faraday.get(url)
       if response.success?
-        feed = FeedNormalizer::FeedNormalizer.parse(response.body)
+        feed = FeedNormalizer::FeedNormalizer.parse(response.body, loose: true)
         feed.clean! if boolify(interpolated['clean'])
         max_events = (interpolated['max_events_per_run'].presence || 0).to_i
         created_event_count = 0
