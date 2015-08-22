@@ -1,6 +1,6 @@
 mysqldata:
   image: mysql
-  command: true
+  command: /bin/true
 
 mysql:
   image: mysql
