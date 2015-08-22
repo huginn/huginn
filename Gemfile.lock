@@ -28,6 +28,15 @@ GIT
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.1)
 
+GIT
+  remote: https://github.com/cantino/delayed_job_active_record
+  revision: 7ede4ea81561a66427f600decb87f6fcdb5b8aa4
+  branch: configurable-reserve-sql-strategy
+  specs:
+    delayed_job_active_record (4.0.3)
+      activerecord (>= 3.0, < 5.0)
+      delayed_job (>= 3.0, < 4.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -119,9 +128,6 @@ GEM
     debug_inspector (0.0.2)
     delayed_job (4.0.6)
       activesupport (>= 3.0, < 5.0)
-    delayed_job_active_record (4.0.3)
-      activerecord (>= 3.0, < 5.0)
-      delayed_job (>= 3.0, < 4.1)
     delorean (2.1.0)
       chronic
     devise (3.4.1)
@@ -525,7 +531,7 @@ DEPENDENCIES
   coveralls
   daemons (~> 1.1.9)
   delayed_job (~> 4.0.0)
-  delayed_job_active_record (~> 4.0.0)
+  delayed_job_active_record!
   delorean
   devise (~> 3.4.0)
   dotenv-rails (~> 2.0.1)
