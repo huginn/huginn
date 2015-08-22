@@ -8,8 +8,9 @@ module Agents
     gem_dependency_check { defined?(Wunderground) && defined?(ForecastIO) }
 
     description <<-MD
+      The Weather Agent creates an event for the day's weather at a given `location`.
+
       #{'## Include `forecast_io` and `wunderground` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The WeatherAgent creates an event for the day's weather at a given `location`.
 
       You also must select `which_day` you would like to get the weather for where the number 0 is for today and 1 is for tomorrow and so on. Weather is only returned for 1 week at a time.
 

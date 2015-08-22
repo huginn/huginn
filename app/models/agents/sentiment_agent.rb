@@ -7,10 +7,9 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
-      The SentimentAgent generates `good-bad` (psychological valence or happiness index), `active-passive` (arousal),
-      and  `strong-weak` (dominance) score. It will output a value between 1 and 9. It will only work on English content.
+      The Sentiment Agent generates `good-bad` (psychological valence or happiness index), `active-passive` (arousal), and  `strong-weak` (dominance) score. It will output a value between 1 and 9. It will only work on English content.
 
-      Make sure the content this agent is analyzing have sufficient length to get respectable results.
+      Make sure the content this agent is analyzing is of sufficient length to get respectable results.
 
       Provide a JSONPath in `content` field where content is residing and set `expected_receive_period_in_days` to the maximum number of days you would allow to be passed between events being received by this agent.
     MD

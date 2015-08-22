@@ -4,7 +4,7 @@ module Agents
 
     description  do
       <<-MD
-        The Agent outputs received events as either RSS or JSON.  Use it to output a public or private stream of Huginn data.
+        The Data Output Agent outputs received events as either RSS or JSON.  Use it to output a public or private stream of Huginn data.
 
         This Agent will output data at:
 

@@ -5,14 +5,17 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
+      The Twitter User Agent follows the timeline of a specified Twitter user.
+
       #{twitter_dependencies_missing if dependencies_missing?}
-      The TwitterUserAgent follows the timeline of a specified Twitter user.
 
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
 
       You must also provide the `username` of the Twitter user to monitor.
 
       Set `include_retweets` to `false` to not include retweets (default: `true`)
+      
+      Set `exclude_replies` to `true` to exclude replies (default: `false`)
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -53,6 +56,7 @@ module Agents
       {
         'username' => 'tectonic',
         'include_retweets' => 'true',
+        'exclude_replies' => 'false',
         'expected_update_period_in_days' => '2'
       }
     end
@@ -81,10 +85,14 @@ module Agents
     def include_retweets?
       interpolated[:include_retweets] != "false"
     end
+    
+    def exclude_replies?
+      boolify(interpolated[:exclude_replies]) || false
+    end
 
     def check
       since_id = memory['since_id'] || nil
-      opts = {:count => 200, :include_rts => include_retweets?, :exclude_replies => false, :include_entities => true, :contributor_details => true}
+      opts = {:count => 200, :include_rts => include_retweets?, :exclude_replies => exclude_replies?, :include_entities => true, :contributor_details => true}
       opts.merge! :since_id => since_id unless since_id.nil?
 
       # http://rdoc.info/gems/twitter/Twitter/REST/Timelines#user_timeline-instance_method

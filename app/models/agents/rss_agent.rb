@@ -13,7 +13,7 @@ module Agents
 
     description do
       <<-MD
-        This Agent consumes RSS feeds and emits events when they change.
+        The RSS Agent consumes RSS feeds and emits events when they change.
 
         This Agent is fairly simple, using [feed-normalizer](https://github.com/aasmith/feed-normalizer) as a base.  For complex feeds
         with additional field types, we recommend using a WebsiteAgent.  See [this example](https://github.com/cantino/huginn/wiki/Agent-configuration-examples#itunes-trailers).

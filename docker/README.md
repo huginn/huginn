@@ -68,7 +68,7 @@ To link to another mysql container, for example:
 To link to another container named 'postgres':
 
     docker run --rm --name huginn \
-        --link postgres:postgresql \
+        --link postgres \
         -p 3000:3000 \
         -e "HUGINN_DATABASE_USERNAME=huginn" \
         -e "HUGINN_DATABASE_PASSWORD=pass@word" \

@@ -7,10 +7,9 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      The BasecampAgent checks a Basecamp project for new Events
+      The Basecamp Agent checks a Basecamp project for new Events
 
       To be able to use this Agent you need to authenticate with 37signals in the [Services](/services) section first.
-
     MD
 
     event_description <<-MD

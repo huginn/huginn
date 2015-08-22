@@ -84,6 +84,16 @@ GEM
       rails (>= 3.1)
     buftok (0.2.0)
     builder (3.2.2)
+    capistrano (3.4.0)
+      i18n
+      rake (>= 10.0.0)
+      sshkit (~> 1.3)
+    capistrano-bundler (1.1.4)
+      capistrano (~> 3.1)
+      sshkit (~> 1.2)
+    capistrano-rails (1.1.3)
+      capistrano (~> 3.1)
+      capistrano-bundler (~> 1.1)
     celluloid (0.16.0)
       timers (~> 4.0.0)
     chronic (0.10.2)
@@ -95,6 +105,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.9.1)
+    colorize (0.7.7)
     cookiejar (0.3.2)
     coveralls (0.7.1)
       multi_json (~> 1.3)
@@ -230,10 +241,16 @@ GEM
     kaminari (0.16.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    kgio (2.9.2)
+    kgio (2.9.3)
     kramdown (1.3.3)
     launchy (2.4.2)
       addressable (~> 2.3)
+    letter_opener (1.4.1)
+      launchy (~> 2.2)
+    letter_opener_web (1.3.0)
+      actionmailer (>= 3.2)
+      letter_opener (~> 1.0)
+      railties (>= 3.2)
     libv8 (3.16.14.7)
     liquid (3.0.6)
     listen (2.7.9)
@@ -261,6 +278,9 @@ GEM
     mysql2 (0.3.16)
     naught (1.0.0)
     net-ftp-list (3.2.8)
+    net-scp (1.2.1)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.9.2)
     netrc (0.10.3)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
@@ -413,15 +433,16 @@ GEM
     slop (3.6.0)
     spectrum-rails (1.3.4)
       railties (>= 3.1)
-    spring (1.3.6)
-    spring-commands-rspec (1.0.4)
-      spring (>= 0.9.1)
     sprockets (3.2.0)
       rack (~> 1.0)
     sprockets-rails (2.3.1)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
+    sshkit (1.7.1)
+      colorize (>= 0.7.0)
+      net-scp (>= 1.1.2)
+      net-ssh (>= 2.8.0)
     string-scrub (0.0.5)
     systemu (2.6.4)
     term-ansicolor (1.3.0)
@@ -469,7 +490,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.1)
-    unicorn (4.8.3)
+    unicorn (4.9.0)
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
@@ -497,6 +518,9 @@ DEPENDENCIES
   binding_of_caller
   bootstrap-kaminari-views (~> 0.0.3)
   bundler (>= 1.5.0)
+  capistrano (~> 3.4.0)
+  capistrano-bundler (~> 1.1.4)
+  capistrano-rails (~> 1.1)
   coffee-rails (~> 4.1.0)
   coveralls
   daemons (~> 1.1.9)
@@ -518,7 +542,7 @@ DEPENDENCIES
   geokit-rails (~> 2.0.1)
   google-api-client
   guard
-  guard-livereload
+  guard-livereload (~> 2.2)
   guard-rspec
   haversine
   hipchat (~> 1.2.0)
@@ -529,6 +553,7 @@ DEPENDENCIES
   jsonpath (~> 0.5.6)
   kaminari (~> 0.16.1)
   kramdown (~> 1.3.3)
+  letter_opener_web
   liquid (~> 3.0.3)
   mini_magick
   mqtt
@@ -562,8 +587,6 @@ DEPENDENCIES
   shoulda-matchers
   slack-notifier (~> 1.0.0)
   spectrum-rails
-  spring (~> 1.3.0)
-  spring-commands-rspec
   string-scrub
   therubyracer (~> 0.12.2)
   tumblr_client
@@ -574,7 +597,7 @@ DEPENDENCIES
   tzinfo (>= 1.2.0)
   tzinfo-data
   uglifier (>= 1.3.0)
-  unicorn
+  unicorn (~> 4.9.0)
   vcr
   webmock (~> 1.17.4)
   weibo_2!
@@ -582,4 +605,4 @@ DEPENDENCIES
   xmpp4r (~> 0.5.6)
 
 BUNDLED WITH
-   1.10.5
+   1.10.6

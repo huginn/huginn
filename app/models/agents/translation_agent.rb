@@ -3,8 +3,10 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
-      You can use Translation Agent to translate text between natural languages.
+      The Translation Agent will attempt to translate text between natural languages.
+
       Services are provided using Microsoft Translator. You can [sign up](https://datamarket.azure.com/dataset/bing/microsofttranslator) and [register your application](https://datamarket.azure.com/developer/applications/register) to get `client_id` and `client_secret` which are required to use this agent.
+      
       `to` must be filled with a [translator language code](http://msdn.microsoft.com/en-us/library/hh456380.aspx).
 
       Specify what you would like to translate in `content` field, you can use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) specify which part of the payload you want to translate.

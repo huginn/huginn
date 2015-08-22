@@ -11,7 +11,7 @@ module MarkdownClassAttributes
 
           def #{attribute}
             if self.class.#{attribute}.is_a?(Proc)
-              Utils.unindent(self.instance_eval(&self.class.#{attribute}) || "No #{attribute} has been set.").tap {|i| p i}
+              Utils.unindent(self.instance_eval(&self.class.#{attribute}) || "No #{attribute} has been set.")
             else
               Utils.unindent(self.class.#{attribute} || "No #{attribute} has been set.")
             end

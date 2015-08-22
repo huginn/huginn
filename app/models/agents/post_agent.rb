@@ -7,13 +7,13 @@ module Agents
     default_schedule "never"
 
     description <<-MD
-      A PostAgent receives events from other agents (or runs periodically), merges those events with the [Liquid-interpolated](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) contents of `payload`, and sends the results as POST (or GET) requests to a specified url.  To skip merging in the incoming event, but still send the interpolated payload, set `no_merge` to `true`.
+      A Post Agent receives events from other agents (or runs periodically), merges those events with the [Liquid-interpolated](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) contents of `payload`, and sends the results as POST (or GET) requests to a specified url.  To skip merging in the incoming event, but still send the interpolated payload, set `no_merge` to `true`.
 
       The `post_url` field must specify where you would like to send requests. Please include the URI scheme (`http` or `https`).
 
       The `method` used can be any of `get`, `post`, `put`, `patch`, and `delete`.
 
-      By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).  Change `content_type` to `json` to send JSON instead.
+      By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).  Change `content_type` to `json` to send JSON instead.  Change `content_type` to `xml` to send XML, where the name of the root element may be specified using `xml_root`, defaulting to `post`.
 
       Other Options:
 
@@ -102,6 +102,9 @@ module Agents
         when 'json'
           headers['Content-Type'] = 'application/json; charset=utf-8'
           body = data.to_json
+        when 'xml'
+          headers['Content-Type'] = 'text/xml; charset=utf-8'
+          body = data.to_xml(root: (interpolated(payload)[:xml_root] || 'post'))
         else
           body = data
         end

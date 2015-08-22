@@ -7,6 +7,8 @@ describe Agents::TwitterUserAgent do
 
     @opts = {
       :username => "tectonic",
+      :include_retweets => "true",
+      :exclude_replies => "false",
       :expected_update_period_in_days => "2",
       :starting_at => "Jan 01 00:00:01 +0000 2000",
       :consumer_key => "---",

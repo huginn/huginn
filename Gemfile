@@ -99,8 +99,13 @@ group :development do
   gem 'binding_of_caller'
   gem 'quiet_assets'
   gem 'guard'
-  gem 'guard-livereload'
+  gem 'guard-livereload', '~> 2.2'
   gem 'guard-rspec'
+  gem 'letter_opener_web'
+
+  gem 'capistrano', '~> 3.4.0'
+  gem 'capistrano-rails', '~> 1.1'
+  gem 'capistrano-bundler', '~> 1.1.4'
 
   group :test do
     gem 'coveralls', require: false
@@ -112,8 +117,6 @@ group :development do
     gem 'rspec-rails', '~> 3.1'
     gem 'rspec-html-matchers', '~> 0.7'
     gem 'shoulda-matchers'
-    gem 'spring', '~> 1.3.0'
-    gem 'spring-commands-rspec'
     gem 'vcr'
     gem 'webmock', '~> 1.17.4', require: false
   end
@@ -121,6 +124,7 @@ end
 
 group :production do
   gem 'rack', '> 1.5.0'
+  gem 'unicorn', '~> 4.9.0'
 end
 
 # Platform requirements.
@@ -146,6 +150,5 @@ end
 
 on_heroku do
   gem 'pg'
-  gem 'unicorn'
   gem 'rails_12factor', group: :production
 end
