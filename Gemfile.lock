@@ -28,6 +28,19 @@ GIT
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.1)
 
+GIT
+  remote: git@github.com:darrencauthon/huginn_agent.git
+  revision: 9b9906019b7ab76fbe7c493097f79eb903274439
+  specs:
+    huginn_agent (0.0.1)
+      activesupport
+
+GIT
+  remote: git@github.com:darrencauthon/proof_of_concept_huginn_agents.git
+  revision: fd672d52766230fb2ba137fb64c747fea25c4460
+  specs:
+    proof_of_concept_huginn_agents (0.0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -547,6 +560,7 @@ DEPENDENCIES
   haversine
   hipchat (~> 1.2.0)
   httparty (~> 0.13)
+  huginn_agent!
   hypdf (~> 1.0.7)
   jquery-rails (~> 3.1.3)
   json (~> 1.8.1)
@@ -568,6 +582,7 @@ DEPENDENCIES
   omniauth-twitter
   omniauth-wunderlist!
   pg
+  proof_of_concept_huginn_agents!
   protected_attributes (~> 1.0.8)
   pry-rails
   quiet_assets
