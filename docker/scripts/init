@@ -156,7 +156,7 @@ fi
 if [ -n "\${DATABASE_INITIAL_CONNECT_MAX_RETRIES}" ]; then
   max=\${DATABASE_INITIAL_CONNECT_MAX_RETRIES}
   count=0
-  while ! rake mysql_test:ping > /dev/null 2>&1 && [[ \$count -le \$max ]] ; do
+  while ! rake database_test:ping > /dev/null 2>&1 && [[ \$count -le \$max ]] ; do
     count=\$[\$count+1]
     echo "Retry \$count of \$max attempting to connect to \$DATABASE_HOST. Sleeping \${DATABASE_INITIAL_CONNECT_SLEEP:5}"
     sleep \${DATABASE_INITIAL_CONNECT_SLEEP:5}
