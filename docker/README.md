@@ -56,7 +56,7 @@ To link to another mysql container, for example:
         -e HUGINN_MYSQL_USER=huginn \
         -e HUGINN_MYSQL_PASSWORD=somethingsecret \
         -e HUGINN_MYSQL_ROOT_PASSWORD=somethingevenmoresecret \
-        cantino/huginn
+        mysql
     docker run --rm --name huginn \
         --link mysql \
         -p 3000:3000 \
