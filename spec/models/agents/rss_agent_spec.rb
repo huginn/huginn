@@ -157,10 +157,9 @@ describe Agents::RssAgent do
 
     it "captures multiple categories" do
       agent.check
-      first, second, third = agent.events.take(3)
-      expect(first.payload['categories'].count).to eq(3)
-      expect(second.payload['categories'].count).to eq(2)
-      expect(third.payload['categories'].count).to eq(1)
+      first, *, third = agent.events.take(3)
+      expect(first.payload['categories']).to eq(["csv", "crossplatform", "utilities"])
+      expect(third.payload['categories']).to eq(["web"])
     end
   end
 
