@@ -51,14 +51,14 @@ Simple stand-alone usage:
 
 To link to another mysql container, for example:
 
-    docker run --rm --name mysql \
+    docker run --rm --name huginn_mysql \
         -e HUGINN_MYSQL_DATABASE=huginn \
         -e HUGINN_MYSQL_USER=huginn \
         -e HUGINN_MYSQL_PASSWORD=somethingsecret \
         -e HUGINN_MYSQL_ROOT_PASSWORD=somethingevenmoresecret \
         mysql
     docker run --rm --name huginn \
-        --link mysql \
+        --link huginn_mysql:mysql \
         -p 3000:3000 \
         -e HUGINN_DATABASE_NAME=huginn \
         -e HUGINN_DATABASE_USERNAME=huginn \
@@ -68,7 +68,7 @@ To link to another mysql container, for example:
 To link to another container named 'postgres':
 
     docker run --rm --name huginn \
-        --link postgres \
+        --link huginn_postgres:postgres \
         -p 3000:3000 \
         -e "HUGINN_DATABASE_USERNAME=huginn" \
         -e "HUGINN_DATABASE_PASSWORD=pass@word" \
