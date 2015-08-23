@@ -14,3 +14,7 @@ class Delayed::Job
   scope :awaiting_retry, ->{ where("failed_at IS NULL AND attempts > 0") }
   scope :failed, -> { where("failed_at IS NOT NULL") }
 end
+
+Delayed::Backend::ActiveRecord.configure do |config|
+  config.reserve_sql_strategy = :default_sql
+end
