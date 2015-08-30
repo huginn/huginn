@@ -4,11 +4,12 @@ module Agents
 
 #    cannot_create_events!
     can_dry_run!
-    can_order_created_events!
+#    can_order_created_events!
 
     default_schedule "never"
 
     description <<-MD
+      --------TESTING v1--------
       A Post Agent receives events from other agents (or runs periodically), merges those events with the [Liquid-interpolated](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) contents of `payload`, and sends the results as POST (or GET) requests to a specified url.  To skip merging in the incoming event, but still send the interpolated payload, set `no_merge` to `true`.
 
       The `post_url` field must specify where you would like to send requests. Please include the URI scheme (`http` or `https`).
@@ -118,6 +119,142 @@ module Agents
       response = faraday.run_request(method.to_sym, url, body, headers) { |request|
         request.params.update(params) if params
       }
+      
+      interpolation_context.stack {
+        interpolation_context['_response_'] = ResponseDrop.new(response)
+        body = response.body
+        doc = parse(body)
+
+        if extract_full_json?
+#          if store_payload!(previous_payloads(1), doc)
+            log "Storing new result for '#{name}': #{doc.inspect}"
+            create_event payload: payload.merge(doc)
+#          end
+          return
+        end
+
+        output =
+          case extraction_type
+          when 'json'
+            extract_json(doc)
+          when 'text'
+            extract_text(doc)
+          else
+            extract_xml(doc)
+          end
+
+        num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
+
+        if num_unique_lengths.length != 1
+          raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
+        end
+
+#        old_events = previous_payloads num_unique_lengths.first
+#        num_unique_lengths.first.times do |index|
+#          result = {}
+#          interpolated['extract'].keys.each do |name|
+#            result[name] = output[name][index]
+#            if name.to_s == 'url'
+#              result[name] = (response.env[:url] + result[name]).to_s
+#            end
+#          end
+
+#          if store_payload!(old_events, result)
+            log "Storing new parsed result for '#{name}': #{result.inspect}"
+            create_event payload: payload.merge(result)
+#          end
+        end
+      }
     end
+    
+    	# This method returns true if the result should be stored as a new event.
+    # If mode is set to 'on_change', this method may return false and update an existing
+    # event to expire further in the future.
+#    def store_payload!(old_events, result)
+#      case interpolated['mode'].presence
+#      when 'on_change'
+#        result_json = result.to_json
+#        if found = old_events.find { |event| event.payload.to_json == result_json }
+#          found.update!(expires_at: new_event_expiration_date)
+#          false
+#        else
+#          true
+#        end
+#      when 'all', 'merge', ''
+#        true
+#      else
+#        raise "Illegal options[mode]: #{interpolated['mode']}"
+#      end
+#    end
+#
+#    def previous_payloads(num_events)
+#      if interpolated['uniqueness_look_back'].present?
+#        look_back = interpolated['uniqueness_look_back'].to_i
+#      else
+#        # Larger of UNIQUENESS_FACTOR * num_events and UNIQUENESS_LOOK_BACK
+#        look_back = UNIQUENESS_FACTOR * num_events
+#        if look_back < UNIQUENESS_LOOK_BACK
+#          look_back = UNIQUENESS_LOOK_BACK
+#        end
+#      end
+#      events.order("id desc").limit(look_back) if interpolated['mode'] == "on_change"
+#    end
+
+    def extract_full_json?
+      !interpolated['extract'].present? && extraction_type == "json"
+    end
+
+    def extraction_type(interpolated = interpolated())
+      (interpolated['type'] || begin
+        case interpolated['url']
+        when /\.(rss|xml)$/i
+          "xml"
+        when /\.json$/i
+          "json"
+        when /\.(txt|text)$/i
+          "text"
+        else
+          "html"
+        end
+      end).to_s
+    end
+
+    def parse(data)
+      case type = extraction_type
+      when "xml"
+        doc = Nokogiri::XML(data)
+        # ignore xmlns, useful when parsing atom feeds
+        doc.remove_namespaces! unless use_namespaces?
+        doc
+      when "json"
+        JSON.parse(data)
+      when "html"
+        Nokogiri::HTML(data)
+      when "text"
+        data
+      else
+        raise "Unknown extraction type: #{type}"
+      end
+    end
+
+    # Wraps Faraday::Response
+    class ResponseDrop < LiquidDroppable::Drop
+      def headers
+        HeaderDrop.new(@object.headers)
+      end
+
+      # Integer value of HTTP status
+      def status
+        @object.status
+      end
+    end
+
+    # Wraps Faraday::Utils::Headers
+    class HeaderDrop < LiquidDroppable::Drop
+      def before_method(name)
+        @object[name.tr('_', '-')]
+      end
+    end	
+      
   end
 end
