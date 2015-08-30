@@ -12,7 +12,7 @@ module Agents
     default_schedule "never"
 
     description <<-MD
-      --------TESTING v1--------
+      --------TESTING v2--------
       A Post Agent receives events from other agents (or runs periodically), merges those events with the [Liquid-interpolated](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) contents of `payload`, and sends the results as POST (or GET) requests to a specified url.  To skip merging in the incoming event, but still send the interpolated payload, set `no_merge` to `true`.
 
       The `post_url` field must specify where you would like to send requests. Please include the URI scheme (`http` or `https`).
@@ -30,7 +30,13 @@ module Agents
     MD
 
 #    event_description "Does not produce events."
-    event_description "TBD."
+    event_description do
+      "Events will have the following fields:\n\n    %s" % [
+        Utils.pretty_print(Hash[options['extract'].keys.map { |key|
+          [key, "..."]
+        }])
+      ]
+    end
 
     def default_options
       {
@@ -220,6 +226,75 @@ module Agents
           "html"
         end
       end).to_s
+    end
+    
+    def use_namespaces?
+      if value = interpolated.key?('use_namespaces')
+        boolify(interpolated['use_namespaces'])
+      else
+        interpolated['extract'].none? { |name, extraction_details|
+          extraction_details.key?('xpath')
+        }
+      end
+    end
+
+    def extract_each(&block)
+      interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
+        output[name] = block.call(extraction_details)
+      }
+    end
+
+    def extract_json(doc)
+      extract_each { |extraction_details|
+        result = Utils.values_at(doc, extraction_details['path'])
+        log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
+        result
+      }
+    end
+
+    def extract_text(doc)
+      extract_each { |extraction_details|
+        regexp = Regexp.new(extraction_details['regexp'])
+        case index = extraction_details['index']
+        when /\A\d+\z/
+          index = index.to_i
+        end
+        result = []
+        doc.scan(regexp) {
+          result << Regexp.last_match[index]
+        }
+        log "Extracting #{extraction_type} at #{regexp}: #{result}"
+        result
+      }
+    end
+
+    def extract_xml(doc)
+      extract_each { |extraction_details|
+        case
+        when css = extraction_details['css']
+          nodes = doc.css(css)
+        when xpath = extraction_details['xpath']
+          nodes = doc.xpath(xpath)
+        else
+          raise '"css" or "xpath" is required for HTML or XML extraction'
+        end
+        case nodes
+        when Nokogiri::XML::NodeSet
+          result = nodes.map { |node|
+            case value = node.xpath(extraction_details['value'] || '.')
+            when Float
+              # Node#xpath() returns any numeric value as float;
+              # convert it to integer as appropriate.
+              value = value.to_i if value.to_i == value
+            end
+            value.to_s
+          }
+        else
+          raise "The result of HTML/XML extraction was not a NodeSet"
+        end
+        log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
+        result
+      }
     end
 
     def parse(data)
