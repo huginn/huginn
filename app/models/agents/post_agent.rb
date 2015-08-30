@@ -134,6 +134,8 @@ module Agents
         body = response.body
         doc = parse(body)
 
+        log "Storing new parsed result for '#{name}': #{doc}"          
+        
         if extract_full_json?
 #          if store_payload!(previous_payloads(1), doc)
             log "Storing new result for '#{name}': #{doc.inspect}"
@@ -151,7 +153,7 @@ module Agents
           else
             extract_xml(doc)
           end
-
+        
         num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
 
         if num_unique_lengths.length != 1
