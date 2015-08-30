@@ -71,7 +71,9 @@ module LongRunnable
           stop!
         rescue StandardError => e
           message = "#{id} Exception #{e.message}:\n#{e.backtrace.first(10).join("\n")}"
-          agent.error(message)
+          AgentRunner.with_connection do
+            agent.error(message)
+          end
         end
       end
     end
