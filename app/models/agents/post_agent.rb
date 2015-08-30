@@ -1,3 +1,6 @@
+require 'nokogiri'
+require 'date'
+
 module Agents
   class PostAgent < Agent
     include WebRequestConcern
@@ -163,7 +166,7 @@ module Agents
             log "Storing new parsed result for '#{name}': #{result.inspect}"
             create_event payload: payload.merge(result)
 #          end
-        end
+#        end
       }
     end
     
