@@ -57,6 +57,12 @@ class AgentRunner
     @@agents << agent unless @@agents.include?(agent)
   end
 
+  def self.with_connection
+    ActiveRecord::Base.connection_pool.with_connection do
+      yield
+    end
+  end
+
   private
   def run_workers
     workers             = load_workers
@@ -83,7 +89,9 @@ class AgentRunner
       next if @options[:only] && !@options[:only].include?(klass)
       next if @options[:except] && @options[:except].include?(klass)
 
-      (klass.setup_worker || []).each do |agent_worker|
+      AgentRunner.with_connection do
+        (klass.setup_worker || [])
+      end.each do |agent_worker|
         workers[agent_worker.id] = agent_worker
       end
     end

@@ -123,7 +123,9 @@ module Agents
 
         time, nick, message = normalize_args(event, args)
 
-        agent.create_event(payload: {event: event, time: time, nick: nick, message: message})
+        AgentRunner.with_connection do
+          agent.create_event(payload: {event: event, time: time, nick: nick, message: message})
+        end
       end
 
       def stop

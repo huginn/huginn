@@ -236,7 +236,9 @@ module Agents
           next unless (filter.downcase.split(SEPARATOR) - status["text"].downcase.split(SEPARATOR)).reject(&:empty?) == [] # Hacky McHackerson
           @filter_to_agent_map[filter].each do |agent|
             puts " -> #{agent.name}"
-            agent.process_tweet(filter, status)
+            AgentRunner.with_connection do
+              agent.process_tweet(filter, status)
+            end
           end
         end
       end
