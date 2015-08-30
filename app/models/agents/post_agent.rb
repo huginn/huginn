@@ -2,7 +2,7 @@ module Agents
   class PostAgent < Agent
     include WebRequestConcern
 
-    cannot_create_events!
+#    cannot_create_events!
 
     default_schedule "never"
 
@@ -23,7 +23,8 @@ module Agents
         * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
     MD
 
-    event_description "Does not produce events."
+#    event_description "Does not produce events."
+    event_description "TBD."
 
     def default_options
       {
@@ -112,7 +113,7 @@ module Agents
         error "Invalid method '#{method}'"
       end
 
-      faraday.run_request(method.to_sym, url, body, headers) { |request|
+      response = faraday.run_request(method.to_sym, url, body, headers) { |request|
         request.params.update(params) if params
       }
     end
