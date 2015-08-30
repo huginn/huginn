@@ -3,6 +3,8 @@ module Agents
     include WebRequestConcern
 
 #    cannot_create_events!
+    can_dry_run!
+    can_order_created_events!
 
     default_schedule "never"
 
