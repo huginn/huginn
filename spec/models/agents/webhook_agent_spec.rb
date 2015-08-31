@@ -60,6 +60,28 @@ describe Agents::WebhookAgent do
 
       end
 
+      context "accepting get and post" do
+
+        before { agent.options['verbs'] = 'get;post' }
+
+        it "should accept GET" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "get", "text/html")
+          }.to change { Event.count }.by(1)
+          expect(out).to eq(['Event Created', 201])
+        end
+
+        it "should accept POST" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+          }.to change { Event.count }.by(1)
+          expect(out).to eq(['Event Created', 201])
+        end
+
+      end
+
     end
 
   end
