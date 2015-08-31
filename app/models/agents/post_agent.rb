@@ -248,15 +248,15 @@ module Agents
           raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
         end
 
-#        old_events = previous_payloads num_unique_lengths.first
-#        num_unique_lengths.first.times do |index|
-#          result = {}
-#          interpolated['extract'].keys.each do |name|
-#            result[name] = output[name][index]
-#            if name.to_s == 'url'
-#              result[name] = (response.env[:url] + result[name]).to_s
-#            end
-#          end
+        old_events = previous_payloads num_unique_lengths.first
+        num_unique_lengths.first.times do |index|
+          result = {}
+          interpolated['extract'].keys.each do |name|
+            result[name] = output[name][index]
+            if name.to_s == 'url'
+              result[name] = (response.env[:url] + result[name]).to_s
+            end
+          end
 
 #          if store_payload!(old_events, result)
             log "Storing new parsed result for '#{name}': #{result.inspect}"
@@ -285,19 +285,19 @@ module Agents
 #        raise "Illegal options[mode]: #{interpolated['mode']}"
 #      end
 #    end
-#
-#    def previous_payloads(num_events)
-#      if interpolated['uniqueness_look_back'].present?
-#        look_back = interpolated['uniqueness_look_back'].to_i
-#      else
-#        # Larger of UNIQUENESS_FACTOR * num_events and UNIQUENESS_LOOK_BACK
-#        look_back = UNIQUENESS_FACTOR * num_events
-#        if look_back < UNIQUENESS_LOOK_BACK
-#          look_back = UNIQUENESS_LOOK_BACK
-#        end
-#      end
-#      events.order("id desc").limit(look_back) if interpolated['mode'] == "on_change"
-#    end
+
+    def previous_payloads(num_events)
+      if interpolated['uniqueness_look_back'].present?
+        look_back = interpolated['uniqueness_look_back'].to_i
+      else
+        # Larger of UNIQUENESS_FACTOR * num_events and UNIQUENESS_LOOK_BACK
+        look_back = UNIQUENESS_FACTOR * num_events
+        if look_back < UNIQUENESS_LOOK_BACK
+          look_back = UNIQUENESS_LOOK_BACK
+        end
+      end
+      events.order("id desc").limit(look_back) if interpolated['mode'] == "on_change"
+    end
 
     def extract_full_json?
       !interpolated['extract'].present? && extraction_type == "json"
