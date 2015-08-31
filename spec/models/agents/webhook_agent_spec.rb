@@ -82,6 +82,80 @@ describe Agents::WebhookAgent do
 
       end
 
+      context "accepting only get" do
+
+        before { agent.options['verbs'] = 'get' }
+
+        it "should accept GET" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "get", "text/html")
+          }.to change { Event.count }.by(1)
+          expect(out).to eq(['Event Created', 201])
+        end
+
+        it "should not accept POST" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+          }.to change { Event.count }.by(0)
+          expect(out).to eq(['Please use GET requests only', 401])
+        end
+
+      end
+
+      context "accepting only post" do
+
+        before { agent.options['verbs'] = 'post' }
+
+        it "should not accept GET" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "get", "text/html")
+          }.to change { Event.count }.by(0)
+          expect(out).to eq(['Please use POST requests only', 401])
+        end
+
+        it "should accept POST" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+          }.to change { Event.count }.by(1)
+          expect(out).to eq(['Event Created', 201])
+        end
+
+      end
+
+      context "accepting only put" do
+
+        before { agent.options['verbs'] = 'put' }
+
+        it "should accept PUT" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "put", "text/html")
+          }.to change { Event.count }.by(1)
+          expect(out).to eq(['Event Created', 201])
+        end
+
+        it "should not accept GET" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "get", "text/html")
+          }.to change { Event.count }.by(0)
+          expect(out).to eq(['Please use PUT requests only', 401])
+        end
+
+        it "should not accept POST" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+          }.to change { Event.count }.by(0)
+          expect(out).to eq(['Please use PUT requests only', 401])
+        end
+
+      end
+
     end
 
   end

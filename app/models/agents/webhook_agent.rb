@@ -39,7 +39,8 @@ module Agents
 
     def receive_web_request(params, method, format)
       secret = params.delete('secret')
-      return ["Please use POST requests only", 401] unless method == "post" || options['verbs']
+      verbs = (options['verbs'] ? options['verbs'] : 'post').split(';')
+      return ["Please use #{verbs.first.upcase} requests only", 401] unless verbs.include?(method)
       return ["Not Authorized", 401] unless secret == interpolated['secret']
 
       [payload_for(params)].flatten.each do |payload|
