@@ -9,6 +9,7 @@ development:
   host: <%= ENV['DATABASE_HOST'] || "" %>
   port: <%= ENV['DATABASE_PORT'] || "" %>
   socket: <%= ENV['DATABASE_SOCKET'] || ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find { |path| File.exist? path } %>
+  strict: false
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -23,6 +24,7 @@ test:
   password:  <%= ENV['DATABASE_PASSWORD'].presence || "" %>
   socket: <%= ENV['DATABASE_SOCKET'] || ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find { |path| File.exist? path } %>
   port: <%= ENV['DATABASE_PORT'] || "" %>
+  strict: false
 
 production:
   adapter: <%= ENV['DATABASE_ADAPTER'].presence || "mysql2" %>
@@ -35,3 +37,4 @@ production:
   host: <%= ENV['DATABASE_HOST'] || "" %>
   port: <%= ENV['DATABASE_PORT'] || "" %>
   socket: <%= ENV['DATABASE_SOCKET'] || ["/var/run/mysqld/mysqld.sock", "/opt/local/var/run/mysql5/mysqld.sock", "/tmp/mysql.sock"].find{ |path| File.exist? path } %>
+  strict: false
