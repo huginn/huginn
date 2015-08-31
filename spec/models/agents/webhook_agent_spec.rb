@@ -80,6 +80,14 @@ describe Agents::WebhookAgent do
           expect(out).to eq(['Event Created', 201])
         end
 
+        it "should not accept PUT" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "put", "text/html")
+          }.to change { Event.count }.by(0)
+          expect(out).to eq(['Please use GET/POST requests only', 401])
+        end
+
       end
 
       context "accepting only get" do

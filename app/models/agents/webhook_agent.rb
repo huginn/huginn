@@ -40,7 +40,7 @@ module Agents
     def receive_web_request(params, method, format)
       secret = params.delete('secret')
       verbs = (options['verbs'] ? options['verbs'] : 'post').split(';')
-      return ["Please use #{verbs.first.upcase} requests only", 401] unless verbs.include?(method)
+      return ["Please use #{verbs.join('/').upcase} requests only", 401] unless verbs.include?(method)
       return ["Not Authorized", 401] unless secret == interpolated['secret']
 
       [payload_for(params)].flatten.each do |payload|
