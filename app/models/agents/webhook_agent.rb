@@ -38,10 +38,13 @@ module Agents
     end
 
     def receive_web_request(params, method, format)
+      # check the secret
       secret = params.delete('secret')
+      return ["Not Authorized", 401] unless secret == interpolated['secret']
+
+      #check the verbs
       verbs = (options['verbs'] ? options['verbs'] : 'post').split(/[,;]/).map { |x| x.strip.downcase }
       return ["Please use #{verbs.join('/').upcase} requests only", 401] unless verbs.include?(method)
-      return ["Not Authorized", 401] unless secret == interpolated['secret']
 
       [payload_for(params)].flatten.each do |payload|
         create_event(payload: payload)
