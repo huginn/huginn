@@ -38,12 +38,29 @@ describe Agents::WebhookAgent do
       expect(out).to eq(['Not Authorized', 401])
     end
 
-    it "should only accept POSTs" do
-      out = nil
-      expect {
-        out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "get", "text/html")
-      }.to change { Event.count }.by(0)
-      expect(out).to eq(['Please use POST requests only', 401])
+    describe "receiving events" do
+
+      context "default settings" do
+
+        it "should not accept GET" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "get", "text/html")
+          }.to change { Event.count }.by(0)
+          expect(out).to eq(['Please use POST requests only', 401])
+        end
+
+        it "should accept POST" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+          }.to change { Event.count }.by(1)
+          expect(out).to eq(['Event Created', 201])
+        end
+
+      end
+
     end
+
   end
 end
