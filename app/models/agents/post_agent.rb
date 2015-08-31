@@ -44,10 +44,15 @@ module Agents
         'expected_receive_period_in_days' => '1',
         'content_type' => 'form',
         'method' => 'post',
-        'type' => 'html',
+        'type' => 'json',
         'payload' => {
           'key' => 'value',
           'something' => 'the event contained {{ somekey }}'
+        },
+        'extract' => {
+            'url' => { 'css' => "#comic img", 'value' => "@src" },
+            'title' => { 'css' => "#comic img", 'value' => "@alt" },
+            'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
         },
         'headers' => {}
       }
