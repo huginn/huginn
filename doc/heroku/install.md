@@ -1,18 +1,18 @@
 ## Deploy to Heroku
 
-Huginn works very well on the cheapest Heroku paid plan. This is what we recommend if you want to use Huginn on heroku.
+Huginn works very well on the cheapest Heroku paid plan. This is what we recommend if you want to use Huginn on Heroku.
 
 Notes for any Heroku plan:
 
 * The `setup_heroku` command points Heroku at a special Procfile (`deployment/heroku/Procfile.heroku`) that is designed to be run on only one Heroku web worker.  If you want to run multiple workers, change the Heroku config variable `PROCFILE_PATH` with `heroku config:set PROCFILE_PATH=./Procfile` and switch back to the standard Huginn Procfile configuration.
 
-Notes if you try the free plan (which won't work very well):
+If you still wish to use the Heroku free plan (which won't work very well), please understand the following:
 
 * Heroku's [free plan](https://www.heroku.com/pricing) limits total runtime per day to 18 hours. This means that Huginn must sleep some of the time, and so recurring tasks will only run if their recurrence frequency fits within the free plan's awake time, which is 30 minutes. Therefore, we recommend that you only use the every 1 minute, every 2 minute, and every 5 minute Agent scheduling options.
 * If you're using the free plan, you need to signup for a free [uptimerobot](https://uptimerobot.com) account and have it ping your Huginn URL on Heroku once every 70 minutes.  If you still receive warnings from Heroku, try a longer interval.
 * Heroku's free Postgres plan limits the number of database rows that you can have to 10,000, so you should be sure to set a low event retention schedule for your agents.
 
-### Instructions
+## Instructions
 
 * Install the [Heroku Toolbelt](https://toolbelt.heroku.com/) and then run `heroku login`
 * Go into your huginn directory and run `bundle`
