@@ -609,3 +609,6 @@ DEPENDENCIES
   weibo_2!
   wunderground (~> 1.2.0)
   xmpp4r (~> 0.5.6)
+
+BUNDLED WITH
+   1.10.6
