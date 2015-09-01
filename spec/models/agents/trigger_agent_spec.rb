@@ -23,6 +23,8 @@ describe Agents::TriggerAgent do
     @event.agent = agents(:bob_rain_notifier_agent)
     @event.payload = { 'foo' => { "bar" => { 'baz' => "a2b" }},
                        'name' => "Joe" }
+
+    stub_request(:any, /pastebin.com\/raw.php/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/textfile.txt")), :status => 200)
   end
 
   describe "validation" do
@@ -155,6 +157,52 @@ describe Agents::TriggerAgent do
     it "puts can extract values into the message based on paths" do
       @checker.receive([@event])
       expect(Event.last.payload['message']).to eq("I saw 'a2b' from Joe")
+    end
+
+    it "handles regexes sourced from external documents" do
+      @checker.options['rules'][0] = {
+        'type'  => "regexdoc",
+        'value' => "http://pastebin.com/raw.php?i=v9Cr6aAw",
+        'path'  => "foo.bar.baz",
+      }
+
+      @event.payload['foo']['bar']['baz'] = "a2b"
+      expect {
+        @checker.receive([@event])
+      }.to change { Event.count }.by(1)
+
+      @event.payload['foo']['bar']['baz'] = "a222b"
+      expect {
+        @checker.receive([@event])
+      }.to change { Event.count }.by(1)
+
+      @event.payload['foo']['bar']['baz'] = "a22222b"
+      expect {
+        @checker.receive([@event])
+      }.to change { Event.count }.by(0)
+    end
+
+    it "handles negated regexes sourced from external documents" do
+      @checker.options['rules'][0] = {
+        'type'  => "!regexdoc",
+        'value' => "http://pastebin.com/raw.php?i=v9Cr6aAw",
+        'path'  => "foo.bar.baz",
+      }
+
+      @event.payload['foo']['bar']['baz'] = "a2b"
+      expect {
+        @checker.receive([@event])
+      }.to change { Event.count }.by(0)
+
+      @event.payload['foo']['bar']['baz'] = "a222b"
+      expect {
+        @checker.receive([@event])
+      }.to change { Event.count }.by(0)
+
+      @event.payload['foo']['bar']['baz'] = "a22222b"
+      expect {
+        @checker.receive([@event])
+      }.to change { Event.count }.by(1)
     end
 
     it "handles numerical comparisons" do
