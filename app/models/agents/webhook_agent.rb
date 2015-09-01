@@ -46,7 +46,7 @@ module Agents
       return ["Not Authorized", 401] unless secret == interpolated['secret']
 
       #check the verbs
-      verbs = (interpolated['verbs'] || 'post').split(/,/).map { |x| x.strip.downcase }
+      verbs = (interpolated['verbs'] || 'post').split(/,/).map { |x| x.strip.downcase }.select { |x| x.present? }
       return ["Please use #{verbs.join('/').upcase} requests only", 401] unless verbs.include?(method)
 
       [payload_for(params)].flatten.each do |payload|

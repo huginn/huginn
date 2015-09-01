@@ -192,6 +192,14 @@ describe Agents::WebhookAgent do
           expect(out).to eq(['Event Created', 201])
         end
 
+        it "should not accept DELETE" do
+          out = nil
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "delete", "text/html")
+          }.to change { Event.count }.by(0)
+          expect(out).to eq(['Please use PUT/POST/GET requests only', 401])
+        end
+
       end
 
     end
