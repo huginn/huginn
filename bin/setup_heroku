@@ -160,7 +160,7 @@ if first_time
   puts
   puts "\t#{$config['INVITATION_CODE']}"
   puts
-  puts "We recommend that you read https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku and setup Pingdom to keep your app awake!"
+  puts "We strongly recommend that you read https://github.com/cantino/huginn/blob/master/doc/heroku/install.md thoroughly!"
 end
 
 puts
