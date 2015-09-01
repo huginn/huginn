@@ -62,7 +62,7 @@ describe Agents::WebhookAgent do
 
       context "accepting get and post" do
 
-        before { agent.options['verbs'] = 'get;post' }
+        before { agent.options['verbs'] = 'get,post' }
 
         it "should accept GET" do
           out = nil
@@ -166,7 +166,7 @@ describe Agents::WebhookAgent do
 
       context "flaky content with commas" do
 
-        before { agent.options['verbs'] = ';;  PUT,POST; gEt , ;' }
+        before { agent.options['verbs'] = ',,  PUT,POST, gEt , ,' }
 
         it "should accept PUT" do
           out = nil
