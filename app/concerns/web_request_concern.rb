@@ -121,6 +121,8 @@ module WebRequestConcern
         builder.request :basic_auth, *userinfo
       end
 
+      builder.use FaradayMiddleware::Gzip
+
       case backend = faraday_backend
         when :typhoeus
           require 'typhoeus/adapters/faraday'
