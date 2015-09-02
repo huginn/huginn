@@ -12,7 +12,7 @@
   <% end %>
 
   <li>
-    <%= link_to icon_tag('glyphicon-eye-open') + ' Show'.html_safe, agent_path(agent) %>
+    <%= link_to icon_tag('glyphicon-eye-open') + ' Show'.html_safe, agent_path(agent, return: return_to) %>
   </li>
 
   <li class="divider"></li>
