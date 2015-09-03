@@ -44,7 +44,7 @@ module WebRequestConcern
             encoding = @default_encoding
           else
             # Never try to transcode a binary content
-            return
+            next
           end
         end
         body.encode!(Encoding::UTF_8, encoding) unless body.encoding == Encoding::UTF_8
