@@ -38,7 +38,7 @@ class ApplicationController < ActionController::Base
         else
           agents_path
         end
-      when /\A#{Regexp::escape scenarios_path}\/\d+\z/, agents_path
+      when /\A#{(Regexp::escape scenarios_path)}/, /\A#{(Regexp::escape agents_path)}/, /\A#{(Regexp::escape events_path)}/
         ret
     end
   end
