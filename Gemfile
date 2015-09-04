@@ -40,7 +40,6 @@ gem 'haversine'
 
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
-# gem 'omniauth-github'
 gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
 
 # Uncomment to use 'em_http' as FARADAY_HTTP_BACKEND

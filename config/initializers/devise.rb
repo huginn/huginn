@@ -251,12 +251,6 @@ Devise.setup do |config|
     config.omniauth :'37signals', key, secret
   end
 
-  if defined?(OmniAuth::Strategies::GitHub) &&
-     (key = ENV["GITHUB_OAUTH_KEY"]).present? &&
-     (secret = ENV["GITHUB_OAUTH_SECRET"]).present?
-    config.omniauth :github, key, secret
-  end
-
   if defined?(OmniAuth::Strategies::Dropbox) &&
      (key = ENV["DROPBOX_OAUTH_KEY"]).present? &&
      (secret = ENV["DROPBOX_OAUTH_SECRET"]).present?
