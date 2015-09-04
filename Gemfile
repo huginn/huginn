@@ -41,7 +41,6 @@ gem 'haversine'
 
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
-# gem 'omniauth-github'
 gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
