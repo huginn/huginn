@@ -42,6 +42,13 @@ GIT
       omniauth-oauth2 (~> 1.1)
 
 GIT
+  remote: git@github.com:darrencauthon/huginn_agent.git
+  revision: a66a5de153c05fc7cb667e0f8014c45dfdd05a7a
+  specs:
+    huginn_agent (0.0.1)
+      activesupport
+
+GIT
   remote: https://github.com/cantino/delayed_job_active_record
   revision: 7ede4ea81561a66427f600decb87f6fcdb5b8aa4
   branch: configurable-reserve-sql-strategy
@@ -49,6 +56,12 @@ GIT
     delayed_job_active_record (4.0.3)
       activerecord (>= 3.0, < 5.0)
       delayed_job (>= 3.0, < 4.1)
+
+PATH
+  remote: ~/darren/twitter_huginn_agents
+  specs:
+    twitter_huginn_agents (0.0.1)
+      twitter
 
 GEM
   remote: https://rubygems.org/
@@ -559,6 +572,7 @@ DEPENDENCIES
   haversine
   hipchat (~> 1.2.0)
   httparty (~> 0.13)
+  huginn_agent!
   hypdf (~> 1.0.7)
   jquery-rails (~> 3.1.3)
   json (~> 1.8.1)
@@ -605,6 +619,7 @@ DEPENDENCIES
   twilio-ruby (~> 3.11.5)
   twitter (~> 5.14.0)
   twitter-stream!
+  twitter_huginn_agents!
   typhoeus (~> 0.6.3)
   tzinfo (>= 1.2.0)
   tzinfo-data
