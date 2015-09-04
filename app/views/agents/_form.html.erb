@@ -91,6 +91,8 @@
                 <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
                 <%= f.label :propagate_immediately, :class => 'propagate-immediately' do %>Propagate immediately
                   <%= f.check_box :propagate_immediately %>
+                  &nbsp;
+                  <span class="glyphicon glyphicon-question-sign hover-help" data-content="Normally, Huginn moves Events from source Agents to receiving Agents once per minute. Checking this option will cause Events created by this Agent's sources to be received immediately. This can use more CPU resources, but will decrease the time between Event creation and being received by this Agent."></span>
                 <% end %>
               </div>
             </div>
