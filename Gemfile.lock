@@ -42,20 +42,6 @@ GIT
       omniauth-oauth2 (~> 1.1)
 
 GIT
-  remote: git@github.com:darrencauthon/huginn_agent.git
-  revision: a66a5de153c05fc7cb667e0f8014c45dfdd05a7a
-  specs:
-    huginn_agent (0.0.1)
-      activesupport
-
-GIT
-  remote: git@github.com:darrencauthon/twitter_huginn_agents.git
-  revision: 42ea262c319860fb942d9fce1d62afd479101c92
-  specs:
-    twitter_huginn_agents (0.0.1)
-      twitter
-
-GIT
   remote: https://github.com/cantino/delayed_job_active_record
   revision: 7ede4ea81561a66427f600decb87f6fcdb5b8aa4
   branch: configurable-reserve-sql-strategy
@@ -63,6 +49,20 @@ GIT
     delayed_job_active_record (4.0.3)
       activerecord (>= 3.0, < 5.0)
       delayed_job (>= 3.0, < 4.1)
+
+GIT
+  remote: https://github.com/darrencauthon/huginn_agent.git
+  revision: 85b89e248cfbdbfbbf59ebac2c248740f9393737
+  specs:
+    huginn_agent (0.0.1)
+      activesupport
+
+GIT
+  remote: https://github.com/darrencauthon/twitter_huginn_agents.git
+  revision: 9310888d716204d77e06959ddaf55582c2ca9e46
+  specs:
+    twitter_huginn_agents (0.0.1)
+      twitter
 
 GEM
   remote: https://rubygems.org/
