@@ -251,11 +251,11 @@ module Agents
       check_urls(interpolated['url'])
     end
 
-    def check_urls(in_url)
+    def check_urls(in_url, payload = {})
       return unless in_url.present?
 
       Array(in_url).each do |url|
-        check_url(url)
+        check_url(url, payload)
       end
     end
 
@@ -322,11 +322,11 @@ module Agents
         interpolate_with(event) do
           url_to_scrape =
             if url_template = options['url_from_event'].presence
-              interpolate_string(url_template)
+              interpolate_options(url_template)
             else
               event.payload['url']
             end
-          check_url(url_to_scrape,
+          check_urls(url_to_scrape,
                     interpolated['mode'].to_s == "merge" ? event.payload : {})
         end
       end
