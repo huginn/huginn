@@ -55,6 +55,7 @@ module Agents
 
     def check
       auth_options = {:basic_auth => {:username =>interpolated[:username], :password=>interpolated['password']}}
+      log "Adioso Credentials #{auth_options}"
       log "Adioso Request: http://api.adioso.com/v2/search/parse?q=#{URI.encode(interpolated['from'])}+to+#{URI.encode(interpolated['to'])}"
       parse_response = HTTParty.get "http://api.adioso.com/v2/search/parse?q=#{URI.encode(interpolated['from'])}+to+#{URI.encode(interpolated['to'])}", auth_options
       log "Adioso Parse_Response #{parse_response}"
