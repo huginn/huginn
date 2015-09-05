@@ -673,6 +673,19 @@ fire: hot
         expect(stub).to have_been_requested
       end
 
+      it "should allow url_from_event to be an array of urls" do
+        stub1 = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
+        stub2 = stub_request(:any, 'http://google.org/?url=http%3A%2F%2Fxkcd.com')
+
+        @checker.options = @valid_options.merge(
+          'url_from_event' => ['http://example.org/?url={{url | uri_escape}}', 'http://google.org/?url={{url | uri_escape}}']
+        )
+        @checker.receive([@event])
+
+        expect(stub1).to have_been_requested
+        expect(stub2).to have_been_requested
+      end
+
       it "should interpolate values from incoming event payload" do
         expect {
           @valid_options['extract'] = {
