@@ -52,7 +52,7 @@ GIT
 
 GIT
   remote: https://github.com/darrencauthon/huginn_agent.git
-  revision: 85b89e248cfbdbfbbf59ebac2c248740f9393737
+  revision: b9372e810b3d27c954984936f2b1ef0e2ccff4b9
   specs:
     huginn_agent (0.0.1)
       activesupport
