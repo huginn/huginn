@@ -49,6 +49,13 @@ GIT
       activesupport
 
 GIT
+  remote: git@github.com:darrencauthon/twitter_huginn_agents.git
+  revision: 42ea262c319860fb942d9fce1d62afd479101c92
+  specs:
+    twitter_huginn_agents (0.0.1)
+      twitter
+
+GIT
   remote: https://github.com/cantino/delayed_job_active_record
   revision: 7ede4ea81561a66427f600decb87f6fcdb5b8aa4
   branch: configurable-reserve-sql-strategy
@@ -56,12 +63,6 @@ GIT
     delayed_job_active_record (4.0.3)
       activerecord (>= 3.0, < 5.0)
       delayed_job (>= 3.0, < 4.1)
-
-PATH
-  remote: ~/darren/twitter_huginn_agents
-  specs:
-    twitter_huginn_agents (0.0.1)
-      twitter
 
 GEM
   remote: https://rubygems.org/

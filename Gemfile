@@ -154,4 +154,4 @@ on_heroku do
 end
 
 gem 'huginn_agent', git: 'git@github.com:darrencauthon/huginn_agent.git'
-gem 'twitter_huginn_agents', path: '~/darren/twitter_huginn_agents'
+gem 'twitter_huginn_agents', git: 'git@github.com:darrencauthon/twitter_huginn_agents.git'
