@@ -1,5 +1,10 @@
 # Changes
 
+* Sep 2, 2015    - WebRequestConcern Agents automatically decode gzip/inflate encodings.
+* Sep 1, 2015    - WebhookAgent can configure allowed verbs (GET, POST, PUT, ...) for incoming requests.
+* Aug 21, 2015   - PostAgent supports "xml" as `content_type`.
+* Aug 3, 2015    - Dry Run allows user to input an event payload.
+* Aug 1, 2015    - Huginn now requires Ruby >=2.0 to run.
 * Jul 30, 2015   - RssAgent can configure the order of events created via `events_order`.
 * Jul 29, 2015   - WebsiteAgent can configure the order of events created via `events_order`.
 * Jul 29, 2015   - DataOutputAgent can configure the order of events in the output via `events_order`.

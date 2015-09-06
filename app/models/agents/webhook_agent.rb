@@ -20,6 +20,9 @@ module Agents
         * `payload_path` - JSONPath of the attribute in the POST body to be
           used as the Event payload.  If `payload_path` points to an array,
           Events will be created for each element.
+        * `verbs` - Comma-separated list of http verbs your agent will accept.
+          For example, "post,get" will enable POST and GET requests. Defaults
+          to "post".
       MD
     end
 
@@ -38,9 +41,13 @@ module Agents
     end
 
     def receive_web_request(params, method, format)
+      # check the secret
       secret = params.delete('secret')
-      return ["Please use POST requests only", 401] unless method == "post"
       return ["Not Authorized", 401] unless secret == interpolated['secret']
+
+      #check the verbs
+      verbs = (interpolated['verbs'] || 'post').split(/,/).map { |x| x.strip.downcase }.select { |x| x.present? }
+      return ["Please use #{verbs.join('/').upcase} requests only", 401] unless verbs.include?(method)
 
       [payload_for(params)].flatten.each do |payload|
         create_event(payload: payload)
