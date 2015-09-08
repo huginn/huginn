@@ -197,7 +197,7 @@ module DotHelper
       root << svg
       root << overlay_container = Nokogiri::XML::Node.new('div', doc) { |div|
         div['class'] = 'overlay-container'
-        div['style'] = "width: #{svg['width']}; height: #{svg['height']}"
+        div['style'] = "width: #{svg['width']}; height: #{svg['height']}; z-index: 1;"
       }
       overlay_container << overlay = Nokogiri::XML::Node.new('div', doc) { |div|
         div['class'] = 'overlay'
@@ -208,32 +208,400 @@ module DotHelper
         agent = agents.find { |a| a.id == agent_id }
 
         count = agent.events_count
-        next unless count && count > 0
 
-        overlay << Nokogiri::XML::Node.new('a', doc) { |badge|
+        overlay << Nokogiri::XML::Node.new('div', doc) { |badge|
           badge['id'] = id = 'b%d' % agent_id
-          badge['class'] = 'badge'
-          badge['href'] = agent_events_path(agent)
-          badge['target'] = '_blank'
-          badge['title'] = "#{count} events created"
-          badge.content = count.to_s
-
+          badge['class'] = 'btn-group'
           node['data-badge-id'] = id
 
-          badge << Nokogiri::XML::Node.new('span', doc) { |label|
-            # a dummy label only to obtain the background color
-            label['class'] = [
-              'label',
-              if agent.unavailable?
-                'label-warning'
-              elsif agent.working?
-                'label-success'
-              else
-                'label-danger'
-              end
-            ].join(' ')
-            label['style'] = 'display: none';
+          badge << Nokogiri::XML::Node.new('button', doc) { |btn|
+            btn['type'] = 'button'
+            btn['class'] = 'btn btn-default dropdown-toggle'
+            btn['data-toggle'] = 'dropdown'
+            btn['aria-expanded'] = 'false'
+            btn['style'] = 'width: 17px; height: 17px; background-color: #60C0F5'
+            btn.content = ""
+
+            btn << Nokogiri::XML::Node.new('span', doc) { |caret|
+              caret['class'] = 'caret'
+              caret['style'] = 'width: 8px; height: 8px; border-top: 8px solid; vertical-align: top; padding: 1px'
+            }
           }
+
+          badge << Nokogiri::XML::Node.new('ul', doc) { |ultag|
+            ultag['class'] = 'dropdown-menu'
+            ultag['role'] = 'menu'
+            ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
+              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+                atag['href'] = agent_path(agent)
+                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                  spantag['class'] = 'glyphicon glyphicon-eye-open'
+                  spantag.content = ' Show All'
+                }
+              }
+            }
+            ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
+              litag['class'] = 'divider'
+            }
+            ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
+              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+                atag['href'] = '#'
+                atag['data-toggle'] = 'modal'
+                atag['data-target'] = '#diagramEditAgent%d' % agent_id
+                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                  spantag['class'] = 'glyphicon glyphicon-pencil'
+                  spantag.content = ' Edit agent name'
+                }
+              }
+            }
+            ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
+              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+                atag['href'] = edit_agent_path(agent)
+                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                  spantag['class'] = 'glyphicon glyphicon-pencil'
+                  spantag.content = ' Edit agent settings'
+                }
+              }
+            }
+            ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
+              litag['class'] = 'divider'
+            }
+            ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
+              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+                atag['href'] = '#'
+                atag['data-toggle'] = 'modal'
+                atag['data-target'] = '#diagramEnableAgent%d' % agent_id
+                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                  if agent.disabled?
+                    spantag['class'] = 'glyphicon glyphicon-play'
+                    spantag.content = ' Enable agent'
+                  else
+                    spantag['class'] = 'glyphicon glyphicon-pause'
+                    spantag.content = ' Disable agent'
+                  end
+                }
+              }
+            }
+            ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
+              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+                atag['href'] = '#'
+                atag['data-toggle'] = 'modal'
+                atag['data-target'] = '#diagramSrcAgent%d' % agent_id
+                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                  spantag['class'] = 'glyphicon glyphicon-road'
+                  spantag.content = ' Set Source Agent'
+                }
+              }
+            }
+          }
+          #modal for setting source agent
+          root << Nokogiri::XML::Node.new('div', doc) { |div|
+            div['class'] = 'confirm-agent modal'
+            div['id'] = 'diagramSrcAgent%d' % agent_id
+            div['tabindex'] = '-1'
+            div['role'] = 'dialog'
+            div['aria-labelledby'] = 'diagramSrcAgentLabel%d' % agent_id
+            div['aria-hidden'] = 'true'
+            div << Nokogiri::XML::Node.new('div', doc) { |divtag|
+              divtag['class'] = 'modal-dialog modal-lg'
+              divtag << Nokogiri::XML::Node.new('div', doc) { |divtag2nd|
+                divtag2nd['class'] = 'modal-content'
+                divtag2nd << Nokogiri::XML::Node.new('div', doc) { |divheader|
+                  divheader['class'] = 'modal-header'
+                  divheader << Nokogiri::XML::Node.new('button', doc) { |btntag|
+                    btntag['class'] = 'close'
+                    btntag['type'] = 'button'
+                    btntag['data-dismiss'] = 'modal'
+                    btntag['aria-label'] = 'Close'
+                    btntag << Nokogiri::XML::Node.new('span', doc) { |spantag|
+                      spantag['aria-hidden'] = 'true'
+                      spantag.content = 'x'
+                    }
+                  }
+                  divheader << Nokogiri::XML::Node.new('h4', doc) { |h4tag|
+                    h4tag['class'] = 'modal-title'
+                    h4tag['id'] = 'diagramSrcAgentLabel%d' % agent_id
+                    h4tag.content = 'Select Source Agent('+agent.name+')'
+                  }
+                }
+                divtag2nd << Nokogiri::XML::Node.new('div', doc) { |divbody|
+                  divbody['class'] = 'modal-body'
+                  divbody << Nokogiri::XML::Node.new('label', doc) { |labeltag|
+                    labeltag.content = 'Source'
+                  }
+                  divbody << Nokogiri::XML::Node.new('div', doc) { |divtag|
+                    divtag['class'] = 'col-md-10'
+                    divbody << Nokogiri::XML::Node.new('form', doc) { |formtag|
+                      formtag['id'] = 'edit_agent%d' % agent_id
+                      formtag['class'] = 'edit_agnet'
+                      formtag['method'] = 'post'
+                      formtag['action'] = '/agents/%d' % agent_id+'?return=diagram'
+                      formtag['accept-charset'] = 'UTF-8'
+                      formtag << Nokogiri::XML::Node.new('div', doc) { |divtag2inbody|
+                        divtag2inbody['style'] = 'display:none'
+                        divtag2inbody << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                          inputtag['type'] = 'hidden'
+                          inputtag['name'] = 'utf8'
+                          inputtag['value'] = '&#x2713;'
+                        }
+                        divtag2inbody << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                          inputtag['type'] = 'hidden'
+                          inputtag['name'] = '_method'
+                          inputtag['value'] = 'PUT'
+                        }
+                        divtag2inbody << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                          inputtag['type'] = 'hidden'
+                          inputtag['name'] = 'authenticity_token'
+                          inputtag['value'] = form_authenticity_token
+                        }
+                      }
+                      formtag << Nokogiri::XML::Node.new('div', doc) { |divtag3inbody|
+                        divtag3inbody['class'] = 'form-group'
+                        divtag3inbody << Nokogiri::XML::Node.new('div', doc) { |divtagindivtag3|
+                          divtagindivtag3['class'] = 'link-region'
+                          divtagindivtag3['data-can-receive-events'] = 'true'
+                          divtagindivtag3 << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                            inputtag['type'] = 'hidden'
+                            inputtag['value'] = ''
+                            inputtag['name'] = 'agent[source_ids][]'
+                          }
+                          divtagindivtag3 << Nokogiri::XML::Node.new('select', doc) { |selecttag|
+                            selecttag['class'] = 'select2 form-control'
+                            selecttag['size'] = '5'
+                            selecttag['multiple'] = 'multiple'
+                            selecttag['name'] = 'agent[source_ids][]'
+                            eventSources = (current_user.agents - [agent]).find_all { |a| a.can_create_events? }
+                            sourceids = agent.source_ids
+                            eventSources.map {|s|
+                              selecttag << Nokogiri::XML::Node.new('option', doc) { |optiontag|
+                                optiontag['value'] = s.id
+                                if sourceids.include?(s.id)
+                                  optiontag['selected'] = 'selected'
+                                end
+                                optiontag.content = s.name
+                              }
+                            }
+                          }
+                        }
+                      }
+                      formtag << Nokogiri::XML::Node.new('div', doc) { |divtag4inbody|
+                        divtag4inbody['class'] = 'form-group'
+                        divtag4inbody << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                          inputtag['class'] = 'btn btn-primary'
+                          inputtag['type'] = 'submit'
+                          inputtag['value'] = 'Save'
+                          inputtag['name'] = 'commit'
+                        }
+                      }
+                    }
+                  }
+                }
+                divtag2nd << Nokogiri::XML::Node.new('div', doc) { |divfooter|
+                  divfooter['class'] = 'modal-footer'
+                  divfooter << Nokogiri::XML::Node.new('button', doc) { |btntag|
+                    btntag['type'] = 'button'
+                    btntag['class'] = 'btn btn-default'
+                    btntag['data-dismiss'] = 'modal'
+                    btntag.content = 'close'
+                  }
+                }
+              }
+            }
+          }
+          #End of #modal for setting source agent
+          #modal for edit agent name
+          root << Nokogiri::XML::Node.new('div', doc) { |div|
+            div['class'] = 'confirm-agent modal'
+            div['id'] = 'diagramEditAgent%d' % agent_id
+            div['tabindex'] = '-1'
+            div['role'] = 'dialog'
+            div['aria-labelledby'] = 'diagramEditAgentLabel%d' % agent_id
+            div['aria-hidden'] = 'true'
+            div << Nokogiri::XML::Node.new('div', doc) { |divtag|
+              divtag['class'] = 'modal-dialog modal-lg'
+              divtag << Nokogiri::XML::Node.new('div', doc) { |divtag2nd|
+                divtag2nd['class'] = 'modal-content'
+                divtag2nd << Nokogiri::XML::Node.new('div', doc) { |divheader|
+                  divheader['class'] = 'modal-header'
+                  divheader << Nokogiri::XML::Node.new('button', doc) { |btntag|
+                    btntag['class'] = 'close'
+                    btntag['type'] = 'button'
+                    btntag['data-dismiss'] = 'modal'
+                    btntag['aria-label'] = 'Close'
+                    btntag << Nokogiri::XML::Node.new('span', doc) { |spantag|
+                      spantag['aria-hidden'] = 'true'
+                      spantag.content = 'x'
+                    }
+                  }
+                  divheader << Nokogiri::XML::Node.new('h4', doc) { |h4tag|
+                    h4tag['class'] = 'modal-title'
+                    h4tag['id'] = 'diagramEditAgentLabel%d' % agent_id
+                    h4tag.content = 'Edit Agent name('+agent.name+')'
+                  }
+                }
+                divtag2nd << Nokogiri::XML::Node.new('div', doc) { |divbody|
+                  divbody['class'] = 'modal-body'
+                  divbody << Nokogiri::XML::Node.new('div', doc) { |divtag|
+                    divtag['class'] = 'col-md-10'
+                    divbody << Nokogiri::XML::Node.new('form', doc) { |formtag|
+                      formtag['id'] = 'editname_agent%d' % agent_id
+                      formtag['class'] = 'editname_agentt'
+                      formtag['method'] = 'post'
+                      formtag['action'] = '/agents/%d' % agent_id+'?return=diagram'
+                      formtag['accept-charset'] = 'UTF-8'
+                      formtag << Nokogiri::XML::Node.new('div', doc) { |divtag2inbody|
+                        divtag2inbody['style'] = 'display:none'
+                        divtag2inbody << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                          inputtag['type'] = 'hidden'
+                          inputtag['name'] = 'utf8'
+                          inputtag['value'] = '&#x2713;'
+                        }
+                        divtag2inbody << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                          inputtag['type'] = 'hidden'
+                          inputtag['name'] = '_method'
+                          inputtag['value'] = 'PUT'
+                        }
+                        divtag2inbody << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                          inputtag['type'] = 'hidden'
+                          inputtag['name'] = 'authenticity_token'
+                          inputtag['value'] = form_authenticity_token
+                        }
+                      }
+                      formtag << Nokogiri::XML::Node.new('div', doc) { |divtag3inbody|
+                        divtag3inbody['class'] = 'form-group'
+                        divtag3inbody << Nokogiri::XML::Node.new('label', doc) { |labeltag|
+                          labeltag['for'] = 'agent_name'
+                          labeltag.content = 'Name'
+                        }
+                        divtag3inbody << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                          inputtag['class'] = 'form-control'
+                          inputtag['for'] = 'agent_name'
+                          inputtag['name'] = 'agent[name]'
+                          inputtag['type'] = 'text'
+                          inputtag['value'] = agent.name
+                        }
+                      }
+                      formtag << Nokogiri::XML::Node.new('div', doc) { |divtag4inbody|
+                        divtag4inbody['class'] = 'form-group'
+                        divtag4inbody << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                          inputtag['class'] = 'btn btn-primary'
+                          inputtag['type'] = 'submit'
+                          inputtag['value'] = 'Save'
+                          inputtag['name'] = 'commit'
+                        }
+                      }
+                    }
+                  }
+                }
+                divtag2nd << Nokogiri::XML::Node.new('div', doc) { |divfooter|
+                  divfooter['class'] = 'modal-footer'
+                  divfooter << Nokogiri::XML::Node.new('button', doc) { |btntag|
+                    btntag['type'] = 'button'
+                    btntag['class'] = 'btn btn-default'
+                    btntag['data-dismiss'] = 'modal'
+                    btntag.content = 'close'
+                  }
+                }
+              }
+            }
+          }
+          #End of modal for edit agent name
+          #Modal for enable/disable agent
+          root << Nokogiri::XML::Node.new('div', doc) { |div|
+            div['class'] = 'confirm-agent modal'
+            div['id'] = 'diagramEnableAgent%d' % agent_id
+            div['tabindex'] = '-1'
+            div['role'] = 'dialog'
+            div['aria-labelledby'] = 'diagramEnableAgentLabel%d' % agent_id
+            div['aria-hidden'] = 'true'
+            div << Nokogiri::XML::Node.new('div', doc) { |divtag|
+              divtag['class'] = 'modal-dialog modal-sm'
+              divtag << Nokogiri::XML::Node.new('div', doc) { |divtag2nd|
+                divtag2nd['class'] = 'modal-content'
+                divtag2nd << Nokogiri::XML::Node.new('div', doc) { |divheader|
+                  divheader['class'] = 'modal-header'
+                  divheader << Nokogiri::XML::Node.new('button', doc) { |btntag|
+                    btntag['class'] = 'close'
+                    btntag['type'] = 'button'
+                    btntag['data-dismiss'] = 'modal'
+                    btntag['aria-label'] = 'Close'
+                    btntag << Nokogiri::XML::Node.new('span', doc) { |spantag|
+                      spantag['aria-hidden'] = 'true'
+                      spantag.content = 'x'
+                    }
+                  }
+                  divheader << Nokogiri::XML::Node.new('h4', doc) { |h4tag|
+                    h4tag['class'] = 'modal-title'
+                    h4tag['id'] = 'diagramEditAgentLabel%d' % agent_id
+                    h4tag.content = 'Confirm'
+                  }
+                }
+                divtag2nd << Nokogiri::XML::Node.new('div', doc) { |divbody|
+                  divbody['class'] = 'modal-body'
+                  divbody << Nokogiri::XML::Node.new('div', doc) { |divtag|
+                    divtag << Nokogiri::XML::Node.new('p', doc) { |ptag|
+                      if agent.disabled?
+                        ptag.content = 'Enable agent('+agent.name+') ?'
+                      else
+                        ptag.content = 'Disable agent('+agent.name+') ?'
+                      end
+                    }
+                  }
+                }
+                divtag2nd << Nokogiri::XML::Node.new('div', doc) { |divfooter|
+                  divfooter['class'] = 'modal-footer'
+                  divfooter << Nokogiri::XML::Node.new('form', doc) { |formtag|
+                    formtag['id'] = 'editenable_agent%d' % agent_id
+                    formtag['class'] = 'enablename_agentt'
+                    formtag['method'] = 'post'
+                    formtag['action'] = '/agents/%d' % agent_id+'?return=diagram'
+                    formtag['accept-charset'] = 'UTF-8'
+                    formtag << Nokogiri::XML::Node.new('div', doc) { |divtag2inform|
+                      divtag2inform['style'] = 'display:none'
+                      divtag2inform << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                        inputtag['type'] = 'hidden'
+                        inputtag['name'] = 'utf8'
+                        inputtag['value'] = '&#x2713;'
+                      }
+                      divtag2inform << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                        inputtag['type'] = 'hidden'
+                        inputtag['name'] = '_method'
+                        inputtag['value'] = 'PUT'
+                      }
+                      divtag2inform << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                        inputtag['type'] = 'hidden'
+                        inputtag['name'] = 'authenticity_token'
+                        inputtag['value'] = form_authenticity_token
+                      }
+                    }
+
+                    formtag << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                      inputtag['id'] = 'agent_disabled'
+                      inputtag['type'] = 'hidden'
+                      inputtag['value'] = (!agent.disabled).to_s
+                      inputtag['name'] = 'agent[disabled]'
+                    }
+
+                    formtag << Nokogiri::XML::Node.new('button', doc) { |btntag|
+                      btntag['class'] = 'btn btn-default'
+                      btntag['type'] = 'submit'
+                      btntag['name'] = 'button'
+                      btntag['data-dismiss'] = 'agent[disabled]'
+                      btntag.content = 'No'
+                    }
+
+                    formtag << Nokogiri::XML::Node.new('input', doc) { |inputtag|
+                      inputtag['class'] = 'btn btn-primary'
+                      inputtag['type'] = 'submit'
+                      inputtag['value'] = 'Yes'
+                      inputtag['name'] = 'commit'
+                    }
+                  }
+                }
+              }
+            }
+          }
+          #Modal for enable/disable agent
         }
       }
       # See also: app/assets/diagram.js.coffee
