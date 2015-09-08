@@ -5,14 +5,24 @@ describe Agents::ShellCommandAgent do
     @valid_path = Dir.pwd
 
     @valid_params = {
-        :path  => @valid_path,
-        :command  => "pwd",
-        :expected_update_period_in_days => "1",
-      }
+      path: @valid_path,
+      command: 'pwd',
+      expected_update_period_in_days: '1',
+    }
 
-    @checker = Agents::ShellCommandAgent.new(:name => "somename", :options => @valid_params)
+    @valid_params2 = {
+      path: @valid_path,
+      command: [RbConfig.ruby, '-e', 'puts "hello, world."; STDERR.puts "warning!"'],
+      expected_update_period_in_days: '1',
+    }
+
+    @checker = Agents::ShellCommandAgent.new(name: 'somename', options: @valid_params)
     @checker.user = users(:jane)
     @checker.save!
+
+    @checker2 = Agents::ShellCommandAgent.new(name: 'somename2', options: @valid_params2)
+    @checker2.user = users(:jane)
+    @checker2.save!
 
     @event = Event.new
     @event.agent = agents(:jane_weather_agent)
@@ -27,6 +37,7 @@ describe Agents::ShellCommandAgent do
   describe "validation" do
     before do
       expect(@checker).to be_valid
+      expect(@checker2).to be_valid
     end
 
     it "should validate presence of necessary fields" do
@@ -68,6 +79,14 @@ describe Agents::ShellCommandAgent do
       expect(Event.last.payload[:path]).to eq(@valid_path)
       expect(Event.last.payload[:command]).to eq('pwd')
       expect(Event.last.payload[:output]).to eq("fake pwd output")
+    end
+
+    it "should create an event when checking (unstubbed)" do
+      expect { @checker2.check }.to change { Event.count }.by(1)
+      expect(Event.last.payload[:path]).to eq(@valid_path)
+      expect(Event.last.payload[:command]).to eq([RbConfig.ruby, '-e', 'puts "hello, world."; STDERR.puts "warning!"'])
+      expect(Event.last.payload[:output]).to eq('hello, world.')
+      expect(Event.last.payload[:errors]).to eq('warning!')
     end
 
     it "does not run when should_run? is false" do

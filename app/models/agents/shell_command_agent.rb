@@ -11,7 +11,7 @@ module Agents
     description <<-MD
       The Shell Command Agent will execute commands on your local system, returning the output.
 
-      `command` specifies the command to be executed, and `path` will tell ShellCommandAgent in what directory to run this command.
+      `command` specifies the command (either a shell command line string or an array of command line arguments) to be executed, and `path` will tell ShellCommandAgent in what directory to run this command.
 
       `expected_update_period_in_days` is used to determine if the Agent is working.
 
@@ -48,6 +48,10 @@ module Agents
     def validate_options
       unless options['path'].present? && options['command'].present? && options['expected_update_period_in_days'].present?
         errors.add(:base, "The path, command, and expected_update_period_in_days fields are all required.")
+      end
+
+      unless Array(options['command']).all? { |o| o.is_a?(String) }
+        errors.add(:base, "command must be a shell command line string or an array of command line arguments.")
       end
 
       unless File.directory?(options['path'])
@@ -92,7 +96,7 @@ module Agents
         rout, wout = IO.pipe
         rerr, werr = IO.pipe
 
-        pid = spawn(command, chdir: path, out: wout, err: werr)
+        pid = spawn(*command, chdir: path, out: wout, err: werr)
 
         wout.close
         werr.close
