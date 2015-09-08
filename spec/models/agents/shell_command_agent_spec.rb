@@ -12,7 +12,8 @@ describe Agents::ShellCommandAgent do
 
     @valid_params2 = {
       path: @valid_path,
-      command: [RbConfig.ruby, '-e', 'puts "hello, world."; STDERR.puts "warning!"'],
+      command: [RbConfig.ruby, '-e', 'puts "hello, #{STDIN.eof? ? "world" : STDIN.read.strip}."; STDERR.puts "warning!"'],
+      stdin: "{{name}}",
       expected_update_period_in_days: '1',
     }
 
@@ -27,7 +28,8 @@ describe Agents::ShellCommandAgent do
     @event = Event.new
     @event.agent = agents(:jane_weather_agent)
     @event.payload = {
-      :cmd => "ls"
+      'name' => 'Huginn',
+      'cmd' => 'ls',
     }
     @event.save!
 
@@ -58,7 +60,7 @@ describe Agents::ShellCommandAgent do
 
   describe "#working?" do
     it "generating events as scheduled" do
-      stub(@checker).run_command(@valid_path, 'pwd') { ["fake pwd output", "", 0] }
+      stub(@checker).run_command(@valid_path, 'pwd', nil) { ["fake pwd output", "", 0] }
 
       expect(@checker).not_to be_working
       @checker.check
@@ -71,7 +73,7 @@ describe Agents::ShellCommandAgent do
 
   describe "#check" do
     before do
-      stub(@checker).run_command(@valid_path, 'pwd') { ["fake pwd output", "", 0] }
+      stub(@checker).run_command(@valid_path, 'pwd', nil) { ["fake pwd output", "", 0] }
     end
 
     it "should create an event when checking" do
@@ -84,7 +86,7 @@ describe Agents::ShellCommandAgent do
     it "should create an event when checking (unstubbed)" do
       expect { @checker2.check }.to change { Event.count }.by(1)
       expect(Event.last.payload[:path]).to eq(@valid_path)
-      expect(Event.last.payload[:command]).to eq([RbConfig.ruby, '-e', 'puts "hello, world."; STDERR.puts "warning!"'])
+      expect(Event.last.payload[:command]).to eq([RbConfig.ruby, '-e', 'puts "hello, #{STDIN.eof? ? "world" : STDIN.read.strip}."; STDERR.puts "warning!"'])
       expect(Event.last.payload[:output]).to eq('hello, world.')
       expect(Event.last.payload[:errors]).to eq('warning!')
     end
@@ -97,7 +99,7 @@ describe Agents::ShellCommandAgent do
 
   describe "#receive" do
     before do
-      stub(@checker).run_command(@valid_path, @event.payload[:cmd]) { ["fake ls output", "", 0] }
+      stub(@checker).run_command(@valid_path, @event.payload[:cmd], nil) { ["fake ls output", "", 0] }
     end
 
     it "creates events" do
@@ -106,6 +108,13 @@ describe Agents::ShellCommandAgent do
       expect(Event.last.payload[:path]).to eq(@valid_path)
       expect(Event.last.payload[:command]).to eq(@event.payload[:cmd])
       expect(Event.last.payload[:output]).to eq("fake ls output")
+    end
+
+    it "creates events (unstubbed)" do
+      @checker2.receive([@event])
+      expect(Event.last.payload[:path]).to eq(@valid_path)
+      expect(Event.last.payload[:output]).to eq('hello, Huginn.')
+      expect(Event.last.payload[:errors]).to eq('warning!')
     end
 
     it "does not run when should_run? is false" do

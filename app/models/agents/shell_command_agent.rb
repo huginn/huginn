@@ -11,7 +11,7 @@ module Agents
     description <<-MD
       The Shell Command Agent will execute commands on your local system, returning the output.
 
-      `command` specifies the command (either a shell command line string or an array of command line arguments) to be executed, and `path` will tell ShellCommandAgent in what directory to run this command.
+      `command` specifies the command (either a shell command line string or an array of command line arguments) to be executed, and `path` will tell ShellCommandAgent in what directory to run this command.  The content of `stdin` will be fed to the command via the standard input.
 
       `expected_update_period_in_days` is used to determine if the Agent is working.
 
@@ -50,6 +50,12 @@ module Agents
         errors.add(:base, "The path, command, and expected_update_period_in_days fields are all required.")
       end
 
+      case options['stdin']
+      when String, nil
+      else
+        errors.add(:base, "stdin must be a string.")
+      end
+
       unless Array(options['command']).all? { |o| o.is_a?(String) }
         errors.add(:base, "command must be a shell command line string or an array of command line arguments.")
       end
@@ -79,8 +85,9 @@ module Agents
       if Agents::ShellCommandAgent.should_run?
         command = opts['command']
         path = opts['path']
+        stdin = opts['stdin']
 
-        result, errors, exit_status = run_command(path, command)
+        result, errors, exit_status = run_command(path, command, stdin)
 
         vals = {"command" => command, "path" => path, "exit_status" => exit_status, "errors" => errors, "output" => result}
         created_event = create_event :payload => vals
@@ -91,15 +98,22 @@ module Agents
       end
     end
 
-    def run_command(path, command)
+    def run_command(path, command, stdin)
       begin
         rout, wout = IO.pipe
         rerr, werr = IO.pipe
+        rin,  win = IO.pipe
 
-        pid = spawn(*command, chdir: path, out: wout, err: werr)
+        pid = spawn(*command, chdir: path, out: wout, err: werr, in: rin)
 
         wout.close
         werr.close
+        rin.close
+
+        if stdin
+          win.write stdin
+          win.close
+        end
 
         (result = rout.read).strip!
         (errors = rerr.read).strip!
