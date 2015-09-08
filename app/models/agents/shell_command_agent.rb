@@ -1,5 +1,3 @@
-require 'open3'
-
 module Agents
   class ShellCommandAgent < Agent
     default_schedule "never"
@@ -88,23 +86,25 @@ module Agents
     end
 
     def run_command(path, command)
-      result = nil
-      errors = nil
-      exit_status = nil
+      begin
+        rout, wout = IO.pipe
+        rerr, werr = IO.pipe
 
-      Dir.chdir(path){
-        begin
-          stdin, stdout, stderr, wait_thr = Open3.popen3(command)
-          exit_status = wait_thr.value.to_i
-          result = stdout.gets(nil)
-          errors = stderr.gets(nil)
-        rescue Exception => e
-          errors = e.to_s
-        end
-      }
+        pid = spawn(command, chdir: path, out: wout, err: werr)
 
-      result = result.to_s.strip
-      errors = errors.to_s.strip
+        wout.close
+        werr.close
+
+        (result = rout.read).strip!
+        (errors = rerr.read).strip!
+
+        _, status = Process.wait2(pid)
+        exit_status = status.exitstatus
+      rescue Exception => e
+        errors = e.to_s
+        result = ''.freeze
+        exit_status = nil
+      end
 
       [result, errors, exit_status]
     end
