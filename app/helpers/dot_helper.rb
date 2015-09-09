@@ -219,7 +219,13 @@ module DotHelper
             btn['class'] = 'btn btn-default dropdown-toggle'
             btn['data-toggle'] = 'dropdown'
             btn['aria-expanded'] = 'false'
-            btn['style'] = 'width: 17px; height: 17px; background-color: #60C0F5'
+            if agent.unavailable?
+              btn['style'] = 'width: 17px; height: 17px; background-color: #F0AD4E'
+            elsif agent.working?
+              btn['style'] = 'width: 17px; height: 17px; background-color: #5CB85C'
+            else
+              btn['style'] = 'width: 17px; height: 17px; background-color: #D9534F'
+            end
             btn.content = ""
 
             btn << Nokogiri::XML::Node.new('span', doc) { |caret|
@@ -232,9 +238,9 @@ module DotHelper
             ultag['class'] = 'dropdown-menu'
             ultag['role'] = 'menu'
             ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
-              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+              litag << Nokogiri::XML::Node.new('a', doc) { |atag|
                 atag['href'] = agent_path(agent)
-                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                atag << Nokogiri::XML::Node.new('span', doc) { |spantag|
                   spantag['class'] = 'glyphicon glyphicon-eye-open'
                   spantag.content = ' Show All'
                 }
@@ -244,20 +250,20 @@ module DotHelper
               litag['class'] = 'divider'
             }
             ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
-              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+              litag << Nokogiri::XML::Node.new('a', doc) { |atag|
                 atag['href'] = '#'
                 atag['data-toggle'] = 'modal'
                 atag['data-target'] = '#diagramEditAgent%d' % agent_id
-                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                atag << Nokogiri::XML::Node.new('span', doc) { |spantag|
                   spantag['class'] = 'glyphicon glyphicon-pencil'
                   spantag.content = ' Edit agent name'
                 }
               }
             }
             ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
-              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+              litag << Nokogiri::XML::Node.new('a', doc) { |atag|
                 atag['href'] = edit_agent_path(agent)
-                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                atag << Nokogiri::XML::Node.new('span', doc) { |spantag|
                   spantag['class'] = 'glyphicon glyphicon-pencil'
                   spantag.content = ' Edit agent settings'
                 }
@@ -267,11 +273,11 @@ module DotHelper
               litag['class'] = 'divider'
             }
             ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
-              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+              litag << Nokogiri::XML::Node.new('a', doc) { |atag|
                 atag['href'] = '#'
                 atag['data-toggle'] = 'modal'
                 atag['data-target'] = '#diagramEnableAgent%d' % agent_id
-                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                atag << Nokogiri::XML::Node.new('span', doc) { |spantag|
                   if agent.disabled?
                     spantag['class'] = 'glyphicon glyphicon-play'
                     spantag.content = ' Enable agent'
@@ -283,18 +289,18 @@ module DotHelper
               }
             }
             ultag << Nokogiri::XML::Node.new('li', doc) { |litag|
-              litag<< Nokogiri::XML::Node.new('a', doc) { |atag|
+              litag << Nokogiri::XML::Node.new('a', doc) { |atag|
                 atag['href'] = '#'
                 atag['data-toggle'] = 'modal'
                 atag['data-target'] = '#diagramSrcAgent%d' % agent_id
-                atag<< Nokogiri::XML::Node.new('span', doc) { |spantag|
+                atag << Nokogiri::XML::Node.new('span', doc) { |spantag|
                   spantag['class'] = 'glyphicon glyphicon-road'
                   spantag.content = ' Set Source Agent'
                 }
               }
             }
           }
-          #modal for setting source agent
+          # modal for setting source agent
           root << Nokogiri::XML::Node.new('div', doc) { |div|
             div['class'] = 'confirm-agent modal'
             div['id'] = 'diagramSrcAgent%d' % agent_id
@@ -408,8 +414,8 @@ module DotHelper
               }
             }
           }
-          #End of #modal for setting source agent
-          #modal for edit agent name
+          # End of #modal for setting source agent
+          # modal for edit agent name
           root << Nokogiri::XML::Node.new('div', doc) { |div|
             div['class'] = 'confirm-agent modal'
             div['id'] = 'diagramEditAgent%d' % agent_id
@@ -505,8 +511,8 @@ module DotHelper
               }
             }
           }
-          #End of modal for edit agent name
-          #Modal for enable/disable agent
+          # End of modal for edit agent name
+          # Modal for enable/disable agent
           root << Nokogiri::XML::Node.new('div', doc) { |div|
             div['class'] = 'confirm-agent modal'
             div['id'] = 'diagramEnableAgent%d' % agent_id
@@ -601,7 +607,7 @@ module DotHelper
               }
             }
           }
-          #Modal for enable/disable agent
+          # End of Modal for enable/disable agent
         }
       }
       # See also: app/assets/diagram.js.coffee
