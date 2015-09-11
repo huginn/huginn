@@ -16,7 +16,7 @@ $ ->
       badge.css
         left: tl.x - badge.outerWidth()  * (2/3)
         top:  tl.y - badge.outerHeight() * (1/3)
-        'background-color': badge.find('.label').css('background-color')
+        position: "absolute"
       .show()
       return
     return

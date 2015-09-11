@@ -244,6 +244,8 @@ class AgentsController < ApplicationController
       end
     when /\A#{Regexp::escape scenarios_path}\/\d+\z/, agents_path
       path = ret
+    when "diagram"
+      path = diagram_path
     end
 
     if path
