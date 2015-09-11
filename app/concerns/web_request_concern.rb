@@ -123,6 +123,11 @@ module WebRequestConcern
 
       builder.use FaradayMiddleware::Gzip
 
+      unless builder.headers.any? { |key,| /\Aaccept[-_]encoding\z/i =~ key }
+        # Exclude `deflate` by default.  See #1018.
+        builder.headers[:accept_encoding] = 'gzip,identity'
+      end
+
       case backend = faraday_backend
         when :typhoeus
           require 'typhoeus/adapters/faraday'

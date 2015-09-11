@@ -227,6 +227,36 @@ describe Agents::WebsiteAgent do
         event = Event.last
         expect(event.payload['version']).to eq(2)
       end
+
+      it 'should either avoid or support a raw deflate stream (#1018)' do
+        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /\A(?!.*deflate)/ }).
+          to_return(body: 'hello',
+                    status: 200)
+        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /deflate/ }).
+          to_return(body: '\xcb\x48\xcd\xc9\xc9\x07\x00\x06\x2c'.force_encoding(Encoding::ASCII_8BIT),
+                    headers: { 'Content-Encoding' => 'deflate' },
+                    status: 200)
+
+        site = {
+          'name' => 'Some Response',
+          'expected_update_period_in_days' => '2',
+          'type' => 'text',
+          'url' => 'http://deflate',
+          'mode' => 'on_change',
+          'extract' => {
+            'content' => { 'regexp' => '.+', 'index' => 0 }
+          }
+        }
+        checker = Agents::WebsiteAgent.new(name: "Deflate Test", options: site)
+        checker.user = users(:bob)
+        checker.save!
+
+        expect {
+          checker.check
+        }.to change { Event.count }.by(1)
+        event = Event.last
+        expect(event.payload['content']).to eq('hello')
+      end
     end
 
     describe 'encoding' do
