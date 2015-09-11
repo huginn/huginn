@@ -30,6 +30,20 @@ class ApplicationController < ActionController::Base
     basecamp_auth_check
   end
 
+  def filtered_agent_return_link(options = {})
+    case ret = params[:return].presence || options[:return]
+      when "show"
+        if @agent && !@agent.destroyed?
+          agent_path(@agent)
+        else
+          agents_path
+        end
+      when /\A#{(Regexp::escape scenarios_path)}/, /\A#{(Regexp::escape agents_path)}/, /\A#{(Regexp::escape events_path)}/
+        ret
+    end
+  end
+  helper_method :filtered_agent_return_link
+
   private
 
   def twitter_oauth_check

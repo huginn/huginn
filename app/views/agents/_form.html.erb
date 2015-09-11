@@ -15,6 +15,8 @@
              method: @agent.new_record? ? "POST" : "PUT",
              html: { class: 'agent-form' }) do |f| %>
 
+  <%= hidden_field_tag :return, params[:return] %>
+
   <div class="row">
     <div class="col-md-6">
       <div class="row">

@@ -1,7 +1,7 @@
 <ul class="dropdown-menu" role="menu">
   <% if agent.can_be_scheduled? %>
     <li>
-      <%= link_to icon_tag('glyphicon-refresh', class: 'color-success') + ' Run', run_agent_path(agent, return: returnTo), method: :post, tabindex: "-1" %>
+      <%= link_to icon_tag('glyphicon-refresh', class: 'color-success') + ' Run', run_agent_path(agent, return: return_to), method: :post, tabindex: "-1" %>
     </li>
   <% end %>
 
@@ -12,13 +12,13 @@
   <% end %>
 
   <li>
-    <%= link_to icon_tag('glyphicon-eye-open') + ' Show'.html_safe, agent_path(agent) %>
+    <%= link_to icon_tag('glyphicon-eye-open') + ' Show'.html_safe, agent_path(agent, return: return_to) %>
   </li>
 
   <li class="divider"></li>
 
   <li>
-    <%= link_to icon_tag('glyphicon-pencil') + ' Edit agent'.html_safe, edit_agent_path(agent) %>
+    <%= link_to icon_tag('glyphicon-pencil') + ' Edit agent'.html_safe, edit_agent_path(agent, return: return_to) %>
   </li>
 
   <li>
@@ -40,7 +40,7 @@
 
     <% agent.scenarios.each do |scenario| %>
       <li>
-        <%= link_to icon_tag('glyphicon-remove-circle', class: 'color-warning') + " Remove from #{scenario_label(scenario)}".html_safe, leave_scenario_agent_path(agent, scenario_id: scenario.to_param, return: returnTo), method: :put, tabindex: "-1" %>
+        <%= link_to icon_tag('glyphicon-remove-circle', class: 'color-warning') + " Remove from #{scenario_label(scenario)}".html_safe, leave_scenario_agent_path(agent, scenario_id: scenario.to_param, return: return_to), method: :put, tabindex: "-1" %>
       </li>
     <% end %>
   <% end %>
@@ -49,12 +49,12 @@
 
   <% if agent.can_create_events? && agent.events.count > 0 %>
     <li>
-      <%= link_to icon_tag('glyphicon-trash', class: 'color-danger') + ' Delete all events', remove_events_agent_path(agent, return: returnTo), method: :delete, data: {confirm: 'Are you sure you want to delete ALL emitted events for this Agent?'}, tabindex: "-1" %>
+      <%= link_to icon_tag('glyphicon-trash', class: 'color-danger') + ' Delete all events', remove_events_agent_path(agent, return: return_to), method: :delete, data: {confirm: 'Are you sure you want to delete ALL emitted events for this Agent?'}, tabindex: "-1" %>
     </li>
   <% end %>
 
   <li>
-    <%= link_to icon_tag('glyphicon-remove', class: 'color-danger') + ' Delete agent', agent_path(agent, return: returnTo), method: :delete, data: { confirm: 'Are you sure that you want to permanently delete this Agent?' }, tabindex: "-1" %>
+    <%= link_to icon_tag('glyphicon-remove', class: 'color-danger') + ' Delete agent', agent_path(agent, return: return_to), method: :delete, data: { confirm: 'Are you sure that you want to permanently delete this Agent?' }, tabindex: "-1" %>
   </li>
 </ul>
 
@@ -69,7 +69,7 @@
         <p><% if agent.disabled? %>Enable<% else %>Disable<% end %> &quot;<%= agent.name %>&quot;?</p>
       </div>
       <div class="modal-footer">
-        <%= form_for(agent, as: :agent, url: agent_path(agent, return: returnTo), method: 'PUT') do |f| %>
+        <%= form_for(agent, as: :agent, url: agent_path(agent, return: return_to), method: 'PUT') do |f| %>
           <% if agent.disabled && agent.can_receive_events? %>
             <div class="form-group">
               <%= f.check_box :drop_pending_events %>

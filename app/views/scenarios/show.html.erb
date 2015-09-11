@@ -10,13 +10,13 @@
         <blockquote><%= markdown(@scenario.description) %></blockquote>
       <% end %>
 
-      <%= render 'agents/table', :returnTo => scenario_path(@scenario) %>
+      <%= render 'agents/table', :return_to => scenario_path(@scenario) %>
 
       <br/>
 
       <div class="btn-group">
         <%= link_to icon_tag('glyphicon-chevron-left') + ' Back', scenarios_path, class: "btn btn-default" %>
-        <%= link_to icon_tag('glyphicon-plus') + ' New Agent', new_agent_path(scenario_id: @scenario.id), class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-plus') + ' New Agent', new_agent_path(scenario_id: @scenario.id, return: request.path), class: "btn btn-default" %>
         <%= link_to icon_tag('glyphicon-random') + ' View Diagram', scenario_diagram_path(@scenario), class: "btn btn-default" %>
         <%= link_to icon_tag('glyphicon-edit') + ' Edit', edit_scenario_path(@scenario), class: "btn btn-default" %>
         <% if @scenario.source_url.present? %>
