@@ -263,6 +263,16 @@ Devise.setup do |config|
     config.omniauth :wunderlist, key, secret
   end
 
+  if defined?(OmniAuth::Strategies::Evernote) &&
+    (key = ENV["EVERNOTE_OAUTH_KEY"]).present? &&
+    (secret = ENV["EVERNOTE_OAUTH_SECRET"]).present?
+    # for production:
+    config.omniauth :evernote, key, secret
+
+    # for development:
+    # config.omniauth :evernote, key, secret, client_options: { :site => 'https://sandbox.evernote.com' }
+  end
+
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
   # change the failure app, you can configure them inside the config.warden block.
