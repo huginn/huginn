@@ -266,11 +266,11 @@ Devise.setup do |config|
   if defined?(OmniAuth::Strategies::Evernote) &&
     (key = ENV["EVERNOTE_OAUTH_KEY"]).present? &&
     (secret = ENV["EVERNOTE_OAUTH_SECRET"]).present?
-    # for production:
-    config.omniauth :evernote, key, secret
-
     # for development:
-    # config.omniauth :evernote, key, secret, client_options: { :site => 'https://sandbox.evernote.com' }
+    config.omniauth :evernote, key, secret, client_options: { :site => 'https://sandbox.evernote.com' }
+    
+    # for production:
+    # config.omniauth :evernote, key, secret
   end
 
   # ==> Warden configuration

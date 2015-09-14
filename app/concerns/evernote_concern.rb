@@ -16,7 +16,8 @@ module EvernoteConcern
       token:           evernote_oauth_token,
       consumer_key:    evernote_consumer_key,
       consumer_secret: evernote_consumer_secret,
-      sandbox: false
+      # set to false in production
+      sandbox: true
     )
   end
 

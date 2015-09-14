@@ -5,7 +5,11 @@ module Agents
     description <<-MD
       The Evernote Agent connects with a user's Evernote note store.
 
-      To be able to use this agent with your account you need to authenticate with Evernote in the [Services](/services) section.
+      Visit [Evernote](https://dev.evernote.com/doc/) to set up an Evernote app and receive an api key and secret.
+      Store these in the Evernote environment variables in the .env file.
+      You will also need to create a [Sandbox](https://sandbox.evernote.com/Registration.action) account to use during development.
+
+      Next, you'll need to authenticate with Evernote in the [Services](/services) section.
 
       Options:
 
