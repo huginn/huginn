@@ -157,7 +157,6 @@ module Agents
         end
 
         memory[:last_checked_at] = Time.now.to_i * 1000
-        save!
       end
     end
 
@@ -165,8 +164,8 @@ module Agents
 
     def note_params(options)
       params = interpolated(options)[:note]
-      errors.add(:base, "only one notebook allowed") unless params[:notebook].to_s.split(", ") == 1
-      params[:tagNames] = params[:tagNames].to_s.split(", ")
+      errors.add(:base, "only one notebook allowed") unless params[:notebook].to_s.split(/\s*,\s*/) == 1
+      params[:tagNames] = params[:tagNames].to_s.split(/\s*,\s*/)
       params
     end
 
@@ -175,7 +174,7 @@ module Agents
     end
 
     def note_store
-      NoteStore.new(evernote_note_store)
+      @note_store ||= NoteStore.new(evernote_note_store)
     end
 
     # wrapper for evernote api NoteStore
