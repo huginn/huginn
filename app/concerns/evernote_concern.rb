@@ -27,7 +27,7 @@ module EvernoteConcern
     unless evernote_consumer_key.present? &&
       evernote_consumer_secret.present? &&
       evernote_oauth_token.present?
-      errors.add(:base, "Evernote consumer_key, consumer_secret, oauth_token, and oauth_token_secret are required to authenticate with the Twitter API.  You can provide these as options to this Agent, or as Credentials with the same names, but starting with 'evernote_'.")
+      errors.add(:base, "Evernote consumer_key, consumer_secret, oauth_token, and oauth_token_secret are required to authenticate with the Evernote API.  You can provide these as options to this Agent, or as Credentials with the same names, but starting with 'evernote_'.")
     end
   end
 
