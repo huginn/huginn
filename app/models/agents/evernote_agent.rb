@@ -263,7 +263,7 @@ module Agents
           params[:content] =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" \
             "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">" \
-            "<en-note>#{params[:content]}</en-note>"
+            "<en-note>#{params[:content].encode(:xml => :text)}</en-note>"
         end
 
         params
