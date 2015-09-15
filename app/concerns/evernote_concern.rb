@@ -16,12 +16,15 @@ module EvernoteConcern
       token:           evernote_oauth_token,
       consumer_key:    evernote_consumer_key,
       consumer_secret: evernote_consumer_secret,
-      # set to false in production
-      sandbox: true
+      sandbox:         use_sandbox?
     )
   end
 
   private
+
+  def use_sandbox?
+    ENV["USE_EVERNOTE_SANDBOX"] == "true"
+  end
 
   def validate_evernote_options
     unless evernote_consumer_key.present? &&
