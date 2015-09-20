@@ -40,7 +40,8 @@ module Agents
             If a note with the above title and notebook did note exist already, one would be created.
 
           - When `mode` is `read` the values are search parameters.
-            Note: The `content` parameter is not used for searching.
+            Note: The `content` parameter is not used for searching. Setting `title` only filters
+            notes whose titles contain `title` as a substring, not as the exact title.
 
             For example, to find all notes with tag 'CS' in the notebook 'xkcd', use:
 
@@ -190,9 +191,11 @@ module Agents
 
       def create_or_update_note(params)
         search = Search.new(self, {title: params[:title], notebook: params[:notebook]})
+
         # evernote search can only filter notes with titles containing a substring;
         # this finds a note with the exact title
         note = search.notes.detect {|note| note.title == params[:title]}
+
         if note
           # a note with specified title and notebook exists, so update it
           update_note(params.merge(guid: note.guid, notebookGuid: note.notebookGuid))
@@ -218,6 +221,7 @@ module Agents
         params = with_wrapped_content(params)
 
         # append specified tags instead of replacing current tags
+        # evernote will create any new tags
         tags = getNoteTagNames(params[:guid])
         tags.each { |tag|
           params[:tagNames] << tag unless params[:tagNames].include?(tag) }
@@ -234,7 +238,7 @@ module Agents
       end
 
       def build_note(en_note)
-        notebook = find_notebook(guid: en_note.notebookGuid).name
+        notebook = find_notebook(guid: en_note.notebookGuid).try(:name)
         tags = en_note.tagNames || find_tags(en_note.tagGuids.to_a).map(&:name)
         Note.new(en_note, notebook, tags)
       end
@@ -276,11 +280,6 @@ module Agents
           @opts = opts
         end
 
-        def filtered_metadata
-          filter, spec = create_filter, create_spec
-          metadata = note_store.findNotesMetadata(filter, 0, 100, spec).notes
-        end
-
         def note_guids
           filtered_metadata.map(&:guid)
         end
@@ -295,7 +294,7 @@ module Agents
             # and notes that recently had the specified tags added
             metadata.select! do |note_data|
               note_data.updated > opts[:last_checked_at] ||
-              (!opts[:notes_with_tags].include?(note_data.guid) && note_data.created > opts[:agent_created_at])
+              !opts[:notes_with_tags].include?(note_data.guid)
             end
 
           elsif opts[:last_checked_at]
@@ -305,8 +304,6 @@ module Agents
           metadata.map! { |note_data| note_store.find_note(note_data.guid) }
           metadata
         end
-
-        private
 
         def create_filter
           filter = Evernote::EDAM::NoteStore::NoteFilter.new
@@ -321,6 +318,13 @@ module Agents
 
           filter.words = query_terms.join(" ")
           filter
+        end
+
+        private
+
+        def filtered_metadata
+          filter, spec = create_filter, create_spec
+          metadata = note_store.findNotesMetadata(filter, 0, 100, spec).notes
         end
 
         def create_spec
