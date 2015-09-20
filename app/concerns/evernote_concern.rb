@@ -30,7 +30,7 @@ module EvernoteConcern
     unless evernote_consumer_key.present? &&
       evernote_consumer_secret.present? &&
       evernote_oauth_token.present?
-      errors.add(:base, "Evernote consumer_key, consumer_secret, oauth_token, and oauth_token_secret are required to authenticate with the Evernote API.  You can provide these as options to this Agent, or as Credentials with the same names, but starting with 'evernote_'.")
+      errors.add(:base, "Evernote ENV variables and a Service are required")
     end
   end
 
@@ -44,9 +44,5 @@ module EvernoteConcern
 
   def evernote_oauth_token
     service && service.token
-  end
-
-  def evernote_oauth_token_secret
-    service && service.secret
   end
 end
