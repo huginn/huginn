@@ -166,7 +166,10 @@ module Agents
     def note_params(options)
       params = interpolated(options)[:note]
       errors.add(:base, "only one notebook allowed") unless params[:notebook].to_s.split(/\s*,\s*/) == 1
+
       params[:tagNames] = params[:tagNames].to_s.split(/\s*,\s*/)
+      params[:title].strip!
+      params[:notebook].strip!
       params
     end
 
@@ -311,9 +314,9 @@ module Agents
           # evernote search grammar:
           # https://dev.evernote.com/doc/articles/search_grammar.php#Search_Terms
           query_terms = []
-          query_terms << "notebook:\"#{opts[:notebook]}\""   if opts[:notebook].present?
-          query_terms << "intitle:\"#{opts[:title]}\""       if opts[:title].present?
-          query_terms << "updated:day-1"                     if opts[:last_checked_at].present?
+          query_terms << "notebook:\"#{opts[:notebook]}\"" if opts[:notebook].present?
+          query_terms << "intitle:\"#{opts[:title]}\""     if opts[:title].present?
+          query_terms << "updated:day-1"                   if opts[:last_checked_at].present?
           opts[:tagNames].to_a.each { |tag| query_terms << "tag:#{tag}" }
 
           filter.words = query_terms.join(" ")
