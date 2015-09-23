@@ -155,3 +155,6 @@ on_heroku do
   gem 'pg'
   gem 'rails_12factor', group: :production
 end
+
+gem 'huginn_agent', git: 'https://github.com/darrencauthon/huginn_agent.git'
+gem 'twitter_huginn_agents', git: 'https://github.com/darrencauthon/twitter_huginn_agents.git'
