@@ -42,6 +42,22 @@ class GoogleCalendar
     ret
   end
 
+  # who - String: email of user to add event
+  # text - String: what, where, and when (only what and when are required)
+  def quickadd_as(who, text)
+    auth_as
+
+    @logger.info("Attempting to quickAdd event for " + who + ": " + text)
+
+    ret = @client.execute(
+      api_method: @calendar.events.quick_add,
+      parameters: {'calendarId' => who, 'sendNotifications' => true, 'text' => text, 'sendNotifications' => true },
+      headers: {'Content-Type' => 'application/json'}
+    )
+    @logger.debug ret.to_yaml
+    ret
+  end
+
   def events_as(who, date)
     auth_as
 
