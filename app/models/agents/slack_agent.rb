@@ -74,10 +74,12 @@ module Agents
       incoming_events.each do |event|
         opts = interpolated(event)
         slack_opts = filter_options(opts)
-        if /^:/.match(opts[:icon])
-          slack_opts[:icon_emoji] = opts[:icon]
-        else
-          slack_opts[:icon_url] = opts[:icon]
+        if opts[:icon].to_s != ''
+          if /^:/.match(opts[:icon])
+            slack_opts[:icon_emoji] = opts[:icon]
+          else
+            slack_opts[:icon_url] = opts[:icon]
+          end
         end
         slack_notifier.ping opts[:message], slack_opts
       end
