@@ -1,6 +1,7 @@
 module Agents
   class SlackAgent < Agent
     DEFAULT_USERNAME = 'Huginn'
+    ALLOWED_PARAMS = ['channel', 'username', 'unfurl_links', 'attachments']
 
     cannot_be_scheduled!
     cannot_create_events!
@@ -65,14 +66,22 @@ module Agents
       @slack_notifier ||= Slack::Notifier.new(webhook_url, username: username)
     end
 
+    def filter_options(opts)
+      opts.select { |key, value| ALLOWED_PARAMS.include? key }.symbolize_keys
+    end
+
     def receive(incoming_events)
       incoming_events.each do |event|
         opts = interpolated(event)
-        if /^:/.match(opts[:icon])
-          slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username], icon_emoji: opts[:icon], unfurl_links: opts[:unfurl_links]
-        else
-          slack_notifier.ping opts[:message], channel: opts[:channel], username: opts[:username], icon_url: opts[:icon], unfurl_links: opts[:unfurl_links]
+        slack_opts = filter_options(opts)
+        if opts[:icon].to_s != ''
+          if /^:/.match(opts[:icon])
+            slack_opts[:icon_emoji] = opts[:icon]
+          else
+            slack_opts[:icon_url] = opts[:icon]
+          end
         end
+        slack_notifier.ping opts[:message], slack_opts
       end
     end
   end
