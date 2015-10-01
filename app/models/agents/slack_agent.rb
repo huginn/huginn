@@ -81,7 +81,7 @@ module Agents
             slack_opts[:icon_url] = opts[:icon]
           end
         end
-        slack_notifier.ping opts[:message], slack_opts
+        slack_notifier.ping opts[:message], slack_opts.stringify_keys
       end
     end
   end
