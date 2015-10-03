@@ -13,7 +13,10 @@ module Agents
 
       The `value` can be a single value or an array of values. In the case of an array, if one or more values match then the rule matches.
 
-      All rules must match for the Agent to match.  The resulting Event will have a payload message of `message`.  You can use liquid templating in the `message, have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
+      By default, all rules must match for the Agent to trigger. You can switch this so that only one rule must match by
+      setting `must_match` to `1`.
+
+      The resulting Event will have a payload message of `message`.  You can use liquid templating in the `message, have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
       Set `keep_event` to `true` if you'd like to re-emit the incoming event, optionally merged with 'message' when provided.
 
@@ -35,6 +38,14 @@ module Agents
       errors.add(:base, "message is required unless 'keep_event' is 'true'") unless options['message'].present? || keep_event?
 
       errors.add(:base, "keep_event, when present, must be 'true' or 'false'") unless options['keep_event'].blank? || %w[true false].include?(options['keep_event'])
+
+      if options['must_match'].present?
+        if options['must_match'].to_i < 1
+          errors.add(:base, "If used, the 'must_match' option must be a positive integer")
+        elsif options['must_match'].to_i > options['rules'].length
+          errors.add(:base, "If used, the 'must_match' option must be equal to or less than the number of rules")
+        end
+      end
     end
 
     def default_options
@@ -59,12 +70,12 @@ module Agents
 
         opts = interpolated(event)
 
-        match = opts['rules'].all? do |rule|
+        match_results = opts['rules'].map do |rule|
           value_at_path = Utils.value_at(event['payload'], rule['path'])
           rule_values = rule['value']
           rule_values = [rule_values] unless rule_values.is_a?(Array)
 
-          match_found = rule_values.any? do |rule_value|
+          rule_values.any? do |rule_value|
             case rule['type']
             when "regex"
               value_at_path.to_s =~ Regexp.new(rule_value, Regexp::IGNORECASE)
@@ -88,7 +99,7 @@ module Agents
           end
         end
 
-        if match
+        if matches?(match_results)
           if keep_event?
             payload = event.payload.dup
             payload['message'] = opts['message'] if opts['message'].present?
@@ -98,6 +109,14 @@ module Agents
 
           create_event :payload => payload
         end
+      end
+    end
+
+    def matches?(matches)
+      if options['must_match'].present?
+        matches.select { |match| match }.length >= options['must_match'].to_i
+      else
+        matches.all?
       end
     end
 
