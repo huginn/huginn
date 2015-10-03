@@ -71,8 +71,16 @@ module Agents
         'expected_update_period_in_days' => '2'
       }
     end
+    
+    def check
+      if key_setup?
+        create_event :payload => model(weather_provider, which_day).merge('location' => location)
+      end
+    end
 
-    def service
+    private
+    
+    def weather_provider
       interpolated["service"].presence || "wunderground"
     end
 
@@ -85,8 +93,7 @@ module Agents
     end
 
     def validate_options
-      errors.add(:base, "service is required") unless service.present?
-      errors.add(:base, "service must be set to 'forecastio' or 'wunderground'") unless ["forecastio", "wunderground"].include?(service)
+      errors.add(:base, "service must be set to 'forecastio' or 'wunderground'") unless ["forecastio", "wunderground"].include?(weather_provider)
       errors.add(:base, "location is required") unless location.present?
       errors.add(:base, "api_key is required") unless key_setup?
       errors.add(:base, "which_day selection is required") unless which_day.present?
@@ -104,10 +111,10 @@ module Agents
       end
     end
 
-    def model(service,which_day)
-      if service == "wunderground"
+    def model(weather_provider,which_day)
+      if weather_provider == "wunderground"
         wunderground[which_day]
-      elsif service == "forecastio"
+      elsif weather_provider == "forecastio"
         forecastio.each do |value|
           timestamp = Time.at(value.time)
           if (timestamp.to_date - Time.now.to_date).to_i == which_day
@@ -174,12 +181,5 @@ module Agents
         end
       end
     end
-
-    def check
-      if key_setup?
-        create_event :payload => model(service, which_day).merge('location' => location)
-      end
-    end
-
   end
 end
