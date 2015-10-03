@@ -159,7 +159,7 @@ module Agents
         @filter_to_agent_map = @config[:filter_to_agent_map]
 
         schedule_in RELOAD_TIMEOUT do
-          puts "--> Restarting TwitterStream #{id}"
+          puts "--> Restarting TwitterStream #{id} at #{Time.now} <--"
           restart!
         end
       end
@@ -199,16 +199,16 @@ module Agents
         end
 
         stream.on_error do |message|
-          STDERR.puts " --> Twitter error: #{message} <--"
+          STDERR.puts " --> Twitter error: #{message} at #{Time.now} <--"
         end
 
         stream.on_no_data do |message|
-          STDERR.puts " --> Got no data for awhile; trying to reconnect."
+          STDERR.puts " --> Got no data for awhile; trying to reconnect at #{Time.now} <--"
           restart!
         end
 
         stream.on_max_reconnects do |timeout, retries|
-          STDERR.puts " --> Oops, tried too many times! <--"
+          STDERR.puts " --> Oops, tried too many times! at #{Time.now} <--"
           sleep 60
           restart!
         end
@@ -222,20 +222,18 @@ module Agents
         status['text'] = status['text'].gsub(/&lt;/, "<").gsub(/&gt;/, ">").gsub(/[\t\n\r]/, '  ')
 
         if status["retweeted_status"].present? && status["retweeted_status"].is_a?(Hash)
-          puts "Skipping retweet: #{status["text"]}"
           return
         elsif @recent_tweets.include?(status["id_str"])
-          puts "Skipping duplicate tweet: #{status["text"]}"
+          puts "(#{Time.now}) Skipping duplicate tweet: #{status["text"]}"
           return
         end
 
         @recent_tweets << status["id_str"]
         @recent_tweets.shift if @recent_tweets.length > DUPLICATE_DETECTION_LENGTH
-        puts status["text"]
         @filter_to_agent_map.keys.each do |filter|
           next unless (filter.downcase.split(SEPARATOR) - status["text"].downcase.split(SEPARATOR)).reject(&:empty?) == [] # Hacky McHackerson
           @filter_to_agent_map[filter].each do |agent|
-            puts " -> #{agent.name}"
+            puts "(#{Time.now}) #{agent.name} received: #{status["text"]}"
             AgentRunner.with_connection do
               agent.process_tweet(filter, status)
             end
