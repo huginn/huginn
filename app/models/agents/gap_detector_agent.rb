@@ -21,7 +21,7 @@ module Agents
 
     def validate_options
       unless options['message'].present?
-        errors.add(:base, "window_duration_in_days and message are required")
+        errors.add(:base, "message is required")
       end
 
       unless options['window_duration_in_days'].present? && options['window_duration_in_days'].to_f > 0
