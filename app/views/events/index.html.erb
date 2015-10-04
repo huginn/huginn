@@ -40,7 +40,7 @@
 
       <% if @agent %>
         <div class="btn-group">
-          <%= link_to icon_tag('glyphicon-eye-open') + ' View Agent'.html_safe, agent_path(@agent, return: request.fullpath), class: "btn btn-default" %>
+          <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, filtered_agent_return_link || agents_path, class: "btn btn-default" %>
           <%= link_to icon_tag('glyphicon-random') + ' See all events'.html_safe, events_path, class: "btn btn-default" %>
         </div>
       <% end %>

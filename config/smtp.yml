@@ -6,6 +6,9 @@ development:
   enable_starttls_auto: <%= ENV['SMTP_ENABLE_STARTTLS_AUTO'] == 'true' ? true : false %>
   user_name: <%= ENV['SMTP_USER_NAME'] || "" %>
   password: <%= ENV['SMTP_PASSWORD'] || "" %>
+  openssl_verify_mode: <%= ENV['SMTP_OPENSSL_VERIFY_MODE'].presence || 'null' %>
+  ca_path: <%= ENV['SMTP_OPENSSL_CA_PATH'].presence || 'null' %>
+  ca_file: <%= ENV['SMTP_OPENSSL_CA_FILE'].presence || 'null' %>
 
 staging:
   address: <%= ENV['SMTP_SERVER'] || "smtp.gmail.com" %>
@@ -15,6 +18,9 @@ staging:
   enable_starttls_auto: <%= ENV['SMTP_ENABLE_STARTTLS_AUTO'] == 'true' ? true : false %>
   user_name: <%= ENV['SMTP_USER_NAME'] || "" %>
   password: <%= ENV['SMTP_PASSWORD'] || "" %>
+  openssl_verify_mode: <%= ENV['SMTP_OPENSSL_VERIFY_MODE'].presence || 'null' %>
+  ca_path: <%= ENV['SMTP_OPENSSL_CA_PATH'].presence || 'null' %>
+  ca_file: <%= ENV['SMTP_OPENSSL_CA_FILE'].presence || 'null' %>
 
 production:
   address: <%= ENV['SMTP_SERVER'] || "smtp.gmail.com" %>
@@ -24,3 +30,6 @@ production:
   enable_starttls_auto: <%= ENV['SMTP_ENABLE_STARTTLS_AUTO'] == 'true' ? true : false %>
   user_name: <%= ENV['SMTP_USER_NAME'] || "" %>
   password: <%= ENV['SMTP_PASSWORD'] || "" %>
+  openssl_verify_mode: <%= ENV['SMTP_OPENSSL_VERIFY_MODE'].presence || 'null' %>
+  ca_path: <%= ENV['SMTP_OPENSSL_CA_PATH'].presence || 'null' %>
+  ca_file: <%= ENV['SMTP_OPENSSL_CA_FILE'].presence || 'null' %>

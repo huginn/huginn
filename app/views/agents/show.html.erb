@@ -15,7 +15,7 @@
           <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><span class='glyphicon glyphicon-list-alt'></span> Logs</a></li>
 
           <% if @agent.can_create_events? && @agent.events.count > 0 %>
-            <li><%= link_to icon_tag('glyphicon-random') + ' Events'.html_safe, agent_events_path(@agent) %></li>
+            <li><%= link_to icon_tag('glyphicon-random') + ' Events'.html_safe, agent_events_path(@agent, return: request.fullpath) %></li>
           <% else %>
             <li class='disabled'><a><span class='glyphicon glyphicon-random'></span> Events</a></li>
           <% end %>
