@@ -94,6 +94,20 @@ bob_twitter_user_agent:
       :oauth_token_secret => "---"
     }.to_json.inspect %>
 
+tectonic_twitter_user_agent:
+  type: Agents::TwitterFavorites
+  user: tectonic
+  name: "tectonic's Twitter Favorites Watcher"
+  guid: <%= SecureRandom.hex %>
+  options: <%= {
+      :username => "tectonic",
+      :expected_update_period_in_days => "2",
+      :consumer_key => "---",
+      :consumer_secret => "---",
+      :oauth_token => "---",
+      :oauth_token_secret => "---"
+    }.to_json.inspect %>
+
 bob_manual_event_agent:
   type: Agents::ManualEventAgent
   user: bob
