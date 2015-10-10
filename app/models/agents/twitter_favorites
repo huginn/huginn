@@ -5,13 +5,13 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      The Twitter Favorite List Agent follows the favorite list of a specified Twitter user.
+      The Twitter Favorites List Agent follows the favorites list of a specified Twitter user.
 
       #{twitter_dependencies_missing if dependencies_missing?}
 
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
 
-      You must also provide the `username` of the Twitter user to monitor.
+      You must also provide the `username` of the Twitter user, `number` of latest tweets to monitor and max `history' size.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -51,17 +51,20 @@ module Agents
     def default_options
       {
         'username' => 'tectonic',
+        'number' => '10'
+        'history' => '100'
         'expected_update_period_in_days' => '2'
       }
     end
 
-    def validate_options
+     def validate_options
       errors.add(:base, "username is required") unless options['username'].present?
+      errors.add(:base, "number is required") unless options['number'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
 
       if options[:starting_at].present?
         Time.parse(options[:starting_at]) rescue errors.add(:base, "Error parsing starting_at")
-        end
+      end
     end
 
     def starting_at
@@ -73,21 +76,24 @@ module Agents
     end
 
     def check
-      since_id = memory['since_id'] || nil
-      opts = {:count => 10}
-      opts.merge! :since_id => since_id unless since_id.nil?
-
-      # http://www.rubydoc.info/gems/twitter/Twitter/REST/Favorites#favorites-instance_method
+      opts = {:count => interpolated['number']}
       tweets = twitter.favorites(interpolated['username'], opts)
 
       tweets.each do |tweet|
-        if tweet.created_at >= starting_at
-         memory['since_id'] = tweet.id if !memory['since_id'] || (tweet.id > memory['since_id'])
-         create_event :payload => tweet.attrs
+                if memory.value? tweet.id
+                else
+                        memory[tweet.id] = tweet.id
+                        create_event :payload => tweet.attrs
+                end
         end
-      end
 
-      save!
+        if memory.length > interpolated['history'].to_i
+                memory_key = memory.keys[0,50]
+                memory_key.each do |k|
+                        memory.delete(k)
+                end
+        end
+        save!
     end
   end
 end
