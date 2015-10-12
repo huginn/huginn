@@ -14,7 +14,7 @@ module Agents
       #{'## Include `slack-notifier` in your Gemfile to use this Agent!' if dependencies_missing?}
 
       To get started, you will first need to configure an incoming webhook.
-      
+
       - Go to `https://my.slack.com/services/new/incoming-webhook`, choose a default channel and add the integration.
 
       Your webhook URL will look like: `https://hooks.slack.com/services/some/random/characters`
@@ -74,7 +74,7 @@ module Agents
       incoming_events.each do |event|
         opts = interpolated(event)
         slack_opts = filter_options(opts)
-        if opts[:icon].to_s != ''
+        if opts[:icon].present?
           if /^:/.match(opts[:icon])
             slack_opts[:icon_emoji] = opts[:icon]
           else
