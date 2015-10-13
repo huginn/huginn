@@ -60,6 +60,7 @@ module Agents
      def validate_options
       errors.add(:base, "username is required") unless options['username'].present?
       errors.add(:base, "number is required") unless options['number'].present?
+      errors.add(:base, "history is required") unless options['number'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
 
       if options[:starting_at].present?
@@ -85,7 +86,8 @@ module Agents
           memory[:last_seen].push(tweet.id)
           create_event :payload => tweet.attrs
         end
-
+      end
+      
       if memory[:last_seen].length > interpolated['history'].to_i
         memory[:last_seen] = memory[:last_seen][0,interpolated['history'].to_i/2]
       end
