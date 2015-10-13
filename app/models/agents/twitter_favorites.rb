@@ -51,8 +51,8 @@ module Agents
     def default_options
       {
         'username' => 'tectonic',
-        'number' => '10'
-        'history' => '100'
+        'number' => '10',
+        'history' => '100',
         'expected_update_period_in_days' => '2'
       }
     end
@@ -82,10 +82,9 @@ module Agents
       tweets.each do |tweet|
         if memory[:last_seen].include? tweet.id
         else
-            memory[:last_seen].push(tweet.id)
-            create_event :payload => tweet.attrs
+          memory[:last_seen].push(tweet.id)
+          create_event :payload => tweet.attrs
         end
-      end
 
       if memory[:last_seen].length > interpolated['history'].to_i
         memory[:last_seen] = memory[:last_seen][0,interpolated['history'].to_i/2]
