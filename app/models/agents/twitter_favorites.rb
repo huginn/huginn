@@ -11,7 +11,7 @@ module Agents
 
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
 
-      You must also provide the `username` of the Twitter user, `number` of latest tweets to monitor and max `history' size.
+      You must also provide the `username` of the Twitter user, `number` of latest tweets to monitor and `history' as number of tweets that will be held in memory.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -80,20 +80,17 @@ module Agents
       tweets = twitter.favorites(interpolated['username'], opts)
 
       tweets.each do |tweet|
-                if memory.value? tweet.id
-                else
-                        memory[tweet.id] = tweet.id
-                        create_event :payload => tweet.attrs
-                end
+        if memory[:last_seen].include? tweet.id
+        else
+            memory[:last_seen].push(tweet.id)
+            create_event :payload => tweet.attrs
         end
+      end
 
-        if memory.length > interpolated['history'].to_i
-                memory_key = memory.keys[0,50]
-                memory_key.each do |k|
-                        memory.delete(k)
-                end
-        end
-        save!
+      if memory[:last_seen].length > interpolated['history'].to_i
+        memory[:last_seen] = memory[:last_seen][0,interpolated['history'].to_i/2]
+      end
+      save!
     end
   end
 end
