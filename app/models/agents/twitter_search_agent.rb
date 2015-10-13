@@ -13,7 +13,7 @@ module Agents
 
       You must provide the desired `search`.
       
-      Set `result_type` (String) — Specifies what type of search results you would prefer to receive. Options are "mixed", "recent", and "popular". (default: `mixed`)
+      Set `result_type` to specify which [type of search results](https://dev.twitter.com/rest/reference/get/search/tweets) you would prefer to receive. Options are "mixed", "recent", and "popular". (default: `mixed`)
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -76,12 +76,12 @@ module Agents
 
     def check
       since_id = memory['since_id'] || nil
-      opts = {:include_entities => true}
+      opts = {include_entities: true}
       opts.merge! result_type: interpolated[:result_type] if interpolated[:result_type].present?
       opts.merge! :since_id => since_id unless since_id.nil?
 
       # http://www.rubydoc.info/gems/twitter/Twitter/REST/Search
-      tweets = twitter.search(interpolated['search'], opts).take(100)
+      tweets = twitter.search(interpolated['search'], opts).to_a
 
       tweets.each do |tweet|
         if tweet.created_at >= starting_at
