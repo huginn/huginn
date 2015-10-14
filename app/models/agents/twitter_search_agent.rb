@@ -15,6 +15,8 @@ module Agents
       
       Set `result_type` to specify which [type of search results](https://dev.twitter.com/rest/reference/get/search/tweets) you would prefer to receive. Options are "mixed", "recent", and "popular". (default: `mixed`)
 
+      Set `max_results` to limit the amount of results to retrieve per run(default: `500`. The API rate limit is ~18,000 per 15 minutes. [Click here to learn more about rate limits](https://dev.twitter.com/rest/public/rate-limiting).
+
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
       Set `starting_at` to the date/time (eg. `Mon Jun 02 00:38:12 +0000 2014`) you want to start receiving tweets from (default: agent's `created_at`)
@@ -74,20 +76,28 @@ module Agents
       end
     end
 
+    def max_results
+      if interpolated['max_results'].present?
+        interpolated['max_results'].to_i
+      else 
+        500
+      end
+    end
+
     def check
       since_id = memory['since_id'] || nil
       opts = {include_entities: true}
       opts.merge! result_type: interpolated[:result_type] if interpolated[:result_type].present?
-      opts.merge! :since_id => since_id unless since_id.nil?
+      opts.merge! since_id: since_id unless since_id.nil?
 
       # http://www.rubydoc.info/gems/twitter/Twitter/REST/Search
-      tweets = twitter.search(interpolated['search'], opts).to_a
+      tweets = twitter.search(interpolated['search'], opts).take(max_results)
 
       tweets.each do |tweet|
-        if tweet.created_at >= starting_at
+        if (tweet.created_at >= starting_at)
           memory['since_id'] = tweet.id if !memory['since_id'] || (tweet.id > memory['since_id'])
 
-          create_event :payload => tweet.attrs
+          create_event payload: tweet.attrs
         end
       end
 
