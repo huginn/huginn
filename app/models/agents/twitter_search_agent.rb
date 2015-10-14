@@ -64,7 +64,7 @@ module Agents
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
 
       if options[:starting_at].present?
-        Time.parse(options[:starting_at]) rescue errors.add(:base, "Error parsing starting_at")
+        Time.parse(interpolated[:starting_at]) rescue errors.add(:base, "Error parsing starting_at")
       end
     end
 
@@ -77,11 +77,7 @@ module Agents
     end
 
     def max_results
-      if interpolated['max_results'].present?
-        interpolated['max_results'].to_i
-      else 
-        500
-      end
+      (interpolated['max_results'].presence || 500).to_i
     end
 
     def check

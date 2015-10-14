@@ -9,11 +9,7 @@ describe Agents::TwitterSearchAgent do
       search: "freebandnames",
       expected_update_period_in_days: "2",
       starting_at: "Jan 01 00:00:01 +0000 2000",
-      max_results: '3',
-      consumer_key: "---",
-      consumer_secret: "---",
-      oauth_token: "---",
-      oauth_token_secret: "---"
+      max_results: '3'
     }
 
   end
