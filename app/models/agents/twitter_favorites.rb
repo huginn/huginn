@@ -81,10 +81,14 @@ module Agents
       tweets = twitter.favorites(interpolated['username'], opts)
 
       tweets.each do |tweet|
-        if memory[:last_seen].include? tweet.id
+        if memory[:last_seen].nil? 
+          memory[:last_seen] = Array.new()
         else
-          memory[:last_seen].push(tweet.id)
-          create_event :payload => tweet.attrs
+          if memory[:last_seen].include? tweet.id
+          else
+            memory[:last_seen].push(tweet.id)
+            create_event :payload => tweet.attrs
+          end
         end
       end
       
