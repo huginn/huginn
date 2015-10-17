@@ -118,9 +118,7 @@ module Agents
     end
 
     def payload_for(mo)
-      payload = mo.slice(*TYPE_ATTRIBUTES[mo['type']], 'sender_id', 'phone', 'group_id').to_json
-      log(payload)
-      payload
+      mo.slice(*TYPE_ATTRIBUTES[mo['type']], 'sender_id', 'phone', 'group_id').to_json
     end
 
     def endpoint_for(type)
