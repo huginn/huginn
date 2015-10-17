@@ -5,9 +5,11 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      The Twitter Search Agent emits the results of a specified search.
+      The Twitter Search Agent performs and emits the results of a specified Twitter search.
 
       #{twitter_dependencies_missing if dependencies_missing?}
+
+      If you want realtime data from Twitter about frequent terms, you should definitely use the Twitter Stream Agent instead.
 
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
 
