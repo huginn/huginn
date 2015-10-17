@@ -101,7 +101,7 @@ module Agents
       mo = interpolated(event)
       begin
         response = HTTParty.post(endpoint_for(mo['type']), body: payload_for(mo), headers: headers)
-        response.code == 201 ? log(response.body) : error(response.body)
+        error(response.body) if response.code != 201
       rescue HTTParty::Error => e
         error(e.message)
       end
