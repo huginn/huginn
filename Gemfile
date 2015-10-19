@@ -16,7 +16,6 @@ gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
 gem 'hypdf', '~> 1.0.7'           # PDFInfoAgent
-gem 'pocket-ruby'                 # PocketAgent
 
 # Weibo Agents
 gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
