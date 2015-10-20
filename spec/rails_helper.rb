@@ -21,11 +21,13 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActiveRecord::Migration.maintain_test_schema!
 
-# TODO: This will silence warnings when the raise_error matcher
-# is used without providing a specific error or error message.
-# Specs SHOULD pass the type of error that you're expecting to be
-# raised when using the raise_error matcher.
-RSpec::Expectations.configuration.warn_about_potential_false_positives = false
+# Mix in shoulda matchers
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
 
 RSpec.configure do |config|
   config.mock_with :rr

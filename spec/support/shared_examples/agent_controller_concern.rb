@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 shared_examples_for AgentControllerConcern do
   describe "preconditions" do

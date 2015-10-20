@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'time'
 
 describe Agents::ImapFolderAgent do

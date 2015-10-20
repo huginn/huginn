@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Scenario do
   let(:new_instance) { users(:bob).scenarios.build(:name => "some scenario") }

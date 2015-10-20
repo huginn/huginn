@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agent do
   it_behaves_like WorkingHelpers
@@ -223,7 +223,7 @@ describe Agent do
         mock(Agent).find(@checker.id) { @checker }
         expect {
           Agents::SomethingSource.async_check(@checker.id)
-        }.to raise_error
+        }.to raise_error(RuntimeError)
         log = @checker.logs.first
         expect(log.message).to match(/Exception/)
         expect(log.level).to eq(4)
@@ -263,7 +263,7 @@ describe Agent do
         Agent.async_check(agents(:bob_weather_agent).id)
         expect {
           Agent.async_receive(agents(:bob_rain_notifier_agent).id, [agents(:bob_weather_agent).events.last.id])
-        }.to raise_error
+        }.to raise_error(RuntimeError)
         log = agents(:bob_rain_notifier_agent).logs.first
         expect(log.message).to match(/Exception/)
         expect(log.level).to eq(4)

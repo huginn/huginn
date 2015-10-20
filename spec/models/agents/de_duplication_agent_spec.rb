@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::DeDuplicationAgent do
   def create_event(output=nil)
