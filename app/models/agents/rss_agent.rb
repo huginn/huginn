@@ -115,8 +115,10 @@ module Agents
       sort_events(new_events).each.with_index do |event, index|
         entry_id = event.payload[:id]
         if check_and_track(entry_id)
-          created_event_count += 1
-          create_event(event) unless max_events && max_events > 0 && index >= max_events
+          unless max_events && max_events > 0 && index >= max_events
+            created_event_count += 1
+            create_event(event)
+          end
         end
       end
       log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
