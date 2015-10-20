@@ -29,7 +29,7 @@ gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 gem 'omniauth-twitter'
 
 # Tumblr Agents
-gem 'tumblr_client', github: 'knu/tumblr_client', branch: 'patch-1'
+gem 'tumblr_client', github: 'tumblr/tumblr_client', ref: '0c59b'
 gem 'omniauth-tumblr'
 
 # Dropbox Agents
