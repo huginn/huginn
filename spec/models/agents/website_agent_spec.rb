@@ -233,7 +233,7 @@ describe Agents::WebsiteAgent do
           to_return(body: 'hello',
                     status: 200)
         stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /deflate/ }).
-          to_return(body: '\xcb\x48\xcd\xc9\xc9\x07\x00\x06\x2c'.force_encoding(Encoding::ASCII_8BIT),
+          to_return(body: "\xcb\x48\xcd\xc9\xc9\x07\x00\x06\x2c".b,
                     headers: { 'Content-Encoding' => 'deflate' },
                     status: 200)
 
