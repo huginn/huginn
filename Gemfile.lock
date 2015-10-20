@@ -20,9 +20,9 @@ GIT
       rest-client (~> 1.8)
 
 GIT
-  remote: git://github.com/knu/tumblr_client.git
-  revision: d6f1f64a7cba381345c588e28ebcff28048c3a6c
-  branch: patch-1
+  remote: git://github.com/tumblr/tumblr_client.git
+  revision: 0c59b04e49f2a8c89860613b18cf4e8f978d8dc7
+  branch: master
   specs:
     tumblr_client (0.8.5)
       faraday (~> 0.9.0)
