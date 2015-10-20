@@ -442,9 +442,9 @@ module Agents
         when Nokogiri::XML::NodeSet
           result = nodes.map { |node|
             value = node.xpath(extraction_details['value'] || '.')
-            if extraction_details['strip_cdata']
+            if value.is_a?(Nokogiri::XML::NodeSet)
               child = value.first
-              if child.cdata?
+              if child && child.cdata?
                 value = child.text
               end
             end

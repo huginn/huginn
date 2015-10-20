@@ -543,8 +543,8 @@ describe Agents::WebsiteAgent do
             'url' => 'http://example.com/cdata_rss.atom',
             'mode' => 'on_change',
             'extract' => {
-              'author' => { 'xpath' => '/feed/entry/author/name', 'value' => './/text()', 'strip_cdata' => true },
-              'title' => { 'xpath' => '/feed/entry/title', 'value' => './/text()', 'strip_cdata' => false },
+              'author' => { 'xpath' => '/feed/entry/author/name', 'value' => './/text()'},
+              'title' => { 'xpath' => '/feed/entry/title', 'value' => './/text()' },
               'content' => { 'xpath' => '/feed/entry/content', 'value' => './/text()' },
             }
           }, keep_events_for: 2.days)
@@ -558,8 +558,8 @@ describe Agents::WebsiteAgent do
           }.to change { Event.count }.by(10)
           event = Event.last
           expect(event.payload['author']).to eq('bill98')
-          expect(event.payload['title']).to eq('<![CDATA[Help: Rainmeter Skins • Test if Today is Between 2 Dates]]>')
-          expect(event.payload['content']).to start_with('<![CDATA[Can I ')
+          expect(event.payload['title']).to eq('Help: Rainmeter Skins • Test if Today is Between 2 Dates')
+          expect(event.payload['content']).to start_with('Can I ')
         end
 
       end
