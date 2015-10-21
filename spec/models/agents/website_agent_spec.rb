@@ -529,6 +529,41 @@ describe Agents::WebsiteAgent do
         end
       end
 
+      describe "XML with cdata" do
+        before do
+          stub_request(:any, /cdata_rss/).to_return(
+            body: File.read(Rails.root.join("spec/data_fixtures/cdata_rss.atom")),
+            status: 200
+          )
+
+          @checker = Agents::WebsiteAgent.new(name: 'cdata', options: {
+            'name' => 'CDATA',
+            'expected_update_period_in_days' => '2',
+            'type' => 'xml',
+            'url' => 'http://example.com/cdata_rss.atom',
+            'mode' => 'on_change',
+            'extract' => {
+              'author' => { 'xpath' => '/feed/entry/author/name', 'value' => './/text()'},
+              'title' => { 'xpath' => '/feed/entry/title', 'value' => './/text()' },
+              'content' => { 'xpath' => '/feed/entry/content', 'value' => './/text()' },
+            }
+          }, keep_events_for: 2.days)
+          @checker.user = users(:bob)
+          @checker.save!
+        end
+
+        it "works with XPath" do
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(10)
+          event = Event.last
+          expect(event.payload['author']).to eq('bill98')
+          expect(event.payload['title']).to eq('Help: Rainmeter Skins • Test if Today is Between 2 Dates')
+          expect(event.payload['content']).to start_with('Can I ')
+        end
+
+      end
+
       describe "JSON" do
         it "works with paths" do
           json = {
