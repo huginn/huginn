@@ -46,8 +46,6 @@ module Agents
 
       Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions all namespaces are stripped from the document unless a toplevel option `use_namespaces` is set to true.
 
-      If the extracted value contains `<![CDATA[content]]` you can get the `content` part if you set `strip_cdata` to true.
-
       # Scraping JSON
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
