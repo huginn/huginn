@@ -38,6 +38,11 @@ namespace :production do
     run_sv('start')
   end
 
+  task :force_stop => :check do
+    puts "Force stopping huginn ..."
+    run_sv('force-stop')
+  end
+
   task :status => :check do
     run_sv('status')
   end
