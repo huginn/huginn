@@ -102,7 +102,7 @@ module Agents
           if response.success?
             feed = FeedNormalizer::FeedNormalizer.parse(response.body, loose: true)
             feed.clean! if boolify(interpolated['clean'])
-            new_events += feed_to_events(feed)
+            new_events.concat feed_to_events(feed)
           else
             error "Failed to fetch #{url}: #{response.inspect}"
           end
