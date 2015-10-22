@@ -74,6 +74,8 @@ describe Agents::ShellCommandAgent do
   describe "#check" do
     before do
       stub(@checker).run_command(@valid_path, 'pwd', nil) { ["fake pwd output", "", 0] }
+      stub(@checker).run_command(@valid_path, 'empty_output', nil) { ["", "", 0] }
+      stub(@checker).run_command(@valid_path, 'failure', nil) { ["failed", "error message", 1] }
     end
 
     it "should create an event when checking" do
@@ -89,6 +91,34 @@ describe Agents::ShellCommandAgent do
       expect(Event.last.payload[:command]).to eq([RbConfig.ruby, '-e', 'puts "hello, #{STDIN.eof? ? "world" : STDIN.read.strip}."; STDERR.puts "warning!"'])
       expect(Event.last.payload[:output]).to eq('hello, world.')
       expect(Event.last.payload[:errors]).to eq('warning!')
+    end
+
+    describe "with suppress_on_empty_output" do
+      it "should suppress events on empty output" do
+        @checker.options[:suppress_on_empty_output] = true
+        @checker.options[:command] = 'empty_output'
+        expect { @checker.check }.not_to change { Event.count }
+      end
+
+      it "should not suppress events on non-empty output" do
+        @checker.options[:suppress_on_empty_output] = true
+        @checker.options[:command] = 'failure'
+        expect { @checker.check }.to change { Event.count }.by(1)
+      end
+    end
+
+    describe "with suppress_on_failure" do
+      it "should suppress events on failure" do
+        @checker.options[:suppress_on_failure] = true
+        @checker.options[:command] = 'failure'
+        expect { @checker.check }.not_to change { Event.count }
+      end
+
+      it "should not suppress events on success" do
+        @checker.options[:suppress_on_failure] = true
+        @checker.options[:command] = 'empty_output'
+        expect { @checker.check }.to change { Event.count }.by(1)
+      end
     end
 
     it "does not run when should_run? is false" do

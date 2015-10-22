@@ -20,6 +20,10 @@ module Agents
 
       The resulting event will contain the `command` which was executed, the `path` it was executed under, the `exit_status` of the command, the `errors`, and the actual `output`. ShellCommandAgent will not log an error if the result implies that something went wrong.
 
+      If `suppress_on_failure` is set to true, no event is emitted when `exit_status` is not zero.
+
+      If `suppress_on_empty_output` is set to true, no event is emitted when `output` is empty.
+
       *Warning*: This type of Agent runs arbitrary commands on your system, #{Agents::ShellCommandAgent.should_run? ? "but is **currently enabled**" : "and is **currently disabled**"}.
       Only enable this Agent if you trust everyone using your Huginn installation.
       You can enable this Agent in your .env file by setting `ENABLE_INSECURE_AGENTS` to `true`.
@@ -31,7 +35,7 @@ module Agents
         {
           "command": "pwd",
           "path": "/home/Huginn",
-          "exit_status": "0",
+          "exit_status": 0,
           "errors": "",
           "output": "/home/Huginn"
         }
@@ -41,6 +45,8 @@ module Agents
       {
           'path' => "/",
           'command' => "pwd",
+          'suppress_on_failure' => false,
+          'suppress_on_empty_output' => false,
           'expected_update_period_in_days' => 1
       }
     end
@@ -89,10 +95,19 @@ module Agents
 
         result, errors, exit_status = run_command(path, command, stdin)
 
-        vals = {"command" => command, "path" => path, "exit_status" => exit_status, "errors" => errors, "output" => result}
-        created_event = create_event :payload => vals
+        payload = {
+          'command' => command,
+          'path' => path,
+          'exit_status' => exit_status,
+          'errors' => errors,
+          'output' => result,
+        }
 
-        log("Ran '#{command}' under '#{path}'", :outbound_event => created_event, :inbound_event => event)
+        unless suppress_event?(payload)
+          created_event = create_event payload: payload
+        end
+
+        log("Ran '#{command}' under '#{path}'", outbound_event: created_event, inbound_event: event)
       else
         log("Unable to run because insecure agents are not enabled.  Edit ENABLE_INSECURE_AGENTS in the Huginn .env configuration.")
       end
@@ -127,6 +142,11 @@ module Agents
       end
 
       [result, errors, exit_status]
+    end
+
+    def suppress_event?(payload)
+      (boolify(interpolated['suppress_on_failure']) && payload['exit_status'].nonzero?) ||
+        (boolify(interpolated['suppress_on_empty_output']) && payload['output'].empty?)
     end
   end
 end
