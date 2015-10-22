@@ -120,7 +120,7 @@ module Agents
 
         _, status = Process.wait2(pid)
         exit_status = status.exitstatus
-      rescue Exception => e
+      rescue => e
         errors = e.to_s
         result = ''.freeze
         exit_status = nil
