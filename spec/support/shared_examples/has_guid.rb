@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 shared_examples_for HasGuid do
   it "gets created before_save, but only if it's not present" do

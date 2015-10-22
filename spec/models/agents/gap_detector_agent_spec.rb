@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::GapDetectorAgent do
   let(:valid_params) {

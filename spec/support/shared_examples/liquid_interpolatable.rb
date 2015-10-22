@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 shared_examples_for LiquidInterpolatable do
   before(:each) do
@@ -94,7 +94,7 @@ shared_examples_for LiquidInterpolatable do
       it "should raise an exception for undefined credentials" do
         expect {
           @checker.interpolate_string("{% credential unknown %}", {})
-        }.to raise_error
+        }.to raise_error(/No user credential named/)
       end
     end
 

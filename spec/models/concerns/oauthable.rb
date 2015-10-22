@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 module Agents
   class OauthableTestAgent < Agent

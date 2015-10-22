@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe ScenariosController do
   def valid_attributes(options = {})
