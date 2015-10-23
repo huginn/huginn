@@ -87,34 +87,41 @@ module Agents
     end
 
     def check
-      Array(interpolated['url']).each do |url|
-        check_url(url)
-      end
+      check_urls(Array(interpolated['url']))
     end
 
     protected
 
-    def check_url(url)
-      response = faraday.get(url)
-      if response.success?
-        feed = FeedNormalizer::FeedNormalizer.parse(response.body, loose: true)
-        feed.clean! if boolify(interpolated['clean'])
-        max_events = (interpolated['max_events_per_run'].presence || 0).to_i
-        created_event_count = 0
-        sort_events(feed_to_events(feed)).each.with_index do |event, index|
-          break if max_events && max_events > 0 && index >= max_events
-          entry_id = event.payload[:id]
-          if check_and_track(entry_id)
+    def check_urls(urls)
+      new_events = []
+      max_events = (interpolated['max_events_per_run'].presence || 0).to_i
+
+      urls.each do |url|
+        begin
+          response = faraday.get(url)
+          if response.success?
+            feed = FeedNormalizer::FeedNormalizer.parse(response.body, loose: true)
+            feed.clean! if boolify(interpolated['clean'])
+            new_events.concat feed_to_events(feed)
+          else
+            error "Failed to fetch #{url}: #{response.inspect}"
+          end
+        rescue => e
+          error "Failed to fetch #{url} with message '#{e.message}': #{e.backtrace}"
+        end
+      end
+
+      created_event_count = 0
+      sort_events(new_events).each.with_index do |event, index|
+        entry_id = event.payload[:id]
+        if check_and_track(entry_id)
+          unless max_events && max_events > 0 && index >= max_events
             created_event_count += 1
             create_event(event)
           end
         end
-        log "Fetched #{url} and created #{created_event_count} event(s)."
-      else
-        error "Failed to fetch #{url}: #{response.inspect}"
       end
-    rescue => e
-      error "Failed to fetch #{url} with message '#{e.message}': #{e.backtrace}"
+      log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
     end
 
     def get_entry_id(entry)
