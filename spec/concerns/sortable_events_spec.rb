@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe SortableEvents do
   let(:agent_class) {
@@ -152,7 +152,7 @@ describe SortableEvents do
             passive_agent_class.class_eval do
               can_order_created_events!
             end
-          }.to raise_error
+          }.to raise_error('Cannot order events for agent that cannot create events')
         end
 
         it 'should work if called from an Agent that can create events' do
@@ -160,7 +160,7 @@ describe SortableEvents do
             active_agent_class.class_eval do
               can_order_created_events!
             end
-          }.not_to raise_error
+          }.not_to raise_error()
         end
       end
 

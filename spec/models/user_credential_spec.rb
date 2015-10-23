@@ -1,19 +1,19 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe UserCredential do
   describe "validation" do
-    it { is_expected.to validate_uniqueness_of(:credential_name).scoped_to(:user_id) }
-    it { is_expected.to validate_presence_of(:credential_name) }
-    it { is_expected.to validate_presence_of(:credential_value) }
-    it { is_expected.to validate_presence_of(:user_id) }
+    it { should validate_uniqueness_of(:credential_name).scoped_to(:user_id) }
+    it { should validate_presence_of(:credential_name) }
+    it { should validate_presence_of(:credential_value) }
+    it { should validate_presence_of(:user_id) }
   end
 
   describe "mass assignment" do
-    it { is_expected.to allow_mass_assignment_of :credential_name }
+    it { should allow_mass_assignment_of :credential_name }
 
-    it { is_expected.to allow_mass_assignment_of :credential_value }
+    it { should allow_mass_assignment_of :credential_value }
 
-    it { is_expected.not_to allow_mass_assignment_of :user_id }
+    it { should_not allow_mass_assignment_of :user_id }
   end
 
   describe "cleaning fields" do
