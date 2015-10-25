@@ -73,7 +73,7 @@ module Agents
     end
 
     def response_message
-      options['response'] || 'Event Created'
+      interpolated['response'] || 'Event Created'
     end
   end
 end
