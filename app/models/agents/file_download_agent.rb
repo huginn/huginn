@@ -1,4 +1,3 @@
-
 require "tempfile"
 require "faraday"
 require "uri"
@@ -14,15 +13,15 @@ module Agents
 
       # Optional parameters
       * destination: where to save the file, if omitted tempfile will be created.
-      * merge: it will keep the original event and it will add the destination where we saved the file, by default it is false
+      * mode: if you set to `merge` it will keep the original event and it will add the destination where we saved the file, by default it is `clean`
     MD
 
     def default_options
       {
-          'expected_update_period_in_days' => 10,
-          'url' => '{{ url }}',
-          'destination' => '{{ destination }}',
-          'merge' => false
+          "expected_update_period_in_days" => 10,
+          "url" => "{{ url }}",
+          "destination" => "{{ destination }}",
+          "mode" => "clean"
       }
     end
 
@@ -38,14 +37,14 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         timeout = interpolated(event)['timeout'] || 10
-        merge = interpolated(event)['merge']
+        mode = interpolated(event)['mode']
         destination = interpolated(event)['destination']
         url = interpolated(event)['url']
         begin
           response = download(url)
           path = save(destination, response.body)
 
-          if merge == "true"
+          if mode == "merge"
             create_event :payload => event.payload.dup.merge({
               "destination" => path
             })

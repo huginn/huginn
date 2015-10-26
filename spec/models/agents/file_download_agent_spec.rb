@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Agents::FileDownloadAgent do
   describe "validate" do
-
+    # TODO
   end
 
   describe "#receive" do
@@ -11,13 +11,9 @@ describe Agents::FileDownloadAgent do
         @opts = {
           :url => "{{ url }}",
           :expected_update_period_in_days => 10,
-          :merge => "{{ merge }}",
+          :mode => "{{ mode }}",
           :destination => "/tmp/video.mp4"
         }
-
-
-
-        #stub.instance_of(Agents::FileDownloadAgent) do |klass|
 
         instance_of(Agents::FileDownloadAgent) do
           save("/tmp/video.mp4", "response from get") {
@@ -31,7 +27,6 @@ describe Agents::FileDownloadAgent do
             resp
           }
         end
-        #end
         @checker = Agents::FileDownloadAgent.new(
           :name => "TestFileDownloader",
           :options => @opts
@@ -46,7 +41,7 @@ describe Agents::FileDownloadAgent do
         event.agent = agents(:bob_weather_agent)
         event.payload = {
           :url => "http://example.org/video.mp4?secret=pssst",
-          :merge => "false"
+          :mode => "clean"
         }
         event.save!
         Agents::FileDownloadAgent.async_receive(@checker.id, [event.id])
@@ -62,7 +57,7 @@ describe Agents::FileDownloadAgent do
         event.payload = {
           :url => "http://example.org/video.mp4?secret=pssst",
           :my_special_prop => "my_special_value",
-          :merge => true
+          :mode => "merge"
         }
         event.save!
         Agents::FileDownloadAgent.async_receive(@checker.id, [event.id])
@@ -132,7 +127,7 @@ describe Agents::FileDownloadAgent do
         @opts = {
           :url => "{{ url }}",
           :expected_update_period_in_days => 10,
-          :merge => "{{ merge }}",
+          :mode => "{{ mode }}",
           :destination => "/tmp/video.mp4"
         }
 
@@ -158,7 +153,7 @@ describe Agents::FileDownloadAgent do
         @opts = {
           :url => "{{ url }}",
           :expected_update_period_in_days => 10,
-          :merge => "{{ merge }}",
+          :mode => "{{ mode }}",
           :destination => "/tmp/video.mp4"
         }
 
@@ -191,7 +186,7 @@ describe Agents::FileDownloadAgent do
         @opts = {
           :url => "{{ url }}",
           :expected_update_period_in_days => 10,
-          :merge => "{{ merge }}",
+          :mode => "{{ mode }}",
           :destination => "/tmp/video.mp4"
         }
 
@@ -212,7 +207,7 @@ describe Agents::FileDownloadAgent do
       @opts = {
         :url => "{{ url }}",
         :expected_update_period_in_days => 10,
-        :merge => "{{ merge }}",
+        :mode => "{{ mode }}",
         :destination => "/tmp/video.mp4"
       }
 
@@ -236,32 +231,4 @@ describe Agents::FileDownloadAgent do
       expect(response.body).to eq("response from get")
     end
   end
-  # before do
-  #   @opts = {
-  #
-  #   }
-  #
-  #   @checker = Agents::FileDownloadAgent.new(@opts)
-  #   @checker.service = services(:generic)
-  #   @checker.user = users(:bob)
-  #   @checker.save!
-  #
-  #   @event = Event.new
-  #   @event.agent = agents(:bob_weather_agent)
-  #   @event.payload = { :title => "Gonna rain...", :body => 'San Francisco is gonna get wet' }
-  #   @event.save!
-  #
-  #   stub.any_instance_of(Agents::TumblrPublishAgent).tumblr {
-  #     stub!.text(anything, anything) { { "id" => "5" } }
-  #   }
-  # end
-  #
-  # describe '#receive' do
-  #   it 'should publish any payload it receives' do
-  #     Agents::TumblrPublishAgent.async_receive(@checker.id, [@event.id])
-  #     expect(@checker.events.count).to eq(1)
-  #     expect(@checker.events.first.payload['post_id']).to eq('5')
-  #     expect(@checker.events.first.payload['published_post']).to eq('[huginnbot.tumblr.com] text')
-  #   end
-  # end
 end
