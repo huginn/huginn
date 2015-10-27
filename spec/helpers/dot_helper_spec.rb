@@ -72,7 +72,7 @@ describe DotHelper do
       end
 
       it "generates a richer DOT script" do
-        expect(agents_dot(@agents, true)).to match(%r{
+        expect(agents_dot(@agents, rich: true)).to match(%r{
           \A
           digraph \x20 "Agent \x20 Event \x20 Flow" \{
             node \[ [^\]]+ \];

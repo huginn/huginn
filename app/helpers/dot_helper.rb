@@ -1,8 +1,8 @@
 module DotHelper
-  def render_agents_diagram(agents)
+  def render_agents_diagram(agents, layout: nil)
     if (command = ENV['USE_GRAPHVIZ_DOT']) &&
        (svg = IO.popen([command, *%w[-Tsvg -q1 -o/dev/stdout /dev/stdin]], 'w+') { |dot|
-          dot.print agents_dot(agents, true)
+          dot.print agents_dot(agents, rich: true, layout: layout)
           dot.close_write
           dot.read
         } rescue false)
@@ -125,7 +125,7 @@ module DotHelper
     DotDrawer.draw(vars, &block)
   end
 
-  def agents_dot(agents, rich = false)
+  def agents_dot(agents, rich: false, layout: nil)
     draw(agents: agents,
          agent_id: ->agent { 'a%d' % agent.id },
          agent_label: ->agent {
@@ -158,7 +158,10 @@ module DotHelper
       end
 
       block('digraph', 'Agent Event Flow') {
-        # statement 'graph', rankdir: 'LR'
+        layout ||= ENV['DIAGRAM_DEFAULT_LAYOUT'].presence
+        if rich && /\A[a-z]+\z/ === layout
+          statement 'graph', layout: layout, overlap: 'false'
+        end
         statement 'node',
                   shape: 'box',
                   style: 'rounded',
@@ -197,7 +200,6 @@ module DotHelper
       root << svg
       root << overlay_container = Nokogiri::XML::Node.new('div', doc) { |div|
         div['class'] = 'overlay-container'
-        div['style'] = "width: #{svg['width']}; height: #{svg['height']}"
       }
       overlay_container << overlay = Nokogiri::XML::Node.new('div', doc) { |div|
         div['class'] = 'overlay'
