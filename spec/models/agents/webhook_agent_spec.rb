@@ -38,6 +38,20 @@ describe Agents::WebhookAgent do
       expect(out).to eq(['Not Authorized', 401])
     end
 
+    it 'should respond with customized response message if configured with `response` option' do
+      out = nil
+      agent.options['response'] = 'That Worked'
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['That Worked', 201])
+    end
+
+    it 'should respond with `Event Created` if response option is nil' do
+      out = nil
+      agent.options['response'] = nil
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201])
+    end
+
     describe "receiving events" do
 
       context "default settings" do
