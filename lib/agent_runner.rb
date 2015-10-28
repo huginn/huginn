@@ -100,7 +100,7 @@ class AgentRunner
 
   def restart_dead_workers
     @workers.each_pair do |id, worker|
-      if worker.thread && !worker.thread.alive?
+      if !worker.restarting && worker.thread && !worker.thread.alive?
         puts "Restarting #{id.to_s}"
         @workers[id].run!
       end
