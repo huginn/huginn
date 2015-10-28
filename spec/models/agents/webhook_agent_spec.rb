@@ -30,7 +30,7 @@ describe Agents::WebhookAgent do
       expect(Event.last.payload).to eq({ 'name' => 'jon' })
     end
 
-    it 'should not create event if secrets dont match' do
+    it 'should not create event if secrets do not match' do
       out = nil
       expect {
         out = agent.receive_web_request({ 'secret' => 'bazbat', 'some_key' => payload }, "post", "text/html")
@@ -39,15 +39,22 @@ describe Agents::WebhookAgent do
     end
 
     it 'should respond with customized response message if configured with `response` option' do
-      out = nil
       agent.options['response'] = 'That Worked'
       out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
       expect(out).to eq(['That Worked', 201])
+
+      # Empty string is a valid response
+      agent.options['response'] = ''
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['', 201])
     end
 
-    it 'should respond with `Event Created` if response option is nil' do
-      out = nil
+    it 'should respond with `Event Created` if the response option is nil or missing' do
       agent.options['response'] = nil
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201])
+
+      agent.options.delete('response')
       out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
       expect(out).to eq(['Event Created', 201])
     end

@@ -37,8 +37,7 @@ module Agents
     def default_options
       { "secret" => "supersecretstring",
         "expected_receive_period_in_days" => 1,
-        "payload_path" => "some_key",
-        "response" => "Event Created"
+        "payload_path" => "some_key"
       }
     end
 
