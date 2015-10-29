@@ -262,11 +262,11 @@ describe Agents::WebsiteAgent do
     describe 'encoding' do
       it 'should be forced with force_encoding option' do
         huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /no-encoding/).to_return(:body => {
-            :value => huginn,
-          }.to_json.encode(Encoding::EUC_JP), :headers => {
+        stub_request(:any, /no-encoding/).to_return(body: {
+            value: huginn,
+          }.to_json.encode(Encoding::EUC_JP).b, headers: {
             'Content-Type' => 'application/json',
-          }, :status => 200)
+          }, status: 200)
         site = {
           'name' => "Some JSON Response",
           'expected_update_period_in_days' => "2",
@@ -278,22 +278,22 @@ describe Agents::WebsiteAgent do
           },
           'force_encoding' => 'EUC-JP',
         }
-        checker = Agents::WebsiteAgent.new(:name => "No Encoding Site", :options => site)
+        checker = Agents::WebsiteAgent.new(name: "No Encoding Site", options: site)
         checker.user = users(:bob)
         checker.save!
 
-        checker.check
+        expect { checker.check }.to change { Event.count }.by(1)
         event = Event.last
         expect(event.payload['value']).to eq(huginn)
       end
 
       it 'should be overridden with force_encoding option' do
         huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /wrong-encoding/).to_return(:body => {
-            :value => huginn,
-          }.to_json.encode(Encoding::EUC_JP), :headers => {
+        stub_request(:any, /wrong-encoding/).to_return(body: {
+            value: huginn,
+          }.to_json.encode(Encoding::EUC_JP).b, headers: {
             'Content-Type' => 'application/json; UTF-8',
-          }, :status => 200)
+          }, status: 200)
         site = {
           'name' => "Some JSON Response",
           'expected_update_period_in_days' => "2",
@@ -305,11 +305,63 @@ describe Agents::WebsiteAgent do
           },
           'force_encoding' => 'EUC-JP',
         }
-        checker = Agents::WebsiteAgent.new(:name => "Wrong Encoding Site", :options => site)
+        checker = Agents::WebsiteAgent.new(name: "Wrong Encoding Site", options: site)
         checker.user = users(:bob)
         checker.save!
 
-        checker.check
+        expect { checker.check }.to change { Event.count }.by(1)
+        event = Event.last
+        expect(event.payload['value']).to eq(huginn)
+      end
+
+      it 'should be determined by charset in Content-Type' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /charset-euc-jp/).to_return(body: {
+            value: huginn,
+          }.to_json.encode(Encoding::EUC_JP), headers: {
+            'Content-Type' => 'application/json; charset=EUC-JP',
+          }, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://charset-euc-jp.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+        }
+        checker = Agents::WebsiteAgent.new(name: "Charset reader", options: site)
+        checker.user = users(:bob)
+        checker.save!
+
+        expect { checker.check }.to change { Event.count }.by(1)
+        event = Event.last
+        expect(event.payload['value']).to eq(huginn)
+      end
+
+      it 'should default to UTF-8 when unknown charset is found' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /charset-unknown/).to_return(body: {
+            value: huginn,
+          }.to_json.b, headers: {
+            'Content-Type' => 'application/json; charset=unicode',
+          }, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://charset-unknown.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+        }
+        checker = Agents::WebsiteAgent.new(name: "Charset reader", options: site)
+        checker.user = users(:bob)
+        checker.save!
+
+        expect { checker.check }.to change { Event.count }.by(1)
         event = Event.last
         expect(event.payload['value']).to eq(huginn)
       end

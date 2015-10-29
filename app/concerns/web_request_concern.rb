@@ -39,7 +39,7 @@ module WebRequestConcern
           # detection, so we do that.
           case env[:response_headers][:content_type]
           when /;\s*charset\s*=\s*([^()<>@,;:\\\"\/\[\]?={}\s]+)/i
-            encoding = Encoding.find($1) rescue nil
+            encoding = Encoding.find($1) rescue @default_encoding
           when /\A\s*(?:text\/[^\s;]+|application\/(?:[^\s;]+\+)?(?:xml|json))\s*(?:;|\z)/i
             encoding = @default_encoding
           else
@@ -47,7 +47,7 @@ module WebRequestConcern
             next
           end
         end
-        body.encode!(Encoding::UTF_8, encoding) unless body.encoding == Encoding::UTF_8
+        body.encode!(Encoding::UTF_8, encoding)
       end
     end
   end
