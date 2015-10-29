@@ -73,6 +73,29 @@ describe Agents::DataOutputAgent do
     end
   end
 
+  describe "#receive" do
+    it "should push to hubs when push_hubs is given" do
+      agent.options[:push_hubs] = %w[http://push.example.com]
+      agent.options[:template] = { 'link' => 'http://huginn.example.org' }
+
+      alist = nil
+
+      stub_request(:post, 'http://push.example.com/')
+        .with(headers: { 'Content-Type' => %r{\Aapplication/x-www-form-urlencoded\s*(?:;|\z)} })
+        .to_return { |request|
+        alist = URI.decode_www_form(request.body).sort
+        { status: 200, body: 'ok' }
+      }
+
+      agent.receive(events(:bob_website_agent_event))
+
+      expect(alist).to eq [
+        ["hub.mode", "publish"],
+        ["hub.url", agent.feed_url(secret: agent.options[:secrets].first, format: :xml)]
+      ]
+    end
+  end
+
   describe "#receive_web_request" do
     before do
       current_time = Time.now
