@@ -173,7 +173,6 @@ module Agents
         options_obj[:comment] = options['comment']
         tumblr.reblog(blog_name, options_obj)
       end
-      end
     end
 
     def get_post(blog_name, id)
