@@ -11,6 +11,8 @@ module Agents
 
       `expected_receive_period_in_days` is used to determine if the Agent is working. Set it to the maximum number of days
       that you anticipate passing without this Agent receiving an incoming Event.
+
+      `shuffle` is used to emit events in random order. Set to true to enable shuffling the events before emitting them. By default it's false.
     MD
 
     def default_options
@@ -55,10 +57,22 @@ module Agents
 
     def check
       if memory['event_ids'] && memory['event_ids'].length > 0
-        received_events.where(id: memory['event_ids']).reorder('events.id asc').each do |event|
+        events = received_events.where(id: memory['event_ids'])
+
+        events = reorder(events, !!options['shuffle'])
+
+        events.each do |event|
           create_event payload: event.payload
         end
         memory['event_ids'] = []
+      end
+    end
+
+    def reorder(events, shuffle)
+      if shuffle == true
+        events.reorder('rand()')
+      else
+        events.reorder('events.id asc')
       end
     end
   end
