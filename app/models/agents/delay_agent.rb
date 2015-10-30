@@ -70,7 +70,7 @@ module Agents
 
     def reorder(events, shuffle)
       if shuffle == true
-        events.reorder('rand()')
+        events.shuffle
       else
         events.reorder('events.id asc')
       end
