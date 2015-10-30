@@ -60,7 +60,7 @@ module Agents
         events = received_events.where(id: memory['event_ids']).reorder('events.id asc')
 
         if options['max_emitted_events'].present?
-          events = events.slice(0, options['max_emitted_events'].to_i)
+          events = events.limit(options['max_emitted_events'].to_i)
         end
 
         events.each do |event|
