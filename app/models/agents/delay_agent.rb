@@ -19,8 +19,7 @@ module Agents
       {
         'expected_receive_period_in_days' => "10",
         'max_events' => "100",
-        'keep' => 'newest',
-        'max_emitted_events' => "100"
+        'keep' => 'newest'
       }
     end
 
