@@ -311,4 +311,17 @@ module LiquidInterpolatable
   end
   Liquid::Template.register_tag('credential', LiquidInterpolatable::Tags::Credential)
   Liquid::Template.register_tag('line_break', LiquidInterpolatable::Tags::LineBreak)
+
+  class Random < Liquid::Tag
+    def initialize(tag_name, max, tokens)
+       super
+       @max = max.to_i
+    end
+
+    def render(context)
+      rand(@max).to_s
+    end
+  end
+
+  Liquid::Template.register_tag('random', Random)
 end

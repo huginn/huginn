@@ -144,6 +144,7 @@ module SortableEvents
       events.map.with_index { |event, index|
         interpolate_with(event) {
           interpolation_context['_index_'] = index
+          interpolation_context['event_id'] = event.id
           order_by.map { |expression, type, _|
             string = interpolate_string(expression)
             begin

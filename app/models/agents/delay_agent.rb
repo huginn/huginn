@@ -2,6 +2,8 @@ module Agents
   class DelayAgent < Agent
     default_schedule "every_12h"
 
+    DEFAULT_EVENTS_ORDER = [["{{event_id}}", "number"]]
+
     description <<-MD
       The DelayAgent stores received Events and emits copies of them on a schedule. Use this as a buffer or queue of Events.
 
@@ -11,6 +13,15 @@ module Agents
 
       `expected_receive_period_in_days` is used to determine if the Agent is working. Set it to the maximum number of days
       that you anticipate passing without this Agent receiving an incoming Event.
+
+      `shuffle` is used to emit events in random order. Set to true to enable shuffling the events before emitting them. By default it's false.
+
+      # Ordering Events
+
+      #{description_events_order}
+
+      In this Agent, the default value for `events_order` is `#{DEFAULT_EVENTS_ORDER.to_json}`.
+
     MD
 
     def default_options
@@ -33,6 +44,8 @@ module Agents
       unless options['max_events'].present? && options['max_events'].to_i > 0
         errors.add(:base, "The 'max_events' option is required and must be an integer greater than 0")
       end
+
+      validate_events_order
     end
 
     def working?
@@ -55,11 +68,19 @@ module Agents
 
     def check
       if memory['event_ids'] && memory['event_ids'].length > 0
-        received_events.where(id: memory['event_ids']).reorder('events.id asc').each do |event|
+        events = received_events.where(id: memory['event_ids'])
+
+        events = sort_events(events)
+
+        events.each do |event|
           create_event payload: event.payload
         end
         memory['event_ids'] = []
       end
+    end
+
+    def events_order
+      options["events_order"] || DEFAULT_EVENTS_ORDER
     end
   end
 end
