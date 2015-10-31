@@ -19,7 +19,7 @@ module Agents
 
       `blog_name` Your Tumblr URL (e.g. "mustardhamsters.tumblr.com")
 
-      `post_type` One of [text, photo, quote, link, chat, audio, video]
+      `post_type` One of [text, photo, quote, link, chat, audio, video, reblog]
 
 
       -------------
@@ -49,6 +49,7 @@ module Agents
 
       **Video** `caption` `embed`
 
+      **Reblog** `id` `reblog_key` `comment`
 
       -------------
 
@@ -90,6 +91,9 @@ module Agents
           'conversation' => "{{conversation}}",
           'external_url' => "{{external_url}}",
           'embed' => "{{embed}}",
+          'id' => "{{id}}",
+          'reblog_key' => "{{reblog_key}}",
+          'comment' => "{{comment}}",
         },
       }
     end
@@ -163,6 +167,11 @@ module Agents
         options_obj[:caption] = options['caption']
         options_obj[:embed] = options['embed']
         tumblr.video(blog_name, options_obj)
+      when "reblog"
+        options_obj[:id] = options['id']
+        options_obj[:reblog_key] = options['reblog_key']
+        options_obj[:comment] = options['comment']
+        tumblr.reblog(blog_name, options_obj)
       end
     end
 
