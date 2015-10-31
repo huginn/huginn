@@ -113,17 +113,17 @@ describe Agents::DelayAgent do
     end
 
     it "re-emits Events in random order and clears the memory" do
-      agent.options['shuffle'] = true
+      # agent.options['shuffle'] = true
+      agent.options['events_order'] = [["{% random 5 %}", "number"]]
       agent.receive([first_event, second_event, third_event])
       expect(agent.memory['event_ids']).to eq [second_event.id, third_event.id]
-
-      stub.proxy(agent).reorder(anything, true)
 
       expect {
         agent.check
       }.to change { agent.events.count }.by(2)
 
       # do not reorder since we are trying to prove it is random order
+
       events = agent.events
       expect(events.first.payload).to eq( third_event.payload).or eq(second_event.payload)
       expect(events.second.payload).to eq(third_event.payload).or eq(second_event.payload)
