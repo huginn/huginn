@@ -96,6 +96,7 @@ gem 'string-scrub'	# for ruby <2.1
 gem 'therubyracer', '~> 0.12.2'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '>= 1.3.0'
+gem 'addressable', '>= 2.3.8'
 
 group :development do
   gem 'better_errors', '~> 1.1'

@@ -911,4 +911,69 @@ fire: hot
       end
     end
   end
+
+  describe "checking urls" do
+    before do
+      stub_request(:any, /example/).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/urlTest.html")), :status => 200)
+      @valid_options = {
+        'name' => "Url Test",
+        'expected_update_period_in_days' => "2",
+        'type' => "html",
+        'url' => "http://www.example.com",
+        'mode' => 'all',
+        'extract' => {
+          'url' => { 'css' => "a", 'value' => "@href" },
+        }
+      }
+      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)
+      @checker.user = users(:bob)
+      @checker.save!
+    end
+
+    describe "#check" do
+      it "should check hostname" do
+        @checker.check
+        event = Event.all[2]
+        expect(event.payload['url']).to eq("http://google.com")
+      end
+
+      it "should check unescaped query" do
+        @checker.check
+        event = Event.all[3]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=some%20query")
+      end
+
+      it "should check properly escaped query" do
+        @checker.check
+        event = Event.all[4]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=some%20query")
+      end
+
+      it "should check unescaped unicode url" do
+        @checker.check
+        event = Event.all[5]
+        expect(event.payload['url']).to eq("http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+      it "should check unescaped unicode query" do
+        @checker.check
+        event = Event.all[6]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+      it "should check properly escaped unicode url" do
+        @checker.check
+        event = Event.all[7]
+        expect(event.payload['url']).to eq("http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+      it "should check properly escaped unicode query" do
+        @checker.check
+        event = Event.all[8]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+    end
+  end
 end

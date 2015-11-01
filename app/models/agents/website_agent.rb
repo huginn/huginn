@@ -1,5 +1,7 @@
 require 'nokogiri'
 require 'date'
+require 'uri'
+require 'addressable/uri'
 
 module Agents
   class WebsiteAgent < Agent
@@ -259,13 +261,24 @@ module Agents
       end
     end
 
+    def get_valid_url(url)
+      if (url =~ URI::ABS_URI) 
+      	return url
+      end
+
+      parsed = Addressable::URI.parse(url)      
+      return parsed.normalize.to_s
+    end
+
     def check_url(url, payload = {})
       unless /\Ahttps?:\/\//i === url
         error "Ignoring a non-HTTP url: #{url.inspect}"
         return
       end
-      log "Fetching #{url}"
-      response = faraday.get(url)
+
+      valid_url = get_valid_url(url)
+      log "Fetching #{valid_url}"
+      response = faraday.get(valid_url)
       raise "Failed: #{response.inspect}" unless response.success?
 
       interpolation_context.stack {
@@ -303,7 +316,7 @@ module Agents
           interpolated['extract'].keys.each do |name|
             result[name] = output[name][index]
             if name.to_s == 'url'
-              result[name] = (response.env[:url] + result[name]).to_s
+              result[name] = (response.env[:url] + get_valid_url(result[name])).to_s
             end
           end
 
