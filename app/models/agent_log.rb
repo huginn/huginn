@@ -14,6 +14,8 @@ class AgentLog < ActiveRecord::Base
   before_validation :scrub_message
   before_save :truncate_message
 
+  scope :errors, lambda { where('level > 3') }
+
   def self.log_for_agent(agent, message, options = {})
     puts "Agent##{agent.id}: #{message}" unless Rails.env.test?
 
