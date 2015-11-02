@@ -23,6 +23,7 @@ module Agents
         * `verbs` - Comma-separated list of http verbs your agent will accept.
           For example, "post,get" will enable POST and GET requests. Defaults
           to "post".
+        * `response` - The response message to the request. Defaults to 'Event Created'.
       MD
     end
 
@@ -53,7 +54,7 @@ module Agents
         create_event(payload: payload)
       end
 
-      ['Event Created', 201]
+      [response_message, 201]
     end
 
     def working?
@@ -68,6 +69,10 @@ module Agents
 
     def payload_for(params)
       Utils.value_at(params, interpolated['payload_path']) || {}
+    end
+
+    def response_message
+      interpolated['response'] || 'Event Created'
     end
   end
 end

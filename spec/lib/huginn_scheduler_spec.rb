@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'huginn_scheduler'
 
 describe HuginnScheduler do

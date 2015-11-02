@@ -11,6 +11,8 @@ module Agents
 
       `expected_receive_period_in_days` is used to determine if the Agent is working. Set it to the maximum number of days
       that you anticipate passing without this Agent receiving an incoming Event.
+
+      `max_emitted_events` is used to limit the number of the maximum events which should be created. If you omit this DelayAgent will create events for every event stored in the memory.
     MD
 
     def default_options
@@ -55,10 +57,16 @@ module Agents
 
     def check
       if memory['event_ids'] && memory['event_ids'].length > 0
-        received_events.where(id: memory['event_ids']).reorder('events.id asc').each do |event|
-          create_event payload: event.payload
+        events = received_events.where(id: memory['event_ids']).reorder('events.id asc')
+
+        if options['max_emitted_events'].present?
+          events = events.limit(options['max_emitted_events'].to_i)
         end
-        memory['event_ids'] = []
+
+        events.each do |event|
+          create_event payload: event.payload
+          memory['event_ids'].delete(event.id)
+        end
       end
     end
   end

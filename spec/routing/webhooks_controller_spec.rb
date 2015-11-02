@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe "routing for web requests", :type => :routing do
   it "routes to handle_request" do

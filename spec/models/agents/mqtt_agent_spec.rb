@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'mqtt'
 require './spec/support/fake_mqtt_server'
 
