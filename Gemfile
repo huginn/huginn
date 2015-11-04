@@ -43,6 +43,9 @@ gem 'haversine'
 gem 'omniauth-evernote'
 gem 'evernote_oauth'
 
+# SimpleMetaAgent
+gem 'metainspector'
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
