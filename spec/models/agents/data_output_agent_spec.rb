@@ -193,6 +193,16 @@ describe Agents::DataOutputAgent do
         XML
       end
 
+      it "can output RSS with hub links when push_hubs is specified" do
+        stub(agent).feed_link { "https://yoursite.com" }
+        agent.options[:push_hubs] = %w[https://pubsubhubbub.superfeedr.com/ https://pubsubhubbub.appspot.com/]
+        content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+        expect(status).to eq(200)
+        expect(content_type).to eq('text/xml')
+        xml = Nokogiri::XML(content)
+        expect(xml.xpath('/rss/channel/atom:link[@rel="hub"]/@href').map(&:text).sort).to eq agent.options[:push_hubs].sort
+      end
+
       it "can output JSON" do
         agent.options['template']['item']['foo'] = "hi"
 
