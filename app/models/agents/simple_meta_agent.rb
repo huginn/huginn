@@ -58,8 +58,12 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         if url = Utils.value_at(event.payload, interpolated['url_path'])
-          page = MetaInspector.new(url)
-          create_event payload: event.payload.merge(meta: page.to_hash, untracked_url: page.untracked_url)
+          begin
+            page = MetaInspector.new(url, connection_timeout: 10)
+          rescue Faraday::TimeoutError
+          else
+            create_event payload: event.payload.merge(meta: page.to_hash, untracked_url: page.untracked_url)
+          end
         end
       end
     end
