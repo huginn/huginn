@@ -79,7 +79,6 @@ describe Agents::TumblrPublishAgent do
     describe '#receive' do
       it 'should publish any payload it receives and handle error' do
         Agents::TumblrPublishAgent.async_receive(@checker.id, [@event.id])
-        puts "events #{@checker.events.inspect}"
         expect(@checker.events.count).to eq(0)
       end
     end
