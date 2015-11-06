@@ -61,7 +61,7 @@ class Rufus::Scheduler
         job.scheduler_agent_id = agent_id
 
         if scheduler_agent = job.scheduler_agent
-          scheduler_agent.check!
+          scheduler_agent.control!
         else
           puts "Unscheduling SchedulerAgent##{job.scheduler_agent_id} (disabled or deleted)"
           job.unschedule
