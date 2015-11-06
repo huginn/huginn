@@ -142,7 +142,7 @@ shared_examples_for AgentControllerConcern do
       agent.save!
       old_options = agents(:bob_data_output_agent).options
 
-      agent.check
+      agent.control!
 
       expect(agent.control_targets.reload).to all(satisfy { |a| a.options['template'] && a.options['template']['item'] && (a.options['template']['item']['title'] == 'changed') })
       expect(agents(:bob_data_output_agent).reload.options).to eq(old_options.deep_merge(agent.options['configure_options']))
