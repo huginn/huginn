@@ -87,7 +87,7 @@ module Agents
       true
     end
 
-    def check
+    def check!
       control!
     end
 

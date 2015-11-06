@@ -88,7 +88,7 @@ describe Agents::SchedulerAgent do
   describe "check!" do
     it "should control targets" do
       stub(agent).control!.once { nil }
-      agent.check
+      agent.check!
     end
   end
 end
