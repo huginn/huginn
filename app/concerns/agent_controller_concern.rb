@@ -7,7 +7,7 @@ module AgentControllerConcern
 
   def default_options
     {
-      'action' => 'run',
+      'action' => 'run'
     }
   end
 
@@ -68,7 +68,7 @@ module AgentControllerConcern
             log "Agent '#{target.name}' is disabled"
           end
         when 'configure'
-          target.update!(options: target.options.merge(interpolated['configure_options']))
+          target.update! options: target.options.deep_merge(interpolated['configure_options'])
           log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"
         when ''
           # Do nothing
