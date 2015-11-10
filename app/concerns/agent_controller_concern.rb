@@ -68,7 +68,8 @@ module AgentControllerConcern
             log "Agent '#{target.name}' is disabled"
           end
         when 'configure'
-          target.update! options: target.options.deep_merge(interpolated['configure_options'])
+          new_options = target.options.deep_merge(interpolated['configure_options']) { |key, old, new| !(new.kind_of?(Array) && old.kind_of?(Array)) ? new : (old+new).uniq }
+          target.update! options: new_options
           log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"
         when ''
           # Do nothing
