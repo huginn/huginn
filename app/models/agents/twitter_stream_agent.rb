@@ -176,7 +176,7 @@ module Agents
 
       def stop
         EventMachine.stop_event_loop if EventMachine.reactor_running?
-        thread.terminate
+        terminate_thread!
       end
 
       private

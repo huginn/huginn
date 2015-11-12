@@ -193,6 +193,7 @@ describe Agents::TwitterStreamAgent do
     context "#stop" do
       it "stops the thread" do
         mock(@worker.thread).terminate
+        mock(@worker.thread).status
         @worker.stop
       end
     end
