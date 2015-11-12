@@ -223,6 +223,80 @@ describe Agents::WebhookAgent do
 
       end
 
+      context "with reCAPTCHA" do
+        it "should not check a reCAPTCHA response unless recaptcha_secret is set" do
+          checked = false
+          out = nil
+
+          stub_request(:any, /verify/).to_return { |request|
+            checked = true
+            { status: 200, body: '{"success":false}' }
+          }
+
+          expect {
+            out= agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+          }.not_to change { checked }
+
+          expect(out).to eq(["Event Created", 201])
+        end
+
+        it "should reject a request if recaptcha_secret is set but g-recaptcha-response is not given" do
+          agent.options['recaptcha_secret'] = 'supersupersecret'
+
+          checked = false
+          out = nil
+
+          stub_request(:any, /verify/).to_return { |request|
+            checked = true
+            { status: 200, body: '{"success":false}' }
+          }
+
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+          }.not_to change { checked }
+
+          expect(out).to eq(["Not Authorized", 401])
+        end
+
+        it "should reject a request if recaptcha_secret is set and g-recaptcha-response given is not verified" do
+          agent.options['recaptcha_secret'] = 'supersupersecret'
+
+          checked = false
+          out = nil
+
+          stub_request(:any, /verify/).to_return { |request|
+            checked = true
+            { status: 200, body: '{"success":false}' }
+          }
+
+          expect {
+            out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload, 'g-recaptcha-response' => 'somevalue' }, "post", "text/html")
+          }.to change { checked }
+
+          expect(out).to eq(["Not Authorized", 401])
+        end
+
+        it "should accept a request if recaptcha_secret is set and g-recaptcha-response given is verified" do
+          agent.options['payload_path'] = '.'
+          agent.options['recaptcha_secret'] = 'supersupersecret'
+
+          checked = false
+          out = nil
+
+          stub_request(:any, /verify/).to_return { |request|
+            checked = true
+            { status: 200, body: '{"success":true}' }
+          }
+
+          expect {
+            out = agent.receive_web_request(payload.merge({ 'secret' => 'foobar', 'g-recaptcha-response' => 'somevalue' }), "post", "text/html")
+          }.to change { checked }
+
+          expect(out).to eq(["Event Created", 201])
+          expect(Event.last.payload).to eq(payload)
+        end
+      end
+
     end
 
   end
