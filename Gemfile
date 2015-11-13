@@ -154,4 +154,6 @@ end
 on_heroku do
   gem 'pg'
   gem 'rails_12factor', group: :production
+  # uncomment to use `rake heroku:restart`
+  # gem 'heroku-api'
 end
