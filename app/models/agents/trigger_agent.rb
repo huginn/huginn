@@ -7,7 +7,25 @@ module Agents
     description <<-MD
       The Trigger Agent will watch for a specific value in an Event payload.
 
-      The `rules` array contains hashes of `path`, `value`, and `type`.  The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax.
+      The `rules` object contains hashes of `path`, `value`, and `type`.  The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax. Ex: 
+            
+          rules: 
+            {
+              filtera: 
+                {
+                  type: "!regex", 
+                  path: "text", 
+                  value: "a"
+                }, 
+              filterb: 
+                {
+                  type: "!regex", 
+                  path: "text", 
+                  value: "b"
+                }
+            }
+
+      Note: the `rules` option still accepts the deprecated array format and will automatically convert it to the new format upon save.
 
       The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.  Note that regex patterns are matched case insensitively.  If you want case sensitive matching, prefix your pattern with `(?-i)`.
 
@@ -30,9 +48,18 @@ module Agents
     MD
 
     def validate_options
-      unless options['expected_receive_period_in_days'].present? && options['rules'].present? &&
-             options['rules'].all? { |rule| rule['type'].present? && VALID_COMPARISON_TYPES.include?(rule['type']) && rule['value'].present? && rule['path'].present? }
-        errors.add(:base, "expected_receive_period_in_days, message, and rules, with a type, value, and path for every rule, are required")
+      unless options['expected_receive_period_in_days'].present?
+        errors.add(:base, "expected_receive_period_in_days is required")
+      end
+      if options['rules'].is_a? Array
+        options['rules'] = options['rules'].each_with_index.to_h.invert # converts into Hash using index as the key
+      end
+      if options['rules'].present?
+        unless options['rules'].is_a?(Hash) && options['rules'].values.all? { |rule| rule['type'].present? && VALID_COMPARISON_TYPES.include?(rule['type']) && rule['value'].present? && rule['path'].present? }
+          errors.add(:base, "The rules option should be an object where the keys identify the rule(name) and each value is an object containing the required rule inputs. Ex. rules: {'filter a': {type: '!regex', path: 'text', value: 'a'}}")
+        end
+      else
+        errors.add(:base, "rules, with a type, value, and path for every rule, are required")
       end
 
       errors.add(:base, "message is required unless 'keep_event' is 'true'") unless options['message'].present? || keep_event?
@@ -70,7 +97,8 @@ module Agents
 
         opts = interpolated(event)
 
-        match_results = opts['rules'].map do |rule|
+        opts['rules'] = opts['rules'].each_with_index.to_h.invert if opts['rules'].is_a?(Array) # makes deprecated options format still work
+        match_results = opts['rules'].values.map do |rule|
           value_at_path = Utils.value_at(event['payload'], rule['path'])
           rule_values = rule['value']
           rule_values = [rule_values] unless rule_values.is_a?(Array)
