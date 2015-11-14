@@ -17,7 +17,7 @@ module Agents
 
       * `enable`: Target Agents are enabled (if not) when this agent is triggered.
 
-      * `configure`: Target Agents have their options updated with the contents of `configure_options`. Set `configure_options_nested_array_update_mode` to `merge`(default) or `replace` when configuring arrays that are nested within the `configure_options` hash.
+      * `configure`: Target Agents have their options updated with the contents of `configure_options`. Set `nested_array_update_mode` to `merge`(default) or `replace` when configuring arrays that are nested within the `configure_options` hash.
 
       Here's a tip: you can use Liquid templating to dynamically determine the action type.  For example:
 
