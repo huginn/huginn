@@ -27,8 +27,8 @@ module AgentControllerConcern
       if options['configure_options'].nil? || options['configure_options'].keys.length == 0
         errors.add(:base, "The 'configure_options' options hash must be supplied when using the 'configure' action.")
       end
-      if options['configure_options_nested_array_update_mode'].present? && !%w(replace merge).include?(options['configure_options_nested_array_update_mode'])
-        errors.add(:base, "The 'configure_options_nested_array_update_mode' must be equal to 'merge' or 'replace' when provided.")
+      if options['nested_array_update_mode'].present? && !%w(replace merge).include?(options['nested_array_update_mode'])
+        errors.add(:base, "The 'nested_array_update_mode' must be equal to 'merge' or 'replace' when provided.")
       end
     when 'enable', 'disable'
     when nil
@@ -71,7 +71,7 @@ module AgentControllerConcern
             log "Agent '#{target.name}' is disabled"
           end
         when 'configure'
-          new_options = if interpolated['configure_options_nested_array_update_mode'] == 'replace'
+          new_options = if interpolated['nested_array_update_mode'] == 'replace'
                           target.options.deep_merge(interpolated['configure_options'])
                         else
                           target.options.deep_merge(interpolated['configure_options']) { |key, old, new| !(new.kind_of?(Array) && old.kind_of?(Array)) ? new : (old+new).uniq }
