@@ -6,7 +6,8 @@ Delayed::Worker.default_priority = 10
 Delayed::Worker.delay_jobs = !Rails.env.test?
 Delayed::Worker.sleep_delay = (ENV['DELAYED_JOB_SLEEP_DELAY'].presence || 10).to_f
 
-Delayed::Worker.logger = Rails.logger
+# Delayed::Worker.logger = Logger.new(Rails.root.join('log', 'delayed_job.log'))
+# Delayed::Worker.logger.level = Logger::DEBUG
 
 class Delayed::Job
   scope :pending, ->{ where("locked_at IS NULL AND attempts = 0") }
