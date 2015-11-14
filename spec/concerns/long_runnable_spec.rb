@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe LongRunnable do
   class LongRunnableAgent < Agent
@@ -76,6 +76,14 @@ describe LongRunnable do
     context "#stop!" do
       it "terminates the thread" do
         mock(@worker.thread).terminate
+        mock(@worker.thread).status { 'run' }
+        @worker.stop!
+      end
+
+      it "wakes up sleeping threads after termination" do
+        mock(@worker.thread).terminate
+        mock(@worker.thread).status { 'sleep' }
+        mock(@worker.thread).wakeup
         @worker.stop!
       end
 

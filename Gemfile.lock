@@ -20,9 +20,17 @@ GIT
       rest-client (~> 1.8)
 
 GIT
-  remote: git://github.com/knu/tumblr_client.git
-  revision: d6f1f64a7cba381345c588e28ebcff28048c3a6c
-  branch: patch-1
+  remote: git://github.com/lostisland/faraday_middleware.git
+  revision: c5836ae55857272732b33eb0e0a98d60e995a376
+  branch: master
+  specs:
+    faraday_middleware (0.10.0)
+      faraday (>= 0.7.4, < 0.10)
+
+GIT
+  remote: git://github.com/tumblr/tumblr_client.git
+  revision: 0c59b04e49f2a8c89860613b18cf4e8f978d8dc7
+  branch: master
   specs:
     tumblr_client (0.8.5)
       faraday (~> 0.9.0)
@@ -187,8 +195,6 @@ GEM
     extlib (0.9.16)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
-    faraday_middleware (0.10.0)
-      faraday (>= 0.7.4, < 0.10)
     feed-normalizer (1.5.2)
       hpricot (>= 0.6)
       simple-rss (>= 1.1)
@@ -293,7 +299,7 @@ GEM
     mime-types (2.6.1)
     mini_magick (4.2.3)
     mini_portile (0.6.2)
-    minitest (5.8.0)
+    minitest (5.8.1)
     mqtt (0.3.1)
     multi_json (1.11.2)
     multi_xml (0.5.5)
@@ -442,8 +448,8 @@ GEM
       tilt (~> 1.1)
     select2-rails (3.5.9.3)
       thor (~> 0.14)
-    shoulda-matchers (2.8.0)
-      activesupport (>= 3.0.0)
+    shoulda-matchers (3.0.0)
+      activesupport (>= 4.0.0)
     signet (0.5.1)
       addressable (>= 2.2.3)
       faraday (>= 0.9.0.rc5)
@@ -553,7 +559,7 @@ DEPENDENCIES
   em-http-request (~> 1.1.2)
   evernote_oauth
   faraday (~> 0.9.0)
-  faraday_middleware (>= 0.10.0)
+  faraday_middleware!
   feed-normalizer
   ffi (>= 1.9.4)
   font-awesome-sass (~> 4.3.2)

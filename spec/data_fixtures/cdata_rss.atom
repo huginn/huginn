@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-gb">
+  <link rel="self" type="application/atom+xml" href="http://rainmeter.net/forum/feed.php" />
+  <title>Rainmeter Forums</title>
+  <link href="http://rainmeter.net/forum/index.php" />
+  <updated>2015-10-11T14:52:35+00:00</updated>
+  <author>
+    <name><![CDATA[Rainmeter Forums]]></name>
+  </author>
+  <id>http://rainmeter.net/forum/feed.php</id>
+  <entry>
+    <author>
+      <name><![CDATA[supergergo]]></name>
+    </author>
+    <updated>2015-10-11T14:52:35+00:00</updated>
+    <published>2015-10-11T14:52:35+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21984&amp;p=116390#p116390</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21984&amp;p=116390#p116390" />
+    <title type="html"><![CDATA[Help: Rainmeter Skins • Re: Cannot change font for Simple Launcher]]></title>
+    <category term="Help: Rainmeter Skins" scheme="http://rainmeter.net/forum/viewforum.php?f=5" label="Help: Rainmeter Skins" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21984&amp;p=116390#p116390"><![CDATA[<div class="quotewrapper"><div class="quotetitle">jsmorley wrote:</div><div class="quotecontent"><br />You don't use the file name of the font, you use the internal font name.<br /><br /><span style="background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #869AA8; color: #2E8B57; display: inline; font-family: Monaco,'Andale Mono','Courier New',Courier,monospace; font-size: 1em; font-style: normal; line-height: 1.3em; padding: 0 3px;">FontFace=ITC Avant Garde Pro XLt</span><br /><br /><div class="attachwrapper">1.jpg</div><br /></div></div><br /><br />Thank you!!<p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=35297">supergergo</a> — 29 minutes ago</p><hr />]]></content>
+  </entry>
+  <entry>
+    <author>
+      <name><![CDATA[redsaph]]></name>
+    </author>
+    <updated>2015-10-11T13:51:44+00:00</updated>
+    <published>2015-10-11T13:51:44+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21411&amp;p=116389#p116389</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21411&amp;p=116389#p116389" />
+    <title type="html"><![CDATA[Plugins &amp; Addons • Re: Plugin: ColorExtract]]></title>
+    <category term="Plugins &amp; Addons" scheme="http://rainmeter.net/forum/viewforum.php?f=18" label="Plugins &amp; Addons" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21411&amp;p=116389#p116389"><![CDATA[This is pretty great! The things we can do with this plugin...  <img src="http://rainmeter.net/forum/images/smilies/yikes.gif" alt=":o" title="Shocked" /><p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=28432">redsaph</a> — Today, 1:51 pm</p><hr />]]></content>
+  </entry>
+  <entry>
+    <author>
+      <name><![CDATA[jsmorley]]></name>
+    </author>
+    <updated>2015-10-11T13:36:51+00:00</updated>
+    <published>2015-10-11T13:36:51+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21984&amp;p=116388#p116388</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21984&amp;p=116388#p116388" />
+    <title type="html"><![CDATA[Help: Rainmeter Skins • Re: Cannot change font for Simple Launcher]]></title>
+    <category term="Help: Rainmeter Skins" scheme="http://rainmeter.net/forum/viewforum.php?f=5" label="Help: Rainmeter Skins" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21984&amp;p=116388#p116388"><![CDATA[You don't use the file name of the font, you use the internal font name.<br /><br /><span style="background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #869AA8; color: #2E8B57; display: inline; font-family: Monaco,'Andale Mono','Courier New',Courier,monospace; font-size: 1em; font-style: normal; line-height: 1.3em; padding: 0 3px;">FontFace=ITC Avant Garde Pro XLt</span><br /><br /><div class="attachwrapper">1.jpg</div><p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=85">jsmorley</a> — Today, 1:36 pm</p><hr />]]></content>
+  </entry>
+  <entry>
+    <author>
+      <name><![CDATA[xlr8r_]]></name>
+    </author>
+    <updated>2015-10-11T13:35:15+00:00</updated>
+    <published>2015-10-11T13:35:15+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21939&amp;p=116387#p116387</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21939&amp;p=116387#p116387" />
+    <title type="html"><![CDATA[Tips &amp; Tricks • Re: Working with the HWiNFO plugin]]></title>
+    <category term="Tips &amp; Tricks" scheme="http://rainmeter.net/forum/viewforum.php?f=15" label="Tips &amp; Tricks" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21939&amp;p=116387#p116387"><![CDATA[again: one more<p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=35276">xlr8r_</a> — Today, 1:35 pm</p><hr />]]></content>
+  </entry>
+  <entry>
+    <author>
+      <name><![CDATA[supergergo]]></name>
+    </author>
+    <updated>2015-10-11T13:27:56+00:00</updated>
+    <published>2015-10-11T13:27:56+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21984&amp;p=116386#p116386</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21984&amp;p=116386#p116386" />
+    <title type="html"><![CDATA[Help: Rainmeter Skins • Cannot change font for Simple Launcher]]></title>
+    <category term="Help: Rainmeter Skins" scheme="http://rainmeter.net/forum/viewforum.php?f=5" label="Help: Rainmeter Skins" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21984&amp;p=116386#p116386"><![CDATA[Hi,<br />I simply cannot change the font for this skin. I tried the @Resources folder in the skin's root, but nothing, I also tried to install the font, but still, nothing. <br /><br />Here is a snip of my code:<br />[APP1]<br />Meter=STRING<br />X=0<br />Y=0<br />FontColor=255, 255, 255, 1000<br />FontSize=40<br />FontFace=ITCAvantGardePro-XLt<br />SolidColor=0,0,0,1<br />StringStyle=NORMAL<br />StringAlign=LEFT<br />AntiAlias=1<br />Text=&quot;University&quot;<br />LeftMouseUpAction=!Execute [&quot;C:\Users\G\Documents\Uni&quot;]<br /><br />I also tried to use other variations of the font, but still nothing happens when I save and hit refresh. Even if it says the font's name at FontFace, it does not change.<br /><br />Link for the launcher: <!-- m --><a class="postlink" href="http://danieliop.deviantart.com/art/Simple-RM-Launcher-216478809">http://danieliop.deviantart.com/art/Sim ... -216478809</a><!-- m --><p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=35297">supergergo</a> — Today, 1:27 pm</p><hr />]]></content>
+  </entry>
+  <entry>
+    <author>
+      <name><![CDATA[balala]]></name>
+    </author>
+    <updated>2015-10-11T08:27:55+00:00</updated>
+    <published>2015-10-11T08:27:55+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116381#p116381</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116381#p116381" />
+    <title type="html"><![CDATA[Help: Rainmeter Skins • Re: Test if Today is Between 2 Dates]]></title>
+    <category term="Help: Rainmeter Skins" scheme="http://rainmeter.net/forum/viewforum.php?f=5" label="Help: Rainmeter Skins" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116381#p116381"><![CDATA[If I'm not wrong your bangs are wrong, because you want to show/hide a group of meters. For that, you have to use the !ShowMeterGroup/!HideMeterGroup bangs, instead of !ShowGroup/!HideGroup. The last pair will show/hide a group of active skins, while the !ShowMeterGroup/!HideMeterGroup will show/hide a group of meters. On your posted code, One is a group of meters (it contains the [Boo] meter). So, replace the [MeasureDate] measure with something like this:<br /><div><div class="codetitle"><b>Code:</b> </div><div class="codecontent"><code>&#91;MeasureDate&#93;<br />Measure=Time<br />Format=%#m.%d<br />IfCondition=(MeasureDate &gt;= 12.02) &amp;&amp; (MeasureDate &lt;= 12.25)<br />IfTrueAction=&#91;!ShowMeterGroup One&#93;<br />IfFalseAction=&#91;!HideMeterGroup One&#93;</code></div></div><p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=7491">balala</a> — Today, 8:27 am</p><hr />]]></content>
+  </entry>
+  <entry>
+    <author>
+      <name><![CDATA[bill98]]></name>
+    </author>
+    <updated>2015-10-11T14:02:43+00:00</updated>
+    <published>2015-10-11T07:36:57+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116380#p116380</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116380#p116380" />
+    <title type="html"><![CDATA[Help: Rainmeter Skins • Re: Test if Today is Between 2 Dates]]></title>
+    <category term="Help: Rainmeter Skins" scheme="http://rainmeter.net/forum/viewforum.php?f=5" label="Help: Rainmeter Skins" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116380#p116380"><![CDATA[Thanks!  I must have something else wrong, because it always shows the group/Image.<br /><br /><div><div class="codetitle"><b>Code:</b> </div><div class="codecontent"><code>&#91;Variables&#93;<br />@Include1=#@#VariablesM2.inc<br />@Include2=#@#FloatingImage.inc<br />IN=1<br />;Holiday<br /><br />&#91;mIName&#93;<br />Measure=String<br />String=#IN#<br />DynamicVariables=1<br />RegExpSubstitute=1<br />Substitute=&quot;^1$&quot;:&quot;#1IName#&quot;,&quot;^2$&quot;:&quot;#2IName#&quot;,&quot;^3$&quot;:&quot;#3IName#&quot;,&quot;^4$&quot;:&quot;#4IName#&quot;,&quot;^5$&quot;:&quot;#5IName#&quot;,&quot;^6$&quot;:&quot;#6IName#&quot;,&quot;^7$&quot;:&quot;#7IName#&quot;,&quot;^8$&quot;:&quot;#8IName#&quot;,&quot;^9$&quot;:&quot;#9IName#&quot;,&quot;^10$&quot;:&quot;#10IName#&quot;<br /><br />&#91;mSizex&#93;<br />Measure=String<br />String=#IN#<br />DynamicVariables=1<br />RegExpSubstitute=1<br />Substitute=&quot;^1$&quot;:&quot;#1Sizex#&quot;,&quot;^2$&quot;:&quot;#2Sizex#&quot;,&quot;^3$&quot;:&quot;#3Sizex#&quot;,&quot;^4$&quot;:&quot;#4Sizex#&quot;,&quot;^5$&quot;:&quot;#5Sizex#&quot;,&quot;^6$&quot;:&quot;#6Sizex#&quot;,&quot;^7$&quot;:&quot;#7Sizex#&quot;,&quot;^8$&quot;:&quot;#8Sizex#&quot;,&quot;^9$&quot;:&quot;#9Sizex#&quot;,&quot;^10$&quot;:&quot;#10Sizex#&quot;<br /><br />&#91;mSizey&#93;<br />Measure=String<br />String=#IN#<br />DynamicVariables=1<br />RegExpSubstitute=1<br />Substitute=&quot;^1$&quot;:&quot;#1Sizey#&quot;,&quot;^2$&quot;:&quot;#2Sizey#&quot;,&quot;^3$&quot;:&quot;#3Sizey#&quot;,&quot;^4$&quot;:&quot;#4Sizey#&quot;,&quot;^5$&quot;:&quot;#5Sizey#&quot;,&quot;^6$&quot;:&quot;#6Sizey#&quot;,&quot;^7$&quot;:&quot;#7Sizey#&quot;,&quot;^8$&quot;:&quot;#8Sizey#&quot;,&quot;^9$&quot;:&quot;#9Sizey#&quot;,&quot;^10$&quot;:&quot;#10Sizey#&quot;<br /><br />&#91;mXMovemt&#93;<br />Measure=String<br />String=#IN#<br />DynamicVariables=1<br />RegExpSubstitute=1<br />Substitute=&quot;^1$&quot;:&quot;#1XMovemt#&quot;,&quot;^2$&quot;:&quot;#2XMovemt#&quot;,&quot;^3$&quot;:&quot;#3XMovemt#&quot;,&quot;^4$&quot;:&quot;#4XMovemt#&quot;,&quot;^5$&quot;:&quot;#5XMovemt#&quot;,&quot;^6$&quot;:&quot;#6XMovemt#&quot;,&quot;^7$&quot;:&quot;#7XMovemt#&quot;,&quot;^8$&quot;:&quot;#8XMovemt#&quot;,&quot;^9$&quot;:&quot;#9XMovemt#&quot;,&quot;^10$&quot;:&quot;#10XMovemt#&quot;<br /><br />&#91;mYMovemt&#93;<br />Measure=String<br />String=#IN#<br />DynamicVariables=1<br />RegExpSubstitute=1<br />Substitute=&quot;^1$&quot;:&quot;#1YMovemt#&quot;,&quot;^2$&quot;:&quot;#2YMovemt#&quot;,&quot;^3$&quot;:&quot;#3YMovemt#&quot;,&quot;^4$&quot;:&quot;#4YMovemt#&quot;,&quot;^5$&quot;:&quot;#5YMovemt#&quot;,&quot;^6$&quot;:&quot;#6YMovemt#&quot;,&quot;^7$&quot;:&quot;#7YMovemt#&quot;,&quot;^8$&quot;:&quot;#8YMovemt#&quot;,&quot;^9$&quot;:&quot;#9YMovemt#&quot;,&quot;^10$&quot;:&quot;#10YMovemt#&quot;<br /><br />&#91;mUpDDiv&#93;<br />Measure=String<br />String=#IN#<br />DynamicVariables=1<br />RegExpSubstitute=1<br />Substitute=&quot;^1$&quot;:&quot;#1UpDDiv#&quot;,&quot;^2$&quot;:&quot;#2UpDDiv#&quot;,&quot;^3$&quot;:&quot;#3UpDDiv#&quot;,&quot;^4$&quot;:&quot;#4UpDDiv#&quot;,&quot;^5$&quot;:&quot;#5UpDDiv#&quot;,&quot;^6$&quot;:&quot;#6UpDDiv#&quot;,&quot;^7$&quot;:&quot;#7UpDDiv#&quot;,&quot;^8$&quot;:&quot;#8UpDDiv#&quot;,&quot;^9$&quot;:&quot;#9UpDDiv#&quot;,&quot;^10$&quot;:&quot;#10UpDDiv#&quot;<br /><br />&#91;MeasureDate&#93;<br />Measure=Time<br />Format=%#m.%d<br />IfCondition=(MeasureDate &gt;= 12.02) &amp;&amp; (MeasureDate &lt;= 12.25)<br />IfTrueAction=&#91;!ShowGroup One&#93;<br />IfFalseAction=&#91;!HideGroup One&#93;<br /><br /><br />&#91;RX&#93;<br />Measure=Calc<br />Formula=Random<br />UpdateRandom=1<br />LowBound=(#Xc#-(&#91;mSizex&#93;+&#91;mXMovemt&#93;))<br />HighBound=(#Xc#+&#91;mXMovemt&#93;)<br />DynamicVariables=1<br />UpdateDivider=&#91;mUpDDiv&#93;<br /><br /><br />&#91;RY&#93;<br />Measure=Calc<br />Formula=Random<br />UpdateRandom=1<br />LowBound=(#Yc#-(&#91;mSizey&#93;+&#91;mYMovemt&#93;))<br />HighBound=(#Yc#+&#91;mYMovemt&#93;)<br />DynamicVariables=1<br />UpdateDivider=&#91;mUpDDiv&#93;<br /><br />&#91;Boo&#93;<br />Meter=Image<br />ImageName=#@#icons\&#91;mIName&#93;<br />x=&#91;RX&#93;<br />Y=&#91;RY&#93;<br />DynamicVariables=1<br />Group=One<br /><br /><br />&#91;SHData&#93;<br />Meter=String<br />x=900<br />y=50<br />FontSize=15<br />FontColor=0,0,0,255<br />Text=Xc=#Xc##CRLF#Yc=#Yc##CRLF#RX=&#91;RX&#93;#CRLF#RY=&#91;RY&#93;#CRLF#Xmovemt=&#91;mXmovemt&#93;#CRLF#YMovemt=&#91;mYMovemt&#93;#CRLF#UpDDivider=&#91;mUpDDiv&#93;#CRLF#&#91;MeasureDate&#93;</code></div></div><p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=10741">bill98</a> — Today, 7:36 am</p><hr />]]></content>
+  </entry>
+  <entry>
+    <author>
+      <name><![CDATA[balala]]></name>
+    </author>
+    <updated>2015-10-11T05:42:06+00:00</updated>
+    <published>2015-10-11T05:42:06+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21980&amp;p=116379#p116379</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21980&amp;p=116379#p116379" />
+    <title type="html"><![CDATA[Help: Rainmeter Skins • Re: Lano Visualizer - computer can't auto-sleep]]></title>
+    <category term="Help: Rainmeter Skins" scheme="http://rainmeter.net/forum/viewforum.php?f=5" label="Help: Rainmeter Skins" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21980&amp;p=116379#p116379"><![CDATA[I had the same issue a while ago. I also looked for a fix/solution, but found no one. Finaly I stoped using any visualizer skin. But I also would be interested finding a fix, if it's possible. There is one?<p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=7491">balala</a> — Today, 5:42 am</p><hr />]]></content>
+  </entry>
+  <entry>
+    <author>
+      <name><![CDATA[balala]]></name>
+    </author>
+    <updated>2015-10-11T05:37:02+00:00</updated>
+    <published>2015-10-11T05:37:02+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116378#p116378</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116378#p116378" />
+    <title type="html"><![CDATA[Help: Rainmeter Skins • Re: Test if Today is Between 2 Dates]]></title>
+    <category term="Help: Rainmeter Skins" scheme="http://rainmeter.net/forum/viewforum.php?f=5" label="Help: Rainmeter Skins" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116378#p116378"><![CDATA[Don't use the IfMatch/IfMatchAction/IfNotMatchAction options, instead try with IfConditions. To do that, you have to properly format the date. Instead of the <span style="background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #869AA8; color: #2E8B57; display: inline; font-family: Monaco,'Andale Mono','Courier New',Courier,monospace; font-size: 1em; font-style: normal; line-height: 1.3em; padding: 0 3px;">Format=%m%d</span>, try this format option: <span style="background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #869AA8; color: #2E8B57; display: inline; font-family: Monaco,'Andale Mono','Courier New',Courier,monospace; font-size: 1em; font-style: normal; line-height: 1.3em; padding: 0 3px;">Format=%m.%d</span>. Now you'll have a date formated as a decimal number (eg for today I have right now 10.11). This way you can use the IfConditions:<br /><div><div class="codetitle"><b>Code:</b> </div><div class="codecontent"><code>&#91;MeasureDate&#93;<br />Measure=Time<br />Format=%#m.%d<br />IfCondition=((MeasureDate&gt;=10.01)&amp;&amp;(MeasureDate&lt;=10.09))<br />IfTrueAction=&#91;!ShowGroup One&#93;<br />IfFalseAction=&#91;!HideGroup One&#93;</code></div></div><br />Two other comments about your code:<br />1. I don't think you'd need the <span style="background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #869AA8; color: #2E8B57; display: inline; font-family: Monaco,'Andale Mono','Courier New',Courier,monospace; font-size: 1em; font-style: normal; line-height: 1.3em; padding: 0 3px;">IfConditionMode=1</span>/<span style="background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #869AA8; color: #2E8B57; display: inline; font-family: Monaco,'Andale Mono','Courier New',Courier,monospace; font-size: 1em; font-style: normal; line-height: 1.3em; padding: 0 3px;">IfMatchMode=1</span> option. Without it, the condition will be checked when the date is changing, with it, on every update cycle. It's useless.<br />2. Even if you'd try to use the IfMatch option, in your code that was wrong: you can't use operators (=, &lt; or &gt;), because we're talking about strings.<p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=7491">balala</a> — Today, 5:37 am</p><hr />]]></content>
+  </entry>
+  <entry>
+    <author>
+      <name><![CDATA[bill98]]></name>
+    </author>
+    <updated>2015-10-11T03:38:51+00:00</updated>
+    <published>2015-10-11T03:38:51+00:00</published>
+    <id>http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116377#p116377</id>
+    <link href="http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116377#p116377" />
+    <title type="html"><![CDATA[Help: Rainmeter Skins • Test if Today is Between 2 Dates]]></title>
+    <category term="Help: Rainmeter Skins" scheme="http://rainmeter.net/forum/viewforum.php?f=5" label="Help: Rainmeter Skins" />
+    <content type="html" xml:base="http://rainmeter.net/forum/viewtopic.php?t=21982&amp;p=116377#p116377"><![CDATA[Can I do something like this to test if the date is between two dates<br /><br /><br />[MeasureDate]<br />Measure=Time<br />Format=%m%d<br />IfMatch&gt;=1001 &amp;&amp; &lt;=1009<br />IfMatchAction=[!ShowGroup One]<br />IfNotMatchAction=[!HideGroup One]<br />IfMatchMode=1<p>Statistics: Posted by <a href="http://rainmeter.net/forum/memberlist.php?mode=viewprofile&amp;u=10741">bill98</a> — Today, 3:38 am</p><hr />]]></content>
+  </entry>
+</feed>

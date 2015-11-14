@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::SchedulerAgent do
   let(:valid_params) {
@@ -82,13 +82,6 @@ describe Agents::SchedulerAgent do
       }
       agent.save
       expect(agent.memory['scheduled_at']).to be_nil
-    end
-  end
-
-  describe "check!" do
-    it "should control targets" do
-      stub(agent).control!.once { nil }
-      agent.check!
     end
   end
 end

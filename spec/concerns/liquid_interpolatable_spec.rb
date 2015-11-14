@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'nokogiri'
 
 describe LiquidInterpolatable::Filters do

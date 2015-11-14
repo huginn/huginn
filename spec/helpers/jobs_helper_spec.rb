@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe JobsHelper do
   let(:job) { Delayed::Job.new }

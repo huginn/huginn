@@ -264,8 +264,9 @@ module Agents
         error "Ignoring a non-HTTP url: #{url.inspect}"
         return
       end
-      log "Fetching #{url}"
-      response = faraday.get(url)
+      uri = Utils.normalize_uri(url)
+      log "Fetching #{uri}"
+      response = faraday.get(uri)
       raise "Failed: #{response.inspect}" unless response.success?
 
       interpolation_context.stack {
@@ -303,7 +304,7 @@ module Agents
           interpolated['extract'].keys.each do |name|
             result[name] = output[name][index]
             if name.to_s == 'url'
-              result[name] = (response.env[:url] + result[name]).to_s
+              result[name] = (response.env[:url] + Utils.normalize_uri(result[name])).to_s
             end
           end
 
@@ -439,7 +440,14 @@ module Agents
         case nodes
         when Nokogiri::XML::NodeSet
           result = nodes.map { |node|
-            case value = node.xpath(extraction_details['value'] || '.')
+            value = node.xpath(extraction_details['value'] || '.')
+            if value.is_a?(Nokogiri::XML::NodeSet)
+              child = value.first
+              if child && child.cdata?
+                value = child.text
+              end
+            end
+            case value
             when Float
               # Node#xpath() returns any numeric value as float;
               # convert it to integer as appropriate.

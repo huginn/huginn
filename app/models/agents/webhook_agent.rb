@@ -18,11 +18,12 @@ module Agents
         * `expected_receive_period_in_days` - How often you expect to receive
           events this way. Used to determine if the agent is working.
         * `payload_path` - JSONPath of the attribute in the POST body to be
-          used as the Event payload.  If `payload_path` points to an array,
-          Events will be created for each element.
+          used as the Event payload.  Set to `.` to return the entire message.
+          If `payload_path` points to an array, Events will be created for each element.
         * `verbs` - Comma-separated list of http verbs your agent will accept.
           For example, "post,get" will enable POST and GET requests. Defaults
           to "post".
+        * `response` - The response message to the request. Defaults to 'Event Created'.
       MD
     end
 
@@ -53,7 +54,7 @@ module Agents
         create_event(payload: payload)
       end
 
-      ['Event Created', 201]
+      [response_message, 201]
     end
 
     def working?
@@ -68,6 +69,10 @@ module Agents
 
     def payload_for(params)
       Utils.value_at(params, interpolated['payload_path']) || {}
+    end
+
+    def response_message
+      interpolated['response'] || 'Event Created'
     end
   end
 end

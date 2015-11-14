@@ -65,9 +65,8 @@
               <div class="can-control-other-agents">
                 <div class="form-group">
                   <%= f.label :control_targets %>
-                  <% eventControlTargets = current_user.agents.select(&:can_be_scheduled?) %>
                   <%= f.select(:control_target_ids,
-                               options_for_select(eventControlTargets.map {|s| [s.name, s.id] },
+                               options_for_select(current_user.agents.map {|s| [s.name, s.id] },
                                                   @agent.control_target_ids),
                                {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
                 </div>

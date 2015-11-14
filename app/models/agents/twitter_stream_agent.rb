@@ -125,13 +125,13 @@ module Agents
     end
 
     def self.setup_worker
-      if Agents::TwitterStreamAgent.dependencies_missing?
-        STDERR.puts Agents::TwitterStreamAgent.twitter_dependencies_missing
-        STDERR.flush
-        return false
-      end
-
       Agents::TwitterStreamAgent.active.group_by { |agent| agent.twitter_oauth_token }.map do |oauth_token, agents|
+        if Agents::TwitterStreamAgent.dependencies_missing?
+          STDERR.puts Agents::TwitterStreamAgent.twitter_dependencies_missing
+          STDERR.flush
+          return false
+        end
+
         filter_to_agent_map = agents.map { |agent| agent.options[:filters] }.flatten.uniq.compact.map(&:strip).inject({}) { |m, f| m[f] = []; m }
 
         agents.each do |agent|
@@ -176,7 +176,7 @@ module Agents
 
       def stop
         EventMachine.stop_event_loop if EventMachine.reactor_running?
-        thread.terminate
+        terminate_thread!
       end
 
       private

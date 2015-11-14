@@ -196,7 +196,7 @@ module Agents
     end
 
     def uri_path_escape(string)
-      str = string.dup.force_encoding(Encoding::ASCII_8BIT)  # string.b in Ruby >=2.0
+      str = string.b
       str.gsub!(/([^A-Za-z0-9\-._~!$&()*+,=@]+)/) { |m|
         '%' + m.unpack('H2' * m.bytesize).join('%').upcase
       }
