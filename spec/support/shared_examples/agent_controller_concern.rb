@@ -51,15 +51,15 @@ shared_examples_for AgentControllerConcern do
         expect(agent).to be_valid
       end
 
-      it "should allow 'configure_options_nested_array_update_mode' to exist in options when the action is 'configure'" do
+      it "should allow 'nested_array_update_mode' to exist in options when the action is 'configure'" do
         agent.options['action'] = 'configure'
         agent.options['configure_options'] = { 'key' => 'value' }
         expect(agent).to be_valid
-        agent.options['configure_options_nested_array_update_mode'] = 'replace'
+        agent.options['nested_array_update_mode'] = 'replace'
         expect(agent).to be_valid
-        agent.options['configure_options_nested_array_update_mode'] = 'merge'
+        agent.options['nested_array_update_mode'] = 'merge'
         expect(agent).to be_valid
-        agent.options['configure_options_nested_array_update_mode'] = 'fail'
+        agent.options['nested_array_update_mode'] = 'fail'
         expect(agent).not_to be_valid
       end
     end
@@ -179,10 +179,10 @@ shared_examples_for AgentControllerConcern do
       expect(agent.control_targets.reload).to all(satisfy { |a| a.options['rules'] && a.options['rules'].last['value'] && (a.options['rules'].last['value'] == 'changed') })
       expect(agents(:bob_trigger_agent).reload.options).to eq(new_options)
     end
-    it "should replace configured target's nested array when 'configure_options_nested_array_update_mode' is set to 'replace'" do
+    it "should replace configured target's nested array when 'nested_array_update_mode' is set to 'replace'" do
       agent.control_targets << agents(:bob_trigger_agent)
       agent.options['action'] = 'configure'
-      agent.options['configure_options_nested_array_update_mode'] = 'replace'
+      agent.options['nested_array_update_mode'] = 'replace'
       agent.options['configure_options'] = { 
           rules: [
               {
