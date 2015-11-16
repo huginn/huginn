@@ -10,7 +10,7 @@ describe Agents::SimpleMetaAgent do
   end
   let(:agent) do
     _agent = Agents::SimpleMetaAgent.new(name: 'My SimpleMetaAgent')
-    _agent.options = _agent.default_options.merge(url_path: 'url')
+    _agent.options = _agent.default_options.merge(url: '{{url}}')
     _agent.user = users(:bob)
     _agent.sources << agents(:bob_website_agent)
     _agent.save!
@@ -40,8 +40,8 @@ describe Agents::SimpleMetaAgent do
       agent.options['expected_receive_period_in_days'] = -1
       expect(agent).not_to be_valid
     end
-    it "should validate presence of url_path" do
-      agent.options[:url_path] = nil
+    it "should validate presence of url" do
+      agent.options[:url] = nil
       expect(agent).not_to be_valid
     end
   end
@@ -53,7 +53,7 @@ describe Agents::SimpleMetaAgent do
       }.to change {Event.count}.by 1
       expect(Event.last.payload['meta']).not_to be nil
     end
-    it 'should not emit event if value at url_path is nil' do
+    it 'should not emit event if value at url is nil' do
       expect {
         agent.receive([events(:url_less_event)])
       }.to change {Event.count}.by 0

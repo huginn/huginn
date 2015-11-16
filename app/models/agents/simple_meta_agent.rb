@@ -1,11 +1,15 @@
 module Agents
   class SimpleMetaAgent < Agent
     cannot_be_scheduled!
+    can_dry_run!
+    gem_dependency_check { defined? MetaInspector }
 
     description <<-MD
-      The SimpleMetaAgent scrapes meta from url_path, merges a meta object with the event.payload and re-emits the updated event.
+      The SimpleMetaAgent scrapes meta from `url`, merges a meta object with the event.payload and re-emits the updated event.
 
-      `url_path` is a [JSONPaths](http://goessner.net/articles/JsonPath/) to the URL to extract meta from.
+      #{'## Include `metainspector` in your Gemfile to use this Agent!' if dependencies_missing?}
+
+      `url` is the URL to extract meta from. You can use liquid templating in the `url` to extract from the incoming event. Have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
       `expected_receive_period_in_days` is used to determine if the Agent is working. Set it to the maximum number of days
       that you anticipate passing without this Agent receiving an incoming Event.
@@ -37,7 +41,7 @@ module Agents
 
     def default_options
       {
-        url_path: 'path.to.url',
+        url: '{{url}}',
         expected_receive_period_in_days: "10"
       }
     end
@@ -46,8 +50,8 @@ module Agents
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
         errors.add(:base, "Please provide 'expected_receive_period_in_days' to indicate how many days can pass before this Agent is considered to be not working")
       end
-      unless options['url_path'].present?
-        errors.add(:base, "Please provide 'url_path' to indicate which value to analyze for collecting top events.")
+      unless options['url'].present?
+        errors.add(:base, "Please provide 'url' to indicate which value to analyze for collecting top events.")
       end
     end
 
@@ -57,13 +61,19 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        if url = Utils.value_at(event.payload, interpolated['url_path'])
+        opts = interpolated(event)
+        if (url = opts['url']) && (url =~ /\A#{URI::regexp(['http', 'https'])}\z/)
           begin
-            page = MetaInspector.new(url, connection_timeout: 10)
+            page = MetaInspector.new(url, connection_timeout: 10, read_timeout: 10, retries: 0)
           rescue Faraday::TimeoutError
+            log "Timeout error event ##{event.id}: #{url}"
+          rescue FaradayMiddleware::RedirectLimitReached
+            log "Redirect limit reached event ##{event.id}: #{url}"
           else
             create_event payload: event.payload.merge(meta: page.to_hash, untracked_url: page.untracked_url)
           end
+        else
+          log "Invalid URL: #{url}"
         end
       end
     end

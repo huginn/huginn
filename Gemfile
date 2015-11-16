@@ -16,6 +16,7 @@ gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
 gem 'hypdf', '~> 1.0.7'           # PDFInfoAgent
+gem 'metainspector'               # SimpleMetaAgent
 
 # Weibo Agents
 gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
@@ -42,9 +43,6 @@ gem 'haversine'
 # EvernoteAgent
 gem 'omniauth-evernote'
 gem 'evernote_oauth'
-
-# SimpleMetaAgent
-gem 'metainspector'
 
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
