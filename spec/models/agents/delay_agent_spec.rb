@@ -108,5 +108,20 @@ describe Agents::DelayAgent do
 
       expect(agent.memory['event_ids']).to eq []
     end
+
+    it "re-emits max_emitted_events and clears just them from the memory" do
+      agent.options['max_emitted_events'] = 1
+      agent.receive([first_event, second_event, third_event])
+      expect(agent.memory['event_ids']).to eq [second_event.id, third_event.id]
+
+      expect {
+        agent.check
+      }.to change { agent.events.count }.by(1)
+
+      events = agent.events.reorder('events.id desc')
+      expect(agent.memory['event_ids']).to eq [third_event.id]
+      expect(events.first.payload).to eq second_event.payload
+
+    end
   end
 end

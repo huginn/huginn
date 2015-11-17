@@ -262,11 +262,11 @@ describe Agents::WebsiteAgent do
     describe 'encoding' do
       it 'should be forced with force_encoding option' do
         huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /no-encoding/).to_return(:body => {
-            :value => huginn,
-          }.to_json.encode(Encoding::EUC_JP), :headers => {
+        stub_request(:any, /no-encoding/).to_return(body: {
+            value: huginn,
+          }.to_json.encode(Encoding::EUC_JP).b, headers: {
             'Content-Type' => 'application/json',
-          }, :status => 200)
+          }, status: 200)
         site = {
           'name' => "Some JSON Response",
           'expected_update_period_in_days' => "2",
@@ -278,22 +278,22 @@ describe Agents::WebsiteAgent do
           },
           'force_encoding' => 'EUC-JP',
         }
-        checker = Agents::WebsiteAgent.new(:name => "No Encoding Site", :options => site)
+        checker = Agents::WebsiteAgent.new(name: "No Encoding Site", options: site)
         checker.user = users(:bob)
         checker.save!
 
-        checker.check
+        expect { checker.check }.to change { Event.count }.by(1)
         event = Event.last
         expect(event.payload['value']).to eq(huginn)
       end
 
       it 'should be overridden with force_encoding option' do
         huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /wrong-encoding/).to_return(:body => {
-            :value => huginn,
-          }.to_json.encode(Encoding::EUC_JP), :headers => {
+        stub_request(:any, /wrong-encoding/).to_return(body: {
+            value: huginn,
+          }.to_json.encode(Encoding::EUC_JP).b, headers: {
             'Content-Type' => 'application/json; UTF-8',
-          }, :status => 200)
+          }, status: 200)
         site = {
           'name' => "Some JSON Response",
           'expected_update_period_in_days' => "2",
@@ -305,11 +305,63 @@ describe Agents::WebsiteAgent do
           },
           'force_encoding' => 'EUC-JP',
         }
-        checker = Agents::WebsiteAgent.new(:name => "Wrong Encoding Site", :options => site)
+        checker = Agents::WebsiteAgent.new(name: "Wrong Encoding Site", options: site)
         checker.user = users(:bob)
         checker.save!
 
-        checker.check
+        expect { checker.check }.to change { Event.count }.by(1)
+        event = Event.last
+        expect(event.payload['value']).to eq(huginn)
+      end
+
+      it 'should be determined by charset in Content-Type' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /charset-euc-jp/).to_return(body: {
+            value: huginn,
+          }.to_json.encode(Encoding::EUC_JP), headers: {
+            'Content-Type' => 'application/json; charset=EUC-JP',
+          }, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://charset-euc-jp.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+        }
+        checker = Agents::WebsiteAgent.new(name: "Charset reader", options: site)
+        checker.user = users(:bob)
+        checker.save!
+
+        expect { checker.check }.to change { Event.count }.by(1)
+        event = Event.last
+        expect(event.payload['value']).to eq(huginn)
+      end
+
+      it 'should default to UTF-8 when unknown charset is found' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /charset-unknown/).to_return(body: {
+            value: huginn,
+          }.to_json.b, headers: {
+            'Content-Type' => 'application/json; charset=unicode',
+          }, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://charset-unknown.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+        }
+        checker = Agents::WebsiteAgent.new(name: "Charset reader", options: site)
+        checker.user = users(:bob)
+        checker.save!
+
+        expect { checker.check }.to change { Event.count }.by(1)
         event = Event.last
         expect(event.payload['value']).to eq(huginn)
       end
@@ -857,6 +909,69 @@ fire: hot
       it "should check for changes" do
         expect { @checker.check }.to change { Event.count }.by(1)
       end
+    end
+  end
+
+  describe "checking urls" do
+    before do
+      stub_request(:any, /example/).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/urlTest.html")), :status => 200)
+      @valid_options = {
+        'name' => "Url Test",
+        'expected_update_period_in_days' => "2",
+        'type' => "html",
+        'url' => "http://www.example.com",
+        'mode' => 'all',
+        'extract' => {
+          'url' => { 'css' => "a", 'value' => "@href" },
+        }
+      }
+      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)
+      @checker.user = users(:bob)
+      @checker.save!
+    end
+
+    describe "#check" do
+      before do
+        expect { @checker.check }.to change { Event.count }.by(7)
+        @events = Event.last(7)
+      end
+
+      it "should check hostname" do
+        event = @events[0]
+        expect(event.payload['url']).to eq("http://google.com")
+      end
+
+      it "should check unescaped query" do
+        event = @events[1]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=some%20query")
+      end
+
+      it "should check properly escaped query" do
+        event = @events[2]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=some%20query")
+      end
+
+      it "should check unescaped unicode url" do
+        event = @events[3]
+        expect(event.payload['url']).to eq("http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+      it "should check unescaped unicode query" do
+        event = @events[4]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+      it "should check properly escaped unicode url" do
+        event = @events[5]
+        expect(event.payload['url']).to eq("http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+      it "should check properly escaped unicode query" do
+        event = @events[6]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
     end
   end
 end

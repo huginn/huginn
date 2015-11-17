@@ -21,6 +21,18 @@ module Utils
     end
   end
 
+  def self.normalize_uri(uri)
+    begin
+      URI(uri)
+    rescue URI::Error
+      URI(uri.to_s.gsub(/[^\-_.!~*'()a-zA-Z\d;\/?:@&=+$,\[\]]+/) { |unsafe|
+            unsafe.bytes.each_with_object(String.new) { |uc, s|
+              s << sprintf('%%%02X', uc)
+            }
+          }.force_encoding(Encoding::US_ASCII))
+    end
+  end
+
   def self.interpolate_jsonpaths(value, data, options = {})
     if options[:leading_dollarsign_is_jsonpath] && value[0] == '$'
       Utils.values_at(data, value).first.to_s
