@@ -17,12 +17,10 @@ class AgentRunner
     @scheduler = Rufus::Scheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'].presence || 0.3)
 
     @scheduler.every 5 do
-      p :every
       restart_dead_workers if @running
     end
 
     @scheduler.every 60 do
-      p :every
       run_workers if @running
     end
 
