@@ -3,16 +3,20 @@ require 'huginn_scheduler'
 
 describe HuginnScheduler do
   before(:each) do
+    @rufus_scheduler = Rufus::Scheduler.new
     @scheduler = HuginnScheduler.new
     stub(@scheduler).setup {}
-    @scheduler.setup!(Rufus::Scheduler.new, Mutex.new)
-    stub
+    @scheduler.setup!(@rufus_scheduler, Mutex.new)
+  end
+
+  after(:each) do
+    @rufus_scheduler.shutdown(:wait)
   end
 
   it "schould register the schedules with the rufus scheduler and run" do
-    mock.instance_of(Rufus::Scheduler).join
+    mock(@rufus_scheduler).join
     scheduler = HuginnScheduler.new
-    scheduler.setup!(Rufus::Scheduler.new, Mutex.new)
+    scheduler.setup!(@rufus_scheduler, Mutex.new)
     scheduler.run
   end
 
@@ -87,6 +91,8 @@ end
 
 describe Rufus::Scheduler do
   before :each do
+    Agent.delete_all
+
     @taoe, Thread.abort_on_exception = Thread.abort_on_exception, false
     @oso, @ose, $stdout, $stderr = $stdout, $stderr, StringIO.new, StringIO.new
 
@@ -105,7 +111,7 @@ describe Rufus::Scheduler do
   end
 
   after :each do
-    @scheduler.shutdown
+    @scheduler.shutdown(:wait)
 
     Thread.abort_on_exception = @taoe
     $stdout, $stderr = @oso, @ose

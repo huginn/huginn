@@ -7,7 +7,7 @@ class DelayedJobWorker < LongRunnable::Worker
   end
 
   def stop
-    @dj.stop
+    @dj.stop if @dj
   end
 
   def self.setup_worker

@@ -17,10 +17,12 @@ class AgentRunner
     @scheduler = Rufus::Scheduler.new(frequency: ENV['SCHEDULER_FREQUENCY'].presence || 0.3)
 
     @scheduler.every 5 do
+      p :every
       restart_dead_workers if @running
     end
 
     @scheduler.every 60 do
+      p :every
       run_workers if @running
     end
 
@@ -28,7 +30,7 @@ class AgentRunner
   end
 
   def stop
-    puts "Stopping AgentRunner..."
+    puts "Stopping AgentRunner..." unless Rails.env.test?
     @running = false
     @workers.each_pair do |_, w| w.stop! end
     @scheduler.stop
@@ -64,19 +66,20 @@ class AgentRunner
   end
 
   private
+
   def run_workers
     workers             = load_workers
     new_worker_ids      = workers.keys
     current_worker_ids  = @workers.keys
 
     (current_worker_ids - new_worker_ids).each do |outdated_worker_id|
-      puts "Killing #{outdated_worker_id}"
+      puts "Killing #{outdated_worker_id}" unless Rails.env.test?
       @workers[outdated_worker_id].stop!
       @workers.delete(outdated_worker_id)
     end
 
     (new_worker_ids - current_worker_ids).each do |new_worker_id|
-      puts "Starting #{new_worker_id}"
+      puts "Starting #{new_worker_id}" unless Rails.env.test?
       @workers[new_worker_id] = workers[new_worker_id]
       @workers[new_worker_id].setup!(@scheduler, @mutex)
       @workers[new_worker_id].run!
@@ -101,7 +104,7 @@ class AgentRunner
   def restart_dead_workers
     @workers.each_pair do |id, worker|
       if worker.thread && !worker.thread.alive?
-        puts "Restarting #{id.to_s}"
+        puts "Restarting #{id.to_s}" unless Rails.env.test?
         @workers[id].run!
       end
     end

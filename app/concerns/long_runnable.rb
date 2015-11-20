@@ -90,8 +90,12 @@ module LongRunnable
       if respond_to?(:stop)
         stop
       else
-        thread.terminate
+        terminate_thread
       end
+    end
+
+    def terminate_thread
+      thread.terminate if thread
     end
 
     def restart!
@@ -117,6 +121,7 @@ module LongRunnable
     end
 
     private
+
     def schedule(method, args, &blk)
       @scheduler.send(method, *args, tag: id, &blk)
     end

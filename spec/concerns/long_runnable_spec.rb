@@ -9,7 +9,7 @@ describe LongRunnable do
     end
   end
 
-  before(:all) do
+  before(:each) do
     @agent = LongRunnableAgent.new
   end
 
@@ -41,7 +41,13 @@ describe LongRunnable do
     before(:each) do
       @agent = Object.new
       @worker = LongRunnable::Worker.new(agent: @agent, id: 'test1234')
-      @worker.setup!(Rufus::Scheduler.new, Mutex.new)
+      @scheduler = Rufus::Scheduler.new
+      @worker.setup!(@scheduler, Mutex.new)
+    end
+
+    after(:each) do
+      @worker.thread.terminate if @worker.thread
+      @scheduler.shutdown(:wait)
     end
 
     it "calls boolify of the agent" do
@@ -75,7 +81,7 @@ describe LongRunnable do
 
     context "#stop!" do
       it "terminates the thread" do
-        mock(@worker.thread).terminate
+        mock.proxy(@worker).terminate_thread
         @worker.stop!
       end
 
