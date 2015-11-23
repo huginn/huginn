@@ -97,8 +97,10 @@ module LongRunnable
     end
 
     def terminate_thread!
-      thread.terminate
-      thread.wakeup if thread.status == 'sleep'
+      if thread
+        thread.terminate
+        thread.wakeup if thread.status == 'sleep'
+      end
     end
 
     def restart!
@@ -126,6 +128,7 @@ module LongRunnable
     end
 
     private
+
     def schedule(method, args, &blk)
       @scheduler.send(method, *args, tag: id, &blk)
     end

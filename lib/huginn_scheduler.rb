@@ -145,6 +145,7 @@ class HuginnScheduler < LongRunnable::Worker
   end
 
   private
+
   def run_schedule(time)
     with_mutex do
       puts "Queuing schedule for #{time}"

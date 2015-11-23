@@ -9,7 +9,7 @@ describe LongRunnable do
     end
   end
 
-  before(:all) do
+  before(:each) do
     @agent = LongRunnableAgent.new
   end
 
@@ -41,7 +41,13 @@ describe LongRunnable do
     before(:each) do
       @agent = Object.new
       @worker = LongRunnable::Worker.new(agent: @agent, id: 'test1234')
-      @worker.setup!(Rufus::Scheduler.new, Mutex.new)
+      @scheduler = Rufus::Scheduler.new
+      @worker.setup!(@scheduler, Mutex.new)
+    end
+
+    after(:each) do
+      @worker.thread.terminate if @worker.thread && !@skip_thread_terminate
+      @scheduler.shutdown(:wait)
     end
 
     it "calls boolify of the agent" do
@@ -75,21 +81,35 @@ describe LongRunnable do
 
     context "#stop!" do
       it "terminates the thread" do
-        mock(@worker.thread).terminate
-        mock(@worker.thread).status { 'run' }
-        @worker.stop!
-      end
-
-      it "wakes up sleeping threads after termination" do
-        mock(@worker.thread).terminate
-        mock(@worker.thread).status { 'sleep' }
-        mock(@worker.thread).wakeup
+        mock.proxy(@worker).terminate_thread!
         @worker.stop!
       end
 
       it "gracefully stops the worker" do
         mock(@worker).stop
         @worker.stop!
+      end
+    end
+
+    context "#terminate_thread!" do
+      before do
+        @skip_thread_terminate = true
+        mock_thread = Object.new
+        stub(@worker).thread { mock_thread }
+      end
+
+      it "terminates the thread" do
+        mock(@worker.thread).terminate
+        do_not_allow(@worker.thread).wakeup
+        mock(@worker.thread).status { 'run' }
+        @worker.terminate_thread!
+      end
+
+      it "wakes up sleeping threads after termination" do
+        mock(@worker.thread).terminate
+        mock(@worker.thread).wakeup
+        mock(@worker.thread).status { 'sleep' }
+        @worker.terminate_thread!
       end
     end
 
