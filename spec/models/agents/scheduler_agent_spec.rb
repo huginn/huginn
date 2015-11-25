@@ -84,11 +84,4 @@ describe Agents::SchedulerAgent do
       expect(agent.memory['scheduled_at']).to be_nil
     end
   end
-
-  describe "check!" do
-    it "should control targets" do
-      stub(agent).control!.once { nil }
-      agent.check!
-    end
-  end
 end
