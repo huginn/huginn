@@ -85,7 +85,7 @@ gem 'liquid', '~> 3.0.3'
 gem 'mini_magick'
 gem 'mysql2', '~> 0.3.16'
 gem 'multi_xml'
-gem 'nokogiri', '~> 1.6.4'
+gem 'nokogiri', '1.6.7.rc4'
 gem 'omniauth'
 gem 'rails', '4.2.4'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
@@ -95,7 +95,7 @@ gem 'spectrum-rails'
 gem 'string-scrub'	# for ruby <2.1
 gem 'therubyracer', '~> 0.12.2'
 gem 'typhoeus', '~> 0.6.3'
-gem 'uglifier', '>= 1.3.0'
+gem 'uglifier', '~> 2.7.2'
 
 group :development do
   gem 'better_errors', '~> 1.1'
