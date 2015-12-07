@@ -317,7 +317,7 @@ describe ScenarioImport do
       end
     end
 
-    context "when an a scenario already exists with the given guid" do
+    context "when an a scenario already exists with the given guid for the importing user" do
       let!(:existing_scenario) do
         _existing_scenerio = users(:bob).scenarios.build(:name => "an existing scenario", :description => "something")
         _existing_scenerio.guid = guid
@@ -504,6 +504,31 @@ describe ScenarioImport do
           }
           expect(scenario_import).not_to be_valid
           expect(scenario_import).to have(1).error_on(:base)
+        end
+      end
+    end
+    
+    context "when an a scenario already exists with the given guid for the a different user" do
+      let!(:existing_scenario) do
+        _existing_scenerio = users(:jane).scenarios.build(:name => "an existing scenario", :description => "something")
+        _existing_scenerio.guid = guid
+        _existing_scenerio.save!
+        _existing_scenerio
+      end
+      
+      describe "#import" do
+        it "makes a new scenario" do
+          expect {
+            scenario_import.import(:skip_agents => true)
+          }.to change { users(:bob).scenarios.count }.by(1)
+
+          expect(scenario_import.scenario.name).to eq(name)
+          expect(scenario_import.scenario.description).to eq(description)
+          expect(scenario_import.scenario.guid).to eq(guid)
+          expect(scenario_import.scenario.tag_fg_color).to eq(tag_fg_color)
+          expect(scenario_import.scenario.tag_bg_color).to eq(tag_bg_color)
+          expect(scenario_import.scenario.source_url).to eq(source_url)
+          expect(scenario_import.scenario.public).to be_falsey
         end
       end
     end
