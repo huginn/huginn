@@ -27,7 +27,7 @@ class AgentsExporter
   end
 
   def agents
-    options[:agents].to_a
+    options[:agents].sort_by{|agent| agent.guid}.to_a
   end
 
   def links
