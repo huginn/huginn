@@ -5,6 +5,8 @@ class GemfileHelper
 
       yield dotenv_dir
 
+      return if ENV['ON_HEROKU'] == 'true'
+
       $:.unshift File.join(dotenv_dir, 'lib')
       require "dotenv"
       $:.shift
