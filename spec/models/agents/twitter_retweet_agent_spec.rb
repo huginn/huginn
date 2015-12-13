@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Agents::TwitterRetweetAgent do
   before do
-    @options = { :expected_receive_period_in_days => "2" }
+    @options = { :expected_receive_period_in_days => '2' }
     @retweet_agent = described_class.new(name: 'RetweetingFiend', options: @options)
     @retweet_agent.service = services(:generic)
     @retweet_agent.user = users(:bob)
@@ -31,7 +31,7 @@ describe Agents::TwitterRetweetAgent do
       )
     end
 
-    context 'when the twitter client succeeds in retweeting' do
+    context 'when the twitter client succeeds retweeting' do
       context 'single incoming event' do
         it 'should retweet the tweet from the payload' do
           mock(@retweet_agent.twitter).retweet([@tweet1])
@@ -39,7 +39,7 @@ describe Agents::TwitterRetweetAgent do
         end
       end
 
-      context 'multiple incoming event' do
+      context 'multiple incoming events' do
         it 'should retweet both tweets from the payload' do
           mock(@retweet_agent.twitter).retweet([@tweet1, @tweet2])
           @retweet_agent.receive([@event1, @event2])
