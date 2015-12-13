@@ -37,7 +37,7 @@ module Agents
         create_event :payload => {
           'success' => false,
           'error' => e.message,
-          'tweets' => tweets_to_retweet.map { |t| [t.id, t.text] }.to_h,
+          'tweets' => Hash[tweets_to_retweet.map { |t| [t.id, t.text] }],
           'agent_id' => incoming_events.first.agent_id,
           'event_id' => incoming_events.first.id
         }
