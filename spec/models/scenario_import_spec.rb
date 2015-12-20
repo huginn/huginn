@@ -508,7 +508,7 @@ describe ScenarioImport do
       end
     end
     
-    context "when an a scenario already exists with the given guid for the a different user" do
+    context "when Bob imports Jane's scenario" do
       let!(:existing_scenario) do
         _existing_scenerio = users(:jane).scenarios.build(:name => "an existing scenario", :description => "something")
         _existing_scenerio.guid = guid
@@ -517,10 +517,12 @@ describe ScenarioImport do
       end
       
       describe "#import" do
-        it "makes a new scenario" do
+        it "makes a new scenario for Bob" do
           expect {
             scenario_import.import(:skip_agents => true)
           }.to change { users(:bob).scenarios.count }.by(1)
+
+          expect(Scenario.where(guid: guid).count).to eq(2)
 
           expect(scenario_import.scenario.name).to eq(name)
           expect(scenario_import.scenario.description).to eq(description)
@@ -529,6 +531,13 @@ describe ScenarioImport do
           expect(scenario_import.scenario.tag_bg_color).to eq(tag_bg_color)
           expect(scenario_import.scenario.source_url).to eq(source_url)
           expect(scenario_import.scenario.public).to be_falsey
+        end
+
+        it "does not change Jane's scenario" do
+          expect {
+            scenario_import.import(:skip_agents => true)
+          }.not_to change { users(:jane).scenarios }
+          expect(users(:jane).scenarios.find_by(guid: guid)).to eq(existing_scenario)
         end
       end
     end
