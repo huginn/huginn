@@ -38,8 +38,8 @@ module Agents
           'success' => false,
           'error' => e.message,
           'tweets' => Hash[tweets_to_retweet.map { |t| [t.id, t.text] }],
-          'agent_id' => incoming_events.first.agent_id,
-          'event_id' => incoming_events.first.id
+          'agent_ids' => incoming_events.map(&:agent_id),
+          'event_ids' => incoming_events.map(&:id)
         }
       end
     end

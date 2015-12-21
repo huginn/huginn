@@ -56,13 +56,21 @@ describe Agents::TwitterRetweetAgent do
 
       it 'should create an event with tweet info and the error message' do
         @retweet_agent.receive([@event1, @event2])
+
         failure_event = @retweet_agent.events.last
+
         expect(failure_event.payload[:error]).to eq('uh oh')
         expect(failure_event.payload[:tweets]).to eq(
           {
             @event1.payload[:id].to_s => @event1.payload[:text],
             @event2.payload[:id].to_s => @event2.payload[:text]
           }
+        )
+        expect(failure_event.payload[:agent_ids]).to match_array(
+          [@event1.agent_id, @event2.agent_id]
+        )
+        expect(failure_event.payload[:event_ids]).to match_array(
+          [@event2.id, @event1.id]
         )
       end
     end
