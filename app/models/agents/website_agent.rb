@@ -24,7 +24,7 @@ module Agents
 
       * If the Event contains a `url` key, that URL will be fetched.
       * For more control, you can set the `url_from_event` option and it will be used as a Liquid template to generate the url to access based on the Event.
-      * If you set `event_data_path` to the [JSONPath](http://goessner.net/articles/JsonPath/) of content in the Event, that will be used directly without fetching any URL.
+      * If you set `data_from_event` to the [JSONPath](http://goessner.net/articles/JsonPath/) of content in the Event, that will be used directly without fetching any URL.
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with the new values.
 
       # Supported Document Types
@@ -145,7 +145,7 @@ module Agents
 
     def validate_options
       # Check for required fields
-      errors.add(:base, "either url, url_from_event, or event_data_path are required") unless options['url'].present? || options['url_from_event'].present? || options['event_data_path'].present?
+      errors.add(:base, "either url, url_from_event, or data_from_event are required") unless options['url'].present? || options['url_from_event'].present? || options['data_from_event'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       validate_extract_options!
 
@@ -331,18 +331,16 @@ module Agents
         interpolate_with(event) do
           existing_payload = interpolated['mode'].to_s == "merge" ? event.payload : {}
 
-          if event_data_path = options['event_data_path'].presence
-            data = Utils.value_at(event.payload, interpolate_options(event_data_path))
+          if data_from_event = options['data_from_event'].presence
+            data = interpolate_options(data_from_event)
             if data.present?
               handle_event_data(data, event, existing_payload)
             else
-              error "No data was found in the Event payload at the JSONPath #{interpolate_options(event_data_path)}", inbound_event: event
+              error "No data was found in the Event payload using the template #{data_from_event}", inbound_event: event
             end
           else
             url_to_scrape =
-              if event_data_path = options['event_data_path'].presence
-                interpolate_options(event_data_path)
-              elsif url_template = options['url_from_event'].presence
+              if url_template = options['url_from_event'].presence
                 interpolate_options(url_template)
               else
                 event.payload['url']

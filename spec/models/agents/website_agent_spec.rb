@@ -853,7 +853,7 @@ fire: hot
         end
       end
 
-      describe "with a event_data_path" do
+      describe "with a data_from_event" do
         describe "with json data" do
           before do
             @event = Event.new
@@ -868,7 +868,7 @@ fire: hot
 
             @checker.options = @valid_options.merge(
               'type' => 'json',
-              'event_data_path' => 'some_object.some_data',
+              'data_from_event' => '{{ some_object.some_data }}',
               'extract' => {
                 'value' => { 'path' => 'hello' }
               }
@@ -893,14 +893,14 @@ fire: hot
 
           it "should output an error when nothing can be found at the path" do
             @checker.options = @checker.options.merge(
-              'event_data_path' => 'some_object.mistake'
+              'data_from_event' => '{{ some_object.mistake }}'
             )
 
             expect {
               @checker.receive([@event])
             }.to_not change { Event.count }
 
-            expect(@checker.logs.last.message).to match(/No data was found in the Event payload at the JSONPath some_object.mistake/)
+            expect(@checker.logs.last.message).to match(/No data was found in the Event payload using the template {{ some_object\.mistake }}/)
           end
 
           it "should output an error when the data cannot be parsed" do
@@ -928,7 +928,7 @@ fire: hot
 
             @checker.options = @valid_options.merge(
               'type' => 'html',
-              'event_data_path' => 'some_object.some_data',
+              'data_from_event' => '{{ some_object.some_data }}',
               'extract' => {
                 'title' => { 'css' => ".title", 'value' => ".//text()" },
                 'body' => { 'css' => "div span.body", 'value' => ".//text()" }
