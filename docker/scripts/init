@@ -18,10 +18,10 @@ if [ -n "${MYSQL_PORT_3306_TCP_ADDR}" ]; then
   HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-mysql2}
   HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
   HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
-elif [ -n "${POSTGRESQL_PORT_5432_TCP_ADDR}" ]; then
-  HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-postgres}
-  HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${POSTGRESQL_PORT_5432_TCP_ADDR}}
-  HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${POSTGRESQL_PORT_5432_TCP_PORT}}
+elif [ -n "${POSTGRES_PORT_5432_TCP_ADDR}" ]; then
+  HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-postgresql}
+  HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
+  HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
 fi
 
 grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | cut -d= -f1 | \
@@ -31,6 +31,7 @@ grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | cut -d=
 
 chmod ugo+r /app/.env
 source /app/.env
+sudo -u huginn -H bundle install --deployment --without test
 
 DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
 DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
@@ -39,8 +40,8 @@ USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT}}
 # use default port number if it is still not set
 case "${DATABASE_ADAPTER}" in
   mysql2) DATABASE_PORT=${DATABASE_PORT:-3306} ;;
-  postgres) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
-  *) echo "Unsupported database adapter. Available adapters are mysql2, and postgres." && exit 1 ;;
+  postgresql) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
+  *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
 esac
 
 # initialize supervisord config
@@ -71,8 +72,8 @@ echo DATABASE_HOST=\${DATABASE_HOST}
 
 # start mysql server if \${DATABASE_HOST} is the .env.example default
 if [ "\${DATABASE_HOST}" = "your-domain-here.com" -o "\${DATABASE_HOST}" = "" ]; then
-  if [ "\${DATABASE_ADAPTER}" = "postgres" ]; then
-    echo "DATABASE_ADAPTER 'postgres' is not supported internally. Please provide DATABASE_HOST."
+  if [ "\${DATABASE_ADAPTER}" = "postgresql" ]; then
+    echo "DATABASE_ADAPTER 'postgresql' is not supported internally. Please provide DATABASE_HOST."
     exit 1
   fi
 
