@@ -24,7 +24,7 @@ module Agents
 
       * If the Event contains a `url` key, that URL will be fetched.
       * For more control, you can set the `url_from_event` option and it will be used as a Liquid template to generate the url to access based on the Event.
-      * If you set `data_from_event` to the [JSONPath](http://goessner.net/articles/JsonPath/) of content in the Event, that will be used directly without fetching any URL.
+      * If you set `data_from_event` to a Liquid template, it will be used to generate the data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with the new values.
 
       # Supported Document Types
