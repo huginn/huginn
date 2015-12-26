@@ -50,7 +50,7 @@ class ScenarioImport
     @agent_diffs || generate_diff
   end
 
-  def should_import?
+  def import_confirmed?
     do_import == "1"
   end
 
@@ -109,10 +109,6 @@ class ScenarioImport
 
   def scenario
     @scenario || @existing_scenario
-  end
-
-  def will_request_local?(url_root)
-    data.blank? && file.blank? && url.present? && url.starts_with?(url_root)
   end
 
   protected
