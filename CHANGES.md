@@ -1,5 +1,6 @@
 # Changes
 
+* Dec 26, 2015   - WebsiteAgent can accept a `data_from_event` Liquid template instead of a URL.
 * Oct 17, 2015   - TwitterSearchAgent added for running period Twitter searches.
 * Oct 17, 2015   - GapDetectorAgent added to alert when no data has been seen in a certain period of time.
 * Oct 12, 2015   - Slack agent supports attachments.

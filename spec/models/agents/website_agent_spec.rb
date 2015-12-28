@@ -763,92 +763,186 @@ fire: hot
     end
 
     describe "#receive" do
-      before do
-        @event = Event.new
-        @event.agent = agents(:bob_rain_notifier_agent)
-        @event.payload = {
-          'url' => 'http://xkcd.com',
-          'link' => 'Random',
-        }
-      end
-
-      it "should scrape from the url element in incoming event payload" do
-        expect {
-          @checker.options = @valid_options
-          @checker.receive([@event])
-        }.to change { Event.count }.by(1)
-      end
-
-      it "should use url_from_event as url to scrape if it exists when receiving an event" do
-        stub = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
-
-        @checker.options = @valid_options.merge(
-          'url_from_event' => 'http://example.org/?url={{url | uri_escape}}'
-        )
-        @checker.receive([@event])
-
-        expect(stub).to have_been_requested
-      end
-
-      it "should allow url_from_event to be an array of urls" do
-        stub1 = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
-        stub2 = stub_request(:any, 'http://google.org/?url=http%3A%2F%2Fxkcd.com')
-
-        @checker.options = @valid_options.merge(
-          'url_from_event' => ['http://example.org/?url={{url | uri_escape}}', 'http://google.org/?url={{url | uri_escape}}']
-        )
-        @checker.receive([@event])
-
-        expect(stub1).to have_been_requested
-        expect(stub2).to have_been_requested
-      end
-
-      it "should interpolate values from incoming event payload" do
-        expect {
-          @valid_options['extract'] = {
-            'from' => {
-              'xpath' => '*[1]',
-              'value' => '{{url | to_xpath}}'
-            },
-            'to' => {
-              'xpath' => '(//a[@href and text()={{link | to_xpath}}])[1]',
-              'value' => '@href'
-            },
+      describe "with a url or url_from_event" do
+        before do
+          @event = Event.new
+          @event.agent = agents(:bob_rain_notifier_agent)
+          @event.payload = {
+            'url' => 'http://xkcd.com',
+            'link' => 'Random',
           }
-          @checker.options = @valid_options
-          @checker.receive([@event])
-        }.to change { Event.count }.by(1)
+        end
 
-        expect(Event.last.payload).to eq({
-          'from' => 'http://xkcd.com',
-          'to' => 'http://dynamic.xkcd.com/random/comic/',
-        })
+        it "should scrape from the url element in incoming event payload" do
+          expect {
+            @checker.options = @valid_options
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+        end
+
+        it "should use url_from_event as url to scrape if it exists when receiving an event" do
+          stub = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
+
+          @checker.options = @valid_options.merge(
+            'url_from_event' => 'http://example.org/?url={{url | uri_escape}}'
+          )
+          @checker.receive([@event])
+
+          expect(stub).to have_been_requested
+        end
+
+        it "should allow url_from_event to be an array of urls" do
+          stub1 = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
+          stub2 = stub_request(:any, 'http://google.org/?url=http%3A%2F%2Fxkcd.com')
+
+          @checker.options = @valid_options.merge(
+            'url_from_event' => ['http://example.org/?url={{url | uri_escape}}', 'http://google.org/?url={{url | uri_escape}}']
+          )
+          @checker.receive([@event])
+
+          expect(stub1).to have_been_requested
+          expect(stub2).to have_been_requested
+        end
+
+        it "should interpolate values from incoming event payload" do
+          expect {
+            @valid_options['extract'] = {
+              'from' => {
+                'xpath' => '*[1]',
+                'value' => '{{url | to_xpath}}'
+              },
+              'to' => {
+                'xpath' => '(//a[@href and text()={{link | to_xpath}}])[1]',
+                'value' => '@href'
+              },
+            }
+            @checker.options = @valid_options
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+
+          expect(Event.last.payload).to eq({
+            'from' => 'http://xkcd.com',
+            'to' => 'http://dynamic.xkcd.com/random/comic/',
+          })
+        end
+
+        it "should interpolate values from incoming event payload and _response_" do
+          @event.payload['title'] = 'XKCD'
+
+          expect {
+            @valid_options['extract'] = {
+              'response_info' => @valid_options['extract']['url'].merge(
+                'value' => '{% capture sentence %}The reponse from {{title}} was {{_response_.status}} {{_response_.headers.X-Status-Message}}.{% endcapture %}{{sentence | to_xpath}}'
+              )
+            }
+            @checker.options = @valid_options
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+
+          expect(Event.last.payload['response_info']).to eq('The reponse from XKCD was 200 OK.')
+        end
+
+        it "should support merging of events" do
+          expect {
+            @checker.options = @valid_options
+            @checker.options[:mode] = "merge"
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+          last_payload = Event.last.payload
+          expect(last_payload['link']).to eq('Random')
+        end
       end
 
-      it "should interpolate values from incoming event payload and _response_" do
-        @event.payload['title'] = 'XKCD'
+      describe "with a data_from_event" do
+        describe "with json data" do
+          before do
+            @event = Event.new
+            @event.agent = agents(:bob_rain_notifier_agent)
+            @event.payload = {
+              'something' => 'some value',
+              'some_object' => {
+                'some_data' => { hello: 'world' }.to_json
+              }
+            }
+            @event.save!
 
-        expect {
-          @valid_options['extract'] = {
-            'response_info' => @valid_options['extract']['url'].merge(
-              'value' => '{% capture sentence %}The reponse from {{title}} was {{_response_.status}} {{_response_.headers.X-Status-Message}}.{% endcapture %}{{sentence | to_xpath}}'
+            @checker.options = @valid_options.merge(
+              'type' => 'json',
+              'data_from_event' => '{{ some_object.some_data }}',
+              'extract' => {
+                'value' => { 'path' => 'hello' }
+              }
             )
-          }
-          @checker.options = @valid_options
-          @checker.receive([@event])
-        }.to change { Event.count }.by(1)
+          end
 
-        expect(Event.last.payload['response_info']).to eq('The reponse from XKCD was 200 OK.')
-      end
+          it "should extract from the event data in the incoming event payload" do
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world' })
+          end
 
-      it "should support merging of events" do
-        expect {
-          @checker.options = @valid_options
-          @checker.options[:mode] = "merge"
-          @checker.receive([@event])
-        }.to change { Event.count }.by(1)
-        last_payload = Event.last.payload
-        expect(last_payload['link']).to eq('Random')
+          it "should support merge mode" do
+            @checker.options['mode'] = "merge"
+
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world'))
+          end
+
+          it "should output an error when nothing can be found at the path" do
+            @checker.options = @checker.options.merge(
+              'data_from_event' => '{{ some_object.mistake }}'
+            )
+
+            expect {
+              @checker.receive([@event])
+            }.to_not change { Event.count }
+
+            expect(@checker.logs.last.message).to match(/No data was found in the Event payload using the template {{ some_object\.mistake }}/)
+          end
+
+          it "should output an error when the data cannot be parsed" do
+            @event.update_attribute :payload, @event.payload.merge('some_object' => { 'some_data' => '{invalid json' })
+
+            expect {
+              @checker.receive([@event])
+            }.to_not change { Event.count }
+
+            expect(@checker.logs.last.message).to match(/Error when handling event data:/)
+          end
+        end
+
+        describe "with HTML data" do
+          before do
+            @event = Event.new
+            @event.agent = agents(:bob_rain_notifier_agent)
+            @event.payload = {
+              'url' => 'http://xkcd.com',
+              'some_object' => {
+                'some_data' => "<div><span class='title'>Title!</span><span class='body'>Body!</span></div>"
+              }
+            }
+            @event.save!
+
+            @checker.options = @valid_options.merge(
+              'type' => 'html',
+              'data_from_event' => '{{ some_object.some_data }}',
+              'extract' => {
+                'title' => { 'css' => ".title", 'value' => ".//text()" },
+                'body' => { 'css' => "div span.body", 'value' => ".//text()" }
+              }
+            )
+          end
+
+          it "should extract from the event data in the incoming event payload" do
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'title' => 'Title!', 'body' => 'Body!' })
+          end
+        end
       end
     end
   end
