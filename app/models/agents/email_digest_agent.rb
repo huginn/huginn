@@ -41,7 +41,7 @@ module Agents
     def check
       if self.memory['events'] && self.memory['events'].length > 0
         ids = self.memory['events'].join(",")
-        events = sort_events(Event.where(id: memory['events']))
+        events = sort_events(Event.find(memory['events']))
         groups = events.map { |event| present(event.payload) }
         recipients.each do |recipient|
           log "Sending digest mail to #{recipient} with events [#{ids}]"
