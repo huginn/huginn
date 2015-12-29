@@ -17,6 +17,10 @@ module Agents
       account's default email address.
 
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
+
+        # Ordering events in the output
+
+        #{description_events_order('events in the output')}
     MD
 
     def default_options
@@ -29,23 +33,21 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        self.memory['queue'] ||= []
-        self.memory['queue'] << event.payload
-        self.memory['events'] ||= []
-        self.memory['events'] << event.id
+        memory['event_ids'] ||= []
+        memory['event_ids'] << event.id
       end
     end
 
     def check
-      if self.memory['queue'] && self.memory['queue'].length > 0
-        ids = self.memory['events'].join(",")
-        groups = self.memory['queue'].map { |payload| present(payload) }
+      if self.memory['event_ids'] && self.memory['event_ids'].length > 0
+        ids = self.memory['event_ids'].join(",")
+        events = sort_events(Event.where(id: memory['event_ids']))
+        groups = events.map { |event| present(event.payload) }
         recipients.each do |recipient|
           log "Sending digest mail to #{recipient} with events [#{ids}]"
           SystemMailer.send_message(:to => recipient, :subject => interpolated['subject'], :headline => interpolated['headline'], :groups => groups).deliver_later
         end
-        self.memory['queue'] = []
-        self.memory['events'] = []
+        self.memory['event_ids'] = []
       end
     end
   end
