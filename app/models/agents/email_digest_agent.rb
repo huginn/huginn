@@ -33,21 +33,21 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        memory['event_ids'] ||= []
-        memory['event_ids'] << event.id
+        memory['events'] ||= []
+        memory['events'] << event.id
       end
     end
 
     def check
-      if self.memory['event_ids'] && self.memory['event_ids'].length > 0
-        ids = self.memory['event_ids'].join(",")
-        events = sort_events(Event.where(id: memory['event_ids']))
+      if self.memory['events'] && self.memory['events'].length > 0
+        ids = self.memory['events'].join(",")
+        events = sort_events(Event.where(id: memory['events']))
         groups = events.map { |event| present(event.payload) }
         recipients.each do |recipient|
           log "Sending digest mail to #{recipient} with events [#{ids}]"
           SystemMailer.send_message(:to => recipient, :subject => interpolated['subject'], :headline => interpolated['headline'], :groups => groups).deliver_later
         end
-        self.memory['event_ids'] = []
+        self.memory['events'] = []
       end
     end
   end
