@@ -1,0 +1,35 @@
+mysqldata:
+  image: mysql
+  command: /bin/true
+
+mysql:
+  image: mysql
+  volumes_from:
+    - mysqldata
+  environment:
+    MYSQL_ROOT_PASSWORD: myrootpassword
+    MYSQL_DATABASE: huginn
+    MYSQL_USER: huginn
+    MYSQL_PASSWORD: myhuginnpassword
+
+huginn_web:
+  build: .
+  restart: always
+  extends:
+    file: environment.yml
+    service: huginn_base
+  ports:
+    - 3000:3000
+  links:
+    - mysql
+
+huginn_threaded:
+  build: .
+  restart: always
+  extends:
+    file: environment.yml
+    service: huginn_base
+  links:
+    - mysql
+  command: /scripts/init bin/threaded.rb
+
