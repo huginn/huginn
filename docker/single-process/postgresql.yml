@@ -11,7 +11,7 @@ postgres:
     POSTGRES_USER: huginn
 
 huginn_web:
-  build: .
+  image: dsander/huginn-single-process
   restart: always
   extends:
     file: environment.yml
@@ -24,7 +24,7 @@ huginn_web:
     - postgres
 
 huginn_threaded:
-  build: .
+  image: dsander/huginn-single-process
   restart: always
   extends:
     file: environment.yml
@@ -36,7 +36,7 @@ huginn_threaded:
   command: /scripts/init bin/threaded.rb
 
 # huginn_schedule:
-#   build: .
+#   image: dsander/huginn-single-process
 #   extends:
 #     file: environment.yml
 #     service: huginn_base
@@ -48,7 +48,7 @@ huginn_threaded:
 
 
 # huginn_twitter_stream:
-#   build: .
+#   image: dsander/huginn-single-process
 #   extends:
 #     file: environment.yml
 #     service: huginn_base
@@ -60,7 +60,7 @@ huginn_threaded:
 
 
 # huginn_dj1:
-#   build: .
+#   image: dsander/huginn-single-process
 #   extends:
 #     file: environment.yml
 #     service: huginn_base

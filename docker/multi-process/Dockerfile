@@ -1,7 +1,10 @@
-FROM dsander/huginn-single-process:latest
+FROM cantino/huginn-single-process:latest
 MAINTAINER Andrew Cantino
 
 WORKDIR /app
+
+ADD scripts/standalone-packages /scripts/standalone-packages
+RUN /scripts/standalone-packages
 
 ADD scripts/init /scripts/init
 

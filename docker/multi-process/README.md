@@ -27,9 +27,9 @@ There is an exported docker volume of /var/lib/mysql to allow persistence of tha
 
 Additionally, the database variables may be overridden from the above as per the standard Huginn documentation:
 
-    HUGINN_DATABASE_ADAPTER #(must be either 'postgres' or 'mysql2')
-    HUGINN_DATABASE_HOST
-    HUGINN_DATABASE_PORT
+    DATABASE_ADAPTER #(must be either 'postgres' or 'mysql2')
+    DATABASE_HOST
+    DATABASE_PORT
 
 This script will run database migrations (rake db:migrate) which should be idempotent.
 
@@ -70,8 +70,6 @@ To link to another container named 'postgres':
     docker run --name huginn_postgres \
         -e POSTGRES_PASSWORD=mysecretpassword \
         -e POSTGRES_USER=huginn -d postgres
-    docker run -it --link huginn_postgres:postgres --rm postgres \
-        sh -c 'exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U huginn -c "create database huginn_development;"'
     docker run --rm --name huginn \
         --link huginn_postgres:postgres \
         -p 3000:3000 \
@@ -80,60 +78,13 @@ To link to another container named 'postgres':
         -e HUGINN_DATABASE_ADAPTER=postgresql \
         cantino/huginn
 
-The `docker/` folder also has a `docker-compose.yml` that allows for a sample database formation with a data volume container:
+The `docker/multi-process` folder also has a `docker-compose.yml` that allows for a sample database formation with a data volume container:
 
-    cd docker ; docker-compose up
+    cd docker/multi-process ; docker-compose up
 
 ## Environment Variables
 
-Other Huginn 12factored environment variables of note, as generated and put into the .env file as per Huginn documentation,
-with an additional `HUGINN_` prefix to the variable.
-
-These are:
-
-    HUGINN_APP_SECRET_TOKEN
-    HUGINN_DOMAIN
-    HUGINN_ASSET_HOST
-    HUGINN_DATABASE_ADAPTER
-    HUGINN_DATABASE_ENCODING
-    HUGINN_DATABASE_RECONNECT
-    HUGINN_DATABASE_NAME
-    HUGINN_DATABASE_POOL
-    HUGINN_DATABASE_USERNAME
-    HUGINN_DATABASE_PASSWORD
-    HUGINN_DATABASE_HOST
-    HUGINN_DATABASE_PORT
-    HUGINN_DATABASE_SOCKET
-    HUGINN_RAILS_ENV
-    HUGINN_FORCE_SSL
-    HUGINN_INVITATION_CODE
-    HUGINN_SMTP_DOMAIN
-    HUGINN_SMTP_USER_NAME
-    HUGINN_SMTP_PASSWORD
-    HUGINN_SMTP_SERVER
-    HUGINN_SMTP_PORT
-    HUGINN_SMTP_AUTHENTICATION
-    HUGINN_SMTP_ENABLE_STARTTLS_AUTO
-    HUGINN_EMAIL_FROM_ADDRESS
-    HUGINN_AGENT_LOG_LENGTH
-    HUGINN_TWITTER_OAUTH_KEY
-    HUGINN_TWITTER_OAUTH_SECRET
-    HUGINN_THIRTY_SEVEN_SIGNALS_OAUTH_KEY
-    HUGINN_THIRTY_SEVEN_SIGNALS_OAUTH_SECRET
-    HUGINN_AWS_ACCESS_KEY_ID
-    HUGINN_AWS_ACCESS_KEY
-    HUGINN_AWS_SANDBOX
-    HUGINN_FARADAY_HTTP_BACKEND
-    HUGINN_DEFAULT_HTTP_USER_AGENT
-    HUGINN_ALLOW_JSONPATH_EVAL
-    HUGINN_ENABLE_INSECURE_AGENTS
-    HUGGIN_ENABLE_SECOND_PRECISION_SCHEDULE
-    HUGINN_USE_GRAPHVIZ_DOT
-    HUGINN_TIMEZONE
-    HUGGIN_FAILED_JOBS_TO_KEEP
-
-
-The above environment variables will override the defaults. The defaults are read from the [.env.example](https://github.com/cantino/huginn/blob/master/.env.example) file.
+Other Huginn 12factored environment variables of note, as generated and put into the .env file as per Huginn documentation. All variables of the [.env.example](https://github.com/cantino/huginn/blob/master/.env.example) can be used to override the defaults which a read from the current `.env.example`.
 
 For variables in the .env.example that are commented out, the default is to not include that variable in the generated .env file.
 
@@ -145,7 +96,7 @@ You don't need to do this on your own, because there is an [automated build](htt
 
 ## Source
 
-The source is [available on GitHub](https://github.com/cantino/huginn/).
+The source is [available on GitHub](https://github.com/cantino/huginn/docker/multi-process/).
 
 Please feel free to submit pull requests and/or fork at your leisure.
 

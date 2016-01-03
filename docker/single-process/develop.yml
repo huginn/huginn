@@ -13,7 +13,7 @@ mysql:
     MYSQL_PASSWORD: myhuginnpassword
 
 huginn_web:
-  image: dsander/huginn-single-process
+  build: .
   restart: always
   extends:
     file: environment.yml
@@ -24,7 +24,7 @@ huginn_web:
     - mysql
 
 huginn_threaded:
-  image: dsander/huginn-single-process
+  build: .
   restart: always
   extends:
     file: environment.yml

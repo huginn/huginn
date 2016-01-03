@@ -22,11 +22,16 @@ elif [ -n "${POSTGRES_PORT_5432_TCP_ADDR}" ]; then
   DATABASE_PORT=${DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
   DATABASE_ENCODING=utf8
 else
-  DATABASE_PASSWORD=password
-  DATABASE_NAME=huginn_production
+  START_MYSQL=${START_MYSQL:-true}
 fi
 
-USE_GRAPHVIZ_DOT=${USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
+USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
+DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
+DATABASE_PORT=${HUGINN_DATABASE_PORT:-${DATABASE_PORT}}
+DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
+DATABASE_PASSWORD=${HUGINN_DATABASE_PASSWORD:-${DATABASE_PASSWORD:-password}}
+DATABASE_NAME=${HUGINN_DATABASE_NAME:-${DATABASE_NAME:-huginn_production}}
+RAILS_ENV=${HUGINN_RAILS_ENV:-${RAILS_ENV:-production}}
 
 IFS="="
 grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
@@ -34,16 +39,14 @@ grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
     eval "echo \"$var=\${$var:-\${HUGINN_$var-\$value}}\""
   done | grep -v -e ^= > /app/.env
 
-eval "echo RAILS_ENV=${RAILS_ENV:-${RAILS_ENV:-production}}" >> .env
-eval "echo ON_HEROKU=true" >> .env
-eval "echo RAILS_SERVE_STATIC_FILES=true" >> .env
+eval "echo RAILS_ENV=${RAILS_ENV}" >> .env
+eval "echo START_MYSQL=${START_MYSQL}" >> .env
+echo "ON_HEROKU=true" >> .env
+echo "RAILS_SERVE_STATIC_FILES=true" >> .env
 
 chmod ugo+r /app/.env
 source /app/.env
 sudo -u huginn -H bundle install --deployment --without test
-
-DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
-DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
 
 # use default port number if it is still not set
 case "${DATABASE_ADAPTER}" in
@@ -79,7 +82,8 @@ source /app/.env
 echo DATABASE_HOST=\${DATABASE_HOST}
 
 # start mysql server if \${DATABASE_HOST} is the .env.example default
-if [ "\${DATABASE_HOST}" = "your-domain-here.com" -o "\${DATABASE_HOST}" = "" ]; then
+if [ "\${START_MYSQL}" = "true" ]; then
+  echo "DATABASE_SOCKET=/var/run/mysqld/mysqld.sock" >> .env
   if [ "\${DATABASE_ADAPTER}" = "postgresql" ]; then
     echo "DATABASE_ADAPTER 'postgresql' is not supported internally. Please provide DATABASE_HOST."
     exit 1
@@ -126,7 +130,6 @@ EOF
   done
 
   if ! echo "USE \${DATABASE_NAME}" | mysql -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} >/dev/null 2>&1; then
-    DB_INIT="yes"
     echo "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('\${DATABASE_PASSWORD:\$DATABASE_PASSWORD}');" | mysql -u root
   fi
 fi
