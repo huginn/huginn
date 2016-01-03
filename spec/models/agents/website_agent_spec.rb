@@ -769,7 +769,7 @@ fire: hot
           @event.agent = agents(:bob_rain_notifier_agent)
           @event.payload = {
             'url' => 'http://xkcd.com',
-            'link' => 'Random',
+            'link' => 'Random'
           }
         end
 
@@ -824,6 +824,16 @@ fire: hot
             'from' => 'http://xkcd.com',
             'to' => 'http://dynamic.xkcd.com/random/comic/',
           })
+        end
+
+        it "should use the options url if no url is in the event payload, and `url_from_event` is not provided" do
+          @checker.options['mode'] = 'merge'
+          @event.payload.delete('url')
+          expect {
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+          expect(Event.last.payload['title']).to eq('Evolving')
+          expect(Event.last.payload['link']).to eq('Random')
         end
 
         it "should interpolate values from incoming event payload and _response_" do

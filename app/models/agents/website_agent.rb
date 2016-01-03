@@ -16,7 +16,7 @@ module Agents
     description <<-MD
       The Website Agent scrapes a website, XML document, or JSON feed and creates Events based on the results.
 
-      Specify a `url` and select a `mode` for when to create Events based on the scraped data, either `all` or `on_change`.
+      Specify a `url` and select a `mode` for when to create Events based on the scraped data, either `all`, `on_change`, or `merge` (if fetching based on an Event, see below).
 
       `url` can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape)
 
@@ -37,7 +37,7 @@ module Agents
 
       # Scraping HTML and XML
 
-      When parsing HTML or XML, these sub-hashes specify how each extraction should be done.  The Agent first selects a node set from the document for each extraction key by evaluating either a CSS selector in `css` or an XPath expression in `xpath`.  It then evaluates an XPath expression in `value` (default: `.`) on each node in the node set, converting the result into string.  Here's an example:
+      When parsing HTML or XML, these sub-hashes specify how each extraction should be done.  The Agent first selects a node set from the document for each extraction key by evaluating either a CSS selector in `css` or an XPath expression in `xpath`.  It then evaluates an XPath expression in `value` (default: `.`) on each node in the node set, converting the result into a string.  Here's an example:
 
           "extract": {
             "url": { "css": "#comic img", "value": "@src" },
@@ -45,11 +45,11 @@ module Agents
             "body_text": { "css": "div.main", "value": ".//text()" }
           }
 
-      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and ".//text()" is to extract all the enclosed texts. To extract the innerHTML, use "./node()"; and to extract the outer HTML, use  ".".
+      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and `.//text()` extracts all the enclosed text. To extract the innerHTML, use `./node()`; and to extract the outer HTML, use  `.`.
 
-      You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove comma from a formatted number, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-space(.//text())` should actually be `normalize-space(.)`.
+      You can also use [XPath functions](http://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove commas from formatted numbers, etc.  Note that these functions take a string, not a node set, so what you may think would be written as `normalize-space(.//text())` should actually be `normalize-space(.)`.
 
-      Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions all namespaces are stripped from the document unless a toplevel option `use_namespaces` is set to true.
+      Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions, all namespaces are stripped from the document unless the top-level option `use_namespaces` is set to `true`.
 
       # Scraping JSON
 
@@ -92,7 +92,7 @@ module Agents
 
       Set `uniqueness_look_back` to limit the number of events checked for uniqueness (typically for performance).  This defaults to the larger of #{UNIQUENESS_LOOK_BACK} or #{UNIQUENESS_FACTOR}x the number of detected received results.
 
-      Set `force_encoding` to an encoding name if the website is known to respond with a missing, invalid or wrong charset in the Content-Type header.  Note that a text content without a charset is taken as encoded in UTF-8 (not ISO-8859-1).
+      Set `force_encoding` to an encoding name if the website is known to respond with a missing, invalid, or wrong charset in the Content-Type header.  Note that a text content without a charset is taken as encoded in UTF-8 (not ISO-8859-1).
 
       Set `user_agent` to a custom User-Agent name if the website does not like the default value (`#{default_user_agent}`).
 
@@ -343,7 +343,7 @@ module Agents
               if url_template = options['url_from_event'].presence
                 interpolate_options(url_template)
               else
-                event.payload['url']
+                event.payload['url'].presence || interpolated['url']
               end
             check_urls(url_to_scrape, existing_payload)
           end
