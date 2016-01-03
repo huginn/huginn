@@ -153,7 +153,7 @@ describe Agents::DataOutputAgent do
         expect(content_type).to eq('text/xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
-          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
           <channel>
            <atom:link href="https://yoursite.com/users/#{agent.user.id}/web_requests/#{agent.id}/secret1.xml" rel="self" type="application/rss+xml"/>
            <atom:icon>https://yoursite.com/favicon.ico</atom:icon>
@@ -392,7 +392,7 @@ describe Agents::DataOutputAgent do
         expect(content_type).to eq('text/xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
-          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
           <channel>
            <atom:link href="https://yoursite.com/users/#{agent.user.id}/web_requests/#{agent.id}/secret1.xml" rel="self" type="application/rss+xml"/>
            <atom:icon>https://yoursite.com/favicon.ico</atom:icon>
