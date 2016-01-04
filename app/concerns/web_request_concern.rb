@@ -110,7 +110,9 @@ module WebRequestConcern
 
       builder.headers[:user_agent] = user_agent
 
-      builder.use FaradayMiddleware::FollowRedirects
+      unless boolify(interpolated['disable_redirect_follow'])
+        builder.use FaradayMiddleware::FollowRedirects
+      end
       builder.request :url_encoded
 
       if boolify(interpolated['disable_url_encoding'])
