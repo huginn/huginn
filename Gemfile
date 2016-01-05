@@ -160,7 +160,12 @@ on_heroku = ENV['ON_HEROKU'] ||
             ENV['HEROKU_POSTGRESQL_GOLD_URL'] ||
             File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
 
-ENV['DATABASE_ADAPTER'] ||= 'postgresql' if on_heroku
+ENV['DATABASE_ADAPTER'] ||=
+  if on_heroku
+    'postgresql'
+  else
+    'mysql2'
+  end
 
 if_true(on_heroku) do
   gem 'rails_12factor', group: :production
