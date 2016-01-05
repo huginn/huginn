@@ -14,7 +14,7 @@ class GemfileHelper
       root = Pathname.new(File.join(File.dirname(__FILE__), '..'))
       sanity_check Dotenv.load(
                                 root.join(".env.local"),
-                                root.join(".env.#{ENV['RAILS_ENV']}"),
+                                root.join(".env.#{ENV['RAILS_ENV'] || 'development'}"),
                                 root.join(".env")
                               )
     end
