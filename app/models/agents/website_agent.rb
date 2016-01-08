@@ -18,14 +18,13 @@ module Agents
 
       Specify a `url` and select a `mode` for when to create Events based on the scraped data, either `all`, `on_change`, or `merge` (if fetching based on an Event, see below).
 
-      `url` can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape)
+      The `url` option can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape).
 
       The WebsiteAgent can also scrape based on incoming events.
 
-      * If the Event contains a `url` key, that URL will be fetched.
-      * For more control, you can set the `url_from_event` option and it will be used as a Liquid template to generate the url to access based on the Event.
-      * If you set `data_from_event` to a Liquid template, it will be used to generate the data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
-      * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with the new values.
+      * Set the `url_from_event` option to a Liquid template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
+      * Alternatively, set `data_from_event` to a Liquid template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
+      * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
 
       # Supported Document Types
 
@@ -343,7 +342,7 @@ module Agents
               if url_template = options['url_from_event'].presence
                 interpolate_options(url_template)
               else
-                event.payload['url'].presence || interpolated['url']
+                interpolated['url']
               end
             check_urls(url_to_scrape, existing_payload)
           end
