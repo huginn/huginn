@@ -73,7 +73,7 @@ Download Ruby and compile it:
 
 Install the bundler and foreman gems:
 
-    sudo gem install bundler foreman --no-ri --no-rdoc
+    sudo gem install rake bundler foreman --no-ri --no-rdoc
 
 ## 3. System Users
 
@@ -225,7 +225,7 @@ When done you see `See the Huginn Wiki for more Agent examples!  https://github.
 
 **Note:** This will create an initial user, you can set the username and password by supplying it in environmental variables `SEED_USERNAME` and `SEED_PASSWORD` as seen below. If you don't set the password (and it is set to the default one) please wait with exposing Huginn to the public internet until the installation is done and you've logged into the server and changed your password.
 
-    sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=admin SEED_PASSWORD=yourpassword
+    sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=admin SEED_PASSWORD=password
 
 ### Compile Assets
 
