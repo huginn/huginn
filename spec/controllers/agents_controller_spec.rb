@@ -397,6 +397,8 @@ describe AgentsController do
     it "accepts an event" do
       sign_in users(:bob)
       agent = agents(:bob_website_agent)
+      agent.options['url_from_event'] = '{{ url }}'
+      agent.save!
       url_from_event = "http://xkcd.com/?from_event=1".freeze
       expect {
         post :dry_run, id: agent, event: { url: url_from_event }
