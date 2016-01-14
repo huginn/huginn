@@ -1,3 +1,5 @@
+# :markup: markdown
+
 module LiquidInterpolatable
   extend ActiveSupport::Concern
 
@@ -311,4 +313,93 @@ module LiquidInterpolatable
   end
   Liquid::Template.register_tag('credential', LiquidInterpolatable::Tags::Credential)
   Liquid::Template.register_tag('line_break', LiquidInterpolatable::Tags::LineBreak)
+
+  module Blocks
+    # Replace every occurrence of a given regex pattern in the first
+    # "in" block with the result of the "with" block in which the
+    # variable `match` is set for each iteration, which can be used as
+    # follows:
+    #
+    # - `match[0]` or just `match`: the whole matching string
+    # - `match[1]`..`match[n]`: strings matching the numbered capture groups
+    # - `match.size`: total number of the elements above (n+1)
+    # - `match.names`: array of names of named capture groups
+    # - `match[name]`..: strings matching the named capture groups
+    # - `match.pre_match`: string preceding the match
+    # - `match.post_match`: string following the match
+    # - `match.***`: equivalent to `match['***']` unless it conflicts with the existing methods above
+    #
+    # If named captures (`(?<name>...)`) are used in the pattern, they
+    # are also made accessible as variables.  Note that if numbered
+    # captures are used mixed with named captures, you could get
+    # unexpected results.
+    #
+    # Example usage:
+    #
+    #     {% regex_replace "\w+" in %}Use me like this.{% with %}{{ match | capitalize }}{% endregex_replace %}
+    #     {% assign fullname = "Doe, John A." %}
+    #     {% regex_replace_first "\A(?<name1>.+), (?<name2>.+)\z" in %}{{ fullname }}{% with %}{{ name2 }} {{ name1 }}{% endregex_replace_first %}
+    #
+    #     Use Me Like This.
+    #
+    #     John A. Doe
+    #
+    class RegexReplace < Liquid::Block
+      Syntax = /\A\s*(#{Liquid::QuotedFragment})(?:\s+in)?\s*\z/
+
+      def initialize(tag_name, markup, tokens)
+        super
+
+        case markup
+        when Syntax
+          @regexp = $1
+        else
+          raise Liquid::SyntaxError, 'Syntax Error in regex_replace tag - Valid syntax: regex_replace pattern in'
+        end
+        @nodelist = @in_block = []
+        @with_block = nil
+      end
+
+      def nodelist
+        if @with_block
+          @in_block + @with_block
+        else
+          @in_block
+        end
+      end
+
+      def unknown_tag(tag, markup, tokens)
+        return super unless tag == 'with'.freeze
+        @nodelist = @with_block = []
+      end
+
+      def render(context)
+        begin
+          regexp = Regexp.new(context[@regexp].to_s)
+        rescue ::SyntaxError => e
+          raise Liquid::SyntaxError, "Syntax Error in regex_replace tag - #{e.message}"
+        end
+
+        subject = render_all(@in_block, context)
+
+        subject.send(first? ? :sub : :gsub, regexp) {
+          next '' unless @with_block
+          m = Regexp.last_match
+          context.stack do
+            m.names.each do |name|
+              context[name] = m[name]
+            end
+            context['match'.freeze] = m
+            render_all(@with_block, context)
+          end
+        }
+      end
+
+      def first?
+        @tag_name.end_with?('_first'.freeze)
+      end
+    end
+  end
+  Liquid::Template.register_tag('regex_replace',       LiquidInterpolatable::Blocks::RegexReplace)
+  Liquid::Template.register_tag('regex_replace_first', LiquidInterpolatable::Blocks::RegexReplace)
 end
