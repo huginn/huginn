@@ -2,8 +2,6 @@ module Agents
   class PostAgent < Agent
     include WebRequestConcern
 
-    cannot_create_events!
-
     default_schedule "never"
 
     description <<-MD
@@ -15,6 +13,9 @@ module Agents
 
       By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).  Change `content_type` to `json` to send JSON instead.  Change `content_type` to `xml` to send XML, where the name of the root element may be specified using `xml_root`, defaulting to `post`.
 
+      If `emit_events` is set to `true`, the server response will be emitted as an Event and can be fed to a WebsiteAgent for parsing (using its `data_from_event` and `type` options). No data processing
+      will be attempted by this Agent, so the "body" value will always be raw text.
+
       Other Options:
 
         * `headers` - When present, it should be a hash of headers to send with the request.
@@ -23,7 +24,17 @@ module Agents
         * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
     MD
 
-    event_description "Does not produce events."
+    event_description <<-MD
+      Events look like this:
+        {
+          "status": 200,
+          "response_headers": {
+            "Content-Type": "text/html",
+            ...
+          },
+          "body": "<html>Some data...</html>"
+        }
+    MD
 
     def default_options
       {
@@ -54,6 +65,10 @@ module Agents
 
       if options['payload'].present? && !options['payload'].is_a?(Hash)
         errors.add(:base, "if provided, payload must be a hash")
+      end
+
+      if options['emit_events'].present? && ![true, false, 'true', 'false'].include?(options['emit_events'])
+        errors.add(:base, "if provided, emit_events must be true or false")
       end
 
       unless %w[post get put delete patch].include?(method)
@@ -112,9 +127,13 @@ module Agents
         error "Invalid method '#{method}'"
       end
 
-      faraday.run_request(method.to_sym, url, body, headers) { |request|
+      response = faraday.run_request(method.to_sym, url, body, headers) { |request|
         request.params.update(params) if params
       }
+
+      if boolify(interpolated['emit_events'])
+        create_event payload: { body: response.body, response_headers: response.headers, status: response.status }
+      end
     end
   end
 end
