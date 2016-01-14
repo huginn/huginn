@@ -768,20 +768,13 @@ fire: hot
           @event = Event.new
           @event.agent = agents(:bob_rain_notifier_agent)
           @event.payload = {
-            'url' => 'http://xkcd.com',
-            'link' => 'Random',
+            'url' => 'http://foo.com',
+            'link' => 'Random'
           }
         end
 
-        it "should scrape from the url element in incoming event payload" do
-          expect {
-            @checker.options = @valid_options
-            @checker.receive([@event])
-          }.to change { Event.count }.by(1)
-        end
-
-        it "should use url_from_event as url to scrape if it exists when receiving an event" do
-          stub = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
+        it "should use url_from_event as the url to scrape" do
+          stub = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Ffoo.com')
 
           @checker.options = @valid_options.merge(
             'url_from_event' => 'http://example.org/?url={{url | uri_escape}}'
@@ -791,9 +784,16 @@ fire: hot
           expect(stub).to have_been_requested
         end
 
+        it "should use the Agent's `url` option if url_from_event is not set" do
+          expect {
+            @checker.options = @valid_options
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+        end
+
         it "should allow url_from_event to be an array of urls" do
-          stub1 = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
-          stub2 = stub_request(:any, 'http://google.org/?url=http%3A%2F%2Fxkcd.com')
+          stub1 = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Ffoo.com')
+          stub2 = stub_request(:any, 'http://google.org/?url=http%3A%2F%2Ffoo.com')
 
           @checker.options = @valid_options.merge(
             'url_from_event' => ['http://example.org/?url={{url | uri_escape}}', 'http://google.org/?url={{url | uri_escape}}']
@@ -805,7 +805,10 @@ fire: hot
         end
 
         it "should interpolate values from incoming event payload" do
+          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+
           expect {
+            @valid_options['url_from_event'] = '{{ url }}'
             @valid_options['extract'] = {
               'from' => {
                 'xpath' => '*[1]',
@@ -821,9 +824,19 @@ fire: hot
           }.to change { Event.count }.by(1)
 
           expect(Event.last.payload).to eq({
-            'from' => 'http://xkcd.com',
+            'from' => 'http://foo.com',
             'to' => 'http://dynamic.xkcd.com/random/comic/',
           })
+        end
+
+        it "should use the options url if no url is in the event payload, and `url_from_event` is not provided" do
+          @checker.options['mode'] = 'merge'
+          @event.payload.delete('url')
+          expect {
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+          expect(Event.last.payload['title']).to eq('Evolving')
+          expect(Event.last.payload['link']).to eq('Random')
         end
 
         it "should interpolate values from incoming event payload and _response_" do
@@ -1065,7 +1078,6 @@ fire: hot
         event = @events[6]
         expect(event.payload['url']).to eq("https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
       end
-
     end
   end
 end
