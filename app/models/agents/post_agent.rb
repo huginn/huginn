@@ -2,6 +2,7 @@ module Agents
   class PostAgent < Agent
     include WebRequestConcern
 
+    can_dry_run!
     default_schedule "never"
 
     description <<-MD
@@ -14,7 +15,7 @@ module Agents
       By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).  Change `content_type` to `json` to send JSON instead.  Change `content_type` to `xml` to send XML, where the name of the root element may be specified using `xml_root`, defaulting to `post`.
 
       If `emit_events` is set to `true`, the server response will be emitted as an Event and can be fed to a WebsiteAgent for parsing (using its `data_from_event` and `type` options). No data processing
-      will be attempted by this Agent, so the "body" value will always be raw text.
+      will be attempted by this Agent, so the Event's "body" value will always be raw text.
 
       Other Options:
 
