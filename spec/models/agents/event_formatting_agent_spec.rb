@@ -40,6 +40,21 @@ describe Agents::EventFormattingAgent do
         },
         :conditions => "someothervalue"
     }
+
+    @event2 = Event.new
+    @event2.agent = agents(:jane_weather_agent)
+    @event2.created_at = Time.now
+    @event2.payload = {
+        :content => {
+            :text => "Some Lorem Ipsum 2",
+            :name => "somevalue2",
+        },
+        :date => {
+            :epoch => "1357966800",
+            :pretty => "00:00 AM EST on January 12, 2015"
+        },
+        :conditions => "someothervalue2"
+    }
   end
 
   describe "#receive" do
@@ -63,8 +78,14 @@ describe Agents::EventFormattingAgent do
     end
 
     it "should handle matchers and Liquid templating in instructions" do
-      @checker.receive([@event])
-      expect(Event.last.payload[:subject]).to eq("Weather looks like someothervalue according to the forecast at 10:00 PM EST")
+      expect {
+        @checker.receive([@event, @event2])
+      }.to change { Event.count }.by(2)
+
+      formatted_event1, formatted_event2 = Event.last(2)
+
+      expect(formatted_event1.payload[:subject]).to eq("Weather looks like someothervalue according to the forecast at 10:00 PM EST")
+      expect(formatted_event2.payload[:subject]).to eq("Weather looks like someothervalue2 according to the forecast at 00:00 AM EST")
     end
 
     it "should allow escaping" do
