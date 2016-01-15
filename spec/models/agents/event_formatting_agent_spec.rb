@@ -8,6 +8,7 @@ describe Agents::EventFormattingAgent do
             :instructions => {
                 :message => "Received {{content.text}} from {{content.name}} .",
                 :subject => "Weather looks like {{conditions}} according to the forecast at {{pretty_date.time}}",
+                :timezone => "{{timezone}}",
                 :agent => "{{agent.type}}",
                 :created_at => "{{created_at}}",
                 :created_at_iso => "{{created_at | date:'%FT%T%:z'}}",
@@ -18,6 +19,10 @@ describe Agents::EventFormattingAgent do
                     :path => "{{date.pretty}}",
                     :regexp => "\\A(?<time>\\d\\d:\\d\\d [AP]M [A-Z]+)",
                     :to => "pretty_date",
+                },
+                {
+                    :path => "{{pretty_date.time}}",
+                    :regexp => "(?<timezone>[A-Z]+)\\z",
                 },
             ],
         }
@@ -50,8 +55,8 @@ describe Agents::EventFormattingAgent do
             :name => "somevalue2",
         },
         :date => {
-            :epoch => "1357966800",
-            :pretty => "00:00 AM EST on January 12, 2015"
+            :epoch => "1366372800",
+            :pretty => "08:00 AM EDT on April 19, 2013"
         },
         :conditions => "someothervalue2"
     }
@@ -85,7 +90,24 @@ describe Agents::EventFormattingAgent do
       formatted_event1, formatted_event2 = Event.last(2)
 
       expect(formatted_event1.payload[:subject]).to eq("Weather looks like someothervalue according to the forecast at 10:00 PM EST")
-      expect(formatted_event2.payload[:subject]).to eq("Weather looks like someothervalue2 according to the forecast at 00:00 AM EST")
+      expect(formatted_event1.payload[:timezone]).to eq("EST")
+      expect(formatted_event2.payload[:subject]).to eq("Weather looks like someothervalue2 according to the forecast at 08:00 AM EDT")
+      expect(formatted_event2.payload[:timezone]).to eq("EDT")
+    end
+
+    it "should not fail if no matchers are defined" do
+      @checker.options.delete(:matchers)
+
+      expect {
+        @checker.receive([@event, @event2])
+      }.to change { Event.count }.by(2)
+
+      formatted_event1, formatted_event2 = Event.last(2)
+
+      expect(formatted_event1.payload[:subject]).to eq("Weather looks like someothervalue according to the forecast at ")
+      expect(formatted_event1.payload[:timezone]).to eq("")
+      expect(formatted_event2.payload[:subject]).to eq("Weather looks like someothervalue2 according to the forecast at ")
+      expect(formatted_event2.payload[:timezone]).to eq("")
     end
 
     it "should allow escaping" do
