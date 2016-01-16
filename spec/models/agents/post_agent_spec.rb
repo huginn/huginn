@@ -216,7 +216,7 @@ describe Agents::PostAgent do
 
         it "emits the response headers" do
           @checker.check
-          expect(@checker.events.last.payload['response_headers']).to eq({ 'Content-Type' => 'text/html' })
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
         end
       end
     end
@@ -321,11 +321,11 @@ describe Agents::PostAgent do
       expect(@checker).to be_valid
     end
 
-    it "requires emit_events to be true or false, if present" do
+    it "requires emit_events to be true or false" do
       @checker.options['emit_events'] = 'what?'
       expect(@checker).not_to be_valid
 
-      @checker.options['emit_events'] = ''
+      @checker.options.delete('emit_events')
       expect(@checker).to be_valid
 
       @checker.options['emit_events'] = 'true'

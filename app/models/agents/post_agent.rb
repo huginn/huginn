@@ -29,7 +29,7 @@ module Agents
       Events look like this:
         {
           "status": 200,
-          "response_headers": {
+          "headers": {
             "Content-Type": "text/html",
             ...
           },
@@ -47,7 +47,8 @@ module Agents
           'key' => 'value',
           'something' => 'the event contained {{ somekey }}'
         },
-        'headers' => {}
+        'headers' => {},
+        'emit_events' => 'false'
       }
     end
 
@@ -68,7 +69,7 @@ module Agents
         errors.add(:base, "if provided, payload must be a hash")
       end
 
-      if options['emit_events'].present? && ![true, false, 'true', 'false'].include?(options['emit_events'])
+      if options.has_key?('emit_events') && boolify(options['emit_events']).nil?
         errors.add(:base, "if provided, emit_events must be true or false")
       end
 
@@ -133,7 +134,7 @@ module Agents
       }
 
       if boolify(interpolated['emit_events'])
-        create_event payload: { body: response.body, response_headers: response.headers, status: response.status }
+        create_event payload: { body: response.body, headers: response.headers, status: response.status }
       end
     end
   end
