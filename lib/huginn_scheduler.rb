@@ -61,7 +61,7 @@ class Rufus::Scheduler
         job.scheduler_agent_id = agent_id
 
         if scheduler_agent = job.scheduler_agent
-          scheduler_agent.check!
+          scheduler_agent.control!
         else
           puts "Unscheduling SchedulerAgent##{job.scheduler_agent_id} (disabled or deleted)"
           job.unschedule
@@ -92,61 +92,60 @@ class Rufus::Scheduler
   end
 end
 
-class HuginnScheduler
+class HuginnScheduler < LongRunnable::Worker
+  include LongRunnable
+
   FAILED_JOBS_TO_KEEP = 100
-  attr_accessor :mutex
 
-  def initialize(options = {})
-    @rufus_scheduler = Rufus::Scheduler.new(options)
-    self.mutex = Mutex.new
-  end
-
-  def stop
-    @rufus_scheduler.stop
-  end
-
-  def run!
+  def setup
     tzinfo_friendly_timezone = ActiveSupport::TimeZone::MAPPING[ENV['TIMEZONE'].presence || "Pacific Time (US & Canada)"]
 
     # Schedule event propagation.
-    @rufus_scheduler.every '1m' do
+    every '1m' do
       propagate!
     end
 
     # Schedule event cleanup.
-    @rufus_scheduler.every ENV['EVENT_EXPIRATION_CHECK'].presence || '6h' do
+    every ENV['EVENT_EXPIRATION_CHECK'].presence || '6h' do
       cleanup_expired_events!
     end
 
     # Schedule failed job cleanup.
-    @rufus_scheduler.every '1h' do
+    every '1h' do
       cleanup_failed_jobs!
     end
 
     # Schedule repeating events.
     %w[1m 2m 5m 10m 30m 1h 2h 5h 12h 1d 2d 7d].each do |schedule|
-      @rufus_scheduler.every schedule do
+      every schedule do
         run_schedule "every_#{schedule}"
       end
     end
 
     # Schedule events for specific times.
     24.times do |hour|
-      @rufus_scheduler.cron "0 #{hour} * * * " + tzinfo_friendly_timezone do
+      cron "0 #{hour} * * * " + tzinfo_friendly_timezone do
         run_schedule hour_to_schedule_name(hour)
       end
     end
 
     # Schedule Scheduler Agents
 
-    @rufus_scheduler.every '1m' do
-      @rufus_scheduler.schedule_scheduler_agents
+    every '1m' do
+      @scheduler.schedule_scheduler_agents
     end
+  end
 
-    @rufus_scheduler.join
+  def run
+    @scheduler.join
+  end
+
+  def self.setup_worker
+    [new(id: self.to_s)]
   end
 
   private
+
   def run_schedule(time)
     with_mutex do
       puts "Queuing schedule for #{time}"
@@ -187,8 +186,8 @@ class HuginnScheduler
   end
 
   def with_mutex
-    ActiveRecord::Base.connection_pool.with_connection do
-      mutex.synchronize do
+    mutex.synchronize do
+      ActiveRecord::Base.connection_pool.with_connection do
         yield
       end
     end

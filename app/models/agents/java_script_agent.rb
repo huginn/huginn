@@ -21,6 +21,8 @@ module Agents
       * `this.memory()`
       * `this.memory(key)`
       * `this.memory(keyToSet, valueToSet)`
+      * `this.credential(name)`
+      * `this.credential(name, valueToSet)`
       * `this.options()`
       * `this.options(key)`
       * `this.log(message)`
@@ -120,6 +122,8 @@ module Agents
       end
       context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
       context["unescapeHtml"] = lambda { |a, x| CGI.unescapeHTML(x) }
+      context['getCredential'] = lambda { |a, k| credential(k); }
+      context['setCredential'] = lambda { |a, k, v| set_credential(k, v) }
 
       if (options['language'] || '').downcase == 'coffeescript'
         context.eval(CoffeeScript.compile code)
@@ -142,6 +146,12 @@ module Agents
       (interpolated['code'] || '').strip =~ /\Acredential:(.*)\Z/ && $1
     end
 
+    def set_credential(name, value)
+      c = user.user_credentials.find_or_initialize_by(credential_name: name)
+      c.credential_value = value
+      c.save!
+    end
+
     def setup_javascript
       <<-JS
         function Agent() {};
@@ -161,6 +171,14 @@ module Agents
             return JSON.parse(getMemory())[key];
           } else {
             return JSON.parse(getMemory());
+          }
+        }
+
+        Agent.credential = function(name, value) {
+          if (typeof(value) !== "undefined") {
+            setCredential(name, value);
+          } else {
+            return getCredential(name);
           }
         }
 

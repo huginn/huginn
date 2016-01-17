@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::DataOutputAgent do
   let(:agent) do
@@ -73,6 +73,29 @@ describe Agents::DataOutputAgent do
     end
   end
 
+  describe "#receive" do
+    it "should push to hubs when push_hubs is given" do
+      agent.options[:push_hubs] = %w[http://push.example.com]
+      agent.options[:template] = { 'link' => 'http://huginn.example.org' }
+
+      alist = nil
+
+      stub_request(:post, 'http://push.example.com/')
+        .with(headers: { 'Content-Type' => %r{\Aapplication/x-www-form-urlencoded\s*(?:;|\z)} })
+        .to_return { |request|
+        alist = URI.decode_www_form(request.body).sort
+        { status: 200, body: 'ok' }
+      }
+
+      agent.receive(events(:bob_website_agent_event))
+
+      expect(alist).to eq [
+        ["hub.mode", "publish"],
+        ["hub.url", agent.feed_url(secret: agent.options[:secrets].first, format: :xml)]
+      ]
+    end
+  end
+
   describe "#receive_web_request" do
     before do
       current_time = Time.now
@@ -130,7 +153,7 @@ describe Agents::DataOutputAgent do
         expect(content_type).to eq('text/xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
-          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
           <channel>
            <atom:link href="https://yoursite.com/users/#{agent.user.id}/web_requests/#{agent.id}/secret1.xml" rel="self" type="application/rss+xml"/>
            <atom:icon>https://yoursite.com/favicon.ico</atom:icon>
@@ -168,6 +191,16 @@ describe Agents::DataOutputAgent do
           </channel>
           </rss>
         XML
+      end
+
+      it "can output RSS with hub links when push_hubs is specified" do
+        stub(agent).feed_link { "https://yoursite.com" }
+        agent.options[:push_hubs] = %w[https://pubsubhubbub.superfeedr.com/ https://pubsubhubbub.appspot.com/]
+        content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+        expect(status).to eq(200)
+        expect(content_type).to eq('text/xml')
+        xml = Nokogiri::XML(content)
+        expect(xml.xpath('/rss/channel/atom:link[@rel="hub"]/@href').map(&:text).sort).to eq agent.options[:push_hubs].sort
       end
 
       it "can output JSON" do
@@ -359,7 +392,7 @@ describe Agents::DataOutputAgent do
         expect(content_type).to eq('text/xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
-          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
           <channel>
            <atom:link href="https://yoursite.com/users/#{agent.user.id}/web_requests/#{agent.id}/secret1.xml" rel="self" type="application/rss+xml"/>
            <atom:icon>https://yoursite.com/favicon.ico</atom:icon>

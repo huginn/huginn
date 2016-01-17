@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::JabberAgent do
   let(:sent) { [] }
@@ -44,6 +44,17 @@ describe Agents::JabberAgent do
     end
   end
 
+  context "#start_worker?" do
+    it "starts when connect_to_receiver is truthy" do
+      agent.options[:connect_to_receiver] = 'true'
+      expect(agent.start_worker?).to be_truthy
+    end
+
+    it "does not starts when connect_to_receiver is not truthy" do
+      expect(agent.start_worker?).to be_falsy
+    end
+  end
+
   describe "validation" do
     before do
       expect(agent).to be_valid
@@ -76,6 +87,68 @@ describe Agents::JabberAgent do
       agent.receive([event, event2])
       expect(sent).to eq([ 'Warning! Weather Alert! - http://www.weather.com/',
                        'Warning! Another Weather Alert! - http://www.weather.com/we-are-screwed'])
+    end
+  end
+
+  describe Agents::JabberAgent::Worker do
+    before(:each) do
+      @worker = Agents::JabberAgent::Worker.new(agent: agent)
+      @worker.setup
+      stub.any_instance_of(Jabber::Client).connect
+      stub.any_instance_of(Jabber::Client).auth
+    end
+
+    it "runs" do
+      agent.options[:jabber_receiver] = 'someJID'
+      mock.any_instance_of(Jabber::MUC::SimpleMUCClient).join('someJID')
+      @worker.run
+    end
+
+    it "stops" do
+      @worker.instance_variable_set(:@client, @worker.client)
+      mock.any_instance_of(Jabber::Client).close
+      mock.any_instance_of(Jabber::Client).stop
+      mock(@worker).thread { mock!.terminate }
+      @worker.stop
+    end
+
+    context "#message_handler" do
+      it "it ignores messages for the first seconds" do
+        @worker.instance_variable_set(:@started_at, Time.now)
+        expect { @worker.message_handler(:on_message, [123456, 'nick', 'hello']) }
+          .to change { agent.events.count }.by(0)
+      end
+
+      it "creates events" do
+        @worker.instance_variable_set(:@started_at, Time.now - 10.seconds)
+        expect { @worker.message_handler(:on_message, [123456, 'nick', 'hello']) }
+          .to change { agent.events.count }.by(1)
+        event = agent.events.last
+        expect(event.payload).to eq({'event' => 'on_message', 'time' => 123456, 'nick' => 'nick', 'message' => 'hello'})
+      end
+    end
+
+    context "#normalize_args" do
+      it "handles :on_join and :on_leave" do
+        time, nick, message = @worker.send(:normalize_args, :on_join, [123456, 'nick'])
+        expect(time).to eq(123456)
+        expect(nick).to eq('nick')
+        expect(message).to be_nil
+      end
+
+      it "handles :on_message and :on_leave" do
+        time, nick, message = @worker.send(:normalize_args, :on_message, [123456, 'nick', 'hello'])
+        expect(time).to eq(123456)
+        expect(nick).to eq('nick')
+        expect(message).to eq('hello')
+      end
+
+      it "handles :on_room_message" do
+        time, nick, message = @worker.send(:normalize_args, :on_room_message, [123456, 'hello'])
+        expect(time).to eq(123456)
+        expect(nick).to be_nil
+        expect(message).to eq('hello')
+      end
     end
   end
 end

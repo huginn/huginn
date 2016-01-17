@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'ostruct'
 
 describe Agents::PostAgent do
@@ -50,7 +50,7 @@ describe Agents::PostAgent do
           raise "unexpected Content-Type: #{content_type}"
         end
       end
-      { status: 200, body: "ok" }
+      { status: 200, body: "<html>a webpage!</html>", headers: { 'Content-Type' => 'text/html' } }
     }
   end
 
@@ -186,6 +186,40 @@ describe Agents::PostAgent do
 
       expect(@sent_requests[:get][0].data).to eq(@checker.options['payload'].to_query)
     end
+
+    describe "emitting events" do
+      context "when emit_events is not set to true" do
+        it "does not emit events" do
+          expect {
+            @checker.check
+          }.not_to change { @checker.events.count }
+        end
+      end
+
+      context "when emit_events is set to true" do
+        before do
+          @checker.options['emit_events'] = 'true'
+          @checker.save!
+        end
+
+        it "emits the response status" do
+          expect {
+            @checker.check
+          }.to change { @checker.events.count }.by(1)
+          expect(@checker.events.last.payload['status']).to eq 200
+        end
+
+        it "emits the body" do
+          @checker.check
+          expect(@checker.events.last.payload['body']).to eq '<html>a webpage!</html>'
+        end
+
+        it "emits the response headers" do
+          @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
+        end
+      end
+    end
   end
 
   describe "#working?" do
@@ -284,6 +318,23 @@ describe Agents::PostAgent do
       expect(@checker).to be_valid
 
       @checker.options['headers'] = { "Authorization" => "foo bar" }
+      expect(@checker).to be_valid
+    end
+
+    it "requires emit_events to be true or false" do
+      @checker.options['emit_events'] = 'what?'
+      expect(@checker).not_to be_valid
+
+      @checker.options.delete('emit_events')
+      expect(@checker).to be_valid
+
+      @checker.options['emit_events'] = 'true'
+      expect(@checker).to be_valid
+
+      @checker.options['emit_events'] = 'false'
+      expect(@checker).to be_valid
+
+      @checker.options['emit_events'] = true
       expect(@checker).to be_valid
     end
   end

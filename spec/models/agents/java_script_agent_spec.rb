@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::JavaScriptAgent do
   before do
@@ -262,6 +262,34 @@ describe Agents::JavaScriptAgent do
           @agent.check
         }.not_to raise_error
         expect(AgentLog.last.message).to eq("hello from coffeescript")
+      end
+    end
+
+    describe "user credentials" do
+      it "can access an existing credential" do
+        @agent.send(:set_credential, 'test', 'hello')
+        @agent.options['code'] = 'Agent.check = function() { this.log(this.credential("test")); };'
+        @agent.save!
+        @agent.check
+        expect(AgentLog.last.message).to eq("hello")
+      end
+
+      it "will create a new credential" do
+        @agent.options['code'] = 'Agent.check = function() { this.credential("test","1234"); };'
+        @agent.save!
+        expect {
+          @agent.check
+        }.to change(UserCredential, :count).by(1)
+      end
+
+      it "updates an existing credential" do
+        @agent.send(:set_credential, 'test', 1234)
+        @agent.options['code'] = 'Agent.check = function() { this.credential("test","12345"); };'
+        @agent.save!
+        expect {
+          @agent.check
+        }.to change(UserCredential, :count).by(0)
+        expect(@agent.user.user_credentials.last.credential_value).to eq('12345')
       end
     end
   end

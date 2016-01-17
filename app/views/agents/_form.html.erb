@@ -15,6 +15,8 @@
              method: @agent.new_record? ? "POST" : "PUT",
              html: { class: 'agent-form' }) do |f| %>
 
+  <%= hidden_field_tag :return, params[:return] %>
+
   <div class="row">
     <div class="col-md-6">
       <div class="row">
@@ -63,9 +65,8 @@
               <div class="can-control-other-agents">
                 <div class="form-group">
                   <%= f.label :control_targets %>
-                  <% eventControlTargets = current_user.agents.select(&:can_be_scheduled?) %>
                   <%= f.select(:control_target_ids,
-                               options_for_select(eventControlTargets.map {|s| [s.name, s.id] },
+                               options_for_select(current_user.agents.map {|s| [s.name, s.id] },
                                                   @agent.control_target_ids),
                                {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
                 </div>
@@ -91,6 +92,8 @@
                 <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
                 <%= f.label :propagate_immediately, :class => 'propagate-immediately' do %>Propagate immediately
                   <%= f.check_box :propagate_immediately %>
+                  &nbsp;
+                  <span class="glyphicon glyphicon-question-sign hover-help" data-content="Normally, Huginn moves Events from source Agents to receiving Agents once per minute. Checking this option will cause Events created by this Agent's sources to be received immediately. This can use more CPU resources, but will decrease the time between Event creation and being received by this Agent."></span>
                 <% end %>
               </div>
             </div>

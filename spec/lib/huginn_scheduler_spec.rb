@@ -1,20 +1,23 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'huginn_scheduler'
 
 describe HuginnScheduler do
   before(:each) do
+    @rufus_scheduler = Rufus::Scheduler.new
     @scheduler = HuginnScheduler.new
-    stub
+    stub(@scheduler).setup {}
+    @scheduler.setup!(@rufus_scheduler, Mutex.new)
   end
 
-  it "should stop the scheduler" do
-    mock.instance_of(Rufus::Scheduler).stop
-    @scheduler.stop
+  after(:each) do
+    @rufus_scheduler.shutdown(:wait)
   end
 
   it "schould register the schedules with the rufus scheduler and run" do
-    mock.instance_of(Rufus::Scheduler).join
-    @scheduler.run!
+    mock(@rufus_scheduler).join
+    scheduler = HuginnScheduler.new
+    scheduler.setup!(@rufus_scheduler, Mutex.new)
+    scheduler.run
   end
 
   it "should run scheduled agents" do
@@ -53,7 +56,7 @@ describe HuginnScheduler do
     end
   end
 
-  describe "cleanup_failed_jobs!" do
+  describe "cleanup_failed_jobs!", focus: true do
     before do
       3.times do |i|
         Delayed::Job.create(failed_at: Time.now - i.minutes)
@@ -75,10 +78,21 @@ describe HuginnScheduler do
       ENV['FAILED_JOBS_TO_KEEP'] = old
     end
   end
+
+  context "#setup_worker" do
+    it "should return an array with an instance of itself" do
+      workers = HuginnScheduler.setup_worker
+      expect(workers).to be_a(Array)
+      expect(workers.first).to be_a(HuginnScheduler)
+      expect(workers.first.id).to eq('HuginnScheduler')
+    end
+  end
 end
 
 describe Rufus::Scheduler do
   before :each do
+    Agent.delete_all
+
     @taoe, Thread.abort_on_exception = Thread.abort_on_exception, false
     @oso, @ose, $stdout, $stderr = $stdout, $stderr, StringIO.new, StringIO.new
 
@@ -97,7 +111,7 @@ describe Rufus::Scheduler do
   end
 
   after :each do
-    @scheduler.shutdown
+    @scheduler.shutdown(:wait)
 
     Thread.abort_on_exception = @taoe
     $stdout, $stderr = @oso, @ose

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::WebsiteAgent do
   describe "checking without basic auth" do
@@ -170,6 +170,35 @@ describe Agents::WebsiteAgent do
     end
 
     describe 'unzipping' do
+      it 'should unzip automatically if the response has Content-Encoding: gzip' do
+        json = {
+          'response' => {
+            'version' => 2,
+            'title' => "hello!"
+          }
+        }
+        zipped = ActiveSupport::Gzip.compress(json.to_json)
+        stub_request(:any, /gzip/).to_return(body: zipped, headers: { 'Content-Encoding' => 'gzip' }, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://gzip.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'version' => { 'path' => 'response.version' },
+          },
+          # no unzip option
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        expect(event.payload['version']).to eq(2)
+      end
+
       it 'should unzip with unzip option' do
         json = {
           'response' => {
@@ -178,7 +207,7 @@ describe Agents::WebsiteAgent do
           }
         }
         zipped = ActiveSupport::Gzip.compress(json.to_json)
-        stub_request(:any, /gzip/).to_return(:body => zipped, :status => 200)
+        stub_request(:any, /gzip/).to_return(body: zipped, status: 200)
         site = {
           'name' => "Some JSON Response",
           'expected_update_period_in_days' => "2",
@@ -198,16 +227,46 @@ describe Agents::WebsiteAgent do
         event = Event.last
         expect(event.payload['version']).to eq(2)
       end
+
+      it 'should either avoid or support a raw deflate stream (#1018)' do
+        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /\A(?!.*deflate)/ }).
+          to_return(body: 'hello',
+                    status: 200)
+        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /deflate/ }).
+          to_return(body: "\xcb\x48\xcd\xc9\xc9\x07\x00\x06\x2c".b,
+                    headers: { 'Content-Encoding' => 'deflate' },
+                    status: 200)
+
+        site = {
+          'name' => 'Some Response',
+          'expected_update_period_in_days' => '2',
+          'type' => 'text',
+          'url' => 'http://deflate',
+          'mode' => 'on_change',
+          'extract' => {
+            'content' => { 'regexp' => '.+', 'index' => 0 }
+          }
+        }
+        checker = Agents::WebsiteAgent.new(name: "Deflate Test", options: site)
+        checker.user = users(:bob)
+        checker.save!
+
+        expect {
+          checker.check
+        }.to change { Event.count }.by(1)
+        event = Event.last
+        expect(event.payload['content']).to eq('hello')
+      end
     end
 
     describe 'encoding' do
       it 'should be forced with force_encoding option' do
         huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /no-encoding/).to_return(:body => {
-            :value => huginn,
-          }.to_json.encode(Encoding::EUC_JP), :headers => {
+        stub_request(:any, /no-encoding/).to_return(body: {
+            value: huginn,
+          }.to_json.encode(Encoding::EUC_JP).b, headers: {
             'Content-Type' => 'application/json',
-          }, :status => 200)
+          }, status: 200)
         site = {
           'name' => "Some JSON Response",
           'expected_update_period_in_days' => "2",
@@ -219,22 +278,22 @@ describe Agents::WebsiteAgent do
           },
           'force_encoding' => 'EUC-JP',
         }
-        checker = Agents::WebsiteAgent.new(:name => "No Encoding Site", :options => site)
+        checker = Agents::WebsiteAgent.new(name: "No Encoding Site", options: site)
         checker.user = users(:bob)
         checker.save!
 
-        checker.check
+        expect { checker.check }.to change { Event.count }.by(1)
         event = Event.last
         expect(event.payload['value']).to eq(huginn)
       end
 
       it 'should be overridden with force_encoding option' do
         huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /wrong-encoding/).to_return(:body => {
-            :value => huginn,
-          }.to_json.encode(Encoding::EUC_JP), :headers => {
+        stub_request(:any, /wrong-encoding/).to_return(body: {
+            value: huginn,
+          }.to_json.encode(Encoding::EUC_JP).b, headers: {
             'Content-Type' => 'application/json; UTF-8',
-          }, :status => 200)
+          }, status: 200)
         site = {
           'name' => "Some JSON Response",
           'expected_update_period_in_days' => "2",
@@ -246,11 +305,63 @@ describe Agents::WebsiteAgent do
           },
           'force_encoding' => 'EUC-JP',
         }
-        checker = Agents::WebsiteAgent.new(:name => "Wrong Encoding Site", :options => site)
+        checker = Agents::WebsiteAgent.new(name: "Wrong Encoding Site", options: site)
         checker.user = users(:bob)
         checker.save!
 
-        checker.check
+        expect { checker.check }.to change { Event.count }.by(1)
+        event = Event.last
+        expect(event.payload['value']).to eq(huginn)
+      end
+
+      it 'should be determined by charset in Content-Type' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /charset-euc-jp/).to_return(body: {
+            value: huginn,
+          }.to_json.encode(Encoding::EUC_JP), headers: {
+            'Content-Type' => 'application/json; charset=EUC-JP',
+          }, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://charset-euc-jp.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+        }
+        checker = Agents::WebsiteAgent.new(name: "Charset reader", options: site)
+        checker.user = users(:bob)
+        checker.save!
+
+        expect { checker.check }.to change { Event.count }.by(1)
+        event = Event.last
+        expect(event.payload['value']).to eq(huginn)
+      end
+
+      it 'should default to UTF-8 when unknown charset is found' do
+        huginn = "\u{601d}\u{8003}"
+        stub_request(:any, /charset-unknown/).to_return(body: {
+            value: huginn,
+          }.to_json.b, headers: {
+            'Content-Type' => 'application/json; charset=unicode',
+          }, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://charset-unknown.example.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'value' => { 'path' => 'value' },
+          },
+        }
+        checker = Agents::WebsiteAgent.new(name: "Charset reader", options: site)
+        checker.user = users(:bob)
+        checker.save!
+
+        expect { checker.check }.to change { Event.count }.by(1)
         event = Event.last
         expect(event.payload['value']).to eq(huginn)
       end
@@ -470,6 +581,41 @@ describe Agents::WebsiteAgent do
         end
       end
 
+      describe "XML with cdata" do
+        before do
+          stub_request(:any, /cdata_rss/).to_return(
+            body: File.read(Rails.root.join("spec/data_fixtures/cdata_rss.atom")),
+            status: 200
+          )
+
+          @checker = Agents::WebsiteAgent.new(name: 'cdata', options: {
+            'name' => 'CDATA',
+            'expected_update_period_in_days' => '2',
+            'type' => 'xml',
+            'url' => 'http://example.com/cdata_rss.atom',
+            'mode' => 'on_change',
+            'extract' => {
+              'author' => { 'xpath' => '/feed/entry/author/name', 'value' => './/text()'},
+              'title' => { 'xpath' => '/feed/entry/title', 'value' => './/text()' },
+              'content' => { 'xpath' => '/feed/entry/content', 'value' => './/text()' },
+            }
+          }, keep_events_for: 2.days)
+          @checker.user = users(:bob)
+          @checker.save!
+        end
+
+        it "works with XPath" do
+          expect {
+            @checker.check
+          }.to change { Event.count }.by(10)
+          event = Event.last
+          expect(event.payload['author']).to eq('bill98')
+          expect(event.payload['title']).to eq('Help: Rainmeter Skins • Test if Today is Between 2 Dates')
+          expect(event.payload['content']).to start_with('Can I ')
+        end
+
+      end
+
       describe "JSON" do
         it "works with paths" do
           json = {
@@ -617,79 +763,199 @@ fire: hot
     end
 
     describe "#receive" do
-      before do
-        @event = Event.new
-        @event.agent = agents(:bob_rain_notifier_agent)
-        @event.payload = {
-          'url' => 'http://xkcd.com',
-          'link' => 'Random',
-        }
-      end
-
-      it "should scrape from the url element in incoming event payload" do
-        expect {
-          @checker.options = @valid_options
-          @checker.receive([@event])
-        }.to change { Event.count }.by(1)
-      end
-
-      it "should use url_from_event as url to scrape if it exists when receiving an event" do
-        stub = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
-
-        @checker.options = @valid_options.merge(
-          'url_from_event' => 'http://example.org/?url={{url | uri_escape}}'
-        )
-        @checker.receive([@event])
-
-        expect(stub).to have_been_requested
-      end
-
-      it "should interpolate values from incoming event payload" do
-        expect {
-          @valid_options['extract'] = {
-            'from' => {
-              'xpath' => '*[1]',
-              'value' => '{{url | to_xpath}}'
-            },
-            'to' => {
-              'xpath' => '(//a[@href and text()={{link | to_xpath}}])[1]',
-              'value' => '@href'
-            },
+      describe "with a url or url_from_event" do
+        before do
+          @event = Event.new
+          @event.agent = agents(:bob_rain_notifier_agent)
+          @event.payload = {
+            'url' => 'http://foo.com',
+            'link' => 'Random'
           }
-          @checker.options = @valid_options
-          @checker.receive([@event])
-        }.to change { Event.count }.by(1)
+        end
 
-        expect(Event.last.payload).to eq({
-          'from' => 'http://xkcd.com',
-          'to' => 'http://dynamic.xkcd.com/random/comic/',
-        })
+        it "should use url_from_event as the url to scrape" do
+          stub = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Ffoo.com')
+
+          @checker.options = @valid_options.merge(
+            'url_from_event' => 'http://example.org/?url={{url | uri_escape}}'
+          )
+          @checker.receive([@event])
+
+          expect(stub).to have_been_requested
+        end
+
+        it "should use the Agent's `url` option if url_from_event is not set" do
+          expect {
+            @checker.options = @valid_options
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+        end
+
+        it "should allow url_from_event to be an array of urls" do
+          stub1 = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Ffoo.com')
+          stub2 = stub_request(:any, 'http://google.org/?url=http%3A%2F%2Ffoo.com')
+
+          @checker.options = @valid_options.merge(
+            'url_from_event' => ['http://example.org/?url={{url | uri_escape}}', 'http://google.org/?url={{url | uri_escape}}']
+          )
+          @checker.receive([@event])
+
+          expect(stub1).to have_been_requested
+          expect(stub2).to have_been_requested
+        end
+
+        it "should interpolate values from incoming event payload" do
+          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+
+          expect {
+            @valid_options['url_from_event'] = '{{ url }}'
+            @valid_options['extract'] = {
+              'from' => {
+                'xpath' => '*[1]',
+                'value' => '{{url | to_xpath}}'
+              },
+              'to' => {
+                'xpath' => '(//a[@href and text()={{link | to_xpath}}])[1]',
+                'value' => '@href'
+              },
+            }
+            @checker.options = @valid_options
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+
+          expect(Event.last.payload).to eq({
+            'from' => 'http://foo.com',
+            'to' => 'http://dynamic.xkcd.com/random/comic/',
+          })
+        end
+
+        it "should use the options url if no url is in the event payload, and `url_from_event` is not provided" do
+          @checker.options['mode'] = 'merge'
+          @event.payload.delete('url')
+          expect {
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+          expect(Event.last.payload['title']).to eq('Evolving')
+          expect(Event.last.payload['link']).to eq('Random')
+        end
+
+        it "should interpolate values from incoming event payload and _response_" do
+          @event.payload['title'] = 'XKCD'
+
+          expect {
+            @valid_options['extract'] = {
+              'response_info' => @valid_options['extract']['url'].merge(
+                'value' => '{% capture sentence %}The reponse from {{title}} was {{_response_.status}} {{_response_.headers.X-Status-Message}}.{% endcapture %}{{sentence | to_xpath}}'
+              )
+            }
+            @checker.options = @valid_options
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+
+          expect(Event.last.payload['response_info']).to eq('The reponse from XKCD was 200 OK.')
+        end
+
+        it "should support merging of events" do
+          expect {
+            @checker.options = @valid_options
+            @checker.options[:mode] = "merge"
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+          last_payload = Event.last.payload
+          expect(last_payload['link']).to eq('Random')
+        end
       end
 
-      it "should interpolate values from incoming event payload and _response_" do
-        @event.payload['title'] = 'XKCD'
+      describe "with a data_from_event" do
+        describe "with json data" do
+          before do
+            @event = Event.new
+            @event.agent = agents(:bob_rain_notifier_agent)
+            @event.payload = {
+              'something' => 'some value',
+              'some_object' => {
+                'some_data' => { hello: 'world' }.to_json
+              }
+            }
+            @event.save!
 
-        expect {
-          @valid_options['extract'] = {
-            'response_info' => @valid_options['extract']['url'].merge(
-              'value' => '{% capture sentence %}The reponse from {{title}} was {{_response_.status}} {{_response_.headers.X-Status-Message}}.{% endcapture %}{{sentence | to_xpath}}'
+            @checker.options = @valid_options.merge(
+              'type' => 'json',
+              'data_from_event' => '{{ some_object.some_data }}',
+              'extract' => {
+                'value' => { 'path' => 'hello' }
+              }
             )
-          }
-          @checker.options = @valid_options
-          @checker.receive([@event])
-        }.to change { Event.count }.by(1)
+          end
 
-        expect(Event.last.payload['response_info']).to eq('The reponse from XKCD was 200 OK.')
-      end
+          it "should extract from the event data in the incoming event payload" do
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world' })
+          end
 
-      it "should support merging of events" do
-        expect {
-          @checker.options = @valid_options
-          @checker.options[:mode] = "merge"
-          @checker.receive([@event])
-        }.to change { Event.count }.by(1)
-        last_payload = Event.last.payload
-        expect(last_payload['link']).to eq('Random')
+          it "should support merge mode" do
+            @checker.options['mode'] = "merge"
+
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world'))
+          end
+
+          it "should output an error when nothing can be found at the path" do
+            @checker.options = @checker.options.merge(
+              'data_from_event' => '{{ some_object.mistake }}'
+            )
+
+            expect {
+              @checker.receive([@event])
+            }.to_not change { Event.count }
+
+            expect(@checker.logs.last.message).to match(/No data was found in the Event payload using the template {{ some_object\.mistake }}/)
+          end
+
+          it "should output an error when the data cannot be parsed" do
+            @event.update_attribute :payload, @event.payload.merge('some_object' => { 'some_data' => '{invalid json' })
+
+            expect {
+              @checker.receive([@event])
+            }.to_not change { Event.count }
+
+            expect(@checker.logs.last.message).to match(/Error when handling event data:/)
+          end
+        end
+
+        describe "with HTML data" do
+          before do
+            @event = Event.new
+            @event.agent = agents(:bob_rain_notifier_agent)
+            @event.payload = {
+              'url' => 'http://xkcd.com',
+              'some_object' => {
+                'some_data' => "<div><span class='title'>Title!</span><span class='body'>Body!</span></div>"
+              }
+            }
+            @event.save!
+
+            @checker.options = @valid_options.merge(
+              'type' => 'html',
+              'data_from_event' => '{{ some_object.some_data }}',
+              'extract' => {
+                'title' => { 'css' => ".title", 'value' => ".//text()" },
+                'body' => { 'css' => "div span.body", 'value' => ".//text()" }
+              }
+            )
+          end
+
+          it "should extract from the event data in the incoming event payload" do
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'title' => 'Title!', 'body' => 'Body!' })
+          end
+        end
       end
     end
   end
@@ -749,6 +1015,68 @@ fire: hot
     describe "#check" do
       it "should check for changes" do
         expect { @checker.check }.to change { Event.count }.by(1)
+      end
+    end
+  end
+
+  describe "checking urls" do
+    before do
+      stub_request(:any, /example/).
+        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/urlTest.html")), :status => 200)
+      @valid_options = {
+        'name' => "Url Test",
+        'expected_update_period_in_days' => "2",
+        'type' => "html",
+        'url' => "http://www.example.com",
+        'mode' => 'all',
+        'extract' => {
+          'url' => { 'css' => "a", 'value' => "@href" },
+        }
+      }
+      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)
+      @checker.user = users(:bob)
+      @checker.save!
+    end
+
+    describe "#check" do
+      before do
+        expect { @checker.check }.to change { Event.count }.by(7)
+        @events = Event.last(7)
+      end
+
+      it "should check hostname" do
+        event = @events[0]
+        expect(event.payload['url']).to eq("http://google.com")
+      end
+
+      it "should check unescaped query" do
+        event = @events[1]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=some%20query")
+      end
+
+      it "should check properly escaped query" do
+        event = @events[2]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=some%20query")
+      end
+
+      it "should check unescaped unicode url" do
+        event = @events[3]
+        expect(event.payload['url']).to eq("http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+      it "should check unescaped unicode query" do
+        event = @events[4]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+      it "should check properly escaped unicode url" do
+        event = @events[5]
+        expect(event.payload['url']).to eq("http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
+      end
+
+      it "should check properly escaped unicode query" do
+        event = @events[6]
+        expect(event.payload['url']).to eq("https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
       end
     end
   end

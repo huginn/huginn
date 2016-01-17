@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'nokogiri'
 
 describe LiquidInterpolatable::Filters do
@@ -218,6 +218,40 @@ describe LiquidInterpolatable::Filters do
       agent.interpolation_context['something'] = "foo\\1\n\nfoo\\bar\n\nfoo\\baz"
       agent.options['test'] = "{{ something | regex_replace: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace: '\\n+', '\\n'  }}"
       expect(agent.interpolated['test']).to eq("foo\\1\nfoobar\\\nfoobaz\\")
+    end
+  end
+
+  describe 'regex_replace_first block' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should replace the first occurrence of a string using regex' do
+      agent.interpolation_context['something'] = 'foobar zoobar'
+      agent.options['cleaned'] = '{% regex_replace_first "(?<word>\S+)(?<suffix>bar)" in %}{{ something }}{% with %}{{ word | upcase }}{{ suffix }}{% endregex_replace_first %}'
+      expect(agent.interpolated['cleaned']).to eq('FOObar zoobar')
+    end
+
+    it 'should be able to take a pattern in a variable' do
+      agent.interpolation_context['something'] = 'foobar zoobar'
+      agent.interpolation_context['pattern'] = "(?<word>\\S+)(?<suffix>bar)"
+      agent.options['cleaned'] = '{% regex_replace_first pattern in %}{{ something }}{% with %}{{ word | upcase }}{{ suffix }}{% endregex_replace_first %}'
+      expect(agent.interpolated['cleaned']).to eq('FOObar zoobar')
+    end
+
+    it 'should define a variable named "match" in a "with" block' do
+      agent.interpolation_context['something'] = 'foobar zoobar'
+      agent.interpolation_context['pattern'] = "(?<word>\\S+)(?<suffix>bar)"
+      agent.options['cleaned'] = '{% regex_replace_first pattern in %}{{ something }}{% with %}{{ match.word | upcase }}{{ match["suffix"] }}{% endregex_replace_first %}'
+      expect(agent.interpolated['cleaned']).to eq('FOObar zoobar')
+    end
+  end
+
+  describe 'regex_replace block' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should replace the all occurrences of a string using regex' do
+      agent.interpolation_context['something'] = 'foobar zoobar'
+      agent.options['cleaned'] = '{% regex_replace "(?<word>\S+)(?<suffix>bar)" in %}{{ something }}{% with %}{{ word | upcase }}{{ suffix }}{% endregex_replace %}'
+      expect(agent.interpolated['cleaned']).to eq('FOObar ZOObar')
     end
   end
 end

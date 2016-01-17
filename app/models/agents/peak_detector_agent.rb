@@ -7,7 +7,7 @@ module Agents
     description <<-MD
       The Peak Detector Agent will watch for peaks in an event stream.  When a peak is detected, the resulting Event will have a payload message of `message`.  You can include extractions in the message, for example: `I saw a bar of: {{foo.bar}}`, have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
-      The `value_path` value is a [JSONPaths](http://goessner.net/articles/JsonPath/) to the value of interest.  `group_by_path` is a hash path that will be used to group values, if present.
+      The `value_path` value is a [JSONPath](http://goessner.net/articles/JsonPath/) to the value of interest.  `group_by_path` is a JSONPath that will be used to group values, if present.
 
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
 

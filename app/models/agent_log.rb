@@ -35,7 +35,7 @@ class AgentLog < ActiveRecord::Base
   protected
 
   def scrub_message
-    if message_changed?
+    if message_changed? && !message.nil?
       self.message = message.inspect unless message.is_a?(String)
       self.message.scrub!{ |bytes| "<#{bytes.unpack('H*')[0]}>" }
     end

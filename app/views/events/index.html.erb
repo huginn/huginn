@@ -19,7 +19,7 @@
         <% @events.each do |event| %>
           <% next unless event.agent %>
           <%= content_tag :tr, class: (highlighted?(event.id) ? 'hl' : nil) do %>
-            <td><%= link_to event.agent.name, agent_path(event.agent) %></td>
+            <td><%= link_to event.agent.name, agent_path(event.agent, return: request.fullpath) %></td>
             <td title='<%= event.created_at %>'><%= time_ago_in_words event.created_at %> ago</td>
             <td class='payload'><%= truncate event.payload.to_json, :length => 90, :omission => "" %></td>
             <td>
@@ -40,7 +40,7 @@
 
       <% if @agent %>
         <div class="btn-group">
-          <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, agents_path, class: "btn btn-default" %>
+          <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, filtered_agent_return_link || agents_path, class: "btn btn-default" %>
           <%= link_to icon_tag('glyphicon-random') + ' See all events'.html_safe, events_path, class: "btn btn-default" %>
         </div>
       <% end %>

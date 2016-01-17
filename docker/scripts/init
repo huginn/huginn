@@ -18,10 +18,10 @@ if [ -n "${MYSQL_PORT_3306_TCP_ADDR}" ]; then
   HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-mysql2}
   HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
   HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
-elif [ -n "${POSTGRESQL_PORT_5432_TCP_ADDR}" ]; then
-  HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-postgres}
-  HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${POSTGRESQL_PORT_5432_TCP_ADDR}}
-  HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${POSTGRESQL_PORT_5432_TCP_PORT}}
+elif [ -n "${POSTGRES_PORT_5432_TCP_ADDR}" ]; then
+  HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-postgresql}
+  HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
+  HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
 fi
 
 grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | cut -d= -f1 | \
@@ -31,6 +31,7 @@ grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | cut -d=
 
 chmod ugo+r /app/.env
 source /app/.env
+sudo -u huginn -H bundle install --deployment --without test
 
 DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
 DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
@@ -39,8 +40,8 @@ USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT}}
 # use default port number if it is still not set
 case "${DATABASE_ADAPTER}" in
   mysql2) DATABASE_PORT=${DATABASE_PORT:-3306} ;;
-  postgres) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
-  *) echo "Unsupported database adapter. Available adapters are mysql2, and postgres." && exit 1 ;;
+  postgresql) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
+  *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
 esac
 
 # initialize supervisord config
@@ -71,8 +72,8 @@ echo DATABASE_HOST=\${DATABASE_HOST}
 
 # start mysql server if \${DATABASE_HOST} is the .env.example default
 if [ "\${DATABASE_HOST}" = "your-domain-here.com" -o "\${DATABASE_HOST}" = "" ]; then
-  if [ "\${DATABASE_ADAPTER}" = "postgres" ]; then
-    echo "DATABASE_ADAPTER 'postgres' is not supported internally. Please provide DATABASE_HOST."
+  if [ "\${DATABASE_ADAPTER}" = "postgresql" ]; then
+    echo "DATABASE_ADAPTER 'postgresql' is not supported internally. Please provide DATABASE_HOST."
     exit 1
   fi
 
@@ -105,7 +106,7 @@ EOF
 
   # wait for mysql server to start (max 120 seconds)
   timeout=120
-  while ! mysqladmin -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} status >/dev/null 2>&1
+  while ! mysqladmin -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} status >/dev/null 2>&1
   do
     (( timeout = timeout - 1 ))
     if [ \$timeout -eq 0 ]; then
@@ -116,10 +117,10 @@ EOF
     sleep 1
   done
 
-  if ! echo "USE \${DATABASE_NAME}" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} >/dev/null 2>&1; then
+  if ! echo "USE \${DATABASE_NAME}" | mysql -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} >/dev/null 2>&1; then
     DB_INIT="yes"
     echo "CREATE DATABASE IF NOT EXISTS \\\`\${DATABASE_NAME}\\\` DEFAULT CHARACTER SET \\\`utf8\\\` COLLATE \\\`utf8_unicode_ci\\\`;" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
-    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \\\`${DATABASE_NAME}\\\`.* TO 'root'@'localhost';" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
+    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \\\`${DATABASE_NAME}\\\`.* TO 'root'@'localhost';" | mysql -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
   fi
 fi
 supervisorctl start foreman >/dev/null
@@ -147,19 +148,46 @@ cat <<FOREMAN > /tmp/foreman.sh
 #!/bin/bash -e
 source /app/.env
 
-# Assuming we have a created database, run the migrations and seed it idempotently.
-[ -z "\${DO_NOT_MIGRATE}" ] && sudo -u huginn -EH bundle exec rake db:migrate
-[ -z "\${DO_NOT_SEED}" ] && sudo -u huginn -EH bundle exec rake db:seed
+# The database may need to start up for a bit first
+if [ -n "\${INTENTIONALLY_SLEEP}" ]; then
+  echo "Intentionally sleeping \${INTENTIONALLY_SLEEP}"
+  sleep \${INTENTIONALLY_SLEEP}
+fi
 
-[ -n "\$INTENTIONALLY_SLEEP" ] && sleep \$INTENTIONALLY_SLEEP
+if [ -n "\${DATABASE_INITIAL_CONNECT_MAX_RETRIES}" ]; then
+  max=\${DATABASE_INITIAL_CONNECT_MAX_RETRIES}
+  count=0
+  while ! rake database_test:ping > /dev/null 2>&1 && [[ \$count -le \$max ]] ; do
+    count=\$[\$count+1]
+    echo "Retry \$count of \$max attempting to connect to \$DATABASE_HOST. Sleeping \${DATABASE_INITIAL_CONNECT_SLEEP:5}"
+    sleep \${DATABASE_INITIAL_CONNECT_SLEEP:5}
+  done
+fi
+
+# We may need to try and create a database
+if [ -n "\${CREATE_DB}" ]; then
+ sudo -u huginn -EH bundle exec rake db:create
+fi
+
+# Assuming we have a created database, run the migrations and seed it idempotently.
+if [ -z "\${DO_NOT_MIGRATE}" ]; then
+ sudo -u huginn -EH bundle exec rake db:migrate
+fi
+
+if [ -z "\${DO_NOT_SEED}" ]; then
+  sudo -u huginn -EH bash -xc 'bundle exec rake db:seed &'
+fi
 
 # Fixup the Procfile and prepare the PORT
-[ -n "\${DO_NOT_RUN_JOBS}" ] && perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
+if [ -n "\${DO_NOT_RUN_JOBS}" ]; then
+  perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
+fi
+
 perl -pi -e 's/rails server -b0.0.0.0\$/rails server -b 0.0.0.0 -p \\\$PORT/' /app/Procfile
 export PORT="\${PORT:-3000}"
 
 # Start huginn
-exec sudo -u huginn -EH bundle exec foreman start
+exec sudo -u huginn -EH bash -xc 'exec bundle exec foreman start'
 FOREMAN
 
 chmod 755 /tmp/foreman.sh
