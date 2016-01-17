@@ -22,6 +22,7 @@
 heroku git:clone --app <%= content_tag :var, app_name %>
 cd <%= content_tag :var, app_name %>
 bundle
+cp .env.example .env
 bin/setup_heroku
 <%- end %>
 

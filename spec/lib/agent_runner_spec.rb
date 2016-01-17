@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe AgentRunner do
   context "without traps" do
@@ -8,10 +8,14 @@ describe AgentRunner do
       @agent_runner = AgentRunner.new
     end
 
+    after(:each) do
+      @agent_runner.stop
+      AgentRunner.class_variable_set(:@@agents, [])
+    end
+
     context "#run" do
       before do
         mock(@agent_runner).run_workers
-        mock.instance_of(IO).puts('Stopping AgentRunner...')
       end
 
       it "runs until stop is called" do
@@ -30,6 +34,7 @@ describe AgentRunner do
       before do
         AgentRunner.class_variable_set(:@@agents, [HuginnScheduler, DelayedJobWorker])
       end
+
       it "loads all workers" do
         workers = @agent_runner.send(:load_workers)
         expect(workers).to be_a(Hash)
@@ -37,27 +42,29 @@ describe AgentRunner do
       end
 
       it "loads only the workers specified in the :only option" do
-        @agent_runner = AgentRunner.new(only: HuginnScheduler)
-        workers = @agent_runner.send(:load_workers)
+        agent_runner = AgentRunner.new(only: HuginnScheduler)
+        workers = agent_runner.send(:load_workers)
         expect(workers.keys).to eq(['HuginnScheduler'])
+        agent_runner.stop
       end
 
       it "does not load workers specified in the :except option" do
-        @agent_runner = AgentRunner.new(except: HuginnScheduler)
-        workers = @agent_runner.send(:load_workers)
+        agent_runner = AgentRunner.new(except: HuginnScheduler)
+        workers = agent_runner.send(:load_workers)
         expect(workers.keys).to eq(['DelayedJobWorker'])
+
+        agent_runner.stop
       end
     end
 
     context "running workers" do
       before do
         AgentRunner.class_variable_set(:@@agents, [HuginnScheduler, DelayedJobWorker])
-        stub.instance_of(IO).puts
-        stub.instance_of(LongRunnable::Worker).setup!
+        stub.instance_of(HuginnScheduler).setup
+        stub.instance_of(DelayedJobWorker).setup
       end
 
       context "#run_workers" do
-
         it "runs all the workers" do
           mock.instance_of(HuginnScheduler).run!
           mock.instance_of(DelayedJobWorker).run!
@@ -97,6 +104,8 @@ describe AgentRunner do
       mock(Signal).trap('TERM')
       mock(Signal).trap('QUIT')
       agent_runner.set_traps
+
+      agent_runner.stop
     end
   end
 end

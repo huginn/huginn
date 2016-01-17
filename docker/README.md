@@ -67,11 +67,17 @@ To link to another mysql container, for example:
 
 To link to another container named 'postgres':
 
+    docker run --name huginn_postgres \
+        -e POSTGRES_PASSWORD=mysecretpassword \
+        -e POSTGRES_USER=huginn -d postgres
+    docker run -it --link huginn_postgres:postgres --rm postgres \
+        sh -c 'exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U huginn -c "create database huginn_development;"'
     docker run --rm --name huginn \
         --link huginn_postgres:postgres \
         -p 3000:3000 \
-        -e "HUGINN_DATABASE_USERNAME=huginn" \
-        -e "HUGINN_DATABASE_PASSWORD=pass@word" \
+        -e HUGINN_DATABASE_USERNAME=huginn \
+        -e HUGINN_DATABASE_PASSWORD=mysecretpassword \
+        -e HUGINN_DATABASE_ADAPTER=postgresql \
         cantino/huginn
 
 The `docker/` folder also has a `docker-compose.yml` that allows for a sample database formation with a data volume container:

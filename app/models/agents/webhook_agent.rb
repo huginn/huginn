@@ -1,5 +1,7 @@
 module Agents
   class WebhookAgent < Agent
+    include WebRequestConcern
+
     cannot_be_scheduled!
     cannot_receive_events!
 
@@ -18,11 +20,14 @@ module Agents
         * `expected_receive_period_in_days` - How often you expect to receive
           events this way. Used to determine if the agent is working.
         * `payload_path` - JSONPath of the attribute in the POST body to be
-          used as the Event payload.  If `payload_path` points to an array,
-          Events will be created for each element.
+          used as the Event payload.  Set to `.` to return the entire message.
+          If `payload_path` points to an array, Events will be created for each element.
         * `verbs` - Comma-separated list of http verbs your agent will accept.
           For example, "post,get" will enable POST and GET requests. Defaults
           to "post".
+        * `response` - The response message to the request. Defaults to 'Event Created'.
+        * `recaptcha_secret` - Setting this to a reCAPTCHA "secret" key makes your agent verify incoming requests with reCAPTCHA.  Don't forget to embed a reCAPTCHA snippet including your "site" key in the originating form(s).
+        * `recaptcha_send_remote_addr` - Set this to true if your server is properly configured to set REMOTE_ADDR to the IP address of each visitor (instead of that of a proxy server).
       MD
     end
 
@@ -45,15 +50,41 @@ module Agents
       secret = params.delete('secret')
       return ["Not Authorized", 401] unless secret == interpolated['secret']
 
-      #check the verbs
+      # check the verbs
       verbs = (interpolated['verbs'] || 'post').split(/,/).map { |x| x.strip.downcase }.select { |x| x.present? }
       return ["Please use #{verbs.join('/').upcase} requests only", 401] unless verbs.include?(method)
+
+      # check the reCAPTCHA response if required
+      if recaptcha_secret = interpolated['recaptcha_secret'].presence
+        recaptcha_response = params.delete('g-recaptcha-response') or
+          return ["Not Authorized", 401]
+
+        parameters = {
+          secret: recaptcha_secret,
+          response: recaptcha_response,
+        }
+
+        if boolify(interpolated['recaptcha_send_remote_addr'])
+          parameters[:remoteip] = request.env['REMOTE_ADDR']
+        end
+
+        begin
+          response = faraday.post('https://www.google.com/recaptcha/api/siteverify',
+                                  parameters)
+        rescue => e
+          error "Verification failed: #{e.message}"
+          return ["Not Authorized", 401]
+        end
+
+        JSON.parse(response.body)['success'] or
+          return ["Not Authorized", 401]
+      end
 
       [payload_for(params)].flatten.each do |payload|
         create_event(payload: payload)
       end
 
-      ['Event Created', 201]
+      [response_message, 201]
     end
 
     def working?
@@ -68,6 +99,10 @@ module Agents
 
     def payload_for(params)
       Utils.value_at(params, interpolated['payload_path']) || {}
+    end
+
+    def response_message
+      interpolated['response'] || 'Event Created'
     end
   end
 end

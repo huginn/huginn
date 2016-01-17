@@ -87,10 +87,6 @@ module Agents
       true
     end
 
-    def check!
-      control!
-    end
-
     def validate_options
       if (spec = options['schedule']).present?
         begin

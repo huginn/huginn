@@ -1,5 +1,20 @@
 # Changes
 
+* Jan 14, 2016   - Liquid block tag `regex_replace` and `regex_replace_first` added.
+* Jan 12, 2016   - WebhookAgent supports reCAPTCHA.
+* Dec 26, 2015   - WebsiteAgent can accept a `data_from_event` Liquid template instead of a URL.
+* Oct 17, 2015   - TwitterSearchAgent added for running period Twitter searches.
+* Oct 17, 2015   - GapDetectorAgent added to alert when no data has been seen in a certain period of time.
+* Oct 12, 2015   - Slack agent supports attachments.
+* Oct 9, 2015    - The TriggerAgent can be asked to match on fewer then all match groups.
+* Oct 4, 2015    - Add DelayAgent for buffering incoming Events
+* Oct 3, 2015    - Add SSL verification options to smtp.yml
+* Oct 3, 2015    - Better handling of 'Back' links in the UI.
+* Sep 22, 2015   - Comprehensive EvernoteAgent added
+* Sep 13, 2015   - JavaScriptAgent can access and set Credentials.
+* Sep 9, 2015    - Add AgentRunner and LongRunnable to support long running agents.
+* Sep 8, 2015    - Allow `url_from_event` in the WebsiteAgent to be an Array
+* Sep 7, 2015    - Enable `strict: false` in database.yml
 * Sep 2, 2015    - WebRequestConcern Agents automatically decode gzip/inflate encodings.
 * Sep 1, 2015    - WebhookAgent can configure allowed verbs (GET, POST, PUT, ...) for incoming requests.
 * Aug 21, 2015   - PostAgent supports "xml" as `content_type`.

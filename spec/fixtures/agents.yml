@@ -111,3 +111,24 @@ jane_basecamp_agent:
   user: jane
   service: generic
   guid: <%= SecureRandom.hex %>
+
+
+bob_data_output_agent:
+  type: Agents::DataOutputAgent
+  user: bob
+  name: RSS Feed 
+  guid: <%= SecureRandom.hex %>
+  options: <%= {
+    expected_receive_period_in_days: 3,
+    secrets: ['secret'],
+    template: {
+      title: 'unchanged',
+      description: 'unchanged',
+      item: {
+        title: 'unchanged',
+        description: 'unchanged',
+        author: 'unchanged',
+        link: 'http://example.com'
+        }
+      }
+    }.to_json.inspect %>

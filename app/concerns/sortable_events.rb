@@ -11,7 +11,7 @@ module SortableEvents
 
   module ClassMethods
     def can_order_created_events!
-      raise if cannot_create_events?
+      raise 'Cannot order events for agent that cannot create events' if cannot_create_events?
       prepend AutomaticSorter
     end
 

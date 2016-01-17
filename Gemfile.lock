@@ -20,9 +20,26 @@ GIT
       rest-client (~> 1.8)
 
 GIT
-  remote: git://github.com/knu/tumblr_client.git
-  revision: d6f1f64a7cba381345c588e28ebcff28048c3a6c
-  branch: patch-1
+  remote: git://github.com/collectiveidea/delayed_job_active_record.git
+  revision: 61e688e03b2ef4004b08de6d1e0a123fda8fffad
+  branch: master
+  specs:
+    delayed_job_active_record (4.1.0)
+      activerecord (>= 3.0, < 5.1)
+      delayed_job (>= 3.0, < 5)
+
+GIT
+  remote: git://github.com/lostisland/faraday_middleware.git
+  revision: c5836ae55857272732b33eb0e0a98d60e995a376
+  branch: master
+  specs:
+    faraday_middleware (0.10.0)
+      faraday (>= 0.7.4, < 0.10)
+
+GIT
+  remote: git://github.com/tumblr/tumblr_client.git
+  revision: 0c59b04e49f2a8c89860613b18cf4e8f978d8dc7
+  branch: master
   specs:
     tumblr_client (0.8.5)
       faraday (~> 0.9.0)
@@ -41,14 +58,12 @@ GIT
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.1)
 
-GIT
-  remote: https://github.com/cantino/delayed_job_active_record
-  revision: 7ede4ea81561a66427f600decb87f6fcdb5b8aa4
-  branch: configurable-reserve-sql-strategy
+PATH
+  remote: vendor/gems/dotenv-2.0.1
   specs:
-    delayed_job_active_record (4.0.3)
-      activerecord (>= 3.0, < 5.0)
-      delayed_job (>= 3.0, < 4.1)
+    dotenv (2.0.1)
+    dotenv-rails (2.0.1)
+      dotenv (= 2.0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -116,8 +131,23 @@ GEM
     capistrano-rails (1.1.3)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
-    celluloid (0.16.0)
-      timers (~> 4.0.0)
+    celluloid (0.17.2)
+      celluloid-essentials
+      celluloid-extras
+      celluloid-fsm
+      celluloid-pool
+      celluloid-supervision
+      timers (>= 4.1.1)
+    celluloid-essentials (0.20.5)
+      timers (>= 4.1.1)
+    celluloid-extras (0.20.5)
+      timers (>= 4.1.1)
+    celluloid-fsm (0.20.5)
+      timers (>= 4.1.1)
+    celluloid-pool (0.20.5)
+      timers (>= 4.1.1)
+    celluloid-supervision (0.20.5)
+      timers (>= 4.1.1)
     chronic (0.10.2)
     coderay (1.1.0)
     coffee-rails (4.1.0)
@@ -139,7 +169,7 @@ GEM
       safe_yaml (~> 1.0.0)
     daemons (1.1.9)
     debug_inspector (0.0.2)
-    delayed_job (4.0.6)
+    delayed_job (4.1.1)
       activesupport (>= 3.0, < 5.0)
     delorean (2.1.0)
       chronic
@@ -154,9 +184,6 @@ GEM
     docile (1.1.5)
     domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
-    dotenv (2.0.1)
-    dotenv-rails (2.0.1)
-      dotenv (= 2.0.1)
     dropbox-api (0.4.2)
       hashie
       multi_json
@@ -183,12 +210,10 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    execjs (2.3.0)
+    execjs (2.6.0)
     extlib (0.9.16)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
-    faraday_middleware (0.10.0)
-      faraday (>= 0.7.4, < 0.10)
     feed-normalizer (1.5.2)
       hpricot (>= 0.6)
       simple-rss (>= 1.1)
@@ -238,7 +263,7 @@ GEM
     haversine (0.3.0)
     hipchat (1.2.0)
       httparty
-    hitimes (1.2.2)
+    hitimes (1.2.3)
     hpricot (0.8.6)
     httmultiparty (0.3.10)
       httparty (>= 0.7.3)
@@ -274,7 +299,7 @@ GEM
       actionmailer (>= 3.2)
       letter_opener (~> 1.0)
       railties (>= 3.2)
-    libv8 (3.16.14.7)
+    libv8 (3.16.14.13)
     liquid (3.0.6)
     listen (2.7.9)
       celluloid (>= 0.15.2)
@@ -292,8 +317,8 @@ GEM
     method_source (0.8.2)
     mime-types (2.6.1)
     mini_magick (4.2.3)
-    mini_portile (0.6.2)
-    minitest (5.8.0)
+    mini_portile2 (2.0.0)
+    minitest (5.8.3)
     mqtt (0.3.1)
     multi_json (1.11.2)
     multi_xml (0.5.5)
@@ -305,8 +330,8 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (2.9.2)
     netrc (0.10.3)
-    nokogiri (1.6.6.2)
-      mini_portile (~> 0.6.0)
+    nokogiri (1.6.7.1)
+      mini_portile2 (~> 2.0.0.rc2)
     oauth (0.4.7)
     oauth2 (0.9.4)
       faraday (>= 0.8, < 0.10)
@@ -340,7 +365,7 @@ GEM
       multi_json (~> 1.3)
       omniauth-oauth (~> 1.0)
     orm_adapter (0.5.0)
-    pg (0.17.1)
+    pg (0.18.3)
     polyglot (0.3.5)
     protected_attributes (1.0.8)
       activemodel (>= 4.0.1, < 5.0)
@@ -389,7 +414,7 @@ GEM
     rb-fsevent (0.9.4)
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
-    ref (1.0.5)
+    ref (2.0.0)
     responders (2.1.0)
       railties (>= 4.2.0, < 5)
     rest-client (1.8.0)
@@ -442,8 +467,8 @@ GEM
       tilt (~> 1.1)
     select2-rails (3.5.9.3)
       thor (~> 0.14)
-    shoulda-matchers (2.8.0)
-      activesupport (>= 3.0.0)
+    shoulda-matchers (3.0.0)
+      activesupport (>= 4.0.0)
     signet (0.5.1)
       addressable (>= 2.2.3)
       faraday (>= 0.9.0.rc5)
@@ -480,7 +505,7 @@ GEM
     thor (0.19.1)
     thread_safe (0.3.5)
     tilt (1.4.1)
-    timers (4.0.1)
+    timers (4.1.1)
       hitimes
     tins (1.3.2)
     treetop (1.5.3)
@@ -504,7 +529,7 @@ GEM
       ethon (>= 0.7.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    uglifier (2.7.0)
+    uglifier (2.7.2)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
     unf (0.1.4)
@@ -544,16 +569,17 @@ DEPENDENCIES
   coffee-rails (~> 4.1.0)
   coveralls
   daemons (~> 1.1.9)
-  delayed_job (~> 4.0.0)
+  delayed_job (~> 4.1.0)
   delayed_job_active_record!
   delorean
   devise (~> 3.4.0)
-  dotenv-rails (~> 2.0.1)
+  dotenv!
+  dotenv-rails!
   dropbox-api
   em-http-request (~> 1.1.2)
   evernote_oauth
   faraday (~> 0.9.0)
-  faraday_middleware (>= 0.10.0)
+  faraday_middleware!
   feed-normalizer
   ffi (>= 1.9.4)
   font-awesome-sass (~> 4.3.2)
@@ -581,7 +607,7 @@ DEPENDENCIES
   multi_xml
   mysql2 (~> 0.3.16)
   net-ftp-list (~> 3.2.8)
-  nokogiri (~> 1.6.4)
+  nokogiri (= 1.6.7.1)
   omniauth
   omniauth-37signals
   omniauth-dropbox
@@ -589,7 +615,7 @@ DEPENDENCIES
   omniauth-tumblr
   omniauth-twitter
   omniauth-wunderlist!
-  pg
+  pg (~> 0.18.3)
   protected_attributes (~> 1.0.8)
   pry-rails
   quiet_assets
@@ -618,7 +644,7 @@ DEPENDENCIES
   typhoeus (~> 0.6.3)
   tzinfo (>= 1.2.0)
   tzinfo-data
-  uglifier (>= 1.3.0)
+  uglifier (~> 2.7.2)
   unicorn (~> 4.9.0)
   vcr
   webmock (~> 1.17.4)

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe LiquidMigrator do
   describe "converting JSONPath strings" do
