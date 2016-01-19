@@ -264,17 +264,20 @@ h2 .scenario, a span.label.scenario {
   width: 200px;
 }
 
-$services:            twitter     37signals   github      tumblr      dropbox   wunderlist;
-$service-colors:      #55acee     #8fc857     #444444     #2c4762     #007EE5   #ED5F27;
+$service-colors: (
+  twitter:      #55acee,
+  37signals:    #8fc857,
+  github:       #444444,
+  tumblr:       #2c4762,
+  dropbox:      #007EE5,
+  wunderlist:   #ED5F27
+);
 
 @mixin services {
-  @each $service in $services {
-    $i: index($services, $service);
-    $service-color: nth($service-colors, $i);
-
+  @each $service, $color in $service-colors {
     &.service-#{$service} {
       color: #fff;
-      background-color: $service-color;
+      background-color: $color;
     }
   }
 }
