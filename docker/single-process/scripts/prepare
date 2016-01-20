@@ -13,11 +13,6 @@ path-exclude=/usr/share/doc/*
 path-include=/usr/share/doc/*/copyright
 EOF
 
-cat > /etc/default/locale <<EOF
-LC_ALL=en_US.UTF-8
-LANG=en_US.UTF-8
-EOF
-
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
 minimal_apt_get_install='apt-get install -y --no-install-recommends'
@@ -33,6 +28,8 @@ $minimal_apt_get_install build-essential checkinstall git-core \
   graphviz libgraphviz-dev \
   libmysqlclient-dev libpq-dev libsqlite3-dev \
   ruby2.2 ruby2.2-dev
+locale-gen en_US.UTF-8
+update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 gem install --no-ri --no-rdoc bundler
 
 apt-get purge -y python3* rsyslog rsync manpages
