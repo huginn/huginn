@@ -330,7 +330,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (2.9.2)
     netrc (0.10.3)
-    nokogiri (1.6.7.1)
+    nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
     oauth (0.4.7)
     oauth2 (0.9.4)
@@ -607,7 +607,7 @@ DEPENDENCIES
   multi_xml
   mysql2 (~> 0.3.16)
   net-ftp-list (~> 3.2.8)
-  nokogiri (= 1.6.7.1)
+  nokogiri (= 1.6.7.2)
   omniauth
   omniauth-37signals
   omniauth-dropbox
