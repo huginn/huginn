@@ -92,7 +92,7 @@ gem 'kramdown', '~> 1.3.3'
 gem 'liquid', '~> 3.0.3'
 gem 'mini_magick'
 gem 'multi_xml'
-gem 'nokogiri', '1.6.7.1'
+gem 'nokogiri', '1.6.7.2'
 gem 'omniauth'
 gem 'rails', '4.2.4'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
