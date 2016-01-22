@@ -173,7 +173,7 @@ GEM
       activesupport (>= 3.0, < 5.0)
     delorean (2.1.0)
       chronic
-    devise (3.4.1)
+    devise (3.5.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 3.2.6, < 5)
@@ -415,8 +415,8 @@ GEM
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
     ref (2.0.0)
-    responders (2.1.0)
-      railties (>= 4.2.0, < 5)
+    responders (2.1.1)
+      railties (>= 4.2.0, < 5.1)
     rest-client (1.8.0)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
@@ -543,7 +543,7 @@ GEM
       macaddr (~> 1.0)
     uuidtools (2.1.5)
     vcr (2.9.2)
-    warden (1.2.3)
+    warden (1.2.4)
       rack (>= 1.0)
     webmock (1.17.4)
       addressable (>= 2.2.7)
@@ -572,7 +572,7 @@ DEPENDENCIES
   delayed_job (~> 4.1.0)
   delayed_job_active_record!
   delorean
-  devise (~> 3.4.0)
+  devise (~> 3.5.4)
   dotenv!
   dotenv-rails!
   dropbox-api

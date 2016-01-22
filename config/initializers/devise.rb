@@ -94,6 +94,9 @@ Devise.setup do |config|
   # Setup a pepper to generate the encrypted password.
   # config.pepper = "SOME LONG HASH GENERATED WITH rake secret"
 
+  # Send a notification email when the user's password is changed
+  # config.send_password_change_notification = false
+
   # ==> Configuration for :confirmable
   # A period that the user is allowed to access the website even without
   # confirming their account. For instance, if set to 2.days, the user will be
@@ -150,9 +153,6 @@ Devise.setup do |config|
   # The time you want to timeout the user session without activity. After this
   # time the user will be asked for credentials again. Default is 30 minutes.
   # config.timeout_in = 30.minutes
-
-  # If true, expires auth token on session timeout.
-  # config.expire_auth_token_on_timeout = false
 
   # ==> Configuration for :lockable
   # Defines which strategy will be used to lock an account.
