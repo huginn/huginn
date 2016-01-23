@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+locale-gen en_US.UTF-8
+
 # Shallow clone the huginn project repo
 git clone --depth 1 https://github.com/cantino/huginn /app
 
@@ -25,7 +27,7 @@ if [ -d "/scripts/cache" ]; then
   chown -R huginn:huginn vendor/cache
 fi
 sudo -u huginn -H cp .env.example .env
-sudo -u huginn -H ON_HEROKU=true bundle install --deployment --without test
+sudo -u huginn -H LC_ALL="en_US.UTF-8" LANG="en_US.UTF-8" ON_HEROKU=true bundle install --deployment --without test
 sudo -u huginn -H rm .env
 
 # silence setlocale message (THANKS DEBIAN!)
