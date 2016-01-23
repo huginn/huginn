@@ -1,4 +1,15 @@
-<h3>Manually Create Events</h3>
+<p>
+  Use this form to manually emit Events from this Agent (usually for testing).
+</p>
+
+<p>
+  If you add a top-level key called <code>payloads</code> that points to an array of objects, they will be emitted as a series
+  of Events.  Otherwise, everything entered will be emitted as a single Event.
+</p>
+
+<p>
+  Liquid formatting is supported.
+</p>
 
 <h4 id='event-creation-status'></h4>
 
@@ -22,7 +33,7 @@
       $.ajax({
         url: $form.attr('action'),
         method: "post",
-        data: { payload: JSON.parse($form.find("textarea").val()) },
+        data: { payload: $form.find("textarea").val() },
         dataType: "JSON",
         success: function(json) {
           if (json.success) {
