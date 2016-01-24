@@ -3,9 +3,6 @@ set -e
 
 cd /app
 
-# Default to the environment variable values set in .env.example
-source /app/.env.example
-
 # Cleanup any leftover pid file
 if [ -f /app/tmp/pids/server.pid ]; then
   rm /app/tmp/pids/server.pid
@@ -15,27 +12,41 @@ fi
 # requires that the mysql or postgresql containers have exposed
 # port 3306 and 5432 respectively.
 if [ -n "${MYSQL_PORT_3306_TCP_ADDR}" ]; then
-  HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-mysql2}
-  HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
-  HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
+  DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
+  DATABASE_HOST=${DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
+  DATABASE_PORT=${DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
+  DATABASE_ENCODING=${DATABASE_ENCODING:-utf8mb4}
 elif [ -n "${POSTGRES_PORT_5432_TCP_ADDR}" ]; then
-  HUGINN_DATABASE_ADAPTER=${HUGINN_DATABASE_ADAPTER:-postgresql}
-  HUGINN_DATABASE_HOST=${HUGINN_DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
-  HUGINN_DATABASE_PORT=${HUGINN_DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
+  DATABASE_ADAPTER=${DATABASE_ADAPTER:-postgresql}
+  DATABASE_HOST=${DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
+  DATABASE_PORT=${DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
+  DATABASE_ENCODING=utf8
+else
+  START_MYSQL=${START_MYSQL:-true}
 fi
 
-grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | cut -d= -f1 | \
-  while read var ; do
-    eval "echo \"$var=\\\"\${HUGINN_$var:-\$$var}\\\"\""
+USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
+DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
+DATABASE_PORT=${HUGINN_DATABASE_PORT:-${DATABASE_PORT}}
+DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
+DATABASE_PASSWORD=${HUGINN_DATABASE_PASSWORD:-${DATABASE_PASSWORD:-password}}
+DATABASE_NAME=${HUGINN_DATABASE_NAME:-${DATABASE_NAME:-huginn_production}}
+RAILS_ENV=${HUGINN_RAILS_ENV:-${RAILS_ENV:-production}}
+
+IFS="="
+grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
+  while read var value ; do
+    eval "echo \"$var=\${$var:-\${HUGINN_$var-\$value}}\""
   done | grep -v -e ^= > /app/.env
+
+eval "echo RAILS_ENV=${RAILS_ENV}" >> .env
+eval "echo START_MYSQL=${START_MYSQL}" >> .env
+echo "ON_HEROKU=true" >> .env
+echo "RAILS_SERVE_STATIC_FILES=true" >> .env
 
 chmod ugo+r /app/.env
 source /app/.env
 sudo -u huginn -H bundle install --deployment --without test
-
-DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
-DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
-USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT}}
 
 # use default port number if it is still not set
 case "${DATABASE_ADAPTER}" in
@@ -71,7 +82,8 @@ source /app/.env
 echo DATABASE_HOST=\${DATABASE_HOST}
 
 # start mysql server if \${DATABASE_HOST} is the .env.example default
-if [ "\${DATABASE_HOST}" = "your-domain-here.com" -o "\${DATABASE_HOST}" = "" ]; then
+if [ "\${START_MYSQL}" = "true" ]; then
+  echo "DATABASE_SOCKET=/var/run/mysqld/mysqld.sock" >> .env
   if [ "\${DATABASE_ADAPTER}" = "postgresql" ]; then
     echo "DATABASE_ADAPTER 'postgresql' is not supported internally. Please provide DATABASE_HOST."
     exit 1
@@ -106,7 +118,7 @@ EOF
 
   # wait for mysql server to start (max 120 seconds)
   timeout=120
-  while ! mysqladmin -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} status >/dev/null 2>&1
+  while ! mysqladmin -u root status >/dev/null 2>&1
   do
     (( timeout = timeout - 1 ))
     if [ \$timeout -eq 0 ]; then
@@ -118,9 +130,7 @@ EOF
   done
 
   if ! echo "USE \${DATABASE_NAME}" | mysql -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD} >/dev/null 2>&1; then
-    DB_INIT="yes"
-    echo "CREATE DATABASE IF NOT EXISTS \\\`\${DATABASE_NAME}\\\` DEFAULT CHARACTER SET \\\`utf8\\\` COLLATE \\\`utf8_unicode_ci\\\`;" | mysql -uroot \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
-    echo "GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON \\\`${DATABASE_NAME}\\\`.* TO 'root'@'localhost';" | mysql -u\${DATABASE_USERNAME:-root} \${DATABASE_PASSWORD:+-p\$DATABASE_PASSWORD}
+    echo "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('\${DATABASE_PASSWORD:\$DATABASE_PASSWORD}');" | mysql -u root
   fi
 fi
 supervisorctl start foreman >/dev/null
@@ -165,9 +175,7 @@ if [ -n "\${DATABASE_INITIAL_CONNECT_MAX_RETRIES}" ]; then
 fi
 
 # We may need to try and create a database
-if [ -n "\${CREATE_DB}" ]; then
- sudo -u huginn -EH bundle exec rake db:create
-fi
+sudo -u huginn -EH bundle exec rake db:create
 
 # Assuming we have a created database, run the migrations and seed it idempotently.
 if [ -z "\${DO_NOT_MIGRATE}" ]; then

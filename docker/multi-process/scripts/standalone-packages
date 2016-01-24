@@ -1,0 +1,9 @@
+DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y python2.7 python-docutils mysql-server \
+                   supervisor python-pip && \
+pip install supervisor-stdout
+rm -rf /var/lib/apt/lists/*
+rm -rf /usr/share/doc/
+rm -rf /usr/share/man/
+rm -rf /usr/share/locale/
