@@ -36,6 +36,10 @@ Getting Huginn up and running using docker is quick and painless once you have d
 
 Follow the [instructions on the docker hub registry](https://registry.hub.docker.com/u/cantino/huginn/) on how to configure Huginn using environment variables and linking the container to an external MySQL or PostgreSQL database.
 
+## Running each Huginn process in a seperate container
+
+With the `cantino/huginn-single-process` image you can easily run each process needed for Huginn in a separate container and scale them individually when needed. Have a look at the [Docker hub](https://hub.docker.com/r/cantino/huginn-single-process/) and the [documentation for the container](https://github.com/cantino/huginn/tree/master/docker/single-process)
+
 ### Other options:
 
 Other Docker options:
