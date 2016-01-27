@@ -37,6 +37,11 @@ Huginn::Application.configure do
   # yet still be able to expire them through the digest params.
   config.assets.digest = true
 
+  # Adds additional error checking when serving assets at runtime.
+  # Checks for improperly declared sprockets dependencies.
+  # Raises helpful error messages.
+  config.assets.raise_runtime_errors = true
+
   config.action_mailer.default_url_options = { :host => ENV['DOMAIN'] }
   config.action_mailer.asset_host = ENV['DOMAIN']
   config.action_mailer.raise_delivery_errors = true
