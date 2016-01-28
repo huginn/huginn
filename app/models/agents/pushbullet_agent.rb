@@ -24,6 +24,8 @@ module Agents
 
       If you do not select an existing device, Huginn will create a new one with the name 'Huginn'.
 
+      To push to all of your devices, select `All Devices` from the devices list.
+
       You have to provide a message `type` which has to be `note`, `link`, or `address`. The message types `checklist`, and `file` are not supported at the moment.
 
       Depending on the message `type` you can use additional fields:
@@ -71,7 +73,9 @@ module Agents
     end
 
     def complete_device_id
-      devices.map { |d| {text: d['nickname'], id: d['iden']} }
+      devices
+        .map { |d| {text: d['nickname'], id: d['iden']} }
+        .unshift(text: 'All Devices', id: '__ALL__')
     end
 
     def working?
@@ -114,14 +118,14 @@ module Agents
       end
     end
 
-
     def basic_auth
       {basic_auth: {username: interpolated[:api_key].presence || credential('pushbullet_api_key'), password: ''}}
     end
 
     def query_options(event)
       mo = interpolated(event)
-      basic_auth.merge(body: {device_iden: mo[:device_id], type: mo[:type]}.merge(payload(mo)))
+      dev_ident = mo[:device_id] == "__ALL__" ? '' : mo[:device_id]
+      basic_auth.merge(body: {device_iden: dev_ident, type: mo[:type]}.merge(payload(mo)))
     end
 
     def payload(mo)
