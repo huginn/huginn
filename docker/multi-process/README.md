@@ -3,7 +3,7 @@ Huginn for docker with multiple container linkage
 
 This image runs a linkable [Huginn](https://github.com/cantino/huginn) instance.
 
-There is an automated build repository on docker hub for [cantino/huginn](https://registry.hub.docker.com/builds/github/cantino/huginn/).
+There is an automated build repository on docker hub for [cantino/huginn](https://hub.docker.com/r/cantino/huginn/builds/).
 
 This was patterned after [sameersbn/gitlab](https://registry.hub.docker.com/u/sameersbn/gitlab) by [ianblenke/huginn](http://github.com/ianblenke/huginn), and imported here for official generation of a docker hub auto-build image.
 
