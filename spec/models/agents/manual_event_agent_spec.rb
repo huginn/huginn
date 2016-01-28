@@ -26,6 +26,13 @@ describe Agents::ManualEventAgent do
       expect(events[1].payload).to eq({ 'key' => 'value1' })
     end
 
+    it "errors when given both payloads and other top-level keys" do
+      expect {
+        json = { 'key' => 'value2', 'payloads' => [{ 'key' => 'value1' }] }.to_json
+        expect(@checker.handle_details_post({ 'payload' => json })).to eq({ success: false, error: "If you provide the 'payloads' key, please do not provide any other keys at the top level." })
+      }.to_not change { @checker.events.count }
+    end
+
     it "supports Liquid formatting" do
       expect {
         json = { 'key' => "{{ 'now' | date: '%Y' }}", 'nested' => { 'lowercase' => "{{ 'uppercase' | upcase }}" } }.to_json
