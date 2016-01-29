@@ -265,6 +265,24 @@ describe Agents::ImapFolderAgent do
         }
         expect { @checker.check }.to change { Event.count }.by(1)
       end
+
+      describe 'processing mails with a broken From header value' do
+        before do
+          # "from" patterns work against mail addresses and not
+          # against text parts, so these mails should be skipped if a
+          # "from" condition is given.
+          @mails.first.header['from'] = '.'
+          @mails.last.header['from'] = '@'
+        end
+
+        it 'should ignore them without failing if a "from" condition is given' do
+          @checker.options['conditions']['from'] = '*'
+
+          expect {
+            expect { @checker.check }.not_to change { Event.count }
+          }.not_to raise_exception
+        end
+      end
     end
   end
 
