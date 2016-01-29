@@ -227,7 +227,8 @@ module Agents
             }
           when 'from', 'to', 'cc'
             value.present? or next true
-            mail.header[key].addresses.any? { |address|
+            header = mail.header[key] or next false
+            header.addresses.any? { |address|
               Array(value).any? { |pattern|
                 glob_match?(pattern, address)
               }

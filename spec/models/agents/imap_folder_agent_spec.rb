@@ -183,6 +183,14 @@ describe Agents::ImapFolderAgent do
         expect { @checker.check }.not_to change { Event.count }
       end
 
+      it 'should not fail when a condition on Cc is given and a mail does not have the field' do
+        @checker.options['conditions']['cc'] = 'John.Doe@*'
+
+        expect {
+          expect { @checker.check }.not_to change { Event.count }
+        }.not_to raise_exception
+      end
+
       it 'should perform regexp matching and save named captures' do
         @checker.options['conditions'].update(
           'subject' => '\ARe: (?<a>.+)',
