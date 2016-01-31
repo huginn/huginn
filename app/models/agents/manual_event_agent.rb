@@ -18,8 +18,15 @@ module Agents
 
     def handle_details_post(params)
       if params['payload']
-        create_event(:payload => params['payload'])
-        { :success => true }
+        json = interpolate_options(JSON.parse(params['payload']))
+        if json['payloads'] && (json.keys - ['payloads']).length > 0
+          { :success => false, :error => "If you provide the 'payloads' key, please do not provide any other keys at the top level." }
+        else
+          [json['payloads'] || json].flatten.each do |payload|
+            create_event(:payload => payload)
+          end
+          { :success => true }
+        end
       else
         { :success => false, :error => "You must provide a JSON payload" }
       end
