@@ -7,6 +7,7 @@ module Agents
     gem_dependency_check { defined?(HyPDF) }
 
     cannot_be_scheduled!
+    no_bulk_receive!
 
     description <<-MD
       The PDF Info Agent returns the metadata contained within a given PDF file, using HyPDF.

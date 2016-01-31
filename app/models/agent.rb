@@ -208,6 +208,10 @@ class Agent < ActiveRecord::Base
     self.class.can_dry_run?
   end
 
+  def no_bulk_receive?
+    self.class.no_bulk_receive?
+  end
+
   def log(message, options = {})
     AgentLog.log_for_agent(self, message, options)
   end
@@ -350,6 +354,14 @@ class Agent < ActiveRecord::Base
       !!@can_dry_run
     end
 
+    def no_bulk_receive!
+      @no_bulk_receive = true
+    end
+
+    def no_bulk_receive?
+      !!@no_bulk_receive
+    end
+
     def gem_dependency_check
       @gem_dependencies_checked = true
       @gem_dependencies_met = yield
@@ -365,7 +377,7 @@ class Agent < ActiveRecord::Base
     def receive!(options={})
       Agent.transaction do
         scope = Agent.
-                select("agents.id AS receiver_agent_id, sources.id AS source_agent_id, events.id AS event_id").
+                select("agents.id AS receiver_agent_id, events.id AS event_id").
                 joins("JOIN links ON (links.receiver_id = agents.id)").
                 joins("JOIN agents AS sources ON (links.source_id = sources.id)").
                 joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)").
@@ -377,21 +389,25 @@ class Agent < ActiveRecord::Base
         sql = scope.to_sql()
 
         agents_to_events = {}
-        Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_id, event_id|
+        Agent.connection.select_rows(sql).each do |receiver_agent_id, event_id|
           agents_to_events[receiver_agent_id.to_i] ||= []
           agents_to_events[receiver_agent_id.to_i] << event_id
         end
 
-        event_ids = agents_to_events.values.flatten.uniq.compact
-
         Agent.where(:id => agents_to_events.keys).each do |agent|
+          event_ids = agents_to_events[agent.id].uniq
           agent.update_attribute :last_checked_event_id, event_ids.max
-          Agent.async_receive(agent.id, agents_to_events[agent.id].uniq)
+
+          if agent.no_bulk_receive?
+            event_ids.each { |event_id| Agent.async_receive(agent.id, [event_id]) }
+          else
+            Agent.async_receive(agent.id, event_ids)
+          end
         end
 
         {
           :agent_count => agents_to_events.keys.length,
-          :event_count => event_ids.length
+          :event_count => agents_to_events.values.flatten.uniq.compact.length
         }
       end
     end

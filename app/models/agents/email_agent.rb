@@ -4,6 +4,7 @@ module Agents
 
     cannot_be_scheduled!
     cannot_create_events!
+    no_bulk_receive!
 
     description <<-MD
       The Email Agent sends any events it receives via email immediately.

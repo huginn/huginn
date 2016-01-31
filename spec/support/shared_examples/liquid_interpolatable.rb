@@ -30,7 +30,7 @@ shared_examples_for LiquidInterpolatable do
       })
     end
 
-    it "should work with arrays", focus: true do
+    it "should work with arrays" do
       @checker.options = {"value" => ["{{variable}}", "Much array", "Hey, {{hello_world}}"]}
       expect(@checker.interpolate_options(@checker.options, @event)).to eq({
         "value" => ["hello", "Much array", "Hey, Hello world"]

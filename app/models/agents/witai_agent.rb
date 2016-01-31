@@ -1,6 +1,7 @@
 module Agents
   class WitaiAgent < Agent
     cannot_be_scheduled!
+    no_bulk_receive!
 
     description <<-MD
       The `wit.ai` agent receives events, sends a text query to your `wit.ai` instance and generates outcome events.
