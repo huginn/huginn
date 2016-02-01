@@ -25,7 +25,7 @@ module Agents
 
       Agent Configuration:
 
-      `calendar_id` - The id the calendar you want to publish to. Typically your google account email address.
+      `calendar_id` - The id the calendar you want to publish to. Typically your google account email address.  Liquid formatting (e.g. `{{ cal_id }}`) is allowed here in order to extract the calendar_id from the incoming event.
 
       `google` A hash of configuration options for the agent.
 
@@ -35,7 +35,6 @@ module Agents
 
       `google` `key_secret` - The secret for the key, typically 'notasecret'
 
-      
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -94,8 +93,8 @@ module Agents
      incoming_events.each do |event|
         calendar = GoogleCalendar.new(options, Rails.logger)
 
-        calendar_event = JSON.parse(calendar.publish_as(options['calendar_id'], event.payload["message"]).response.body)
-  
+        calendar_event = JSON.parse(calendar.publish_as(interpolated(event)['calendar_id'], event.payload["message"]).response.body)
+
         create_event :payload => {
           'success' => true,
           'published_calendar_event' => calendar_event,
