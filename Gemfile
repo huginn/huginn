@@ -108,9 +108,10 @@ group :development do
   gem 'better_errors', '~> 1.1'
   gem 'binding_of_caller'
   gem 'quiet_assets'
-  gem 'guard'
-  gem 'guard-livereload', '~> 2.2'
-  gem 'guard-rspec'
+  gem 'guard', '~> 2.13.0'
+  gem 'guard-livereload', '~> 2.5.1'
+  gem 'guard-rspec', '~> 4.6.4'
+  gem 'rack-livereload', '~> 0.3.16'
   gem 'letter_opener_web'
 
   gem 'capistrano', '~> 3.4.0'
