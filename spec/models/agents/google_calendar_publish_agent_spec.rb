@@ -70,14 +70,16 @@ describe Agents::GoogleCalendarPublishAgent, :vcr do
       }.to_json
     end
 
-    before do
+    def setup_mock!
       fake_interface = Object.new
-      mock(GoogleCalendar).new(agent.options, Rails.logger) { fake_interface }
+      mock(GoogleCalendar).new(agent.interpolate_options(agent.options), Rails.logger) { fake_interface }
       mock(fake_interface).publish_as(calendar_id, message) { stub!.response.stub!.body { response_body } }
     end
 
     describe 'when the calendar_id is in the options' do
       it 'should publish any payload it receives' do
+        setup_mock!
+
         expect {
           agent.receive([event])
         }.to change { agent.events.count }.by(1)
@@ -88,6 +90,8 @@ describe Agents::GoogleCalendarPublishAgent, :vcr do
 
     describe 'with Liquid templating' do
       it 'should allow Liquid in the calendar_id' do
+        setup_mock!
+
         agent.options['calendar_id'] = '{{ cal_id }}'
         agent.save!
 
@@ -98,6 +102,22 @@ describe Agents::GoogleCalendarPublishAgent, :vcr do
 
         expect(agent.events.count).to eq(1)
         expect(agent.events.last.payload).to eq({ "success" => true, "published_calendar_event" => JSON.parse(response_body), "agent_id" => event.agent_id, "event_id" => event.id })
+      end
+
+      it 'should allow Liquid in the key' do
+        agent.options['google'].delete('key_file')
+        agent.options['google']['key'] = '{% credential google_key %}'
+        agent.save!
+
+        users(:jane).user_credentials.create! credential_name: 'google_key', credential_value: 'something'
+
+        agent.reload
+
+        setup_mock!
+
+        agent.receive([event])
+
+        expect(agent.events.count).to eq(1)
       end
     end
   end
