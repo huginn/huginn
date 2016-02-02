@@ -5,7 +5,7 @@ Huginn is packaged in two docker images.
 
 #### [cantino/huginn](multi-process/README.md) multiple process image
 
-This image runs all processes needed by Huginn in one container, when not database is linked it will also start MySQL internally. It is great to try huginn without having to set up anything, however maintenance and backups can be difficult.
+This image runs all processes needed by Huginn in one container, when the database is not linked it will also start MySQL internally. This is great to try huginn without having to set up anything, however maintenance and backups can be difficult.
 
 #### [cantino/huginn-single-process](single-process/README.md) multiple container image
 
