@@ -15,7 +15,7 @@ If you still wish to use the Heroku free plan (which won't work very well), plea
 ## Instructions
 
 * Install the [Heroku Toolbelt](https://toolbelt.heroku.com/) and then run `heroku login`
-* Go into your huginn directory and run `bundle`
+* Go into your huginn directory and run `cp .env.example .env && bundle`
 * Now, run the magic setup wizard: `bin/setup_heroku`
 * That's it!
 * If you make changes, you can re-run `bin/setup_heroku`, or just do `git push heroku master`.
