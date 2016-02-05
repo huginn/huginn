@@ -1,3 +1,5 @@
+If you are viewing this from the docker hub page the please follow the links to view the actual documentation for the [cantino/huginn](https://github.com/cantino/huginn/tree/master/docker/multi-process) or [cantino/huginn-single-process](https://github.com/cantino/huginn/tree/master/docker/single-process) image. Help us getting the bug fixed which is causing this inconvenience by commenting on [this issue](https://github.com/docker/hub-feedback/issues/467)
+
 ![Huginn](https://raw.github.com/cantino/huginn/master/media/huginn-logo.png "Your agents are standing by.")
 
 -----
