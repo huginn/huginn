@@ -103,6 +103,8 @@ module Agents
 
       Set `unzip` to `gzip` to inflate the resource using gzip.
 
+      Set `consider_http_error_success` to an array of ints, ex: `[404]` to consider also 404 as successes, and to scrape it.
+
       # Liquid Templating
 
       In Liquid templating, the following variable is available:
@@ -149,6 +151,7 @@ module Agents
       errors.add(:base, "either url, url_from_event, or data_from_event are required") unless options['url'].present? || options['url_from_event'].present? || options['data_from_event'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       validate_extract_options!
+      validate_consider_http_success_option!
 
       # Check for optional fields
       if options['mode'].present?
@@ -164,6 +167,27 @@ module Agents
       end
 
       validate_web_request_options!
+    end
+
+    def validate_consider_http_success_option!
+      consider_success = options["consider_http_error_success"]
+      if consider_success != nil
+
+        if consider_success.class != Array
+          errors.add(:base,"Must be an array and specify at least one status code")
+        else
+          if consider_success.uniq.count != consider_success.count
+            errors.add(:base,"Duplicate http code found")
+          else
+            if consider_success.map(&:class).uniq != [Fixnum]
+              errors.add(:base,"Please make sure to use only integer values for code")
+            else
+              @error_codes_considered_success = consider_success
+            end
+          end
+        end
+
+      end
     end
 
     def validate_extract_options!
@@ -273,7 +297,7 @@ module Agents
       uri = Utils.normalize_uri(url)
       log "Fetching #{uri}"
       response = faraday.get(uri)
-      raise "Failed: #{response.inspect}" unless response.success?
+      raise "Failed: #{response.inspect}" unless consider_response_successful?(response)
 
       interpolation_context.stack {
         interpolation_context['_response_'] = ResponseDrop.new(response)
@@ -353,6 +377,11 @@ module Agents
     end
 
     private
+    def consider_response_successful?(response)
+      response.success? || begin
+        @error_codes_considered_success.present? && @error_codes_considered_success.include?(response.status)
+      end
+    end
 
     def handle_event_data(data, event, existing_payload)
       handle_data(data, event.payload['url'], existing_payload)

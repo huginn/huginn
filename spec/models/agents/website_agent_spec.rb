@@ -40,6 +40,23 @@ describe Agents::WebsiteAgent do
         expect(@checker).not_to be_valid
       end
 
+      it 'should validate the consider_http_error_success fields' do
+        @checker.options['consider_http_error_success'] = [404]
+        expect(@checker).to be_valid
+
+        @checker.options['consider_http_error_success'] = [404, 404]
+        expect(@checker).not_to be_valid
+
+        @checker.options['consider_http_error_success'] = [404.0]
+        expect(@checker).not_to be_valid
+
+        @checker.options['consider_http_error_success'] = ["not_a_code"]
+        expect(@checker).not_to be_valid
+
+        @checker.options['consider_http_error_success'] = []
+        expect(@checker).not_to be_valid
+      end
+
       it "should validate uniqueness_look_back" do
         @checker.options['uniqueness_look_back'] = "nonsense"
         expect(@checker).not_to be_valid
@@ -166,6 +183,38 @@ describe Agents::WebsiteAgent do
           @checker.options = @valid_options
           @checker.check
         }.to change { Event.count }.by(1)
+      end
+    end
+
+    describe 'consider_http_error_success' do
+      it 'should allow scraping from a 404 result' do
+        json = {
+          'response' => {
+            'version' => 2,
+            'title' => "hello!"
+          }
+        }
+        zipped = ActiveSupport::Gzip.compress(json.to_json)
+        stub_request(:any, /gzip/).to_return(body: zipped, headers: { 'Content-Encoding' => 'gzip' }, status: 404)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://gzip.com",
+          'mode' => 'on_change',
+          'consider_http_error_success': [404],
+          'extract' => {
+            'version' => { 'path' => 'response.version' },
+          },
+          # no unzip option
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        expect(event.payload['version']).to eq(2)
       end
     end
 
