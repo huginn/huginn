@@ -181,8 +181,6 @@ module Agents
           else
             if consider_success.map(&:class).uniq != [Fixnum]
               errors.add(:base,"Please make sure to use only integer values for code")
-            else
-              @error_codes_considered_success = consider_success
             end
           end
         end
@@ -297,6 +295,7 @@ module Agents
       uri = Utils.normalize_uri(url)
       log "Fetching #{uri}"
       response = faraday.get(uri)
+
       raise "Failed: #{response.inspect}" unless consider_response_successful?(response)
 
       interpolation_context.stack {
@@ -379,7 +378,8 @@ module Agents
     private
     def consider_response_successful?(response)
       response.success? || begin
-        @error_codes_considered_success.present? && @error_codes_considered_success.include?(response.status)
+        consider_success = options["consider_http_error_success"]
+        consider_success.present? && consider_success.include?(response.status)
       end
     end
 

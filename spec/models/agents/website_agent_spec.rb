@@ -202,7 +202,7 @@ describe Agents::WebsiteAgent do
           'type' => "json",
           'url' => "http://gzip.com",
           'mode' => 'on_change',
-          'consider_http_error_success': [404],
+          'consider_http_error_success' => [404],
           'extract' => {
             'version' => { 'path' => 'response.version' },
           },
