@@ -121,6 +121,8 @@ group :development do
   group :test do
     gem 'coveralls', require: false
     gem 'delorean'
+    gem 'poltergeist'
+    gem 'capybara-select2', require: false
     gem 'pry-rails'
     gem 'rr'
     gem 'rspec', '~> 3.2'
