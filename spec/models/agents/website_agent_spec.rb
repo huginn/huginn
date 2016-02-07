@@ -57,7 +57,13 @@ describe Agents::WebsiteAgent do
         expect(@checker).not_to be_valid
 
         @checker.options['http_success_codes'] = []
-        expect(@checker).not_to be_valid
+        expect(@checker).to be_valid
+
+        @checker.options['http_success_codes'] = ''
+        expect(@checker).to be_valid
+
+        @checker.options['http_success_codes'] = false
+        expect(@checker).to be_valid
       end
 
       it "should validate uniqueness_look_back" do

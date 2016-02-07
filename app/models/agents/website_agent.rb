@@ -151,7 +151,7 @@ module Agents
       errors.add(:base, "either url, url_from_event, or data_from_event are required") unless options['url'].present? || options['url_from_event'].present? || options['data_from_event'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       validate_extract_options!
-      validate_consider_http_success_option!
+      validate_http_success_codes!
 
       # Check for optional fields
       if options['mode'].present?
@@ -169,16 +169,14 @@ module Agents
       validate_web_request_options!
     end
 
-    def validate_consider_http_success_option!
+    def validate_http_success_codes!
       consider_success = options["http_success_codes"]
-      if consider_success != nil
+      if consider_success.present?
 
         if (consider_success.class != Array)
           errors.add(:http_success_codes, "must be an array and specify at least one status code")
         else
-          if consider_success.blank?
-            errors.add(:http_success_codes, "must not be empty")
-          elsif consider_success.uniq.count != consider_success.count
+          if consider_success.uniq.count != consider_success.count
             errors.add(:http_success_codes, "duplicate http code found")
           else
             if consider_success.any?{|e| e.to_s !~ /^\d+$/ }
