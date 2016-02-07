@@ -40,20 +40,23 @@ describe Agents::WebsiteAgent do
         expect(@checker).not_to be_valid
       end
 
-      it 'should validate the consider_http_error_success fields' do
-        @checker.options['consider_http_error_success'] = [404]
+      it 'should validate the http_success_codes fields' do
+        @checker.options['http_success_codes'] = [404]
         expect(@checker).to be_valid
 
-        @checker.options['consider_http_error_success'] = [404, 404]
+        @checker.options['http_success_codes'] = [404, 404]
         expect(@checker).not_to be_valid
 
-        @checker.options['consider_http_error_success'] = [404.0]
+        @checker.options['http_success_codes'] = [404, "422"]
+        expect(@checker).to be_valid
+
+        @checker.options['http_success_codes'] = [404.0]
         expect(@checker).not_to be_valid
 
-        @checker.options['consider_http_error_success'] = ["not_a_code"]
+        @checker.options['http_success_codes'] = ["not_a_code"]
         expect(@checker).not_to be_valid
 
-        @checker.options['consider_http_error_success'] = []
+        @checker.options['http_success_codes'] = []
         expect(@checker).not_to be_valid
       end
 
@@ -186,7 +189,7 @@ describe Agents::WebsiteAgent do
       end
     end
 
-    describe 'consider_http_error_success' do
+    describe 'http_success_codes' do
       it 'should allow scraping from a 404 result' do
         json = {
           'response' => {
@@ -202,7 +205,7 @@ describe Agents::WebsiteAgent do
           'type' => "json",
           'url' => "http://gzip.com",
           'mode' => 'on_change',
-          'consider_http_error_success' => [404],
+          'http_success_codes' => [404],
           'extract' => {
             'version' => { 'path' => 'response.version' },
           },

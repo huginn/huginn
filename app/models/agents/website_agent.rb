@@ -103,7 +103,7 @@ module Agents
 
       Set `unzip` to `gzip` to inflate the resource using gzip.
 
-      Set `consider_http_error_success` to an array of ints, ex: `[404]` to consider also 404 as successes, and to scrape it.
+      Set `http_success_codes` to an array of status codes (e.g., `[404, 422]`) to treat HTTP response codes beyond 200 as successes.
 
       # Liquid Templating
 
@@ -170,17 +170,19 @@ module Agents
     end
 
     def validate_consider_http_success_option!
-      consider_success = options["consider_http_error_success"]
+      consider_success = options["http_success_codes"]
       if consider_success != nil
 
-        if consider_success.class != Array
-          errors.add(:base,"Must be an array and specify at least one status code")
+        if (consider_success.class != Array)
+          errors.add(:http_success_codes, "must be an array and specify at least one status code")
         else
-          if consider_success.uniq.count != consider_success.count
-            errors.add(:base,"Duplicate http code found")
+          if consider_success.blank?
+            errors.add(:http_success_codes, "must not be empty")
+          elsif consider_success.uniq.count != consider_success.count
+            errors.add(:http_success_codes, "duplicate http code found")
           else
-            if consider_success.map(&:class).uniq != [Fixnum]
-              errors.add(:base,"Please make sure to use only integer values for code")
+            if consider_success.any?{|e| e.to_s !~ /^\d+$/ }
+              errors.add(:http_success_codes, "please make sure to use only numeric values for code, ex 404, or \"404\"")
             end
           end
         end
@@ -378,8 +380,8 @@ module Agents
     private
     def consider_response_successful?(response)
       response.success? || begin
-        consider_success = options["consider_http_error_success"]
-        consider_success.present? && consider_success.include?(response.status)
+        consider_success = options["http_success_codes"]
+        consider_success.present? && (consider_success.include?(response.status.to_s) || consider_success.include?(response.status))
       end
     end
 
