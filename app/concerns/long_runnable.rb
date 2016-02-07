@@ -98,13 +98,15 @@ module LongRunnable
 
     def terminate_thread!
       if thread
-        thread.terminate
+        thread.instance_eval { ActiveRecord::Base.connection_pool.release_connection }
         thread.wakeup if thread.status == 'sleep'
+        thread.terminate
       end
     end
 
     def restart!
       without_alive_check do
+        puts "--> Restarting #{id} at #{Time.now} <--"
         stop!
         setup!(scheduler, mutex)
         run!
