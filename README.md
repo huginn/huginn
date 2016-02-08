@@ -84,7 +84,14 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 
 ### Develop
 
-All agents have specs! Test all specs with `bundle exec rspec`, or test a specific spec with `bundle exec rspec path/to/specific/spec.rb`. Read more about rspec for rails [here](https://github.com/rspec/rspec-rails).
+All agents have specs! And there's also acceptance tests that simulate running Huginn in a headless browser. 
+
+* Install PhantomJS 2.1.1 or greater: 
+  * Using [Node Package Manager](https://www.npmjs.com/): `npm install phantomjs` 
+  * Using [Homebrew](http://brew.sh/) on OSX `brew install phantomjs`
+* Run all specs with `bundle exec rspec`
+* Run a specific spec with `bundle exec rspec path/to/specific/test_spec.rb`. 
+* Read more about rspec for rails [here](https://github.com/rspec/rspec-rails).
 
 ## Deployment
 
