@@ -241,7 +241,7 @@ Edit the `Procfile` and choose one of the suggested versions for production
 
 Export the init scripts:
 
-    sudo rake production:export
+    sudo bundle exec rake production:export
 
 **Note:** You have to re-export the init script every time you change the configuration in `.env` or your `Procfile`!
 
@@ -252,7 +252,7 @@ Export the init scripts:
 
 ### Ensure Your Huginn Instance Is Running
 
-    sudo rake production:status
+    sudo bundle exec rake production:status
 
 ## 7. Nginx
 
@@ -305,7 +305,7 @@ Visit YOUR_SERVER in your web browser for your first Huginn login. The setup has
 
 **Enjoy!** :sparkles: :star: :fireworks:
 
-You can use `cd /home/huginn/huginn && sudo rake production:start` and `cd /home/huginn/huginn && sudo rake production:stop` to start and stop Huginn.
+You can use `cd /home/huginn/huginn && sudo bundle exec rake production:start` and `cd /home/huginn/huginn && sudo bundle exec rake production:stop` to start and stop Huginn.
 
 Be sure to read the section about how to [update](./update.md) your Huginn installation as well! You can also use [Capistrano](./capistrano.md) to keep your installation up to date.
 
@@ -330,7 +330,7 @@ Restart Nginx, export the init script and restart Huginn:
 ```
 cd /home/huginn/huginn
 sudo service nginx restart
-sudo rake production:export
+sudo bundle exec rake production:export
 ```
 
 Using a self-signed certificate is discouraged, but if you must use it follow the normal directions. Then generate the certificate:
@@ -349,7 +349,7 @@ If something went wrong during the installation please make sure you followed th
 When your Huginn instance still is not working first run the self check:
 
     cd /home/huginn/huginn
-    sudo rake production:check
+    sudo bundle exec rake production:check
 
 We are sorry when you are still having issues, now please check the various log files for error messages:
 
