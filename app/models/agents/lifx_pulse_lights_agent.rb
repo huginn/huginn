@@ -41,7 +41,7 @@ module Agents
     end
 
     def working?
-      (last_receive_at.present? && last_error_log_at.nil?) || (last_receive_at.present? && last_error_log_at.present? && last_receive_at > last_error_log_at)
+      received_event_without_error?
     end
 
     def receive(incoming_events)
