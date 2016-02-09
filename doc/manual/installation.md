@@ -241,7 +241,7 @@ Edit the `Procfile` and choose one of the suggested versions for production
 
 Export the init scripts:
 
-    sudo rake production:export
+    sudo bundle exec rake production:export
 
 **Note:** You have to re-export the init script every time you change the configuration in `.env` or your `Procfile`!
 
