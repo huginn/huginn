@@ -252,7 +252,7 @@ Export the init scripts:
 
 ### Ensure Your Huginn Instance Is Running
 
-    sudo rake production:status
+    sudo bundle exec rake production:status
 
 ## 7. Nginx
 
