@@ -3,6 +3,8 @@ module Agents
     default_schedule "never"
 
     can_dry_run!
+    no_bulk_receive!
+
 
     def self.should_run?
       ENV['ENABLE_INSECURE_AGENTS'] == "true"

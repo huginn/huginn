@@ -295,6 +295,14 @@ describe Agent do
         Agent.receive!
       end
 
+      it "should call receive for each event when no_bulk_receive! is used" do
+        mock.any_instance_of(Agents::TriggerAgent).receive(anything).twice
+        stub(Agents::TriggerAgent).no_bulk_receive? { true }
+        Agent.async_check(agents(:bob_weather_agent).id)
+        Agent.async_check(agents(:bob_weather_agent).id)
+        Agent.receive!
+      end
+
       it "should ignore events that were created before a particular Link" do
         agent2 = Agents::SomethingSource.new(:name => "something")
         agent2.user = users(:bob)

@@ -3,6 +3,7 @@ module Agents
     include DropboxConcern
 
     cannot_be_scheduled!
+    no_bulk_receive!
 
     description <<-MD
       The Dropbox File Url Agent is used to work with Dropbox. It takes a file path (or multiple file paths) and emits events with [temporary links](https://www.dropbox.com/developers/core/docs#media).

@@ -56,7 +56,7 @@ describe HuginnScheduler do
     end
   end
 
-  describe "cleanup_failed_jobs!", focus: true do
+  describe "cleanup_failed_jobs!" do
     before do
       3.times do |i|
         Delayed::Job.create(failed_at: Time.now - i.minutes)
@@ -64,7 +64,7 @@ describe HuginnScheduler do
       @keep = Delayed::Job.order(:failed_at)[1]
     end
 
-    it "work with set FAILED_JOBS_TO_KEEP env variable", focus: true do
+    it "work with set FAILED_JOBS_TO_KEEP env variable" do
       expect { @scheduler.send(:cleanup_failed_jobs!) }.to change(Delayed::Job, :count).by(-1)
       expect { @scheduler.send(:cleanup_failed_jobs!) }.to change(Delayed::Job, :count).by(0)
       expect(@keep.id).to eq(Delayed::Job.order(:failed_at)[0].id)

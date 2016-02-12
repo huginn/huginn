@@ -4,6 +4,7 @@ module Agents
 
     cannot_be_scheduled!
     cannot_create_events!
+    no_bulk_receive!
 
     before_validation :create_device, on: :create
 
