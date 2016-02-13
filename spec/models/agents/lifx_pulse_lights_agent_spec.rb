@@ -3,7 +3,6 @@ require 'rails_helper'
 describe Agents::LifxPulseLightsAgent do
   before(:each) do
     @valid_params = { 
-        'auth_token' => 'VALID_TOKEN',
         'light_selector' => 'label:Bulb3',
         "color" => "#ff0000",
         "cycles" => 5,
@@ -17,6 +16,7 @@ describe Agents::LifxPulseLightsAgent do
 
     @agent = Agents::LifxPulseLightsAgent.new(:name => "pulser", :options => @valid_params)
     @agent.user = users(:jane)
+    @agent.service = services(:generic)
     @agent.save!
   end
 
@@ -25,29 +25,11 @@ describe Agents::LifxPulseLightsAgent do
       expect(@agent).to be_valid
     end
 
-    it "should require a auth_token" do
-      @agent.options['auth_token'] = nil
+    it "should require a LIFX authentication service" do
+      @agent.service = nil
       expect(@agent).not_to be_valid
-      
-      @agent.user.user_credentials.create :credential_name => 'lifx_auth_token', :credential_value => 'SOME_CREDENTIAL'
-      expect(@agent).not_to be_valid
-      
-      @agent.options['auth_token'] = '{% credential lifx_auth_token %}'
-      expect(@agent).to be_valid
     end
     
-    it "verify the auth token by making a request" do
-      any_instance_of(LifxClient) do |klass|
-        stub(klass).get_lights { true }
-      end
-      expect(@agent).to be_valid
-      
-      any_instance_of(LifxClient) do |klass|
-        stub(klass).get_lights { false }
-      end
-      expect(@agent).not_to be_valid
-    end
-
     it "should require a light_selector" do
       @agent.options['light_selector'] = nil
       expect(@agent).not_to be_valid
@@ -68,21 +50,10 @@ describe Agents::LifxPulseLightsAgent do
     end
   end
 
-  it "should not be working until the first event was received" do
+  it "uses the WorkingHelper to determine if the agent is working" do
+    stub(@agent).received_event_without_error? { false }
     expect(@agent).not_to be_working
-    @agent.last_receive_at = Time.now
-    expect(@agent).to be_working
-  end
-
-  it "should not be working when the last error occured after the last received event" do
-    @agent.last_receive_at = Time.now - 1.minute
-    @agent.last_error_log_at = Time.now
-    expect(@agent).not_to be_working
-  end
-
-  it "should be working when the last received event occured after the last error" do
-    @agent.last_receive_at = Time.now
-    @agent.last_error_log_at = Time.now - 1.minute
+    stub(@agent).received_event_without_error? { true }
     expect(@agent).to be_working
   end
 end

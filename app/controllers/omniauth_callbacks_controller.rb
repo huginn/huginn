@@ -1,3 +1,4 @@
+require 'pp'
 class OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def action_missing(name)
     case name.to_sym

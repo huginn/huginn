@@ -236,7 +236,7 @@ Devise.setup do |config|
   if defined?(OmniAuth::Strategies::Lifx) &&
      (key = ENV["LIFX_CLIENT_ID"]).present? &&
      (secret = ENV["LIFX_CLIENT_SECRET"]).present?
-    config.omniauth :lifx, key, secret, authorize_params: {remote_control:all}
+    config.omniauth(:lifx, key, secret)
   end
 
   if defined?(OmniAuth::Strategies::Twitter) &&

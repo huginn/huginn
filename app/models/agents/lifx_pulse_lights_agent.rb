@@ -8,18 +8,13 @@ module Agents
     cannot_create_events!
 
     description <<-MD
-      Orchestrates your LIFX lights (http://lifx.com/)
+      Pulses your your [LIFX lights](http://lifx.com/) between their current color and a color you specify.
       
-      To get your auth_token:
-      
-      - Log on and go to the Settings page of your [LIFX Account](https://cloud.lifx.com/settings)
-      - Follow the instructions to "Generate New Token"
-      - Copy the new token and use as the `auth_token` -OR- create a new credential called `lifx_auth_token`
-      
+      To be able to use this Agent you need to authenticate with LIFX in the [Services](/services) section first.
+
       Read more about the [LIFX HTTP API](http://api.developer.lifx.com/) 
     MD
     
-    form_configurable :auth_token
     form_configurable :light_selector
     form_configurable :color
     form_configurable :cycles
@@ -27,13 +22,12 @@ module Agents
     form_configurable :power_on, type: :boolean
 
     def validate_options
-      errors.add(:base, "Provide a valid Auth token") unless auth_token.present? && client.get_lights
+      errors.add(:base, "You need to authenticate with LIFX in the Services section") unless service.try(:token).present?
       errors.add(:base, "Light selector is required") unless options['light_selector'].present?
     end
     
     def default_options
       { 
-        'auth_token' => '{% credential lifx_auth_token %}',
         'light_selector' => 'label:Bulb3',
         "color" => "#ff0000",
         "cycles" => 5,
@@ -53,12 +47,8 @@ module Agents
     end
     
     private
-    def auth_token
-      interpolated[:auth_token].presence
-    end
-    
     def client
-      @client ||= LifxClient.new(auth_token, interpolated[:light_selector])
+      @client ||= LifxClient.new(service.token, interpolated[:light_selector])
     end
   end
 end
