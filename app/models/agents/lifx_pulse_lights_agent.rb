@@ -1,6 +1,8 @@
 module Agents
   class LifxPulseLightsAgent < Agent
     include FormConfigurable
+    include Oauthable
+    valid_oauth_providers :'lifx'
     
     cannot_be_scheduled!
     cannot_create_events!

@@ -233,6 +233,12 @@ Devise.setup do |config|
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
 
+  if defined?(OmniAuth::Strategies::Lifx) &&
+     (key = ENV["LIFX_CLIENT_ID"]).present? &&
+     (secret = ENV["LIFX_CLIENT_SECRET"]).present?
+    config.omniauth :lifx, key, secret, authorize_params: {remote_control:all}
+  end
+
   if defined?(OmniAuth::Strategies::Twitter) &&
      (key = ENV["TWITTER_OAUTH_KEY"]).present? &&
      (secret = ENV["TWITTER_OAUTH_SECRET"]).present?

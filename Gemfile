@@ -72,6 +72,7 @@ gem 'aws-sdk-core', '~> 2.2.15'
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
+gem 'omniauth-lifx'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
