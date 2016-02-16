@@ -36,10 +36,9 @@ module Agents
       incoming_events.each do |event|
         recipients(event.payload).each do |recipient|
           log "Sending digest mail to #{recipient} with event #{event.id}"
-	  SystemMailer.send_message(:to => recipient, :subject => interpolated(event)['subject'], :headline => interpolated(event)['headline'], :body => interpolated(event)['body'], :groups => [present(event.payload)], :agent => self).deliver_later
+          SystemMailer.send_message(:to => recipient, :subject => interpolated(event)['subject'], :headline => interpolated(event)['headline'], :body => interpolated(event)['body'], :groups => [present(event.payload)]).deliver_later
         end
       end
     end
   end
 end
-   
