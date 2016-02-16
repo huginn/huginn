@@ -7,6 +7,7 @@ module Agents
 
     can_dry_run!
     can_order_created_events!
+    no_bulk_receive!
 
     default_schedule "every_12h"
 

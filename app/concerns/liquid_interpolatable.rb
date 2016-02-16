@@ -299,9 +299,7 @@ module LiquidInterpolatable
       end
 
       def render(context)
-        credential = context.registers[:agent].credential(@credential_name)
-        raise "No user credential named '#{@credential_name}' defined" if credential.nil?
-        credential
+        context.registers[:agent].credential(@credential_name)
       end
     end
 
