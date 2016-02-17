@@ -15,7 +15,7 @@ module Agents
       * stops (array)
       * alert_window_in_minutes (integer)
 
-      First, select an agency by visiting [http://www.nextbus.com/predictor/agencySelector.jsp](http://www.nextbus.com/predictor/agencySelector.jsp) and finding your transit system.  Once you find it, copy the part of the URL after `?a=`.  For example, for the San Francisco MUNI system, you would end up on [http://www.nextbus.com/predictor/stopSelector.jsp?a=**sf-muni**](http://www.nextbus.com/predictor/stopSelector.jsp?a=sf-muni) and copy "sf-muni".  Put that into this Agent's agency setting.
+      First, select an agency by visiting [https://www.nextbus.com/predictor/adaAgency.jsp](https://www.nextbus.com/predictor/adaAgency.jsp) and finding your transit system.  Once you find it, copy the part of the URL after `?a=`.  For example, for the San Francisco MUNI system, you would end up on [https://www.nextbus.com/predictor/adaDirection.jsp?a=**sf-muni**](https://www.nextbus.com/predictor/adaDirection.jsp?a=sf-muni) and copy "sf-muni".  Put that into this Agent's agency setting.
 
       Next, find the stop tags that you care about.  To find the tags for the sf-muni system, for the N route, visit this URL:
       [http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=sf-muni&r=**N**](http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=sf-muni&r=N)
