@@ -57,7 +57,7 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ### Docker
 
-The quickest and easiest way to check out Huginn is to use the offical Docker image. Have a look at the [documentation](https://github.com/cantino/huginn/blob/master/doc/docker/install.md).
+The quickest and easiest way to check out Huginn is to use the official Docker image. Have a look at the [documentation](https://github.com/cantino/huginn/blob/master/doc/docker/install.md).
 
 ### Local Installation
 
