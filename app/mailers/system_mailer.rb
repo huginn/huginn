@@ -39,7 +39,7 @@ ActionMailer::DeliveryJob.rescue_from(StandardError) do |exception|
   if !exception.message.start_with?('+++')
     Rails.logger.info "Intercepted ActionMailer::DeliveryJob error: #{exception.message}"
     SystemMailer.agent.log("Mailing error: #{exception.message}") if !SystemMailer.agent.nil?
-    raise $!, "+++#{$!}", $!.backtrace
+    raise exception, "+++#{exception.message}", exception.backtrace
   end
 end
 
