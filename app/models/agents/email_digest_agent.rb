@@ -16,6 +16,8 @@ module Agents
       You can specify one or more `recipients` for the email, or skip the option in order to send the email to your
       account's default email address.
 
+      You can provide a `from` address for the email, or leave it blank to default to the value of `EMAIL_FROM_ADDRESS` (`#{ENV['EMAIL_FROM_ADDRESS']}`).
+
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
     MD
 
@@ -42,7 +44,13 @@ module Agents
         groups = self.memory['queue'].map { |payload| present(payload) }
         recipients.each do |recipient|
           log "Sending digest mail to #{recipient} with events [#{ids}]"
-          SystemMailer.send_message(:to => recipient, :subject => interpolated['subject'], :headline => interpolated['headline'], :groups => groups).deliver_later
+          SystemMailer.send_message(
+            to: recipient,
+            from: interpolated['from'],
+            subject: interpolated['subject'],
+            headline: interpolated['headline'],
+            groups: groups
+          ).deliver_later
         end
         self.memory['queue'] = []
         self.memory['events'] = []
