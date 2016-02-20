@@ -5,6 +5,9 @@ class SystemMailer < ActionMailer::Base
     @groups = options[:groups]
     @headline = options[:headline]
     @body = options[:body]
-    mail :to => options[:to], :subject => options[:subject]
+
+    mail_options = { to: options[:to], subject: options[:subject] }
+    mail_options[:from] = options[:from] if options[:from].present?
+    mail(mail_options)
   end
 end

@@ -322,7 +322,7 @@ GEM
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
-    mysql2 (0.3.16)
+    mysql2 (0.3.20)
     naught (1.0.0)
     nenv (0.2.0)
     net-ftp-list (3.2.8)
@@ -624,7 +624,7 @@ DEPENDENCIES
   mini_magick
   mqtt
   multi_xml
-  mysql2 (~> 0.3.16)
+  mysql2 (~> 0.3.20)
   net-ftp-list (~> 3.2.8)
   nokogiri (= 1.6.7.2)
   omniauth
