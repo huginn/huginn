@@ -21,6 +21,8 @@ module Agents
 
       Select your destination and lets use the n-judah route. The link should be [http://www.nextbus.com/predictor/adaStop.jsp?a=sf-muni&r=N](http://www.nextbus.com/predictor/adaStop.jsp?a=sf-muni&r=N) Once you find it, copy the part of the URL after `r=`.
 
+      The link may not work, but we're just trying to get the part after the r=, so even if it gives an error, continue to the next step.
+
       To find the tags for the sf-muni system, for the N route, visit this URL:
       [http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=sf-muni&r=**N**](http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=sf-muni&r=N)
 
