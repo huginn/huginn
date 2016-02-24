@@ -6,7 +6,6 @@ describe Agents::TwitterFavorites do
   end
 
   before do
-
     @opts = {:username => "tectonic", :number => "10", :history => "100", :expected_update_period_in_days => "2", :starting_at => "Sat Feb 20 01:32:08 +0000 2016"}
 
     @agent = Agents::TwitterFavorites.new(name: "tectonic", options: @opts)
@@ -28,14 +27,12 @@ describe Agents::TwitterFavorites do
   end
 
   describe "making sure check method works" do
-
     it "expect change method to change event" do
-     expect { @agent.check }.to change {Event.count}.by(3)
+      expect { @agent.check }.to change {Event.count}.by(3)
     end
   end
 
   describe "#check with starting_at=future date" do
-
     it "should check for changes starting_at a future date, thus not find any" do
       opts = @opts.merge({ starting_at: "Thurs Feb 23 16:12:04 +0000 2017" })
 
