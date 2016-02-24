@@ -2,6 +2,12 @@
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
 
 user = User.find_or_initialize_by(:email => ENV['SEED_EMAIL'] || "admin@example.com")
+
+if user.persisted?
+  puts "User with email '#{user.email}' already exists, not seeding."
+  exit
+end
+
 user.username = ENV['SEED_USERNAME'] || "admin"
 user.password = ENV['SEED_PASSWORD'] || "password"
 user.password_confirmation = ENV['SEED_PASSWORD'] || "password"
