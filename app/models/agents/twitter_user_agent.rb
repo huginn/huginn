@@ -7,9 +7,9 @@ module Agents
     description <<-MD
       There are two options in using the Twitter User Agent. 
 
-      The first option is to follow the timeline of a specified Twitter user.
+      The first option is to follow the timeline of a specific Twitter user.
 
-      The second option is to follow your own home timeline including both your tweets and from people whom you are following.
+      The second option is to follow your own home timeline including both your tweets and tweets from people whom you are following.
 
       #{twitter_dependencies_missing if dependencies_missing?}
 
@@ -17,7 +17,7 @@ module Agents
 
       For the first option, you must provide the `username` of the Twitter user to monitor.
 
-      For the second option, you must remove 'username' and set 'choose_home_time_line' to 'true'.
+      For the second option, you must remove `username` and set `choose_home_time_line` to `true`. Forgetting to remove username will malfunction the agent.
 
       Set `include_retweets` to `false` to not include retweets (default: `true`)
       
