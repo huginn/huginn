@@ -13,7 +13,7 @@ module Agents
 
       For the first option, you must provide the `username` of the Twitter user to monitor.
 
-      For the second option, you must remove `username` and set `choose_home_time_line` to `true`. Forgetting to remove username will malfunction the agent.
+      For the second option, you must set `choose_home_time_line` to `true`. 
 
       Set `include_retweets` to `false` to not include retweets (default: `true`)
       
@@ -67,9 +67,8 @@ module Agents
     def validate_options
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       
-      if options[:choose_home_time_line] == 'false'
-        errors.add(:base, "username is required")
-      end
+      errors.add(:base, "username is required") unless options['choose_home_time_line'].include?('true')
+
       if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
         errors.add(:base, "include_retweets must be a boolean value string (true/false)")
       end
