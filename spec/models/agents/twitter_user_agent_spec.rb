@@ -52,7 +52,7 @@ describe Agents::TwitterUserAgent do
       
       opts = @opts.merge({:choose_home_time_line => "false" })
 
-      checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => @opts1)
+      checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => opts)
       checker.service = services(:generic)
       checker.user = users(:bob)
       checker.save!
