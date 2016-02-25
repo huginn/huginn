@@ -6,10 +6,15 @@ module Agents
 
     description <<-MD
       The Twitter Favorites List Agent follows the favorites list of a specified Twitter user.
+
       #{twitter_dependencies_missing if dependencies_missing?}
+
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
+
       You must also provide the `username` of the Twitter user, `number` of latest tweets to monitor and `history' as number of tweets that will be held in memory.
+
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+      
       Set `starting_at` to the date/time (eg. `Mon Jun 02 00:38:12 +0000 2014`) you want to start receiving tweets from (default: agent's `created_at`)
     MD
 
