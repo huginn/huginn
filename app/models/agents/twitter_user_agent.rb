@@ -78,9 +78,6 @@ module Agents
       if options[:starting_at].present?
         Time.parse(options[:starting_at]) rescue errors.add(:base, "Error parsing starting_at")
       end
-      # if options[:username].present? 
-      #   errors.add(:base, "username is required")
-      # end
     end
 
     def starting_at
@@ -131,7 +128,6 @@ module Agents
             create_event :payload => tweet.attrs
           end
         end
-      #save!
       end
     end
   end
