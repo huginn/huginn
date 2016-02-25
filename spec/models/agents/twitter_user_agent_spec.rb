@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Agents::TwitterUserAgent do
   before do
     # intercept the twitter API request for @tectonic's user profile
-    stub_request(:any, /tectonic/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+    stub_request(:any, "https://api.twitter.com/1.1/statuses/home_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
 
     @opts = {
       :username => "tectonic",
@@ -15,7 +15,7 @@ describe Agents::TwitterUserAgent do
       :consumer_secret => "---",
       :oauth_token => "---",
       :oauth_token_secret => "---",
-      :choose_home_time_line => 'false'
+      :choose_home_time_line => 'true'
     }
 
     @checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => @opts)
@@ -43,16 +43,16 @@ describe Agents::TwitterUserAgent do
     end
   end
 
-  describe "#check that home timeline works" do
+  describe "#check that user timeline works" do
     before do
-      stub_request(:any, "https://api.twitter.com/1.1/statuses/home_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+      stub_request(:any, /tectonic/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
     end
 
-    it "should check that event changed with timeline sets to true" do
+    it "should check that event changed with timeline sets to false" do
       
-      opts = @opts.tap { |ots| ots.delete(:username)}.merge({ :choose_home_time_line => "true" })
+      opts = @opts.merge({:choose_home_time_line => "false" })
 
-      checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => opts)
+      checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => @opts1)
       checker.service = services(:generic)
       checker.user = users(:bob)
       checker.save!
