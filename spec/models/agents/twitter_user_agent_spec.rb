@@ -14,7 +14,8 @@ describe Agents::TwitterUserAgent do
       :consumer_key => "---",
       :consumer_secret => "---",
       :oauth_token => "---",
-      :oauth_token_secret => "---"
+      :oauth_token_secret => "---",
+      :choose_home_time_line => 'false'
     }
 
     @checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => @opts)
@@ -42,4 +43,21 @@ describe Agents::TwitterUserAgent do
     end
   end
 
+  describe "#check that home timeline works" do
+    before do
+      stub_request(:any, //).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+    end
+
+    it "should check that event changed with timeline sets to true" do
+      
+      opts = @opts.tap { |ots| ots.delete(:username)}.merge({ :choose_home_time_line => "true" })
+
+      checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => opts)
+      checker.service = services(:generic)
+      checker.user = users(:bob)
+      checker.save!
+
+      expect { checker.check }.to change { Event.count }.by(5)
+    end
+  end
 end
