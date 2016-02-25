@@ -5,11 +5,7 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      There are two options in using the Twitter User Agent. 
-
-      The first option is to follow the timeline of a specific Twitter user.
-
-      The second option is to follow your own home timeline including both your tweets and tweets from people whom you are following.
+      The Twitter User Agent either follows the timeline of a specific Twitter user or follow your own home timeline including both your tweets and tweets from people whom you are following.
 
       #{twitter_dependencies_missing if dependencies_missing?}
 
@@ -70,7 +66,10 @@ module Agents
 
     def validate_options
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
-
+      
+      if options[:choose_home_time_line] == 'false'
+        errors.add(:base, "username is required")
+      end
       if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
         errors.add(:base, "include_retweets must be a boolean value string (true/false)")
       end
@@ -89,7 +88,7 @@ module Agents
     end
 
     def choose_home_time_line?
-      interpolated[:choose_home_time_line] != "false"
+      interpolated[:choose_home_time_line] == "true"
     end
 
     def include_retweets?
@@ -107,7 +106,6 @@ module Agents
 
       if choose_home_time_line?
 
-      # http://rdoc.info/gems/twitter/Twitter/REST/Timelines#user_timeline-instance_method
         tweets = twitter.home_timeline(opts)
 
         tweets.each do |tweet|

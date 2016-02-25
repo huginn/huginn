@@ -45,7 +45,7 @@ describe Agents::TwitterUserAgent do
 
   describe "#check that home timeline works" do
     before do
-      stub_request(:any, //).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+      stub_request(:any, "https://api.twitter.com/1.1/statuses/home_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
     end
 
     it "should check that event changed with timeline sets to true" do
