@@ -6,12 +6,12 @@ module Agents
 
     description <<-MD
       The Twitter User Agent either follows the timeline of a specific Twitter user or follows your own home timeline including both your tweets and tweets from people whom you are following.
-      
+
       #{twitter_dependencies_missing if dependencies_missing?}
 
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
 
-      To follow a Twitter user set `choose_home_time_line` to `false` and provide a `username`.
+      To follow a Twitter user set `choose_home_time_line` to `false` and provide the `username`.
 
       To follow your own home timeline set `choose_home_time_line` to `true`.
 
