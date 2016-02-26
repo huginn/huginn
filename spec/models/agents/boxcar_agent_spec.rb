@@ -44,7 +44,6 @@ describe Agents::BoxcarAgent do
 
     it "should raise error when invalid response arrives" do
       stub(HTTParty).post { {"blah" => "blah"} }
-      @checker.receive([@event])
       expect{@checker.send_notification}.to raise_error
     end
 
