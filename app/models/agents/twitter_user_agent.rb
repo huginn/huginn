@@ -52,17 +52,14 @@ module Agents
         'include_retweets' => 'true',
         'exclude_replies' => 'false',
         'expected_update_period_in_days' => '2',
-        'choose_home_time_line' => 'false'
+        'choose_home_time_line' => 'true'
       }
     end
 
     def validate_options
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       
-      #errors.add(:base, "username is required") unless options['choose_home_time_line'] == 'true'
-      if options['choose_home_time_line'].present? && %[false].include?(options['choose_home_time_line'].to_s)
-        errors.add(:base, "username is required")
-      end
+      errors.add(:base, "username is required") unless options['choose_home_time_line'] == 'true'
 
       if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
         errors.add(:base, "include_retweets must be a boolean value string (true/false)")

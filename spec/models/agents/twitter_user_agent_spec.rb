@@ -6,7 +6,7 @@ describe Agents::TwitterUserAgent do
     stub_request(:any, "https://api.twitter.com/1.1/statuses/home_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
 
     @opts = {
-      :username => "tectonic",
+      #:username => "tectonic",
       :include_retweets => "true",
       :exclude_replies => "false",
       :expected_update_period_in_days => "2",
@@ -43,21 +43,20 @@ describe Agents::TwitterUserAgent do
     end
   end
 
-  describe "#check that user timeline works" do
+  describe "#check that if choose time line is false then username is required" do
     before do
-      stub_request(:any, /tectonic/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+      #stub_request(:any, '/tectonic/').to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+      stub_request(:any, "https://api.twitter.com/1.1/statuses/user_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
     end
 
-    it "should check that event changed with timeline sets to false" do
+    it "should check that error messaged added if choose time line is false" do
       
-      opts = @opts.merge({:choose_home_time_line => "false" })
+      opts = @opts.merge!({:choose_home_time_line => "false" })
 
       checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => opts)
       checker.service = services(:generic)
       checker.user = users(:bob)
-      checker.save!
-
-      expect { checker.check }.to change { Event.count }.by(5)
+      expect(checker.save).to eq (checker.errors.messages[:base] == "username is required" )
     end
   end
 end
