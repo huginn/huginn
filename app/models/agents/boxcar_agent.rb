@@ -54,7 +54,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         payload_interpolated = interpolated(event)
-        user_credentails = payload_interpolated['user_credentials'] || credential('boxcar_api_key')
+        user_credentials = payload_interpolated['user_credentials'] || credential('boxcar_api_key')
         post_params = {
           'user_credentials' => user_credentials,
           'notification' => {
