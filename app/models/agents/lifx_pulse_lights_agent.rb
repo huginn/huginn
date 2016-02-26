@@ -42,7 +42,9 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        client.pulse(options.slice(:color, :cycles, :persist, :power_on))
+        payload = interpolated(event)
+        payload.slice!(:color, :cycles, :persist, :power_on)
+        client.pulse(payload)
       end
     end
     
