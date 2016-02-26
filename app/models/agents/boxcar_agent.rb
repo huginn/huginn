@@ -75,6 +75,10 @@ module Agents
       if response['Response'].present?  and response['Response'] == "Not authorized"
         raise StandardError, response['Response']
       end
+      if not response['id'].present?
+        puts response
+        raise StandardError, "Invalid response from Boxcar: #{response}"
+      end
     end
   end
 end

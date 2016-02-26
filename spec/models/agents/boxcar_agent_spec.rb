@@ -37,15 +37,15 @@ describe Agents::BoxcarAgent do
   end
 
   describe "#receive" do
-
     it "sends a message" do
-      stub(HTTParty).post '{
-        "id":843878764,
-        "message":"blah",
-        "title":"blah",
-        "source_name":"Huginn"
-      }'
+      stub(HTTParty).post { {"id" => 1, "message" => "blah", "title" => "blah","source_name" => "Custom Notification"} }
       @checker.receive([@event])
+    end
+
+    it "should raise error when invalid response arrives" do
+      stub(HTTParty).post { {"blah" => "blah"} }
+      @checker.receive([@event])
+      expect{@checker.send_notification}.to raise_error
     end
 
     it "should raise error when response says unauthorized" do
