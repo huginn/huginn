@@ -5,15 +5,22 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      The Twitter User Agent either follows the timeline of a specific Twitter user or follow your own home timeline including both your tweets and tweets from people whom you are following.
+      The Twitter User Agent either follows the timeline of a specific Twitter user or follows your own home timeline including both your tweets and tweets from people whom you are following.
+      
       #{twitter_dependencies_missing if dependencies_missing?}
+
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
-      For the first option, you must provide the `username` of the Twitter user to monitor.
-      For the second option, you must set `choose_home_time_line` to `true`. 
+
+      To follow a Twitter user set `choose_home_time_line` to `false` and provide a `username`.
+
+      To follow your own home timeline set `choose_home_time_line` to `true`.
+
       Set `include_retweets` to `false` to not include retweets (default: `true`)
       
       Set `exclude_replies` to `true` to exclude replies (default: `false`)
+
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+
       Set `starting_at` to the date/time (eg. `Mon Jun 02 00:38:12 +0000 2014`) you want to start receiving tweets from (default: agent's `created_at`)
     MD
 
@@ -52,14 +59,13 @@ module Agents
         'include_retweets' => 'true',
         'exclude_replies' => 'false',
         'expected_update_period_in_days' => '2',
-        'choose_home_time_line' => 'true'
+        'choose_home_time_line' => 'false'
       }
     end
 
     def validate_options
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
-      
-      errors.add(:base, "username is required") unless options['choose_home_time_line'] == 'true'
+      errors.add(:base, "username is required") if options['username'].blank? && !boolify(options['choose_home_time_line'])
 
       if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
         errors.add(:base, "include_retweets must be a boolean value string (true/false)")
