@@ -85,7 +85,7 @@ module Agents
     end
 
     def choose_home_time_line?
-      interpolated[:choose_home_time_line] == "true"
+      boolify(interpolated[:choose_home_time_line]) == "true"
     end
 
     def include_retweets?
@@ -102,26 +102,16 @@ module Agents
       opts.merge! :since_id => since_id unless since_id.nil?
 
       if choose_home_time_line?
-
         tweets = twitter.home_timeline(opts)
-
-        tweets.each do |tweet|
-          if tweet.created_at >= starting_at
-            memory['since_id'] = tweet.id if !memory['since_id'] || (tweet.id > memory['since_id'])
-
-            create_event :payload => tweet.attrs
-          end
-        end
-
       else
         tweets = twitter.user_timeline(interpolated['username'], opts)
+      end
 
-        tweets.each do |tweet|
-          if tweet.created_at >= starting_at
-            memory['since_id'] = tweet.id if !memory['since_id'] || (tweet.id > memory['since_id'])
+      tweets.each do |tweet|
+        if tweet.created_at >= starting_at
+          memory['since_id'] = tweet.id if !memory['since_id'] || (tweet.id > memory['since_id'])
 
-            create_event :payload => tweet.attrs
-          end
+          create_event :payload => tweet.attrs
         end
       end
     end
