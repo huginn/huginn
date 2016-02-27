@@ -459,6 +459,9 @@ GEM
       rspec-mocks (~> 3.2.0)
       rspec-support (~> 3.2.0)
     rspec-support (3.2.2)
+    rspotify (1.15.4)
+      omniauth-oauth2 (~> 1.1)
+      rest-client (~> 1.7)
     rturk (2.12.1)
       erector
       nokogiri
@@ -648,6 +651,7 @@ DEPENDENCIES
   rspec-collection_matchers (~> 1.1.0)
   rspec-html-matchers (~> 0.7)
   rspec-rails (~> 3.1)
+  rspotify
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
   rufus-scheduler (~> 3.0.8)
