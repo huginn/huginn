@@ -3,10 +3,10 @@ require 'rails_helper'
 describe Agents::TwitterUserAgent do
   before do
     # intercept the twitter API request for @tectonic's user profile
-    stub_request(:any, "https://api.twitter.com/1.1/statuses/home_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+    stub_request(:any, "https://api.twitter.com/1.1/statuses/user_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true&screen_name=tectonic").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
 
     @opts = {
-      #:username => "tectonic",
+      :username => "tectonic",
       :include_retweets => "true",
       :exclude_replies => "false",
       :expected_update_period_in_days => "2",
@@ -14,8 +14,7 @@ describe Agents::TwitterUserAgent do
       :consumer_key => "---",
       :consumer_secret => "---",
       :oauth_token => "---",
-      :oauth_token_secret => "---",
-      :choose_home_time_line => 'true'
+      :oauth_token_secret => "---"
     }
 
     @checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => @opts)
@@ -45,12 +44,30 @@ describe Agents::TwitterUserAgent do
 
   describe "#check that if choose time line is false then username is required" do
     before do
-      stub_request(:any, "https://api.twitter.com/1.1/statuses/user_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+      stub_request(:any, "https://api.twitter.com/1.1/statuses/home_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
     end
 
-    it "should check that error messaged added if choose time line is false" do
-      
-      opts = @opts.merge!({:choose_home_time_line => "false" })
+    it 'requires username unless choose_home_time_line is true' do
+      expect(@checker).to be_valid
+
+      @checker.options['username'] = nil
+      expect(@checker).to_not be_valid
+
+      @checker.options['choose_home_time_line'] = 'true'
+      expect(@checker).to be_valid
+    end
+
+    context "when choose_home_time_line is true" do
+      before do
+        @checker.options['choose_home_time_line'] = true
+        @checker.options.delete('username')
+        @checker.save!
+      end
+    end
+
+    it "error messaged added if choose_home_time_line is false and username does not exist" do
+
+      opts = @opts.tap { |o| o.delete(:username) }.merge!({:choose_home_time_line => "false" })
 
       checker = Agents::TwitterUserAgent.new(:name => "tectonic", :options => opts)
       checker.service = services(:generic)
