@@ -13,9 +13,9 @@ module Agents
       The access token is available on general "Settings" screen of Boxcar iOS
       app or from Boxcar Web Inbox settings page.
 
-      Please provide the access token as `user_credentails` in `options` or create a
-      `boxcar_api_key` credential. The value in `user_credentials` will be considered if
-      specified in both places.
+      Please provide your access token in the `user_credentials` option. If
+      you'd like to use a credential, set the `user_credentials` option to `{%
+      credential CREDENTIAL_NAME %}`.
 
       Options:
 
@@ -43,8 +43,7 @@ module Agents
     end
 
     def strip(string)
-      puts string
-      string.strip! || string
+      (string || '').strip
     end
 
     def validate_options
@@ -54,7 +53,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         payload_interpolated = interpolated(event)
-        user_credentials = payload_interpolated['user_credentials'] || credential('boxcar_api_key')
+        user_credentials = payload_interpolated['user_credentials']
         post_params = {
           'user_credentials' => user_credentials,
           'notification' => {
@@ -72,11 +71,10 @@ module Agents
     def send_notification(post_params)
       response = HTTParty.post(API_URL, :query => post_params)
       raise StandardError, response['error']['message'] if response['error'].present?
-      if response['Response'].present?  and response['Response'] == "Not authorized"
+      if response['Response'].present?  && response['Response'] == "Not authorized"
         raise StandardError, response['Response']
       end
-      if not response['id'].present?
-        puts response
+      if !response['id'].present?
         raise StandardError, "Invalid response from Boxcar: #{response}"
       end
     end
