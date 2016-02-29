@@ -85,7 +85,7 @@ module Agents
     end
 
     def choose_home_time_line?
-      boolify(interpolated[:choose_home_time_line]) == "true"
+      interpolated[:choose_home_time_line] == "true"
     end
 
     def include_retweets?
