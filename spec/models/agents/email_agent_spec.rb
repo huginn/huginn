@@ -75,5 +75,19 @@ describe Agents::EmailAgent do
       expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to match(/\A\s*<strong>rain\!<\/strong>\s*\z/)
       expect(get_message_part(ActionMailer::Base.deliveries.last, /html/).strip).to match(/<body>\s*<strong>rain\!<\/strong>\s*<\/body>/)
     end
+    it "can take content type option to set content type of email sent" do
+      @checker.update_attributes :options => @checker.options.merge({
+        'content_type' => 'text/plain'
+      })
+
+      event2 = Event.new
+      event2.agent = agents(:bob_rain_notifier_agent)
+      event2.payload = { :foo => { :subject => "Something you should know about" }, :some_html => "<strong>rain!</strong>" }
+      event2.save!
+
+      Agents::EmailAgent.async_receive(@checker.id, [event2.id])
+
+      expect(ActionMailer::Base.deliveries.last.content_type).to eq("text/plain; charset=UTF-8")
+    end
   end
 end
