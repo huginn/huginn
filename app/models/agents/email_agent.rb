@@ -25,6 +25,8 @@ module Agents
 
       You can provide a `content_type` for the email and specify `text/plain` or `text/html` to be sent.
 
+      If you do not specify `content_type`, then the recipient email server will determine the correct rendering.
+
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
     MD
 
