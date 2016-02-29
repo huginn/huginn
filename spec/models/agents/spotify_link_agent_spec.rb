@@ -22,7 +22,8 @@ describe Agents::SpotifyLinkAgent do
       mock(RSpotify::Artist).search('Test artist') { [artist] }
 
       agent.receive([event])
-      expect(Event.last.payload['artist_link'])
+      last_payload = Event.last.payload['artist_link']
+      expect(last_payload)
         .to(eq('http://open.spotify.com/test_artist'))
     end
   end
