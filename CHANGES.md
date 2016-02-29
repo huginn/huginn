@@ -1,5 +1,10 @@
 # Changes
 
+* Feb 26, 2016   - Added TwitterFavorites Agent for following the favorites of a Twitter user. Thanks @jngai and @bigretromike!
+* Feb 26, 2016   - Added HttpStatusAgent for pinging web servers and returning the resulting HTTP status code. Thanks @darrencauthon!
+* Feb 20, 2016   - A `from` option can now be specified on email agents. (If you're using Gmail, it may still show your normal address unless you add the new address as a valid sender on the account.)
+* Feb 20, 2016   - Added a recommended PORT to the .env.example file.
+* Feb 15, 2016   - Allow usage of spring in development by setting SPRING in .env.
 * Feb 14, 2016   - Bug fix: missing Credential no longer 500 errors during an import.
 * Feb 12, 2016   - Add `no_bulk_receive!` option to ensure Events are processed individually in certain Agents.
 * Feb 7, 2016    - Add `http_success_codes` option to the WebsiteAgent to treat more than just 200 as success codes.
