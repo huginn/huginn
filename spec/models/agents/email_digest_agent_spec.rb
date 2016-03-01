@@ -11,6 +11,10 @@ describe Agents::EmailDigestAgent do
     @checker = Agents::EmailDigestAgent.new(:name => "something", :options => { :expected_receive_period_in_days => "2", :subject => "something interesting" })
     @checker.user = users(:bob)
     @checker.save!
+
+    @checker1 = Agents::EmailDigestAgent.new(:name => "something", :options => { :expected_receive_period_in_days => "2", :subject => "something interesting", :content_type => "text/plain" })
+    @checker1.user = users(:bob)
+    @checker1.save!
   end
 
   after do
@@ -35,6 +39,7 @@ describe Agents::EmailDigestAgent do
   end
 
   describe "#check" do
+
     it "should send an email" do
       Agents::EmailDigestAgent.async_check(@checker.id)
       expect(ActionMailer::Base.deliveries).to eq([])
@@ -47,6 +52,7 @@ describe Agents::EmailDigestAgent do
       @checker.save!
 
       Agents::EmailDigestAgent.async_check(@checker.id)
+
       expect(ActionMailer::Base.deliveries.last.to).to eq(["bob@example.com"])
       expect(ActionMailer::Base.deliveries.last.subject).to eq("something interesting")
       expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to eq("Event\n  data: Something you should know about\n\nFoo\n  bar: 2\n  url: http://google.com\n\nhi\n  woah: there\n\nEvent\n  test: 2")
@@ -72,6 +78,21 @@ describe Agents::EmailDigestAgent do
       expect(html_email_text).to match(/avehumidity/)
 
       expect(@checker.reload.memory[:queue]).to be_empty
+    end
+    
+    it "should send email with correct content type" do
+      Agents::EmailDigestAgent.async_check(@checker1.id)
+      expect(ActionMailer::Base.deliveries).to eq([])
+
+      @checker1.memory[:queue] = [{ :data => "Something you should know about" },
+                                 { :title => "Foo", :url => "http://google.com", :bar => 2 },
+                                 { "message" => "hi", :woah => "there" },
+                                 { "test" => 2 }]
+      @checker1.memory[:events] = [1,2,3,4]
+      @checker1.save!
+
+      Agents::EmailDigestAgent.async_check(@checker1.id)
+      expect(ActionMailer::Base.deliveries.last.content_type).to eq("text/plain; charset=UTF-8")
     end
   end
 end
