@@ -1,8 +1,10 @@
 # Huginn is designed to be a multi-User system.  Users have many Agents (and Events created by those Agents).
 class User < ActiveRecord::Base
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable, :lockable,
-         :omniauthable
+  DEVISE_MODULES = [:database_authenticatable, :registerable,
+                    :recoverable, :rememberable, :trackable,
+                    :validatable, :lockable, :omniauthable,
+                    (ENV['REQUIRE_CONFIRMED_EMAIL'] == 'true' ? :confirmable : nil)].compact
+  devise *DEVISE_MODULES
 
   INVITATION_CODES = [ENV['INVITATION_CODE'] || 'try-huginn']
 
