@@ -19,6 +19,12 @@ describe User do
             should_not allow_value(v).for(:invitation_code)
           end
         end
+
+        it "requires no authentication code when requires_no_invitation_code! is called" do
+          u = User.new(username: 'test', email: 'test@test.com', password: '12345678', password_confirmation: '12345678')
+          u.requires_no_invitation_code!
+          expect(u).to be_valid
+        end
       end
       
       context "when configured not to use invitation codes" do
