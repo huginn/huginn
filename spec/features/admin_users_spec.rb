@@ -78,5 +78,25 @@ describe Admin::UsersController do
         expect(page).to have_text("Password confirmation doesn't match")
       end
     end
+
+    context "(de)activating users" do
+      it "deactivates an existing user" do
+        visit admin_users_path
+        expect(page).not_to have_text('inactive')
+        find(:css, "a[href='/admin/users/#{users(:bob).id}/deactivate']").click
+        expect(page).to have_text('inactive')
+        users(:bob).reload
+        expect(users(:bob)).not_to be_active
+      end
+
+      it "deactivates an existing user" do
+        users(:bob).deactivate!
+        visit admin_users_path
+        find(:css, "a[href='/admin/users/#{users(:bob).id}/activate']").click
+        expect(page).not_to have_text('inactive')
+        users(:bob).reload
+        expect(users(:bob)).to be_active
+      end
+    end
   end
 end

@@ -1,7 +1,7 @@
 class Admin::UsersController < ApplicationController
   before_action :authenticate_admin!
 
-  before_action :find_user, only: [:edit, :destroy, :update]
+  before_action :find_user, only: [:edit, :destroy, :update, :deactivate, :activate]
 
   helper_method :resource
 
@@ -61,6 +61,24 @@ class Admin::UsersController < ApplicationController
     respond_to do |format|
       format.html { redirect_to admin_users_path, notice: "User '#{@user.username}' was deleted." }
       format.json { head :no_content }
+    end
+  end
+
+  def deactivate
+    @user.deactivate!
+
+    respond_to do |format|
+      format.html { redirect_to admin_users_path, notice: "User '#{@user.username}' was deactivated." }
+      format.json { render json: @user, status: :ok, location: admin_users_path(@user) }
+    end
+  end
+
+  def activate
+    @user.activate!
+
+    respond_to do |format|
+      format.html { redirect_to admin_users_path, notice: "User '#{@user.username}' was activated." }
+      format.json { render json: @user, status: :ok, location: admin_users_path(@user) }
     end
   end
 

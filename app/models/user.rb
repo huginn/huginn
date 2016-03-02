@@ -43,6 +43,32 @@ class User < ActiveRecord::Base
     end
   end
 
+  def active?
+    !deactivated_at
+  end
+
+  def deactivate!
+    User.transaction do
+      agents.update_all(deactivated: true)
+      update_attribute(:deactivated_at, Time.now)
+    end
+  end
+
+  def activate!
+    User.transaction do
+      agents.update_all(deactivated: false)
+      update_attribute(:deactivated_at, nil)
+    end
+  end
+
+  def active_for_authentication?
+    super && active?
+  end
+
+  def inactive_message
+    active? ? super : :deactivated_account
+  end
+
   def self.using_invitation_code?
     ENV['SKIP_INVITATION_CODE'] != 'true'
   end

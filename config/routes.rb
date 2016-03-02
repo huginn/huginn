@@ -67,7 +67,12 @@ Huginn::Application.routes.draw do
   end
 
   namespace :admin do
-    resources :users, except: :show
+    resources :users, except: :show do
+      member do
+        put :deactivate
+        put :activate
+      end
+    end
   end
 
   get "/worker_status" => "worker_status#show"

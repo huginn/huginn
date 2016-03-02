@@ -40,4 +40,28 @@ describe User do
       end
     end
   end
+
+  context '#deactivate!' do
+    it "deactivates the user and all her agents" do
+      agent = agents(:jane_website_agent)
+      users(:jane).deactivate!
+      agent.reload
+      expect(agent.deactivated).to be_truthy
+      expect(users(:jane).deactivated_at).not_to be_nil
+    end
+  end
+
+  context '#activate!' do
+    before do
+      users(:bob).deactivate!
+    end
+
+    it 'activates the user and all his agents' do
+      agent = agents(:bob_website_agent)
+      users(:bob).activate!
+      agent.reload
+      expect(agent.deactivated).to be_falsy
+      expect(users(:bob).deactivated_at).to be_nil
+    end
+  end
 end

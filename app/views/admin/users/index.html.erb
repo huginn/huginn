@@ -14,7 +14,7 @@
             <th>Email</th>
             <th>State</th>
             <th>Active agents</th>
-            <th>Inactive agents</th>
+            <th>Deactivated agents</th>
             <th>Registered since</th>
             <th>Options</th>
           </tr>
@@ -23,12 +23,17 @@
             <tr>
               <td><%= link_to user.username, edit_admin_user_path(user) %></td>
               <td><%= user.email %></td>
-              <td>state</td>
+              <td><%= user_account_state(user) %></td>
               <td><%= user.agents.active.count %></td>
               <td><%= user.agents.inactive.count %></td>
               <td title='<%= user.created_at %>'><%= time_ago_in_words user.created_at %> ago</td>
               <td>
                 <div class="btn-group btn-group-xs">
+                  <% if user.active? %>
+                    <%= link_to 'Deactivate', deactivate_admin_user_path(user), method: :put, class: "btn btn-default" %>
+                  <% else %>
+                    <%= link_to 'Activate', activate_admin_user_path(user), method: :put, class: "btn btn-default" %>
+                  <% end %>
                   <%= link_to 'Delete', admin_user_path(user), method: :delete, data: { confirm: 'Are you sure? This can not be undone.' }, class: "btn btn-default" %>
                 </div>
               </td>
