@@ -5,13 +5,15 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
-      The Twitter User Agent follows the timeline of a specified Twitter user.
+      The Twitter User Agent either follows the timeline of a specific Twitter user or follows your own home timeline including both your tweets and tweets from people whom you are following.
 
       #{twitter_dependencies_missing if dependencies_missing?}
 
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
 
-      You must also provide the `username` of the Twitter user to monitor.
+      To follow a Twitter user set `choose_home_time_line` to `false` and provide the `username`.
+
+      To follow your own home timeline set `choose_home_time_line` to `true`.
 
       Set `include_retweets` to `false` to not include retweets (default: `true`)
       
@@ -24,7 +26,6 @@ module Agents
 
     event_description <<-MD
       Events are the raw JSON provided by the [Twitter API](https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline). Should look something like:
-
           {
              ... every Tweet field, including ...
             "text": "something",
@@ -57,13 +58,14 @@ module Agents
         'username' => 'tectonic',
         'include_retweets' => 'true',
         'exclude_replies' => 'false',
-        'expected_update_period_in_days' => '2'
+        'expected_update_period_in_days' => '2',
+        'choose_home_time_line' => 'false'
       }
     end
 
     def validate_options
-      errors.add(:base, "username is required") unless options['username'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
+      errors.add(:base, "username is required") if options['username'].blank? && !boolify(options['choose_home_time_line'])
 
       if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
         errors.add(:base, "include_retweets must be a boolean value string (true/false)")
@@ -82,6 +84,10 @@ module Agents
       end
     end
 
+    def choose_home_time_line?
+      boolify(interpolated['choose_home_time_line'])
+    end
+
     def include_retweets?
       interpolated[:include_retweets] != "false"
     end
@@ -95,8 +101,11 @@ module Agents
       opts = {:count => 200, :include_rts => include_retweets?, :exclude_replies => exclude_replies?, :include_entities => true, :contributor_details => true}
       opts.merge! :since_id => since_id unless since_id.nil?
 
-      # http://rdoc.info/gems/twitter/Twitter/REST/Timelines#user_timeline-instance_method
-      tweets = twitter.user_timeline(interpolated['username'], opts)
+      if choose_home_time_line?
+        tweets = twitter.home_timeline(opts)
+      else
+        tweets = twitter.user_timeline(interpolated['username'], opts)
+      end
 
       tweets.each do |tweet|
         if tweet.created_at >= starting_at
@@ -105,8 +114,6 @@ module Agents
           create_event :payload => tweet.attrs
         end
       end
-
-      save!
     end
   end
 end
