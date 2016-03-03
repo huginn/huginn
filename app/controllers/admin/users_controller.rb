@@ -6,7 +6,7 @@ class Admin::UsersController < ApplicationController
   helper_method :resource
 
   def index
-    @users = User.reorder(:created_at).page(params[:page])
+    @users = User.reorder('created_at DESC').page(params[:page])
 
     respond_to do |format|
       format.html

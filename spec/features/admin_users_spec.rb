@@ -80,6 +80,11 @@ describe Admin::UsersController do
     end
 
     context "(de)activating users" do
+      it "does not show deactivation buttons for the current user" do
+        visit admin_users_path
+        expect(page).not_to have_css("a[href='/admin/users/#{users(:jane).id}/deactivate']")
+      end
+
       it "deactivates an existing user" do
         visit admin_users_path
         expect(page).not_to have_text('inactive')

@@ -29,12 +29,14 @@
               <td title='<%= user.created_at %>'><%= time_ago_in_words user.created_at %> ago</td>
               <td>
                 <div class="btn-group btn-group-xs">
-                  <% if user.active? %>
-                    <%= link_to 'Deactivate', deactivate_admin_user_path(user), method: :put, class: "btn btn-default" %>
-                  <% else %>
-                    <%= link_to 'Activate', activate_admin_user_path(user), method: :put, class: "btn btn-default" %>
+                  <% if user != current_user %>
+                    <% if user.active? %>
+                      <%= link_to 'Deactivate', deactivate_admin_user_path(user), method: :put, class: "btn btn-default" %>
+                    <% else %>
+                      <%= link_to 'Activate', activate_admin_user_path(user), method: :put, class: "btn btn-default" %>
+                    <% end %>
+                    <%= link_to 'Delete', admin_user_path(user), method: :delete, data: { confirm: 'Are you sure? This can not be undone.' }, class: "btn btn-default" %>
                   <% end %>
-                  <%= link_to 'Delete', admin_user_path(user), method: :delete, data: { confirm: 'Are you sure? This can not be undone.' }, class: "btn btn-default" %>
                 </div>
               </td>
             </tr>
