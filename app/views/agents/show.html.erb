@@ -161,8 +161,7 @@
               <b>Options:</b>
               <pre><%= Utils.pretty_jsonify @agent.options || {} %></pre>
             </p>
-            <button type="submit" class="btn btn-default" id="target">Reveal Memory</button>
-            <button type="submit" class="btn btn-default" id="target1">Hide Memory</button>
+            <button type="submit" class="btn btn-default" id="target">Hide or Reveal Memory</button>
             <div id="memorytoggle" class="hidden">
               <p id="memory" data-agent-id="<%= @agent.id %>">
                 <b>Memory:</b>
@@ -182,10 +181,6 @@
 
 <%= javascript_tag do %>
 $( "#target" ).click(function() {
-  $("#memorytoggle").removeClass("hidden");
-});
-
-$( "#target1" ).click(function() {
-  $("#memorytoggle").addClass("hidden");
+  $("#memorytoggle").toggleClass("hidden");
 });
 <% end %>
