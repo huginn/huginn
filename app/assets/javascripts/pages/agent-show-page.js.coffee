@@ -1,13 +1,8 @@
-$('#target').click ->
-  $('#memorytoggle').toggleClass 'hidden'
-  return
-
-`$( "#target" ).click(function() {
-  $("#memorytoggle").toggleClass("hidden");
-});`
-
 class @AgentShowPage
   constructor: ->
+   $('#target').click ->
+     $('#memorytoggle').toggleClass 'hidden'
+     return
     $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", @fetchLogs
     $(".agent-show #logs .clear").on "click", @clearLogs
     $(".agent-show #memory .clear").on "click", @clearMemory
