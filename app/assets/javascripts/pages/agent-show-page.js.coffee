@@ -1,3 +1,7 @@
+$('#target').click ->
+  $('#memorytoggle').toggleClass 'hidden'
+  return
+
 class @AgentShowPage
   constructor: ->
     $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", @fetchLogs
@@ -56,4 +60,3 @@ class @AgentShowPage
 
 $ ->
   Utils.registerPage(AgentShowPage, forPathsMatching: /^agents\/\d+/)
-
