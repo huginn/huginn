@@ -220,6 +220,11 @@ module LiquidInterpolatable
       input.to_s.sub(Regexp.new(regex), unescape_replacement(replacement.to_s))
     end
 
+    # Serializes data as JSON
+    def json(input)
+      JSON.dump(input)
+    end
+
     private
 
     def logger
