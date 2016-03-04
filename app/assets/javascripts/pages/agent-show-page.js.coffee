@@ -1,8 +1,11 @@
 class @AgentShowPage
   constructor: ->
-    $('#target').click ->
-      $('#memorytoggle').toggleClass 'hidden'
-      return
+    $('#toggle-memory').click ->
+      if $('#memorypanel').hasClass('hidden')
+        $('#memorypanel').removeClass 'hidden'
+      else
+        $('#memorypanel').addClass 'hidden'
+
     $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", @fetchLogs
     $(".agent-show #logs .clear").on "click", @clearLogs
     $(".agent-show #memory .clear").on "click", @clearMemory
@@ -56,6 +59,12 @@ class @AgentShowPage
         .fail ->
           $("#memory .spinner").fadeOut ->
             $("#memory .clear").css(display: 'inline-block')
+
+    $('#toggle-memory').click ->
+      if $('#memorypanel').hasClass('hidden')
+        $('#memorypanel').removeClass 'hidden'
+      else
+        $('#memorypanel').addClass 'hidden'
 
 $ ->
   Utils.registerPage(AgentShowPage, forPathsMatching: /^agents\/\d+/)
