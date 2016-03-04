@@ -60,6 +60,5 @@ class @AgentShowPage
         .fail ->
           $("#memory .spinner").fadeOut ->
             $("#memory .clear").css(display: 'inline-block')
-          
 $ ->
   Utils.registerPage(AgentShowPage, forPathsMatching: /^agents\/\d+/)
