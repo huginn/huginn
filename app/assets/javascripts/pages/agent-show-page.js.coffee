@@ -42,7 +42,7 @@ class @AgentShowPage
         $("#logs .spinner").stop(true, true).fadeOut ->
           $("#logs .refresh, #logs .clear").show()
 
-  toggleMemory:(e) ->
+  toggleMemory: ->
 
     if $('#memorypanel').hasClass('hidden')
       $('#memorypanel').removeClass 'hidden'
