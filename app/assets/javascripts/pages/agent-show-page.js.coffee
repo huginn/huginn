@@ -1,6 +1,5 @@
 class @AgentShowPage
   constructor: ->
-
     $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", @fetchLogs
     $(".agent-show #logs .clear").on "click", @clearLogs
     $(".agent-show #memory .clear").on "click", @clearMemory
@@ -43,14 +42,12 @@ class @AgentShowPage
           $("#logs .refresh, #logs .clear").show()
 
   toggleMemory: ->
-
     if $('#memorypanel').hasClass('hidden')
       $('#memorypanel').removeClass 'hidden'
     else
       $('#memorypanel').addClass 'hidden'
 
   clearMemory: (e) ->
-
     if confirm("Are you sure you want to clear memory of this Agent?")
       agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
       e.preventDefault()
@@ -63,7 +60,6 @@ class @AgentShowPage
         .fail ->
           $("#memory .spinner").fadeOut ->
             $("#memory .clear").css(display: 'inline-block')
-
-            
+          
 $ ->
   Utils.registerPage(AgentShowPage, forPathsMatching: /^agents\/\d+/)
