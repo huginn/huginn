@@ -27,7 +27,7 @@ There is an exported docker volume of /var/lib/mysql to allow persistence of tha
 
 Additionally, the database variables may be overridden from the above as per the standard Huginn documentation:
 
-    DATABASE_ADAPTER #(must be either 'postgres' or 'mysql2')
+    DATABASE_ADAPTER #(must be either 'postgresql' or 'mysql2')
     DATABASE_HOST
     DATABASE_PORT
 
