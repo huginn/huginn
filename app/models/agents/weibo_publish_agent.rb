@@ -1,4 +1,4 @@
-# encoding: utf-8 
+# encoding: utf-8
 
 module Agents
   class WeiboPublishAgent < Agent
@@ -38,7 +38,8 @@ module Agents
         'app_key' => "---",
         'app_secret' => "---",
         'expected_update_period_in_days' => "10",
-        'message_path' => "text"
+        'message_path' => "text",
+        'pic_path' => "text"
       }
     end
 
@@ -49,11 +50,12 @@ module Agents
       end
       incoming_events.each do |event|
         tweet_text = Utils.value_at(event.payload, interpolated(event)['message_path'])
+        pic_url = Utils.value_at(event.payload, interpolated(event)['pic_path'])
         if event.agent.type == "Agents::TwitterUserAgent"
           tweet_text = unwrap_tco_urls(tweet_text, event.payload)
         end
         begin
-          publish_tweet tweet_text
+          publish_tweet tweet_text, pic_url
           create_event :payload => {
             'success' => true,
             'published_tweet' => tweet_text,
@@ -69,11 +71,28 @@ module Agents
             'event_id' => event.id
           }
         end
+        sleep 30
       end
     end
 
-    def publish_tweet text
-      weibo_client.statuses.update text
+    def publish_tweet text, pic
+      begin
+        if image?(pic)
+          weibo_client.statuses.upload text, open(pic)
+        else
+          weibo_client.statuses.update text
+        end
+      rescue => e
+        if e.message == "getaddrinfo: nodename nor servname provided, or not known"
+          weibo_client.statuses.update text
+        else
+          raise e
+        end
+      end
+    end
+
+    def image?(pic)
+      pic.to_s.end_with?(".gif") or pic.to_s.end_with?(".png") or pic.to_s.end_with?(".jpg", ".jpeg")
     end
 
     def unwrap_tco_urls text, tweet_json
