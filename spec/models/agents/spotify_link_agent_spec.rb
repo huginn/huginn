@@ -13,7 +13,7 @@ describe Agents::SpotifyLinkAgent do
 
   describe '#receive' do
     context 'when the event payload contains artist_name' do
-      it 'adds an artist_link field to the event payload' do
+      it 'adds an artist link to the payload' do
         @event.payload = { artist_name: 'Test artist' }
 
         artist_options = {
@@ -23,17 +23,17 @@ describe Agents::SpotifyLinkAgent do
           }
         }
         artist = RSpotify::Artist.new(artist_options)
-        mock(RSpotify::Artist).search('Test artist') { [artist] }
+        mock(RSpotify::Artist).search(anything) { [artist] }
 
         @agent.receive([@event])
-        last_payload = Event.last.payload['artist_link']
+        last_payload = Event.last.payload['spotify_link']
         expect(last_payload)
           .to(eq('http://open.spotify.com/test_artist'))
       end
     end
 
-    context 'when the event payload contains artist_name and track_name' do
-      it 'adds a track_link to the event payload' do
+    context 'when the event payload contains track_name' do
+      it 'adds a track link to the payload' do
         @event.payload = {
           artist_name: 'Test artist',
           track_name: 'Test track'
@@ -49,7 +49,7 @@ describe Agents::SpotifyLinkAgent do
         mock(RSpotify::Track).search(anything) { [track] }
 
         @agent.receive([@event])
-        last_payload = Event.last.payload['track_link']
+        last_payload = Event.last.payload['spotify_link']
         expect(last_payload)
           .to(eq('http://open.spotify.com/test_track'))
       end

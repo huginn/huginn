@@ -7,16 +7,8 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         payload = event.payload.dup
-        if payload[:artist_name] && payload[:track_name]
-          track_link = get_track_link(
-            payload[:artist_name],
-            payload[:track_name]
-          )
-          payload[:track_link] = track_link if track_link
-        elsif payload[:artist_name]
-          artist_link = get_artist_link(payload[:artist_name])
-          payload[:artist_link] = artist_link if artist_link
-        end
+        spotify_link = get_spotify_link(payload)
+        payload[:spotify_link] = spotify_link if spotify_link
 
         create_event(payload: payload)
       end
@@ -27,6 +19,14 @@ module Agents
     end
 
     private
+
+    def get_spotify_link(payload)
+      if payload[:artist_name] && payload[:track_name]
+        get_track_link(payload[:artist_name], payload[:track_name])
+      elsif payload[:artist_name]
+        get_artist_link(payload[:artist_name])
+      end
+    end
 
     def get_artist_link(artist_name)
       artists = RSpotify::Artist.search(artist_name)
