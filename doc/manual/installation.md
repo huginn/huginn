@@ -233,9 +233,19 @@ When done you see `See the Huginn Wiki for more Agent examples!  https://github.
 
 Huginn uses [foreman](http://ddollar.github.io/foreman/) to generate the init scripts based on a `Procfile`
 
-Edit the `Procfile` and choose one of the suggested versions for production
+Edit the [`Procfile`](https://github.com/cantino/huginn/blob/master/Procfile) and choose one of the suggested versions for production
 
     sudo -u huginn -H editor Procfile
+
+Comment out (disable) [these two lines](https://github.com/cantino/huginn/blob/master/Procfile#L6-L7)
+
+    web: bundle exec rails server -p ${PORT-3000} -b ${IP-0.0.0.0}
+    jobs: bundle exec rails runner bin/threaded.rb
+
+Enable (remove the comment) [from these lines](https://github.com/cantino/huginn/blob/master/Procfile#L24-L25) or [those](https://github.com/cantino/huginn/blob/master/Procfile#L28-L31)
+
+    # web: bundle exec unicorn -c config/unicorn.rb
+    # jobs: bundle exec rails runner bin/threaded.rb
 
 Export the init scripts:
 
