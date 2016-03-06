@@ -50,7 +50,7 @@ Import node.js repository (can be skipped on Ubuntu and Debian Jessie):
 
 Install the required packages (needed to compile Ruby and native extensions to Ruby gems):
 
-    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz
+    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz rake
 
 
 ## 2. Ruby
@@ -300,7 +300,7 @@ You should receive `syntax is okay` and `test is successful` messages. If you re
 Visit YOUR_SERVER in your web browser for your first Huginn login. The setup has created a default admin account for you. You can use it to log in:
 
     admin
-    password
+    yourpassword
 
 
 **Enjoy!** :sparkles: :star: :fireworks:
