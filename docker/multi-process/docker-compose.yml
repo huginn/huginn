@@ -1,9 +1,9 @@
 mysqldata:
-  image: mysql
+  image: mysql:5.7
   command: /bin/true
 
 mysql:
-  image: mysql
+  image: mysql:5.7
   volumes_from:
     - mysqldata
   environment:
