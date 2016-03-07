@@ -37,19 +37,28 @@ module Agents
       }
     end
 
+    def working?
+      received_event_without_error?
+    end
+
     def receive(incoming_events)
       incoming_events.each do |event|
         recipients(event.payload).each do |recipient|
-          log "Sending mail to #{recipient} with event #{event.id}"
-          SystemMailer.send_message(
-            to: recipient,
-            from: interpolated(event)['from'],
-            subject: interpolated(event)['subject'],
-            headline: interpolated(event)['headline'],
-            body: interpolated(event)['body'],
-            content_type: interpolated(event)['content_type'],
-            groups: [present(event.payload)]
-          ).deliver_later
+          begin
+            SystemMailer.send_message(
+              to: recipient,
+              from: interpolated(event)['from'],
+              subject: interpolated(event)['subject'],
+              headline: interpolated(event)['headline'],
+              body: interpolated(event)['body'],
+              content_type: interpolated(event)['content_type'],
+              groups: [present(event.payload)]
+            ).deliver_now
+            log "Sent mail to #{recipient} with event #{event.id}"
+          rescue => e
+            error("Error sending mail to #{recipient} with event #{event.id}: #{e.message}")
+            raise
+          end
         end
       end
     end

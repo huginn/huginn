@@ -59,6 +59,23 @@ describe Agents::EmailDigestAgent do
       expect(@checker.reload.memory[:queue]).to be_empty
     end
 
+    it "logs and re-raises mailer errors" do
+      mock(SystemMailer).send_message(anything) { raise Net::SMTPAuthenticationError.new("Wrong password") }
+
+      @checker.memory[:queue] = [{ :data => "Something you should know about" }]
+      @checker.memory[:events] = [1]
+      @checker.save!
+
+      expect {
+        Agents::EmailDigestAgent.async_check(@checker.id)
+      }.to raise_error(/Wrong password/)
+
+      expect(@checker.reload.memory[:events]).not_to be_empty
+      expect(@checker.reload.memory[:queue]).not_to be_empty
+
+      expect(@checker.logs.last.message).to match(/Error sending digest mail .* Wrong password/)
+    end
+
     it "can receive complex events and send them on" do
       stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
       stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
