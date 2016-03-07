@@ -162,19 +162,19 @@
               <pre><%= Utils.pretty_jsonify @agent.options || {} %></pre>
             </p>
             <button type="submit" class="btn btn-default" id="toggle-memory">Show Memory</button>
-              <div id="memorypanel" class="hidden">
-                <p id="memory" data-agent-id="<%= @agent.id %>">
-                  <b>Memory:</b>
-                  <% if @agent.memory.present? %>
-                    <i class="fa fa-spinner fa-pulse spinner"></i>
-                    <i class="fa fa-trash action-icon clear"></i>
-                  <% end %>
-                    <pre class="memory"><%= Utils.pretty_jsonify @agent.memory || {} %></pre>
-                </p>
-              </div>
+            <div id="memorypanel" class="hidden">
+              <p id="memory" data-agent-id="<%= @agent.id %>">
+                <b>Memory:</b>
+                <% if @agent.memory.present? %>
+                  <i class="fa fa-spinner fa-pulse spinner"></i>
+                  <i class="fa fa-trash action-icon clear"></i>
+                <% end %>
+                <pre class="memory"><%= Utils.pretty_jsonify @agent.memory || {} %></pre>
+              </p>
             </div>
           </div>
         </div>
       </div>
   </div>
 </div>
+
