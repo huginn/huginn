@@ -44,8 +44,10 @@ class @AgentShowPage
   toggleMemory: ->
     if $('#memorypanel').hasClass('hidden')
       $('#memorypanel').removeClass 'hidden'
+      $('#toggle-memory').text('Hide Memory')
     else
       $('#memorypanel').addClass 'hidden'
+      $('#toggle-memory').text('Show Memory')
 
   clearMemory: (e) ->
     if confirm("Are you sure you want to clear memory of this Agent?")
