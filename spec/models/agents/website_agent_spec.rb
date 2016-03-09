@@ -1020,9 +1020,6 @@ fire: hot
 
   describe "checking with http basic auth" do
     before do
-      stub_request(:any, /example/).
-        with(headers: { 'Authorization' => "Basic #{['user:pass'].pack('m').chomp}" }).
-        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
       @valid_options = {
         'name' => "XKCD",
         'expected_update_period_in_days' => "2",
@@ -1039,6 +1036,16 @@ fire: hot
       @checker = Agents::WebsiteAgent.new(:name => "auth", :options => @valid_options)
       @checker.user = users(:bob)
       @checker.save!
+
+      case @checker.faraday_backend
+      when :typhoeus
+        # Webmock's typhoeus adapter does not read the Authorization
+        # header: https://github.com/bblimke/webmock/pull/592
+        stub_request(:any, "www.example.com").
+          with(headers: { 'Authorization' => "Basic #{['user:pass'].pack('m0')}" })
+      else
+        stub_request(:any, "user:pass@www.example.com")
+      end.to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
     end
 
     describe "#check" do
