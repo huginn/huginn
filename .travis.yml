@@ -8,8 +8,9 @@ env:
     - DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
 rvm:
 - 2.0.0
-- 2.1.5
-- 2.2.0
+- 2.1
+- 2.2
+- 2.3.0
 cache: bundler
 bundler_args: --without development production
 before_script:
