@@ -4,45 +4,30 @@ module Agents
   class AftershipAgent < Agent
 
     API_URL = 'https://api.aftership.com/v4'
-    HEADERS = {"aftership-api-key"=> "apikey", "Content-Type"=>"application/json"}
 
     description <<-MD
+      The Aftership agent allows you to track your shipment from aftership and emit them into events.
 
-      The Aftership agent allows you to track your shipment data from aftership and emit them into events.
+      To be able to use the Aftership API, you need to generate an `API Key`. You do need a paying plan to use their tracking feature.
 
-      To be able to use the Aftership API, you need to generate an `API Key`.
-      You can generate an api key by visiting `apps > app and click add` on aftership website. 
+      You need a key value pair to retrieve data. The key is `get_url`.
 
-      The agent is limited to 600 reqs/min per account. You do need a paying plan to use their tracking feature.
+      The options are `/trackings/export` to get tracking results for backup purposes, `/trackings/slug/tracking_number` to get tracking 
+      for a single tracking number and `/trackings` to get all of your trackings. You have two options to get courier information, `/couriers` 
+      which returns the couriers that are activiated at your account and the other is `/couriers/all` which returns all couriers.
+      `slug` is a unique courier code which you can get from using this agent.
 
-      If you are requesting tracking data from aftership. You have to put in a specific url for get_url in default options. 
-
-      The options are `/trackings/export` to get tracking results for backup purposes, `/trackings/:slug/:tracking_number` to get tracking 
-
-      for a single tracking number and `trackings` to get all of your trackings.
+      The url must be properly formatted with a `/` in front.
 
       Required Options:
 
       * `Content-Type` application/json
-      * `aftership_api_key` - YOUR_API_KEY.
-      * `a certain request whether it be get or put or post`
+      * `api_key` - YOUR_API_KEY.
+      * `key value pair request`
     MD
 
     event_description <<-MD
-      Events look like this:
-
-    {
-      "meta": {
-        "code": 200
-      },
-      "data": {
-        "couriers": [
-           { ... }, 
-           { ... },
-           { ... }
-           ] 
-       }
-     }
+      It depends what kind of event that you are working on:
       MD
 
     def default_options
@@ -53,30 +38,29 @@ module Agents
     end
 
     def uri
-      #there may be an updated version
-      uri = URI.parse('https://api.aftership.com/v4')
-      #uri.query = [uri.query, '/trackings' ].compact.join()
-      uri.query = [uri.query, interpolated['get_url'] ].compact.join()
-      uri.to_s.gsub('?','')
+      uri = URI.parse API_URL
+      uri.query = interpolated['get_url'] if uri.query.nil?
+      uri.to_s.gsub('?','') 
     end
 
     def working?
-      !recent_error_logs?
+      (events_count.present? && events_count > 0)
     end
 
     def validate_options
-      #errors.add(:base, "You need to specify a aftership api key") unless options['aftership-api-key'].present?
+      errors.add(:base, "You need to specify a api key") unless options['api_key'].present?
       errors.add(:base, "Content-Type must be set to application/json") unless options['Content_Type'].present? && options['Content_Type'] == 'application/json'
-      #only one put or request can be requested
+      errors.add(:base, "You need to specify a certain request") unless options['get_url'].present?
     end
 
-    def request
-      HTTParty.get(uri, :headers => HEADERS)
+    def request_options
+      {:headers => {"aftership-api-key" => interpolated['api_key'], "Content-Type"=>"application/json"} }
     end
 
     def check
-      data = {"body" => request.body, "message" => request.message}
-      create_event :payload => data
+      response = HTTParty.get(uri, request_options)
+      events = JSON.parse response.body
+      create_event :payload => events
     end
   end
 end
