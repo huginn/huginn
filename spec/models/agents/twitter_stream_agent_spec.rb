@@ -169,20 +169,23 @@ describe Agents::TwitterStreamAgent do
       @config = {agent: @agent, config: {filter_to_agent_map: {'agent' => [@mock_agent]}}}
       @worker = Agents::TwitterStreamAgent::Worker.new(@config)
       @worker.instance_variable_set(:@recent_tweets, [])
-      mock(@worker).schedule_in(Agents::TwitterStreamAgent::Worker::RELOAD_TIMEOUT)
+      #mock(@worker).schedule_in(Agents::TwitterStreamAgent::Worker::RELOAD_TIMEOUT)
       @worker.setup!(nil, Mutex.new)
     end
 
     context "#run" do
-      it "starts the stream" do
+      before(:each) do
         mock(EventMachine).run.yields
+        mock(EventMachine).add_periodic_timer(3600)
+      end
+
+      it "starts the stream" do
         mock(@worker).stream!(['agent'], @agent)
         mock(Thread).stop
         @worker.run
       end
 
       it "yields received tweets" do
-        mock(EventMachine).run.yields
         mock(@worker).stream!(['agent'], @agent).yields('status' => 'hello')
         mock(@worker).handle_status('status' => 'hello')
         mock(Thread).stop
@@ -222,6 +225,9 @@ describe Agents::TwitterStreamAgent do
         it "logs error messages" do
           stub_without(:on_error).on_error.yields('woups')
           mock(STDERR).puts(anything) { |text| expect(text).to match(/woups/) }
+          mock(STDERR).puts(anything) { |text| expect(text).to match(/Sleeping/) }
+          mock(@worker).sleep(15)
+          mock(@worker).restart!
           @worker.send(:stream!, ['agent'], @agent)
         end
 
@@ -257,6 +263,7 @@ describe Agents::TwitterStreamAgent do
 
       it "deduplicates tweets" do
         @worker.send(:handle_status, {'text' => 'dup', 'id_str' => '1'})
+        mock(@worker).puts(anything) { |text| expect(text).to match(/Skipping/) }
         @worker.send(:handle_status, {'text' => 'dup', 'id_str' => '1'})
         expect(@worker.instance_variable_get(:'@recent_tweets').select { |str| str == '1' }.length).to eq 1
       end
@@ -264,6 +271,7 @@ describe Agents::TwitterStreamAgent do
       it "calls the agent to process the tweet" do
         mock(@mock_agent).name { 'mock' }
         mock(@mock_agent).process_tweet('agent', {'text' => 'agent'})
+        mock(@worker).puts(anything) { |text| expect(text).to match(/received/) }
         @worker.send(:handle_status, {'text' => 'agent', 'id_str' => '123'})
         expect(@worker.instance_variable_get(:'@recent_tweets')).to include('123')
       end
