@@ -41,16 +41,17 @@ class @AgentShowPage
         $("#logs .spinner").stop(true, true).fadeOut ->
           $("#logs .refresh, #logs .clear").show()
 
-  toggleMemory: ->
-    if $('#memorypanel').hasClass('hidden')
-      $('#memorypanel').removeClass 'hidden'
-      $('#toggle-memory').text('Hide Memory')
+  toggleMemory: (e) ->
+    e.preventDefault()
+    if $('pre.memory').hasClass('hidden')
+      $('pre.memory').removeClass 'hidden'
+      $('#toggle-memory').text('Hide')
     else
-      $('#memorypanel').addClass 'hidden'
-      $('#toggle-memory').text('Show Memory')
+      $('pre.memory').addClass 'hidden'
+      $('#toggle-memory').text('Show')
 
   clearMemory: (e) ->
-    if confirm("Are you sure you want to clear memory of this Agent?")
+    if confirm("Are you sure you want to completely clear the memory of this Agent?")
       agentId = $(e.target).closest("[data-agent-id]").data("agent-id")
       e.preventDefault()
       $("#memory .spinner").css(display: 'inline-block')
