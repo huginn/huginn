@@ -40,6 +40,21 @@ describe Agents::EmailAgent do
       expect(get_message_part(ActionMailer::Base.deliveries.first, /plain/).strip).to eq("hi!\n  data: Something you should know about")
     end
 
+    it "logs and re-raises any mailer errors" do
+      event1 = Event.new
+      event1.agent = agents(:bob_rain_notifier_agent)
+      event1.payload = { :message => "hi!", :data => "Something you should know about" }
+      event1.save!
+
+      mock(SystemMailer).send_message(anything) { raise Net::SMTPAuthenticationError.new("Wrong password") }
+
+      expect {
+        Agents::EmailAgent.async_receive(@checker.id, [event1.id])
+      }.to raise_error(/Wrong password/)
+
+      expect(@checker.logs.last.message).to match(/Error sending mail .* Wrong password/)
+    end
+
     it "can receive complex events and send them on" do
       stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
       stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
@@ -75,6 +90,7 @@ describe Agents::EmailAgent do
       expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to match(/\A\s*<strong>rain\!<\/strong>\s*\z/)
       expect(get_message_part(ActionMailer::Base.deliveries.last, /html/).strip).to match(/<body>\s*<strong>rain\!<\/strong>\s*<\/body>/)
     end
+
     it "can take content type option to set content type of email sent" do
       @checker.update_attributes :options => @checker.options.merge({
         'content_type' => 'text/plain'
