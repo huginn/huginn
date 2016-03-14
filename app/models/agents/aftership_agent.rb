@@ -119,21 +119,13 @@ module Agents
     end
 
     def single_tracking_request?
-      boolify(interpolated[:single_tracking_request]) != "false"
-    end
-
-    def last_checkpoint?
-      boolify(interpolated[:last_checkpoint]) != "false"
+      interpolated[:single_tracking_request] != "false"
     end
 
     def uri
       uri = URI.parse API_URL
-      if options['get'] && single_tracking_request?
+      if single_tracking_request?
         uri.query = interpolated['get']+ '/' + interpolated['slug'] + '/' + interpolated['tracking_number'] if uri.query.nil? 
-      elsif options['get'] && last_checkpoint?
-        uri.query = interpolated['get'] + '/' + interpolated['slug'] + '/' + interpolated['tracking_number'] if uri.query.nil?
-      elsif options['delete']
-        uri.query = interpolated['delete'] + interpolated['slug'] + '/' + interpolated['tracking_number'] if uri.query.nil?
       else
         uri.query = interpolated['get'] if uri.query.nil? 
       end
@@ -141,13 +133,12 @@ module Agents
     end
 
     def working?
-      (events_count.present? && events_count > 0)
+      true
     end
 
     def validate_options
       errors.add(:base, "You need to specify a api key") unless options['api_key'].present?
       errors.add(:base, "Content-Type must be set to application/json") unless options['Content_Type'].present? && options['Content_Type'] == 'application/json'
-      errors.add(:base, "You need to specify a certain request") unless options['get'].present? || options['delete'].present?
     end
 
     def request_options
@@ -155,13 +146,9 @@ module Agents
     end
 
     def check
-      if options['get'] 
-        response = HTTParty.get(uri, request_options)
-        events = JSON.parse response.body
-        create_event :payload => events
-      elsif options['delete']
-        response = HTTParty.delete(uri, request_options)
-      end
+      response = HTTParty.get(uri, request_options)
+      events = JSON.parse response.body
+      create_event :payload => events
     end
   end
 end
