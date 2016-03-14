@@ -10,7 +10,7 @@ module Agents
 
       To be able to use the Aftership API, you need to generate an `API Key`. You need a paying plan to use their tracking feature.
 
-      You can use this agent to either retrieve or delete data. The keys are `get` and `delete`. You have to provide a specific request and its associated option.
+      You can use this agent to retrieve tracking data. You have to provide a specific `get` request and its associated option.
  
       To get all trackings for your packages please enter `get` for key and `/trackings` for the option.
       To get tracking for a specific tracking number, add the extra options `slug`, `tracking_number` and set `single_tracking_request` to true.
@@ -20,13 +20,8 @@ module Agents
       To get the last checkpoint of a package set key to `get` and option to `/last_checkpoint` plus provide `slug` and `tracking_number`
 
       `slug` is a unique courier code. 
-      
-      You have two options to get courier information along with `get`, `/couriers` 
-      which returns the couriers that are activiated at your account and the other is `/couriers/all` which returns all couriers.
 
-      The `delete` option allows you to delete a specific shipment. It is `/trackings/:slug/:tracking_number`.
-
-      All urls must be properly formatted with a `/` in front.
+      You can get a list of courier information here `https://www.aftership.com/courier`
 
       Required Options:
 
@@ -122,14 +117,8 @@ module Agents
       interpolated[:single_tracking_request] != "false"
     end
 
-    def uri
-      uri = URI.parse API_URL
-      if single_tracking_request?
-        uri.query = interpolated['get']+ '/' + interpolated['slug'] + '/' + interpolated['tracking_number'] if uri.query.nil? 
-      else
-        uri.query = interpolated['get'] if uri.query.nil? 
-      end
-      uri.to_s.gsub('?','') 
+    def last_checkpoint?
+      interpolated[:last_checkpoint_request] != "false"
     end
 
     def working?
@@ -141,14 +130,31 @@ module Agents
       errors.add(:base, "Content-Type must be set to application/json") unless options['Content_Type'].present? && options['Content_Type'] == 'application/json'
     end
 
-    def request_options
-      {:headers => {"aftership-api-key" => interpolated['api_key'], "Content-Type"=>"application/json"} }
-    end
-
     def check
-      response = HTTParty.get(uri, request_options)
+      if single_tracking_request? || last_checkpoint?
+        response = HTTParty.get(single_or_checkpoint_tracking_url, request_options)
+      else
+        response = HTTParty.get(trackings_url, request_options)
+      end
       events = JSON.parse response.body
       create_event :payload => events
+    end
+
+  private
+    def base_url
+      "https://api.aftership.com/v4/"
+    end
+
+    def trackings_url
+      base_url + "#{URI.encode(interpolated[:get].to_s)}"
+    end
+
+    def single_or_checkpoint_tracking_url
+      base_url + "#{URI.encode(interpolated[:get].to_s)}/#{URI.encode(interpolated[:slug].to_s)}/#{URI.encode(interpolated[:tracking_number].to_s)}"
+    end
+
+    def request_options
+      {:headers => {"aftership-api-key" => interpolated['api_key'], "Content-Type"=>"application/json"} }
     end
   end
 end
