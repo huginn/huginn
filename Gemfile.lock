@@ -144,13 +144,13 @@ GEM
     chronic (0.10.2)
     cliver (0.3.2)
     coderay (1.1.0)
-    coffee-rails (4.1.0)
+    coffee-rails (4.1.1)
       coffee-script (>= 2.2.0)
-      railties (>= 4.0.0, < 5.0)
-    coffee-script (2.3.0)
+      railties (>= 4.0.0, < 5.1.x)
+    coffee-script (2.4.1)
       coffee-script-source
       execjs
-    coffee-script-source (1.9.1)
+    coffee-script-source (1.10.0)
     colorize (0.7.7)
     concurrent-ruby (1.0.1)
     cookiejar (0.3.2)
@@ -585,7 +585,7 @@ DEPENDENCIES
   capistrano-bundler (~> 1.1.4)
   capistrano-rails (~> 1.1)
   capybara-select2
-  coffee-rails (~> 4.1.0)
+  coffee-rails (~> 4.1.1)
   coveralls
   daemons (~> 1.1.9)
   delayed_job (~> 4.1.0)

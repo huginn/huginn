@@ -79,7 +79,7 @@ gem 'protected_attributes', '~>1.0.8' # This must be loaded before some other ge
 gem 'ace-rails-ap', '~> 2.0.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
-gem 'coffee-rails', '~> 4.1.0'
+gem 'coffee-rails', '~> 4.1.1'
 gem 'daemons', '~> 1.1.9'
 gem 'delayed_job', '~> 4.1.0'
 gem 'delayed_job_active_record', github: 'collectiveidea/delayed_job_active_record', branch: 'master'
