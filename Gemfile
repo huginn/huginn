@@ -63,6 +63,9 @@ gem 'haversine'
 gem 'omniauth-evernote'
 gem 'evernote_oauth'
 
+# LocalFileAgent (watch functionality)
+gem 'listen', '~> 3.0.5', require: false
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
@@ -75,7 +78,6 @@ unless Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.5.0')
 end
 
 gem 'protected_attributes', '~>1.0.8' # This must be loaded before some other gems, like delayed_job.
-
 gem 'ace-rails-ap', '~> 2.0.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
