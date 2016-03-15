@@ -3,7 +3,7 @@ require 'uri'
 module Agents
   class AftershipAgent < Agent
 
-    API_URL = 'https://api.aftership.com/v4'
+    default_schedule "every_10m"
 
     description <<-MD
       The Aftership agent allows you to track your shipment from aftership and emit them into events.
@@ -23,7 +23,6 @@ module Agents
 
       Required Options:
 
-      * `Content-Type` application/json
       * `api_key` - YOUR_API_KEY.
       * `get/delete and its associated options`
     MD
@@ -106,7 +105,6 @@ module Agents
 
     def default_options
       { 'api_key' => 'YOUR_API_KEY',
-        'Content_Type' => 'application/json',
         'get' => '/trackings'
       }
     end
@@ -125,7 +123,7 @@ module Agents
 
     def validate_options
       errors.add(:base, "You need to specify a api key") unless options['api_key'].present?
-      errors.add(:base, "Content-Type must be set to application/json") unless options['Content_Type'].present? && options['Content_Type'] == 'application/json'
+      errors.add(:base, "You need to specify a get request") unless options['get'].present?
     end
 
     def check
