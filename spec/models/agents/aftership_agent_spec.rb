@@ -5,12 +5,29 @@ describe Agents::AftershipAgent do
 
     @opts = {
       "api_key" => '800deeaf-e285-9d62-bc90-j999c1973cc9',
-      "get" => 'trackings'
+      "get" => 'trackings',
+      "slug" => 'usps',
+      "tracking_number" => "9361289684090010005054"
+
     }
 
     @checker = Agents::AftershipAgent.new(:name => "tectonic", :options => @opts)
     @checker.user = users(:bob)
     @checker.save!
+  end
+
+  describe '#helpers' do
+    it "should return the correct request header" do
+      expect(@checker.send(:request_options)).to eq({:headers => {"aftership-api-key" => '800deeaf-e285-9d62-bc90-j999c1973cc9', "Content-Type"=>"application/json"}})
+    end
+
+    it "should generate the correct events url" do
+      expect(@checker.send(:event_url)).to eq("https://api.aftership.com/v4/trackings")
+    end
+
+    it "should generate the correct single or checkpoint tracking url" do
+      expect(@checker.send(:single_or_checkpoint_tracking_url)).to eq("https://api.aftership.com/v4/trackings/usps/9361289684090010005054")
+    end
   end
 
   describe "#that checker should be valid" do
@@ -33,4 +50,6 @@ describe Agents::AftershipAgent do
       expect(@checker.errors.full_messages.first).to eq("You need to specify a get request")
     end
   end
+
+  describe '#check'
 end
