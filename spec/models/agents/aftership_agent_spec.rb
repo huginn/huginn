@@ -3,12 +3,17 @@ require 'rails_helper'
 describe Agents::AftershipAgent do
   before do
 
+    stub_request(:get, /trackings/).to_return(
+      :body => File.read(Rails.root.join("spec/data_fixtures/aftership.json")),
+      :status => 200,
+      :headers => {"Content-Type" => "text/json"}
+    )
+
     @opts = {
       "api_key" => '800deeaf-e285-9d62-bc90-j999c1973cc9',
       "get" => 'trackings',
       "slug" => 'usps',
       "tracking_number" => "9361289684090010005054"
-
     }
 
     @checker = Agents::AftershipAgent.new(:name => "tectonic", :options => @opts)
@@ -25,8 +30,15 @@ describe Agents::AftershipAgent do
       expect(@checker.send(:event_url)).to eq("https://api.aftership.com/v4/trackings")
     end
 
-    it "should generate the correct single or checkpoint tracking url" do
+    it "should generate the correct single tracking url" do
+      @checker.options['single_tracking_request'] = true
       expect(@checker.send(:single_or_checkpoint_tracking_url)).to eq("https://api.aftership.com/v4/trackings/usps/9361289684090010005054")
+    end
+
+    it "should generate the correct checkpoint tracking url" do
+      @checker.options['get'] = 'last_checkpoint'
+      @checker.options['last_checkpoint_request'] = true
+      expect(@checker.send(:single_or_checkpoint_tracking_url)).to eq("https://api.aftership.com/v4/last_checkpoint/usps/9361289684090010005054")
     end
   end
 
@@ -51,5 +63,10 @@ describe Agents::AftershipAgent do
     end
   end
 
-  describe '#check'
+  describe '#check' do
+    it "should check that initial run creates an event" do
+      @checker.memory[:last_updated_at] = '2016-03-15T14:01:05+00:00'
+      expect { @checker.check }.to change { Event.count }.by(1)
+    end
+  end
 end

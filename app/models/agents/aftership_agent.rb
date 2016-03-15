@@ -13,9 +13,11 @@ module Agents
       You can use this agent to retrieve tracking data. You have to provide a specific `get` request and its associated option.
  
       To get all trackings for your packages please enter `get` for key and `trackings` for the option.
-      To get tracking for a specific tracking number, add the extra options `slug`, `tracking_number` and set `single_tracking_request` to true.
+      To get tracking for a specific tracking number, add the extra keys `slug`, `tracking_number` and its associated values.
 
-      To get the last checkpoint of a package set key to `get` and option to `last_checkpoint` plus provide `slug` and `tracking_number`
+      Set `single_tracking_request` to true as well.
+
+      To get the last checkpoint of a package set key to `get` and option to `last_checkpoint`. Please provide `slug` and `tracking_number`
 
       `slug` is a unique courier code. 
 
@@ -24,7 +26,7 @@ module Agents
       Required Options:
 
       * `api_key` - YOUR_API_KEY.
-      * `get/delete and its associated options`
+      * `get and its associated options`
     MD
 
     event_description <<-MD
