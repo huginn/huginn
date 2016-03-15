@@ -122,7 +122,7 @@ module Agents
     end
 
     def working?
-      true
+      !recent_error_logs?
     end
 
     def validate_options
