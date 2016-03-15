@@ -114,11 +114,11 @@ module Agents
     end
 
     def single_tracking_request?
-      interpolated[:single_tracking_request] != "false"
+      boolify(interpolated[:single_tracking_request])
     end
 
     def last_checkpoint?
-      interpolated[:last_checkpoint_request] != "false"
+      boolify(interpolated[:last_checkpoint_request])
     end
 
     def working?
@@ -134,7 +134,7 @@ module Agents
       if single_tracking_request? || last_checkpoint?
         response = HTTParty.get(single_or_checkpoint_tracking_url, request_options)
       else
-        response = HTTParty.get(trackings_url, request_options)
+        response = HTTParty.get(event_url, request_options)
       end
       events = JSON.parse response.body
       create_event :payload => events
@@ -145,7 +145,7 @@ module Agents
       "https://api.aftership.com/v4/"
     end
 
-    def trackings_url
+    def event_url
       base_url + "#{URI.encode(interpolated[:get].to_s)}"
     end
 
