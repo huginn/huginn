@@ -11,7 +11,7 @@ describe Agents::AftershipAgent do
 
     @opts = {
       "api_key" => '800deeaf-e285-9d62-bc90-j999c1973cc9',
-      "get" => 'trackings',
+      "path" => 'trackings',
       "slug" => 'usps',
       "tracking_number" => "9361289684090010005054"
     }
@@ -36,7 +36,7 @@ describe Agents::AftershipAgent do
     end
 
     it "should generate the correct checkpoint tracking url" do
-      @checker.options['get'] = 'last_checkpoint'
+      @checker.options['path'] = 'last_checkpoint'
       @checker.options['last_checkpoint_request'] = true
       expect(@checker.send(:single_or_checkpoint_tracking_url)).to eq("https://api.aftership.com/v4/last_checkpoint/usps/9361289684090010005054")
     end
@@ -53,13 +53,13 @@ describe Agents::AftershipAgent do
     end
   end
 
-  describe "get request must exist" do
-    it "should check that validation added if get does not exist" do
-      opts = @opts.tap { |o| o.delete('get') }
+  describe "path request must exist" do
+    it "should check that validation added if path does not exist" do
+      opts = @opts.tap { |o| o.delete('path') }
       @checker = Agents::AftershipAgent.new(:name => "tectonic", :options => opts)
       @checker.user = users(:bob)
       expect(@checker.save).to eq false
-      expect(@checker.errors.full_messages.first).to eq("You need to specify a get request")
+      expect(@checker.errors.full_messages.first).to eq("You need to specify a path request")
     end
   end
 
