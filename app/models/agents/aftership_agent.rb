@@ -10,7 +10,7 @@ module Agents
 
       To be able to use the Aftership API, you need to generate an `API Key`. You need a paying plan to use their tracking feature.
 
-      You can use this agent to retrieve tracking data. You have to provide a specific `get` request and its associated option.
+      You can use this agent to retrieve tracking data. You have to provide a specific `path` request and its associated option.
  
       To get all trackings for your packages please enter `path` for key and `trackings` for the option.
       To get tracking for a specific tracking number, add the extra keys `slug`, `tracking_number` and their associated values. Set `single_tracking_request` to true.
