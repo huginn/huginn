@@ -15,7 +15,7 @@ module Agents
       To get all trackings for your packages please enter `path` for key and `trackings` for the option.
       To get tracking for a specific tracking number, add the extra keys `slug`, `tracking_number` and their associated values. Set `single_tracking_request` to true.
 
-      To get the last checkpoint of a package set key to `path` and option to `last_checkpoint`. Please provide `slug` and `tracking_number`
+      To get the last checkpoint of a package set key to `path` and option to `last_checkpoint`. Please provide `slug` and `tracking_number`. Set `last_checkpoint_request` to true.
 
       `slug` is a unique courier code. 
 
@@ -105,7 +105,7 @@ module Agents
 
     def default_options
       { 'api_key' => 'YOUR_API_KEY',
-        'path' => '/trackings'
+        'path' => 'trackings'
       }
     end
 
