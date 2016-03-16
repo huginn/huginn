@@ -12,12 +12,10 @@ module Agents
 
       You can use this agent to retrieve tracking data. You have to provide a specific `get` request and its associated option.
  
-      To get all trackings for your packages please enter `get` for key and `trackings` for the option.
-      To get tracking for a specific tracking number, add the extra keys `slug`, `tracking_number` and its associated values.
+      To get all trackings for your packages please enter `path` for key and `trackings` for the option.
+      To get tracking for a specific tracking number, add the extra keys `slug`, `tracking_number` and their associated values. Set `single_tracking_request` to true.
 
-      Set `single_tracking_request` to true as well.
-
-      To get the last checkpoint of a package set key to `get` and option to `last_checkpoint`. Please provide `slug` and `tracking_number`
+      To get the last checkpoint of a package set key to `path` and option to `last_checkpoint`. Please provide `slug` and `tracking_number`
 
       `slug` is a unique courier code. 
 
@@ -26,12 +24,12 @@ module Agents
       Required Options:
 
       * `api_key` - YOUR_API_KEY.
-      * `get and its associated options`
+      * `path and its associated options`
     MD
 
     event_description <<-MD
       A typical tracking event has 3 objects (attributes, tracking, and checkpoint) and it looks like this
-          {
+    {
         "meta": {
             "code": 200
         },
@@ -95,19 +93,19 @@ module Agents
                             "coordinates": [],
                             "state": null,
                             "zip": null
-                       },
+                        },
                         ...
                     ]
                 },
                 ...
             ]
         }
-     }
+    }
     MD
 
     def default_options
       { 'api_key' => 'YOUR_API_KEY',
-        'get' => '/trackings'
+        'path' => '/trackings'
       }
     end
 
@@ -125,7 +123,7 @@ module Agents
 
     def validate_options
       errors.add(:base, "You need to specify a api key") unless options['api_key'].present?
-      errors.add(:base, "You need to specify a get request") unless options['get'].present?
+      errors.add(:base, "You need to specify a path request") unless options['path'].present?
     end
 
     def check
@@ -144,11 +142,11 @@ module Agents
     end
 
     def event_url
-      base_url + "#{URI.encode(interpolated[:get].to_s)}"
+      base_url + "#{URI.encode(interpolated[:path].to_s)}"
     end
 
     def single_or_checkpoint_tracking_url
-      base_url + "#{URI.encode(interpolated[:get].to_s)}/#{URI.encode(interpolated[:slug].to_s)}/#{URI.encode(interpolated[:tracking_number].to_s)}"
+      base_url + "#{URI.encode(interpolated[:path].to_s)}/#{URI.encode(interpolated[:slug].to_s)}/#{URI.encode(interpolated[:tracking_number].to_s)}"
     end
 
     def request_options
