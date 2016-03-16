@@ -2,6 +2,7 @@
   <table class='table table-striped'>
     <tr>
       <th><%= sortable_column 'name', 'asc' %></th>
+      <th><%= sortable_column 'created_at', 'desc', name: 'Age' %></th>
       <th>Schedule</th>
       <th><%= sortable_column 'last_check_at', name: 'Last Check' %></th>
       <th><%= sortable_column 'last_event_at', name: 'Last Event Out' %></th>
@@ -22,6 +23,9 @@
               <%= scenario_links(agent) %>
             </span>
           <% end %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <%= time_ago_in_words agent.created_at %>
         </td>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_be_scheduled? %>
