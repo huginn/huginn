@@ -61,8 +61,8 @@ class Agent < ActiveRecord::Base
   has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :agent
   has_many :scenarios, :through => :scenario_memberships, :inverse_of => :agents
 
-  scope :active,   -> { where(disabled: false) }
-  scope :inactive, -> { where(disabled: true) }
+  scope :active,   -> { where(disabled: false, deactivated: false) }
+  scope :inactive, -> { where(['disabled = ? OR deactivated = ?', true, true]) }
 
   scope :of_type, lambda { |type|
     type = case type
@@ -381,7 +381,7 @@ class Agent < ActiveRecord::Base
                 joins("JOIN links ON (links.receiver_id = agents.id)").
                 joins("JOIN agents AS sources ON (links.source_id = sources.id)").
                 joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)").
-                where("NOT agents.disabled AND (agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id)")
+                where("NOT agents.disabled AND NOT agents.deactivated AND (agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id)")
         if options[:only_receivers].present?
           scope = scope.where("agents.id in (?)", options[:only_receivers])
         end
@@ -432,7 +432,7 @@ class Agent < ActiveRecord::Base
     # per type of agent, so you can override this to define custom bulk check behavior for your custom Agent type.
     def bulk_check(schedule)
       raise "Call #bulk_check on the appropriate subclass of Agent" if self == Agent
-      where("agents.schedule = ? and disabled = false", schedule).pluck("agents.id").each do |agent_id|
+      where("NOT disabled AND NOT deactivated AND schedule = ?", schedule).pluck("agents.id").each do |agent_id|
         async_check(agent_id)
       end
     end

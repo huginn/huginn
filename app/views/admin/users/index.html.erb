@@ -1,0 +1,55 @@
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>
+          Users
+        </h2>
+      </div>
+
+      <div class='table-responsive'>
+        <table class='table table-striped events'>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>State</th>
+            <th>Active agents</th>
+            <th>Deactivated agents</th>
+            <th>Registered since</th>
+            <th>Options</th>
+          </tr>
+
+          <% @users.each do |user| %>
+            <tr>
+              <td><%= link_to user.username, edit_admin_user_path(user) %></td>
+              <td><%= user.email %></td>
+              <td><%= user_account_state(user) %></td>
+              <td><%= user.agents.active.count %></td>
+              <td><%= user.agents.inactive.count %></td>
+              <td title='<%= user.created_at %>'><%= time_ago_in_words user.created_at %> ago</td>
+              <td>
+                <div class="btn-group btn-group-xs">
+                  <% if user != current_user %>
+                    <% if user.active? %>
+                      <%= link_to 'Deactivate', deactivate_admin_user_path(user), method: :put, class: "btn btn-default" %>
+                    <% else %>
+                      <%= link_to 'Activate', activate_admin_user_path(user), method: :put, class: "btn btn-default" %>
+                    <% end %>
+                    <%= link_to 'Delete', admin_user_path(user), method: :delete, data: { confirm: 'Are you sure? This can not be undone.' }, class: "btn btn-default" %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+
+      <%= paginate @users, theme: 'twitter-bootstrap-3' %>
+
+      <div class="btn-group">
+        <%= link_to icon_tag('glyphicon-plus') + ' New User', new_admin_user_path, class: "btn btn-default" %>
+      </div>
+    </div>
+  </div>
+</div>
+
