@@ -10,21 +10,19 @@ module Agents
 
       To be able to use the Aftership API, you need to generate an `API Key`. You need a paying plan to use their tracking feature.
 
-      You can use this agent to retrieve tracking data. You have to provide a specific `path` request and its associated option.
+      You can use this agent to retrieve tracking data.
  
-      To get all trackings for your packages please enter `path` for key and `trackings` for the option.
-      To get tracking for a specific tracking number, add the extra keys `slug`, `tracking_number` and their associated values. Set `single_tracking_request` to true.
-
-      To get the last checkpoint of a package set key to `path` and option to `last_checkpoint`. Please provide `slug` and `tracking_number`. Set `last_checkpoint_request` to true.
-
-      `slug` is a unique courier code. 
+      Provide the `path` for the API endpoint that you'd like to hit. For example, for all active packages, enter `trackings` 
+      (see https://www.aftership.com/docs/api/4/trackings), for a specific package, use `trackings/SLUG/TRACKING_NUMBER` 
+      and replace `SLUG` with a courier code and `TRACKING_NUMBER` with the tracking number. You can request last checkpoint of a package 
+      by providing `last_checkpoint/SLUG/TRACKING_NUMBER` instead.
 
       You can get a list of courier information here `https://www.aftership.com/courier`
 
       Required Options:
 
       * `api_key` - YOUR_API_KEY.
-      * `path and its associated options`
+      * `path request and its full path`
     MD
 
     event_description <<-MD
@@ -92,14 +90,6 @@ module Agents
       }
     end
 
-    def single_tracking_request?
-      boolify(interpolated[:single_tracking_request])
-    end
-
-    def last_checkpoint?
-      boolify(interpolated[:last_checkpoint_request])
-    end
-
     def working?
       !recent_error_logs?
     end
@@ -110,11 +100,7 @@ module Agents
     end
 
     def check
-      if single_tracking_request? || last_checkpoint?
-        response = HTTParty.get(single_or_checkpoint_tracking_url, request_options)
-      else
-        response = HTTParty.get(event_url, request_options)
-      end
+      response = HTTParty.get(event_url, request_options)
       events = JSON.parse response.body
       create_event :payload => events
     end
@@ -126,10 +112,6 @@ module Agents
 
     def event_url
       base_url + "#{URI.encode(interpolated[:path].to_s)}"
-    end
-
-    def single_or_checkpoint_tracking_url
-      base_url + "#{URI.encode(interpolated[:path].to_s)}/#{URI.encode(interpolated[:slug].to_s)}/#{URI.encode(interpolated[:tracking_number].to_s)}"
     end
 
     def request_options
