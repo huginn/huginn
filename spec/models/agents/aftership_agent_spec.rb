@@ -9,12 +9,6 @@ describe Agents::AftershipAgent do
       :headers => {"Content-Type" => "text/json"}
     )
 
-    stub_request(:get, "trackings/usps/9361289878905919630610").to_return(
-      :body => File.read(Rails.root.join("spec/data_fixtures/aftership.json")),
-      :status => 200,
-      :headers => {"Content-Type" => "text/json"}
-    )
-
     @opts = {
       "api_key" => '800deeaf-e285-9d62-bc90-j999c1973cc9',
       "path" => 'trackings'
