@@ -15,7 +15,7 @@ module Utils
   def self.pretty_print(struct, indent = true)
     output = JSON.pretty_generate(struct)
     if indent
-      output.gsub(/\n/i, "\n    ").tap { |a| p a }
+      output.gsub(/\n/i, "\n    ")
     else
       output
     end

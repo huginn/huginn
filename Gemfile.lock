@@ -110,6 +110,8 @@ GEM
       addressable (>= 2.3.1)
       extlib (>= 0.9.15)
       multi_json (>= 1.0.0)
+    aws-sdk-core (2.2.15)
+      jmespath (~> 1.0)
     bcrypt (3.1.10)
     better_errors (1.1.0)
       coderay (>= 1.0.0)
@@ -279,6 +281,7 @@ GEM
     hypdf (1.0.7)
       httmultiparty (= 0.3.10)
     i18n (0.7.0)
+    jmespath (1.1.3)
     jquery-rails (3.1.3)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
@@ -577,6 +580,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap (~> 2.0.1)
+  aws-sdk-core (~> 2.2.15)
   better_errors (~> 1.1)
   binding_of_caller
   bootstrap-kaminari-views (~> 0.0.3)
@@ -621,6 +625,7 @@ DEPENDENCIES
   kramdown (~> 1.3.3)
   letter_opener_web
   liquid (~> 3.0.3)
+  listen (~> 3.0.5)
   mini_magick
   mqtt
   multi_xml
