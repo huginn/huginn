@@ -81,9 +81,9 @@ For variables in the .env.example that are commented out, the default is to not 
 
 ## Building on your own
 
-You don't need to do this on your own, but if you really want:
+You don't need to do this on your own, but if you really want run this command in the Huginn root directory:
 
-    docker build --rm=true --tag={yourname}/huginn .
+    docker build --rm=true --tag={yourname}/huginn -f docker/single-process/Dockerfile .
 
 ## Source
 
