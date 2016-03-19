@@ -1,0 +1,35 @@
+{
+	"name": "cantino/huginn",
+	"installpath": "/tmp/huginn",
+	"provisioner": "deployment/fodor/provisioner.sh",
+	"text": {
+		"complete": "User/Pass: huginn/huginn123 - please change"
+	},
+	"links": [
+		{
+			"title": "HTTP",
+			"url": "http://{{DOMAIN}}/"
+		},
+		{
+			"title": "Further reading",
+			"url": "https://github.com/cantino/huginn/wiki"
+		}
+	],
+	"size": {
+		"suggested": "2gb",
+		"required": "512mb"
+	},
+	"distro": "ubuntu-14-04-x64",
+	"description": "Example Fodor setup which setups a Droplet with Ubuntu 14.04 and nginx",
+	"keywords": ["fodor", "example", "nginx"],
+	"homepage": "https://github.com/ashleyhindle/fodor-example",
+	"inputs": [
+		{
+			"title": "Fake API Key",
+			"name": "fakeapikey",
+			"placeholder": "xxxx-xxxx-xxxx-xxxx",
+			"type": "regex",
+			"regex": "[a-zA-Z\\-0-9]+"
+		}
+	]
+}
