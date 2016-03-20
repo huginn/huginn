@@ -1,3 +1,4 @@
+# Setup swap file so it works better on lower memory VMs
 fallocate -l 4G /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
@@ -13,6 +14,7 @@ apt-add-repository ppa:brightbox/ruby-ng
 apt-get update
 apt-get -y install ruby2.2 ruby2.2-dev
 
+# Make 'ruby' use the right version
 sudo update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby2.2 400 \
  --slave /usr/bin/rake rake /usr/bin/rake2.2 \
  --slave /usr/bin/ri ri /usr/bin/ri2.2 \
@@ -27,10 +29,13 @@ sudo update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby2.2 400 \
 
 update-alternatives --install /usr/bin/gem gem /usr/bin/gem2.2 400
 
+# This asks a question, so we use 'yes' to say 'y' to them
 yes | gem install rake bundler foreman --no-ri --no-rdoc
 
 adduser --disabled-login --gecos 'Huginn' huginn
 
+
+# Set the default root password - we should change this after installation
 debconf-set-selections <<< 'mysql-server mysql-server/root_password password mysqlsecretpassword'
 debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password mysqlsecretpassword'
 
@@ -67,6 +72,7 @@ sudo -u huginn -H chmod o-rwx .env
 # Copy the example Unicorn config
 sudo -u huginn -H cp config/unicorn.rb.example config/unicorn.rb
 
+# Update .env with production details, and valid database credentials
 sed -i -e 's/DATABASE_NAME=huginn_development/DATABASE_NAME=huginn_production/g' .env
 sed -i -e 's/DATABASE_USERNAME=root/DATABASE_USERNAME=huginn/g' .env
 sed -i -e 's/DATABASE_PASSWORD=""/DATABASE_PASSWORD="huginn"/g' .env
@@ -89,8 +95,11 @@ sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=hu
 
 sudo -u huginn -H bundle exec rake assets:precompile RAILS_ENV=production
 
+
+# Comment out workers from Procfile
 sed -i -e 's/^web:/#web:/g' -e 's/^jobs/#jobs/g' Procfile
 
+# Add our own worker config into Procfile
 echo "web: bundle exec unicorn -c config/unicorn.rb" >> Procfile
 echo "jobs: bundle exec rails runner bin/threaded.rb" >> Procfile
 
@@ -101,6 +110,7 @@ cp deployment/nginx/huginn /etc/nginx/sites-available/huginn
 ln -s /etc/nginx/sites-available/huginn /etc/nginx/sites-enabled/huginn
 rm /etc/nginx/sites-enabled/default
 
+# $DOMAIN is passed in from the Fodor provisioner script - it will be something like 'groovy-cloud-8173.fodor.xyz'
 sed -i -e "s/YOUR_SERVER_FQDN/${DOMAIN}/g" /etc/nginx/sites-available/huginn
 
 service nginx restart
