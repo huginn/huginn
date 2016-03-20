@@ -15,7 +15,7 @@ module Agents
       Read more about the [LIFX HTTP API](http://api.developer.lifx.com/) 
     MD
     
-    form_configurable :light_selector
+    form_configurable :light_selector, roles: :completable
     form_configurable :color
     form_configurable :cycles
     form_configurable :persist, type: :boolean
@@ -28,12 +28,19 @@ module Agents
     
     def default_options
       { 
-        'light_selector' => 'label:Bulb3',
+        'light_selector' => 'all',
         "color" => "#ff0000",
         "cycles" => 5,
         "persist" => false,
         "power_on" => true
       }
+    end
+    
+    def complete_light_selector
+      selectors = client.get_selectors
+      selectors.map do |selector| 
+        { text: selector, id: selector }
+      end
     end
 
     def working?
@@ -43,14 +50,15 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         payload = interpolated(event)
+        selector = payload["light_selector"]
         payload.slice!(:color, :cycles, :persist, :power_on)
-        client.pulse(payload)
+        client(selector).pulse(payload)
       end
     end
     
     private
-    def client
-      @client ||= LifxClient.new(service.token, interpolated[:light_selector])
+    def client(selector = "all")
+      @client = LifxClient.new(service.token, selector)
     end
   end
 end

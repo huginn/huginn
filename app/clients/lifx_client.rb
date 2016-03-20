@@ -7,14 +7,23 @@ class LifxClient
     @selector = selector
   end
     
-  def get_lights
+  def get_selectors
     response = self.class.get("/all", 
       headers: authorization_header,
     )
     if response.code == 404
       return false
     else
-      response
+      lights_json = JSON.parse(response.body)
+      lights = []
+      groups = []
+      lights_json.each do |light| 
+        lights << Light.new(light["id"], light["label"])
+        groups << Group.new(light["group"]["id"], light["group"]["name"])
+      end
+      selectors = ["all"]
+      selectors |= lights.map{|light| "label:#{light.label}"}
+      selectors |= groups.map{|group| "group:#{group.label}"}
     end
   end
   
@@ -48,5 +57,23 @@ class LifxClient
   
   def authorization_header
     {'Authorization' => "Bearer #{@auth_token}"}
+  end
+  
+  class Light
+    attr_reader :id, :label
+    
+    def initialize(id, label)
+      @id = id
+      @label = label
+    end
+  end
+  
+  class Group
+    attr_reader :id, :label
+    
+    def initialize(id, label)
+      @id = id
+      @label = label
+    end
   end
 end
