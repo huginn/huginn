@@ -7,8 +7,8 @@ class LifxClient
     @selector = selector
   end
     
-  def get_selectors
-    response = self.class.get("/all", 
+  def get_selectors(options = {})
+    response = self.class.get("/#{@selector}", 
       headers: authorization_header,
     )
     if response.code == 404
