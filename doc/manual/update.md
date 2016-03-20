@@ -32,7 +32,7 @@ sudo -u huginn -H cp Procfile Procfile.bak
 Get the new code
 ```
 sudo -u huginn -H git fetch --all
-sudo -u huginn -H git checkout -- db/schema.rb Procfile
+sudo -u huginn -H git checkout -- Procfile
 sudo -u huginn -H git checkout master
 sudo -u huginn -H git pull
 ```
