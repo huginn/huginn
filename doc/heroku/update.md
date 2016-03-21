@@ -6,4 +6,5 @@ Once you've run `bin/setup_heroku`, you should have 'cantino/huginn' as a remote
 git fetch origin
 git merge origin/master
 git push -f heroku master # note: this will wipe out any code changes that only exist on Heroku!
+heroku run rake db:migrate # this will migrate the database to the latest state (not needed for every update, but always safe to run)
 ```
