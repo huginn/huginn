@@ -2,6 +2,7 @@ module Agents
   class BeeperAgent < Agent
     cannot_be_scheduled!
     cannot_create_events!
+    no_bulk_receive!
 
     description <<-MD
       Beeper agent sends messages to Beeper app on your mobile device via Push notifications.

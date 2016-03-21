@@ -1,5 +1,3 @@
-If you are viewing this from the docker hub page the please follow the links to view the actual documentation for the [cantino/huginn](https://github.com/cantino/huginn/tree/master/docker/multi-process) or [cantino/huginn-single-process](https://github.com/cantino/huginn/tree/master/docker/single-process) image. Help us getting the bug fixed which is causing this inconvenience by commenting on [this issue](https://github.com/docker/hub-feedback/issues/467)
-
 ![Huginn](https://raw.github.com/cantino/huginn/master/media/huginn-logo.png "Your agents are standing by.")
 
 -----
@@ -57,7 +55,7 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ### Docker
 
-The quickest and easiest way to check out Huginn is to use the offical Docker image. Have a look at the [documentation](https://github.com/cantino/huginn/blob/master/doc/docker/install.md).
+The quickest and easiest way to check out Huginn is to use the official Docker image. Have a look at the [documentation](https://github.com/cantino/huginn/blob/master/doc/docker/install.md).
 
 ### Local Installation
 

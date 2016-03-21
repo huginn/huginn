@@ -5,6 +5,7 @@ module Agents
 
     cannot_be_scheduled!
     cannot_create_events!
+    no_bulk_receive!
 
     gem_dependency_check { defined?(Slack) }
 

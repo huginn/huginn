@@ -15,7 +15,7 @@ module Utils
   def self.pretty_print(struct, indent = true)
     output = JSON.pretty_generate(struct)
     if indent
-      output.gsub(/\n/i, "\n    ").tap { |a| p a }
+      output.gsub(/\n/i, "\n    ")
     else
       output
     end
@@ -129,5 +129,26 @@ module Utils
 
   def self.sort_tuples!(array, orders = [])
     TupleSorter.sort!(array, orders)
+  end
+
+  def self.parse_duration(string)
+    return nil if string.blank?
+    case string.strip
+    when /\A(\d+)\.(\w+)\z/
+      $1.to_i.send($2.to_s)
+    when /\A(\d+)\z/
+      $1.to_i
+    else
+      STDERR.puts "WARNING: Invalid duration format: '#{string.strip}'"
+      nil
+    end
+  end
+
+  def self.if_present(string, method)
+    if string.present?
+      string.send(method)
+    else
+      nil
+    end
   end
 end

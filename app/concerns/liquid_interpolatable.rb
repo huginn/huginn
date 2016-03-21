@@ -220,6 +220,11 @@ module LiquidInterpolatable
       input.to_s.sub(Regexp.new(regex), unescape_replacement(replacement.to_s))
     end
 
+    # Serializes data as JSON
+    def json(input)
+      JSON.dump(input)
+    end
+
     private
 
     def logger
@@ -299,9 +304,7 @@ module LiquidInterpolatable
       end
 
       def render(context)
-        credential = context.registers[:agent].credential(@credential_name)
-        raise "No user credential named '#{@credential_name}' defined" if credential.nil?
-        credential
+        context.registers[:agent].credential(@credential_name)
       end
     end
 

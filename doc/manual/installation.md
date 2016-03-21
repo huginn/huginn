@@ -73,7 +73,7 @@ Download Ruby and compile it:
 
 Install the bundler and foreman gems:
 
-    sudo gem install bundler foreman --no-ri --no-rdoc
+    sudo gem install rake bundler foreman --no-ri --no-rdoc
 
 ## 3. System Users
 
@@ -218,14 +218,12 @@ Change the Unicorn config if needed, the [requirements.md](./requirements.md#uni
     # Migrate to the latest version
     sudo -u huginn -H bundle exec rake db:migrate RAILS_ENV=production
 
-    # Create admin user and example agents
-    sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production
+    # Create admin user and example agents using the default admin/password login
+    sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=admin SEED_PASSWORD=password
 
 When done you see `See the Huginn Wiki for more Agent examples!  https://github.com/cantino/huginn/wiki`
 
-**Note:** This will create an initial user, you can set the username and password by supplying it in environmental variables `SEED_USERNAME` and `SEED_PASSWORD` as seen below. If you don't set the password (and it is set to the default one) please wait with exposing Huginn to the public internet until the installation is done and you've logged into the server and changed your password.
-
-    sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=admin SEED_PASSWORD=yourpassword
+**Note:** This will create an initial user, you can change the username and password by supplying it in environmental variables `SEED_USERNAME` and `SEED_PASSWORD` as seen above. If you don't change the password (and it is set to the default one) please wait with exposing Huginn to the public internet until the installation is done and you've logged into the server and changed your password.
 
 ### Compile Assets
 
@@ -235,9 +233,19 @@ When done you see `See the Huginn Wiki for more Agent examples!  https://github.
 
 Huginn uses [foreman](http://ddollar.github.io/foreman/) to generate the init scripts based on a `Procfile`
 
-Edit the `Procfile` and choose one of the suggested versions for production
+Edit the [`Procfile`](https://github.com/cantino/huginn/blob/master/Procfile) and choose one of the suggested versions for production
 
     sudo -u huginn -H editor Procfile
+
+Comment out (disable) [these two lines](https://github.com/cantino/huginn/blob/master/Procfile#L6-L7)
+
+    web: bundle exec rails server -p ${PORT-3000} -b ${IP-0.0.0.0}
+    jobs: bundle exec rails runner bin/threaded.rb
+
+Enable (remove the comment) [from these lines](https://github.com/cantino/huginn/blob/master/Procfile#L24-L25) or [those](https://github.com/cantino/huginn/blob/master/Procfile#L28-L31)
+
+    # web: bundle exec unicorn -c config/unicorn.rb
+    # jobs: bundle exec rails runner bin/threaded.rb
 
 Export the init scripts:
 
@@ -299,8 +307,8 @@ You should receive `syntax is okay` and `test is successful` messages. If you re
 
 Visit YOUR_SERVER in your web browser for your first Huginn login. The setup has created a default admin account for you. You can use it to log in:
 
-    admin
-    password
+    admin (or your SEED_USERNAME)
+    password (or your SEED_PASSWORD)
 
 
 **Enjoy!** :sparkles: :star: :fireworks:

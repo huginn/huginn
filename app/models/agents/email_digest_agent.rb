@@ -16,6 +16,11 @@ module Agents
       You can specify one or more `recipients` for the email, or skip the option in order to send the email to your
       account's default email address.
 
+      You can provide a `from` address for the email, or leave it blank to default to the value of `EMAIL_FROM_ADDRESS` (`#{ENV['EMAIL_FROM_ADDRESS']}`).
+
+      You can provide a `content_type` for the email and specify `text/plain` or `text/html` to be sent.
+      If you do not specify `content_type`, then the recipient email server will determine the correct rendering.
+
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
     MD
 
@@ -25,6 +30,10 @@ module Agents
           'headline' => "Your notifications:",
           'expected_receive_period_in_days' => "2"
       }
+    end
+
+    def working?
+      received_event_without_error?
     end
 
     def receive(incoming_events)
@@ -41,8 +50,20 @@ module Agents
         ids = self.memory['events'].join(",")
         groups = self.memory['queue'].map { |payload| present(payload) }
         recipients.each do |recipient|
-          log "Sending digest mail to #{recipient} with events [#{ids}]"
-          SystemMailer.send_message(:to => recipient, :subject => interpolated['subject'], :headline => interpolated['headline'], :groups => groups).deliver_later
+          begin
+            SystemMailer.send_message(
+              to: recipient,
+              from: interpolated['from'],
+              subject: interpolated['subject'],
+              headline: interpolated['headline'],
+              content_type: interpolated['content_type'],
+              groups: groups
+            ).deliver_now
+            log "Sent digest mail to #{recipient} with events [#{ids}]"
+          rescue => e
+            error("Error sending digest mail to #{recipient} with events [#{ids}]: #{e.message}")
+            raise
+          end
         end
         self.memory['queue'] = []
         self.memory['events'] = []

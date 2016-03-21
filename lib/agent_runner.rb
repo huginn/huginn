@@ -118,5 +118,6 @@ end
 
 require 'agents/twitter_stream_agent'
 require 'agents/jabber_agent'
+require 'agents/local_file_agent'
 require 'huginn_scheduler'
 require 'delayed_job_worker'

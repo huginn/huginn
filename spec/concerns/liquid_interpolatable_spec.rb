@@ -48,6 +48,16 @@ describe LiquidInterpolatable::Filters do
     end
   end
 
+  describe "json" do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'serializes data to json' do
+      agent.interpolation_context['something'] = {foo: 'bar'}
+      agent.options['cleaned'] = '{{ something | json }}'
+      expect(agent.interpolated['cleaned']).to eq('{"foo":"bar"}')
+    end
+  end
+
   describe 'to_xpath' do
     before do
       def @filter.to_xpath_roundtrip(string)

@@ -172,4 +172,33 @@ describe Utils do
       expect(tuples).to eq expected
     end
   end
+
+  context "#parse_duration" do
+    it "works with correct arguments" do
+      expect(Utils.parse_duration('2.days')).to eq(2.days)
+      expect(Utils.parse_duration('2.seconds')).to eq(2)
+      expect(Utils.parse_duration('2')).to eq(2)
+    end
+
+    it "returns nil when passed nil" do
+      expect(Utils.parse_duration(nil)).to be_nil
+    end
+
+    it "warns and returns nil when not parseable" do
+      mock(STDERR).puts("WARNING: Invalid duration format: 'bogus'")
+      expect(Utils.parse_duration('bogus')).to be_nil
+    end
+  end
+
+  context "#if_present" do
+    it "returns nil when passed nil" do
+      expect(Utils.if_present(nil, :to_i)).to be_nil
+    end
+
+    it "calls the specified method when the argument is present" do
+      argument = mock()
+      mock(argument).to_i { 1 }
+      expect(Utils.if_present(argument, :to_i)).to eq(1)
+    end
+  end
 end

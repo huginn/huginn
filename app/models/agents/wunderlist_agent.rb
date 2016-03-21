@@ -5,6 +5,7 @@ module Agents
     valid_oauth_providers :wunderlist
 
     cannot_be_scheduled!
+    no_bulk_receive!
 
     gem_dependency_check { Devise.omniauth_providers.include?(:wunderlist) }
 

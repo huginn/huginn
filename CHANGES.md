@@ -1,8 +1,57 @@
 # Changes
 
+* Feb 26, 2016   - Added TwitterFavorites Agent for following the favorites of a Twitter user. Thanks @jngai and @bigretromike!
+* Feb 26, 2016   - Added HttpStatusAgent for pinging web servers and returning the resulting HTTP status code. Thanks @darrencauthon!
+* Feb 20, 2016   - A `from` option can now be specified on email agents. (If you're using Gmail, it may still show your normal address unless you add the new address as a valid sender on the account.)
+* Feb 20, 2016   - Added a recommended PORT to the .env.example file.
+* Feb 15, 2016   - Allow usage of spring in development by setting SPRING in .env.
+* Feb 14, 2016   - Bug fix: missing Credential no longer 500 errors during an import.
+* Feb 12, 2016   - Add `no_bulk_receive!` option to ensure Events are processed individually in certain Agents.
+* Feb 7, 2016    - Add `http_success_codes` option to the WebsiteAgent to treat more than just 200 as success codes.
+* Feb 7, 2016    - Add support for writing Capybara specs.
+* Feb 4, 2016    - Bug fix: Fix mysql connection check for multi-process docker image.
+* Feb 3, 2016    - The GoogleCalendarPublishAgent now accepts Liquid in the `calendar_id` option.
+* Feb 1, 2016    - Fix Guard and add rack-livereload for development.
+* Jan 30, 2016   - Add support to the ManualEventAgent for Liquid formatting and creating multiple Events.
+* Jan 28, 2016   - PushbulletAgent can push to all devices.
+* Jan 26, 2016   - Update Rails to 4.2.5.1 for security and unify configuration files.
+* Jan 24, 2016   - Docker upgrades and fixes.
+* Jan 22, 2016   - Upgrade devise to 3.5.4 to address CVE-2015-8314.
+* Jan 20, 2016   - Update nokogiri for CVE-2015-7499.
+* Jan 20, 2016   - Add DigestAgent which collects any Events sent to it and emits them as a single event.
+* Jan 16, 2016   - Update celluloid and delayed_job to avoid potential memory issues.
+* Jan 16, 2016   - PostAgent can emit Events with the resulting data from the server.
+* Jan 15, 2016   - Allow Liquid formatting of the `recipients` option of email Agents.
+* Jan 14, 2016   - Add new block tags `regex_replace`/`regex_replace_first` to Liquid.
+* Jan 14, 2016   - Events received by the WebsiteAgent do not need to contain a `url` value, switching to usage of `url_from_event` instead.
 * Jan 14, 2016   - Liquid block tag `regex_replace` and `regex_replace_first` added.
 * Jan 12, 2016   - WebhookAgent supports reCAPTCHA.
+* Jan 8, 2016    - Remove schema.rb from git.
+* Jan 3, 2016    - Add itunes namespace to DataOutputAgent.
+* Dec 26, 2015   - Allow multiple users to import the same Scenario.
 * Dec 26, 2015   - WebsiteAgent can accept a `data_from_event` Liquid template instead of a URL.
+* Dec 19, 2015   - Update nokogiri to 1.6.7.1 because of security CVEs.
+* Dec 10, 2015   - Bug fix: Do not try to load .env file on Heroku.
+* Dec 8, 2015    - Export Agents in GUID order in Scenarios.
+* Nov 25, 2015   - Update to newest uglifier and nokogiri gems due to security alerts.
+* Nov 14, 2015   - Bug fix: WebsiteAgent handles unicode URLs better.
+* Nov 12, 2015   - Bug fix: fix a memory leak caused by starting a new LongRunnable::Worker when the old one is still restarting.
+* Nov 11, 2015   - EventFormattinghAgent can be dry run.
+* Nov 8, 2015    - Added media namespace to DataOutputAgent output, supporting 'media:content' nodes.
+* Nov 5, 2015    - Bug fix: CommanderAgent can now be manually run correctly.
+* Nov 4, 2015    - DataOutputAgent can push to PubSubHubbub hubs with `push_hubs` option.
+* Oct 31, 2015   - DelayAgent `max_emitted_events` option added to limit the number of events which should be created.
+* Oct 30, 2015   - TumblrPublishAgent reblog `post_type` added.
+* Oct 28, 2015   - TumblrPublishAgent emits the created post.
+* Oct 27, 2015   - WebhookAgent can have a custom `response` message.
+* Oct 27, 2015   - `DIAGRAM_DEFAULT_LAYOUT` option added to select Graphviz layout.
+* Oct 27, 2015   - ShellCommandAgent has new `suppress_on_failure` and `suppress_on_empty_output` options.
+* Oct 24, 2015   - TwitterStream does not complain when not configured.
+* Oct 23, 2015   - Bug fix: RSSAgent now sorts correctly with `events_order`.
+* Oct 22, 2015   - Bug fix: BeeperAgent added to push messages to the Beeper mobile app.
+* Oct 20, 2015   - WebsiteAgent unwraps cdata sections in XML.
+* Oct 20, 2015   - `force_stop` command added to production.rake.
+* Oct 18, 2015   - Bug fix: CommanderAgent can now control any other Agent type.
 * Oct 17, 2015   - TwitterSearchAgent added for running period Twitter searches.
 * Oct 17, 2015   - GapDetectorAgent added to alert when no data has been seen in a certain period of time.
 * Oct 12, 2015   - Slack agent supports attachments.

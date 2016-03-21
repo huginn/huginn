@@ -1,0 +1,26 @@
+<%= form_for([:admin, @user], html: { class: 'form-horizontal' }) do |f| %>
+  <%= devise_error_messages! %>
+  <%= render partial: '/devise/registrations/common_registration_fields', locals: { f: f } %>
+
+  <div class="form-group">
+    <div class="col-md-offset-4 col-md-10">
+      <%= f.label :admin do %>
+        <%= f.check_box :admin %> Admin
+      <% end %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-md-offset-4 col-md-10">
+      <%= f.submit class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>
+
+<hr>
+
+<div class="row">
+  <div class="col-md-12">
+    <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, admin_users_path, class: "btn btn-default" %>
+  </div>
+</div>

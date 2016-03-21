@@ -3,6 +3,7 @@ require 'json'
 module Agents
   class GoogleCalendarPublishAgent < Agent
     cannot_be_scheduled!
+    no_bulk_receive!
 
     gem_dependency_check { defined?(Google) && defined?(Google::APIClient) }
 

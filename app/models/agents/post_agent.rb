@@ -3,6 +3,7 @@ module Agents
     include WebRequestConcern
 
     can_dry_run!
+    no_bulk_receive!
     default_schedule "never"
 
     description <<-MD

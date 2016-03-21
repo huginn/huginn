@@ -1,0 +1,701 @@
+
+[
+{
+  "created_at": "Fri Feb 19 18:08:04 +0000 2016",
+  "id": 700743667217207299,
+  "id_str": "700743667217207299",
+  "text": "Set up Huginn to track higher-tier rewards on Indiegogo campaigns because I'm too nice to tell them to leave",
+  "source": "<a href=\"http://stevencrewniverse.tumblr.com\" rel=\"nofollow\">RoseGem<\/a>",
+  "truncated": false,
+  "in_reply_to_status_id": null,
+  "in_reply_to_status_id_str": null,
+  "in_reply_to_user_id": null,
+  "in_reply_to_user_id_str": null,
+  "in_reply_to_screen_name": null,
+  "user": {
+    "id": 3010753754,
+    "id_str": "3010753754",
+    "name": "Streza_eBooks",
+    "screen_name": "streza_ebooks",
+    "location": "",
+    "description": "Constant bit rater. Fan of space bars, animated GIFs, cookies, and floating-points. Member of the MBR Fan Club. Aggressive header. Processor for now. Bit/byte.",
+    "url": "https://t.co/W0zvIPlUnC",
+    "entities": {
+      "url": {
+        "urls": [
+          {
+            "url": "https://t.co/W0zvIPlUnC",
+            "expanded_url": "http://twitter.com/SteveStreza",
+            "display_url": "twitter.com/SteveStreza",
+            "indices": [
+              0,
+              23
+            ]
+          }
+        ]
+      },
+      "description": {
+        "urls": [
+
+        ]
+      }
+    },
+    "protected": false,
+    "followers_count": 126,
+    "friends_count": 113,
+    "listed_count": 31,
+    "created_at": "Fri Feb 06 02:43:56 +0000 2015",
+    "favourites_count": 2464,
+    "utc_offset": null,
+    "time_zone": null,
+    "geo_enabled": false,
+    "verified": false,
+    "statuses_count": 28548,
+    "lang": "en",
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "C0DEED",
+    "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+    "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+    "profile_background_tile": false,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/672957162151387136/OpClSkjl_normal.jpg",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/672957162151387136/OpClSkjl_normal.jpg",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/3010753754/1423193197",
+    "profile_link_color": "0084B4",
+    "profile_sidebar_border_color": "C0DEED",
+    "profile_sidebar_fill_color": "DDEEF6",
+    "profile_text_color": "333333",
+    "profile_use_background_image": true,
+    "has_extended_profile": false,
+    "default_profile": true,
+    "default_profile_image": false,
+    "following": false,
+    "follow_request_sent": false,
+    "notifications": false
+  },
+  "geo": null,
+  "coordinates": null,
+  "place": null,
+  "contributors": null,
+  "is_quote_status": false,
+  "retweet_count": 0,
+  "favorite_count": 1,
+  "entities": {
+    "hashtags": [
+
+    ],
+    "symbols": [
+
+    ],
+    "user_mentions": [
+
+    ],
+    "urls": [
+
+    ]
+  },
+  "favorited": false,
+  "retweeted": false,
+  "lang": "en"
+},
+
+{
+  "created_at": "Sat Feb 20 01:32:08 +0000 2016",
+  "id": 700855422643621889,
+  "id_str": "700855422643621889",
+  "text": "@tectonic Another word for ?????????",
+  "source": "<a href=\"http://twitterrific.com\" rel=\"nofollow\">Twitterrific<\/a>",
+  "truncated": false,
+  "in_reply_to_status_id": 700854882161438720,
+  "in_reply_to_status_id_str": "700854882161438720",
+  "in_reply_to_user_id": 9813372,
+  "in_reply_to_user_id_str": "9813372",
+  "in_reply_to_screen_name": "tectonic",
+  "user": {
+    "id": 12884962,
+    "id_str": "12884962",
+    "name": "Nicolas Ward",
+    "screen_name": "UltraNurd",
+    "location": "Vancouver, WA",
+    "description": "Gainfully employed NLP and machine learning geek by day. Husby of best wifelet @Andrle. Father of cutest Theodore. I like books, games, and politics. Lutheran",
+    "url": "https://t.co/Ja3DWptYIn",
+    "entities": {
+      "url": {
+        "urls": [
+          {
+            "url": "https://t.co/Ja3DWptYIn",
+            "expanded_url": "http://blog.ultranurd.net",
+            "display_url": "blog.ultranurd.net",
+            "indices": [
+              0,
+              23
+            ]
+          }
+        ]
+      },
+      "description": {
+        "urls": [
+
+        ]
+      }
+    },
+    "protected": false,
+    "followers_count": 1209,
+    "friends_count": 1218,
+    "listed_count": 118,
+    "created_at": "Wed Jan 30 20:25:59 +0000 2008",
+    "favourites_count": 17135,
+    "utc_offset": -18000,
+    "time_zone": "Eastern Time (US & Canada)",
+    "geo_enabled": true,
+    "verified": false,
+    "statuses_count": 69702,
+    "lang": "en",
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "C6E2EE",
+    "profile_background_image_url": "http://abs.twimg.com/images/themes/theme2/bg.gif",
+    "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme2/bg.gif",
+    "profile_background_tile": false,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/701114865436332032/upPSPR2u_normal.png",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/701114865436332032/upPSPR2u_normal.png",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/12884962/1440017042",
+    "profile_link_color": "1F98C7",
+    "profile_sidebar_border_color": "C6E2EE",
+    "profile_sidebar_fill_color": "DAECF4",
+    "profile_text_color": "663B12",
+    "profile_use_background_image": true,
+    "has_extended_profile": false,
+    "default_profile": false,
+    "default_profile_image": false,
+    "following": false,
+    "follow_request_sent": false,
+    "notifications": false
+  },
+  "geo": null,
+  "coordinates": null,
+  "place": null,
+  "contributors": null,
+  "is_quote_status": false,
+  "retweet_count": 0,
+  "favorite_count": 1,
+  "entities": {
+    "hashtags": [
+
+    ],
+    "symbols": [
+
+    ],
+    "user_mentions": [
+      {
+        "screen_name": "tectonic",
+        "name": "Andrew Cantino",
+        "id": 9813372,
+        "id_str": "9813372",
+        "indices": [
+          0,
+          9
+        ]
+      }
+    ],
+    "urls": [
+
+    ]
+  },
+  "favorited": false,
+  "retweeted": false,
+  "lang": "en"
+},
+
+{
+  "created_at": "Sat Feb 20 03:40:03 +0000 2016",
+  "id": 700887613352255490,
+  "id_str": "700887613352255490",
+  "text": "University of Texas allows guns on campus and San Francisco State bans hoverboards. Gotta love humans. https://t.co/t98Z7ATR8Q",
+  "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone<\/a>",
+  "truncated": false,
+  "in_reply_to_status_id": null,
+  "in_reply_to_status_id_str": null,
+  "in_reply_to_user_id": null,
+  "in_reply_to_user_id_str": null,
+  "in_reply_to_screen_name": null,
+  "user": {
+    "id": 285822802,
+    "id_str": "285822802",
+    "name": "Maryam Labib",
+    "screen_name": "labibti",
+    "location": "225",
+    "description": "founder @humansofthemsa, coder @pivotal, alum @cal, funny @twitter, blessing @theworld.",
+    "url": null,
+    "entities": {
+      "description": {
+        "urls": [
+
+        ]
+      }
+    },
+    "protected": false,
+    "followers_count": 366,
+    "friends_count": 279,
+    "listed_count": 10,
+    "created_at": "Thu Apr 21 21:10:56 +0000 2011",
+    "favourites_count": 1454,
+    "utc_offset": -28800,
+    "time_zone": "Pacific Time (US & Canada)",
+    "geo_enabled": false,
+    "verified": false,
+    "statuses_count": 3084,
+    "lang": "en",
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "FF6699",
+    "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/593311458/fnfdvrer7wu731vxbjoo.jpeg",
+    "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/593311458/fnfdvrer7wu731vxbjoo.jpeg",
+    "profile_background_tile": false,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/675612479427219457/j9YB0-6x_normal.jpg",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/675612479427219457/j9YB0-6x_normal.jpg",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/285822802/1449910573",
+    "profile_link_color": "3B94D9",
+    "profile_sidebar_border_color": "CC3366",
+    "profile_sidebar_fill_color": "D4C8CB",
+    "profile_text_color": "362720",
+    "profile_use_background_image": true,
+    "has_extended_profile": false,
+    "default_profile": false,
+    "default_profile_image": false,
+    "following": false,
+    "follow_request_sent": false,
+    "notifications": false
+  },
+  "geo": null,
+  "coordinates": null,
+  "place": null,
+  "contributors": null,
+  "quoted_status_id": 700877581361532930,
+  "quoted_status_id_str": "700877581361532930",
+  "quoted_status": {
+    "created_at": "Sat Feb 20 03:00:11 +0000 2016",
+    "id": 700877581361532930,
+    "id_str": "700877581361532930",
+    "text": "San Francisco State University bans hoverboards https://t.co/flQ7BmEAki https://t.co/4KjztcWDId",
+    "source": "<a href=\"http://www.hootsuite.com\" rel=\"nofollow\">Hootsuite<\/a>",
+    "truncated": false,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "in_reply_to_screen_name": null,
+    "user": {
+      "id": 16664681,
+      "id_str": "16664681",
+      "name": "Los Angeles Times",
+      "screen_name": "latimes",
+      "location": "Los Angeles, CA",
+      "description": "News from Los Angeles and the world. Staffed by http://t.co/zb8HyvYyAJ editors.",
+      "url": "http://t.co/JvbZRDfNzf",
+      "entities": {
+        "url": {
+          "urls": [
+            {
+              "url": "http://t.co/JvbZRDfNzf",
+              "expanded_url": "http://latimes.com/",
+              "display_url": "latimes.com",
+              "indices": [
+                0,
+                22
+              ]
+            }
+          ]
+        },
+        "description": {
+          "urls": [
+            {
+              "url": "http://t.co/zb8HyvYyAJ",
+              "expanded_url": "http://latimes.com",
+              "display_url": "latimes.com",
+              "indices": [
+                48,
+                70
+              ]
+            }
+          ]
+        }
+      },
+      "protected": false,
+      "followers_count": 1799021,
+      "friends_count": 10737,
+      "listed_count": 26340,
+      "created_at": "Thu Oct 09 11:07:42 +0000 2008",
+      "favourites_count": 1724,
+      "utc_offset": -28800,
+      "time_zone": "Pacific Time (US & Canada)",
+      "geo_enabled": true,
+      "verified": true,
+      "statuses_count": 129068,
+      "lang": "en",
+      "contributors_enabled": false,
+      "is_translator": false,
+      "is_translation_enabled": false,
+      "profile_background_color": "FFFFFF",
+      "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/596769492/sp4uqn6gr7cwmjefat2j.jpeg",
+      "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/596769492/sp4uqn6gr7cwmjefat2j.jpeg",
+      "profile_background_tile": false,
+      "profile_image_url": "http://pbs.twimg.com/profile_images/546329819919560704/XMWy2Z50_normal.jpeg",
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/546329819919560704/XMWy2Z50_normal.jpeg",
+      "profile_banner_url": "https://pbs.twimg.com/profile_banners/16664681/1402448809",
+      "profile_link_color": "009999",
+      "profile_sidebar_border_color": "FFFFFF",
+      "profile_sidebar_fill_color": "EFEFEF",
+      "profile_text_color": "615F61",
+      "profile_use_background_image": true,
+      "has_extended_profile": false,
+      "default_profile": false,
+      "default_profile_image": false,
+      "following": false,
+      "follow_request_sent": false,
+      "notifications": false
+    },
+    "geo": null,
+    "coordinates": null,
+    "place": null,
+    "contributors": null,
+    "is_quote_status": false,
+    "retweet_count": 80,
+    "favorite_count": 87,
+    "entities": {
+      "hashtags": [
+
+      ],
+      "symbols": [
+
+      ],
+      "user_mentions": [
+
+      ],
+      "urls": [
+        {
+          "url": "https://t.co/flQ7BmEAki",
+          "expanded_url": "http://lat.ms/1WxgJpV",
+          "display_url": "lat.ms/1WxgJpV",
+          "indices": [
+            48,
+            71
+          ]
+        }
+      ],
+      "media": [
+        {
+          "id": 700877581084659712,
+          "id_str": "700877581084659712",
+          "indices": [
+            72,
+            95
+          ],
+          "media_url": "http://pbs.twimg.com/media/CboEclOWEAAbjEW.jpg",
+          "media_url_https": "https://pbs.twimg.com/media/CboEclOWEAAbjEW.jpg",
+          "url": "https://t.co/4KjztcWDId",
+          "display_url": "pic.twitter.com/4KjztcWDId",
+          "expanded_url": "http://twitter.com/latimes/status/700877581361532930/photo/1",
+          "type": "photo",
+          "sizes": {
+            "small": {
+              "w": 680,
+              "h": 383,
+              "resize": "fit"
+            },
+            "large": {
+              "w": 700,
+              "h": 394,
+              "resize": "fit"
+            },
+            "thumb": {
+              "w": 150,
+              "h": 150,
+              "resize": "crop"
+            },
+            "medium": {
+              "w": 700,
+              "h": 394,
+              "resize": "fit"
+            }
+          }
+        }
+      ]
+    },
+    "extended_entities": {
+      "media": [
+        {
+          "id": 700877581084659712,
+          "id_str": "700877581084659712",
+          "indices": [
+            72,
+            95
+          ],
+          "media_url": "http://pbs.twimg.com/media/CboEclOWEAAbjEW.jpg",
+          "media_url_https": "https://pbs.twimg.com/media/CboEclOWEAAbjEW.jpg",
+          "url": "https://t.co/4KjztcWDId",
+          "display_url": "pic.twitter.com/4KjztcWDId",
+          "expanded_url": "http://twitter.com/latimes/status/700877581361532930/photo/1",
+          "type": "photo",
+          "sizes": {
+            "small": {
+              "w": 680,
+              "h": 383,
+              "resize": "fit"
+            },
+            "large": {
+              "w": 700,
+              "h": 394,
+              "resize": "fit"
+            },
+            "thumb": {
+              "w": 150,
+              "h": 150,
+              "resize": "crop"
+            },
+            "medium": {
+              "w": 700,
+              "h": 394,
+              "resize": "fit"
+            }
+          }
+        }
+      ]
+    },
+    "favorited": false,
+    "retweeted": false,
+    "possibly_sensitive": false,
+    "lang": "en"
+  },
+  "is_quote_status": true,
+  "retweet_count": 6,
+  "favorite_count": 7,
+  "entities": {
+    "hashtags": [
+
+    ],
+    "symbols": [
+
+    ],
+    "user_mentions": [
+
+    ],
+    "urls": [
+      {
+        "url": "https://t.co/t98Z7ATR8Q",
+        "expanded_url": "https://twitter.com/latimes/status/700877581361532930",
+        "display_url": "twitter.com/latimes/status…",
+        "indices": [
+          103,
+          126
+        ]
+      }
+    ]
+  },
+  "favorited": false,
+  "retweeted": false,
+  "possibly_sensitive": false,
+  "lang": "en"
+},
+
+{
+  "created_at": "Tue Feb 23 16:12:04 +0000 2016",
+  "id": 702164029163220993,
+  "id_str": "702164029163220993",
+  "text": "I didn't even realize how islamophobic the U.S. was till Donald Trump threatened to deport Muslims to get votes. https://t.co/WKyoMl7ux8",
+  "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone<\/a>",
+  "truncated": false,
+  "in_reply_to_status_id": null,
+  "in_reply_to_status_id_str": null,
+  "in_reply_to_user_id": null,
+  "in_reply_to_user_id_str": null,
+  "in_reply_to_screen_name": null,
+  "user": {
+    "id": 285822802,
+    "id_str": "285822802",
+    "name": "Maryam Labib",
+    "screen_name": "labibti",
+    "location": "225",
+    "description": "founder @humansofthemsa, coder @pivotal, alum @cal, funny @twitter, blessing @theworld.",
+    "url": null,
+    "entities": {
+      "description": {
+        "urls": [
+
+        ]
+      }
+    },
+    "protected": false,
+    "followers_count": 366,
+    "friends_count": 279,
+    "listed_count": 10,
+    "created_at": "Thu Apr 21 21:10:56 +0000 2011",
+    "favourites_count": 1454,
+    "utc_offset": -28800,
+    "time_zone": "Pacific Time (US & Canada)",
+    "geo_enabled": false,
+    "verified": false,
+    "statuses_count": 3084,
+    "lang": "en",
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "FF6699",
+    "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/593311458/fnfdvrer7wu731vxbjoo.jpeg",
+    "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/593311458/fnfdvrer7wu731vxbjoo.jpeg",
+    "profile_background_tile": false,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/675612479427219457/j9YB0-6x_normal.jpg",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/675612479427219457/j9YB0-6x_normal.jpg",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/285822802/1449910573",
+    "profile_link_color": "3B94D9",
+    "profile_sidebar_border_color": "CC3366",
+    "profile_sidebar_fill_color": "D4C8CB",
+    "profile_text_color": "362720",
+    "profile_use_background_image": true,
+    "has_extended_profile": false,
+    "default_profile": false,
+    "default_profile_image": false,
+    "following": false,
+    "follow_request_sent": false,
+    "notifications": false
+  },
+  "geo": null,
+  "coordinates": null,
+  "place": null,
+  "contributors": null,
+  "quoted_status_id": 702148755395649536,
+  "quoted_status_id_str": "702148755395649536",
+  "quoted_status": {
+    "created_at": "Tue Feb 23 15:11:23 +0000 2016",
+    "id": 702148755395649536,
+    "id_str": "702148755395649536",
+    "text": "The US ruins the Middle East, creates an environment where immigrants see it necessary to come to America, then is overtly islamophobic.",
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android<\/a>",
+    "truncated": false,
+    "in_reply_to_status_id": 702148012051714049,
+    "in_reply_to_status_id_str": "702148012051714049",
+    "in_reply_to_user_id": 427904994,
+    "in_reply_to_user_id_str": "427904994",
+    "in_reply_to_screen_name": "HalfAtlanta",
+    "user": {
+      "id": 427904994,
+      "id_str": "427904994",
+      "name": "Huey P.",
+      "screen_name": "HalfAtlanta",
+      "location": "Atlanta, GA",
+      "description": "Hasta la victoria de África siempre. Organizer. I'm navigating a post-Zaynist world one direct action at a time...☭",
+      "url": "https://t.co/kvMUv6Mlvj",
+      "entities": {
+        "url": {
+          "urls": [
+            {
+              "url": "https://t.co/kvMUv6Mlvj",
+              "expanded_url": "http://urbansoulatlanta.com",
+              "display_url": "urbansoulatlanta.com",
+              "indices": [
+                0,
+                23
+              ]
+            }
+          ]
+        },
+        "description": {
+          "urls": [
+
+          ]
+        }
+      },
+      "protected": false,
+      "followers_count": 2641,
+      "friends_count": 401,
+      "listed_count": 39,
+      "created_at": "Sun Dec 04 03:32:00 +0000 2011",
+      "favourites_count": 27377,
+      "utc_offset": -21600,
+      "time_zone": "Central Time (US & Canada)",
+      "geo_enabled": true,
+      "verified": false,
+      "statuses_count": 27248,
+      "lang": "en",
+      "contributors_enabled": false,
+      "is_translator": false,
+      "is_translation_enabled": false,
+      "profile_background_color": "000000",
+      "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+      "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+      "profile_background_tile": false,
+      "profile_image_url": "http://pbs.twimg.com/profile_images/694036432898396160/xRofldlh_normal.jpg",
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/694036432898396160/xRofldlh_normal.jpg",
+      "profile_banner_url": "https://pbs.twimg.com/profile_banners/427904994/1451575667",
+      "profile_link_color": "9266CC",
+      "profile_sidebar_border_color": "FFFFFF",
+      "profile_sidebar_fill_color": "000000",
+      "profile_text_color": "CF40CF",
+      "profile_use_background_image": true,
+      "has_extended_profile": true,
+      "default_profile": false,
+      "default_profile_image": false,
+      "following": false,
+      "follow_request_sent": false,
+      "notifications": false
+    },
+    "geo": null,
+    "coordinates": null,
+    "place": null,
+    "contributors": null,
+    "is_quote_status": false,
+    "retweet_count": 33,
+    "favorite_count": 37,
+    "entities": {
+      "hashtags": [
+
+      ],
+      "symbols": [
+
+      ],
+      "user_mentions": [
+
+      ],
+      "urls": [
+
+      ]
+    },
+    "favorited": false,
+    "retweeted": false,
+    "lang": "en"
+  },
+  "is_quote_status": true,
+  "retweet_count": 13,
+  "favorite_count": 15,
+  "entities": {
+    "hashtags": [
+
+    ],
+    "symbols": [
+
+    ],
+    "user_mentions": [
+
+    ],
+    "urls": [
+      {
+        "url": "https://t.co/WKyoMl7ux8",
+        "expanded_url": "https://twitter.com/halfatlanta/status/702148755395649536",
+        "display_url": "twitter.com/halfatlanta/st…",
+        "indices": [
+          113,
+          136
+        ]
+      }
+    ]
+  },
+  "favorited": false,
+  "retweeted": false,
+  "possibly_sensitive": false,
+  "lang": "en"
+}
+
+]

@@ -23,11 +23,13 @@ and
 Its recommended to use an image that allows you to create a database via environmental variables at docker run, like `paintedfox / postgresql` or `centurylink / mysql`, so the db is populated when this script runs.
 
 If you do not link a database container, a built-in mysql database will be started.
-There is an exported docker volume of /var/lib/mysql to allow persistence of that mysql database.
+There is an exported docker volume of `/var/lib/mysql` to allow persistence of that mysql database.
+
+__NOTE:__ If you do not export the volme, or use a linked database container, you cannot update Huginn without losing your data.
 
 Additionally, the database variables may be overridden from the above as per the standard Huginn documentation:
 
-    DATABASE_ADAPTER #(must be either 'postgres' or 'mysql2')
+    DATABASE_ADAPTER #(must be either 'postgresql' or 'mysql2')
     DATABASE_HOST
     DATABASE_PORT
 
@@ -45,9 +47,13 @@ The CMD launches Huginn via the scripts/init script. This may become the ENTRYPO
 
 ## Usage
 
-Simple stand-alone usage:
+Simple stand-alone usage (use only for testing/evaluation as it can not be updated without losing data):
 
     docker run -it -p 3000:3000 cantino/huginn
+
+Use a volume to export the data of the internal mysql server:
+
+    docker run -it -p 3000:3000 -v /home/huginn/mysql-data:/var/lib/mysql cantino/huginn
 
 To link to another mysql container, for example:
 
