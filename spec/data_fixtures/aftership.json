@@ -1,0 +1,184 @@
+{
+  "meta": {
+    "code": 200
+  },
+  "data": {
+    "tracking": {
+      "id": "56e6d14a547de4720d9eca7a",
+      "created_at": "2016-03-14T14:57:14+00:00",
+      "updated_at": "2016-03-15T14:01:05+00:00",
+      "last_updated_at": "2016-03-15T14:01:05+00:00",
+      "tracking_number": "9361289684090010005054",
+      "slug": "usps",
+      "active": false,
+      "android": [
+
+      ],
+      "custom_fields": null,
+      "customer_name": null,
+      "delivery_time": 2,
+      "destination_country_iso3": null,
+      "emails": [
+
+      ],
+      "expected_delivery": "2016-03-15",
+      "ios": [
+
+      ],
+      "note": null,
+      "order_id": null,
+      "order_id_path": null,
+      "origin_country_iso3": "USA",
+      "shipment_package_count": 1,
+      "shipment_pickup_date": "2016-03-13T19:35:00",
+      "shipment_delivery_date": "2016-03-15T08:59:00",
+      "shipment_type": "Parcel Select",
+      "shipment_weight": null,
+      "shipment_weight_unit": null,
+      "signed_by": null,
+      "smses": [
+
+      ],
+      "source": "api",
+      "tag": "Delivered",
+      "title": "9361289684090010005054",
+      "tracked_count": 13,
+      "unique_token": "EJjDgTkTl",
+      "checkpoints": [
+        {
+          "slug": "usps",
+          "city": "BALTIMORE",
+          "created_at": "2016-03-14T14:57:14+00:00",
+          "location": "BALTIMORE, MD, 21224",
+          "country_name": null,
+          "message": "Picked Up by Shipping Partner",
+          "country_iso3": null,
+          "tag": "InTransit",
+          "checkpoint_time": "2016-03-13T19:35:00",
+          "coordinates": [
+
+          ],
+          "state": "MD",
+          "zip": "21224"
+        },
+        {
+          "slug": "usps",
+          "city": "BALTIMORE",
+          "created_at": "2016-03-14T14:57:14+00:00",
+          "location": "BALTIMORE, MD, 21224",
+          "country_name": null,
+          "message": "Departed Shipping Partner Facility",
+          "country_iso3": null,
+          "tag": "InTransit",
+          "checkpoint_time": "2016-03-13T23:16:00",
+          "coordinates": [
+
+          ],
+          "state": "MD",
+          "zip": "21224"
+        },
+        {
+          "slug": "usps",
+          "city": "STOUGHTON",
+          "created_at": "2016-03-15T08:00:54+00:00",
+          "location": "STOUGHTON, MA, 02072",
+          "country_name": null,
+          "message": "Departed Shipping Partner Facility",
+          "country_iso3": null,
+          "tag": "InTransit",
+          "checkpoint_time": "2016-03-15T00:11:00",
+          "coordinates": [
+
+          ],
+          "state": "MA",
+          "zip": "02072"
+        },
+        {
+          "slug": "usps",
+          "city": null,
+          "created_at": "2016-03-15T08:00:54+00:00",
+          "location": null,
+          "country_name": null,
+          "message": "Pre-Shipment Info Sent to USPS",
+          "country_iso3": null,
+          "tag": "InfoReceived",
+          "checkpoint_time": "2016-03-15T00:11:00",
+          "coordinates": [
+
+          ],
+          "state": null,
+          "zip": null
+        },
+        {
+          "slug": "usps",
+          "city": "QUINCY",
+          "created_at": "2016-03-15T10:00:57+00:00",
+          "location": "QUINCY, MA, 02169",
+          "country_name": null,
+          "message": "Accepted at USPS Destination Facility",
+          "country_iso3": null,
+          "tag": "InTransit",
+          "checkpoint_time": "2016-03-15T04:14:00",
+          "coordinates": [
+
+          ],
+          "state": "MA",
+          "zip": "02169"
+        },
+        {
+          "slug": "usps",
+          "city": "QUINCY",
+          "created_at": "2016-03-15T10:00:57+00:00",
+          "location": "QUINCY, MA, 02169",
+          "country_name": null,
+          "message": "Arrived at Post Office",
+          "country_iso3": null,
+          "tag": "InTransit",
+          "checkpoint_time": "2016-03-15T05:29:00",
+          "coordinates": [
+
+          ],
+          "state": "MA",
+          "zip": "02169"
+        },
+        {
+          "slug": "usps",
+          "city": "QUINCY",
+          "created_at": "2016-03-15T14:01:00+00:00",
+          "location": "QUINCY, MA, 02169",
+          "country_name": null,
+          "message": "Sorting Complete",
+          "country_iso3": null,
+          "tag": "InTransit",
+          "checkpoint_time": "2016-03-15T08:35:00",
+          "coordinates": [
+
+          ],
+          "state": "MA",
+          "zip": "02169"
+        },
+        {
+          "slug": "usps",
+          "city": "QUINCY",
+          "created_at": "2016-03-15T14:01:00+00:00",
+          "location": "QUINCY, MA, 02169",
+          "country_name": null,
+          "message": "Delivered, Front Door/Porch",
+          "country_iso3": null,
+          "tag": "Delivered",
+          "checkpoint_time": "2016-03-15T08:59:00",
+          "coordinates": [
+
+          ],
+          "state": "MA",
+          "zip": "02169"
+        }
+      ],
+      "tracking_account_number": null,
+      "tracking_destination_country": null,
+      "tracking_key": null,
+      "tracking_postal_code": null,
+      "tracking_ship_date": null
+    }
+  }
+}
