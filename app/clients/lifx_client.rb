@@ -23,7 +23,7 @@ class LifxClient
       lights_json.each do |light| 
         selectors << "group:#{light['group']['name']}"
       end
-      selectors.uni
+      selectors.uniq
     end
   end
   
