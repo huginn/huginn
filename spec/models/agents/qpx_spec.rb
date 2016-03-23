@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Agents::QpxAgent do
   before do
 
-    stub_request(:get, "https://www.googleapis.com/qpxExpress/v1/trips/search").to_return(
+    stub_request(:post, "https://www.googleapis.com/qpxExpress/v1/trips/search?key=800deeaf-e285-9d62-bc90-j999c1973cc9").to_return(
       :body => File.read(Rails.root.join("spec/data_fixtures/qpx.json")),
       :status => 200,
       :headers => {"Content-Type" => "application/json"}
@@ -19,7 +19,6 @@ describe Agents::QpxAgent do
       'infantInSeatCount' => 0,
       'infantInLapCount'=> 0,
       'seniorCount'=> 0,
-      'refundable' => false,
       'solutions'=> 3
     }
 
@@ -35,7 +34,7 @@ describe Agents::QpxAgent do
   end
 
   describe "#that checker should be valid" do
-    it "should check that the aftership object is valid" do
+    it "should check that the object is valid" do
       expect(@checker).to be_valid
     end
 
@@ -88,16 +87,11 @@ describe Agents::QpxAgent do
       @checker.options['solutions'] = nil
       expect(@checker).not_to be_valid
     end
-
-    it "should require Refundable" do 
-      @checker.options['refundable'] = nil
-      expect(@checker).not_to be_valid
-    end
   end
 
   describe '#check' do
     it "should check that initial run creates an event" do
-      @checker.memory[:latestTicketingTime] = '2016-03-18T23:59-04:00'
+      @checker.memory[:latestTicketingTime] = '2016-03-24T23:59-04:00'
       expect { @checker.check }.to change { Event.count }.by(1)
     end
   end

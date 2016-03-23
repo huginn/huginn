@@ -6,7 +6,7 @@ module Agents
 
 
     description <<-MD
-      The QpxExpressAgent will tell you airline prices between a pair of cities. The api limit is 50 requests/day.
+      The QpxExpressAgent will tell you the minimum airline prices between a pair of cities. The api limit is 50 requests/day.
 
       Follow their documentation here (https://developers.google.com/qpx-express/v1/prereqs#get-a-google-account) to retrieve an api key.
       After you get to the google developer console, created a project, enabled qpx express api then you can choose `api key` credential to be created.
@@ -15,9 +15,9 @@ module Agents
 
       All the default options must exist. For `infantInSeatCount`, `infantInLapCount`, `seniorCount`, and `childCount`, leave them to the default value of `0` if its not necessary.
 
-      Set `refundable` to `true` if you want ticket to be refundable. Make sure `date` is in this type of date format `YYYY-MO-DAY`.
+      Make sure `date` is in this type of date format `YYYY-MO-DAY`.
 
-      You can limit the number of `solutions` returned back. The first solution is the lowest priced ticket. Every detailed trip option details starts at `"slice"`.
+      You can limit the number of `solutions` returned back. The first solution is the lowest priced ticket.
     MD
 
     event_description <<-MD
@@ -46,17 +46,16 @@ module Agents
 
     def default_options
       {
-        'qpx_api_key': '',
-        'adultCount': 1,
-        'origin': 'BOS',
-        'destination': 'SFO',
-        'date': '2016-04-11',
-        'childCount': 0,
-        'infantInSeatCount': 0,
-        'infantInLapCount': 0,
-        'seniorCount': 0,
-        'solutions': 3,
-        'refundable': false
+        'qpx_api_key' => '',
+        'adultCount'=> 1,
+        'origin' => 'BOS',
+        'destination' => 'SFO',
+        'date' => '2016-04-11',
+        'childCount' => 0,
+        'infantInSeatCount' => 0,
+        'infantInLapCount'=> 0,
+        'seniorCount'=> 0,
+        'solutions'=> 3
       }
     end
 
@@ -71,7 +70,6 @@ module Agents
       errors.add(:base, "Infant In Lap Count") unless options['infantInLapCount'].present?
       errors.add(:base, "Senior Count must exist") unless options['seniorCount'].present?
       errors.add(:base, "Solutions must exist") unless options['solutions'].present?
-      errors.add(:base, "Refundable must exist") unless options['refundable'].present?
     end
 
     def working?
@@ -79,7 +77,7 @@ module Agents
     end
 
     def check
-      post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[{:kind=>"qpxexpress#sliceInput", :origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s }], :refundable=> interpolated["refundable"], :solutions=> interpolated["solutions"]}}
+      post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[{:kind=>"qpxexpress#sliceInput", :origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s }], :solutions=> interpolated["solutions"]}}
       body = JSON.generate(post_params)
       request = HTTParty.post(event_url, :body => body, :headers => {"Content-Type" => "application/json"})
       events = JSON.parse request.body
