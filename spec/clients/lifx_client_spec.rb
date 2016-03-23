@@ -1,8 +1,32 @@
 require 'rails_helper'
 
 describe LifxClient do
+  let(:selector) { "all" }
+  let(:client) { LifxClient.new("t0k3n", selector) }
+    
+  describe "#pulse" do
+    it "calls the Lifx API with the specified options" do
+      expected_options = {color: "red"}
+      stub = stub_request(:post, "https://api.lifx.com/v1/lights/all/effects/pulse")
+        .with(:body => expected_options, :headers => {'Authorization' => "Bearer t0k3n"})
+
+      client.pulse(expected_options)
+      expect(stub).to have_been_requested
+    end
+  end
+  
+  describe "#toggle" do
+    it "calls the Lifx API with the specified options" do
+      expected_options = {duration: "3"}
+      stub = stub_request(:post, "https://api.lifx.com/v1/lights/all/toggle")
+        .with(:body => expected_options, :headers => {'Authorization' => "Bearer t0k3n"})
+
+      client.toggle(expected_options)
+      expect(stub).to have_been_requested
+    end
+  end
+  
   describe "#get_selectors" do
-    let(:client) { LifxClient.new("token", "all") }
     let(:selectors) { client.get_selectors }
     
     before do
