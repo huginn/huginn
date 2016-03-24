@@ -1,17 +1,18 @@
 module Agents
-  class QpxAgent < Agent
+  class GoogleFlightsAgent < Agent
+    include FormConfigurable
 
     cannot_receive_events!
     default_schedule "every_12h"
 
 
     description <<-MD
-      The QpxExpressAgent will tell you the minimum airline prices between a pair of cities. The api limit is 50 requests/day.
+      The GoogleFlightsAgent will tell you the minimum airline prices between a pair of cities. The api limit is 50 requests/day.
 
       Follow their documentation here (https://developers.google.com/qpx-express/v1/prereqs#get-a-google-account) to retrieve an api key.
       After you get to the google developer console, created a project, enabled qpx express api then you can choose `api key` credential to be created.
 
-      `Origin` and `Destination` requires `airport code`.
+      The `origin` and `destination` options require an [airport code](http://www.expedia.com/daily/airports/AirportCodes.asp).
 
       All the default options must exist. For `infantInSeatCount`, `infantInLapCount`, `seniorCount`, and `childCount`, leave them to the default value of `0` if its not necessary.
 
@@ -58,6 +59,17 @@ module Agents
         'solutions'=> 3
       }
     end
+
+    form_configurable :qpx_api_key, type: :string
+    form_configurable :adultCount
+    form_configurable :origin
+    form_configurable :destination
+    form_configurable :date
+    form_configurable :childCount
+    form_configurable :infantInSeatCount
+    form_configurable :infantInLapCount
+    form_configurable :seniorCount
+    form_configurable :solutions
 
     def validate_options
       errors.add(:base, "You need a qpx api key") unless options['qpx_api_key'].present?

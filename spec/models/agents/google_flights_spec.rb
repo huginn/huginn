@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Agents::QpxAgent do
+describe Agents::GoogleFlightsAgent do
   before do
 
     stub_request(:post, "https://www.googleapis.com/qpxExpress/v1/trips/search?key=800deeaf-e285-9d62-bc90-j999c1973cc9").to_return(
@@ -22,7 +22,7 @@ describe Agents::QpxAgent do
       'solutions'=> 3
     }
 
-    @checker = Agents::QpxAgent.new(:name => "tectonic", :options => @opts)
+    @checker = Agents::GoogleFlightsAgent.new(:name => "tectonic", :options => @opts)
     @checker.user = users(:bob)
     @checker.save!
   end
