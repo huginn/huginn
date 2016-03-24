@@ -59,8 +59,8 @@ GIT
       omniauth-oauth2 (~> 1.1)
 
 GIT
-  remote: https://github.com/dsander/huginn_agent
-  revision: 4b72d075fe98ad1b079d195e6a8f1897c0119815
+  remote: https://github.com/kreuzwerker/DKT.huginn_agent
+  revision: 5c70d01a69ef1ba393f7a75eef502b79e168992a
   branch: feature/agents_in_gems
   specs:
     huginn_agent (0.2)
