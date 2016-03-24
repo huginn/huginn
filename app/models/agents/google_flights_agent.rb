@@ -62,9 +62,9 @@ module Agents
 
     form_configurable :qpx_api_key, type: :string
     form_configurable :adultCount
-    form_configurable :origin
-    form_configurable :destination
-    form_configurable :date
+    form_configurable :origin, type: :string
+    form_configurable :destination, type: :string
+    form_configurable :date, type: :string
     form_configurable :childCount
     form_configurable :infantInSeatCount
     form_configurable :infantInLapCount
