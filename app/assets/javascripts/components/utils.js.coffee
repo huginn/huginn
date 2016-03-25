@@ -100,24 +100,24 @@ class @Utils
       .done (json) =>
         Utils.showDynamicModal """
           <!-- Nav tabs -->
-          <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#log" aria-controls="log" role="tab" data-toggle="tab">Log</a></li>
-            <li role="presentation"><a href="#events" aria-controls="events" role="tab" data-toggle="tab">Events</a></li>
-            <li role="presentation"><a href="#memory" aria-controls="memory" role="tab" data-toggle="tab">Memory</a></li>
+          <ul id="resultTabs" class="nav nav-tabs" role="tablist">
+            <li role="presentation"><a href="#tabEvents" aria-controls="tabEvents" role="tab" data-toggle="tab">Events</a></li>
+            <li role="presentation"><a href="#tabLog" aria-controls="tabLog" role="tab" data-toggle="tab">Log</a></li>
+            <li role="presentation"><a href="#tabMemory" aria-controls="tabMemory" role="tab" data-toggle="tab">Memory</a></li>
           </ul>
           <!-- Tab panes -->
           <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="log">
-              <p>
-                <pre class="agent-dry-run-log"></pre>
-              </p>
-            </div>
-            <div role="tabpanel" class="tab-pane" id="events">
+            <div role="tabpanel" class="tab-pane" id="tabEvents">
               <p>
                 <pre class="agent-dry-run-events"></pre>
               </p>
             </div>
-            <div role="tabpanel" class="tab-pane" id="memory">
+            <div role="tabpanel" class="tab-pane" id="tabLog">
+              <p>
+                <pre><small class="agent-dry-run-log"></small></pre>
+              </p>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="tabMemory">
               <p>
                 <pre class="agent-dry-run-memory"></pre>
               </p>
@@ -129,6 +129,8 @@ class @Utils
               find('.agent-dry-run-log').text(json.log).end().
               find('.agent-dry-run-events').text(json.events).end().
               find('.agent-dry-run-memory').text(json.memory)
+            active = if json.events.match(/^\[\s*\]$/) then 'tabLog' else 'tabEvents'
+            $('#resultTabs a[href="#' + active + '"]').tab('show')
           title: 'Dry Run Results',
           onHide: callback
       .fail (xhr, status, error) ->
