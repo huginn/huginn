@@ -99,12 +99,30 @@ class @Utils
         $('body').css(cursor: 'auto')
       .done (json) =>
         Utils.showDynamicModal """
-          <h5>Log</h5>
-          <pre class="agent-dry-run-log"></pre>
-          <h5>Events</h5>
-          <pre class="agent-dry-run-events"></pre>
-          <h5>Memory</h5>
-          <pre class="agent-dry-run-memory"></pre>
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#log" aria-controls="log" role="tab" data-toggle="tab">Log</a></li>
+            <li role="presentation"><a href="#events" aria-controls="events" role="tab" data-toggle="tab">Events</a></li>
+            <li role="presentation"><a href="#memory" aria-controls="memory" role="tab" data-toggle="tab">Memory</a></li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="log">
+              <p>
+                <pre class="agent-dry-run-log"></pre>
+              </p>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="events">
+              <p>
+                <pre class="agent-dry-run-events"></pre>
+              </p>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="memory">
+              <p>
+                <pre class="agent-dry-run-memory"></pre>
+              </p>
+            </div>
+          </div>
           """,
           body: (body) ->
             $(body).
