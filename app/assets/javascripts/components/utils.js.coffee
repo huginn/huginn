@@ -129,7 +129,7 @@ class @Utils
               find('.agent-dry-run-log').text(json.log).end().
               find('.agent-dry-run-events').text(json.events).end().
               find('.agent-dry-run-memory').text(json.memory)
-            active = if json.events.match(/^\[\s*\]$/) then 'tabLog' else 'tabEvents'
+            active = if json.events.match(/^\[?\s*\]?$/) then 'tabLog' else 'tabEvents'
             $('#resultTabs a[href="#' + active + '"]').tab('show')
           title: 'Dry Run Results',
           onHide: callback
