@@ -100,7 +100,7 @@ class @Utils
       .done (json) =>
         Utils.showDynamicModal """
           <!-- Nav tabs -->
-          <ul id="resultTabs" class="nav nav-tabs" role="tablist">
+          <ul id="resultTabs" class="nav nav-tabs agent-dry-run-tabs" role="tablist">
             <li role="presentation"><a href="#tabEvents" aria-controls="tabEvents" role="tab" data-toggle="tab">Events</a></li>
             <li role="presentation"><a href="#tabLog" aria-controls="tabLog" role="tab" data-toggle="tab">Log</a></li>
             <li role="presentation"><a href="#tabMemory" aria-controls="tabMemory" role="tab" data-toggle="tab">Memory</a></li>
@@ -108,19 +108,13 @@ class @Utils
           <!-- Tab panes -->
           <div class="tab-content">
             <div role="tabpanel" class="tab-pane" id="tabEvents">
-              <p>
-                <pre class="agent-dry-run-events"></pre>
-              </p>
+              <pre class="agent-dry-run-events"></pre>
             </div>
             <div role="tabpanel" class="tab-pane" id="tabLog">
-              <p>
-                <pre><small class="agent-dry-run-log"></small></pre>
-              </p>
+              <pre><small class="agent-dry-run-log"></small></pre>
             </div>
             <div role="tabpanel" class="tab-pane" id="tabMemory">
-              <p>
-                <pre class="agent-dry-run-memory"></pre>
-              </p>
+              <pre class="agent-dry-run-memory"></pre>
             </div>
           </div>
           """,
