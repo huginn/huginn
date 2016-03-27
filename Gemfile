@@ -25,17 +25,18 @@ end
 
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
-gem 'twilio-ruby', '~> 3.11.5'    # TwilioAgent
-gem 'ruby-growl', '~> 4.1.0'      # GrowlAgent
-gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
-gem 'wunderground', '~> 1.2.0'    # WeatherAgent
-gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
-gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'hipchat', '~> 1.2.0'         # HipchatAgent
-gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
-gem 'mqtt'                        # MQTTAgent
-gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
-gem 'hypdf', '~> 1.0.7'           # PDFInfoAgent
+gem 'twilio-ruby', '~> 3.11.5'       # TwilioAgent
+gem 'ruby-growl', '~> 4.1.0'         # GrowlAgent
+gem 'net-ftp-list', '~> 3.2.8'       # FtpsiteAgent
+gem 'wunderground', '~> 1.2.0'       # WeatherAgent
+gem 'forecast_io', '~> 2.0.0'        # WeatherAgent
+gem 'rturk', '~> 2.12.1'             # HumanTaskAgent
+gem 'hipchat', '~> 1.2.0'            # HipchatAgent
+gem 'xmpp4r',  '~> 0.5.6'            # JabberAgent
+gem 'mqtt'                           # MQTTAgent
+gem 'slack-notifier', '~> 1.0.0'     # SlackAgent
+gem 'hypdf', '~> 1.0.7'              # PDFInfoAgent
+gem 'telegram-bot-ruby', '~> 0.4.1'  # TelegramAgent
 
 # Weibo Agents
 gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
