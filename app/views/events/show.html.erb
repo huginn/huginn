@@ -4,12 +4,7 @@
       <div class="page-header">
         <h2>
           Event from <%= @event.agent.name %>
-          <div class="btn-group">
-            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-            </button>
-            <%= render 'agents/action_menu', agent: @event.agent, return_to: (defined?(return_to) && return_to) || request.path %>
-          </div>
+          <%= render 'agents/mini_action_menu', agent: @event.agent, return_to: event_path(@event) %>
         </h2>
       </div>
 
