@@ -39,6 +39,20 @@ class JobsController < ApplicationController
     end
   end
 
+  def retry_queued
+    @jobs = Delayed::Job.where('attempts > 1')
+    @jobs.each do |job| 
+      job.run_at = Time.now
+      job.attempts = 0
+      job.save!
+    end
+
+    respond_to do |format|
+      format.html { redirect_to jobs_path, notice: "Queued jobs getting retried." }
+      format.json { render json: '', status: :ok }
+    end
+  end
+
   def destroy_failed
     Delayed::Job.where.not(failed_at: nil).delete_all
 
