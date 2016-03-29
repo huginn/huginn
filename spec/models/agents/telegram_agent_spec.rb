@@ -55,8 +55,8 @@ describe Agents::TelegramAgent do
       @checker.receive [event_0, event_1]
 
       expect(@sent_messages).to eq([
-        { send_message: { text: 'Looks like its going to rain' } },
-        { send_message: { text: 'Another text message' } }
+        { sendMessage: { text: 'Looks like its going to rain' } },
+        { sendMessage: { text: 'Another text message' } }
       ])
     end
 
@@ -64,28 +64,28 @@ describe Agents::TelegramAgent do
       event = event_with_payload photo: 'https://example.com/image.png'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ send_photo: { photo: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ sendPhoto: { photo: :stubbed_file } }])
     end
 
     it 'accepts audio key and uses :send_audio to send the file' do
       event = event_with_payload audio: 'https://example.com/sound.mp3'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ send_audio: { audio: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ sendAudio: { audio: :stubbed_file } }])
     end
 
     it 'accepts document key and uses :send_document to send the file' do
       event = event_with_payload document: 'https://example.com/document.pdf'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ send_document: { document: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ sendDocument: { document: :stubbed_file } }])
     end
 
     it 'accepts video key and uses :send_video to send the file' do
       event = event_with_payload video: 'https://example.com/video.avi'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ send_video: { video: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ sendVideo: { video: :stubbed_file } }])
     end
   end
 

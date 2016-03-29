@@ -1,18 +1,17 @@
-require 'telegram/bot'
+require 'httmultiparty'
 require 'open-uri'
 require 'tempfile'
 
 module Agents
   class TelegramAgent < Agent
+    include HTTMultiParty
+    base_uri 'https://api.telegram.org/'
+
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!
 
-    gem_dependency_check { defined?(Telegram) }
-
     description <<-MD
-      #{'# Include `telegram-bot-ruby` in your Gemfile to use this Agent!' if dependencies_missing?}
-
       The Telegram Agent receives and collects events and sends them via [Telegram](https://telegram.org/).
 
       It is assumed that events have either a `text`, `photo`, `audio`, `document` or `video` key. You can use the EventFormattingAgent if your event does not provide these keys.
@@ -51,16 +50,20 @@ module Agents
 
     private
 
-    TELEGRAM_FIELDS = {
-      text:     :send_message,
-      photo:    :send_photo,
-      audio:    :send_audio,
-      document: :send_document,
-      video:    :send_video
+    TELEGRAM_ACTIONS = {
+      text:     :sendMessage,
+      photo:    :sendPhoto,
+      audio:    :sendAudio,
+      document: :sendDocument,
+      video:    :sendVideo
     }.freeze
 
+    def telegram_bot_uri(method)
+      "/bot#{interpolated['auth_token']}/#{method}"
+    end
+
     def receive_event(event)
-      TELEGRAM_FIELDS.each do |field, method|
+      TELEGRAM_ACTIONS.each do |field, method|
         payload = load_field event, field
         next unless payload
         send_telegram_message method, field => payload
@@ -69,9 +72,7 @@ module Agents
 
     def send_telegram_message(method, params)
       params[:chat_id] = interpolated['chat_id']
-      Telegram::Bot::Client.run interpolated['auth_token'] do |bot|
-        bot.api.send method, params
-      end
+      TelegramAgent.post telegram_bot_uri(method), query: params
     end
 
     def load_field(event, field)
