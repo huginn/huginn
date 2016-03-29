@@ -81,7 +81,7 @@
         <% end %>
 
         <%= link_to retry_queued_jobs_path, class: "btn btn-default", method: :post do %>
-          <span class="glyphicon glyphicon-trash"></span> Retry Queued Jobs
+          <span class="glyphicon glyphicon-refresh"></span> Retry Queued Jobs
         <% end %>
 
         <%= link_to destroy_all_jobs_path, class: "btn btn-default", method: :delete, data: { confirm: "Are you sure you want to delete ALL pending jobs for all Huginn users?" } do %>
