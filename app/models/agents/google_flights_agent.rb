@@ -16,7 +16,7 @@ module Agents
 
       All the default options must exist. For `infantInSeatCount`, `infantInLapCount`, `seniorCount`, and `childCount`, leave them to the default value of `0` if its not necessary.
 
-      Make sure `date` and `returned_date` is in this type of date format `YYYY-MO-DAY`.
+      Make sure `date` and `return_date` is in this type of date format `YYYY-MM-DAY`.
 
       You can choose one way ticket only by setting `roundtrip` to `false`.
 
@@ -58,7 +58,7 @@ module Agents
         'infantInSeatCount' => 0,
         'infantInLapCount'=> 0,
         'seniorCount'=> 0,
-        'returned_date' => '2016-04-18',
+        'return_date' => '2016-04-18',
         'roundtrip' => true,
         'solutions'=> 3
       }
@@ -74,7 +74,7 @@ module Agents
     form_configurable :infantInLapCount
     form_configurable :seniorCount
     form_configurable :roundtrip, type: :boolean
-    form_configurable :returned_date, type: :string
+    form_configurable :return_date, type: :string
     form_configurable :solutions
     
     def validate_options
@@ -88,7 +88,7 @@ module Agents
       errors.add(:base, "Infant In Lap Count") unless options['infantInLapCount'].present?
       errors.add(:base, "Senior Count must exist") unless options['seniorCount'].present?
       errors.add(:base, "Solutions must exist") unless options['solutions'].present?
-      errors.add(:base, "Returned Date must exist") if options["returned_date"].blank? && boolify(options['roundtrip'])
+      errors.add(:base, "Returned Date must exist") if options["return_date"].blank? && boolify(options['roundtrip'])
     end
 
     def working?
@@ -101,7 +101,7 @@ module Agents
 
     def post_params
       if round_trip?
-        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[ {:origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s }, {:origin=> interpolated["destination"].to_s , :destination=> interpolated["origin"].to_s , :date=> interpolated["returned_date"].to_s } ], :solutions=> interpolated["solutions"]}}
+        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[ {:origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s }, {:origin=> interpolated["destination"].to_s , :destination=> interpolated["origin"].to_s , :date=> interpolated["return_date"].to_s } ], :solutions=> interpolated["solutions"]}}
       else
         post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[{:kind=>"qpxexpress#sliceInput", :origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s }], :solutions=> interpolated["solutions"]}}
       end

@@ -90,7 +90,7 @@ describe Agents::GoogleFlightsAgent do
 
     it "should require Returned Date" do
       @checker.options['roundtrip'] = true
-      @checker.options['returned_date'] = nil
+      @checker.options['return_date'] = nil
       expect(@checker).not_to be_valid
     end
   end
