@@ -63,6 +63,7 @@ Huginn::Application.routes.draw do
     collection do
       delete :destroy_failed
       delete :destroy_all
+      post :retry_queued
     end
   end
 
