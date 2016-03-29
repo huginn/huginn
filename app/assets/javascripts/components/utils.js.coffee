@@ -89,6 +89,8 @@ class @Utils
           $(body).closest('[role=dialog]').on 'hidden.bs.modal', =>
             @invokeDryRun(url, dry_run_data, cleanup)
           .modal('hide')
+        $(body).closest('[role=dialog]').on 'shown.bs.modal', ->
+          $(this).find('.btn-primary').focus()
       title: 'Dry Run'
       onHide: cleanup
 
