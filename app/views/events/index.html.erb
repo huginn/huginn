@@ -10,7 +10,9 @@
       <div class='table-responsive'>
         <table class='table table-striped events'>
           <tr>
-            <th>Source</th>
+            <% unless @agent %>
+              <th>Source</th>
+            <% end %>
             <th>Created</th>
             <th>Payload</th>
             <th></th>
@@ -19,7 +21,9 @@
         <% @events.each do |event| %>
           <% next unless event.agent %>
           <%= content_tag :tr, class: (highlighted?(event.id) ? 'hl' : nil) do %>
-            <td><%= link_to event.agent.name, agent_path(event.agent, return: request.fullpath) %></td>
+            <% unless @agent %>
+              <td><%= link_to event.agent.name, agent_path(event.agent, return: request.fullpath) %></td>
+            <% end %>
             <td title='<%= event.created_at %>'><%= time_ago_in_words event.created_at %> ago</td>
             <td class='payload'><%= truncate event.payload.to_json, :length => 90, :omission => "" %></td>
             <td>
