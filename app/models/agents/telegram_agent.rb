@@ -4,9 +4,6 @@ require 'tempfile'
 
 module Agents
   class TelegramAgent < Agent
-    include HTTMultiParty
-    base_uri 'https://api.telegram.org/'
-
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!
@@ -17,13 +14,13 @@ module Agents
       It is assumed that events have either a `text`, `photo`, `audio`, `document` or `video` key. You can use the EventFormattingAgent if your event does not provide these keys.
 
       The value of `text` key is sent as a plain text message.
-      The value of `photo`, `audio`, `document` and `video` keys should be an url which contents are sent to you according to the type.
+      The value of `photo`, `audio`, `document` and `video` keys should be a url whose contents will be sent to you.
 
       **Setup**
 
-      1. obtain an `auth_token` by [creating a new bot](https://telegram.me/botfather).
-      2. [send a private message to your bot](https://telegram.me/YourHuginnBot)
-      3. obtain your private `chat_id` [from the recently started conversation](https://api.telegram.org/bot<auth_token>/getUpdates)
+      1. Obtain an `auth_token` by [creating a new bot](https://telegram.me/botfather).
+      2. Send a private message to your bot by visiting https://telegram.me/YourHuginnBot
+      3. Obtain your private `chat_id` from the recently started conversation by visiting https://api.telegram.org/bot<auth_token>/getUpdates
     MD
 
     def default_options
@@ -59,7 +56,7 @@ module Agents
     }.freeze
 
     def telegram_bot_uri(method)
-      "/bot#{interpolated['auth_token']}/#{method}"
+      "https://api.telegram.org/bot#{interpolated['auth_token']}/#{method}"
     end
 
     def receive_event(event)
@@ -67,12 +64,13 @@ module Agents
         payload = load_field event, field
         next unless payload
         send_telegram_message method, field => payload
+        unlink_file payload if payload.is_a? Tempfile
       end
     end
 
     def send_telegram_message(method, params)
       params[:chat_id] = interpolated['chat_id']
-      TelegramAgent.post telegram_bot_uri(method), query: params
+      HTTMultiParty.post telegram_bot_uri(method), query: params
     end
 
     def load_field(event, field)
@@ -88,6 +86,11 @@ module Agents
       file.write open(url).read
       file.rewind
       file
+    end
+
+    def unlink_file(file)
+      file.close
+      file.unlink
     end
   end
 end
