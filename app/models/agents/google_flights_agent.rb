@@ -14,13 +14,13 @@ module Agents
 
       The `origin` and `destination` options require an [airport code](http://www.expedia.com/daily/airports/AirportCodes.asp).
 
-      All the default options must exist. For `infantInSeatCount`, `infantInLapCount`, `seniorCount`, and `childCount`, leave them to the default value of `0` if its not necessary.
+      All the default options must exist. For `infantInSeatCount`, `infantInLapCount`, `seniorCount`, and `childCount`, leave them to the default value of `0` if you do not need them.
 
-      Make sure `date` and `return_date` is in this type of date format `YYYY-MM-DAY`.
+      Make sure `date` and `return_date` is in this date format: `YYYY-MM-DAY`.
 
-      You can choose one way ticket only by setting `roundtrip` to `false`.
+      You can choose one way tickets only by setting `roundtrip` to `false`.
 
-      You can limit the number of `solutions` returned back. The first solution is the lowest priced ticket.
+      You can limit the number of `solutions` returned. The first solution will be the lowest priced ticket.
     MD
 
     event_description <<-MD
@@ -88,7 +88,7 @@ module Agents
       errors.add(:base, "Infant In Lap Count") unless options['infantInLapCount'].present?
       errors.add(:base, "Senior Count must exist") unless options['seniorCount'].present?
       errors.add(:base, "Solutions must exist") unless options['solutions'].present?
-      errors.add(:base, "Returned Date must exist") if options["return_date"].blank? && boolify(options['roundtrip'])
+      errors.add(:base, "Return Date must exist") if options["return_date"].blank? && boolify(options['roundtrip'])
     end
 
     def working?
