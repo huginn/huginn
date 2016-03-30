@@ -3,7 +3,11 @@
     <div class='col-md-12'>
       <div class="page-header">
         <h2>
-          Your Events <%= @agent && "from #{@agent.name}" %>
+          Your Events
+          <% if @agent %>
+            from <%= @agent.name %>
+            <%= render 'agents/mini_action_menu', agent: @agent, return_to:   request.path %>
+          <% end %>
         </h2>
       </div>
 
