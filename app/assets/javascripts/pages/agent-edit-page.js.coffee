@@ -159,7 +159,6 @@ class @AgentEditPage
         session.setTabSize(2)
         session.setUseSoftTabs(true)
         session.setUseWrapMode(false)
-        editor.setTheme("ace/theme/chrome")
 
         setSyntax = ->
           switch $("[name='agent[options][language]']").val()

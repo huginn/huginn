@@ -4,7 +4,6 @@ class @UserCredentialPage
     editor.getSession().setTabSize(2)
     editor.getSession().setUseSoftTabs(true)
     editor.getSession().setUseWrapMode(false)
-    editor.setTheme("ace/theme/chrome")
 
     setMode = ->
       mode = $("#user_credential_mode").val()
