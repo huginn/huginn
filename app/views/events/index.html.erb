@@ -6,7 +6,7 @@
           Your Events
           <% if @agent %>
             from <%= @agent.name %>
-            <%= render 'agents/mini_action_menu', agent: @agent, return_to:   request.path %>
+            <%= render 'agents/mini_action_menu', agent: @agent, return_to: request.path %>
           <% end %>
         </h2>
       </div>
