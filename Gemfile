@@ -35,7 +35,7 @@ gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
-gem 'hypdf', '~> 1.0.7'           # PDFInfoAgent
+gem 'hypdf', '~> 1.0.10'          # PDFInfoAgent
 
 # Weibo Agents
 gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
@@ -100,6 +100,7 @@ gem 'foreman', '~> 0.63.0'
 gem 'geokit', '~> 1.8.4'
 gem 'geokit-rails', '~> 2.0.1'
 gem 'httparty', '~> 0.13'
+gem 'httmultiparty', '~> 0.3.16'
 gem 'jquery-rails', '~> 3.1.3'
 gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.6'
