@@ -92,4 +92,17 @@ describe JobsController do
       expect(Delayed::Job.find(@running.id)).to be
     end
   end
+
+  describe "Post retry" do
+    before do
+      @failed = Delayed::Job.create(failed_at: Time.now - 1.minute)
+      @running = Delayed::Job.create(locked_at: Time.now, locked_by: 'test')
+      @queued = Delayed::Job.create({attempts: 1}, :without_protection => true)
+      sign_in users(:jane)
+    end
+
+    it "run the queued job" do
+      expect { post :retry_queued }.to change{Delayed::Job.find(@queued.id).attempts}.from(1).to(0)
+    end
+  end
 end
