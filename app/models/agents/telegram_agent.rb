@@ -20,7 +20,7 @@ module Agents
 
       1. Obtain an `auth_token` by [creating a new bot](https://telegram.me/botfather).
       2. Send a private message to your bot by visiting https://telegram.me/YourHuginnBot
-      3. Obtain your private `chat_id` from the recently started conversation by visiting https://api.telegram.org/bot<auth_token>/getUpdates
+      3. Obtain your private `chat_id` from the recently started conversation by visiting https://api.telegram.org/bot`<auth_token>`/getUpdates
     MD
 
     def default_options
