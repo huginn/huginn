@@ -95,8 +95,6 @@ describe JobsController do
 
   describe "POST retry_queued" do
     before do
-      @failed = Delayed::Job.create(failed_at: Time.now - 1.minute)
-      @running = Delayed::Job.create(locked_at: Time.now, locked_by: 'test')
       @queued = Delayed::Job.create()
       @queued.update_attribute(:attempts, 1)
       sign_in users(:jane)
