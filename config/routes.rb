@@ -82,7 +82,10 @@ Huginn::Application.routes.draw do
   post  "/users/:user_id/update_location/:secret" => "web_requests#update_location" # legacy
 
   devise_for :users,
-             controllers: { omniauth_callbacks: 'omniauth_callbacks' },
+             controllers: { 
+               omniauth_callbacks: 'omniauth_callbacks',
+               registrations: 'users/registrations'
+             },
              sign_out_via: [:post, :delete]
   
   if Rails.env.development?
