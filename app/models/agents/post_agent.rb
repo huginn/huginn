@@ -2,6 +2,8 @@ module Agents
   class PostAgent < Agent
     include WebRequestConcern
 
+    MIME_RE = /\A\w+\/.+\z/
+
     can_dry_run!
     no_bulk_receive!
     default_schedule "never"
@@ -13,7 +15,13 @@ module Agents
 
       The `method` used can be any of `get`, `post`, `put`, `patch`, and `delete`.
 
-      By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).  Change `content_type` to `json` to send JSON instead.  Change `content_type` to `xml` to send XML, where the name of the root element may be specified using `xml_root`, defaulting to `post`.
+      By default, non-GETs will be sent with form encoding (`application/x-www-form-urlencoded`).
+
+      Change `content_type` to `json` to send JSON instead.
+
+      Change `content_type` to `xml` to send XML, where the name of the root element may be specified using `xml_root`, defaulting to `post`.
+
+      When `content_type` contains a [MIME](https://en.wikipedia.org/wiki/Media_type) type, and `payload` is a string, its interpolated value will be sent as a string in the HTTP request's body and the request's `Content-Type` HTTP header will be set to `content_type`. When `payload` is a string `no_merge` has to be set to `true`.
 
       If `emit_events` is set to `true`, the server response will be emitted as an Event and can be fed to a WebsiteAgent for parsing (using its `data_from_event` and `type` options). No data processing
       will be attempted by this Agent, so the Event's "body" value will always be raw text.
@@ -49,7 +57,8 @@ module Agents
           'something' => 'the event contained {{ somekey }}'
         },
         'headers' => {},
-        'emit_events' => 'false'
+        'emit_events' => 'false',
+        'no_merge' => 'false'
       }
     end
 
@@ -66,8 +75,17 @@ module Agents
         errors.add(:base, "post_url and expected_receive_period_in_days are required fields")
       end
 
-      if options['payload'].present? && !options['payload'].is_a?(Hash)
+      if options['payload'].present? && %w[get delete].include?(method) && !options['payload'].is_a?(Hash)
         errors.add(:base, "if provided, payload must be a hash")
+      end
+
+      if options['payload'].present? && %w[post put patch].include?(method)
+        if !options['payload'].is_a?(Hash) && options['content_type'] !~ MIME_RE
+          errors.add(:base, "if provided, payload must be a hash")
+        end
+        if options['content_type'] =~ MIME_RE && options['payload'].is_a?(String) && boolify(options['no_merge']) != true
+          errors.add(:base, "when the payload is a string, `no_merge` has to be set to `true`")
+        end
       end
 
       if options.has_key?('emit_events') && boolify(options['emit_events']).nil?
@@ -116,13 +134,16 @@ module Agents
       when 'post', 'put', 'patch'
         params = nil
 
-        case interpolated(payload)['content_type']
+        case (content_type = interpolated(payload)['content_type'])
         when 'json'
           headers['Content-Type'] = 'application/json; charset=utf-8'
           body = data.to_json
         when 'xml'
           headers['Content-Type'] = 'text/xml; charset=utf-8'
           body = data.to_xml(root: (interpolated(payload)[:xml_root] || 'post'))
+        when MIME_RE
+          headers['Content-Type'] = content_type
+          body = data.to_s
         else
           body = data
         end
