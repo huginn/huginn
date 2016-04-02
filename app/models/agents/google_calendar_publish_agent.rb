@@ -3,6 +3,7 @@ require 'json'
 module Agents
   class GoogleCalendarPublishAgent < Agent
     cannot_be_scheduled!
+    no_bulk_receive!
 
     gem_dependency_check { defined?(Google) && defined?(Google::APIClient) }
 
@@ -25,17 +26,16 @@ module Agents
 
       Agent Configuration:
 
-      `calendar_id` - The id the calendar you want to publish to. Typically your google account email address.
+      `calendar_id` - The id the calendar you want to publish to. Typically your google account email address.  Liquid formatting (e.g. `{{ cal_id }}`) is allowed here in order to extract the calendar_id from the incoming event.
 
       `google` A hash of configuration options for the agent.
 
       `google` `service_account_email` - The authorised service account.
 
-      `google` `key_file` - The path to the key file.
+      `google` `key_file` OR `google` `key` - The path to the key file or the key itself.  Liquid formatting is supported if you want to use a Credential.  (E.g., `{% credential google_key %}`)
 
       `google` `key_secret` - The secret for the key, typically 'notasecret'
 
-      
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -92,10 +92,10 @@ module Agents
 
     def receive(incoming_events)
      incoming_events.each do |event|
-        calendar = GoogleCalendar.new(options, Rails.logger)
+        calendar = GoogleCalendar.new(interpolate_options(options, event), Rails.logger)
 
-        calendar_event = JSON.parse(calendar.publish_as(options['calendar_id'], event.payload["message"]).response.body)
-  
+        calendar_event = JSON.parse(calendar.publish_as(interpolated(event)['calendar_id'], event.payload["message"]).response.body)
+
         create_event :payload => {
           'success' => true,
           'published_calendar_event' => calendar_event,

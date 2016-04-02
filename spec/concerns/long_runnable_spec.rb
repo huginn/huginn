@@ -118,6 +118,7 @@ describe LongRunnable do
         mock(@worker).stop!
         mock(@worker).setup!(@worker.scheduler, @worker.mutex)
         mock(@worker).run!
+        mock(@worker).puts(anything) { |text| expect(text).to match(/Restarting/) }
         @worker.restart!
       end
     end

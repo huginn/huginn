@@ -157,16 +157,14 @@ module Agents
       def setup
         require 'twitter/json_stream'
         @filter_to_agent_map = @config[:filter_to_agent_map]
-
-        schedule_in RELOAD_TIMEOUT do
-          puts "--> Restarting TwitterStream #{id} at #{Time.now} <--"
-          restart!
-        end
       end
 
       def run
         @recent_tweets = []
         EventMachine.run do
+          EventMachine.add_periodic_timer(RELOAD_TIMEOUT) do
+            restart!
+          end
           stream!(@filter_to_agent_map.keys, @agent) do |status|
             handle_status(status)
           end
@@ -200,6 +198,9 @@ module Agents
 
         stream.on_error do |message|
           STDERR.puts " --> Twitter error: #{message} at #{Time.now} <--"
+          STDERR.puts " --> Sleeping for 15 seconds"
+          sleep 15
+          restart!
         end
 
         stream.on_no_data do |message|

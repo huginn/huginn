@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+
+# add a huginn group and user
+adduser --group huginn
+adduser --disabled-login --ingroup huginn --gecos 'Huginn' --no-create-home --home /app huginn
+passwd -d huginn
+
+# Shallow clone the huginn project repo
+git clone --depth 1 https://github.com/cantino/huginn /app
+
+# Change the ownership to huginn
+chown -R huginn:huginn /app
+
+cd app
+
+# create required tmp and log directories
+sudo -u huginn -H mkdir -p tmp/pids tmp/cache tmp/sockets log
+chmod -R u+rwX log tmp
+
+export LC_ALL=en_US.UTF-8
+
+# HACK: We need a database connection to precompile the assets, use sqlite for that
+echo "gem 'sqlite3', '~> 1.3.11'" >> Gemfile
+sudo -u huginn -H RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle install --without test development --path vendor/bundle -j 4
+sudo -u huginn -H RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle exec rake assets:clean assets:precompile
+git checkout Gemfile
+
+# Bundle again to get rid of the sqlite3 gem
+sudo -u huginn -H ON_HEROKU=true DATABASE_ADAPTER=noop bundle install --without test development --path vendor/bundle
+
+# Configure the unicorn server
+mv config/unicorn.rb.example config/unicorn.rb
+sed -ri 's/^listen .*$/listen ENV["PORT"]/' config/unicorn.rb
+sed -ri 's/^stderr_path.*$//' config/unicorn.rb
+sed -ri 's/^stdout_path.*$//' config/unicorn.rb

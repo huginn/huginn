@@ -4,6 +4,7 @@ module Agents
 
     cannot_be_scheduled!
     cannot_create_events!
+    no_bulk_receive!
 
     description <<-MD
       The Email Agent sends any events it receives via email immediately.
@@ -20,6 +21,11 @@ module Agents
       You can specify one or more `recipients` for the email, or skip the option in order to send the email to your
       account's default email address.
 
+      You can provide a `from` address for the email, or leave it blank to default to the value of `EMAIL_FROM_ADDRESS` (`#{ENV['EMAIL_FROM_ADDRESS']}`).
+
+      You can provide a `content_type` for the email and specify `text/plain` or `text/html` to be sent.
+      If you do not specify `content_type`, then the recipient email server will determine the correct rendering.
+
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
     MD
 
@@ -31,11 +37,28 @@ module Agents
       }
     end
 
+    def working?
+      received_event_without_error?
+    end
+
     def receive(incoming_events)
       incoming_events.each do |event|
         recipients(event.payload).each do |recipient|
-          log "Sending digest mail to #{recipient} with event #{event.id}"
-          SystemMailer.send_message(:to => recipient, :subject => interpolated(event)['subject'], :headline => interpolated(event)['headline'], :body => interpolated(event)['body'], :groups => [present(event.payload)]).deliver_later
+          begin
+            SystemMailer.send_message(
+              to: recipient,
+              from: interpolated(event)['from'],
+              subject: interpolated(event)['subject'],
+              headline: interpolated(event)['headline'],
+              body: interpolated(event)['body'],
+              content_type: interpolated(event)['content_type'],
+              groups: [present(event.payload)]
+            ).deliver_now
+            log "Sent mail to #{recipient} with event #{event.id}"
+          rescue => e
+            error("Error sending mail to #{recipient} with event #{event.id}: #{e.message}")
+            raise
+          end
         end
       end
     end

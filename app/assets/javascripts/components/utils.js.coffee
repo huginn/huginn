@@ -89,6 +89,8 @@ class @Utils
           $(body).closest('[role=dialog]').on 'hidden.bs.modal', =>
             @invokeDryRun(url, dry_run_data, cleanup)
           .modal('hide')
+        $(body).closest('[role=dialog]').on 'shown.bs.modal', ->
+          $(this).find('.btn-primary').focus()
       title: 'Dry Run'
       onHide: cleanup
 
@@ -99,18 +101,32 @@ class @Utils
         $('body').css(cursor: 'auto')
       .done (json) =>
         Utils.showDynamicModal """
-          <h5>Log</h5>
-          <pre class="agent-dry-run-log"></pre>
-          <h5>Events</h5>
-          <pre class="agent-dry-run-events"></pre>
-          <h5>Memory</h5>
-          <pre class="agent-dry-run-memory"></pre>
+          <!-- Nav tabs -->
+          <ul id="resultTabs" class="nav nav-tabs agent-dry-run-tabs" role="tablist">
+            <li role="presentation"><a href="#tabEvents" aria-controls="tabEvents" role="tab" data-toggle="tab">Events</a></li>
+            <li role="presentation"><a href="#tabLog" aria-controls="tabLog" role="tab" data-toggle="tab">Log</a></li>
+            <li role="presentation"><a href="#tabMemory" aria-controls="tabMemory" role="tab" data-toggle="tab">Memory</a></li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane" id="tabEvents">
+              <pre class="agent-dry-run-events"></pre>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="tabLog">
+              <pre><small class="agent-dry-run-log"></small></pre>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="tabMemory">
+              <pre class="agent-dry-run-memory"></pre>
+            </div>
+          </div>
           """,
           body: (body) ->
             $(body).
               find('.agent-dry-run-log').text(json.log).end().
               find('.agent-dry-run-events').text(json.events).end().
               find('.agent-dry-run-memory').text(json.memory)
+            active = if json.events.match(/^\[?\s*\]?$/) then 'tabLog' else 'tabEvents'
+            $('#resultTabs a[href="#' + active + '"]').tab('show')
           title: 'Dry Run Results',
           onHide: callback
       .fail (xhr, status, error) ->

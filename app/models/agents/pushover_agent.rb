@@ -2,6 +2,8 @@ module Agents
   class PushoverAgent < Agent
     cannot_be_scheduled!
     cannot_create_events!
+    no_bulk_receive!
+
 
     API_URL = 'https://api.pushover.net/1/messages.json'
 

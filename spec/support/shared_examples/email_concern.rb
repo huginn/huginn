@@ -51,6 +51,9 @@ shared_examples_for EmailConcern do
       agent.options['recipients'] = '{{ email }}'
       expect(agent).to be_valid
 
+      agent.options['recipients'] = '{% if x %}a@x{% else %}b@y{% endif %}'
+      expect(agent).to be_valid
+
       agent.options['recipients'] = ['bob@example.com', 'jane@example.com']
       expect(agent).to be_valid
 

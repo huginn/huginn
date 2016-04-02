@@ -1,0 +1,72 @@
+postgresdata:
+  image: postgres:9.5
+  command: /bin/true
+
+postgres:
+  image: postgres:9.5
+  volumes_from:
+    - postgresdata
+  environment:
+    POSTGRES_PASSWORD: myhuginnpassword
+    POSTGRES_USER: huginn
+
+huginn_web:
+  image: cantino/huginn-single-process
+  restart: always
+  extends:
+    file: environment.yml
+    service: huginn_base
+  environment:
+    DATABASE_ADAPTER: postgresql
+  ports:
+    - 3000:3000
+  links:
+    - postgres
+
+huginn_threaded:
+  image: cantino/huginn-single-process
+  restart: always
+  extends:
+    file: environment.yml
+    service: huginn_base
+  environment:
+    DATABASE_ADAPTER: postgresql
+  links:
+    - postgres
+  command: /scripts/init bin/threaded.rb
+
+# huginn_schedule:
+#   image: cantino/huginn-single-process
+#   extends:
+#     file: environment.yml
+#     service: huginn_base
+#   environment:
+#     DATABASE_ADAPTER: postgresql
+#   links:
+#     - postgres
+#   command: /scripts/init bin/schedule.rb
+
+
+# huginn_twitter_stream:
+#   image: cantino/huginn-single-process
+#   extends:
+#     file: environment.yml
+#     service: huginn_base
+#   environment:
+#     DATABASE_ADAPTER: postgresql
+#   links:
+#     - postgres
+#   command: /scripts/init bin/twitter_stream.rb
+
+
+# huginn_dj1:
+#   image: cantino/huginn-single-process
+#   extends:
+#     file: environment.yml
+#     service: huginn_base
+#   environment:
+#     DATABASE_ADAPTER: postgresql
+#   links:
+#     - postgres
+#   command: /scripts/init script/delayed_job run
+

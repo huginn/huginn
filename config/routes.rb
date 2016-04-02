@@ -66,6 +66,15 @@ Huginn::Application.routes.draw do
     end
   end
 
+  namespace :admin do
+    resources :users, except: :show do
+      member do
+        put :deactivate
+        put :activate
+      end
+    end
+  end
+
   get "/worker_status" => "worker_status#show"
 
   match "/users/:user_id/web_requests/:agent_id/:secret" => "web_requests#handle_request", :as => :web_requests, :via => [:get, :post, :put, :delete]

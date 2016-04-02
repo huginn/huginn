@@ -161,17 +161,18 @@
               <b>Options:</b>
               <pre><%= Utils.pretty_jsonify @agent.options || {} %></pre>
             </p>
-
-            <p id="memory" data-agent-id="<%= @agent.id %>">
-              <b>Memory:</b>
-              <% if @agent.memory.present? %>
+            <% if @agent.memory.present? %>
+              <p id="memory" data-agent-id="<%= @agent.id %>">
+                <b>Memory:</b>
                 <i class="fa fa-spinner fa-pulse spinner"></i>
                 <i class="fa fa-trash action-icon clear"></i>
-              <% end %>
-              <pre class="memory"><%= Utils.pretty_jsonify @agent.memory || {} %></pre>
-            </p>
+                <a id="toggle-memory" href="#">Show</a>
+                <pre class="memory hidden"><%= Utils.pretty_jsonify @agent.memory || {} %></pre>
+              </p>
+            <% end %>
           </div>
         </div>
       </div>
   </div>
 </div>
+

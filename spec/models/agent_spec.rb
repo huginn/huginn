@@ -3,6 +3,34 @@ require 'rails_helper'
 describe Agent do
   it_behaves_like WorkingHelpers
 
+  describe '.active/inactive' do
+    let(:agent) { agents(:jane_website_agent) }
+
+    it 'is active per default' do
+      expect(Agent.active).to include(agent)
+      expect(Agent.inactive).not_to include(agent)
+    end
+
+    it 'is not active when disabled' do
+      agent.update_attribute(:disabled, true)
+      expect(Agent.active).not_to include(agent)
+      expect(Agent.inactive).to include(agent)
+    end
+
+    it 'is not active when deactivated' do
+      agent.update_attribute(:deactivated, true)
+      expect(Agent.active).not_to include(agent)
+      expect(Agent.inactive).to include(agent)
+    end
+
+    it 'is not active when disabled and deactivated' do
+      agent.update_attribute(:disabled, true)
+      agent.update_attribute(:deactivated, true)
+      expect(Agent.active).not_to include(agent)
+      expect(Agent.inactive).to include(agent)
+    end
+  end
+
   describe ".bulk_check" do
     before do
       @weather_agent_count = Agents::WeatherAgent.where(:schedule => "midnight", :disabled => false).count
@@ -15,6 +43,12 @@ describe Agent do
 
     it "should skip disabled Agents" do
       agents(:bob_weather_agent).update_attribute :disabled, true
+      mock(Agents::WeatherAgent).async_check(anything).times(@weather_agent_count - 1)
+      Agents::WeatherAgent.bulk_check("midnight")
+    end
+
+    it "should skip agents of deactivated accounts" do
+      agents(:bob_weather_agent).user.deactivate!
       mock(Agents::WeatherAgent).async_check(anything).times(@weather_agent_count - 1)
       Agents::WeatherAgent.bulk_check("midnight")
     end
@@ -295,6 +329,14 @@ describe Agent do
         Agent.receive!
       end
 
+      it "should call receive for each event when no_bulk_receive! is used" do
+        mock.any_instance_of(Agents::TriggerAgent).receive(anything).twice
+        stub(Agents::TriggerAgent).no_bulk_receive? { true }
+        Agent.async_check(agents(:bob_weather_agent).id)
+        Agent.async_check(agents(:bob_weather_agent).id)
+        Agent.receive!
+      end
+
       it "should ignore events that were created before a particular Link" do
         agent2 = Agents::SomethingSource.new(:name => "something")
         agent2.user = users(:bob)
@@ -326,6 +368,13 @@ describe Agent do
         expect {
           Agent.receive! # and we receive it
         }.to change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+      end
+
+      it "should not run agents of deactivated accounts" do
+        agents(:bob_weather_agent).user.deactivate!
+        Agent.async_check(agents(:bob_weather_agent).id)
+        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
+        Agent.receive!
       end
     end
 

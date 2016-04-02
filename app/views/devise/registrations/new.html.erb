@@ -21,8 +21,8 @@
                 <%= content_tag :pre do -%>
 heroku git:clone --app <%= content_tag :var, app_name %>
 cd <%= content_tag :var, app_name %>
-bundle
 cp .env.example .env
+bundle
 bin/setup_heroku
 <%- end %>
 
@@ -41,34 +41,7 @@ bin/setup_heroku
             </div>
           <% end %>
 
-          <div class="form-group">
-            <%= f.label :email, class: 'col-md-4 control-label' %>
-            <div class="col-md-6">
-              <%= f.email_field :email, autofocus: true, class: 'form-control' %>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <%= f.label :username, class: 'col-md-4 control-label' %>
-            <div class="col-md-6">
-              <%= f.text_field :username, class: 'form-control' %>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <%= f.label :password, class: 'col-md-4 control-label' %>
-            <div class="col-md-6">
-              <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>
-              <% if @validatable %><span class="help-inline"><%= @minimum_password_length %> characters minimum.</span><% end %>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <%= f.label :password_confirmation, class: 'col-md-4 control-label' %>
-            <div class="col-md-6">
-              <%= f.password_field :password_confirmation, autocomplete: "off", class: 'form-control' %>
-            </div>
-          </div>
+          <%= render partial: 'common_registration_fields', locals: { f: f } %>
 
           <div class="form-group">
             <div class="col-md-offset-4 col-md-10">

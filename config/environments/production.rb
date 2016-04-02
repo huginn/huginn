@@ -33,10 +33,8 @@ Huginn::Application.configure do
 
   # Generate digests for assets URLs
   config.assets.digest = true
-  config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
 
-  # Bootstrap fonts
-  config.assets.precompile += %w(*.woff *.eot *.svg *.ttf)
+  # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
@@ -61,9 +59,6 @@ Huginn::Application.configure do
   if ENV['ASSET_HOST'].present?
     config.action_controller.asset_host = ENV['ASSET_HOST']
   end
-
-  # Precompile additional assets (application.js.coffee.erb, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w( diagram.js graphing.js map_marker.js ace.js )
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

@@ -1,7 +1,13 @@
 class GoogleCalendar
   def initialize(config, logger)
     @config = config
-    @key = Google::APIClient::PKCS12.load_key(@config['google']['key_file'], @config['google']['key_secret'])
+
+    if @config['google']['key'].present?
+      @key = OpenSSL::PKCS12.new(@config['google']['key'], @config['google']['key_secret']).key
+    else
+      @key = Google::APIClient::PKCS12.load_key(@config['google']['key_file'], @config['google']['key_secret'])
+    end
+
     @client = Google::APIClient.new(application_name: "Huginn", application_version: "0.0.1")
     @client.retries = 2
     @logger ||= logger

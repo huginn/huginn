@@ -6,13 +6,13 @@ You can also use [Capistrano](./capistrano.md) to keep your installation up to d
 
 ```
 cd /home/huginn/huginn
-sudo rake production:check
+sudo bundle exec rake production:check
 ```
 
 ### 1. Stop server
 
 ```
-sudo rake production:stop
+sudo bundle exec rake production:stop
 ```
 
 ### 2. Store the current version
@@ -32,7 +32,7 @@ sudo -u huginn -H cp Procfile Procfile.bak
 Get the new code
 ```
 sudo -u huginn -H git fetch --all
-sudo -u huginn -H git checkout -- db/schema.rb Procfile
+sudo -u huginn -H git checkout -- Procfile
 sudo -u huginn -H git checkout master
 sudo -u huginn -H git pull
 ```
@@ -87,6 +87,6 @@ sudo -u huginn -H editor .env
 
 ```
 # Export the init script
-sudo rake production:export
+sudo bundle exec rake production:export
 ```
 

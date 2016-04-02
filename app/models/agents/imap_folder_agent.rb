@@ -227,7 +227,14 @@ module Agents
             }
           when 'from', 'to', 'cc'
             value.present? or next true
-            mail.header[key].addresses.any? { |address|
+            begin
+              # Mail::Field really needs to define respond_to_missing?
+              # so we could use try(:addresses) here.
+              addresses = mail.header[key].addresses
+            rescue NoMethodError
+              next false
+            end
+            addresses.any? { |address|
               Array(value).any? { |pattern|
                 glob_match?(pattern, address)
               }

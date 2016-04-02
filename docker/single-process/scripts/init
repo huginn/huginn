@@ -1,0 +1,57 @@
+#!/bin/bash
+set -e
+
+cd /app
+
+# Configure database based on linked container
+if [ -n "${MYSQL_PORT_3306_TCP_ADDR}" ]; then
+  DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
+  DATABASE_HOST=${DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
+  DATABASE_PORT=${DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
+  DATABASE_ENCODING=${DATABASE_ENCODING:-utf8mb4}
+elif [ -n "${POSTGRES_PORT_5432_TCP_ADDR}" ]; then
+  DATABASE_ADAPTER=${DATABASE_ADAPTER:-postgresql}
+  DATABASE_HOST=${DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
+  DATABASE_PORT=${DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
+  DATABASE_ENCODING=utf8
+fi
+
+USE_GRAPHVIZ_DOT=${USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
+
+# Default to the environment variable values set in .env.example
+IFS="="
+grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
+  while read var value ; do
+    eval "echo \"$var=\${$var:-\${HUGINN_$var-\$value}}\""
+  done | grep -v -e ^= > /app/.env
+
+eval "echo PORT=${PORT:-${PORT:-3000}}" >> .env
+eval "echo RAILS_ENV=${RAILS_ENV:-${RAILS_ENV:-production}}" >> .env
+eval "echo ON_HEROKU=true" >> .env
+eval "echo RAILS_SERVE_STATIC_FILES=true" >> .env
+
+chmod ugo+r /app/.env
+source /app/.env
+
+# use default port number if it is still not set
+case "${DATABASE_ADAPTER}" in
+  mysql2) DATABASE_PORT=${DATABASE_PORT:-3306} ;;
+  postgresql) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
+  *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
+esac
+
+sudo -u huginn -H bundle install --without test development --path vendor/bundle
+
+if [ -z $1 ]; then
+  sudo -u huginn -H bundle exec rake db:create db:migrate RAILS_ENV=${RAILS_ENV}
+fi
+
+if [[ -z "${DO_NOT_SEED}" && -z $1 ]]; then
+  sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=${RAILS_ENV}
+fi
+
+if [ -z $1 ]; then
+  exec sudo -u huginn -H bundle exec unicorn -c config/unicorn.rb
+else
+  exec sudo -u huginn -H bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
+fi
