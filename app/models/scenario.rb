@@ -1,11 +1,13 @@
 class Scenario < ActiveRecord::Base
   include HasGuid
 
-  attr_accessible :name, :agent_ids, :description, :public, :source_url, :tag_fg_color, :tag_bg_color
+  attr_accessible :name, :agent_ids, :description, :public, :source_url, :tag_fg_color, :tag_bg_color, :avatar
 
   belongs_to :user, :counter_cache => :scenario_count, :inverse_of => :scenarios
   has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :scenario
   has_many :agents, :through => :scenario_memberships, :inverse_of => :scenarios
+  has_attached_file :avatar, styles: { thumb: "40x40>" }
+  validates_attachment_content_type :avatar, content_type: /\Aimage\/.*\Z/
 
   validates_presence_of :name, :user
 
