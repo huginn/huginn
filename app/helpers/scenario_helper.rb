@@ -10,7 +10,7 @@ module ScenarioHelper
   def scenario_label(scenario, text = nil)
     text ||= scenario.name
     content_tag :span, text, class: 'label scenario' do 
-      concat(image_tag(scenario.avatar.url(:thumb))) #, style: style_colors(scenario)
+      concat(image_tag(scenario.avatar.url(:thumb)))
     end
   end
 
