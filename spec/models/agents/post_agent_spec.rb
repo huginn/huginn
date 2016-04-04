@@ -46,6 +46,8 @@ describe Agents::PostAgent do
           req.data = ActiveSupport::JSON.decode(request.body)
         when 'text/xml'
           req.data = Hash.from_xml(request.body)
+        when Agents::PostAgent::MIME_RE
+          req.data = request.body
         else
           raise "unexpected Content-Type: #{content_type}"
         end
@@ -187,6 +189,16 @@ describe Agents::PostAgent do
       expect(@sent_requests[:get][0].data).to eq(@checker.options['payload'].to_query)
     end
 
+    it "sends options['payload'] as a string POST request when content-type continas a MIME type" do
+      @checker.options['payload'] = '<test>hello</test>'
+      @checker.options['content_type'] = 'application/xml'
+      expect {
+        @checker.check
+      }.to change { @sent_requests[:post].length }.by(1)
+
+      expect(@sent_requests[:post][0].data).to eq('<test>hello</test>')
+    end
+
     describe "emitting events" do
       context "when emit_events is not set to true" do
         it "does not emit events" do
@@ -302,6 +314,25 @@ describe Agents::PostAgent do
 
       @checker.options['payload'] = { 'this' => 'that' }
       expect(@checker).to be_valid
+    end
+
+    it "should not validate payload as a hash if content_type includes a MIME type and method is not get or delete" do
+      @checker.options['no_merge'] = 'true'
+      @checker.options['content_type'] = 'text/xml'
+      @checker.options['payload'] = "test"
+      expect(@checker).to be_valid
+
+      @checker.options['method'] = 'get'
+      expect(@checker).not_to be_valid
+
+      @checker.options['method'] = 'delete'
+      expect(@checker).not_to be_valid
+    end
+
+    it "requires `no_merge` to be set to true when content_type contains a MIME type" do
+      @checker.options['content_type'] = 'text/xml'
+      @checker.options['payload'] = "test"
+      expect(@checker).not_to be_valid
     end
 
     it "requires headers to be a hash, if present" do
