@@ -12,7 +12,7 @@ Delayed::Worker.logger = Rails.logger
 
 class Delayed::Job
   scope :pending, ->{ where("locked_at IS NULL AND attempts = 0") }
-  scope :awaiting_retry, ->{ where("failed_at IS NULL AND attempts > 0") }
+  scope :awaiting_retry, ->{ where("failed_at IS NULL AND attempts > 0 AND locked_at IS NULL") }
   scope :failed, -> { where("failed_at IS NOT NULL") }
 end
 

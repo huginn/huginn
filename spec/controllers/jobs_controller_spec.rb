@@ -101,7 +101,8 @@ describe JobsController do
     end
 
     it "run the queued job" do
-      expect { post :retry_queued }.to change{Delayed::Job.find(@queued.id).attempts}.from(1).to(0)
+      post :retry_queued
+      expect(@queued.run_at.to_s).to eq(Time.zone.now.to_s)
     end
   end
 end
