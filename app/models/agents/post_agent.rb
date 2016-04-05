@@ -25,6 +25,13 @@ module Agents
 
       If `emit_events` is set to `true`, the server response will be emitted as an Event and can be fed to a WebsiteAgent for parsing (using its `data_from_event` and `type` options). No data processing
       will be attempted by this Agent, so the Event's "body" value will always be raw text.
+      The Event will also have a "headers" hash and a "status" integer value.
+      Set `event_headers_style` to one of the following values to normalize the keys of "headers" for downstream agents' convenience:
+
+        * `capitalized` (default) - Header names are capitalized; e.g. "Content-Type"
+        * `downcased` - Header names are downcased; e.g. "content-type"
+        * `snakecased` - Header names are snakecased; e.g. "content_type"
+        * `raw` - Backward compatibility option to leave them unmodified from what the underlying HTTP library returns.
 
       Other Options:
 
@@ -92,6 +99,12 @@ module Agents
         errors.add(:base, "if provided, emit_events must be true or false")
       end
 
+      begin
+        normalize_response_headers({})
+      rescue ArgumentError => e
+        errors.add(:base, e.message)
+      end
+
       unless %w[post get put delete patch].include?(method)
         errors.add(:base, "method must be 'post', 'get', 'put', 'delete', or 'patch'")
       end
@@ -123,6 +136,29 @@ module Agents
     end
 
     private
+
+    def normalize_response_headers(headers)
+      case interpolated['event_headers_style']
+      when nil, '', 'capitalized'
+        normalize = ->name {
+          name.gsub(/(?:\A|(?<=-))([[:alpha:]])|([[:alpha:]]+)/) {
+            $1 ? $1.upcase : $2.downcase
+          }
+        }
+      when 'downcased'
+        normalize = :downcase.to_proc
+      when 'snakecased', nil
+        normalize = ->name { name.tr('A-Z-', 'a-z_') }
+      when 'raw'
+        normalize = ->name { name }  # :itself.to_proc in Ruby >= 2.2
+      else
+        raise ArgumentError, "if provided, event_headers_style must be 'capitalized', 'downcased', 'snakecased' or 'raw'"
+      end
+
+      headers.each_with_object({}) { |(key, value), hash|
+        hash[normalize[key]] = value
+      }
+    end
 
     def handle(data, payload = {})
       url = interpolated(payload)[:post_url]
@@ -156,7 +192,11 @@ module Agents
       }
 
       if boolify(interpolated['emit_events'])
-        create_event payload: { body: response.body, headers: response.headers, status: response.status }
+        create_event payload: {
+          body: response.body,
+          headers: normalize_response_headers(response.headers),
+          status: response.status
+        }
       end
     end
   end
