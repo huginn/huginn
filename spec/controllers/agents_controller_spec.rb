@@ -406,7 +406,7 @@ describe AgentsController do
         [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
       }
       json = JSON.parse(response.body)
-      expect(json['log']).to match(/^I, .* : Fetching #{Regexp.quote(url_from_event)}$/)
+      expect(json['log']).to match(/^\[\d\d:\d\d:\d\d\] INFO -- : Fetching #{Regexp.quote(url_from_event)}$/)
     end
   end
 
