@@ -5,10 +5,14 @@ module DryRunnable
     @dry_run = true
 
     log = StringIO.new
-    @started_at = Time.zone.now
+    @dry_run_started_at = Time.zone.now
     @dry_run_logger = Logger.new(log).tap { |logger|
       logger.formatter = proc { |severity, datetime, progname, message|
-        "[#{elapsed_time(datetime)}] #{severity} -- #{progname}: #{message}\n"
+        elapsed_time = '%02d:%02d:%02d' % 2.times.inject([datetime - @dry_run_started_at]) { |(x, *xs)|
+          [*x.divmod(60), *xs]
+        }
+
+        "[#{elapsed_time}] #{severity} -- #{progname}: #{message}\n"
       }
     }
     @dry_run_results = {
@@ -18,7 +22,7 @@ module DryRunnable
     begin
       raise "#{short_type} does not support dry-run" unless can_dry_run?
       readonly!
-      @started_at = Time.zone.now
+      @dry_run_started_at = Time.zone.now
       @dry_run_logger.info('Dry Run started')
       if event
         raise "This agent cannot receive an event!" unless can_receive_events?
@@ -42,12 +46,6 @@ module DryRunnable
 
   def dry_run?
     !!@dry_run
-  end
-
-  def elapsed_time(datetime)
-    '%02d:%02d:%02d' % 2.times.inject([datetime - @started_at]) { |(x, *xs)|
-      [*x.divmod(60), *xs]
-    }
   end
 
   included do
