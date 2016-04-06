@@ -24,7 +24,7 @@ module JobsHelper
   #
   # Can return nil, or an instance of Agent.
   def agent_from_job(job)
-    if data = YAML.load(job.handler).try(:job_data)
+    if data = YAML.load(job.handler.to_s).try(:job_data)
       Agent.find_by_id(data['arguments'][0])
     else
       false
