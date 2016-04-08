@@ -9,4 +9,4 @@ This image runs all processes needed by Huginn in one container, when the databa
 
 #### [cantino/huginn-single-process](single-process/README.md) multiple container image
 
-This image runs just one process per container and thus needs at least two container to be started, one for the Huginn application server and one for the threaded background worker. It is also possible to every background worker in a separate container to improve the performance. See [the PostgreSQL docker-compose configuration](single-process/postgres.yml) for an example.
+This image runs just one process per container and thus needs at least two container to be started, one for the Huginn application server and one for the threaded background worker. It is also possible to every background worker in a separate container to improve the performance. See [the PostgreSQL docker-compose configuration](single-process/postgresql.yml) for an example.
