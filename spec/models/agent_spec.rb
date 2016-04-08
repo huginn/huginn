@@ -729,14 +729,33 @@ describe Agent do
         @agent.user = users(:bob)
         @agent.save!
 
+        def @agent.receive_web_request(params, method, format, headers={})
+          memory['last_request'] = [params, method, format, headers]
+          ['Ok!', 200]
+        end
+      end
+
+      it "calls the .receive_web_request hook, updates last_web_request_at, and saves" do
+        @agent.trigger_web_request({ :some_param => "some_value" }, "post", "text/html", {})
+        expect(@agent.reload.memory['last_request']).to eq([ { "some_param" => "some_value" }, "post", "text/html", {} ])
+        expect(@agent.last_web_request_at.to_i).to be_within(1).of(Time.now.to_i)
+      end
+    end
+
+    context "when .receive_web_request is defined without headers" do
+      before do
+        @agent = Agents::WebRequestReceiver.new(:name => "something")
+        @agent.user = users(:bob)
+        @agent.save!
+
         def @agent.receive_web_request(params, method, format)
           memory['last_request'] = [params, method, format]
           ['Ok!', 200]
         end
       end
 
-      it "calls the .receive_web_request hook, updates last_web_request_at, and saves" do
-        @agent.trigger_web_request({ :some_param => "some_value" }, "post", "text/html")
+      it "calls the .trigger_web_request with headers, but they don't get passed to .receive_web_request" do
+        @agent.trigger_web_request({ :some_param => "some_value" }, "post", "text/html", {})
         expect(@agent.reload.memory['last_request']).to eq([ { "some_param" => "some_value" }, "post", "text/html" ])
         expect(@agent.last_web_request_at.to_i).to be_within(1).of(Time.now.to_i)
       end
@@ -756,7 +775,7 @@ describe Agent do
 
       it "outputs a deprecation warning and calls .receive_webhook with the params" do
         mock(Rails.logger).warn("DEPRECATED: The .receive_webhook method is deprecated, please switch your Agent to use .receive_web_request.")
-        @agent.trigger_web_request({ :some_param => "some_value" }, "post", "text/html")
+        @agent.trigger_web_request({ :some_param => "some_value" }, "post", "text/html", {})
         expect(@agent.reload.memory['last_webhook_request']).to eq({ "some_param" => "some_value" })
         expect(@agent.last_web_request_at.to_i).to be_within(1).of(Time.now.to_i)
       end
