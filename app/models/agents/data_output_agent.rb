@@ -24,6 +24,7 @@ module Agents
           * `template` - A JSON object representing a mapping between item output keys and incoming event values.  Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values.  Values of the `link`, `title`, `description` and `icon` keys will be put into the \\<channel\\> section of RSS output.  Value of the `self` key will be used as URL for this feed itself, which is useful when you serve it via reverse proxy.  The `item` key will be repeated for every Event.  The `pubDate` key for each item will have the creation time of the Event unless given.
           * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
           * `ttl` - A value for the \\<ttl\\> element in RSS output. (default: `60`)
+          * `itunes_compatible` - Add itunes compatible namespace in output xml (default: `false`)
           * `push_hubs` - Set to a list of PubSubHubbub endpoints you want to publish an update to every time this agent receives an event. (default: none)  Popular hubs include [Superfeedr](https://pubsubhubbub.superfeedr.com/) and [Google](https://pubsubhubbub.appspot.com/).  Note that publishing updates will make your feed URL known to the public, so if you want to keep it secret, set up a reverse proxy to serve your feed via a safe URL and specify it in `template.self`.
 
         If you'd like to output RSS tags with attributes, such as `enclosure`, use something like the following in your `template`:
@@ -156,6 +157,12 @@ module Agents
       interpolated['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
     end
 
+    def xml_namespace
+      if (interpolated['itunes_compatible'] == "true")
+      	"xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\""
+      end
+    end
+
     def push_hubs
       interpolated['push_hubs'].presence || []
     end
@@ -214,7 +221,7 @@ module Agents
 
           return [<<-XML, 200, 'text/xml']
 <?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" #{xml_namespace}>
 <channel>
  <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
  <atom:icon>#{feed_icon.encode(xml: :text)}</atom:icon>
