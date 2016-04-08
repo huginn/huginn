@@ -45,7 +45,7 @@ module Agents
       }
     end
 
-    def receive_web_request(params, method, format)
+    def receive_web_request(params, method, format, headers={})
       # check the secret
       secret = params.delete('secret')
       return ["Not Authorized", 401] unless secret == interpolated['secret']

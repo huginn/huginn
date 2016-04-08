@@ -57,7 +57,7 @@ module Agents
       end
     end
 
-    def receive_web_request(params, method, format)
+    def receive_web_request(params, method, format, headers={})
       params = params.symbolize_keys
       if method != 'post'
         return ['Not Found', 404]
