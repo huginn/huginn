@@ -45,7 +45,7 @@ module Agents
       }
     end
 
-    def receive_web_request(params, method, format, headers={})
+    def receive_web_request(params, method, format, headers={}, request=ActionDispatch::Request.new({}))
       # check the secret
       secret = params.delete('secret')
       return ["Not Authorized", 401] unless secret == interpolated['secret']

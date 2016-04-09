@@ -95,7 +95,7 @@ class Agent < ActiveRecord::Base
     false
   end
 
-  def receive_web_request(params, method, format, headers={})
+  def receive_web_request(params, method, format, headers={}, request=ActionDispatch::Request.new({}))
     # Implement me in your subclass of Agent.
     ["not implemented", 404]
   end
@@ -149,20 +149,20 @@ class Agent < ActiveRecord::Base
     end
   end
 
-  def trigger_web_request(params, method, format, headers)
+  def trigger_web_request(params, method, format, headers, request)
     if respond_to?(:receive_webhook)
       Rails.logger.warn "DEPRECATED: The .receive_webhook method is deprecated, please switch your Agent to use .receive_web_request."
       receive_webhook(params).tap do
         self.last_web_request_at = Time.now
         save!
       end
-    elsif method(:receive_web_request).arity == 3
-      receive_web_request(params, method, format).tap do
-        self.last_web_request_at = Time.now
-        save!
-      end
     else
-      receive_web_request(params, method, format, headers).tap do
+      if method(:receive_web_request).arity == 3
+        handled_request = receive_web_request(params, method, format)
+      else
+        handled_request = receive_web_request(params, method, format, headers, request)
+      end
+      handled_request.tap do
         self.last_web_request_at = Time.now
         save!
       end

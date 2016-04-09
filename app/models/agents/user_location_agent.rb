@@ -57,7 +57,7 @@ module Agents
       end
     end
 
-    def receive_web_request(params, method, format, headers={})
+    def receive_web_request(params, method, format, headers={}, request=ActionDispatch::Request.new({}))
       params = params.symbolize_keys
       if method != 'post'
         return ['Not Found', 404]
