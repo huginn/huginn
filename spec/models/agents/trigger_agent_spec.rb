@@ -6,11 +6,13 @@ describe Agents::TriggerAgent do
       'name' => "my trigger agent",
       'options' => {
         'expected_receive_period_in_days' => 2,
-        'rules' => [{
+        'rules' => {
+          'rule1' => {
                       'type' => "regex",
                       'value' => "a\\db",
                       'path' => "foo.bar.baz",
-                    }],
+                    }
+        },
         'message' => "I saw '{{foo.bar.baz}}' from {{name}}"
       }
     }
@@ -28,6 +30,18 @@ describe Agents::TriggerAgent do
   describe "validation" do
     before do
       expect(@checker).to be_valid
+    end
+
+    it 'should convert deprecated rules array into an object' do
+      deprecated_format = [{
+                            'type' => "regex",
+                            'value' => "a\\db",
+                            'path' => "foo.bar.baz",
+                          }]
+      @checker.options['rules'] = deprecated_format
+      expect(@checker.options['rules'].is_a? Array).to eq true
+      expect(@checker).to be_valid
+      expect(@checker.options['rules'].is_a? Hash).to eq true
     end
 
     it "should validate presence of message" do
@@ -80,11 +94,11 @@ describe Agents::TriggerAgent do
     end
 
     it "should validate the three fields in each rule" do
-      @checker.options['rules'] << { 'path' => "foo", 'type' => "fake", 'value' => "6" }
+      @checker.options['rules']['bad_type'] = { 'path' => "foo", 'type' => "fake", 'value' => "6" }
       expect(@checker).not_to be_valid
-      @checker.options['rules'].last['type'] = "field>=value"
+      @checker.options['rules']['bad_type']['type'] = "field>=value"
       expect(@checker).to be_valid
-      @checker.options['rules'].last.delete('value')
+      @checker.options['rules']['bad_type'].delete('value')
       expect(@checker).not_to be_valid
     end
   end
@@ -117,7 +131,7 @@ describe Agents::TriggerAgent do
 
     it "handles array of regex" do
       @event.payload['foo']['bar']['baz'] = "a222b"
-      @checker.options['rules'][0] = {
+      @checker.options['rules']['rule1'] = {
         'type' => "regex",
         'value' => ["a\\db", "a\\Wb"],
         'path' => "foo.bar.baz",
@@ -139,7 +153,7 @@ describe Agents::TriggerAgent do
 
     it "handles negated regex" do
       @event.payload['foo']['bar']['baz'] = "a2b"
-      @checker.options['rules'][0] = {
+      @checker.options['rules']['rule1'] = {
         'type' => "!regex",
         'value' => "a\\db",
         'path' => "foo.bar.baz",
@@ -180,14 +194,14 @@ describe Agents::TriggerAgent do
 
     it "handles numerical comparisons" do
       @event.payload['foo']['bar']['baz'] = "5"
-      @checker.options['rules'].first['value'] = 6
-      @checker.options['rules'].first['type'] = "field<value"
+      @checker.options['rules']['rule1']['value'] = 6
+      @checker.options['rules']['rule1']['type'] = "field<value"
 
       expect {
         @checker.receive([@event])
       }.to change { Event.count }.by(1)
 
-      @checker.options['rules'].first['value'] = 3
+      @checker.options['rules']['rule1']['value'] = 3
       expect {
         @checker.receive([@event])
       }.not_to change { Event.count }
@@ -195,14 +209,14 @@ describe Agents::TriggerAgent do
 
     it "handles array of numerical comparisons" do
       @event.payload['foo']['bar']['baz'] = "5"
-      @checker.options['rules'].first['value'] = [6, 3]
-      @checker.options['rules'].first['type'] = "field<value"
+      @checker.options['rules']['rule1']['value'] = [6, 3]
+      @checker.options['rules']['rule1']['type'] = "field<value"
 
       expect {
         @checker.receive([@event])
       }.to change { Event.count }.by(1)
 
-      @checker.options['rules'].first['value'] = [4, 3]
+      @checker.options['rules']['rule1']['value'] = [4, 3]
       expect {
         @checker.receive([@event])
       }.not_to change { Event.count }
@@ -210,14 +224,14 @@ describe Agents::TriggerAgent do
 
     it "handles exact comparisons" do
       @event.payload['foo']['bar']['baz'] = "hello world"
-      @checker.options['rules'].first['type'] = "field==value"
+      @checker.options['rules']['rule1']['type'] = "field==value"
 
-      @checker.options['rules'].first['value'] = "hello there"
+      @checker.options['rules']['rule1']['value'] = "hello there"
       expect {
         @checker.receive([@event])
       }.not_to change { Event.count }
 
-      @checker.options['rules'].first['value'] = "hello world"
+      @checker.options['rules']['rule1']['value'] = "hello world"
       expect {
         @checker.receive([@event])
       }.to change { Event.count }.by(1)
@@ -225,14 +239,14 @@ describe Agents::TriggerAgent do
 
     it "handles array of exact comparisons" do
       @event.payload['foo']['bar']['baz'] = "hello world"
-      @checker.options['rules'].first['type'] = "field==value"
+      @checker.options['rules']['rule1']['type'] = "field==value"
 
-      @checker.options['rules'].first['value'] = ["hello there", "hello universe"]
+      @checker.options['rules']['rule1']['value'] = ["hello there", "hello universe"]
       expect {
         @checker.receive([@event])
       }.not_to change { Event.count }
 
-      @checker.options['rules'].first['value'] = ["hello world", "hello universe"]
+      @checker.options['rules']['rule1']['value'] = ["hello world", "hello universe"]
       expect {
         @checker.receive([@event])
       }.to change { Event.count }.by(1)
@@ -240,14 +254,14 @@ describe Agents::TriggerAgent do
 
     it "handles negated comparisons" do
       @event.payload['foo']['bar']['baz'] = "hello world"
-      @checker.options['rules'].first['type'] = "field!=value"
-      @checker.options['rules'].first['value'] = "hello world"
+      @checker.options['rules']['rule1']['type'] = "field!=value"
+      @checker.options['rules']['rule1']['value'] = "hello world"
 
       expect {
         @checker.receive([@event])
       }.not_to change { Event.count }
 
-      @checker.options['rules'].first['value'] = "hello there"
+      @checker.options['rules']['rule1']['value'] = "hello there"
 
       expect {
         @checker.receive([@event])
@@ -256,14 +270,14 @@ describe Agents::TriggerAgent do
 
     it "handles array of negated comparisons" do
       @event.payload['foo']['bar']['baz'] = "hello world"
-      @checker.options['rules'].first['type'] = "field!=value"
-      @checker.options['rules'].first['value'] = ["hello world", "hello world"]
+      @checker.options['rules']['rule1']['type'] = "field!=value"
+      @checker.options['rules']['rule1']['value'] = ["hello world", "hello world"]
 
       expect {
         @checker.receive([@event])
       }.not_to change { Event.count }
 
-      @checker.options['rules'].first['value'] = ["hello there", "hello world"]
+      @checker.options['rules']['rule1']['value'] = ["hello there", "hello world"]
 
       expect {
         @checker.receive([@event])
@@ -272,19 +286,19 @@ describe Agents::TriggerAgent do
 
     it "does fine without dots in the path" do
       @event.payload = { 'hello' => "world" }
-      @checker.options['rules'].first['type'] = "field==value"
-      @checker.options['rules'].first['path'] = "hello"
-      @checker.options['rules'].first['value'] = "world"
+      @checker.options['rules']['rule1']['type'] = "field==value"
+      @checker.options['rules']['rule1']['path'] = "hello"
+      @checker.options['rules']['rule1']['value'] = "world"
       expect {
         @checker.receive([@event])
       }.to change { Event.count }.by(1)
 
-      @checker.options['rules'].first['path'] = "foo"
+      @checker.options['rules']['rule1']['path'] = "foo"
       expect {
         @checker.receive([@event])
       }.not_to change { Event.count }
 
-      @checker.options['rules'].first['value'] = "hi"
+      @checker.options['rules']['rule1']['value'] = "hi"
       expect {
         @checker.receive([@event])
       }.not_to change { Event.count }
@@ -306,7 +320,7 @@ describe Agents::TriggerAgent do
 
     describe "with multiple rules" do
       before do
-        @checker.options['rules'] << {
+        @checker.options['rules']['rule2'] = {
           'type' => "field>=value",
           'value' => "4",
           'path' => "foo.bing"
@@ -363,11 +377,11 @@ describe Agents::TriggerAgent do
       before do
         @checker.options['keep_event'] = 'true'
         @event.payload['foo']['bar']['baz'] = "5"
-        @checker.options['rules'].first['type'] = "field<value"
+        @checker.options['rules']['rule1']['type'] = "field<value"
       end
 
       it "can re-emit the origin event" do
-        @checker.options['rules'].first['value'] = 3
+        @checker.options['rules']['rule1']['value'] = 3
         @checker.options['message'] = ''
         @event.payload['message'] = 'hi there'
 
@@ -375,7 +389,7 @@ describe Agents::TriggerAgent do
           @checker.receive([@event])
         }.not_to change { Event.count }
 
-        @checker.options['rules'].first['value'] = 6
+        @checker.options['rules']['rule1']['value'] = 6
         expect {
           @checker.receive([@event])
         }.to change { Event.count }.by(1)
@@ -384,7 +398,7 @@ describe Agents::TriggerAgent do
       end
 
       it "merges 'message' into the original event when present" do
-        @checker.options['rules'].first['value'] = 6
+        @checker.options['rules']['rule1']['value'] = 6
 
         @checker.receive([@event])
 

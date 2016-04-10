@@ -17,11 +17,13 @@ describe ScenarioImport do
   let(:trigger_agent_options) {
     {
       'expected_receive_period_in_days' => 2,
-      'rules' => [{
+      'rules' => {
+        'rule1' => {
                     'type' => "regex",
                     'value' => "rain|storm",
                     'path' => "conditions",
-                  }],
+                  }
+      },
       'message' => "Looks like rain!"
     }
   }
