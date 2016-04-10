@@ -11,6 +11,8 @@ db/*.sqlite3
 public/system/*
 coverage
 spec/tmp/*
+.travis.yml
+build_docker_image.sh
 
 # Copied from .gitignore
 *.rbc
