@@ -66,7 +66,7 @@ module Agents
     end
 
     def send_message(message)
-      client.account.sms.messages.create :from => interpolated['sender_cell'],
+      client.account.messages.create :from => interpolated['sender_cell'],
                                          :to => interpolated['receiver_cell'],
                                          :body => message
     end
