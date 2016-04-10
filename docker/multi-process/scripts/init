@@ -46,7 +46,7 @@ echo "RAILS_SERVE_STATIC_FILES=true" >> .env
 
 chmod ugo+r /app/.env
 source /app/.env
-sudo -u huginn -H bundle install --deployment --without test
+sudo -u huginn -H bundle install --without test development --path vendor/bundle
 
 # use default port number if it is still not set
 case "${DATABASE_ADAPTER}" in
