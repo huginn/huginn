@@ -97,6 +97,7 @@ describe JobsController do
     before do
       @not_running = Delayed::Job.create(run_at: Time.zone.now - 1.hour)
       @not_running.update_attribute(:attempts, 1)
+      sign_in users(:jane)
     end
 
     it "run the queued job" do
