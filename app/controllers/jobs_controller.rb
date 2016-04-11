@@ -16,7 +16,7 @@ class JobsController < ApplicationController
     respond_to do |format|
       if !running? && @job.destroy
         format.html { redirect_to jobs_path, notice: "Job deleted." }
-        format.json { render json: "", status: :ok }
+        format.json { render json:, status: :ok }
       else
         format.html { redirect_to jobs_path, alert: 'Can not delete a running job.' }
         format.json { render json: "", status: :unprocessable_entity }
@@ -44,7 +44,7 @@ class JobsController < ApplicationController
     
     respond_to do |format|
       format.html { redirect_to jobs_path, notice: "Queued jobs getting retried." }
-      format.json { render json: '', status: :ok }
+      format.json { render json:, status: :ok }
     end
   end
 
@@ -53,7 +53,7 @@ class JobsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to jobs_path, notice: "Failed jobs removed." }
-      format.json { render json: '', status: :ok }
+      format.json { render json:, status: :ok }
     end
   end
 
@@ -62,7 +62,7 @@ class JobsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to jobs_path, notice: "All jobs removed." }
-      format.json { render json: '', status: :ok }
+      format.json { render json:, status: :ok }
     end
   end
 
