@@ -160,7 +160,7 @@ module Agents
       interpolated['push_hubs'].presence || []
     end
 
-    def receive_web_request(params, method, format, headers={}, request=ActionDispatch::Request.new({}))
+    def receive_web_request(params, method, format)
       unless interpolated['secrets'].include?(params['secret'])
         if format =~ /json/
           return [{ error: "Not Authorized" }, 401]
