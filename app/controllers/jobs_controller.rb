@@ -16,7 +16,7 @@ class JobsController < ApplicationController
     respond_to do |format|
       if !running? && @job.destroy
         format.html { redirect_to jobs_path, notice: "Job deleted." }
-        format.json render json: { status: 'success' }
+        format.json { render json: "", status: :ok }
       else
         format.html { redirect_to jobs_path, alert: 'Can not delete a running job.' }
         format.json { render json: "", status: :unprocessable_entity }
@@ -40,7 +40,8 @@ class JobsController < ApplicationController
   end
 
   def retry_queued
-    @jobs = Delayed::Job.awaiting_retry.update_all(run_at: Time.zone.now)
+    #@jobs = Delayed::Job.awaiting_retry.update_all(run_at: Time.zone.now)
+    @jobs = Delayed::Job.where("failed_at IS NULL AND attempts > 0 AND locked_at IS NULL").update_all(run_at: Time.zone.now)
     
     respond_to do |format|
       format.html { redirect_to jobs_path, notice: "Queued jobs getting retried." }
@@ -53,7 +54,7 @@ class JobsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to jobs_path, notice: "Failed jobs removed." }
-      format.json render json: { status: 'success' }
+      format.json { render json: "", status: :ok }
     end
   end
 
@@ -62,7 +63,7 @@ class JobsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to jobs_path, notice: "All jobs removed." }
-      format.json render json: { status: 'success' }
+      format.json { render json: "", status: :ok }
     end
   end
 
