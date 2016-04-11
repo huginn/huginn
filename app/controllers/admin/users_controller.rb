@@ -26,6 +26,7 @@ class Admin::UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
+        DefaultScenarioImporter.import(@user)    
         format.html { redirect_to admin_users_path, notice: "User '#{@user.username}' was successfully created." }
         format.json { render json: @user, status: :ok, location: admin_users_path(@user) }
       else

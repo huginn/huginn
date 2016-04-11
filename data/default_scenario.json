@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "name": "default-scenario",
+  "description": "This scenario has a few agents to get you started. Feel free to change them or delete them as you see fit!",
+  "source_url": false,
+  "guid": "ee4299225e6531c401a8bbbce0771ce4",
+  "tag_fg_color": "#ffffff",
+  "tag_bg_color": "#5bc0de",
+  "exported_at": "2016-04-03T18:24:42Z",
+  "agents": [
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "Rain Notifier",
+      "disabled": false,
+      "guid": "361ee2e955d4726b52c8b044d4f75e25",
+      "options": {
+        "expected_receive_period_in_days": "2",
+        "rules": [
+          {
+            "type": "regex",
+            "value": "rain|storm",
+            "path": "conditions"
+          }
+        ],
+        "message": "Just so you know, it looks like '{{conditions}}' tomorrow in {{location}}"
+      },
+      "keep_events_for": 0,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::WebsiteAgent",
+      "name": "XKCD Source",
+      "disabled": false,
+      "guid": "505c9bba65507c40e5786afff36f688c",
+      "options": {
+        "url": "http://xkcd.com",
+        "mode": "on_change",
+        "expected_update_period_in_days": 5,
+        "extract": {
+          "url": {
+            "css": "#comic img",
+            "value": "@src"
+          },
+          "title": {
+            "css": "#comic img",
+            "value": "@alt"
+          },
+          "hovertext": {
+            "css": "#comic img",
+            "value": "@title"
+          }
+        }
+      },
+      "schedule": "every_1d",
+      "keep_events_for": 0,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::EmailDigestAgent",
+      "name": "Afternoon Digest",
+      "disabled": false,
+      "guid": "65e8ae4533881537de3c346b5178b75d",
+      "options": {
+        "subject": "Your Afternoon Digest",
+        "expected_receive_period_in_days": "7"
+      },
+      "schedule": "5pm",
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::EmailDigestAgent",
+      "name": "Morning Digest",
+      "disabled": false,
+      "guid": "b34eaee75d8dc67843c3bd257c213852",
+      "options": {
+        "subject": "Your Morning Digest",
+        "expected_receive_period_in_days": "30"
+      },
+      "schedule": "6am",
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::WeatherAgent",
+      "name": "SF Weather Agent",
+      "disabled": false,
+      "guid": "bdae6dfdf9d01a123ddd513e695fd466",
+      "options": {
+        "location": "94103",
+        "api_key": "put-your-key-here"
+      },
+      "schedule": "10pm",
+      "keep_events_for": 0
+    },
+    {
+      "type": "Agents::WebsiteAgent",
+      "name": "iTunes Trailer Source",
+      "disabled": false,
+      "guid": "e9afa65457d0a736b9ec20a8dd452fc8",
+      "options": {
+        "url": "http://trailers.apple.com/trailers/home/rss/newtrailers.rss",
+        "mode": "on_change",
+        "type": "xml",
+        "expected_update_period_in_days": 5,
+        "extract": {
+          "title": {
+            "css": "item title",
+            "value": ".//text()"
+          },
+          "url": {
+            "css": "item link",
+            "value": ".//text()"
+          }
+        }
+      },
+      "schedule": "every_1d",
+      "keep_events_for": 0,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::EventFormattingAgent",
+      "name": "Comic Formatter",
+      "disabled": false,
+      "guid": "d86b069650edadfc61db9df767c8b65c",
+      "options": {
+        "instructions": {
+          "message": "<h2>{{title}}</h2><img src=\"{{url}}\"/> <p>{{hovertext}}</p>"
+        },
+        "matchers": [
+
+        ],
+        "mode": "clean"
+      },
+      "keep_events_for": 2592000,
+      "propagate_immediately": false
+    }
+  ],
+  "links": [
+    {
+      "source": 0,
+      "receiver": 3
+    },
+    {
+      "source": 1,
+      "receiver": 6
+    },
+    {
+      "source": 4,
+      "receiver": 0
+    },
+    {
+      "source": 5,
+      "receiver": 2
+    },
+    {
+      "source": 6,
+      "receiver": 2
+    }
+  ],
+  "control_links": [
+
+  ]
+}
