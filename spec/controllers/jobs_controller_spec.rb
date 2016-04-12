@@ -102,7 +102,6 @@ describe JobsController do
 
     it "run the queued job" do
       expect(Delayed::Job.last.run_at.to_s).not_to eq(Time.zone.now.to_s)
-      #Delayed::Job.awaiting_retry.update_all(run_at: Time.zone.now)
       post :retry_queued
       expect(Delayed::Job.last.run_at.to_s).to eq(Time.zone.now.to_s)
     end
