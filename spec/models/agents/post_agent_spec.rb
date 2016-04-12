@@ -52,7 +52,7 @@ describe Agents::PostAgent do
           raise "unexpected Content-Type: #{content_type}"
         end
       end
-      { status: 200, body: "<html>a webpage!</html>", headers: { 'Content-Type' => 'text/html' } }
+      { status: 200, body: "<html>a webpage!</html>", headers: { 'Content-type' => 'text/html' } }
     }
   end
 
@@ -226,9 +226,27 @@ describe Agents::PostAgent do
           expect(@checker.events.last.payload['body']).to eq '<html>a webpage!</html>'
         end
 
-        it "emits the response headers" do
+        it "emits the response headers capitalized by default" do
           @checker.check
           expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
+        end
+
+        it "emits the response headers capitalized" do
+          @checker.options['event_headers_style'] = 'capitalized'
+          @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
+        end
+
+        it "emits the response headers downcased" do
+          @checker.options['event_headers_style'] = 'downcased'
+          @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'content-type' => 'text/html' })
+        end
+
+        it "emits the response headers snakecased" do
+          @checker.options['event_headers_style'] = 'snakecased'
+          @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'content_type' => 'text/html' })
         end
       end
     end
