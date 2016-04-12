@@ -44,7 +44,7 @@ class JobsController < ApplicationController
     
     respond_to do |format|
       format.html { redirect_to jobs_path, notice: "Queued jobs getting retried." }
-      format.json { head :ok }
+      format.json { head :no_content }
     end
   end
 
