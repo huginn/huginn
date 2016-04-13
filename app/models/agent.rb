@@ -165,7 +165,7 @@ class Agent < ActiveRecord::Base
       if method(:receive_web_request).arity == 1
         handled_request = receive_web_request(request)
       else
-        handled_request = receive_web_request(params, request.method_symbol.to_s, request.format)
+        handled_request = receive_web_request(params, request.method_symbol.to_s, request.format.to_s)
       end
       handled_request.tap do
         self.last_web_request_at = Time.now
