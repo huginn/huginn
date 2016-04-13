@@ -92,4 +92,18 @@ describe JobsController do
       expect(Delayed::Job.find(@running.id)).to be
     end
   end
+
+  describe "POST retry_queued" do
+    before do
+      @not_running = Delayed::Job.create(run_at: Time.zone.now - 1.hour)
+      @not_running.update_attribute(:attempts, 1)
+      sign_in users(:jane)
+    end
+
+    it "run the queued job" do
+      expect(Delayed::Job.last.run_at.to_s).not_to eq(Time.zone.now.to_s)
+      post :retry_queued
+      expect(Delayed::Job.last.run_at.to_s).to eq(Time.zone.now.to_s)
+    end
+  end
 end

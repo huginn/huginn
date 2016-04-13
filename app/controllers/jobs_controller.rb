@@ -39,6 +39,15 @@ class JobsController < ApplicationController
     end
   end
 
+  def retry_queued
+    @jobs = Delayed::Job.awaiting_retry.update_all(run_at: Time.zone.now)
+    
+    respond_to do |format|
+      format.html { redirect_to jobs_path, notice: "Queued jobs getting retried." }
+      format.json { head :no_content }
+    end
+  end
+
   def destroy_failed
     Delayed::Job.where.not(failed_at: nil).delete_all
 
