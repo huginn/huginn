@@ -1,3 +1,18 @@
+<script type="text/javascript">
+$(document).ready(function() {
+  $(".js-example-basic-single").select2();
+});
+
+// function format() {
+//     return '<i class="fa ' + 'fa-fa-camera-retro' + '"></i> ';
+// }
+
+// $('.glyphupload').select2({
+//     width: "100%",
+//     formatResult: format
+// });
+</script>
+
 <%= form_for(@scenario, :method => @scenario.new_record? ? "POST" : "PUT") do |f| %>
   <% if @scenario.errors.any? %>
     <div class="row well">
@@ -49,9 +64,8 @@
   <div class="row">
     <div class="col-md-4">
       <div class="form-group">
-        <div>
-          Select an Icon
-          <%= select_tag "icon", options_for_select([['fa fa-camera-retro', 'fa fa-camera-retro'], ['icon-asterisk','icon-asterisk'], ['icon-ban-circle','icon-ban-circle'],['icon-bar-chart','icon-bar-chart']], params[:icon]),
+        <div class="select2-wrapper">
+          <%= select_tag "glyphupload", options_for_select([['Camera Retro', 'fa fa-camera-retro', {'data-icon' => 'fa-fa-camera-retro'}], ['Paper Plane','fa fa-paper-plane-o', {'data-icon' => 'fa-fa-paper-plane-o'}], ['Arrow','fa fa-arrows', {'data-icon' => 'fa-fa-arrows'}]], params[:icon]),
           { :class => 'js-example-basic-single'} %>
         </div>
       </div>

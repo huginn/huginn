@@ -85,6 +85,7 @@ class ScenariosController < ApplicationController
 
   def update
     @scenario = current_user.scenarios.find(params[:id])
+    session[:icon] = params[:icon]
 
     respond_to do |format|
       if @scenario.update_attributes(params[:scenario])
