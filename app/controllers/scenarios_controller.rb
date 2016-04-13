@@ -6,6 +6,7 @@ class ScenariosController < ApplicationController
     set_table_sort sorts: %w[name public], default: { name: :asc }
 
     @scenarios = current_user.scenarios.reorder(table_sort).page(params[:page])
+    @glyph = session[:icon]
 
     respond_to do |format|
       format.html
@@ -69,6 +70,7 @@ class ScenariosController < ApplicationController
 
   def create
     @scenario = current_user.scenarios.build(params[:scenario])
+    session[:icon] = params[:icon]
 
     respond_to do |format|
       if @scenario.save

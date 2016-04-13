@@ -50,6 +50,18 @@
     <div class="col-md-4">
       <div class="form-group">
         <div>
+          Select an Icon
+          <%= select_tag "icon", options_for_select([['fa fa-camera-retro', 'fa fa-camera-retro'], ['icon-asterisk','icon-asterisk'], ['icon-ban-circle','icon-ban-circle'],['icon-bar-chart','icon-bar-chart']], params[:icon]),
+          { :class => 'js-example-basic-single'} %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="form-group">
+        <div>
           <%= f.label :agents %>
           <%= f.select(:agent_ids,
                        options_for_select(current_user.agents.pluck(:name, :id), @scenario.agent_ids),
