@@ -81,7 +81,7 @@ module Agents
       "#{server_url}/users/#{user.id}/web_requests/#{id}/#{secret}"
     end
 
-    def receive_web_request(params, method, format, headers={}, request=ActionDispatch::Request.new({}))
+    def receive_web_request(params, method, format)
       if memory['pending_calls'].has_key? params['secret']
         response = Twilio::TwiML::Response.new {|r| r.Say memory['pending_calls'][params['secret']], :voice => 'woman'}
         memory['pending_calls'].delete params['secret']

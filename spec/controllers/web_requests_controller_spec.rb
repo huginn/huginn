@@ -5,7 +5,7 @@ describe WebRequestsController do
     cannot_receive_events!
     cannot_be_scheduled!
 
-    def receive_web_request(params, method, format, headers={}, request=ActionDispatch::Request.new({}))
+    def receive_web_request(params, method, format)
       if params.delete(:secret) == options[:secret]
         memory[:web_request_values] = params
         memory[:web_request_format] = format
