@@ -3,14 +3,7 @@ $(document).ready(function() {
   $(".js-example-basic-single").select2();
 });
 
-// function format() {
-//     return '<i class="fa ' + 'fa-fa-camera-retro' + '"></i> ';
-// }
-
-// $('.glyphupload').select2({
-//     width: "100%",
-//     formatResult: format
-// });
+scenario_icon
 </script>
 
 <%= form_for(@scenario, :method => @scenario.new_record? ? "POST" : "PUT") do |f| %>
@@ -65,8 +58,16 @@ $(document).ready(function() {
     <div class="col-md-4">
       <div class="form-group">
         <div class="select2-wrapper">
-          <%= select_tag "glyphupload", options_for_select([['Camera Retro', 'fa fa-camera-retro', {'data-icon' => 'fa-fa-camera-retro'}], ['Paper Plane','fa fa-paper-plane-o', {'data-icon' => 'fa-fa-paper-plane-o'}], ['Arrow','fa fa-arrows', {'data-icon' => 'fa-fa-arrows'}]], params[:icon]),
-          { :class => 'js-example-basic-single'} %>
+          <%= select_tag "scenario_icon", options_for_select([
+            ['Adjust','fa fa-adjust'], 
+            ['Arrows','fa fa-arrows'], 
+            ['Automobile','fa fa-car'],
+            ['Anchor','fa fa-anchor'],
+            ['Bar Chart','fa fa-bar-chart'],
+            ['Bug','fa fa-bug'],
+            ['Asterick','fa-asterisk'],
+            ['Arrow','fa fa-arrows']], params[:scenario_icon]),
+          { :style => "font-family:'FontAwesome', Arial;"} %>
         </div>
       </div>
     </div>
@@ -93,3 +94,4 @@ $(document).ready(function() {
     </div>
   </div>
 <% end %>
+</div>
