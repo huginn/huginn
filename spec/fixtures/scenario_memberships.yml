@@ -6,6 +6,10 @@ jane_rain_notifier_agent_scenario_membership:
   agent: jane_rain_notifier_agent
   scenario: jane_weather
 
+jane_rain_notifier_agent_scenario_membership_duplicate:
+  agent: jane_weather_agent
+  scenario: jane_weather_duplicate
+
 bob_weather_agent_scenario_membership:
   agent: bob_weather_agent
   scenario: bob_weather
