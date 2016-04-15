@@ -1,9 +1,14 @@
 <script type="text/javascript">
+function format(icon) {
+  var originalOption = icon.element;
+  return '<i class="fa ' + $(originalOption).data('icon') + '"></i> ' + icon.text;
+}
 $(document).ready(function() {
-  $(".js-example-basic-single").select2();
+  $(".js-example-basic-single").select2({
+    width: '100%',
+    formatResult: format
+  });
 });
-
-scenario_icon
 </script>
 
 <%= form_for(@scenario, :method => @scenario.new_record? ? "POST" : "PUT") do |f| %>
@@ -58,16 +63,18 @@ scenario_icon
     <div class="col-md-4">
       <div class="form-group">
         <div class="select2-wrapper">
-          <%= select_tag "scenario_icon", options_for_select([
-            ['Adjust','fa fa-adjust'], 
-            ['Arrows','fa fa-arrows'], 
-            ['Automobile','fa fa-car'],
-            ['Anchor','fa fa-anchor'],
-            ['Bar Chart','fa fa-bar-chart'],
-            ['Bug','fa fa-bug'],
-            ['Asterick','fa-asterisk'],
-            ['Arrow','fa fa-arrows']], params[:scenario_icon]),
-          { :style => "font-family:'FontAwesome', Arial;"} %>
+          <%= select_tag("scenario_icon",
+            "<option value='fa fa-adjust' data-icon='fa-adjust'>Adjust</option>
+             <option value='fa fa-camera' data-icon='fa-camera'>Camera</option>
+             <option value='fa fa-anchor' data-icon='fa-anchor'>Anchor</option>
+             <option value='fa fa-archive' data-icon='fa-archive'>Archive</option>
+             <option value='fa fa-asterisk' data-icon='fa-asterisk'>Asterisk</option>
+             <option value='fa fa-adn' data-icon='fa-adn'>Adn</option>
+             <option value='fa fa-bell' data-icon='fa-bell'>Bell</option>
+             <option value='fa fa-bicycle' data-icon='fa-bicycle'>Bicycle</option>
+             <option value='fa fa-bolt' data-icon='fa-bolt'>Bolt</option>
+             ".html_safe,
+            {:style => "font-family:'FontAwesome', Arial;", :class => 'js-example-basic-single'})%>
         </div>
       </div>
     </div>
