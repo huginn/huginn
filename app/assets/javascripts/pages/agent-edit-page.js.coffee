@@ -4,6 +4,15 @@ class @AgentEditPage
     @showCorrectRegionsOnStartup()
     $("form.agent-form").on "submit", => @updateFromEditors()
 
+    # Validate agents_options Json on form submit
+    $('form.agent-form').submit (e) ->
+      if $('textarea#agent_options').length
+        try
+          JSON.parse $('#agent_options').val()
+        catch err
+          e.preventDefault()
+          alert 'Sorry, there appears to be an error in your JSON input. Please fix it before continuing.'
+
     $("#agent_name").each ->
       # Select the number suffix if this is a cloned agent.
       if matches = this.value.match(/ \(\d+\)$/)
