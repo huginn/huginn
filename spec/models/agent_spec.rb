@@ -546,6 +546,17 @@ describe Agent do
         expect(agent).to have(0).errors_on(:sources)
       end
 
+      it "should not allow target agents owned by other people" do
+        agent = Agents::SomethingSource.new(:name => "something")
+        agent.user = users(:bob)
+        agent.receiver_ids = [agents(:bob_weather_agent).id]
+        expect(agent).to have(0).errors_on(:receivers)
+        agent.receiver_ids = [agents(:jane_weather_agent).id]
+        expect(agent).to have(1).errors_on(:receivers)
+        agent.user = users(:jane)
+        expect(agent).to have(0).errors_on(:receivers)
+      end
+
       it "should not allow controller agents owned by other people" do
         agent = Agents::SomethingSource.new(:name => "something")
         agent.user = users(:bob)
@@ -961,6 +972,8 @@ describe AgentDrop do
     @efa.sources << @wsa1 << @wsa2
     @efa.memory[:test] = 1
     @efa.save!
+    @wsa1.reload
+    @wsa2.reload
   end
 
   it 'should be created via Agent#to_liquid' do

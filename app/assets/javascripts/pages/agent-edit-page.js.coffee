@@ -117,10 +117,12 @@ class @AgentEditPage
     $(".control-link-region").show()
 
   hideEventCreation: ->
-    $(".event-related-region").hide()
+    $(".event-related-region .select2-container").hide()
+    $(".event-related-region .cannot-create-events").show()
 
   showEventCreation: ->
-    $(".event-related-region").show()
+    $(".event-related-region .select2-container").show()
+    $(".event-related-region .cannot-create-events").hide()
 
   showEventDescriptions: ->
     if $("#agent_source_ids").val()

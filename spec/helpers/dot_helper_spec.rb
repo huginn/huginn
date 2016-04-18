@@ -51,6 +51,8 @@ describe DotHelper do
             agent.save!
           },
         ]
+        @foo.reload
+        @bar2.reload
       end
 
       it "generates a DOT script" do
