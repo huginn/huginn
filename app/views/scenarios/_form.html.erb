@@ -1,16 +1,3 @@
-<script type="text/javascript">
-function format(icon) {
-  var originalOption = icon.element;
-  return '<i class="fa ' + $(originalOption).data('icon') + '"></i> ' + icon.text;
-}
-$(document).ready(function() {
-  $(".js-example-basic-single").select2({
-    width: '100%',
-    formatResult: format
-  });
-});
-</script>
-
 <%= form_for(@scenario, :method => @scenario.new_record? ? "POST" : "PUT") do |f| %>
   <% if @scenario.errors.any? %>
     <div class="row well">
