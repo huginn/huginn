@@ -58,13 +58,6 @@ GIT
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.1)
 
-GIT
-  remote: https://github.com/kreuzwerker/DKT.huginn_agent
-  revision: 5c70d01a69ef1ba393f7a75eef502b79e168992a
-  branch: feature/agents_in_gems
-  specs:
-    huginn_agent (0.2)
-
 PATH
   remote: vendor/gems/dotenv-2.0.1
   specs:
@@ -288,6 +281,8 @@ GEM
     httparty (0.13.7)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
+    huginn_agent (0.4.0)
+      thor
     hypdf (1.0.10)
       httmultiparty (~> 0.3)
       httparty (~> 0.13)
@@ -636,7 +631,7 @@ DEPENDENCIES
   hipchat (~> 1.2.0)
   httmultiparty (~> 0.3.16)
   httparty (~> 0.13)
-  huginn_agent!
+  huginn_agent (~> 0.4.0)
   hypdf (~> 1.0.10)
   jquery-rails (~> 3.1.3)
   json (~> 1.8.1)
