@@ -155,6 +155,7 @@ class HuginnScheduler < LongRunnable::Worker
 
   def propagate!
     with_mutex do
+      return unless AgentPropagateJob.can_enqueue?
       puts "Queuing event propagation"
       AgentPropagateJob.perform_later
     end

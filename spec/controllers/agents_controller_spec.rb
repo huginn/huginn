@@ -68,10 +68,19 @@ describe AgentsController do
   end
 
   describe "POST propagate" do
-    it "runs event propagation for all Agents" do
+    before(:each) do
       sign_in users(:bob)
+    end
+
+    it "runs event propagation for all Agents" do
       mock.proxy(Agent).receive!
       post :propagate
+    end
+
+    it "does not run the propagation when a job is already enqueued" do
+      mock(AgentPropagateJob).can_enqueue? { false }
+      post :propagate
+      expect(flash[:notice]).to eq('Event propagation is already scheduled to run.')
     end
   end
 

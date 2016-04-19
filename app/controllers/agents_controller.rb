@@ -113,11 +113,15 @@ class AgentsController < ApplicationController
   end
 
   def propagate
-    details = Agent.receive! # Eventually this should probably be scoped to the current_user.
-
     respond_to do |format|
-      format.html { redirect_back "Queued propagation calls for #{details[:event_count]} event(s) on #{details[:agent_count]} agent(s)" }
-      format.json { head :ok }
+      if AgentPropagateJob.can_enqueue?
+        details = Agent.receive! # Eventually this should probably be scoped to the current_user.
+        format.html { redirect_back "Queued propagation calls for #{details[:event_count]} event(s) on #{details[:agent_count]} agent(s)" }
+        format.json { head :ok }
+      else
+        format.html { redirect_back "Event propagation is already scheduled to run." }
+        format.json { head :locked }
+      end
     end
   end
 
