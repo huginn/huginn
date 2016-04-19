@@ -62,8 +62,12 @@ $(document).ready(function() {
   <div class="row">
     <div class="col-md-4">
       <div class="form-group">
-        <%= select_tag("scenario_icon", options_for_select([["Adjust", "fa fa-adjust", {'data-icon' => "fa-adjust" }], ["Camera", "fa fa-camera", {'data-icon' => "fa-camera" }], ["Anchor", "fa fa-anchor", {'data-icon' => "fa-anchor" }], ["Archive", "fa fa-archive", {'data-icon'=> "fa-archive" }], ["Asterisk", "fa fa-asterisk", {'data-icon' => "fa-asterisk" }], ["Adn", "fa fa-adn", {'data-icon' => "fa-adn" }],["Bell", "fa fa-bell", {'data-icon' => "fa-bell" }],["Bicycle", "fa fa-bicycle", {'data-icon' => "fa-bicycle" }],["Bolt", "fa fa-bolt", {'data-icon' => "fa-bolt" }]]),
-          {:style => "font-family:'FontAwesome', Arial;", :class => 'js-example-basic-single'})%>
+        <div>
+          <%= f.label :icon %>
+          <%= f.select(:icon, options_for_select([["Adjust", "fa fa-adjust", {"data-icon" => "fa-adjust"}],
+              ["Camera", "fa fa-camera", {"data-icon" => "fa-camera" }], ["Anchor", "fa fa-anchor", {"data-icon" => "fa-anchor" }], ["Archive", "fa fa-archive", {'data-icon'=> "fa-archive" }], ["Asterisk", "fa fa-asterisk", {'data-icon' => "fa-asterisk" }], ["Adn", "fa fa-adn", {'data-icon' => "fa-adn" }],["Bell", "fa fa-bell", {'data-icon' => "fa-bell" }], ["Bicycle", "fa fa-bicycle", {'data-icon' => "fa-bicycle" }]]), {},
+            {:style => "font-family:'FontAwesome', Arial;", :class => 'js-example-basic-single'}) %>
+        </div>
       </div>
     </div>
   </div>
