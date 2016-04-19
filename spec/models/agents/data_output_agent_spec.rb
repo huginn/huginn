@@ -248,6 +248,12 @@ describe Agents::DataOutputAgent do
         end
 
         it 'can reorder the events_to_show last events based on a Liquid expression' do
+          # Check that ordering takes place before limiting, not after
+          agent.options['events_to_show'] = 2
+          asc_content, _status, _content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
+          expect(asc_content['items'].map {|i| i["title"] }).to eq(["Evolving again", "Evolving yet again with a past date"])
+
+          agent.options['events_to_show'] = 40
           asc_content, _status, _content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
           expect(asc_content['items'].map {|i| i["title"] }).to eq(["Evolving", "Evolving again", "Evolving yet again with a past date"])
 

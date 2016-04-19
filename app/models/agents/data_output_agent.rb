@@ -175,6 +175,43 @@ module Agents
       interpolated['push_hubs'].presence || []
     end
 
+    def sorted_events(reload = false)
+      events =
+        if (event_ids = memory[:event_ids]) &&
+           memory[:events_order] == events_order &&
+           memory[:events_to_show] >= events_to_show
+          received_events.where(id: event_ids).to_a
+        else
+          memory[:last_event_id] = nil
+          reload = true
+          []
+        end
+
+      if reload
+        new_events =
+          if last_event_id = memory[:last_event_id]
+            received_events.order(id: :desc).where(Event.arel_table[:id].gt(last_event_id))
+          else
+            # dig at least twice as many events as the number of
+            # `events_to_show`
+            received_events.order(id: :desc).limit([source_ids.count, 2].max * events_to_show)
+          end.to_a
+        events = new_events.concat(events)
+        memory[:events_order] = events_order
+        memory[:events_to_show] = events_to_show
+        memory[:last_event_id] = events.first.try!(:id)
+      end
+
+      events = sort_events(events).last(events_to_show)
+
+      if reload
+        memory[:event_ids] = events.map(&:id)
+        save
+      end
+
+      events
+    end
+
     def receive_web_request(params, method, format)
       unless interpolated['secrets'].include?(params['secret'])
         if format =~ /json/
@@ -184,7 +221,7 @@ module Agents
         end
       end
 
-      source_events = sort_events(received_events.order(id: :desc).limit(events_to_show).to_a)
+      source_events = sorted_events()
 
       interpolation_context.stack do
         interpolation_context['events'] = source_events
@@ -250,6 +287,9 @@ module Agents
 
     def receive(incoming_events)
       url = feed_url(secret: interpolated['secrets'].first, format: :xml)
+
+      # Reload new events and update cache
+      sorted_events(true)
 
       push_hubs.each do |hub|
         push_to_hub(hub, url)
