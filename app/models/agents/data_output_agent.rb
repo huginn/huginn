@@ -45,9 +45,14 @@ module Agents
               "_contents": "tag contents (can be an object for nesting)"
             }
 
-        # Ordering events in the output
+        # Ordering events
 
-        #{description_events_order('events in the output')}
+        #{description_events_order('events')}
+
+        DataOutputAgent will select the last `events_to_show` entries of its received events sorted in the order specified by `events_order`, which is defaulted to the event creation time.
+        So, if you have multiple source agents that may create many events in a run, you may want to either increase `events_to_show` to have a larger "window", or specify the `events_order` option to an appropriate value (like `date_published`) so events from various sources are properly mixed in the resulted feed.
+
+        There is also an option `events_list_order` to control the order of events listed in the output, with the same format as `events_order`.  It is defaulted to `#{Utils.jsonify(DEFAULT_EVENTS_ORDER['events_list_order'])}` so the latest entry is listed first.
 
         # Liquid Templating
 
@@ -175,7 +180,16 @@ module Agents
       interpolated['push_hubs'].presence || []
     end
 
-    def sorted_events(reload = false)
+    DEFAULT_EVENTS_ORDER = {
+      'events_order' => nil,
+      'events_list_order' => [["{{_index_}}", "number", true]],
+    }
+
+    def events_order(key = SortableEvents::EVENTS_ORDER_KEY)
+      super || DEFAULT_EVENTS_ORDER[key]
+    end
+
+    def latest_events(reload = false)
       events =
         if (event_ids = memory[:event_ids]) &&
            memory[:events_order] == events_order &&
@@ -229,7 +243,7 @@ module Agents
         end
       end
 
-      source_events = sorted_events()
+      source_events = sort_events(latest_events(), 'events_list_order')
 
       interpolation_context.stack do
         interpolation_context['events'] = source_events
@@ -297,7 +311,7 @@ module Agents
       url = feed_url(secret: interpolated['secrets'].first, format: :xml)
 
       # Reload new events and update cache
-      sorted_events(true)
+      latest_events(true)
 
       push_hubs.each do |hub|
         push_to_hub(hub, url)
