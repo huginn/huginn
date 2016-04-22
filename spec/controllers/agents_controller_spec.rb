@@ -408,52 +408,6 @@ describe AgentsController do
     end
   end
 
-  describe "POST dry_run" do
-    before do
-      stub_request(:any, /xkcd/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
-    end
-
-    it "does not actually create any agent, event or log" do
-      sign_in users(:bob)
-      expect {
-        post :dry_run, agent: valid_attributes()
-      }.not_to change {
-        [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count]
-      }
-      json = JSON.parse(response.body)
-      expect(json['log']).to be_a(String)
-      expect(json['events']).to be_a(String)
-      expect(JSON.parse(json['events']).map(&:class)).to eq([Hash])
-      expect(json['memory']).to be_a(String)
-      expect(JSON.parse(json['memory'])).to be_a(Hash)
-    end
-
-    it "does not actually update an agent" do
-      sign_in users(:bob)
-      agent = agents(:bob_weather_agent)
-      expect {
-        post :dry_run, id: agent, agent: valid_attributes(name: 'New Name')
-      }.not_to change {
-        [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
-      }
-    end
-
-    it "accepts an event" do
-      sign_in users(:bob)
-      agent = agents(:bob_website_agent)
-      agent.options['url_from_event'] = '{{ url }}'
-      agent.save!
-      url_from_event = "http://xkcd.com/?from_event=1".freeze
-      expect {
-        post :dry_run, id: agent, event: { url: url_from_event }
-      }.not_to change {
-        [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
-      }
-      json = JSON.parse(response.body)
-      expect(json['log']).to match(/^\[\d\d:\d\d:\d\d\] INFO -- : Fetching #{Regexp.quote(url_from_event)}$/)
-    end
-  end
-
   describe "DELETE memory" do
     it "clears memory of the agent" do
       agent = agents(:bob_website_agent)
