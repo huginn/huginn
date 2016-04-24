@@ -14,6 +14,7 @@ Capybara.default_max_wait_time = CAPYBARA_TIMEOUT
 
 RSpec.configure do |config|
   config.include Warden::Test::Helpers
+  config.include AlertConfirmer, type: :feature
   config.before :suite do
     Warden.test_mode!
   end
