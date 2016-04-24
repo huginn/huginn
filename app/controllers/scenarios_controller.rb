@@ -97,7 +97,7 @@ class ScenariosController < ApplicationController
 
   def destroy
     @scenario = current_user.scenarios.find(params[:id])
-    @scenario.destroy
+    @scenario.destroy_with_mode(params[:mode])
 
     respond_to do |format|
       format.html { redirect_to scenarios_path }
