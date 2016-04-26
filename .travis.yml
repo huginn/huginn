@@ -25,7 +25,6 @@ matrix:
     - rvm: 2.3.0
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
 rvm:
-- 2.0.0
 - 2.1
 - 2.2
 - 2.3.0
