@@ -1,4 +1,4 @@
-require 'capybara_helper'
+require 'rails_helper'
 
 describe Admin::UsersController do
   it "requires to be signed in as an admin" do

@@ -166,6 +166,7 @@ GEM
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     daemons (1.1.9)
+    database_cleaner (1.5.3)
     debug_inspector (0.0.2)
     delayed_job (4.1.1)
       activesupport (>= 3.0, < 5.0)
@@ -599,6 +600,7 @@ DEPENDENCIES
   coffee-rails (~> 4.1.1)
   coveralls
   daemons (~> 1.1.9)
+  database_cleaner (~> 1.5.3)
   delayed_job (~> 4.1.0)
   delayed_job_active_record!
   delorean

@@ -1,4 +1,4 @@
-require 'capybara_helper'
+require 'rails_helper'
 
 describe "Creating a new agent", js: true do
   before(:each) do
