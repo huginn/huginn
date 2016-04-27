@@ -36,7 +36,7 @@ server {
   listen [::]:443 ipv6only=on ssl default_server;
   server_name YOUR_SERVER_FQDN; ## Replace this with something like huginn.example.com
   server_tokens off; ## Don't show the nginx version number, a security best practice
-  root /home/git/huginn/public;
+  root /home/huginn/huginn/public;
 
   ## Increase this if you want to upload large attachments
   ## Or if you want to accept large git objects over http
