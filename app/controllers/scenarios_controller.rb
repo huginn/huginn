@@ -26,7 +26,7 @@ class ScenariosController < ApplicationController
     @scenario = current_user.scenarios.find(params[:id])
 
     set_table_sort sorts: %w[name last_check_at last_event_at last_receive_at], default: { name: :asc }
-    @agents = @scenario.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
+    @agents = @scenario.agents.preload(:scenarios, :controllers, :links_as_receiver, :links_as_source, :control_links_as_controller).reorder(table_sort).page(params[:page])
 
     respond_to do |format|
       format.html

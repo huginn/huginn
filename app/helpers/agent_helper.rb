@@ -57,4 +57,28 @@ module AgentHelper
       'maybe'.freeze
     end
   end
+
+  def agent_type_icon(agent)
+    receiver_count = agent.links_as_receiver.length
+    control_count = agent.control_links_as_controller.length
+    source_count = agent.links_as_source.length
+
+    if control_count > 0 && receiver_count > 0
+      content_tag('span') do
+        concat icon_tag('glyphicon-arrow-right')
+        concat tag('br')
+        concat icon_tag('glyphicon-new-window', class: 'glyphicon-flipped')
+      end
+    elsif control_count > 0 && receiver_count == 0
+      icon_tag('glyphicon-new-window', class: 'glyphicon-flipped')
+    elsif receiver_count > 0 && source_count == 0
+      icon_tag('glyphicon-arrow-right')
+    elsif receiver_count == 0 && source_count > 0
+      icon_tag('glyphicon-arrow-left')
+    elsif receiver_count > 0 && source_count > 0
+      icon_tag('glyphicon-transfer')
+    else
+      icon_tag('glyphicon-unchecked')
+    end
+  end
 end
