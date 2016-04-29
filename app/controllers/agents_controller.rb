@@ -6,7 +6,7 @@ class AgentsController < ApplicationController
   def index
     set_table_sort sorts: %w[name created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
 
-    @agents = current_user.agents.preload(:scenarios, :controllers, :links_as_receiver, :links_as_source, :control_links_as_controller).reorder(table_sort).page(params[:page])
+    @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
     if show_only_enabled_agents?
       @agents = @agents.where(disabled: false)

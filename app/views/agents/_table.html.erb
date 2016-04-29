@@ -16,7 +16,7 @@
     <% @agents.each do |agent| %>
       <tr>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
-          <%= agent_type_icon(agent) %>
+          <%= agent_type_icon(agent, @agents) %>
         </td>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <%= link_to agent.name, agent_path(agent, return: (defined?(return_to) && return_to) || request.path) %>
