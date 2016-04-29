@@ -149,21 +149,22 @@ class HuginnScheduler < LongRunnable::Worker
   def run_schedule(time)
     with_mutex do
       puts "Queuing schedule for #{time}"
-      Agent.delay.run_schedule(time)
+      AgentRunScheduleJob.perform_later(time)
     end
   end
 
   def propagate!
     with_mutex do
+      return unless AgentPropagateJob.can_enqueue?
       puts "Queuing event propagation"
-      Agent.delay.receive!
+      AgentPropagateJob.perform_later
     end
   end
 
   def cleanup_expired_events!
     with_mutex do
       puts "Running event cleanup"
-      Event.delay.cleanup_expired!
+      AgentCleanupExpiredJob.perform_later
     end
   end
 

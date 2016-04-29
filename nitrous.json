@@ -1,0 +1,9 @@
+{
+  "template": "rails",
+  "ports": [3000],
+  "name": "Huginn",
+  "description": "Build agents that monitor and act on your behalf. Your agents are standing by!",
+  "scripts": {
+    "Start Huginn": "cd ~/code/huginn && bundle exec foreman start"
+  }
+}

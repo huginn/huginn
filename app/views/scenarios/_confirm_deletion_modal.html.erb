@@ -1,0 +1,46 @@
+<div id="confirm-scenario-deletion-<%= scenario.id %>" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_for(scenario, url: scenario_path(scenario), method: :delete) do |f| %>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title">
+            <% if @scenario && @scenario == scenario %>
+              How do you want to delete this Scenario?
+            <% else %>
+              How do you want to delete the Scenario '<%= scenario.name %>'?
+            <% end %>
+          </h4>
+        </div>
+        <div class="modal-body">
+          <div class="radio">
+            <%= label_tag do %>
+              <%= radio_button_tag :mode, '', true %>
+              <h4><span class="label label-success">Scenario only</span></h4>
+              Only delete the Scenerio, keep the Agents.
+            <% end %>
+          </div>
+          <div class="radio">
+            <%= label_tag do %>
+              <%= radio_button_tag :mode, :unique_agents %>
+              <h4><span class="label label-warning">Scenario and unique Agents</span></h4>
+              Also deletes Agents that are used in this Scenario only.
+            <% end %>
+          </div>
+          <div class="radio">
+            <%= label_tag do %>
+              <%= radio_button_tag :mode, :all_agents %>
+              <h4><span class="label label-danger">Scenario and all included Agents</span></h4>
+              Deletes Scenario and all included Agents, even if they are used in different Scenarios.
+            <% end %>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <%= f.button 'Abort', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
+          <%= f.submit 'Delete', class: 'btn btn-danger' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+

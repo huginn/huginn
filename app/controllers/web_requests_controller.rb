@@ -24,7 +24,8 @@ class WebRequestsController < ApplicationController
     if user
       agent = user.agents.find_by_id(params[:agent_id])
       if agent
-        content, status, content_type = agent.trigger_web_request(params.except(:action, :controller, :agent_id, :user_id, :format), request.method_symbol.to_s, request.format.to_s)
+        content, status, content_type = agent.trigger_web_request(request)
+
         if content.is_a?(String)
           render :text => content, :status => status || 200, :content_type => content_type || 'text/plain'
         elsif content.is_a?(Hash)
@@ -46,7 +47,7 @@ class WebRequestsController < ApplicationController
       secret = params[:secret]
       user.agents.of_type(Agents::UserLocationAgent).each { |agent|
         if agent.options[:secret] == secret
-          agent.trigger_web_request(params.except(:action, :controller, :user_id, :format), request.method_symbol.to_s, request.format.to_s)
+          agent.trigger_web_request(request)
         end
       }
       render :text => "ok"

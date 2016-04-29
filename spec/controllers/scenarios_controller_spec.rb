@@ -150,5 +150,11 @@ describe ScenariosController do
         delete :destroy, :id => scenarios(:jane_weather).to_param
       }.to raise_error(ActiveRecord::RecordNotFound)
     end
+
+    it "passes the mode to the model" do
+      expect {
+        delete :destroy, id: scenarios(:bob_weather).to_param, mode: 'all_agents'
+      }.to change(Agent, :count).by(-2)
+    end
   end
 end

@@ -36,7 +36,7 @@ module TwitterConcern
   end
 
   def twitter
-    Twitter::REST::Client.new do |config|
+    @twitter ||= Twitter::REST::Client.new do |config|
       config.consumer_key = twitter_consumer_key
       config.consumer_secret = twitter_consumer_secret
       config.access_token = twitter_oauth_token
