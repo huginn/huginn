@@ -11,7 +11,7 @@
         <table class='table table-striped events'>
           <tr>
             <th>Status</th>
-            <th>Agent</th>
+            <th>Agent / Job</th>
             <th>Created</th>
             <th>Next Run</th>
             <th>Attempts</th>
@@ -25,6 +25,8 @@
             <td><% case agent = agent_from_job(job)
                    when Agent
                    %><%= link_to(agent.name, agent_path(agent)) %><%
+                   when String
+                   %><%= agent %><%
                    when false
                    %>(system)<%
                    when nil
