@@ -1,11 +1,3 @@
-class @AgentIndexPage
-  constructor: ->
-    $(".visibility-enabler").on 'click', @toggleDisabledAgentVisibility
-
-  toggleDisabledAgentVisibility: (e) ->
-    e.preventDefault()
-    $("tr > td.agent-unavailable").parents("tr").toggle()
-
 class @AgentShowPage
   constructor: ->
     $(".agent-show #show-tabs a[href='#logs'], #logs .refresh").on "click", @fetchLogs
@@ -74,4 +66,3 @@ class @AgentShowPage
 
 $ ->
   Utils.registerPage(AgentShowPage, forPathsMatching: /^agents\/\d+/)
-  Utils.registerPage(AgentIndexPage, forPathsMatching: /^agents#?$/)
