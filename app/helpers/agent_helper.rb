@@ -6,6 +6,14 @@ module AgentHelper
     end
   end
 
+  def toggle_disabled_text
+    if cookies[:huginn_view_disabled_agents]
+      "Hide Disabled Agents"
+    else
+      "Show Disabled Agents"
+    end
+  end
+
   def scenario_links(agent)
     agent.scenarios.map { |scenario|
       link_to(scenario.name, scenario, class: "label", style: style_colors(scenario))

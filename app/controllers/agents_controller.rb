@@ -8,10 +8,28 @@ class AgentsController < ApplicationController
 
     @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
+    if !disabled_agents_viewable?
+      @agents = @agents.where(disabled: false)
+    end
+
     respond_to do |format|
       format.html
       format.json { render json: @agents }
     end
+  end
+
+  def toggle_visibility
+    cookie_name = :huginn_view_disabled_agents
+    if cookies[cookie_name]
+      cookies.delete(cookie_name)
+    else
+      cookies[cookie_name] = {
+        value: "show",
+        expires: 1.year.from_now
+      }
+    end
+
+    redirect_to agents_path
   end
 
   def handle_details_post
@@ -256,5 +274,10 @@ class AgentsController < ApplicationController
     if @agent.present? && @agent.is_form_configurable?
       @agent = FormConfigurableAgentPresenter.new(@agent, view_context)
     end
+  end
+
+  private
+  def disabled_agents_viewable?
+    cookies[:huginn_view_disabled_agents]
   end
 end

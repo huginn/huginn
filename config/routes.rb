@@ -10,6 +10,7 @@ Huginn::Application.routes.draw do
     end
 
     collection do
+      put :toggle_visibility
       post :propagate
       get :type_details
       post :dry_run
