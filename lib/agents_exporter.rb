@@ -19,6 +19,7 @@ class AgentsExporter
       :guid => options[:guid],
       :tag_fg_color => options[:tag_fg_color],
       :tag_bg_color => options[:tag_bg_color],
+      :icon => options[:icon],
       :exported_at => Time.now.utc.iso8601,
       :agents => agents.map { |agent| agent_as_json(agent) },
       :links => links,
