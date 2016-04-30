@@ -153,7 +153,7 @@ describe Agents::DataOutputAgent do
         expect(content_type).to eq('text/xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
-          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
           <channel>
            <atom:link href="https://yoursite.com/users/#{agent.user.id}/web_requests/#{agent.id}/secret1.xml" rel="self" type="application/rss+xml"/>
            <atom:icon>https://yoursite.com/favicon.ico</atom:icon>
@@ -294,6 +294,118 @@ describe Agents::DataOutputAgent do
           expect(Nokogiri(content).at('/rss/channel/atom:icon/text()').text).to eq('https://somesite.com/icon.png')
         end
       end
+
+      describe "with media namespace not set" do
+        before do
+          agent.options['ns_media'] = nil
+          agent.save!
+        end
+
+        it "can output RSS" do
+          stub(agent).feed_link { "https://yoursite.com" }
+          content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(content_type).to eq('text/xml')
+
+          doc = Nokogiri(content)
+          namespaces = doc.collect_namespaces
+          expect(namespaces).not_to include("xmlns:media")
+        end
+      end
+
+      describe "with media namespace set true" do
+        before do
+          agent.options['ns_media'] = 'true'
+          agent.save!
+        end
+
+        it "can output RSS" do
+          stub(agent).feed_link { "https://yoursite.com" }
+          content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(content_type).to eq('text/xml')
+
+          doc = Nokogiri(content)
+          namespaces = doc.collect_namespaces
+          expect(namespaces).to include(
+            "xmlns:media" => 'http://search.yahoo.com/mrss/'
+          )
+        end
+      end
+
+      describe "with media namespace set false" do
+        before do
+          agent.options['ns_media'] = 'false'
+          agent.save!
+        end
+
+        it "can output RSS" do
+          stub(agent).feed_link { "https://yoursite.com" }
+          content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(content_type).to eq('text/xml')
+
+          doc = Nokogiri(content)
+          namespaces = doc.collect_namespaces
+          expect(namespaces).not_to include("xmlns:media")
+        end
+      end
+
+      describe "with itunes namespace not set" do
+        before do
+          agent.options['ns_itunes'] = nil
+          agent.save!
+        end
+
+        it "can output RSS" do
+          stub(agent).feed_link { "https://yoursite.com" }
+          content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(content_type).to eq('text/xml')
+
+          doc = Nokogiri(content)
+          namespaces = doc.collect_namespaces
+          expect(namespaces).not_to include("xmlns:itunes")
+        end
+      end
+
+      describe "with itunes namespace set true" do
+        before do
+          agent.options['ns_itunes'] = 'true'
+          agent.save!
+        end
+
+        it "can output RSS" do
+          stub(agent).feed_link { "https://yoursite.com" }
+          content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(content_type).to eq('text/xml')
+
+          doc = Nokogiri(content)
+          namespaces = doc.collect_namespaces
+          expect(namespaces).to include(
+            "xmlns:itunes" => 'http://www.itunes.com/dtds/podcast-1.0.dtd'
+          )
+        end
+      end
+
+      describe "with itunes namespace set false" do
+        before do
+          agent.options['ns_itunes'] = 'false'
+          agent.save!
+        end
+
+        it "can output RSS" do
+          stub(agent).feed_link { "https://yoursite.com" }
+          content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(content_type).to eq('text/xml')
+
+          doc = Nokogiri(content)
+          namespaces = doc.collect_namespaces
+          expect(namespaces).not_to include("xmlns:itunes")
+        end
+      end
     end
 
     describe "outputting nesting" do
@@ -392,7 +504,7 @@ describe Agents::DataOutputAgent do
         expect(content_type).to eq('text/xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
-          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+          <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" >
           <channel>
            <atom:link href="https://yoursite.com/users/#{agent.user.id}/web_requests/#{agent.id}/secret1.xml" rel="self" type="application/rss+xml"/>
            <atom:icon>https://yoursite.com/favicon.ico</atom:icon>
