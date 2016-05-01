@@ -27,7 +27,7 @@ module AgentControllerConcern
       if options['configure_options'].nil? || options['configure_options'].keys.length == 0
         errors.add(:base, "The 'configure_options' options hash must be supplied when using the 'configure' action.")
       end
-    when 'enable', 'disable'
+    when 'enable', 'disable', 'toggle'
     when nil
       errors.add(:base, "action must be specified")
     when /\{[%{]/
@@ -67,6 +67,9 @@ module AgentControllerConcern
             target.update!(disabled: true)
             log "Agent '#{target.name}' is disabled"
           end
+        when 'toggle'
+          target.update!(disabled: !target.disabled?)
+          log "Agent '#{target.name}' is #{target.disabled? ? 'disabled' : 'enabled'}"
         when 'configure'
           target.update! options: target.options.deep_merge(interpolated['configure_options'])
           log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"

@@ -17,6 +17,8 @@ module Agents
 
       * `enable`: Target Agents are enabled (if not) when this agent is triggered.
 
+      * `toggle`: Target Agents are enabled (if currently disabled) or disabled (if currently enabled) when this agent is triggered.
+
       * `configure`: Target Agents have their options updated with the contents of `configure_options`.
 
       Here's a tip: you can use Liquid templating to dynamically determine the action type.  For example:
