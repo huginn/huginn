@@ -8,7 +8,7 @@ class AgentsController < ApplicationController
 
     @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
-    if !disabled_agents_viewable?
+    if show_only_enabled_agents?
       @agents = @agents.where(disabled: false)
     end
 
@@ -19,14 +19,10 @@ class AgentsController < ApplicationController
   end
 
   def toggle_visibility
-    cookie_name = :huginn_view_disabled_agents
-    if cookies[cookie_name]
-      cookies.delete(cookie_name)
+    if show_only_enabled_agents?
+      mark_all_agents_viewable
     else
-      cookies[cookie_name] = {
-        value: "show",
-        expires: 1.year.from_now
-      }
+      set_only_enabled_agents_as_viewable
     end
 
     redirect_to agents_path
@@ -277,7 +273,18 @@ class AgentsController < ApplicationController
   end
 
   private
-  def disabled_agents_viewable?
-    cookies[:huginn_view_disabled_agents]
+  def show_only_enabled_agents?
+    !!cookies[:huginn_view_only_enabled_agents]
+  end
+
+  def set_only_enabled_agents_as_viewable
+    cookies[:huginn_view_only_enabled_agents] = {
+      value: "true",
+      expires: 1.year.from_now
+    }
+  end
+
+  def mark_all_agents_viewable
+    cookies.delete(:huginn_view_only_enabled_agents)
   end
 end
