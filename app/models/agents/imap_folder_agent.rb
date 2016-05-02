@@ -47,7 +47,7 @@ module Agents
           If this key is unspecified or set to null, it is ignored.
 
       - `has_attachment`
-      
+
           Setting this to true or false means only mails that does or does not have an attachment are selected.
 
           If this key is unspecified or set to null, it is ignored.
@@ -521,8 +521,9 @@ module Agents
         else
           [mail]
         end.select { |part|
-          if part.multipart? || part.attachment? || !part.text? ||
-             !mime_types.include?(part.mime_type)
+          if part.multipart? &&
+             !(part.attachment? || !part.text? ||
+               !mime_types.include?(part.mime_type))
             false
           else
             part.extend(Scrubbed)
