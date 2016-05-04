@@ -146,6 +146,7 @@ group :development do
     gem 'delorean'
     gem 'poltergeist'
     gem 'pry-rails'
+    gem 'pry-byebug'
     gem 'rr'
     gem 'rspec', '~> 3.2'
     gem 'rspec-collection_matchers', '~> 1.1.0'
