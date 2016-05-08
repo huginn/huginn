@@ -31,7 +31,7 @@ module Agents
       Example configuration:
 
       <pre><code>{
-        'uri' => 'mqtts://user:pass@locahost:8883'
+        'uri' => 'mqtts://user:pass@localhost:8883'
         'ssl' => :TLSv1,
         'ca_file' => './ca.pem',
         'cert_file' => './client.crt',
@@ -82,7 +82,7 @@ module Agents
 
     def default_options
       {
-        'uri' => 'mqtts://user:pass@locahost:8883',
+        'uri' => 'mqtts://user:pass@localhost:8883',
         'ssl' => :TLSv1,
         'ca_file'  => './ca.pem',
         'cert_file' => './client.crt',
