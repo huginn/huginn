@@ -212,7 +212,7 @@ describe Agents::TwitterStreamAgent do
       end
 
       it "initializes Twitter::JSONStream" do
-        mock(Twitter::JSONStream).connect({:path=>"/1/statuses/filter.json?track=agent",
+        mock(Twitter::JSONStream).connect({:path=>"/1.1/statuses/filter.json?track=agent",
                                            :ssl=>true, :oauth=>{:consumer_key=>"twitteroauthkey",
                                            :consumer_secret=>"twitteroauthsecret",
                                            :access_key=>"1234token",
