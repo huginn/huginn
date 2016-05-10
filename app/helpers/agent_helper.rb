@@ -8,9 +8,9 @@ module AgentHelper
 
   def toggle_disabled_text
     if cookies[:huginn_view_only_enabled_agents]
-      "Show Disabled Agents"
+      " Show Disabled Agents"
     else
-      "Hide Disabled Agents"
+      " Hide Disabled Agents"
     end
   end
 
