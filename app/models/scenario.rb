@@ -41,6 +41,8 @@ class Scenario < ActiveRecord::Base
   end
 
   def self.icons
-    Rails.cache.fetch('icons') {YAML.load_file(File.expand_path('config/icons.yml'))}
+    @icons ||= begin
+      YAML.load_file(File.expand_path('config/icons.yml'))
+    end
   end
 end

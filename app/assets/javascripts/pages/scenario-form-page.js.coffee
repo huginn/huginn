@@ -1,7 +1,6 @@
 class @ScenarioFormPage
   constructor:() ->
-    @format
-    @enabledSelect2
+    @enabledSelect2()
 
   format: (icon) ->
     originalOption = icon.element
@@ -10,4 +9,7 @@ class @ScenarioFormPage
   enabledSelect2: () ->
     $('.select2-fountawesome-icon').select2
       width: '100%'
-      formatResult: format
+      formatResult: @format
+      
+$ ->
+  Utils.registerPage(ScenarioFormPage, forPathsMatching: /^scenarios\/\d+\/edit/)
