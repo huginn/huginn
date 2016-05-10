@@ -39,4 +39,8 @@ class Scenario < ActiveRecord::Base
   def agents_are_owned
     errors.add(:agents, "must be owned by you") unless agents.all? {|s| s.user == user }
   end
+
+  def self.icons
+    Rails.cache.fetch('icons') {YAML.load_file(File.expand_path('config/icons.yml'))}
+  end
 end

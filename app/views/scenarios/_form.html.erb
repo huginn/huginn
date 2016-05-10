@@ -51,8 +51,8 @@
       <div class="form-group">
         <div>
           <%= f.label :icon %>
-          <%= f.select(:icon, options_for_select(YAML.load_file(File.expand_path('config/icons.yml'))), {},
-            {:style => "font-family:'FontAwesome', Arial;", :class => 'js-example-basic-single'}) %>
+          <%= f.select(:icon, options_for_select(Scenario.icons), {},
+            {:style => "font-family:'FontAwesome', Arial;", :class => 'select2-fountawesome-icon'}) %>
         </div>
       </div>
     </div>
