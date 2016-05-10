@@ -1,7 +1,7 @@
-class @ScenarioPage
-  constructor: ->
-    @format()
-    @enabledSelect2()
+class @ScenarioFormPage
+  constructor:() ->
+    @format
+    @enabledSelect2
 
   format: (icon) ->
     originalOption = icon.element
@@ -11,5 +11,3 @@ class @ScenarioPage
     $('.select2-fountawesome-icon').select2
       width: '100%'
       formatResult: format
-
-
