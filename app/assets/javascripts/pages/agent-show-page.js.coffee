@@ -66,4 +66,3 @@ class @AgentShowPage
 
 $ ->
   Utils.registerPage(AgentShowPage, forPathsMatching: /^agents\/\d+/)
-  

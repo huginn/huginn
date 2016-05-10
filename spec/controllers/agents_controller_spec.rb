@@ -16,6 +16,14 @@ describe AgentsController do
       get :index
       expect(assigns(:agents).all? {|i| expect(i.user).to eq(users(:bob)) }).to be_truthy
     end
+
+    it "should not show disabled agents if the cookie is set" do
+      @request.cookies["huginn_view_only_enabled_agents"] = "true"
+
+      sign_in users(:bob)
+      get :index
+      expect(assigns(:agents).map(&:disabled).uniq).to eq([false])
+    end
   end
 
   describe "POST handle_details_post" do
@@ -64,6 +72,21 @@ describe AgentsController do
       expect {
         post :remove_events, :id => agents(:bob_website_agent).to_param
       }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe "PUT toggle_visibility" do
+    it "should set the cookie" do
+      sign_in users(:jane)
+      put :toggle_visibility
+      expect(response.cookies["huginn_view_only_enabled_agents"]).to eq("true")
+    end
+
+    it "should delete the cookie" do
+      @request.cookies["huginn_view_only_enabled_agents"] = "true"
+      sign_in users(:jane)
+      put :toggle_visibility
+      expect(response.cookies["huginn_view_only_enabled_agents"]).to be_nil
     end
   end
 
