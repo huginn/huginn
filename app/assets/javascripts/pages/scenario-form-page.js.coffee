@@ -12,4 +12,4 @@ class @ScenarioFormPage
       formatResult: @format
       
 $ ->
-  Utils.registerPage(ScenarioFormPage, forPathsMatching: /^scenarios\/\d+\/edit/)
+  Utils.registerPage(ScenarioFormPage, forPathsMatching: /^scenarios/)
