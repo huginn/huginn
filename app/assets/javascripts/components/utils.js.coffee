@@ -132,3 +132,32 @@ class @Utils
       .fail (xhr, status, error) ->
         alert('Error: ' + error)
         callback()
+
+  @select2TagClickHandler: (e, elem) ->
+    if e.which == 1
+      window.location = $(elem).attr('href')
+    else
+      window.open($(elem).attr('href'))
+
+  # _.escape from underscore: https://github.com/jashkenas/underscore/blob/1e68f06610fa4ecb7f2c45d1eb2ad0173d6a2cc1/underscore.js#L1411-L1436
+  escapeMap =
+    '&': '&amp;'
+    '<': '&lt;'
+    '>': '&gt;'
+    '"': '&quot;'
+    '\'': '&#x27;'
+    '`': '&#x60;'
+
+  createEscaper = (map) ->
+    escaper = (match) ->
+      map[match]
+
+    # Regexes for identifying a key that needs to be escaped.
+    source = '(?:' + Object.keys(map).join('|') + ')'
+    testRegexp = RegExp(source)
+    replaceRegexp = RegExp(source, 'g')
+    (string) ->
+      string = if string == null then '' else '' + string
+      if testRegexp.test(string) then string.replace(replaceRegexp, escaper) else string
+
+  @escape = createEscaper(escapeMap)

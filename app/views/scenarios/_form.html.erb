@@ -53,7 +53,7 @@
           <%= f.label :agents %>
           <%= f.select(:agent_ids,
                        options_for_select(current_user.agents.pluck(:name, :id), @scenario.agent_ids),
-                       {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
+                       {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/agents'} }) %>
         </div>
       </div>
     </div>

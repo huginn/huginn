@@ -38,7 +38,7 @@ bob_disabled_website_agent:
   user: bob
   events_count: 1
   schedule: "midnight"
-  name: "Disabled ZKCD"
+  name: "Disabled Agent"
   guid: <%= SecureRandom.hex %>
   options: <%= {
                  :url => "http://xkcd.com",
