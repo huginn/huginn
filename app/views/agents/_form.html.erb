@@ -4,7 +4,7 @@
   <div class="row well model-errors">
     <h2><%= pluralize(@form.number_of_errors, "error") %> prohibited this Agent from being saved:</h2>
     <% @form.error_messages.each do |msg| %>
-      <p class='text-warning'><%= msg %></p>
+      <p class="text-warning"><%= msg %></p>
     <% end %>
   </div>
 <% end %>
@@ -29,20 +29,20 @@
           <div class="col-md-12">
             <div class="form-group">
               <%= f.label :name %>
-              <%= f.text_field :name, :class => 'form-control' %>
+              <%= f.text_field :name, :class => "form-control" %>
             </div>
 
-            <div class='oauthable-form'>
-              <%= render partial: 'oauth_dropdown', locals: { agent: @form.agent } %>
+            <div class="oauthable-form">
+              <%= render partial: "oauth_dropdown", locals: { agent: @form.agent } %>
             </div>
 
             <div class="form-group">
-              <%= f.label :schedule, :class => 'control-label' %>
+              <%= f.label :schedule, :class => "control-label" %>
               <div class="schedule-region" data-can-be-scheduled="<%= @form.schedulable? %>">
                 <div class="can-be-scheduled">
                   <%= f.select(*@form.schedule_select) %>
                 </div>
-                <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
+                <span class="cannot-be-scheduled text-info">This type of Agent cannot be scheduled.</span>
               </div>
             </div>
 
@@ -51,7 +51,7 @@
                 <%= f.label :controllers %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run or controlled by these user-defined Agents."></span>
                 <div class="controller-list">
-                  <%= agent_controllers(@form.agent) || 'None' %>
+                  <%= agent_controllers(@form.agent) || "None" %>
                 </div>
               </div>
             </div>
@@ -65,7 +65,7 @@
               </div>
             </div>
 
-            <div class='event-related-region' data-can-create-events="<%= @form.creates_events? %>">
+            <div class="event-related-region" data-can-create-events="<%= @form.creates_events? %>">
               <div class="form-group">
                 <%= f.label :keep_events_for, "Keep events" %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="In order to conserve disk space, you can choose to have events created by this Agent expire after a certain period of time.  Make sure you keep them long enough to allow any subsequent Agents to make use of them."></span>
@@ -78,8 +78,8 @@
               <span class="glyphicon glyphicon-question-sign hover-help" data-content="This Agent will receive events from the selected Agents."></span>
               <div class="link-region" data-can-receive-events="<%= @form.receives_events? %>">
                 <%= f.select(*@form.event_sources_select) %>
-                <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
-                <%= f.label :propagate_immediately, :class => 'propagate-immediately' do %>Propagate immediately
+                <span class="cannot-receive-events text-info">This type of Agent cannot receive events.</span>
+                <%= f.label :propagate_immediately, :class => "propagate-immediately" do %>Propagate immediately
                   <%= f.check_box :propagate_immediately %>
                   &nbsp;
                   <span class="glyphicon glyphicon-question-sign hover-help" data-content="Normally, Huginn moves Events from source Agents to receiving Agents once per minute. Checking this option will cause Events created by this Agent's sources to be received immediately. This can use more CPU resources, but will decrease the time between Event creation and being received by this Agent."></span>
@@ -92,7 +92,7 @@
               <span class="glyphicon glyphicon-question-sign hover-help" data-content="Events created by this Agent will be sent to the selected Agents."></span>
               <div class="event-related-region">
                 <%= f.select(*@form.event_targets_select) %>
-                <span class='cannot-create-events text-info'>This type of Agent cannot create events.</span>
+                <span class="cannot-create-events text-info">This type of Agent cannot create events.</span>
               </div>
             </div>
 
@@ -107,7 +107,7 @@
           </div>
 
           <div class="col-md-12 agent-options">
-            <%= render partial: 'options', locals: { agent: @form.agent } %>
+            <%= render partial: "options", locals: { agent: @form.agent } %>
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@
     <div class="col-md-6">
       <div class="row">
         <div class="col-md-12">
-          <div class='well description'>
+          <div class="well description">
             <%= @form.html_description %>
           </div>
         </div>
@@ -124,7 +124,7 @@
 
       <div class="row">
         <div class="col-md-12">
-          <div class='well event-descriptions' style='display: none'></div>
+          <div class="well event-descriptions" style="display: none"></div>
         </div>
       </div>
     </div>
