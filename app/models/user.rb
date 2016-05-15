@@ -80,4 +80,8 @@ class User < ActiveRecord::Base
   def requires_no_invitation_code?
     !!@requires_no_invitation_code
   end
+
+  def scenarios?
+    scenario_count > 0
+  end
 end
