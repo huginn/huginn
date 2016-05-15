@@ -23,7 +23,7 @@ class AgentTypeSelector < Selector
         type,
         {title: html_description(type.name)}
       ]
-    }
+    }.sort_by(&:first)
   end
 
   def html_description(name)
