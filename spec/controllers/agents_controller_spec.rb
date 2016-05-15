@@ -124,7 +124,7 @@ describe AgentsController do
       it "opens a clone of a given Agent" do
         sign_in users(:bob)
         get :new, :id => agents(:bob_website_agent).to_param
-        expect(assigns(:agent).attributes).to eq(users(:bob).agents.build_clone(agents(:bob_website_agent)).attributes)
+        expect(assigns(:form).agent.attributes).to eq(users(:bob).agents.build_clone(agents(:bob_website_agent)).attributes)
       end
 
       it "only allows the current user to clone his own Agent" do
@@ -140,13 +140,13 @@ describe AgentsController do
       it 'populates the assigned agent with the scenario' do
         sign_in users(:bob)
         get :new, :scenario_id => scenarios(:bob_weather).id
-        expect(assigns(:agent).scenario_ids).to eq([scenarios(:bob_weather).id])
+        expect(assigns(:form).agent.scenario_ids).to eq([scenarios(:bob_weather).id])
       end
 
       it "does not see other user's scenarios" do
         sign_in users(:bob)
         get :new, :scenario_id => scenarios(:jane_weather).id
-        expect(assigns(:agent).scenario_ids).to eq([])
+        expect(assigns(:form).agent.scenario_ids).to eq([])
       end
     end
   end
@@ -155,7 +155,7 @@ describe AgentsController do
     it "only shows Agents for the current user" do
       sign_in users(:bob)
       get :edit, :id => agents(:bob_website_agent).to_param
-      expect(assigns(:agent)).to eq(agents(:bob_website_agent))
+      expect(assigns(:form).agent).to eq(agents(:bob_website_agent))
 
       expect {
         get :edit, :id => agents(:jane_website_agent).to_param
@@ -169,28 +169,28 @@ describe AgentsController do
       expect {
         post :create, :agent => valid_attributes(:type => "Agents::ThisIsFake")
       }.not_to change { users(:bob).agents.count }
-      expect(assigns(:agent)).to be_a(Agent)
-      expect(assigns(:agent)).to have(1).error_on(:type)
+      expect(assigns(:form).agent).to be_a(Agent)
+      expect(assigns(:form).agent).to have(1).error_on(:type)
 
       sign_in users(:bob)
       expect {
         post :create, :agent => valid_attributes(:type => "Object")
       }.not_to change { users(:bob).agents.count }
-      expect(assigns(:agent)).to be_a(Agent)
-      expect(assigns(:agent)).to have(1).error_on(:type)
+      expect(assigns(:form).agent).to be_a(Agent)
+      expect(assigns(:form).agent).to have(1).error_on(:type)
       sign_in users(:bob)
 
       expect {
         post :create, :agent => valid_attributes(:type => "Agent")
       }.not_to change { users(:bob).agents.count }
-      expect(assigns(:agent)).to be_a(Agent)
-      expect(assigns(:agent)).to have(1).error_on(:type)
+      expect(assigns(:form).agent).to be_a(Agent)
+      expect(assigns(:form).agent).to have(1).error_on(:type)
 
       expect {
         post :create, :agent => valid_attributes(:type => "User")
       }.not_to change { users(:bob).agents.count }
-      expect(assigns(:agent)).to be_a(Agent)
-      expect(assigns(:agent)).to have(1).error_on(:type)
+      expect(assigns(:form).agent).to be_a(Agent)
+      expect(assigns(:form).agent).to have(1).error_on(:type)
     end
 
     it "creates Agents for the current user" do
@@ -220,7 +220,7 @@ describe AgentsController do
       expect {
         post :create, :agent => valid_attributes(:name => "")
       }.not_to change { users(:bob).agents.count }
-      expect(assigns(:agent)).to have(1).errors_on(:name)
+      expect(assigns(:form).agent).to have(1).errors_on(:name)
       expect(response).to render_template("new")
     end
 
@@ -238,7 +238,7 @@ describe AgentsController do
     it "does not allow changing types" do
       sign_in users(:bob)
       post :update, :id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:type => "Agents::WeatherAgent")
-      expect(assigns(:agent)).to have(1).errors_on(:type)
+      expect(assigns(:form).agent).to have(1).errors_on(:type)
       expect(response).to render_template("edit")
     end
 
@@ -264,19 +264,19 @@ describe AgentsController do
     it "will not accept Agent sources owned by other users" do
       sign_in users(:bob)
       post :update, :id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:source_ids => [agents(:jane_weather_agent).id])
-      expect(assigns(:agent)).to have(1).errors_on(:sources)
+      expect(assigns(:form).agent).to have(1).errors_on(:sources)
     end
 
     it "will not accept Scenarios owned by other users" do
       sign_in users(:bob)
       post :update, :id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:scenario_ids => [scenarios(:jane_weather).id])
-      expect(assigns(:agent)).to have(1).errors_on(:scenarios)
+      expect(assigns(:form).agent).to have(1).errors_on(:scenarios)
     end
 
     it "shows errors" do
       sign_in users(:bob)
       post :update, :id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:name => "")
-      expect(assigns(:agent)).to have(1).errors_on(:name)
+      expect(assigns(:form).agent).to have(1).errors_on(:name)
       expect(response).to render_template("edit")
     end
 

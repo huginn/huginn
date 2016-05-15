@@ -162,24 +162,23 @@ class AgentsController < ApplicationController
     agents = current_user.agents
 
     if id = params[:id]
-      @agent = agents.build_clone(agents.find(id))
+      agent = agents.build_clone(agents.find(id))
     else
-      @agent = agents.build
+      agent = agents.build
     end
 
-    @agent.scenario_ids = [params[:scenario_id]] if params[:scenario_id] && current_user.scenarios.find_by(id: params[:scenario_id])
-
-    initialize_presenter
+    agent.scenario_ids = [params[:scenario_id]] if params[:scenario_id] && current_user.scenarios.find_by(id: params[:scenario_id])
+    @form = AgentForm.new(agent: agent, user: current_user, view: view_context)
 
     respond_to do |format|
       format.html
-      format.json { render json: @agent }
+      format.json { render json: @form.agent }
     end
   end
 
   def edit
-    @agent = current_user.agents.find(params[:id])
-    initialize_presenter
+    agent = current_user.agents.find(params[:id])
+    @form = AgentForm.new(agent: agent, user: current_user, view: view_context)
   end
 
   def create
@@ -190,9 +189,9 @@ class AgentsController < ApplicationController
         format.html { redirect_back "'#{@agent.name}' was successfully created.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
-        initialize_presenter
+        @form = AgentForm.new(agent: @agent, user: current_user, view: view_context)
         format.html { render action: "new" }
-        format.json { render json: @agent.errors, status: :unprocessable_entity }
+        format.json { render json: @form.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -205,9 +204,9 @@ class AgentsController < ApplicationController
         format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
-        initialize_presenter
+        @form = AgentForm.new(agent: @agent, user: current_user, view: view_context)
         format.html { render action: "edit" }
-        format.json { render json: @agent.errors, status: :unprocessable_entity }
+        format.json { render json: @form.errors, status: :unprocessable_entity }
       end
     end
   end
