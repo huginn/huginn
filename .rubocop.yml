@@ -1,13 +1,17 @@
 AllCops:
   DisplayCopNames: true
-  RunRailsCops: true
+  DisplayStyleGuide: true
   Exclude:
+    - 'vendor/gems/**/*'
     - '**/*.yml'
     - 'db/**/*'
     - 'config/**/*'
     - 'doc/**/*'
     - 'deployment/**/*'
     - 'bin/**/*'
+
+Rails:
+  Enabled: true
 
 Style/StringLiterals:
   Enabled: false
@@ -21,15 +25,14 @@ Style/RegexpLiteral:
 Style/SpaceInsideHashLiteralBraces:
   Enabled: false
 
-Style/Blocks:
+Style/BlockDelimiters:
   Exclude:
     - 'spec/**/*'
 
 Metrics/LineLength:
   Max: 140
-
-Style/DotPosition:
-  EnforcedStyle: trailing
+  Exclude:
+    - 'spec/**/*'
 
 Style/FormatString:
   Enabled: false
@@ -51,4 +54,19 @@ Style/NumericLiterals:
     - 'spec/**/*'
 
 Style/StringLiteralsInInterpolation:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
   Enabled: false

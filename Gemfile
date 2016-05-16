@@ -136,6 +136,9 @@ group :development do
   gem 'capistrano-rails', '~> 1.1'
   gem 'capistrano-bundler', '~> 1.1.4'
 
+  gem 'pronto', '~> 0.6'
+  gem 'pronto-rubocop', '~> 0.6', require: false
+
   if_true(ENV['SPRING']) do
     gem 'spring-commands-rspec', '~> 1.0.4'
     gem 'spring', '~> 1.6.3'
