@@ -38,7 +38,9 @@ class Scenario < ActiveRecord::Base
   end
 
   def agents_are_owned
-    errors.add(:agents, 'must be owned by you') unless agents.all? { |s| s.user == user }
+    unless agents.all? { |s| s.user == user }
+      errors.add(:agents, 'must be owned by you')
+    end
   end
 
   def self.icons
