@@ -47,14 +47,14 @@ class ScenariosController < ApplicationController
     @scenario = Scenario.find(params[:id])
     raise ActiveRecord::RecordNotFound unless @scenario.public? || (current_user && current_user.id == @scenario.user_id)
 
-    @exporter = AgentsExporter.new(:name => @scenario.name,
-                                   :description => @scenario.description,
-                                   :guid => @scenario.guid,
-                                   :tag_fg_color => @scenario.tag_fg_color,
-                                   :tag_bg_color => @scenario.tag_bg_color,
-                                   :icon => @scenario.icon,
-                                   :source_url => @scenario.public? && export_scenario_url(@scenario),
-                                   :agents => @scenario.agents)
+    @exporter = AgentsExporter.new(name: @scenario.name,
+                                   description: @scenario.description,
+                                   guid: @scenario.guid,
+                                   tag_fg_color: @scenario.tag_fg_color,
+                                   tag_bg_color: @scenario.tag_bg_color,
+                                   icon: @scenario.icon,
+                                   source_url: @scenario.public? && export_scenario_url(@scenario),
+                                   agents: @scenario.agents)
     response.headers['Content-Disposition'] = 'attachment; filename="' + @exporter.filename + '"'
     render :json => JSON.pretty_generate(@exporter.as_json)
   end

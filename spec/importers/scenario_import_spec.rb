@@ -5,7 +5,7 @@ describe ScenarioImport do
   let(:guid) { "somescenarioguid" }
   let(:tag_fg_color) { "#ffffff" }
   let(:tag_bg_color) { "#000000" }
-  let(:icon) { "Star" }
+  let(:icon) { 'Star' }
   let(:description) { "This is a cool Huginn Scenario that does something useful!" }
   let(:name) { "A useful Scenario" }
   let(:source_url) { "http://example.com/scenarios/2/export.json" }
@@ -62,23 +62,23 @@ describe ScenarioImport do
   end
   let(:valid_parsed_data) do
     {
-      :schema_version => 1,
-      :name => name,
-      :description => description,
-      :guid => guid,
-      :tag_fg_color => tag_fg_color,
-      :tag_bg_color => tag_bg_color,
-      :icon => icon,
-      :source_url => source_url,
-      :exported_at => 2.days.ago.utc.iso8601,
-      :agents => [
+      schema_version: 1,
+      name: name,
+      description: description,
+      guid: guid,
+      tag_fg_color: tag_fg_color,
+      tag_bg_color: tag_bg_color,
+      icon: icon,
+      source_url: source_url,
+      exported_at: 2.days.ago.utc.iso8601,
+      agents: [
         valid_parsed_weather_agent_data,
         valid_parsed_trigger_agent_data
       ],
-      :links => [
+      links: [
         { :source => 0, :receiver => 1 }
       ],
-      :control_links => []
+      control_links: []
     }
   end
   let(:valid_data) { valid_parsed_data.to_json }

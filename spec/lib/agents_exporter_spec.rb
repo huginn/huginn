@@ -7,12 +7,13 @@ describe AgentsExporter do
     let(:guid) { "some-guid" }
     let(:tag_fg_color) { "#ffffff" }
     let(:tag_bg_color) { "#000000" }
-    let(:icon) { "Camera" }
+    let(:icon) { 'Camera' }
     let(:source_url) { "http://yourhuginn.com/scenarios/2/export.json" }
     let(:agent_list) { [agents(:jane_weather_agent), agents(:jane_rain_notifier_agent)] }
     let(:exporter) { AgentsExporter.new(
-      :agents => agent_list, :name => name, :description => description, :source_url => source_url,
-      :guid => guid, :tag_fg_color => tag_fg_color, :tag_bg_color => tag_bg_color, :icon => icon) }
+      agents: agent_list, name: name, description: description,
+      source_url: source_url, guid: guid, tag_fg_color: tag_fg_color,
+      tag_bg_color: tag_bg_color, icon: icon) }
 
     it "outputs a structure containing name, description, the date, all agents & their links" do
       data = exporter.as_json

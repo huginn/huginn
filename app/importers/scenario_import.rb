@@ -66,11 +66,11 @@ class ScenarioImport
     icon = parsed_data['icon']
     source_url = parsed_data['source_url'].presence || nil
     @scenario = user.scenarios.where(:guid => guid).first_or_initialize
-    @scenario.update_attributes!(:name => name, :description => description,
-                                 :source_url => source_url, :public => false,
-                                 :tag_fg_color => tag_fg_color,
-                                 :tag_bg_color => tag_bg_color,
-                                 :icon => icon)
+    @scenario.update_attributes!(name: name, description: description,
+                                 source_url: source_url, public: false,
+                                 tag_fg_color: tag_fg_color,
+                                 tag_bg_color: tag_bg_color,
+                                 icon: icon)
 
     unless options[:skip_agents]
       created_agents = agent_diffs.map do |agent_diff|
