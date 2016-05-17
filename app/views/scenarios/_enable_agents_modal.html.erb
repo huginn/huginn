@@ -1,4 +1,4 @@
-<div id="enable-agents-<%= scenario.id %>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="enableAgentLabel" aria-hidden="true">
+<div id="enable-disable-agents-<%= scenario.id %>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="enableAgentLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -9,7 +9,7 @@
         <p>Would you like to enable all agents?</p>
       </div>
       <div class="modal-footer">
-        <%= form_for(scenario, as: :scenario, url: enable_all_scenarios_path(scenario), method: 'PUT') do |f| %>
+        <%= form_for(scenario, as: :scenario, url: enable_or_disable_all_agents_scenario_path(scenario), method: 'PUT') do |f| %>
           <%= f.hidden_field :disabled, value: 'true' %>
           <%= f.button 'No', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
           <%= f.submit 'Yes', class: 'btn btn-primary' %>

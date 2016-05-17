@@ -39,12 +39,12 @@ Huginn::Application.routes.draw do
   resources :scenarios do
     collection do
       resource :scenario_imports, :only => [:new, :create]
-      put :enable_all
     end
 
     member do
       get :share
       get :export
+      put :enable_or_disable_all_agents
     end
 
     resource :diagram, :only => [:show]
