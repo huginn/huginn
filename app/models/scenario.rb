@@ -28,6 +28,12 @@ class Scenario < ActiveRecord::Base
     destroy
   end
 
+  def self.icons
+    @icons ||= begin
+      YAML.load_file(Rails.root.join('config/icons.yml'))
+    end
+  end
+
   private
 
   def unique_agent_ids
@@ -42,11 +48,4 @@ class Scenario < ActiveRecord::Base
       errors.add(:agents, 'must be owned by you')
     end
   end
-
-  def self.icons
-    @icons ||= begin
-      YAML.load_file(Rails.root.join('config/icons.yml'))
-    end
-  end
-  private_class_method :icons
 end
