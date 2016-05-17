@@ -42,7 +42,7 @@ class Scenario < ActiveRecord::Base
 
   def self.icons
     @icons ||= begin
-      YAML.load_file(File.expand_path('config/icons.yml'))
+      YAML.load_file(Rails.root.join('config/icons.yml'))
     end
   end
 end
