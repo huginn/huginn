@@ -1,15 +1,15 @@
 class @ScenarioShowPage
   constructor:() ->
-    $('#disable_all').on "click", @modalbody()
-    $('#enable_all').on "click", @modaltext()
+    @changemodaltext
 
-  modalbody:() ->
-    $('.modal-body').text 'Would you like to disable all agents?'
-    $('#disabledfield').val 'true'
-
-  modaltext:() ->
-    $('.modal-body').text 'Would you like to enable all agents?'
-    $('#disabledfield').val 'false'
+  changemodaltext: () ->
+    if $('#disable_all').click
+      $('.modal-body').text 'Would you like to disable all agents?'
+      $('#disabledfield').val 1
+    else 
+      $('.modal-body').text 'Would you like to enable all agents?'
+      $('#disabledfield').val 0
 
 $ ->
   Utils.registerPage(ScenarioShowPage, forPathsMatching: /^scenarios/)
+
