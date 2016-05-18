@@ -1,6 +1,6 @@
 class @ScenarioShowPage
   constructor:() ->
-    @changemodaltext
+    @changemodaltext()
 
   changemodaltext: () ->
     if $('#disable_all').click
