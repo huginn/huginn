@@ -21,7 +21,7 @@
         <% @scenarios.each do |scenario| %>
           <tr>
             <td>
-              <% if scenario.icon %>
+              <% if scenario.icon.blank? || scenario.icon.nil? %>
                 <%= scenario_label(scenario, icon(scenario.icon))%>
               <% else %>
                  <%= scenario_label(scenario, icon('gear'))%>
