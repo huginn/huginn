@@ -3,10 +3,10 @@ class @ScenarioShowPage
     @changemodaltext()
 
   changemodaltext: () ->
-    if $('#disable_all').click
+    $('#disable_all').click ->
       $('.modal-body').text 'Would you like to disable all agents?'
       $('#disabledfield').val 1
-    else 
+    $('#enable_all').click ->
       $('.modal-body').text 'Would you like to enable all agents?'
       $('#disabledfield').val 0
 
