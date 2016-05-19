@@ -142,7 +142,7 @@ describe ScenariosController do
 
   describe 'PUT enable_or_disable_all_agents' do
     it 'updates disabled on all agents in a scenario for the current user' do
-      @scenario = { 'scenario' => { 'disabled' => '0' } }
+      @scenario = { 'scenario' => { 'disabled' => 'false' } }
       @id = scenarios(:bob_weather).id
       put :enable_or_disable_all_agents, id: @id, scenario: @scenario
       expect(agents(:bob_disabled_website_agent).disabled).to eq(false)
