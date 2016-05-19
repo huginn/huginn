@@ -140,10 +140,12 @@ describe ScenariosController do
     end
   end
 
-  describe "PUT enable_or_disable_all_agents" do
-    it "updates disabled on all agents in a scenario for the current user" do
-      put :enable_or_disable_all_agents, :id => scenarios(:bob_weather), :scenario => { "scenario"=>{"disabled"=>"0"}}
-      expect(scenarios(:bob_weather).agents.where(:name => "Disabled Agent")[0].disabled).to eq(false)
+  describe 'PUT enable_or_disable_all_agents' do
+    it 'updates disabled on all agents in a scenario for the current user' do
+      @scenario = { 'scenario' => { 'disabled' => '0' } }
+      @id = scenarios(:bob_weather).id
+      put :enable_or_disable_all_agents, id: @id, scenario: @scenario
+      expect(agents(:bob_disabled_website_agent).disabled).to eq(false)
       expect(response).to redirect_to(scenario_path(scenarios(:bob_weather)))
     end
   end
