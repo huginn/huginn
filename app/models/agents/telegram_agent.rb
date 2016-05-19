@@ -13,7 +13,7 @@ module Agents
 
       It is assumed that events have either a `text`, `photo`, `audio`, `document` or `video` key. You can use the EventFormattingAgent if your event does not provide these keys.
 
-      The value of `text` key is sent as a plain text message.
+      The value of `text` key is sent as a plain text message. You can also tell Telegram how to parse the message with `parse_mode`, set to either `html` or `markdown`.
       The value of `photo`, `audio`, `document` and `video` keys should be a url whose contents will be sent to you.
 
       **Setup**
@@ -33,6 +33,7 @@ module Agents
     def validate_options
       errors.add(:base, 'auth_token is required') unless options['auth_token'].present?
       errors.add(:base, 'chat_id is required') unless options['chat_id'].present?
+      errors.add(:base, 'parse_mode has invalid value: should be html or markdown') if interpolated['parse_mode'].present? and !['html', 'markdown'].include? interpolated['parse_mode']
     end
 
     def working?
@@ -70,6 +71,7 @@ module Agents
 
     def send_telegram_message(method, params)
       params[:chat_id] = interpolated['chat_id']
+      params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
       HTTMultiParty.post telegram_bot_uri(method), query: params
     end
 
