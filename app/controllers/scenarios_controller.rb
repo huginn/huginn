@@ -103,7 +103,7 @@ class ScenariosController < ApplicationController
         format.html { redirect_to @scenario, notice: 'The agents in this scenario has been successfully updated.' }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
         format.json { render json: @scenario.errors, status: :unprocessable_entity }
       end
     end
