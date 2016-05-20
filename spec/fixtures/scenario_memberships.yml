@@ -19,5 +19,5 @@ bob_rain_notifier_agent_scenario_membership:
   scenario: bob_weather
 
 bob_disabled_website_agent_scenario_membership:
-  agent: bob_disabled_website_agent
+  agent: bob_website_agent
   scenario: bob_weather
