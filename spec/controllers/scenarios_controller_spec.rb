@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'pp'
 
 describe ScenariosController do
   def valid_attributes(options = {})
@@ -142,10 +143,9 @@ describe ScenariosController do
 
   describe 'PUT enable_or_disable_all_agents' do
     it 'updates disabled on all agents in a scenario for the current user' do
-      #@id = scenarios(:bob_weather).id
-      #@scenario = { :scenario => { :disabled => 'true' } }
-      #put :enable_or_disable_all_agents, id: @id, scenario: @scenario
-      put :enable_or_disable_all_agents, :id => scenarios(:bob_weather), :scenario => { :scenario => { :disabled => true } }
+      @id = scenarios(:bob_weather).id
+      @scenario = { :scenario => { :disabled => 'true' } }
+      put :enable_or_disable_all_agents, id: @id, scenario: @scenario
       expect(agents(:bob_rain_notifier_agent).disabled).to eq(true)
       expect(response).to redirect_to(scenario_path(scenarios(:bob_weather)))
     end
@@ -165,7 +165,7 @@ describe ScenariosController do
     it "passes the mode to the model" do
       expect {
         delete :destroy, id: scenarios(:bob_weather).to_param, mode: 'all_agents'
-      }.to change(Agent, :count).by(-3)
+      }.to change(Agent, :count).by(-2)
     end
   end
 end
