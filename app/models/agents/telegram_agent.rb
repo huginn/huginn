@@ -19,8 +19,15 @@ module Agents
       **Setup**
 
       1. Obtain an `auth_token` by [creating a new bot](https://telegram.me/botfather).
-      2. Send a private message to your bot by visiting https://telegram.me/YourHuginnBot
-      3. Obtain your private `chat_id` from the recently started conversation by visiting https://api.telegram.org/bot`<auth_token>`/getUpdates
+      2a. If you would like to send messages to a public channel:
+        1. Add your bot to the channel as an administrator
+        2. Set `chat_id` to the name of your channel - e.g. `@YourHugginChannel`
+      2b. If you would like to send messages to a group:
+        1. Add the bot to the group
+        2. Obtain your group `chat_id` from the recently started conversation by visiting https://api.telegram.org/bot`<auth_token>`/getUpdates
+      2c. If you would like to send messages privately to yourself:
+        1. Send a private message to your bot by visiting https://telegram.me/YourHuginnBot
+        2. Obtain your private `chat_id` from the recently started conversation by visiting https://api.telegram.org/bot`<auth_token>`/getUpdates
     MD
 
     def default_options
