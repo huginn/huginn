@@ -17,7 +17,6 @@ jane_website_agent:
 
 bob_website_agent:
   type: Agents::WebsiteAgent
-  disabled: false
   user: bob
   events_count: 1
   schedule: "midnight"
