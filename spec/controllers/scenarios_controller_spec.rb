@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'pp'
 
 describe ScenariosController do
   def valid_attributes(options = {})
