@@ -16,4 +16,4 @@ bob_weather_agent_scenario_membership:
 
 bob_rain_notifier_agent_scenario_membership:
   agent: bob_rain_notifier_agent
-  scenario: bob_weather
+  scenario: bob_weather_agent
