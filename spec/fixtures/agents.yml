@@ -33,23 +33,35 @@ bob_website_agent:
                }.to_json.inspect %>
 
 bob_disabled_website_agent:
-  type: Agents::WebsiteAgent
-  disabled: true
   user: bob
-  events_count: 1
-  schedule: "midnight"
+  type: Agents::WebsiteAgent
   name: "Disabled Agent"
+  disabled: false
+  schedule: "midnight"
+  events_count: 1
+  last_check_at: <%= Time.now %>
+  last_receive_at: <%= Time.now + 300 %>
+  last_checked_event_id: 2
+  created_at: <%= Time.now - 100 %>
+  updated_at: <%= Time.now + 100 %>
+  memory: "Hello world"
+  last_web_request_at: <%= Time.now - 600 %>
+  keep_events_for: 0
+  last_event_at: <%= Time.now - 700 %>
+  last_error_log_at: <%= Time.now %>
+  propagate_immediately: false
+  deactivated: false
+  service_id : 23
   guid: <%= SecureRandom.hex %>
   options: <%= {
-                 :url => "http://xkcd.com",
+                 :url => "http://trailers.apple.com/trailers/home/rss/newtrailers.rss",
                  :expected_update_period_in_days => 2,
                  :mode => :on_change,
                  :extract => {
-                   :url => {:css => "#comic img", :value => "@src"},
-                   :title => {:css => "#comic img", :value => "@title"}
+                     :title => {:css => "item title", :value => './/text()'},
+                     :url => {:css => "item link", :value => './/text()'}
                  }
                }.to_json.inspect %>
-
 
 bob_weather_agent:
   type: Agents::WeatherAgent

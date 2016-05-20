@@ -97,7 +97,7 @@ class ScenariosController < ApplicationController
 
   def enable_or_disable_all_agents
     @scenario = current_user.scenarios.find(params[:id])
-    @scenario.agents.update_all disabled: params[:scenario][:disabled]
+    @scenario.agents.update_all(disabled: !!params[:scenario][:disabled].to_i)
 
     respond_to do |format|
       format.html { redirect_to @scenario }
