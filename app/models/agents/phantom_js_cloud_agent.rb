@@ -1,17 +1,15 @@
 require 'json'
 require 'uri'
 
-include ERB::Util
-
-
 module Agents
   class PhantomJsCloudAgent < Agent
+    include ERB::Util
     include FormConfigurable
     include WebRequestConcern
 
     can_dry_run!
 
-    default_schedule "every_12h"
+    default_schedule 'every_12h'
 
     description <<-MD
       [PhantomJs Cloud](https://phantomjscloud.com/) renders webpages in much the same way as a browser would, and allows the Website Agent to properly scrape dynamic content from javascript-heavy pages.
@@ -35,6 +33,9 @@ module Agents
       This is useful in case there are any AJAX requests or animations that need to finish up.
       This can safely be set to 0 if you know there are no AJAX or animations you need to wait for (default: `1000`ms)
 
+
+      As this agent only provides a limited subset of the most commonly used options, you can follow [this guide](https://github.com/cantino/huginn/wiki/Browser-Emulation-Using-PhantomJS-Cloud) to make full use of additional options PhantomJsCloud provides.
+
     MD
 
     event_description <<-MD
@@ -46,13 +47,13 @@ module Agents
 
     def default_options
       {
-          'mode' => 'clean',
-          'url' => "http://xkcd.com",
-          'render_type' => "html",
-          'output_as_json' => false,
-          'ignore_images' => false,
-          'user_agent' => self.class.default_user_agent,
-          'wait_interval' => "1000"
+        'mode' => 'clean',
+        'url' => 'http://xkcd.com',
+        'render_type' => 'html',
+        'output_as_json' => false,
+        'ignore_images' => false,
+        'user_agent' => self.class.default_user_agent,
+        'wait_interval' => '1000'
       }
     end
 
@@ -69,39 +70,36 @@ module Agents
       interpolated['mode'].presence || default_options['mode']
     end
 
-    def renderType
+    def render_type
       interpolated['render_type'].presence || default_options['render_type']
     end
 
-    def outputAsJson
-      boolify(interpolated['output_as_json'].presence || default_options['output_as_json'])
+    def output_as_json
+      boolify(interpolated['output_as_json'].presence ||
+      default_options['output_as_json'])
     end
 
-    def ignoreImages
-      boolify(interpolated['ignore_images'].presence || default_options['ignore_images'])
+    def ignore_images
+      boolify(interpolated['ignore_images'].presence ||
+      default_options['ignore_images'])
     end
 
-    def userAgent
+    def user_agent
       interpolated['user_agent'].presence || self.class.default_user_agent
     end
 
-    def waitInterval
+    def wait_interval
       interpolated['wait_interval'].presence || default_options['wait_interval']
     end
 
-    def get_page_request_settings()
+    def page_request_settings
       prs = {}
 
-      if ignoreImages
-        prs.merge!(ignoreImages: ignoreImages)
-      end
+      prs[:ignoreImages] = ignore_images if ignore_images
+      prs[:userAgent] = user_agent if user_agent.present?
 
-      if userAgent.present?
-        prs.merge!(userAgent: userAgent)
-      end
-
-      if waitInterval != default_options['wait_interval']
-        prs.merge!(wait_interval: waitInterval)
+      if wait_interval != default_options['wait_interval']
+        prs[:wait_interval] = wait_interval
       end
 
       prs
@@ -110,19 +108,16 @@ module Agents
     def build_phantom_url(interpolated)
       api_key = interpolated[:api_key]
       page_request_hash = {
-        :url => interpolated[:url],
-        :renderType => renderType
+        url: interpolated[:url],
+        renderType: render_type
       }
 
-      if outputAsJson
-        page_request_hash.merge!(outputAsJson: outputAsJson)
-      end
+      page_request_hash[:outputAsJson] = output_as_json if output_as_json
 
-
-      page_request_settings_hash = get_page_request_settings()
+      page_request_settings_hash = page_request_settings
 
       if page_request_settings_hash.any?
-        page_request_hash.merge!(requestSettings: page_request_settings_hash)
+        page_request_hash[:requestSettings] = page_request_settings_hash
       end
 
       request = page_request_hash.to_json
@@ -141,7 +136,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          existing_payload = interpolated['mode'].to_s == "merge" ? event.payload : {}
+          existing_payload = interpolated['mode'].to_s == 'merge' ? event.payload : {}
           phantom_url = build_phantom_url(interpolated)
 
           result = { 'url' => phantom_url }
@@ -151,17 +146,17 @@ module Agents
     end
 
     def complete_api_key
-      user.user_credentials.map { |c| {text: c.credential_name, id: "{% credential #{c.credential_name} %}"} }
+      user.user_credentials.map { |c| { text: c.credential_name, id: "{% credential #{c.credential_name} %}" } }
     end
 
     def working?
-      !recent_error_logs? or received_event_without_error?
+      !recent_error_logs? || received_event_without_error?
     end
 
     def validate_options
       # Check for required fields
-      errors.add(:base, "Url is required") unless options['url'].present?
-      errors.add(:base, "API key (credential) is required") unless options['api_key'].present?
+      errors.add(:base, 'Url is required') unless options['url'].present?
+      errors.add(:base, 'API key (credential) is required') unless options['api_key'].present?
     end
   end
 end
