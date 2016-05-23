@@ -133,6 +133,11 @@ describe 'HttpStatusAgent' do
         expect(agent.memory['last_status']).to eq('200')
       end
 
+      it "should record the time spent waiting for the reply" do
+        agent.receive events
+        expect(agent.the_created_events[0][:payload]['elapsed_time']).not_to be_nil
+      end
+
       describe "but the status code is not 200" do
         let(:status_code) { 500 }
 
@@ -234,6 +239,12 @@ describe 'HttpStatusAgent' do
           agent.receive events
           expect(agent.the_created_events[0][:payload]['url']).to eq(successful_url)
           expect(agent.the_created_events[1][:payload]['url']).to eq(failing_url)
+        end
+
+        it "should record the time spent waiting for the reply" do
+          agent.receive events
+          expect(agent.the_created_events[0][:payload]['elapsed_time']).not_to be_nil
+          expect(agent.the_created_events[1][:payload]['elapsed_time']).not_to be_nil
         end
 
       end
