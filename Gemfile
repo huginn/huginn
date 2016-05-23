@@ -3,6 +3,9 @@ source 'https://rubygems.org'
 # Ruby 2.0 is the minimum requirement
 ruby ['2.0.0', RUBY_VERSION].max
 
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+
 # Load vendored dotenv gem and .env file
 require File.join(File.dirname(__FILE__), 'lib/gemfile_helper.rb')
 GemfileHelper.load_dotenv do |dotenv_dir|
