@@ -52,13 +52,13 @@ module Agents
     end
 
     def check
-      check_this_url interpolated[:url] false
+      check_this_url interpolated[:url] interpolated[:header]
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          check_this_url interpolated[:url] false
+          check_this_url interpolated[:url] interpolated[:header]
         end
       end
     end
