@@ -2,9 +2,9 @@ class TimeTracker
   attr_accessor :elapsed_time, :result
 
   def self.track
-    start = Process.clock_gettime(Process::CLOCK_REALTIME)
+    start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     result = yield
-    new(Process.clock_gettime(Process::CLOCK_REALTIME) - start, result)
+    new(Process.clock_gettime(Process::CLOCK_MONOTONIC) - start, result)
   end
 
   def initialize(elapsed_time, result)
