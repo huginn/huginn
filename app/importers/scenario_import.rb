@@ -72,7 +72,7 @@ class ScenarioImport
 
     unless options[:skip_agents]
       created_agents = agent_diffs.map do |agent_diff|
-        agent = agent_diff.agent || Agent.build_for_type("Agents::" + agent_diff.type.incoming, user)
+        agent = agent_diff.agent || AgentBuilder.build_for_type("Agents::" + agent_diff.type.incoming, user)
         agent.guid = agent_diff.guid.incoming
         agent.attributes = { :name => agent_diff.name.updated,
                              :disabled => agent_diff.disabled.updated, # == "true"

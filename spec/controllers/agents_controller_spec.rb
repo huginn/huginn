@@ -203,7 +203,7 @@ describe AgentsController do
       expect(assigns(:agent)).to be_a(Agents::WebsiteAgent)
     end
 
-    it "creates Agents and accepts specifing a target agent" do
+    it "creates Agents and accepts a target agent" do
       sign_in users(:bob)
       attributes = valid_attributes
       attributes[:receiver_ids] = attributes[:source_ids]

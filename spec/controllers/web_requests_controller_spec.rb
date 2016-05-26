@@ -97,7 +97,7 @@ describe WebRequestsController do
 
   describe "legacy update_location endpoint" do
     before do
-      @agent = Agent.build_for_type("Agents::UserLocationAgent", users(:bob), name: "something", options: { secret: "my_secret" })
+      @agent = AgentBuilder.build_for_type("Agents::UserLocationAgent", users(:bob), name: "something", options: { secret: "my_secret" })
       @agent.save!
     end
 
@@ -109,7 +109,7 @@ describe WebRequestsController do
     end
 
     it "should only consider Agents::UserLocationAgents for the given user" do
-      @jane_agent = Agent.build_for_type("Agents::UserLocationAgent", users(:jane), name: "something", options: { secret: "my_secret" })
+      @jane_agent = AgentBuilder.build_for_type("Agents::UserLocationAgent", users(:jane), name: "something", options: { secret: "my_secret" })
       @jane_agent.save!
 
       post :update_location, user_id: users(:bob).to_param, secret: "my_secret", longitude: 123, latitude: 45, something: "else"
@@ -123,7 +123,7 @@ describe WebRequestsController do
     end
 
     it "should only look at agents with the given secret" do
-      @agent2 = Agent.build_for_type("Agents::UserLocationAgent", users(:bob), name: "something", options: { secret: "my_secret2" })
+      @agent2 = AgentBuilder.build_for_type("Agents::UserLocationAgent", users(:bob), name: "something", options: { secret: "my_secret2" })
       @agent2.save!
 
       expect {

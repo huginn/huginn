@@ -15,9 +15,9 @@ module AssignableTypes
   end
 
   module ClassMethods
-    def load_types_in(module_name, my_name = module_name.singularize)
-      const_set(:MODULE_NAME, module_name)
-      const_set(:BASE_CLASS_NAME, my_name)
+    def load_types_in
+      module_name = "Agents"
+      const_set(:BASE_CLASS_NAME, module_name.singularize)
       const_set(:TYPES, Dir[Rails.root.join("app", "models", module_name.underscore, "*.rb")].map { |path| module_name + "::" + File.basename(path, ".rb").camelize })
     end
 
@@ -27,21 +27,6 @@ module AssignableTypes
 
     def valid_type?(type)
       const_get(:TYPES).include?(type)
-    end
-
-    def build_for_type(type, user, attributes = {})
-      attributes.delete(:type)
-
-      if valid_type?(type)
-        type.constantize.new(attributes).tap do |instance|
-          instance.user = user if instance.respond_to?(:user=)
-        end
-      else
-        const_get(:BASE_CLASS_NAME).constantize.new(attributes).tap do |instance|
-          instance.type = type
-          instance.user = user if instance.respond_to?(:user=)
-        end
-      end
     end
   end
 end
