@@ -171,26 +171,6 @@ describe AgentsController do
       }.not_to change { users(:bob).agents.count }
       expect(assigns(:agent)).to be_a(Agent)
       expect(assigns(:agent)).to have(1).error_on(:type)
-
-      sign_in users(:bob)
-      expect {
-        post :create, :agent => valid_attributes(:type => "Object")
-      }.not_to change { users(:bob).agents.count }
-      expect(assigns(:agent)).to be_a(Agent)
-      expect(assigns(:agent)).to have(1).error_on(:type)
-      sign_in users(:bob)
-
-      expect {
-        post :create, :agent => valid_attributes(:type => "Agent")
-      }.not_to change { users(:bob).agents.count }
-      expect(assigns(:agent)).to be_a(Agent)
-      expect(assigns(:agent)).to have(1).error_on(:type)
-
-      expect {
-        post :create, :agent => valid_attributes(:type => "User")
-      }.not_to change { users(:bob).agents.count }
-      expect(assigns(:agent)).to be_a(Agent)
-      expect(assigns(:agent)).to have(1).error_on(:type)
     end
 
     it "creates Agents for the current user" do

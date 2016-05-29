@@ -18,7 +18,6 @@ describe WebRequestsController do
   end
 
   before do
-    stub(Agents::WebRequestReceiverAgent).valid_type?("Agents::WebRequestReceiverAgent") { true }
     @agent = Agents::WebRequestReceiverAgent.new(:name => "something", :options => { :secret => "my_secret" })
     @agent.user = users(:bob)
     @agent.save!

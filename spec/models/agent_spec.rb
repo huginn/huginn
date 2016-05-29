@@ -105,28 +105,6 @@ describe Agent do
     end
   end
 
-  describe "changes to type" do
-    it "validates types" do
-      source = Agent.new
-      source.type = "Agents::WeatherAgent"
-      expect(source).to have(0).errors_on(:type)
-      source.type = "Agents::WebsiteAgent"
-      expect(source).to have(0).errors_on(:type)
-      source.type = "Agents::Fake"
-      expect(source).to have(1).error_on(:type)
-    end
-
-    it "disallows changes to type once a record has been saved" do
-      source = agents(:bob_website_agent)
-      source.type = "Agents::WeatherAgent"
-      expect(source).to have(1).error_on(:type)
-    end
-
-    it "should know about available types" do
-      expect(Agent.types).to include(Agents::WeatherAgent, Agents::WebsiteAgent)
-    end
-  end
-
   describe "with an example Agent" do
     class Agents::SomethingSource < Agent
       default_schedule "2pm"
@@ -144,15 +122,10 @@ describe Agent do
       cannot_be_scheduled!
 
       def receive(events)
-        events.each do |event|
+        events.each do
           create_event :payload => { :events_received => 1 }
         end
       end
-    end
-
-    before do
-      stub(Agents::SomethingSource).valid_type?("Agents::SomethingSource") { true }
-      stub(Agents::CannotBeScheduled).valid_type?("Agents::CannotBeScheduled") { true }
     end
 
     describe Agents::SomethingSource do
@@ -728,10 +701,6 @@ describe Agent do
   describe ".trigger_web_request" do
     class Agents::WebRequestReceiver < Agent
       cannot_be_scheduled!
-    end
-
-    before do
-      stub(Agents::WebRequestReceiver).valid_type?("Agents::WebRequestReceiver") { true }
     end
 
     context "when .receive_web_request is defined" do

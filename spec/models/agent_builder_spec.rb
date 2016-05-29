@@ -9,6 +9,7 @@ describe AgentBuilder do
       expect(agent).to be_kind_of(Agents::ManualEventAgent)
       expect(agent.user).to eq(user)
       expect(agent.name).to eq('Dry-Runner')
+      expect(agent.errors_on(:type).size).to eq(0)
     end
 
     context "when the specified type does not include the Agents module" do
@@ -20,11 +21,12 @@ describe AgentBuilder do
   end
 
   context "when the specified type is an Agent (not subclass)" do
-    it "builds the Agent" do
+    it "builds an agent of type Agent with an error on type" do
       agent = AgentBuilder.build_for_type('Agent', user, name: 'ParentAgent')
       expect(agent).to be_kind_of(Agent)
       expect(agent.user).to eq(user)
       expect(agent.name).to eq('ParentAgent')
+      expect(agent.errors_on(:type)).to eq(["is not a valid type"])
     end
   end
 
