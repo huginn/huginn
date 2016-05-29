@@ -14,7 +14,7 @@ module Agents
     form_configurable :disable_redirect_follow, type: :array, values: ['true', 'false']
 
     description <<-MD
-      The HttpStatusAgent will check a url and emit the resulting HTTP status code.
+      The HttpStatusAgent will check a url and emit the resulting HTTP status code with the time that it waited for a reply.
 
       Specify a `Url` and the Http Status Agent will produce an event with the http status code.
 
@@ -27,6 +27,7 @@ module Agents
           {
             "url": "...",
             "status": "..."
+            "elapsed_time": "..."
           }
     MD
 
@@ -60,11 +61,12 @@ module Agents
     private
 
     def check_this_url(url)
-      if result = ping(url)
-        create_event payload: { 'url' => url, 'status' => result.status.to_s, 'response_received' => true }
-        memory['last_status'] = result.status.to_s
+      measured_result = TimeTracker.track { ping(url) }
+      if measured_result.result
+        create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
+        memory['last_status'] = measured_result.status.to_s
       else
-        create_event payload: { 'url' => url, 'response_received' => false }
+        create_event payload: { 'url' => url, 'response_received' => false, 'elapsed_time' => measured_result.elapsed_time }
         memory['last_status'] = nil
       end
     end
@@ -75,7 +77,6 @@ module Agents
     rescue
       nil
     end
-
   end
 
 end
