@@ -1,4 +1,4 @@
-<%= form_for(@scenario, :method => @scenario.new_record? ? "POST" : "PUT") do |f| %>
+<%= form_for(@scenario, html: { multipart: true }, :method => @scenario.new_record? ? "POST" : "PUT") do |f| %>
   <% if @scenario.errors.any? %>
     <div class="row well">
       <h2><%= pluralize(@scenario.errors.count, "error") %> prohibited this Scenario from being saved:</h2>
@@ -34,6 +34,10 @@
       <div class="form-group">
         <%= f.label :description, "Optional Description" %>
         <%= f.text_area :description, :rows => 10, :class => 'form-control', :placeholder => "Optionally describe what this Scenario will do.  If this will be public, you should also include some contact information." %>
+      </div>
+      <div class="form-group">
+        <%= f.label :avatar, "Avatar" %>
+        <%= f.file_field :avatar %>
       </div>
 
       <div class="checkbox">

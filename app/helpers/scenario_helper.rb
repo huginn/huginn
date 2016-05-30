@@ -9,7 +9,9 @@ module ScenarioHelper
 
   def scenario_label(scenario, text = nil)
     text ||= scenario.name
-    content_tag :span, text, class: 'label scenario', style: style_colors(scenario)
+    content_tag :span, text, class: 'label scenario' do 
+      concat(image_tag(scenario.avatar.url(:thumb)))
+    end
   end
 
   def default_scenario_bg_color
