@@ -1,6 +1,4 @@
 require 'rails_helper'
-require_relative '../../app/models/agents/weather_agent'
-require_relative '../../app/models/agents/website_agent'
 
 describe AssignableTypes do
   let(:non_agent_class) {
@@ -34,7 +32,7 @@ describe AssignableTypes do
   end
 
   it "should know about available types" do
-    Agents::WeatherAgent.new
-    expect(Agent.types).to include(Agents::WeatherAgent, Agents::WebsiteAgent)
+    expect(Agent.types.map(&:to_s)).to include("Agents::WeatherAgent", "Agents::WebsiteAgent")
+    expect(Agent.types).not_to include(Agent)
   end
 end

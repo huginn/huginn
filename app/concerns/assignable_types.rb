@@ -16,14 +16,7 @@ module AssignableTypes
 
   module ClassMethods
     def types
-      const_get(:TYPES).map(&:constantize)
-    end
-
-    private
-    def load_types_in
-      module_name = "Agents"
-      const_set(:BASE_CLASS_NAME, module_name.singularize)
-      const_set(:TYPES, Dir[Rails.root.join("app", "models", module_name.underscore, "*.rb")].map { |path| module_name + "::" + File.basename(path, ".rb").camelize })
+      Agent.descendants
     end
   end
 
