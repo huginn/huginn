@@ -132,12 +132,57 @@ describe Agents::JavaScriptAgent do
         expect(AgentLog.last.message).to match(/oh no/)
         expect(AgentLog.last.level).to eq(4)
       end
+    end
 
+    describe "getMemory" do
       it "won't store NaNs" do
         @agent.options['code'] = 'Agent.check = function() { this.memory("foo", NaN); };'
         @agent.save!
         @agent.check
         expect(@agent.memory['foo']).to eq('NaN') # string
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "it stores an Array" do
+        @agent.options['code'] = 'Agent.check = function() {
+          var arr = [1,2];
+          this.memory("foo", arr);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq([1,2])
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "it stores a Hash" do
+        @agent.options['code'] = 'Agent.check = function() {
+          var obj = {};
+          obj["one"] = 1;
+          obj["two"] = [1,2];
+          this.memory("foo", obj);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq({"one"=>1, "two"=> [1,2]})
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "it stores a nested Hash" do
+        @agent.options['code'] = 'Agent.check = function() {
+          var u = {};
+          u["one"] = 1;
+          u["two"] = 2;
+          var obj = {};
+          obj["three"] = 3;
+          obj["four"] = u;
+          this.memory("foo", obj);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq({"three"=>3, "four"=>{"one"=>1, "two"=>2}})
         @agent.save!
         expect { @agent.reload.memory }.not_to raise_error
       end
