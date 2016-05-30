@@ -17,6 +17,12 @@ module Huginn
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W(#{config.root}/lib)
 
+    # Eager load code on boot. This eager loads most of Rails and
+    # your application in memory, allowing both threaded web servers
+    # and those relying on copy on write to perform better.
+    # Rake tasks automatically ignore this option for performance.
+    config.eager_load = true
+
     # Activate observers that should always be running.
     # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
 
