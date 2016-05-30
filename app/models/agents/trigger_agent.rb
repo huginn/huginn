@@ -2,7 +2,7 @@ module Agents
   class TriggerAgent < Agent
     cannot_be_scheduled!
 
-    VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value field!=value field>=value field>value]
+    VALID_COMPARISON_TYPES = %w[regex !regex regexdoc !regexdoc field<value field<=value field==value field!=value field>=value field>value]
 
     description <<-MD
       The Trigger Agent will watch for a specific value in an Event payload.
@@ -81,6 +81,14 @@ module Agents
               value_at_path.to_s =~ Regexp.new(rule_value, Regexp::IGNORECASE)
             when "!regex"
               value_at_path.to_s !~ Regexp.new(rule_value, Regexp::IGNORECASE)
+            when "regexdoc"
+              contents = open(rule_value) { |f| f.read }
+              contents.strip!.gsub!(/[\n]+/,"|")
+              value_at_path.to_s =~ Regexp.new(contents, Regexp::IGNORECASE)
+            when "!regexdoc"
+              contents = open(rule_value) { |f| f.read }
+              contents.strip!.gsub!(/[\n]+/,"|")
+              value_at_path.to_s !~ Regexp.new(contents, Regexp::IGNORECASE)
             when "field>value"
               value_at_path.to_f > rule_value.to_f
             when "field>=value"
