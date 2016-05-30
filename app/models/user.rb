@@ -65,6 +65,10 @@ class User < ActiveRecord::Base
     super && active?
   end
 
+  def has_scenarios?
+    scenario_count > 0
+  end
+
   def inactive_message
     active? ? super : :deactivated_account
   end
@@ -79,9 +83,5 @@ class User < ActiveRecord::Base
 
   def requires_no_invitation_code?
     !!@requires_no_invitation_code
-  end
-
-  def scenarios?
-    scenario_count > 0
   end
 end

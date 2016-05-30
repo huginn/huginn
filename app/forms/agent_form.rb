@@ -16,8 +16,8 @@ class AgentForm
 
   attr_reader :agent
   def_delegators :agent, :errors, :keep_events_for, :new_record?, :short_type
-  def_delegator :user, :scenarios?
-  alias_method :changeable_type?, :new_record?
+  def_delegator :user, :has_scenarios?
+  alias_method :agent_type_changeable?, :new_record?
 
   def agent_type_select
     AgentTypeSelector.new(select_id: :type, selected: agent.type, user: user, view: view)

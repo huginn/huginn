@@ -17,7 +17,7 @@
       <div class="row">
 
         <div class="col-md-12">
-          <% if @form.changeable_type? %>
+          <% if @form.agent_type_changeable? %>
             <div class="form-group type-select">
               <%= f.label :type %>
               <%= f.select(*@form.agent_type_select) %>
@@ -96,7 +96,7 @@
               </div>
             </div>
 
-            <% if @form.scenarios? %>
+            <% if @form.has_scenarios? %>
               <div class="form-group">
                 <%= f.label :scenarios %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="Use Scenarios to group sets of Agents, both for organization, and to make them easy to export and share."></span>
