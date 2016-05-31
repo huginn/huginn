@@ -1,6 +1,7 @@
 <div class='table-responsive'>
   <table class='table table-striped'>
     <tr>
+      <th></th>
       <th><%= sortable_column 'name', 'asc' %></th>
       <th><%= sortable_column 'created_at', 'desc', name: 'Age' %></th>
       <th>Schedule</th>
@@ -14,6 +15,9 @@
 
     <% @agents.each do |agent| %>
       <tr>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <%= agent_type_icon(agent, @agents) %>
+        </td>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <%= link_to agent.name, agent_path(agent, return: (defined?(return_to) && return_to) || request.path) %>
           <br/>
