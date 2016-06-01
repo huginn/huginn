@@ -4,7 +4,7 @@ require 'feed-normalizer'
 module Agents
   class RssAgent < Agent
     include WebRequestConcern
-
+    register_agent
     cannot_receive_events!
     can_dry_run!
     default_schedule "every_1d"

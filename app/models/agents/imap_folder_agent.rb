@@ -4,6 +4,7 @@ require 'mail'
 
 module Agents
   class ImapFolderAgent < Agent
+    register_agent
     cannot_receive_events!
 
     can_dry_run!

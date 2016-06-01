@@ -3,7 +3,7 @@ require 'hypdf'
 
 module Agents
   class PdfInfoAgent < Agent
-
+    register_agent
     gem_dependency_check { defined?(HyPDF) }
 
     cannot_be_scheduled!

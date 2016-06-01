@@ -3,7 +3,7 @@ require 'csv'
 module Agents
   class SentimentAgent < Agent
     class_attribute :anew
-
+    register_agent
     cannot_be_scheduled!
 
     description <<-MD

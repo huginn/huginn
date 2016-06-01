@@ -6,7 +6,7 @@ module AssignableTypes
   end
 
   def short_type
-    @short_type ||= type.split("::").pop
+    @short_type ||= self.class.name.demodulize
   end
 
   def validate_type
@@ -15,8 +15,15 @@ module AssignableTypes
   end
 
   module ClassMethods
+    @@agents = []
+
     def types
-      Agent.descendants
+      @@agents
+    end
+
+    private
+    def register_agent
+      @@agents |= [self] if self < Agent
     end
   end
 

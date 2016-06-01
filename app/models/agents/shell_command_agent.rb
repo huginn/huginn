@@ -1,10 +1,9 @@
 module Agents
   class ShellCommandAgent < Agent
     default_schedule "never"
-
+    register_agent
     can_dry_run!
     no_bulk_receive!
-
 
     def self.should_run?
       ENV['ENABLE_INSECURE_AGENTS'] == "true"

@@ -2,9 +2,8 @@ require 'uri'
 
 module Agents
   class AftershipAgent < Agent
-
+    register_agent
     cannot_receive_events!
-
     default_schedule "every_10m"
 
     description <<-MD

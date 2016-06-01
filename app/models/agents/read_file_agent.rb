@@ -3,6 +3,7 @@ module Agents
     include FormConfigurable
     include FileHandling
 
+    register_agent
     cannot_be_scheduled!
     consumes_file_pointer!
 

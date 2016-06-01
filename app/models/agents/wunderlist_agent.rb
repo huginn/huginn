@@ -2,6 +2,7 @@ module Agents
   class WunderlistAgent < Agent
     include FormConfigurable
     include Oauthable
+    register_agent
     valid_oauth_providers :wunderlist
 
     cannot_be_scheduled!

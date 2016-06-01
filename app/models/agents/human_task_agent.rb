@@ -1,5 +1,6 @@
 module Agents
   class HumanTaskAgent < Agent
+    register_agent
     default_schedule "every_10m"
 
     gem_dependency_check { defined?(RTurk) }

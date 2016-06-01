@@ -2,6 +2,7 @@ require 'json'
 
 module Agents
   class GoogleCalendarPublishAgent < Agent
+    register_agent
     cannot_be_scheduled!
     no_bulk_receive!
 

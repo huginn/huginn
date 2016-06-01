@@ -1,5 +1,6 @@
 module Agents
   class ChangeDetectorAgent < Agent
+    register_agent
     cannot_be_scheduled!
 
     description <<-MD

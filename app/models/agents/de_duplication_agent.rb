@@ -1,6 +1,7 @@
 module Agents
   class DeDuplicationAgent < Agent
     include FormConfigurable
+    register_agent
     cannot_be_scheduled!
 
     description <<-MD

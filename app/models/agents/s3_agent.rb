@@ -2,7 +2,7 @@ module Agents
   class S3Agent < Agent
     include FormConfigurable
     include FileHandling
-
+    register_agent
     emits_file_pointer!
     no_bulk_receive!
 

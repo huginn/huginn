@@ -1,7 +1,7 @@
 module Agents
   class CommanderAgent < Agent
     include AgentControllerConcern
-
+    register_agent
     cannot_create_events!
 
     description <<-MD

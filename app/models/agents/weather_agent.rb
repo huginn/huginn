@@ -4,7 +4,7 @@ require 'cgi'
 module Agents
   class WeatherAgent < Agent
     cannot_receive_events!
-
+    register_agent
     gem_dependency_check { defined?(Wunderground) && defined?(ForecastIO) }
 
     description <<-MD

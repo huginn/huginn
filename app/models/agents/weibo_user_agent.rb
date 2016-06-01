@@ -3,7 +3,7 @@
 module Agents
   class WeiboUserAgent < Agent
     include WeiboConcern
-
+    register_agent
     cannot_receive_events!
 
     description <<-MD

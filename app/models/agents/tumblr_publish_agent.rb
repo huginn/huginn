@@ -3,7 +3,7 @@ require "tumblr_client"
 module Agents
   class TumblrPublishAgent < Agent
     include TumblrConcern
-
+    register_agent
     cannot_be_scheduled!
 
     description <<-MD

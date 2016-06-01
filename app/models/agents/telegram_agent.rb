@@ -4,6 +4,7 @@ require 'tempfile'
 
 module Agents
   class TelegramAgent < Agent
+    register_agent
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!

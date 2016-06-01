@@ -1,6 +1,6 @@
 module Agents
   class BoxcarAgent < Agent
-
+    register_agent
     cannot_be_scheduled!
     cannot_create_events!
 

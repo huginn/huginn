@@ -1,7 +1,7 @@
 module Agents
   class DigestAgent < Agent
     include FormConfigurable
-
+    register_agent
     default_schedule "6am"
 
     description <<-MD

@@ -1,5 +1,6 @@
 module Agents
   class WitaiAgent < Agent
+    register_agent
     cannot_be_scheduled!
     no_bulk_receive!
 

@@ -1,5 +1,6 @@
 module Agents
   class GoogleFlightsAgent < Agent
+    register_agent
     include FormConfigurable
 
     cannot_receive_events!

@@ -1,5 +1,6 @@
 module Agents
   class TwilioReceiveTextAgent < Agent
+    register_agent
     cannot_be_scheduled!
     cannot_receive_events!
 
