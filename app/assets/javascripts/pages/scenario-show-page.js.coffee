@@ -1,12 +1,12 @@
 class @ScenarioShowPage
   constructor:() ->
-    @changeModaltext()
+    @changeModalText()
 
-  changeModaltext: () ->
-    $('#disable_all').click ->
+  changeModalText: () ->
+    $('#disable-all').click ->
       $('#enable-disable-agents .modal-body').text 'Would you like to disable all agents?'
       $('#scenario-disabled-value').val 'true'
-    $('#enable_all').click ->
+    $('#enable-all').click ->
       $('#enable-disable-agents .modal-body').text 'Would you like to enable all agents?'
       $('#scenario-disabled-value').val 'false'
 

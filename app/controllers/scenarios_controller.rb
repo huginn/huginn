@@ -99,8 +99,8 @@ class ScenariosController < ApplicationController
     @scenario = current_user.scenarios.find(params[:id])
 
     respond_to do |format|
-      if @scenario.agents.update_all disabled: (params[:scenario][:disabled] == 'true' ? true : false)
-        format.html { redirect_to @scenario, notice: 'The agents in this scenario has been successfully updated.' }
+      if @scenario.agents.update_all disabled: (params[:scenario][:disabled]) == 'true' ? true : false)
+        format.html { redirect_to @scenario, notice: 'The agents in this scenario have been successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
