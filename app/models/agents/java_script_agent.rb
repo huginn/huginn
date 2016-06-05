@@ -220,9 +220,9 @@ module Agents
     end
 
     def clean_nans(input)
-      if input.is_a?(Array)
+      if input.is_a?(V8::Array)
         input.map {|v| clean_nans(v) }
-      elsif input.is_a?(Hash)
+      elsif input.is_a?(V8::Object)
         input.inject({}) { |m, (k, v)| m[k] = clean_nans(v); m }
       elsif input.is_a?(Float) && input.nan?
         'NaN'
