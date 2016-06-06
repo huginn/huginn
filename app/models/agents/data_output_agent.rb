@@ -188,18 +188,26 @@ module Agents
         end
 
       if reload
-        new_events =
-          if last_event_id = memory[:last_event_id]
-            received_events.order(id: :desc).where(Event.arel_table[:id].gt(last_event_id))
-          else
-            # dig at least twice as many events as the number of
-            # `events_to_show`
-            received_events.order(id: :desc).limit([source_ids.count, 2].max * events_to_show)
-          end.to_a
-        events = new_events.concat(events)
         memory[:events_order] = events_order
         memory[:events_to_show] = events_to_show
-        memory[:last_event_id] = events.first.try!(:id)
+
+        new_events =
+          if last_event_id = memory[:last_event_id]
+            received_events.where(Event.arel_table[:id].gt(last_event_id)).
+              order(id: :asc).to_a
+          else
+            source_ids.flat_map { |source_id|
+              # dig twice as many events as the number of
+              # `events_to_show`
+              received_events.where(agent_id: source_id).
+                last(2 * events_to_show)
+            }.sort_by(&:id)
+          end
+
+        unless new_events.empty?
+          memory[:last_event_id] = new_events.last.id
+          events.concat(new_events)
+        end
       end
 
       events = sort_events(events).last(events_to_show)
