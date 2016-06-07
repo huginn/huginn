@@ -82,8 +82,12 @@ module Agents
       validate_events_order
     end
 
-    def events_order
-      super.presence || DEFAULT_EVENTS_ORDER
+    def events_order(key = SortableEvents::EVENTS_ORDER_KEY)
+      if key == SortableEvents::EVENTS_ORDER_KEY
+        super.presence || DEFAULT_EVENTS_ORDER
+      else
+        raise ArgumentError, "unsupported key: #{key}"
+      end
     end
 
     def check
