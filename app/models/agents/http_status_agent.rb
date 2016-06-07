@@ -65,21 +65,14 @@ module Agents
 
     private
 
-<<<<<<< HEAD:app/models/agents/http_status_agent.rb
-    def check_this_url(url)
+    def check_this_url(url, header)
       measured_result = TimeTracker.track { ping(url) }
       if measured_result.result
-        create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
-        memory['last_status'] = measured_result.status.to_s
-=======
-    def check_this_url(url, header)
-      if result = ping(url)
         if header?
-          create_event payload: { 'url' => url, 'status' => result.status.to_s, 'header' => header, 'header_value' => result.headers[header], 'response_received' => true }
+          create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'header' => header, 'header_value' => result.headers[header], 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
         else
-          create_event payload: { 'url' => url, 'status' => result.status.to_s, 'response_received' => true }
-        memory['last_status'] = result.status.to_s
->>>>>>> 94ca7f3... Add WIP support for HTTP headers:app/models/agents/http_agent.rb
+          create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
+        memory['last_status'] = measured_result.status.to_s
       else
         create_event payload: { 'url' => url, 'response_received' => false, 'elapsed_time' => measured_result.elapsed_time }
         memory['last_status'] = nil
