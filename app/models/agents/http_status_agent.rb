@@ -52,13 +52,13 @@ module Agents
     end
 
     def check
-      check_this_url interpolated[:url] interpolated[:header]
+      check_this_url interpolated[:url], interpolated[:header]
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          check_this_url interpolated[:url] interpolated[:header]
+          check_this_url interpolated[:url], interpolated[:header]
         end
       end
     end
@@ -72,6 +72,7 @@ module Agents
           create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'header' => header, 'header_value' => result.headers[header], 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
         else
           create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
+        end
         memory['last_status'] = measured_result.status.to_s
       else
         create_event payload: { 'url' => url, 'response_received' => false, 'elapsed_time' => measured_result.elapsed_time }
