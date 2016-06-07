@@ -26,13 +26,9 @@ module Agents
 
           {
             "url": "...",
-<<<<<<< HEAD:app/models/agents/http_status_agent.rb
             "status": "..."
             "elapsed_time": "..."
-=======
-            "status": "...",
             "header": "..."
->>>>>>> 94ca7f3... Add WIP support for HTTP headers:app/models/agents/http_agent.rb
           }
     MD
 
