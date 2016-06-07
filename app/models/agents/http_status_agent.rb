@@ -68,8 +68,8 @@ module Agents
     def check_this_url(url, header)
       measured_result = TimeTracker.track { ping(url) }
       if measured_result.result
-        if header?
-          create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'header' => header, 'header_value' => result.headers[header], 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
+        if defined? header
+          create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'header' => header, 'header_value' => measured_result.result.headers[header], 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
         else
           create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
         end
