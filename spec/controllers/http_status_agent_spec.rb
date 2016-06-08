@@ -7,6 +7,7 @@ describe 'HttpStatusAgent' do
       a.service = services(:generic)
       a.user = users(:jane)
       a.options['url'] = 'http://google.com'
+      a.options['header'] = 'Server'
       a.save!
 
       def a.interpolate_with(e, &block)
@@ -79,8 +80,9 @@ describe 'HttpStatusAgent' do
         @interpolated ||= { :url => SecureRandom.uuid }
       end
 
-      def agent.check_this_url url
+      def agent.check_this_url url, header
         @url = url
+        @header = header
       end
 
       def agent.checked_url
@@ -103,10 +105,12 @@ describe 'HttpStatusAgent' do
       let(:successful_url) { SecureRandom.uuid }
 
       let(:status_code) { 200 }
+      let(:header) { "Server" }
+      let(:header_value) { "WEBrick" }
 
       let(:event_with_a_successful_ping) do
-        agent.faraday.set(successful_url, Struct.new(:status).new(status_code))
-        Event.new.tap { |e| e.payload = { url: successful_url } }
+        agent.faraday.set(successful_url, Struct.new(:status, :headers).new(status_code, { header => header_value }))
+        Event.new.tap { |e| e.payload = { url: successful_url, header: "" } }
       end
 
       let(:events) do
@@ -160,7 +164,7 @@ describe 'HttpStatusAgent' do
       describe "but the ping returns a status code of 0" do
 
         let(:event_with_a_successful_ping) do
-          agent.faraday.set(successful_url, Struct.new(:status).new(0))
+          agent.faraday.set(successful_url, Struct.new(:status, :headers).new(0, {}))
           Event.new.tap { |e| e.payload = { url: successful_url } }
         end
 
@@ -190,8 +194,8 @@ describe 'HttpStatusAgent' do
       describe "but the ping returns a status code of -1" do
 
         let(:event_with_a_successful_ping) do
-          agent.faraday.set(successful_url, Struct.new(:status).new(-1))
-          Event.new.tap { |e| e.payload = { url: successful_url } }
+          agent.faraday.set(successful_url, Struct.new(:status, :headers).new(-1, {}))
+          Event.new.tap { |e| e.payload = { url: successful_url, header: "" } }
         end
 
         it "should create one event" do
@@ -214,7 +218,7 @@ describe 'HttpStatusAgent' do
       describe "and with one event with a failing ping" do
 
         let(:failing_url)    { SecureRandom.uuid }
-        let(:event_with_a_failing_ping)    { Event.new.tap { |e| e.payload = { url: failing_url } } }
+        let(:event_with_a_failing_ping)    { Event.new.tap { |e| e.payload = { url: failing_url, header: "" } } }
 
         let(:events) do
           [event_with_a_successful_ping, event_with_a_failing_ping]
