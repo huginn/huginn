@@ -142,6 +142,12 @@ describe 'HttpStatusAgent' do
         expect(agent.the_created_events[0][:payload]['elapsed_time']).not_to be_nil
       end
 
+      it "should not return a header" do
+        agent.receive events
+        expect(agent.the_created_events[0][:payload]['header']).to be_nil
+        expect(agent.the_created_events[0][:payload]['header_value']).to be_nil
+      end
+
       describe "but the status code is not 200" do
         let(:status_code) { 500 }
 
