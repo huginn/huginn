@@ -68,7 +68,7 @@ module Agents
       # Deal with failures
       if measured_result.result
         # Deal with headers
-        if defined? header
+        if !header.empty?
           create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'header' => header, 'header_value' => measured_result.result.headers[header], 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
         else
           create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
