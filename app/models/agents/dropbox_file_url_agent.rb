@@ -52,8 +52,8 @@ module Agents
     end
 
     def receive(events)
-      events.map { |e| e.payload['paths'].split(',').map(&:strip) }
-        .flatten.each do |path|
+      events.flat_map { |e| e.payload['paths'].split(',').map(&:strip) }
+        .each do |path|
           create_event payload: (options['link_type'] == 'permanent' ? permanent_url_for(path) : temporary_url_for(path))
         end
     end
