@@ -168,9 +168,7 @@ describe AgentsController do
       sign_in users(:bob)
       expect {
         post :create, :agent => valid_attributes(:type => "Agents::ThisIsFake")
-      }.not_to change { users(:bob).agents.count }
-      expect(assigns(:agent)).to be_a(Agent)
-      expect(assigns(:agent)).to have(1).error_on(:type)
+      }.to raise_error(NameError)
     end
 
     it "creates Agents for the current user" do

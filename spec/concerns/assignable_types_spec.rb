@@ -16,15 +16,6 @@ describe AssignableTypes do
     end
   }
 
-  it "validates types" do
-    source = agent_class.new(name: 'test') { |agent|
-      agent.user = users(:bob)
-    }
-    expect(source).to have(0).errors_on(:type)
-    source = non_agent_class.new
-    expect(source).to have(1).error_on(:type)
-  end
-
   it "disallows changes to type once a record has been saved" do
     source = agents(:bob_website_agent)
     source.type = "Agents::WeatherAgent"

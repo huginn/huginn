@@ -1,13 +1,9 @@
 class AgentBuilder
   class << self
     def build_for_type(type, user, attributes = {})
-      begin
-        klass = Agents.const_get(type)
-      rescue NameError
-        klass = Agent
-      end
+      klass = Agent.types.detect{|agent_type| agent_type.name == type}
 
-      klass = Agent unless klass <= Agent
+      raise NameError.new("#{type} is not an available agent") unless klass
 
       attributes.delete(:type)
       klass.new(attributes).tap do |instance|

@@ -30,7 +30,7 @@ module Agents
 
       if agent.valid?
         if event_payload = params[:event]
-          dummy_agent = AgentBuilder.build_for_type('ManualEventAgent', current_user, name: 'Dry-Runner')
+          dummy_agent = AgentBuilder.build_for_type('Agents::ManualEventAgent', current_user, name: 'Dry-Runner')
           dummy_agent.readonly!
           event = dummy_agent.events.build(user: current_user, payload: event_payload)
         end

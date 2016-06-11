@@ -11,7 +11,6 @@ module AssignableTypes
 
   def validate_type
     errors.add(:type, "cannot be changed once an instance has been created") if type_changed? && !new_record?
-    errors.add(:type, "is not a valid type") unless valid_type?
   end
 
   module ClassMethods
@@ -23,16 +22,7 @@ module AssignableTypes
 
     private
     def register_agent
-      @@agents |= [self] if self < Agent
-    end
-  end
-
-  private
-  def valid_type?
-    begin
-      self.class < Agent
-    rescue StandardError
-      return false
+      @@agents |= [self]
     end
   end
 end
