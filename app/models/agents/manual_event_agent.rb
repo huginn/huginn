@@ -1,6 +1,5 @@
 module Agents
   class ManualEventAgent < Agent
-    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
     cannot_receive_events!
 

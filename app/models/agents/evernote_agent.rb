@@ -1,7 +1,6 @@
 module Agents
   class EvernoteAgent < Agent
     include EvernoteConcern
-    AgentRegistry.register_agent(self)
     description <<-MD
       The Evernote Agent connects with a user's Evernote note store.
 

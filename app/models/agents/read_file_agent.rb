@@ -2,8 +2,6 @@ module Agents
   class ReadFileAgent < Agent
     include FormConfigurable
     include FileHandling
-
-    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
     consumes_file_pointer!
 

@@ -1,7 +1,6 @@
 module Agents
   class DropboxFileUrlAgent < Agent
     include DropboxConcern
-    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
     no_bulk_receive!
 

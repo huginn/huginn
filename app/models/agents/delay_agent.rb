@@ -1,6 +1,5 @@
 module Agents
   class DelayAgent < Agent
-    AgentRegistry.register_agent(self)
     default_schedule "every_12h"
 
     description <<-MD

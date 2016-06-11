@@ -1,7 +1,6 @@
 module Agents
   class EmailDigestAgent < Agent
     include EmailConcern
-    AgentRegistry.register_agent(self)
     default_schedule "5am"
 
     cannot_create_events!

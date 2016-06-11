@@ -1,6 +1,5 @@
 module Agents
   class AdiosoAgent < Agent
-    AgentRegistry.register_agent(self)
     cannot_receive_events!
 
   	default_schedule "every_1d"

@@ -4,7 +4,6 @@ require 'date'
 module Agents
   class WebsiteAgent < Agent
     include WebRequestConcern
-    AgentRegistry.register_agent(self)
     can_dry_run!
     can_order_created_events!
     no_bulk_receive!

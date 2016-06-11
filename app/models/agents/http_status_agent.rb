@@ -2,7 +2,6 @@ module Agents
   class HttpStatusAgent < Agent
     include WebRequestConcern
     include FormConfigurable
-    AgentRegistry.register_agent(self)
     can_dry_run!
     can_order_created_events!
 

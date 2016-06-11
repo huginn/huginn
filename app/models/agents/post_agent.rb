@@ -1,7 +1,6 @@
 module Agents
   class PostAgent < Agent
     include WebRequestConcern
-    AgentRegistry.register_agent(self)
     MIME_RE = /\A\w+\/.+\z/
 
     can_dry_run!

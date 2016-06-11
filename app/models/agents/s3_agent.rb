@@ -2,7 +2,6 @@ module Agents
   class S3Agent < Agent
     include FormConfigurable
     include FileHandling
-    AgentRegistry.register_agent(self)
     emits_file_pointer!
     no_bulk_receive!
 

@@ -1,7 +1,6 @@
 module Agents
   class TwitterSearchAgent < Agent
     include TwitterConcern
-    AgentRegistry.register_agent(self)
     cannot_receive_events!
 
     description <<-MD

@@ -1,7 +1,6 @@
 module Agents
   class ShellCommandAgent < Agent
     default_schedule "never"
-    AgentRegistry.register_agent(self)
     can_dry_run!
     no_bulk_receive!
 

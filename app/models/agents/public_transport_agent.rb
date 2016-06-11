@@ -3,7 +3,6 @@ require 'cgi'
 module Agents
   class PublicTransportAgent < Agent
     cannot_receive_events!
-    AgentRegistry.register_agent(self)
     default_schedule "every_2m"
 
     description <<-MD

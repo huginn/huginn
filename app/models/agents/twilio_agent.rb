@@ -2,7 +2,6 @@ require 'securerandom'
 
 module Agents
   class TwilioAgent < Agent
-    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!

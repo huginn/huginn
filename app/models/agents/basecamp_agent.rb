@@ -4,8 +4,6 @@ module Agents
     include Oauthable
     valid_oauth_providers :'37signals'
 
-    AgentRegistry.register_agent(self)
-
     cannot_receive_events!
 
     description <<-MD

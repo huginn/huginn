@@ -73,6 +73,11 @@ class Agent < ActiveRecord::Base
     where(:type => type)
   }
 
+  def self.inherited(child)
+    AgentRegistry.register_agent(child)
+    super
+  end
+
   def short_type
     type.demodulize
   end

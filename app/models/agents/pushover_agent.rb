@@ -1,6 +1,5 @@
 module Agents
   class PushoverAgent < Agent
-    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!

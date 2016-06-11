@@ -7,7 +7,6 @@ require 'date'
 module Agents
   class JiraAgent < Agent
     cannot_receive_events!
-    AgentRegistry.register_agent(self)
     description <<-MD
       The Jira Agent subscribes to Jira issue updates.
 
