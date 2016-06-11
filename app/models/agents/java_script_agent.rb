@@ -21,6 +21,7 @@ module Agents
       * `this.memory()`
       * `this.memory(key)`
       * `this.memory(keyToSet, valueToSet)`
+      * `this.deleteKey(key)` (deletes a key from memory and returns the value)
       * `this.credential(name)`
       * `this.credential(name, valueToSet)`
       * `this.options()`
@@ -120,6 +121,7 @@ module Agents
           memory.to_json
         end
       end
+      context["deleteKey"] = lambda { |a, x| memory.delete(x) }
       context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
       context["unescapeHtml"] = lambda { |a, x| CGI.unescapeHTML(x) }
       context['getCredential'] = lambda { |a, k| credential(k); }
@@ -196,6 +198,10 @@ module Agents
 
         Agent.error = function(message) {
           doError(message);
+        }
+
+        Agent.deleteKey = function(key) {
+          return deleteKey(key);
         }
 
         Agent.escapeHtml = function(html) {
