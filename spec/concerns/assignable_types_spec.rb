@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-describe AssignableTypes do
+describe Typeable do
   let(:non_agent_class) {
     Class.new(Object) do
       include ActiveModel::Validations
-      include AssignableTypes
+      include Typeable
 
       def type_changed?
         false
@@ -23,7 +23,7 @@ describe AssignableTypes do
   end
 
   it "should know about available types" do
-    expect(Agent.types.map(&:to_s)).to include("Agents::WeatherAgent", "Agents::WebsiteAgent")
-    expect(Agent.types).not_to include(Agent)
+    expect(AgentRegistry.types.map(&:to_s)).to include("Agents::WeatherAgent", "Agents::WebsiteAgent")
+    expect(AgentRegistry.types).not_to include(Agent)
   end
 end

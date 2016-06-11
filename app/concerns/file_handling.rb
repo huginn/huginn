@@ -35,7 +35,7 @@ module FileHandling
   end
 
   def file_handling_agents
-    @file_handling_agents ||= Agent.types.select{ |c| c.included_modules.include?(FileHandling) }.map { |d| d.name.constantize }
+    @file_handling_agents ||= AgentRegistry.types.select{ |c| c.included_modules.include?(FileHandling) }.map { |d| d.name.constantize }
   end
 
   module ClassMethods

@@ -2,7 +2,7 @@ module Agents
   class CsvAgent < Agent
     include FormConfigurable
     include FileHandling
-    register_agent
+    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
     consumes_file_pointer!
 

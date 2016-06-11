@@ -3,7 +3,7 @@ module Agents
     include LongRunnable
     include FormConfigurable
     include FileHandling
-    register_agent
+    AgentRegistry.register_agent(self)
     emits_file_pointer!
 
     default_schedule 'every_1h'

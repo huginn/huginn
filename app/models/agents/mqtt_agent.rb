@@ -3,7 +3,7 @@ require "json"
 
 module Agents
   class MqttAgent < Agent
-    register_agent
+    AgentRegistry.register_agent(self)
     gem_dependency_check { defined?(MQTT) }
 
     description <<-MD

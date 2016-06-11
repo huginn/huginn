@@ -1,6 +1,6 @@
 module Agents
   class TranslationAgent < Agent
-    register_agent
+    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
 
     description <<-MD

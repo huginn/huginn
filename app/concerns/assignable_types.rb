@@ -1,4 +1,4 @@
-module AssignableTypes
+module Typeable
   extend ActiveSupport::Concern
 
   included do
@@ -11,18 +11,5 @@ module AssignableTypes
 
   def validate_type
     errors.add(:type, "cannot be changed once an instance has been created") if type_changed? && !new_record?
-  end
-
-  module ClassMethods
-    @@agents = []
-
-    def types
-      @@agents
-    end
-
-    private
-    def register_agent
-      @@agents |= [self]
-    end
   end
 end

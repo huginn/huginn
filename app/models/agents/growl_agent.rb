@@ -1,6 +1,6 @@
 module Agents
   class GrowlAgent < Agent
-    register_agent
+    AgentRegistry.register_agent(self)
     attr_reader :growler
 
     cannot_be_scheduled!

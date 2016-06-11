@@ -1,7 +1,7 @@
 module Agents
   class StubhubAgent < Agent
     cannot_receive_events!
-    register_agent
+    AgentRegistry.register_agent(self)
     description <<-MD
       The StubHub Agent creates an event for a given StubHub Event.
 

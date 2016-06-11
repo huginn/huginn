@@ -1,6 +1,6 @@
 module Agents
   class GapDetectorAgent < Agent
-    register_agent
+    AgentRegistry.register_agent(self)
     default_schedule "every_10m"
 
     description <<-MD

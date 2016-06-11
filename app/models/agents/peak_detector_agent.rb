@@ -2,7 +2,7 @@ require 'pp'
 
 module Agents
   class PeakDetectorAgent < Agent
-    register_agent
+    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
 
     description <<-MD

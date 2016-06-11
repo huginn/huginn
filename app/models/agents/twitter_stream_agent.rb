@@ -2,7 +2,7 @@ module Agents
   class TwitterStreamAgent < Agent
     include TwitterConcern
     include LongRunnable
-    register_agent
+    AgentRegistry.register_agent(self)
     cannot_receive_events!
 
     description <<-MD

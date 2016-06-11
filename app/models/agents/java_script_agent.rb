@@ -4,7 +4,7 @@ require 'cgi'
 module Agents
   class JavaScriptAgent < Agent
     include FormConfigurable
-    register_agent
+    AgentRegistry.register_agent(self)
     can_dry_run!
 
     default_schedule "never"

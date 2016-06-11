@@ -1,6 +1,6 @@
 module Agents
   class TriggerAgent < Agent
-    register_agent
+    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
 
     VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value field!=value field>=value field>value]

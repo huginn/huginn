@@ -1,6 +1,6 @@
 module Agents
   class EventFormattingAgent < Agent
-    register_agent
+    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
     can_dry_run!
 

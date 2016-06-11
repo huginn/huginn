@@ -1,7 +1,7 @@
 module Agents
   class TwitterActionAgent < Agent
     include TwitterConcern
-    register_agent
+    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
 
     description <<-MD

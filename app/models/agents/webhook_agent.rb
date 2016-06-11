@@ -1,7 +1,7 @@
 module Agents
   class WebhookAgent < Agent
     include WebRequestConcern
-    register_agent
+    AgentRegistry.register_agent(self)
     cannot_be_scheduled!
     cannot_receive_events!
 
