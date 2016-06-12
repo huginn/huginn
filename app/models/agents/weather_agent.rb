@@ -74,7 +74,7 @@ module Agents
         'expected_update_period_in_days' => '2'
       }
     end
-    
+
     def check
       if key_setup?
         create_event :payload => model(weather_provider, which_day).merge('location' => location)
@@ -82,7 +82,7 @@ module Agents
     end
 
     private
-    
+
     def weather_provider
       interpolated["service"].presence || "wunderground"
     end
@@ -107,7 +107,13 @@ module Agents
     end
 
     def wunderground
-      Wunderground.new(interpolated['api_key'], language: language.upcase).forecast_for(location)['forecast']['simpleforecast']['forecastday'] if key_setup?
+      if key_setup?
+        forecast = Wunderground.new(interpolated['api_key'], language: language.upcase).forecast_for(location)
+        merged = {}
+        forecast['forecast']['simpleforecast']['forecastday'].each { |daily| merged[daily['period']] = daily }
+        forecast['forecast']['txt_forecast']['forecastday'].each { |daily| (merged[daily['period']] || {}).merge!(daily) }
+        merged
+      end
     end
 
     def forecastio
