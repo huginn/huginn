@@ -50,6 +50,7 @@ Huginn::Application.routes.draw do
     member do
       get :share
       get :export
+      put :enable_or_disable_all_agents
     end
 
     resource :diagram, :only => [:show]

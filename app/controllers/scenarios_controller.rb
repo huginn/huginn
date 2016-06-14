@@ -95,6 +95,16 @@ class ScenariosController < ApplicationController
     end
   end
 
+  def enable_or_disable_all_agents
+    @scenario = current_user.scenarios.find(params[:id])
+
+    @scenario.agents.update_all(disabled: params[:scenario][:disabled] == 'true')
+    respond_to do |format|
+      format.html { redirect_to @scenario, notice: 'The agents in this scenario have been successfully updated.' }
+      format.json { head :no_content }
+    end
+  end
+
   def destroy
     @scenario = current_user.scenarios.find(params[:id])
     @scenario.destroy_with_mode(params[:mode])

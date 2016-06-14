@@ -140,6 +140,15 @@ describe ScenariosController do
     end
   end
 
+  describe 'PUT enable_or_disable_all_agents' do
+    it 'updates disabled on all agents in a scenario for the current user' do
+      @params = {"scenario"=>{"disabled"=>"true"}, "commit"=>"Yes", "id"=> scenarios(:bob_weather).id}
+      put :enable_or_disable_all_agents, @params
+      expect(agents(:bob_rain_notifier_agent).disabled).to eq(true)
+      expect(response).to redirect_to(scenario_path(scenarios(:bob_weather)))
+    end
+  end
+
   describe "DELETE destroy" do
     it "destroys only Scenarios owned by the current user" do
       expect {
