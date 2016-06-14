@@ -324,7 +324,7 @@ GEM
     mime-types (2.99.1)
     mimemagic (0.3.1)
     mini_magick (4.2.3)
-    mini_portile2 (2.0.0)
+    mini_portile2 (2.1.0)
     minitest (5.8.4)
     mqtt (0.3.1)
     multi_json (1.11.2)
@@ -338,8 +338,9 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (2.9.2)
     netrc (0.10.3)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
+    nokogiri (1.6.8)
+      mini_portile2 (~> 2.1.0)
+      pkg-config (~> 1.1.7)
     notiffany (0.0.8)
       nenv (~> 0.1)
       shellany (~> 0.0)
@@ -377,6 +378,7 @@ GEM
       omniauth-oauth (~> 1.0)
     orm_adapter (0.5.0)
     pg (0.18.3)
+    pkg-config (1.1.7)
     poltergeist (1.8.1)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
@@ -641,7 +643,7 @@ DEPENDENCIES
   multi_xml
   mysql2 (~> 0.3.20)
   net-ftp-list (~> 3.2.8)
-  nokogiri (= 1.6.7.2)
+  nokogiri (= 1.6.8)
   omniauth
   omniauth-37signals
   omniauth-dropbox
