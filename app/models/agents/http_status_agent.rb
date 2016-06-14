@@ -15,9 +15,9 @@ module Agents
     form_configurable :header
 
     description <<-MD
-      The HttpStatusAgent will check a url and emit the resulting HTTP status code with the time that it waited for a reply. Additionally, it will optionally emit the value of a specified header.
+      The HttpStatusAgent will check a url and emit the resulting HTTP status code with the time that it waited for a reply. Additionally, it will optionally emit the value of one or more specified headers.
 
-      Specify a `Url` and the Http Status Agent will produce an event with the HTTP status code. If you specify a `Header` as well, that header's value will be included in the event.
+      Specify a `Url` and the Http Status Agent will produce an event with the HTTP status code. If you specify a `Header` as well, that header or headers' value(s) will be included in the event.
 
       The `disable redirect follow` option causes the Agent to not follow HTTP redirects. For example, setting this to `true` will cause an agent that receives a 301 redirect to `http://yahoo.com` to return a status of 301 instead of following the redirect and returning 200.
     MD
@@ -29,7 +29,8 @@ module Agents
             "url": "...",
             "status": "..."
             "elapsed_time": "..."
-            "header": "..."
+            "headers": ["..."]
+            "header_values": ["..."]
           }
     MD
 
@@ -49,20 +50,20 @@ module Agents
     end
 
     def check
-      check_this_url interpolated[:url], interpolated[:header]
+      check_this_url interpolated[:url], interpolated[:headers]
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          check_this_url interpolated[:url], interpolated[:header]
+          check_this_url interpolated[:url], interpolated[:headers]
         end
       end
     end
 
     private
 
-    def check_this_url(url, header)
+    def check_this_url(url, headers)
       # Track time
       measured_result = TimeTracker.track { ping(url) }
 
@@ -72,8 +73,8 @@ module Agents
       if measured_result.result
         payload.merge!({ 'response_received' => true, 'status' => measured_result.status.to_s })
         # Deal with headers
-        if header.present?
-          payload.merge!({'header' => header, 'header_value' => measured_result.result.headers[header] })
+        if headers.present?
+          payload.merge!({ 'headers' => headers, 'header_values' => measured_result.result.headers[headers] })
         end
         create_event payload: payload
         memory['last_status'] = measured_result.status.to_s
