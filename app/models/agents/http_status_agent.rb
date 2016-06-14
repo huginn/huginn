@@ -65,19 +65,23 @@ module Agents
     def check_this_url(url, header)
       # Track time
       measured_result = TimeTracker.track { ping(url) }
+
+      payload = { 'url' => url, 'response_received' => false, 'elapsed_time' => measured_result.elapsed_time }
+
       # Deal with failures
       if measured_result.result
+        payload.merge!({ 'response_received' => true, 'status' => measured_result.status.to_s })
         # Deal with headers
-        if !header.empty?
-          create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'header' => header, 'header_value' => measured_result.result.headers[header], 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
-        else
-          create_event payload: { 'url' => url, 'status' => measured_result.status.to_s, 'response_received' => true, 'elapsed_time' => measured_result.elapsed_time }
+        if header.present?
+          payload.merge!({'header' => header, 'header_value' => measured_result.result.headers[header] })
         end
+        create_event payload: payload
         memory['last_status'] = measured_result.status.to_s
       else
-        create_event payload: { 'url' => url, 'response_received' => false, 'elapsed_time' => measured_result.elapsed_time }
+        create_event payload: payload
         memory['last_status'] = nil
       end
+
     end
 
     def ping(url)
