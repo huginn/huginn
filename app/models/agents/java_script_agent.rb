@@ -121,7 +121,7 @@ module Agents
           memory.to_json
         end
       end
-      context["deleteKey"] = lambda { |a, x| memory.delete(x) }
+      context["deleteKey"] = lambda { |a, x| memory.delete(x).to_json }
       context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
       context["unescapeHtml"] = lambda { |a, x| CGI.unescapeHTML(x) }
       context['getCredential'] = lambda { |a, k| credential(k); }
@@ -201,7 +201,7 @@ module Agents
         }
 
         Agent.deleteKey = function(key) {
-          return deleteKey(key);
+          return JSON.parse(deleteKey(key));
         }
 
         Agent.escapeHtml = function(html) {
