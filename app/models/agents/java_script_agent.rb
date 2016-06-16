@@ -114,12 +114,9 @@ module Agents
       context["getOptions"] = lambda { |a, x| interpolated.to_json }
       context["doLog"] = lambda { |a, x| log x }
       context["doError"] = lambda { |a, x| error x }
-      context["getMemory"] = lambda do |a, x, y|
-        if x && y
-          memory[x] = clean_nans(y)
-        else
-          memory.to_json
-        end
+      context["getMemory"] = lambda { |a| memory.to_json }
+      context["setMemory"] = lambda do |a, x, y|
+        memory[x] = clean_nans(y)
       end
       context["deleteKey"] = lambda { |a, x| memory.delete(x).to_json }
       context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
@@ -168,7 +165,7 @@ module Agents
 
         Agent.memory = function(key, value) {
           if (typeof(key) !== "undefined" && typeof(value) !== "undefined") {
-            getMemory(key, value);
+            setMemory(key, value);
           } else if (typeof(key) !== "undefined") {
             return JSON.parse(getMemory())[key];
           } else {
