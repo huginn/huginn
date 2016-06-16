@@ -21,10 +21,10 @@
         <% @scenarios.each do |scenario| %>
           <tr>
             <td>
-              <% if scenario.icon.blank? || scenario.icon.nil? %>
+              <% if scenario.icon.blank? %>
                 <%= scenario_label(scenario, icon('gear'))%>
               <% else %>
-                 <%= scenario_label(scenario, icon(scenario.icon))%>
+                <%= scenario_label(scenario, icon(scenario.icon))%>
               <% end %>
               <%= link_to(scenario.name, scenario) %>
             </td>
