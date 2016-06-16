@@ -186,6 +186,30 @@ describe Agents::JavaScriptAgent do
         @agent.save!
         expect { @agent.reload.memory }.not_to raise_error
       end
+
+      it "it stores null" do
+        @agent.options['code'] = 'Agent.check = function() {
+          this.memory("foo", "test");
+          this.memory("foo", null);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq(nil)
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "it stores false" do
+        @agent.options['code'] = 'Agent.check = function() {
+          this.memory("foo", "test");
+          this.memory("foo", false);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq(false)
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
     end
 
     describe "deleteKey" do
