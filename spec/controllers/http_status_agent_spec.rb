@@ -144,7 +144,7 @@ describe 'HttpStatusAgent' do
 
       it "should not return a header" do
         agent.receive events
-        expect(agent.the_created_events[0][:payload]['header']).to be_nil
+        expect(agent.the_created_events[0][:payload]['headers']).to be_nil
       end
 
       describe "but the status code is not 200" do
@@ -170,7 +170,7 @@ describe 'HttpStatusAgent' do
 
         let(:event_with_a_successful_ping) do
           agent.faraday.set(successful_url, Struct.new(:status, :headers).new(0, {}))
-          Event.new.tap { |e| e.payload = { url: successful_url } }
+          Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
         end
 
         it "should create one event" do
@@ -200,7 +200,7 @@ describe 'HttpStatusAgent' do
 
         let(:event_with_a_successful_ping) do
           agent.faraday.set(successful_url, Struct.new(:status, :headers).new(-1, {}))
-          Event.new.tap { |e| e.payload = { url: successful_url, header: "" } }
+          Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
         end
 
         it "should create one event" do
@@ -223,7 +223,7 @@ describe 'HttpStatusAgent' do
       describe "and with one event with a failing ping" do
 
         let(:failing_url)    { SecureRandom.uuid }
-        let(:event_with_a_failing_ping)    { Event.new.tap { |e| e.payload = { url: failing_url, header: "" } } }
+        let(:event_with_a_failing_ping)    { Event.new.tap { |e| e.payload = { url: failing_url, headers_to_save: "" } } }
 
         let(:events) do
           [event_with_a_successful_ping, event_with_a_failing_ping]
