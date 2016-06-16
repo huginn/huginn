@@ -51,7 +51,7 @@ module Agents
     end
 
     def header_array(str)
-      str.split(',').map { |el| el.strip }
+      (str || '').split(',').map(&:strip)
     end
 
     def check
