@@ -17,7 +17,7 @@ module Agents
     description <<-MD
       The HttpStatusAgent will check a url and emit the resulting HTTP status code with the time that it waited for a reply. Additionally, it will optionally emit the value of one or more specified headers.
 
-      Specify a `Url` and the Http Status Agent will produce an event with the HTTP status code. If you specify a `Header` as well, that header or headers' value(s) will be included in the event.
+      Specify a `Url` and the Http Status Agent will produce an event with the HTTP status code. If you specify one or more `Headers to save` (comma-delimited) as well, that header or headers' value(s) will be included in the event.
 
       The `disable redirect follow` option causes the Agent to not follow HTTP redirects. For example, setting this to `true` will cause an agent that receives a 301 redirect to `http://yahoo.com` to return a status of 301 instead of following the redirect and returning 200.
     MD
@@ -27,10 +27,11 @@ module Agents
 
           {
             "url": "...",
-            "status": "..."
-            "elapsed_time": "..."
-            "headers": ["..."]
-            "header_values": ["..."]
+            "status": "...",
+            "elapsed_time": "...",
+            "headers": {
+              "...": "..."
+            }
           }
     MD
 
