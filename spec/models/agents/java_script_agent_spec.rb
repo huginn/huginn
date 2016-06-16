@@ -188,6 +188,41 @@ describe Agents::JavaScriptAgent do
       end
     end
 
+    describe "deleteKey" do
+      it "deletes a memory key" do
+        @agent.memory = { foo: "baz" }
+        @agent.options['code'] = 'Agent.check = function() {
+          this.deleteKey("foo");
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to be_nil
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "returns the string value of the deleted key" do
+        @agent.memory = { foo: "baz" }
+        @agent.options['code'] = 'Agent.check = function() {
+          this.createEvent({ message: this.deleteKey("foo")});
+          };'
+        @agent.save!
+        @agent.check
+        created_event = @agent.events.last
+        expect(created_event.payload).to eq('message' => "baz")
+      end
+
+      it "returns the hash value of the deleted key" do
+        @agent.memory = { foo: { baz: 'test' }  }
+        @agent.options['code'] = 'Agent.check = function() {
+          this.createEvent({ message: this.deleteKey("foo")});
+          };'
+        @agent.save!
+        @agent.check
+        created_event = @agent.events.last
+        expect(created_event.payload).to eq('message' => { 'baz' => 'test' })
+      end
+    end
+
     describe "creating events" do
       it "creates events with this.createEvent in the JavaScript environment" do
         @agent.options['code'] = 'Agent.check = function() { this.createEvent({ message: "This is an event!", stuff: { foo: 5 } }); };'
