@@ -2,7 +2,7 @@ module Agents
   class TriggerAgent < Agent
     cannot_be_scheduled!
 
-    VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value field!=value field>=value field>value]
+    VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value field!=value field>=value field>value not\ in]
 
     description <<-MD
       The Trigger Agent will watch for a specific value in an Event payload.
@@ -11,7 +11,7 @@ module Agents
 
       The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.  Note that regex patterns are matched case insensitively.  If you want case sensitive matching, prefix your pattern with `(?-i)`.
 
-      The `value` can be a single value or an array of values. In the case of an array, if one or more values match then the rule matches.
+      The `value` can be a single value or an array of values. In the case of an array, all items must be strings, and if one or more values match, then the rule matches. Note: avoid using `field!=value` with arrays, you should use `not in` instead.
 
       By default, all rules must match for the Agent to trigger. You can switch this so that only one rule must match by
       setting `must_match` to `1`.
@@ -75,26 +75,30 @@ module Agents
           rule_values = rule['value']
           rule_values = [rule_values] unless rule_values.is_a?(Array)
 
-          rule_values.any? do |rule_value|
-            case rule['type']
-            when "regex"
-              value_at_path.to_s =~ Regexp.new(rule_value, Regexp::IGNORECASE)
-            when "!regex"
-              value_at_path.to_s !~ Regexp.new(rule_value, Regexp::IGNORECASE)
-            when "field>value"
-              value_at_path.to_f > rule_value.to_f
-            when "field>=value"
-              value_at_path.to_f >= rule_value.to_f
-            when "field<value"
-              value_at_path.to_f < rule_value.to_f
-            when "field<=value"
-              value_at_path.to_f <= rule_value.to_f
-            when "field==value"
-              value_at_path.to_s == rule_value.to_s
-            when "field!=value"
-              value_at_path.to_s != rule_value.to_s
-            else
-              raise "Invalid type of #{rule['type']} in TriggerAgent##{id}"
+          if rule['type'] == 'not in'
+            !rule_values.include?(value_at_path.to_s)
+          elsif rule['type'] == 'field==value'
+            rule_values.include?(value_at_path.to_s)
+          else
+            rule_values.any? do |rule_value|
+              case rule['type']
+              when "regex"
+                value_at_path.to_s =~ Regexp.new(rule_value, Regexp::IGNORECASE)
+              when "!regex"
+                value_at_path.to_s !~ Regexp.new(rule_value, Regexp::IGNORECASE)
+              when "field>value"
+                value_at_path.to_f > rule_value.to_f
+              when "field>=value"
+                value_at_path.to_f >= rule_value.to_f
+              when "field<value"
+                value_at_path.to_f < rule_value.to_f
+              when "field<=value"
+                value_at_path.to_f <= rule_value.to_f
+              when "field!=value"
+                value_at_path.to_s != rule_value.to_s
+              else
+                raise "Invalid type of #{rule['type']} in TriggerAgent##{id}"
+              end
             end
           end
         end
