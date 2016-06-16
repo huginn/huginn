@@ -21,7 +21,11 @@
         <% @scenarios.each do |scenario| %>
           <tr>
             <td>
-              <%= scenario_label(scenario, content_tag(:i, '', class: 'glyphicon glyphicon-font')) %>
+              <% if scenario.icon.blank? || scenario.icon.nil? %>
+                <%= scenario_label(scenario, icon('gear'))%>
+              <% else %>
+                 <%= scenario_label(scenario, icon(scenario.icon))%>
+              <% end %>
               <%= link_to(scenario.name, scenario) %>
             </td>
             <td><%= link_to pluralize(scenario.agents.count, "agent"), scenario %></td>

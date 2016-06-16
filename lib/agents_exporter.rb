@@ -12,17 +12,18 @@ class AgentsExporter
 
   def as_json(opts = {})
     {
-      :schema_version => 1,
-      :name => options[:name].presence || 'No name provided',
-      :description => options[:description].presence || 'No description provided',
-      :source_url => options[:source_url],
-      :guid => options[:guid],
-      :tag_fg_color => options[:tag_fg_color],
-      :tag_bg_color => options[:tag_bg_color],
-      :exported_at => Time.now.utc.iso8601,
-      :agents => agents.map { |agent| agent_as_json(agent) },
-      :links => links,
-      :control_links => control_links
+      schema_version: 1,
+      name: options[:name].presence || 'No name provided',
+      description: options[:description].presence || 'No description provided',
+      source_url: options[:source_url],
+      guid: options[:guid],
+      tag_fg_color: options[:tag_fg_color],
+      tag_bg_color: options[:tag_bg_color],
+      icon: options[:icon],
+      exported_at: Time.now.utc.iso8601,
+      agents: agents.map { |agent| agent_as_json(agent) },
+      links: links,
+      control_links: control_links
     }
   end
 

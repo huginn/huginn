@@ -5,6 +5,7 @@ describe ScenarioImport do
   let(:guid) { "somescenarioguid" }
   let(:tag_fg_color) { "#ffffff" }
   let(:tag_bg_color) { "#000000" }
+  let(:icon) { 'Star' }
   let(:description) { "This is a cool Huginn Scenario that does something useful!" }
   let(:name) { "A useful Scenario" }
   let(:source_url) { "http://example.com/scenarios/2/export.json" }
@@ -61,22 +62,23 @@ describe ScenarioImport do
   end
   let(:valid_parsed_data) do
     {
-      :schema_version => 1,
-      :name => name,
-      :description => description,
-      :guid => guid,
-      :tag_fg_color => tag_fg_color,
-      :tag_bg_color => tag_bg_color,
-      :source_url => source_url,
-      :exported_at => 2.days.ago.utc.iso8601,
-      :agents => [
+      schema_version: 1,
+      name: name,
+      description: description,
+      guid: guid,
+      tag_fg_color: tag_fg_color,
+      tag_bg_color: tag_bg_color,
+      icon: icon,
+      source_url: source_url,
+      exported_at: 2.days.ago.utc.iso8601,
+      agents: [
         valid_parsed_weather_agent_data,
         valid_parsed_trigger_agent_data
       ],
-      :links => [
+      links: [
         { :source => 0, :receiver => 1 }
       ],
-      :control_links => []
+      control_links: []
     }
   end
   let(:valid_data) { valid_parsed_data.to_json }
@@ -191,6 +193,7 @@ describe ScenarioImport do
           expect(scenario_import.scenario.guid).to eq(guid)
           expect(scenario_import.scenario.tag_fg_color).to eq(tag_fg_color)
           expect(scenario_import.scenario.tag_bg_color).to eq(tag_bg_color)
+          expect(scenario_import.scenario.icon).to eq(icon)
           expect(scenario_import.scenario.source_url).to eq(source_url)
           expect(scenario_import.scenario.public).to be_falsey
         end
@@ -340,6 +343,7 @@ describe ScenarioImport do
           expect(existing_scenario.guid).to eq(guid)
           expect(existing_scenario.tag_fg_color).to eq(tag_fg_color)
           expect(existing_scenario.tag_bg_color).to eq(tag_bg_color)
+          expect(existing_scenario.icon).to eq(icon)
           expect(existing_scenario.description).to eq(description)
           expect(existing_scenario.name).to eq(name)
           expect(existing_scenario.source_url).to eq(source_url)
@@ -507,7 +511,7 @@ describe ScenarioImport do
         end
       end
     end
-    
+
     context "when Bob imports Jane's scenario" do
       let!(:existing_scenario) do
         _existing_scenerio = users(:jane).scenarios.build(:name => "an existing scenario", :description => "something")
@@ -515,7 +519,7 @@ describe ScenarioImport do
         _existing_scenerio.save!
         _existing_scenerio
       end
-      
+
       describe "#import" do
         it "makes a new scenario for Bob" do
           expect {
@@ -529,6 +533,7 @@ describe ScenarioImport do
           expect(scenario_import.scenario.guid).to eq(guid)
           expect(scenario_import.scenario.tag_fg_color).to eq(tag_fg_color)
           expect(scenario_import.scenario.tag_bg_color).to eq(tag_bg_color)
+          expect(scenario_import.scenario.icon).to eq(icon)
           expect(scenario_import.scenario.source_url).to eq(source_url)
           expect(scenario_import.scenario.public).to be_falsey
         end

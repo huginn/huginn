@@ -7,11 +7,13 @@ describe AgentsExporter do
     let(:guid) { "some-guid" }
     let(:tag_fg_color) { "#ffffff" }
     let(:tag_bg_color) { "#000000" }
+    let(:icon) { 'Camera' }
     let(:source_url) { "http://yourhuginn.com/scenarios/2/export.json" }
     let(:agent_list) { [agents(:jane_weather_agent), agents(:jane_rain_notifier_agent)] }
     let(:exporter) { AgentsExporter.new(
-      :agents => agent_list, :name => name, :description => description, :source_url => source_url,
-      :guid => guid, :tag_fg_color => tag_fg_color, :tag_bg_color => tag_bg_color) }
+      agents: agent_list, name: name, description: description,
+      source_url: source_url, guid: guid, tag_fg_color: tag_fg_color,
+      tag_bg_color: tag_bg_color, icon: icon) }
 
     it "outputs a structure containing name, description, the date, all agents & their links" do
       data = exporter.as_json
@@ -22,6 +24,7 @@ describe AgentsExporter do
       expect(data[:schema_version]).to eq(1)
       expect(data[:tag_fg_color]).to eq(tag_fg_color)
       expect(data[:tag_bg_color]).to eq(tag_bg_color)
+      expect(data[:icon]).to eq(icon)
       expect(Time.parse(data[:exported_at])).to be_within(2).of(Time.now.utc)
       expect(data[:links]).to eq([{ :source => guid_order(agent_list, :jane_weather_agent), :receiver => guid_order(agent_list, :jane_rain_notifier_agent)}])
       expect(data[:control_links]).to eq([])
