@@ -7,7 +7,7 @@ describe 'HttpStatusAgent' do
       a.service = services(:generic)
       a.user = users(:jane)
       a.options['url'] = 'http://google.com'
-      a.options['header'] = 'Server'
+      a.options['headers_to_save'] = 'Server'
       a.save!
 
       def a.interpolate_with(e, &block)
@@ -77,12 +77,12 @@ describe 'HttpStatusAgent' do
     before do
 
       def agent.interpolated
-        @interpolated ||= { :url => SecureRandom.uuid }
+        @interpolated ||= { :url => SecureRandom.uuid, :headers_to_save => '' }
       end
 
-      def agent.check_this_url url, header
+      def agent.check_this_url url, local_headers
         @url = url
-        @header = header
+        @local_headers = local_headers
       end
 
       def agent.checked_url
@@ -110,7 +110,7 @@ describe 'HttpStatusAgent' do
 
       let(:event_with_a_successful_ping) do
         agent.faraday.set(successful_url, Struct.new(:status, :headers).new(status_code, { header => header_value }))
-        Event.new.tap { |e| e.payload = { url: successful_url, header: "" } }
+        Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
       end
 
       let(:events) do
@@ -145,7 +145,6 @@ describe 'HttpStatusAgent' do
       it "should not return a header" do
         agent.receive events
         expect(agent.the_created_events[0][:payload]['header']).to be_nil
-        expect(agent.the_created_events[0][:payload]['header_value']).to be_nil
       end
 
       describe "but the status code is not 200" do
