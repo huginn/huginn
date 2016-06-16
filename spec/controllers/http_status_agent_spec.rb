@@ -105,11 +105,11 @@ describe 'HttpStatusAgent' do
       let(:successful_url) { SecureRandom.uuid }
 
       let(:status_code) { 200 }
-      let(:header) { "Server" }
-      let(:header_value) { "WEBrick" }
+      let(:header) { SecureRandom.uuid }
+      let(:header_value) { SecureRandom.uuid }
 
       let(:event_with_a_successful_ping) do
-        agent.faraday.set(successful_url, Struct.new(:status, :headers).new(status_code, { header => header_value }))
+        agent.faraday.set(successful_url, Struct.new(:status, :headers).new(status_code, {}))
         Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
       end
 
@@ -258,6 +258,39 @@ describe 'HttpStatusAgent' do
 
       end
 
+      describe "with a header specified" do
+        let(:event_with_a_successful_ping) do
+          agent.faraday.set(successful_url, Struct.new(:status, :headers).new(status_code, {header => header_value}))
+          Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: header } }
+        end
+
+        it "should return the header value" do
+          agent.receive events
+          expect(agent.the_created_events[0][:payload]['headers']).not_to be_nil
+          expect(agent.the_created_events[0][:payload]['headers'][header]).to eq(header_value)
+        end
+
+      end
+
+      describe "with existing and non-existing headers specified" do
+        let(:nonexistant_header) { SecureRandom.uuid }
+
+        let(:event_with_a_successful_ping) do
+          agent.faraday.set(successful_url, Struct.new(:status, :headers).new(status_code, {header => header_value}))
+          Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: header + "," + nonexistant_header } }
+        end
+
+        it "should return the existing header's value" do
+          agent.receive events
+          expect(agent.the_created_events[0][:payload]['headers'][header]).to eq(header_value)
+        end
+
+        it "should return nil for the nonexistant header" do
+          agent.receive events
+          expect(agent.the_created_events[0][:payload]['headers'][nonexistant_header]).to be_nil
+        end
+
+      end
     end
 
     describe "validations" do
