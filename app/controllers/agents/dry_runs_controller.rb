@@ -18,6 +18,7 @@ module Agents
       if agent = current_user.agents.find_by(id: params[:agent_id])
         # POST /agents/:id/dry_run
         if attrs.present?
+          attrs.merge!(memory: agent.memory)
           type = agent.type
           agent = Agent.build_for_type(type, current_user, attrs)
         end

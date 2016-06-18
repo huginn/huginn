@@ -100,5 +100,22 @@ describe Agents::DryRunsController do
       results = assigns(:results)
       expect(results[:log]).to match(/^\[\d\d:\d\d:\d\d\] INFO -- : Fetching #{Regexp.quote(url_from_event)}$/)
     end
+
+    it "uses the memory of an existing Agent" do
+      valid_params = {
+        :name => "somename",
+        :options => {
+          :code => "Agent.check = function() { this.createEvent({ 'message': this.memory('fu') }); };",
+        }
+      }
+      agent = Agents::JavaScriptAgent.new(valid_params)
+      agent.memory = {fu: "bar"}
+      agent.user = users(:bob)
+      agent.save!
+      post :create, agent_id: agent, agent: valid_params
+      results = assigns(:results)
+      expect(results[:events][0]).to eql({"message" => "bar"})
+    end
+
   end
 end
