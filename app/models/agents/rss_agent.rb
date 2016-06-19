@@ -113,7 +113,7 @@ module Agents
 
       created_event_count = 0
       sort_events(new_events).each.with_index do |event, index|
-        entry_id = event.payload[:id]
+        entry_id = event.payload[:update_id]
         if check_and_track(entry_id)
           unless max_events && max_events > 0 && index >= max_events
             created_event_count += 1
@@ -124,8 +124,14 @@ module Agents
       log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
     end
 
-    def get_entry_id(entry)
-      entry.id.presence || Digest::MD5.hexdigest(entry.content)
+    def get_entry_id(entry, with_date)
+      id = (entry.id.presence || Digest::MD5.hexdigest(entry.content))
+      if with_date
+        update = (entry.last_updated || entry.date_published || 0).to_i
+        "#{id}#{update}"
+      else
+        id
+      end
     end
 
     def check_and_track(entry_id)
@@ -142,7 +148,8 @@ module Agents
     def feed_to_events(feed)
       feed.entries.map { |entry|
         Event.new(payload: {
-                    id: get_entry_id(entry),
+                    id: get_entry_id(entry, false),
+                    update_id: get_entry_id(entry, true),
                     date_published: entry.date_published,
                     last_updated: entry.last_updated,
                     url: entry.url,
