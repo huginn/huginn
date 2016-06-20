@@ -30,9 +30,7 @@ Style/BlockDelimiters:
     - 'spec/**/*'
 
 Metrics/LineLength:
-  Max: 140
-  Exclude:
-    - 'spec/**/*'
+  Enabled: false
 
 Style/FormatString:
   Enabled: false
@@ -69,4 +67,13 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/PerceivedComplexity:
+  Enabled: false
+
+Style/TrailingCommaInLiteral:
+  Enabled: false
+
+Style/Alias:
+  Enabled: false
+
+Style/GuardClause:
   Enabled: false
