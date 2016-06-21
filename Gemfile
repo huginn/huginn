@@ -102,6 +102,7 @@ gem 'geokit-rails', '~> 2.0.1'
 gem 'httparty', '~> 0.13'
 gem 'httmultiparty', '~> 0.3.16'
 gem 'jquery-rails', '~> 3.1.3'
+gem 'huginn_agent', '~> 0.4.0'
 gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.6'
 gem 'kaminari', '~> 0.16.1'
@@ -193,4 +194,8 @@ end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
   gem 'mysql2', '~> 0.3.20'
+end
+
+GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|
+  gem *args
 end

@@ -1,1 +1,2 @@
 require 'pp'
+HuginnAgent.require!
