@@ -32,7 +32,7 @@
             <td class='payload'><%= truncate event.payload.to_json, :length => 90, :omission => "" %></td>
             <td>
               <div class="btn-group btn-group-xs">
-                <%= link_to 'Show', event_path(event), class: "btn btn-default" %>
+                <%= link_to 'Show', event_path(event, return: request.fullpath), class: "btn btn-default" %>
                 <%= link_to 'Re-emit', reemit_event_path(event), method: :post, data: { confirm: 'Are you sure you want to duplicate this event and emit the new one now?' }, class: "btn btn-default" %>
                 <%= link_to 'Delete', event_path(event), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default" %>
               </div>
