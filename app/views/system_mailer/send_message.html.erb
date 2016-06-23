@@ -7,7 +7,7 @@
     <% if @body.present? %>
       <%= sanitize @body %>
     <% else %>
-      <% if @headline %>
+      <% if @headline.present? %>
         <h1><%= sanitize @headline %></h1>
       <% end %>
       <% @groups.each do |group| %>

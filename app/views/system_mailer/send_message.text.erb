@@ -1,6 +1,6 @@
 <% if @body.present? %><%= sanitize @body -%>
 <% else -%>
-<% if @headline %><%= @headline %>
+<% if @headline.present? %><%= @headline %>
 
 <% end %><% @groups.each do |group| %><%= group[:title] %>
 <% group[:entries].each do |entry| %>  <%= entry %>
