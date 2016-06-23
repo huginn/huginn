@@ -20,6 +20,7 @@ RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=
 # Bundle again to get rid of the sqlite3 gem
 cp Gemfile.bak Gemfile
 RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle install --without test development --path vendor/bundle -j 4
+chown huginn:huginn Gemfile.lock
 
 # Configure the unicorn server
 mv config/unicorn.rb.example config/unicorn.rb

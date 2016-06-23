@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export LC_ALL=en_US.UTF-8
+
 cd /app
 
 # Configure database based on linked container
@@ -40,18 +42,18 @@ case "${DATABASE_ADAPTER}" in
   *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
 esac
 
-sudo -u huginn -H bundle install --without test development --path vendor/bundle
+sudo -u huginn -H -E bundle install --without test development --path vendor/bundle
 
 if [ -z $1 ]; then
-  sudo -u huginn -H bundle exec rake db:create db:migrate RAILS_ENV=${RAILS_ENV}
+  sudo -u huginn -H -E bundle exec rake db:create db:migrate RAILS_ENV=${RAILS_ENV}
 fi
 
 if [[ -z "${DO_NOT_SEED}" && -z $1 ]]; then
-  sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=${RAILS_ENV}
+  sudo -u huginn -H -E bundle exec rake db:seed RAILS_ENV=${RAILS_ENV}
 fi
 
 if [ -z $1 ]; then
-  exec sudo -u huginn -H bundle exec unicorn -c config/unicorn.rb
+  exec sudo -u huginn -H -E bundle exec unicorn -c config/unicorn.rb
 else
-  exec sudo -u huginn -H bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
+  exec sudo -u huginn -H -E bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
 fi
