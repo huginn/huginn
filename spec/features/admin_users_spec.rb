@@ -1,4 +1,4 @@
-require 'capybara_helper'
+require 'rails_helper'
 
 describe Admin::UsersController do
   it "requires to be signed in as an admin" do
@@ -94,7 +94,7 @@ describe Admin::UsersController do
         expect(users(:bob)).not_to be_active
       end
 
-      it "deactivates an existing user" do
+      it "activates an existing user" do
         users(:bob).deactivate!
         visit admin_users_path
         find(:css, "a[href='/admin/users/#{users(:bob).id}/activate']").click

@@ -7,7 +7,7 @@
 
   <% if agent.can_dry_run? %>
     <li>
-      <%= link_to icon_tag('glyphicon-refresh') + ' Dry Run', '#', 'data-action-url' => dry_run_agent_path(agent), 'data-with-event-mode' => agent_dry_run_with_event_mode(agent), tabindex: "-1", onclick: "Utils.handleDryRunButton(this)" %>
+      <%= link_to icon_tag('glyphicon-refresh') + ' Dry Run', '#', 'data-action-url' => agent_dry_runs_path(agent), 'data-with-event-mode' => agent_dry_run_with_event_mode(agent), tabindex: "-1", onclick: "Utils.handleDryRunButton(this)" %>
     </li>
   <% end %>
 
@@ -47,7 +47,7 @@
 
   <li class="divider"></li>
 
-  <% if agent.can_create_events? && agent.events.count > 0 %>
+  <% if agent.can_create_events? && agent.events_count > 0 %>
     <li>
       <%= link_to icon_tag('glyphicon-trash', class: 'color-danger') + ' Delete all events', remove_events_agent_path(agent, return: return_to), method: :delete, data: {confirm: 'Are you sure you want to delete ALL emitted events for this Agent?'}, tabindex: "-1" %>
     </li>

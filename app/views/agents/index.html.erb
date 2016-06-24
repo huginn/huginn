@@ -13,6 +13,7 @@
         <%= link_to icon_tag('glyphicon-plus') + ' New Agent', new_agent_path, class: "btn btn-default" %>
         <%= link_to icon_tag('glyphicon-refresh') + ' Run event propagation', propagate_agents_path, method: 'post', class: "btn btn-default" %>
         <%= link_to icon_tag('glyphicon-random') + ' View diagram', diagram_path, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-adjust') + toggle_disabled_text, toggle_visibility_agents_path, method: :put, class: "btn btn-default visibility-enabler" %>
       </div>
     </div>
   </div>

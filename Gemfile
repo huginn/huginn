@@ -103,6 +103,7 @@ gem 'geokit-rails', '~> 2.0.1'
 gem 'httparty', '~> 0.13'
 gem 'httmultiparty', '~> 0.3.16'
 gem 'jquery-rails', '~> 3.1.3'
+gem 'huginn_agent', '~> 0.4.0'
 gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.5.6'
 gem 'kaminari', '~> 0.16.1'
@@ -110,7 +111,7 @@ gem 'kramdown', '~> 1.3.3'
 gem 'liquid', '~> 3.0.3'
 gem 'mini_magick'
 gem 'multi_xml'
-gem 'nokogiri', '1.6.7.2'
+gem 'nokogiri', '1.6.8'
 gem 'omniauth'
 gem 'rails', '4.2.5.2'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
@@ -142,11 +143,12 @@ group :development do
   end
 
   group :test do
-    gem 'coveralls', require: false
+    gem 'coveralls', '~> 0.7.4', require: false
     gem 'capybara-select2', require: false
     gem 'delorean'
     gem 'poltergeist'
     gem 'pry-rails'
+    gem 'pry-byebug'
     gem 'rr'
     gem 'rspec', '~> 3.2'
     gem 'rspec-collection_matchers', '~> 1.1.0'
@@ -155,6 +157,7 @@ group :development do
     gem 'shoulda-matchers'
     gem 'vcr'
     gem 'webmock', '~> 1.17.4', require: false
+    gem 'database_cleaner', '~> 1.5.3'
   end
 end
 
@@ -192,4 +195,8 @@ end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
   gem 'mysql2', '~> 0.3.20'
+end
+
+GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|
+  gem *args
 end

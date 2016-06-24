@@ -50,10 +50,22 @@
     <div class="col-md-4">
       <div class="form-group">
         <div>
+          <%= f.label :icon %>
+          <%= f.select(:icon, options_for_select(Scenario.icons), {},
+            {:style => "font-family:'FontAwesome', Arial;", :class => 'select2-fountawesome-icon'}) %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="form-group">
+        <div>
           <%= f.label :agents %>
           <%= f.select(:agent_ids,
                        options_for_select(current_user.agents.pluck(:name, :id), @scenario.agent_ids),
-                       {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
+                       {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/agents'} }) %>
         </div>
       </div>
     </div>

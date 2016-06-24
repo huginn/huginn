@@ -4,6 +4,24 @@ class @AgentEditPage
     @showCorrectRegionsOnStartup()
     $("form.agent-form").on "submit", => @updateFromEditors()
 
+    # Validate agents_options Json on form submit
+    $('form.agent-form').submit (e) ->
+      if $('textarea#agent_options').length
+        try
+          JSON.parse $('#agent_options').val()
+        catch err
+          e.preventDefault()
+          alert 'Sorry, there appears to be an error in your JSON input. Please fix it before continuing.'
+
+      if $(".link-region").length && $(".link-region").data("can-receive-events") == false
+        $(".link-region .select2-linked-tags option:selected").removeAttr('selected')
+
+      if $(".control-link-region").length && $(".control-link-region").data("can-control-other-agents") == false
+        $(".control-link-region .select2-linked-tags option:selected").removeAttr('selected')
+
+      if $(".event-related-region").length && $(".event-related-region").data("can-create-events") == false
+        $(".event-related-region .select2-linked-tags option:selected").removeAttr('selected')
+
     $("#agent_name").each ->
       # Select the number suffix if this is a cloned agent.
       if matches = this.value.match(/ \(\d+\)$/)
@@ -94,24 +112,32 @@ class @AgentEditPage
     $(".link-region .select2-container").hide()
     $(".link-region .propagate-immediately").hide()
     $(".link-region .cannot-receive-events").show()
+    $(".link-region").data("can-receive-events", false)
 
   showLinks: ->
     $(".link-region .select2-container").show()
     $(".link-region .propagate-immediately").show()
     $(".link-region .cannot-receive-events").hide()
+    $(".link-region").data("can-receive-events", true)
     @showEventDescriptions()
 
   hideControlLinks: ->
     $(".control-link-region").hide()
+    $(".control-link-region").data("can-control-other-agents", false)
 
   showControlLinks: ->
     $(".control-link-region").show()
+    $(".control-link-region").data("can-control-other-agents", true)
 
   hideEventCreation: ->
-    $(".event-related-region").hide()
+    $(".event-related-region .select2-container").hide()
+    $(".event-related-region .cannot-create-events").show()
+    $(".event-related-region").data("can-create-events", false)
 
   showEventCreation: ->
-    $(".event-related-region").show()
+    $(".event-related-region .select2-container").show()
+    $(".event-related-region .cannot-create-events").hide()
+    $(".event-related-region").data("can-create-events", true)
 
   showEventDescriptions: ->
     if $("#agent_source_ids").val()

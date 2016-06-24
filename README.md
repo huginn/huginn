@@ -84,7 +84,7 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 
 You can quickly create a free development environment for this Huginn project in the cloud on www.nitrous.io:
 
-<a href="https://www.nitrous.io/quickstart">
+<a href="https://www.nitrous.io/quickstart?repo=https://github.com/cantino/huginn">
   <img src="https://nitrous-image-icons.s3.amazonaws.com/quickstart.png" alt="Nitrous Quickstart" width=142 height=34>
 </a>
 

@@ -47,13 +47,14 @@ class ScenariosController < ApplicationController
     @scenario = Scenario.find(params[:id])
     raise ActiveRecord::RecordNotFound unless @scenario.public? || (current_user && current_user.id == @scenario.user_id)
 
-    @exporter = AgentsExporter.new(:name => @scenario.name,
-                                   :description => @scenario.description,
-                                   :guid => @scenario.guid,
-                                   :tag_fg_color => @scenario.tag_fg_color,
-                                   :tag_bg_color => @scenario.tag_bg_color,
-                                   :source_url => @scenario.public? && export_scenario_url(@scenario),
-                                   :agents => @scenario.agents)
+    @exporter = AgentsExporter.new(name: @scenario.name,
+                                   description: @scenario.description,
+                                   guid: @scenario.guid,
+                                   tag_fg_color: @scenario.tag_fg_color,
+                                   tag_bg_color: @scenario.tag_bg_color,
+                                   icon: @scenario.icon,
+                                   source_url: @scenario.public? && export_scenario_url(@scenario),
+                                   agents: @scenario.agents)
     response.headers['Content-Disposition'] = 'attachment; filename="' + @exporter.filename + '"'
     render :json => JSON.pretty_generate(@exporter.as_json)
   end
@@ -95,9 +96,19 @@ class ScenariosController < ApplicationController
     end
   end
 
+  def enable_or_disable_all_agents
+    @scenario = current_user.scenarios.find(params[:id])
+
+    @scenario.agents.update_all(disabled: params[:scenario][:disabled] == 'true')
+    respond_to do |format|
+      format.html { redirect_to @scenario, notice: 'The agents in this scenario have been successfully updated.' }
+      format.json { head :no_content }
+    end
+  end
+
   def destroy
     @scenario = current_user.scenarios.find(params[:id])
-    @scenario.destroy
+    @scenario.destroy_with_mode(params[:mode])
 
     respond_to do |format|
       format.html { redirect_to scenarios_path }

@@ -14,11 +14,20 @@ Capybara.default_max_wait_time = CAPYBARA_TIMEOUT
 
 RSpec.configure do |config|
   config.include Warden::Test::Helpers
-  config.before :suite do
+  config.include AlertConfirmer, type: :feature
+
+  config.before(:suite) do
     Warden.test_mode!
+    DatabaseCleaner.clean_with(:truncation)
   end
 
-  config.after :each do
+  config.before(:each) do |example|
+    DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
     Warden.test_reset!
   end
 end

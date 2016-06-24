@@ -6,6 +6,14 @@ module AgentHelper
     end
   end
 
+  def toggle_disabled_text
+    if cookies[:huginn_view_only_enabled_agents]
+      " Show Disabled Agents"
+    else
+      " Hide Disabled Agents"
+    end
+  end
+
   def scenario_links(agent)
     agent.scenarios.map { |scenario|
       link_to(scenario.name, scenario, class: "label", style: style_colors(scenario))
@@ -47,6 +55,48 @@ module AgentHelper
       'yes'.freeze
     else
       'maybe'.freeze
+    end
+  end
+
+  def agent_type_icon(agent, agents)
+    receiver_count = links_counter_cache(agents)[:links_as_receiver][agent.id] || 0
+    control_count  = links_counter_cache(agents)[:control_links_as_controller][agent.id] || 0
+    source_count   = links_counter_cache(agents)[:links_as_source][agent.id] || 0
+
+    if control_count > 0 && receiver_count > 0
+      content_tag('span') do
+        concat icon_tag('glyphicon-arrow-right')
+        concat tag('br')
+        concat icon_tag('glyphicon-new-window', class: 'glyphicon-flipped')
+      end
+    elsif control_count > 0 && receiver_count == 0
+      icon_tag('glyphicon-new-window', class: 'glyphicon-flipped')
+    elsif receiver_count > 0 && source_count == 0
+      icon_tag('glyphicon-arrow-right')
+    elsif receiver_count == 0 && source_count > 0
+      icon_tag('glyphicon-arrow-left')
+    elsif receiver_count > 0 && source_count > 0
+      icon_tag('glyphicon-transfer')
+    else
+      icon_tag('glyphicon-unchecked')
+    end
+  end
+
+  private
+
+  def links_counter_cache(agents)
+    @counter_cache ||= {}
+    @counter_cache[agents.__id__] ||= {}.tap do |cache|
+      agent_ids = agents.map(&:id)
+      cache[:links_as_receiver] = Hash[Link.where(receiver_id: agent_ids)
+                                           .group(:receiver_id)
+                                           .pluck('receiver_id', 'count(receiver_id) as id')]
+      cache[:links_as_source]   = Hash[Link.where(source_id: agent_ids)
+                                           .group(:source_id)
+                                           .pluck('source_id', 'count(source_id) as id')]
+      cache[:control_links_as_controller] = Hash[ControlLink.where(controller_id: agent_ids)
+                                                            .group(:controller_id)
+                                                            .pluck('controller_id', 'count(controller_id) as id')]
     end
   end
 end

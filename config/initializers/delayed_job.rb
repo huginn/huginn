@@ -11,11 +11,17 @@ Delayed::Worker.logger = Rails.logger
 # Delayed::Worker.logger.level = Logger::DEBUG
 
 class Delayed::Job
-  scope :pending, ->{ where("locked_at IS NULL AND attempts = 0") }
-  scope :awaiting_retry, ->{ where("failed_at IS NULL AND attempts > 0 AND locked_at IS NULL") }
+  scope :pending, -> { where("locked_at IS NULL AND attempts = 0") }
+  scope :awaiting_retry, -> { where("failed_at IS NULL AND attempts > 0 AND locked_at IS NULL") }
   scope :failed, -> { where("failed_at IS NOT NULL") }
 end
 
-Delayed::Backend::ActiveRecord.configure do |config|
-  config.reserve_sql_strategy = :default_sql
+def database_deadlocks_when_using_optimized_strategy?
+  ENV["DATABASE_ADAPTER"] == "mysql2"
+end
+
+if database_deadlocks_when_using_optimized_strategy?
+  Delayed::Backend::ActiveRecord.configure do |config|
+    config.reserve_sql_strategy = :default_sql
+  end
 end

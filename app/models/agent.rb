@@ -24,16 +24,17 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ['1 hour', 1.hour], ['6 hours', 6.hours], ["1 day", 1.day], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n.days] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :scenario_ids, :keep_events_for, :propagate_immediately, :drop_pending_events
+  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :receiver_ids, :scenario_ids, :keep_events_for, :propagate_immediately, :drop_pending_events
 
   json_serialize :options, :memory
 
   validates_presence_of :name, :user
   validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
-  validate :sources_are_owned
-  validate :controllers_are_owned
-  validate :control_targets_are_owned
-  validate :scenarios_are_owned
+  validates :sources, owned_by: :user_id
+  validates :receivers, owned_by: :user_id
+  validates :controllers, owned_by: :user_id
+  validates :control_targets, owned_by: :user_id
+  validates :scenarios, owned_by: :user_id
   validate :validate_schedule
   validate :validate_options
 
@@ -267,22 +268,6 @@ class Agent < ActiveRecord::Base
   
   private
   
-  def sources_are_owned
-    errors.add(:sources, "must be owned by you") unless sources.all? {|s| s.user_id == user_id }
-  end
-  
-  def controllers_are_owned
-    errors.add(:controllers, "must be owned by you") unless controllers.all? {|s| s.user_id == user_id }
-  end
-
-  def control_targets_are_owned
-    errors.add(:control_targets, "must be owned by you") unless control_targets.all? {|s| s.user_id == user_id }
-  end
-
-  def scenarios_are_owned
-    errors.add(:scenarios, "must be owned by you") unless scenarios.all? {|s| s.user_id == user_id }
-  end
-
   def validate_schedule
     unless cannot_be_scheduled?
       errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)

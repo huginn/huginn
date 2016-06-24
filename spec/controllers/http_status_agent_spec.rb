@@ -7,6 +7,7 @@ describe 'HttpStatusAgent' do
       a.service = services(:generic)
       a.user = users(:jane)
       a.options['url'] = 'http://google.com'
+      a.options['headers_to_save'] = 'Server'
       a.save!
 
       def a.interpolate_with(e, &block)
@@ -76,11 +77,12 @@ describe 'HttpStatusAgent' do
     before do
 
       def agent.interpolated
-        @interpolated ||= { :url => SecureRandom.uuid }
+        @interpolated ||= { :url => SecureRandom.uuid, :headers_to_save => '' }
       end
 
-      def agent.check_this_url url
+      def agent.check_this_url url, local_headers
         @url = url
+        @local_headers = local_headers
       end
 
       def agent.checked_url
@@ -103,10 +105,12 @@ describe 'HttpStatusAgent' do
       let(:successful_url) { SecureRandom.uuid }
 
       let(:status_code) { 200 }
+      let(:header) { SecureRandom.uuid }
+      let(:header_value) { SecureRandom.uuid }
 
       let(:event_with_a_successful_ping) do
-        agent.faraday.set(successful_url, Struct.new(:status).new(status_code))
-        Event.new.tap { |e| e.payload = { url: successful_url } }
+        agent.faraday.set(successful_url, Struct.new(:status, :headers).new(status_code, {}))
+        Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
       end
 
       let(:events) do
@@ -133,6 +137,16 @@ describe 'HttpStatusAgent' do
         expect(agent.memory['last_status']).to eq('200')
       end
 
+      it "should record the time spent waiting for the reply" do
+        agent.receive events
+        expect(agent.the_created_events[0][:payload]['elapsed_time']).not_to be_nil
+      end
+
+      it "should not return a header" do
+        agent.receive events
+        expect(agent.the_created_events[0][:payload]['headers']).to be_nil
+      end
+
       describe "but the status code is not 200" do
         let(:status_code) { 500 }
 
@@ -155,8 +169,8 @@ describe 'HttpStatusAgent' do
       describe "but the ping returns a status code of 0" do
 
         let(:event_with_a_successful_ping) do
-          agent.faraday.set(successful_url, Struct.new(:status).new(0))
-          Event.new.tap { |e| e.payload = { url: successful_url } }
+          agent.faraday.set(successful_url, Struct.new(:status, :headers).new(0, {}))
+          Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
         end
 
         it "should create one event" do
@@ -185,8 +199,8 @@ describe 'HttpStatusAgent' do
       describe "but the ping returns a status code of -1" do
 
         let(:event_with_a_successful_ping) do
-          agent.faraday.set(successful_url, Struct.new(:status).new(-1))
-          Event.new.tap { |e| e.payload = { url: successful_url } }
+          agent.faraday.set(successful_url, Struct.new(:status, :headers).new(-1, {}))
+          Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
         end
 
         it "should create one event" do
@@ -209,7 +223,7 @@ describe 'HttpStatusAgent' do
       describe "and with one event with a failing ping" do
 
         let(:failing_url)    { SecureRandom.uuid }
-        let(:event_with_a_failing_ping)    { Event.new.tap { |e| e.payload = { url: failing_url } } }
+        let(:event_with_a_failing_ping)    { Event.new.tap { |e| e.payload = { url: failing_url, headers_to_save: "" } } }
 
         let(:events) do
           [event_with_a_successful_ping, event_with_a_failing_ping]
@@ -236,8 +250,47 @@ describe 'HttpStatusAgent' do
           expect(agent.the_created_events[1][:payload]['url']).to eq(failing_url)
         end
 
+        it "should record the time spent waiting for the reply" do
+          agent.receive events
+          expect(agent.the_created_events[0][:payload]['elapsed_time']).not_to be_nil
+          expect(agent.the_created_events[1][:payload]['elapsed_time']).not_to be_nil
+        end
+
       end
 
+      describe "with a header specified" do
+        let(:event_with_a_successful_ping) do
+          agent.faraday.set(successful_url, Struct.new(:status, :headers).new(status_code, {header => header_value}))
+          Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: header } }
+        end
+
+        it "should return the header value" do
+          agent.receive events
+          expect(agent.the_created_events[0][:payload]['headers']).not_to be_nil
+          expect(agent.the_created_events[0][:payload]['headers'][header]).to eq(header_value)
+        end
+
+      end
+
+      describe "with existing and non-existing headers specified" do
+        let(:nonexistant_header) { SecureRandom.uuid }
+
+        let(:event_with_a_successful_ping) do
+          agent.faraday.set(successful_url, Struct.new(:status, :headers).new(status_code, {header => header_value}))
+          Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: header + "," + nonexistant_header } }
+        end
+
+        it "should return the existing header's value" do
+          agent.receive events
+          expect(agent.the_created_events[0][:payload]['headers'][header]).to eq(header_value)
+        end
+
+        it "should return nil for the nonexistant header" do
+          agent.receive events
+          expect(agent.the_created_events[0][:payload]['headers'][nonexistant_header]).to be_nil
+        end
+
+      end
     end
 
     describe "validations" do

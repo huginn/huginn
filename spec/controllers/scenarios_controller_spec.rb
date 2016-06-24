@@ -140,6 +140,15 @@ describe ScenariosController do
     end
   end
 
+  describe 'PUT enable_or_disable_all_agents' do
+    it 'updates disabled on all agents in a scenario for the current user' do
+      @params = {"scenario"=>{"disabled"=>"true"}, "commit"=>"Yes", "id"=> scenarios(:bob_weather).id}
+      put :enable_or_disable_all_agents, @params
+      expect(agents(:bob_rain_notifier_agent).disabled).to eq(true)
+      expect(response).to redirect_to(scenario_path(scenarios(:bob_weather)))
+    end
+  end
+
   describe "DELETE destroy" do
     it "destroys only Scenarios owned by the current user" do
       expect {
@@ -149,6 +158,12 @@ describe ScenariosController do
       expect {
         delete :destroy, :id => scenarios(:jane_weather).to_param
       }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "passes the mode to the model" do
+      expect {
+        delete :destroy, id: scenarios(:bob_weather).to_param, mode: 'all_agents'
+      }.to change(Agent, :count).by(-2)
     end
   end
 end

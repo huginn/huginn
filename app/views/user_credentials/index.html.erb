@@ -39,6 +39,28 @@
       <div class="btn-group">
         <%= link_to new_user_credential_path, class: "btn btn-default" do %><span class="glyphicon glyphicon-plus"></span> New Credential<% end %>
         <%= link_to user_credentials_path(format: :json), class: "btn btn-default" do %><span class="glyphicon glyphicon-cloud-download"></span> Download Credentials<% end %>
+        <%= link_to '#', data: { toggle: 'modal', target: '#credentials-upload' }, class: "btn btn-default credentials-upload-button" do %><span class="glyphicon glyphicon-upload"></span> Upload Credentials<% end %>
+      </div>
+
+      <div id="credentials-upload" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <%= form_tag import_user_credentials_path, multipart: true do %>
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Upload Credentials</h4>
+              </div>
+              <div class="modal-body">
+                <p>Upload a credentials file that you have previously exported from a Huginn instance.</p>
+                <%= file_field_tag :file, class: 'form-control' %>
+              </div>
+              <div class="modal-footer">
+                <%= button_tag 'Cancel', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
+                <%= submit_tag 'Upload', class: 'btn btn-primary' %>
+              </div>
+            <% end %>
+          </div>
+        </div>
       </div>
     </div>
   </div>

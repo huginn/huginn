@@ -21,7 +21,11 @@
         <% @scenarios.each do |scenario| %>
           <tr>
             <td>
-              <%= scenario_label(scenario, content_tag(:i, '', class: 'glyphicon glyphicon-font')) %>
+              <% if scenario.icon.blank? %>
+                <%= scenario_label(scenario, icon('gear'))%>
+              <% else %>
+                <%= scenario_label(scenario, icon(scenario.icon))%>
+              <% end %>
               <%= link_to(scenario.name, scenario) %>
             </td>
             <td><%= link_to pluralize(scenario.agents.count, "agent"), scenario %></td>
@@ -31,8 +35,9 @@
                 <%= link_to 'Show', scenario, class: "btn btn-default" %>
                 <%= link_to 'Edit', edit_scenario_path(scenario), class: "btn btn-default" %>
                 <%= link_to 'Share', share_scenario_path(scenario), class: "btn btn-default" %>
-                <%= link_to 'Delete', scenario_path(scenario), method: :delete, data: { confirm: "This will remove the '#{scenario.name}' Scenerio from all Agents and delete it.  Are you sure?" }, class: "btn btn-default" %>
+                <%= link_to 'Delete', '#', data: { toggle: 'modal', target: "#confirm-scenario-deletion-#{scenario.id}"}, class: "btn btn-default" %>
               </div>
+              <%= render 'scenarios/confirm_deletion_modal', scenario: scenario %>
             </td>
           </tr>
         <% end %>

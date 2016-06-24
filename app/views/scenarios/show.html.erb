@@ -23,8 +23,12 @@
           <%= link_to icon_tag('glyphicon-refresh') + ' Update', new_scenario_imports_path(url: @scenario.source_url), class: "btn btn-default" %>
         <% end %>
         <%= link_to icon_tag('glyphicon-share-alt') + ' Share', share_scenario_path(@scenario), class: "btn btn-default" %>
-        <%= link_to icon_tag('glyphicon-trash') + ' Delete', scenario_path(@scenario), method: :delete, data: { confirm: "This will remove the '#{@scenario.name}' Scenerio from all Agents and delete it.  Are you sure?" }, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-trash') + ' Delete', '#', data: { toggle: 'modal', target: "#confirm-scenario-deletion-#{@scenario.id}"}, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-play') + 'Enable all Agents', '#', data: { toggle: 'modal', target: "#enable-disable-agents"}, class: "btn btn-default", id: "enable-all" %>
+        <%= link_to icon_tag('glyphicon-pause') + 'Disable all Agents', '#', data: { toggle: 'modal', target: "#enable-disable-agents"}, class: "btn btn-default", id: "disable-all" %>
       </div>
     </div>
   </div>
 </div>
+<%= render 'scenarios/confirm_deletion_modal', scenario: @scenario %>
+<%= render 'scenarios/enable_agents_modal', scenario: @scenario %>

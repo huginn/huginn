@@ -8,10 +8,24 @@ class AgentsController < ApplicationController
 
     @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
+    if show_only_enabled_agents?
+      @agents = @agents.where(disabled: false)
+    end
+
     respond_to do |format|
       format.html
       format.json { render json: @agents }
     end
+  end
+
+  def toggle_visibility
+    if show_only_enabled_agents?
+      mark_all_agents_viewable
+    else
+      set_only_enabled_agents_as_viewable
+    end
+
+    redirect_to agents_path
   end
 
   def handle_details_post
@@ -31,47 +45,6 @@ class AgentsController < ApplicationController
     respond_to do |format|
       format.html { redirect_back "Agent run queued for '#{@agent.name}'" }
       format.json { head :ok }
-    end
-  end
-
-  def dry_run
-    attrs = params[:agent] || {}
-    if agent = current_user.agents.find_by(id: params[:id])
-      # POST /agents/:id/dry_run
-      if attrs.present?
-        type = agent.type
-        agent = Agent.build_for_type(type, current_user, attrs)
-      end
-    else
-      # POST /agents/dry_run
-      type = attrs.delete(:type)
-      agent = Agent.build_for_type(type, current_user, attrs)
-    end
-    agent.name ||= '(Untitled)'
-
-    if agent.valid?
-      if event_payload = params[:event]
-        dummy_agent = Agent.build_for_type('ManualEventAgent', current_user, name: 'Dry-Runner')
-        dummy_agent.readonly!
-        event = dummy_agent.events.build(user: current_user, payload: event_payload)
-      end
-
-      results = agent.dry_run!(event)
-
-      render json: {
-        log: results[:log],
-        events: Utils.pretty_print(results[:events], false),
-        memory: Utils.pretty_print(results[:memory] || {}, false),
-      }
-    else
-      render json: {
-        log: [
-          "#{pluralize(agent.errors.count, "error")} prohibited this Agent from being saved:",
-          *agent.errors.full_messages
-        ].join("\n- "),
-        events: '',
-        memory: '',
-      }
     end
   end
 
@@ -256,5 +229,21 @@ class AgentsController < ApplicationController
     if @agent.present? && @agent.is_form_configurable?
       @agent = FormConfigurableAgentPresenter.new(@agent, view_context)
     end
+  end
+
+  private
+  def show_only_enabled_agents?
+    !!cookies[:huginn_view_only_enabled_agents]
+  end
+
+  def set_only_enabled_agents_as_viewable
+    cookies[:huginn_view_only_enabled_agents] = {
+      value: "true",
+      expires: 1.year.from_now
+    }
+  end
+
+  def mark_all_agents_viewable
+    cookies.delete(:huginn_view_only_enabled_agents)
   end
 end

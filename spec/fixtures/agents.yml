@@ -32,6 +32,25 @@ bob_website_agent:
                  }
                }.to_json.inspect %>
 
+bob_disabled_website_agent:
+  type: Agents::WebsiteAgent
+  disabled: true
+  user: bob
+  events_count: 1
+  schedule: "midnight"
+  name: "Disabled Agent"
+  guid: <%= SecureRandom.hex %>
+  options: <%= {
+                 :url => "http://xkcd.com",
+                 :expected_update_period_in_days => 2,
+                 :mode => :on_change,
+                 :extract => {
+                   :url => {:css => "#comic img", :value => "@src"},
+                   :title => {:css => "#comic img", :value => "@title"}
+                 }
+               }.to_json.inspect %>
+
+
 bob_weather_agent:
   type: Agents::WeatherAgent
   user: bob
@@ -130,7 +149,7 @@ jane_basecamp_agent:
 bob_data_output_agent:
   type: Agents::DataOutputAgent
   user: bob
-  name: RSS Feed 
+  name: RSS Feed
   guid: <%= SecureRandom.hex %>
   options: <%= {
     expected_receive_period_in_days: 3,

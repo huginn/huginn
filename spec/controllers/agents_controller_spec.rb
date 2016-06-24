@@ -16,6 +16,14 @@ describe AgentsController do
       get :index
       expect(assigns(:agents).all? {|i| expect(i.user).to eq(users(:bob)) }).to be_truthy
     end
+
+    it "should not show disabled agents if the cookie is set" do
+      @request.cookies["huginn_view_only_enabled_agents"] = "true"
+
+      sign_in users(:bob)
+      get :index
+      expect(assigns(:agents).map(&:disabled).uniq).to eq([false])
+    end
   end
 
   describe "POST handle_details_post" do
@@ -64,6 +72,21 @@ describe AgentsController do
       expect {
         post :remove_events, :id => agents(:bob_website_agent).to_param
       }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe "PUT toggle_visibility" do
+    it "should set the cookie" do
+      sign_in users(:jane)
+      put :toggle_visibility
+      expect(response.cookies["huginn_view_only_enabled_agents"]).to eq("true")
+    end
+
+    it "should delete the cookie" do
+      @request.cookies["huginn_view_only_enabled_agents"] = "true"
+      sign_in users(:jane)
+      put :toggle_visibility
+      expect(response.cookies["huginn_view_only_enabled_agents"]).to be_nil
     end
   end
 
@@ -177,6 +200,18 @@ describe AgentsController do
           post :create, :agent => valid_attributes
         }.to change { users(:bob).agents.count }.by(1)
       }.to change { Link.count }.by(1)
+      expect(assigns(:agent)).to be_a(Agents::WebsiteAgent)
+    end
+
+    it "creates Agents and accepts specifing a target agent" do
+      sign_in users(:bob)
+      attributes = valid_attributes
+      attributes[:receiver_ids] = attributes[:source_ids]
+      expect {
+        expect {
+          post :create, :agent => attributes
+        }.to change { users(:bob).agents.count }.by(1)
+      }.to change { Link.count }.by(2)
       expect(assigns(:agent)).to be_a(Agents::WebsiteAgent)
     end
 
@@ -370,52 +405,6 @@ describe AgentsController do
         expect(response.header['Content-Type']).to include('application/json')
 
       end
-    end
-  end
-
-  describe "POST dry_run" do
-    before do
-      stub_request(:any, /xkcd/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
-    end
-
-    it "does not actually create any agent, event or log" do
-      sign_in users(:bob)
-      expect {
-        post :dry_run, agent: valid_attributes()
-      }.not_to change {
-        [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count]
-      }
-      json = JSON.parse(response.body)
-      expect(json['log']).to be_a(String)
-      expect(json['events']).to be_a(String)
-      expect(JSON.parse(json['events']).map(&:class)).to eq([Hash])
-      expect(json['memory']).to be_a(String)
-      expect(JSON.parse(json['memory'])).to be_a(Hash)
-    end
-
-    it "does not actually update an agent" do
-      sign_in users(:bob)
-      agent = agents(:bob_weather_agent)
-      expect {
-        post :dry_run, id: agent, agent: valid_attributes(name: 'New Name')
-      }.not_to change {
-        [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
-      }
-    end
-
-    it "accepts an event" do
-      sign_in users(:bob)
-      agent = agents(:bob_website_agent)
-      agent.options['url_from_event'] = '{{ url }}'
-      agent.save!
-      url_from_event = "http://xkcd.com/?from_event=1".freeze
-      expect {
-        post :dry_run, id: agent, event: { url: url_from_event }
-      }.not_to change {
-        [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
-      }
-      json = JSON.parse(response.body)
-      expect(json['log']).to match(/^\[\d\d:\d\d:\d\d\] INFO -- : Fetching #{Regexp.quote(url_from_event)}$/)
     end
   end
 

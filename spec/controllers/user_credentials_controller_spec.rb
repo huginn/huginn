@@ -10,6 +10,7 @@ describe UserCredentialsController do
 
   before do
     sign_in users(:bob)
+    @file = fixture_file_upload('user_credentials.json')
   end
 
   describe "GET index" do
@@ -27,6 +28,26 @@ describe UserCredentialsController do
       expect {
         get :edit, :id => user_credentials(:jane_aws_secret).to_param
       }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe "Post import" do
+    it "asserts user credentials were created for current user only" do
+      post :import, :file => @file
+      expect(controller.current_user.id).to eq(users(:bob).id)
+      expect(controller.current_user.user_credentials).to eq(users(:bob).user_credentials)
+    end
+
+    it "asserts that primary id in json file is ignored" do
+      post :import, :file => @file
+      expect(controller.current_user.user_credentials.last.id).not_to eq(24)
+    end
+
+    it "duplicate credential name shows an error that it is not saved" do
+      file1 = fixture_file_upload('multiple_user_credentials.json')
+      post :import, :file => file1
+      expect(flash[:notice]).to eq("One or more of the uploaded credentials was not imported due to an error. Perhaps an existing credential had the same name?")
+      expect(response).to redirect_to(user_credentials_path)
     end
   end
 
