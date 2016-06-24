@@ -52,8 +52,6 @@ module Agents
       received_event_without_error? && !recent_error_logs?
     end
 
-    # Doesn't actually matter what comes in as an event
-    # Triggers not matter the event
     def receive(incoming_events)
       configure # is there a better way to do this?
       end_list = get_list(options['end_list_name'])
@@ -83,8 +81,11 @@ module Agents
       end
 
       def get_board
-        # Look into replacing this code with the search action
-        Trello::Board.all.detect {|board| board.name == options['board_name']}
+        Trello::Action.search(
+          options['board_name'],
+          modelTypes: "boards",
+          board_fields: "name"
+        )['boards'].first
       end
 
       def get_member

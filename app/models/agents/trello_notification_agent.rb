@@ -147,8 +147,11 @@ module Agents
       end
 
       def get_board
-        # Look into using the search action instead
-        Trello::Board.all.detect {|board| board.name == options['board_name']}
+        Trello::Action.search(
+          options['board_name'],
+          modelTypes: "boards",
+          board_fields: "name"
+        )['boards'].first
       end
 
       def get_member
