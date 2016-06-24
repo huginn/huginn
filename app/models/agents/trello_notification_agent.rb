@@ -1,3 +1,5 @@
+require 'trello'
+
 module Agents
   class TrelloNotificationAgent < Agent
     no_bulk_receive!
@@ -6,29 +8,54 @@ module Agents
     gem_dependency_check { defined?(Trello) }
 
     description <<-MD
-      The Trello Notification agent allows you to get notifications from Trello.
+      The Trello Notification agent allows you to get notifications from your Trello account.
 
       To use the Trello Notification agent you will first need to sign into your Trello account.
-      Once you have signed in go to the following url https://trello.com/app-key and copy the key.
-      This will be used as the agent "public_key".
+      Once you have signed in go to the following url [https://trello.com/app-key](https://trello.com/app-key) and copy the key.
+      This will be used as the agent `public_key`.
 
-      Next on the same page click on the "Token" link and copy the token displayed. This will be used as the agent "member_token".
+      Next on the same page click on the `Token` link and copy the token displayed. This will be used as the agent `member_token`.
 
-      Additionally you can specify the Trello board name. This will restrict the agent to notifications of that particular board. If no board is specified, then notifications from all boards is returned.
+      Additionally you can specify the Trello board name with the `board_name` option. This will restrict the agent to notifications of that particular board. If no board is specified, then notifications from all boards is returned.
 
-      You will also need to specify you Trello username as "username". If no username is specified it will get a list of notifications for all members of the specified board.
+      You will also need to specify you Trello username as `username`. If no username is specified it will get a list of notifications for all members of the specified board.
 
-      Finally you will also need to specify the max age of the notifications to retrieve. By default this is "0" which will retrieve all notifications. 1 retrieves all notifications 1 day old, 2, 2 days old etc.
+      Finally you will also need to specify the max age of the notifications to retrieve with the `max_age` option. By default this is 0 which will retrieve all notifications. 1d retrieves all notifications 1 day old, 2d - 2 days old, 1h - 1 hour old, 1m - 1 minute old etc.
     MD
 
     event_description <<-MD
-      Here's an example of the event data that is returned by the Trello notifications agent. This is just one notification however more data will be returned based on your configuration.
+      Here's an example of the event data that is returned by the Trello notifications agent. This is just one notification however more data could be returned based on your configuration. Different types of data can also be returned depending on the type of notification.
+
+          {
+            "notifications":
+            {
+              "id": "1119afa1ggg775cg2fmom9a0",
+              "unread": false,
+              "type": "commentCard",
+              "date": "2016-06-17T08:06:57.843Z",
+              "data": {
+                "text": "@user ready for testing.",
+                "card": {
+                  "shortLink": "bC78glii",
+                  "idShort": 200,
+                  "name": "As a user, when I'm on the Edit Profile Page, if I edit the form and hit save, it should close the form.",
+                  "id": "573c735c13dcb2411a32d6bd"
+                },
+                "board": {
+                  "shortLink": "H1RadcyM",
+                  "name": "Software App",
+                  "id": "54b573g3454906237bc9cb70"
+                }
+              },
+              "member_creator_id": "4eg0df123bf061922g054540"
+            }
+          }
     MD
 
     def configure
       Trello.configure do |config|
-        config.developer_public_key = "4dfec6233bf4b6438e86af0ed04cccd5"
-        config.member_token = "c51bf814f53953d602b613226644d50da14a5cffe1219a40afb986ff1f8e2cf7"
+        config.developer_public_key = options['public_key']
+        config.member_token = options['member_token']
       end
     end
 
@@ -36,10 +63,10 @@ module Agents
       {
         'public_key' => 'Public key',
         'member_token' => 'Member token',
-        'board_name' => 'Name of the board'
+        'board_name' => 'Name of the board',
         'username' => 'johndoe',
         'max_age' => '0',
-        'expected_update_period_in_days' => '1'
+        'expected_update_period_in_days' => '1',
       }
     end
 
@@ -53,30 +80,39 @@ module Agents
     end
 
     def check
+      configure # is there a better way to do this?
       notifications = remove_old_notifications(get_notifications)
-      create_event :payload => notifications
+      create_event :payload => {notifications: notifications}
     end
 
     private
       def remove_old_notifications(notifications)
+        notifications_array = []
+
         if options['max_age'] == "0"
-          notifications
+          notifications.each do |notification|
+            notifications_array << notification.attributes
+          end
         else
           max_age = get_max_age
 
-          notifications.collect do |notification|
-            max_age <= ActiveSupport::TimeZone[Time.zone.name].parse(notification.date)
+          notifications.each do |notification|
+            if max_age <= ActiveSupport::TimeZone[Time.zone.name].parse(notification.date).to_i
+              notifications_array << notification.attributes
+            end
           end
         end
+
+        notifications_array
       end
 
       def get_max_age
         max_age = options['max_age']
-        if max_age.includes?('d')
+        if max_age.include?('d')
           max_age[0...1].to_i.days.ago.to_i
-        elsif max_age.includes?('h')
+        elsif max_age.include?('h')
           max_age[0...1].to_i.hours.ago.to_i
-        elsif max_age.includes?('m')
+        elsif max_age.include?('m')
           max_age[0...1].to_i.minutes.ago.to_i
         end
       end
@@ -111,10 +147,11 @@ module Agents
       end
 
       def get_board
+        # Look into using the search action instead
         Trello::Board.all.detect {|board| board.name == options['board_name']}
       end
 
-      def get_member(boards)
+      def get_member
         Trello::Member.find(options['username'])
       end
   end
