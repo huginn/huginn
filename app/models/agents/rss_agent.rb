@@ -113,8 +113,9 @@ module Agents
 
       created_event_count = 0
       sort_events(new_events).each.with_index do |event, index|
-        entry_id = event.payload[:update_id]
-        if check_and_track(entry_id)
+        entry_id = event.payload[:id]
+        entry_update_id = event.payload[:update_id]
+        if check_and_track(entry_id, entry_update_id)
           unless max_events && max_events > 0 && index >= max_events
             created_event_count += 1
             create_event(event)
@@ -134,12 +135,12 @@ module Agents
       end
     end
 
-    def check_and_track(entry_id)
+    def check_and_track(entry_id, entry_update_id)
       memory['seen_ids'] ||= []
-      if memory['seen_ids'].include?(entry_id)
+      if (memory['seen_ids'].include?(entry_update_id) || memory['seen_ids'].include?(entry_id))
         false
       else
-        memory['seen_ids'].unshift entry_id
+        memory['seen_ids'].unshift entry_update_id
         memory['seen_ids'].pop if memory['seen_ids'].length > 500
         true
       end
