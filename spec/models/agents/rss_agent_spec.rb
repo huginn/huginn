@@ -55,16 +55,57 @@ describe Agents::RssAgent do
   end
 
   describe "emitting RSS events" do
-    it "should emit items as events" do
+    it "should emit items as events for an Atom feed" do
+      agent.options['include_feed_info'] = true
+
       expect {
         agent.check
       }.to change { agent.events.count }.by(20)
 
       first, *, last = agent.events.last(20)
+      [first, last].each do |event|
+        expect(first.payload['feed']).to include({
+                                                   "type" => "atom",
+                                                   "title" => "Recent Commits to huginn:master",
+                                                   "url" => "https://github.com/cantino/huginn/commits/master",
+                                                   "links" => [
+                                                     {
+                                                       "type" => "text/html",
+                                                       "rel" => "alternate",
+                                                       "href" => "https://github.com/cantino/huginn/commits/master",
+                                                     },
+                                                     {
+                                                       "type" => "application/atom+xml",
+                                                       "rel" => "self",
+                                                       "href" => "https://github.com/cantino/huginn/commits/master.atom",
+                                                     },
+                                                   ],
+                                                 })
+      end
       expect(first.payload['url']).to eq("https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0")
       expect(first.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0"])
+      expect(first.payload['links']).to eq([
+                                             {
+                                               "href" => "https://github.com/cantino/huginn/commit/d0a844662846cf3c83b94c637c1803f03db5a5b0",
+                                               "rel" => "alternate",
+                                               "type" => "text/html",
+                                             }
+                                          ])
+      expect(first.payload['authors']).to eq(["cantino (https://github.com/cantino)"])
+      expect(first.payload['date_published']).to be_nil
+      expect(first.payload['last_updated']).to eq("2014-07-16T22:26:22-07:00")
       expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af")
       expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af"])
+      expect(last.payload['links']).to eq([
+                                              {
+                                                "href" => "https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af",
+                                                "rel" => "alternate",
+                                                "type" => "text/html",
+                                              }
+                                          ])
+      expect(last.payload['authors']).to eq(["CloCkWeRX (https://github.com/CloCkWeRX)"])
+      expect(last.payload['date_published']).to be_nil
+      expect(last.payload['last_updated']).to eq("2014-07-01T16:37:47+09:30")
     end
 
     it "should emit items as events in the order specified in the events_order option" do
@@ -80,6 +121,33 @@ describe Agents::RssAgent do
       expect(last.payload['title'].strip).to eq('Dashed line in a diagram indicates propagate_immediately being false.')
       expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535")
       expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535"])
+    end
+
+    it "should emit items as events for a FeedBurner RSS 2.0 feed" do
+      agent.options['url'] = "http://feeds.feedburner.com/SlickdealsnetFP?format=atom" # This is actually RSS 2.0 w/ Atom extension
+      agent.options['include_feed_info'] = true
+      agent.save!
+
+      expect {
+        agent.check
+      }.to change { agent.events.count }.by(79)
+
+      first, *, last = agent.events.last(79)
+      expect(first.payload['feed']).to include({
+                                                 "type" => "rss",
+                                                 "title" => "SlickDeals.net",
+                                                 "description" => "Slick online shopping deals.",
+                                                 "url" => "http://slickdeals.net/",
+                                               })
+      # Feedjira extracts feedburner:origLink
+      expect(first.payload['url']).to eq("http://slickdeals.net/permadeal/130160/green-man-gaming---pc-games-tomb-raider-game-of-the-year-6-hitman-absolution-elite-edition")
+      expect(last.payload['feed']).to include({
+                                                "type" => "rss",
+                                                "title" => "SlickDeals.net",
+                                                "description" => "Slick online shopping deals.",
+                                                "url" => "http://slickdeals.net/",
+                                              })
+      expect(last.payload['url']).to eq("http://slickdeals.net/permadeal/129980/amazon---rearth-ringke-fusion-bumper-hybrid-case-for-iphone-6")
     end
 
     it "should track ids and not re-emit the same item when seen again" do
@@ -155,17 +223,39 @@ describe Agents::RssAgent do
       @valid_options['url'] = 'http://onethingwell.org/rss'
     end
 
+    it "captures timestamps normalized in the ISO 8601 format" do
+      agent.check
+      first, *, third = agent.events.take(3)
+      expect(first.payload['date_published']).to eq('2015-08-20T17:00:10+01:00')
+      expect(third.payload['date_published']).to eq('2015-08-20T13:00:07+01:00')
+    end
+
     it "captures multiple categories" do
       agent.check
       first, *, third = agent.events.take(3)
       expect(first.payload['categories']).to eq(["csv", "crossplatform", "utilities"])
       expect(third.payload['categories']).to eq(["web"])
     end
+
+    it "sanitizes HTML content" do
+      agent.options['clean'] = true
+      agent.check
+      event = agent.events.last
+      expect(event.payload['content']).to eq('<a href="http://showgoers.tv/">Showgoers</a>: <blockquote> <p>Showgoers is a Chrome browser extension to synchronize your Netflix player with someone else so that you can co-watch the same movie on different computers with no hassle. Syncing up your player is as easy as sharing a URL.</p> </blockquote>')
+      expect(event.payload['description']).to eq('<a href="http://showgoers.tv/">Showgoers</a>: <blockquote> <p>Showgoers is a Chrome browser extension to synchronize your Netflix player with someone else so that you can co-watch the same movie on different computers with no hassle. Syncing up your player is as easy as sharing a URL.</p> </blockquote>')
+    end
+
+    it "captures an enclosure" do
+      agent.check
+      event = agent.events.fourth
+      expect(event.payload['enclosure']).to eq({ "url" => "http://c.1tw.org/images/2015/itsy.png", "type" => "image/png", "length" => "48249" })
+      expect(event.payload['image']).to eq("http://c.1tw.org/images/2015/itsy.png")
+    end
   end
 
   describe 'logging errors with the feed url' do
     it 'includes the feed URL when an exception is raised' do
-      mock(FeedNormalizer::FeedNormalizer).parse(anything, loose: true) { raise StandardError.new("Some error!") }
+      mock(Feedjira::Feed).parse(anything) { raise StandardError.new("Some error!") }
       expect(lambda {
         agent.check
       }).not_to raise_error

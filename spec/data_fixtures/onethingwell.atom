@@ -44,6 +44,7 @@
             <category>calendar</category>
             <category>menubar</category>
             <category>osx</category>
+            <enclosure url="http://c.1tw.org/images/2015/itsy.png" length="48249" type="image/png" />
         </item>
         <item>
             <title>Magic Wormhole</title>
@@ -208,8 +209,7 @@
         </item>
         <item>
             <title>Showgoers</title>
-            <description>&lt;a href="http://showgoers.tv/"&gt;Showgoers&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Showgoers is a Chrome browser extension to synchronize your Netflix player with someone else so that you can co-watch the same movie on different computers with no hassle. Syncing up your player is as easy as sharing a URL.&lt;/p&gt; &lt;/blockquote&gt;
-            </description>
+            <description>&lt;a href="http://showgoers.tv/" onmouseover="javascript:void(0)"&gt;Showgoers&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Showgoers is a Chrome browser extension to synchronize your Netflix player with someone else so that you can co-watch the same movie on different computers with no hassle. Syncing up your player is as easy as sharing a URL.&lt;/p&gt; &lt;/blockquote&gt;&lt;script&gt;some code&lt;/script&gt;</description>
             <link>http://onethingwell.org/post/125509667816</link>
             <guid>http://onethingwell.org/post/125509667816</guid>
             <pubDate>Fri, 31 Jul 2015 13:00:13 +0100</pubDate>
