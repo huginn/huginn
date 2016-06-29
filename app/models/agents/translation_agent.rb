@@ -44,7 +44,7 @@ module Agents
       request['Authorization'] = "Bearer" + " " + access_token
       http = Net::HTTP.new translate_uri.hostname, translate_uri.port
       response = http.request request
-      YAML.load response.body
+      response.body
     end
 
     def validate_options
@@ -70,7 +70,7 @@ module Agents
         translated_event = {}
         opts = interpolated(event)
         opts['content'].each_pair do |key, value|
-          translated_event[key] = translate(value.first, opts['to'], access_token)
+          translated_event[key] = translate(value, opts['to'], access_token)
         end
         create_event :payload => translated_event
       end
