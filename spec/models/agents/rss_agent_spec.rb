@@ -146,7 +146,11 @@ describe Agents::RssAgent do
       expect {
         agent.check
       }.to change { agent.events.count }.by(79)
-      expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| Digest::MD5.hexdigest(e.payload['content']) })
+      expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| 
+        t = Time.parse e.payload['last_updated']
+        suffix = (t.to_i).to_s 
+        Digest::MD5.hexdigest(e.payload['content']) + suffix
+      })
     end
   end
 
