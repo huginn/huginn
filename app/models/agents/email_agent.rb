@@ -16,7 +16,8 @@ module Agents
 
       You can customize the email body by including the optional `body` param.  Like the `subject`, the `body` can be a simple message
       or a Liquid template.  You could send only the Event's `some_text` field with a `body` set to `{{ some_text }}`.
-      The body can contain simple HTML and will be sanitized.
+      The body can contain simple HTML and will be sanitized. Note that when using `body`, it will be wrapped with `<html>` and `<body>` tags,
+      so you do not need to add these yourself.
 
       You can specify one or more `recipients` for the email, or skip the option in order to send the email to your
       account's default email address.
