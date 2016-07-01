@@ -17,7 +17,7 @@
       <script>
         $(function() {
           var $chart = $(".chart-container.group-<%= index.to_s %>").last();
-          var data = <%= Utils.jsonify(data.map {|count, time| { :x => time.to_i, :y => count.to_i } }) %>;
+          var data = <%= Utils.jsonify(data.select {|c, _t| !c.nil? }.map {|count, time| { :x => time.to_i, :y => count.to_f } }) %>;
           var peaks = <%= Utils.jsonify((@agent.memory[:peaks] && @agent.memory[:peaks][group_name]) || []) %>;
           var name = <%= Utils.jsonify(group_name) %>;
 
