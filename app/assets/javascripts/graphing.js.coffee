@@ -9,6 +9,7 @@ window.renderGraph = ($chart, data, peaks, name) ->
     element: $chart.find(".chart").get(0)
     width: 700
     height: 240
+    min: 'auto'
     series: [
       data: data
       name: name
@@ -28,6 +29,9 @@ window.renderGraph = ($chart, data, peaks, name) ->
     orientation: 'left'
     tickFormat: Rickshaw.Fixtures.Number.formatKMBT
     element: $chart.find(".y-axis").get(0)
+
+  hover_detail = new Rickshaw.Graph.HoverDetail
+    graph: graph
 
   graph.onUpdate ->
     mean = d3.mean data, (i) -> i.y
