@@ -1,7 +1,7 @@
 .show-view.peak-detector-agent,
 .show-view.twitter-stream-agent {
   .rickshaw_annotation_timeline {
-    left: 40px;
+    left: 60px;
     width: 700px;
   }
 
@@ -28,7 +28,7 @@
 
       .chart {
         position: relative;
-        left: 40px;
+        left: 60px;
         overflow: hidden;
         width: 700px;
       }
@@ -60,7 +60,7 @@
         position: absolute;
         top: 0;
         bottom: 0;
-        width: 40px;
+        width: 60px;
       }
     }
   }
