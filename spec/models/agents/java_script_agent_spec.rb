@@ -212,6 +212,22 @@ describe Agents::JavaScriptAgent do
       end
     end
 
+    describe "setMemory" do
+      it "stores an object" do
+        @agent.options['code'] = 'Agent.check = function() {
+          var u = {};
+          u["one"] = 1;
+          u["two"] = 2;
+          this.setMemory(u);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory).to eq({ "one" => 1, "two" => 2 })
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+    end
+
     describe "deleteKey" do
       it "deletes a memory key" do
         @agent.memory = { foo: "baz" }
