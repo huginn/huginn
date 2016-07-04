@@ -21,7 +21,7 @@ module Agents
       * `this.memory()`
       * `this.memory(key)`
       * `this.memory(keyToSet, valueToSet)`
-      * `this.setMemory(object)` (sets the memory to the values of the input object)
+      * `this.setMemory(object)` (replaces the Agent's memory with the provided object)
       * `this.deleteKey(key)` (deletes a key from memory and returns the value)
       * `this.credential(name)`
       * `this.credential(name, valueToSet)`
@@ -116,7 +116,7 @@ module Agents
       context["doLog"] = lambda { |a, x| log x }
       context["doError"] = lambda { |a, x| error x }
       context["getMemory"] = lambda { |a| memory.to_json }
-      context["setKey"] = lambda do |a, x, y|
+      context["setMemoryKey"] = lambda do |a, x, y|
         memory[x] = clean_nans(y)
       end
       context["setMemory"] = lambda do |a, x|
@@ -169,7 +169,7 @@ module Agents
 
         Agent.memory = function(key, value) {
           if (typeof(key) !== "undefined" && typeof(value) !== "undefined") {
-            setKey(key, value);
+            setMemoryKey(key, value);
           } else if (typeof(key) !== "undefined") {
             return JSON.parse(getMemory())[key];
           } else {
