@@ -23,10 +23,10 @@ module Agents
       If you don't want to move all the cards in one list to another list, you can ommit the `start_list_name` and specify a `card_name`. The agent will then search for the card and move it to the list with a name of `end_list_name`. If you specify `start_list_name` and `card_name` the agent will default to moving the single card.
     MD
 
-    def configure
+    def configure(opts)
       Trello.configure do |config|
-        config.developer_public_key = options['public_key']
-        config.member_token = options['member_token']
+        config.developer_public_key = opts['public_key']
+        config.member_token = opts['member_token']
       end
     end
 
@@ -52,23 +52,24 @@ module Agents
       received_event_without_error? && !recent_error_logs?
     end
 
-    def receive(incoming_events)
-      configure # is there a better way to do this?
-      end_list = get_list(options['end_list_name'])
+    def receive(event)
+      opts = interpolated(event.first)
+      configure(opts) if opts['public_key'].present? && opts['member_token'].present?
+      end_list = get_list(opts['end_list_name'], opts)
 
-      if options['start_list_name']
-        start_list = get_list(options['start_list_name'])
+      if opts['start_list_name'].present?
+        start_list = get_list(opts['start_list_name'], opts)
         start_list.move_all_cards(end_list)
-      else
-        card = get_card(options['card_name'])
+      elsif opts['card_name'].present?
+        card = get_card(opts['card_name'])
         card.move_to_list(end_list)
       end
     end
 
     private
-      def get_list(list_name)
-        if options['board_name']
-          get_board.lists.find{|list| list.name == list_name}
+      def get_list(list_name, opts)
+        if opts['board_name'].present?
+          get_board(opts).lists.find{|list| list.name == list_name}
         else
           get_boards.each do |board|
             board.lists.find {|list| list.name == list_name}
@@ -80,16 +81,12 @@ module Agents
         Trello::Board.all
       end
 
-      def get_board
+      def get_board(opts)
         Trello::Action.search(
-          options['board_name'],
+          opts['board_name'],
           modelTypes: "boards",
           board_fields: "name"
         )['boards'].first
-      end
-
-      def get_member
-        Trello::Member.find(options['username'])
       end
   end
 end
