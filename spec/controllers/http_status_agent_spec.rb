@@ -147,6 +147,48 @@ describe 'HttpStatusAgent' do
         expect(agent.the_created_events[0][:payload]['headers']).to be_nil
       end
 
+      describe "but the last status code was 200" do
+        before { agent.memory['last_status'] = '200' }
+
+        describe "and no duplication settings have been set" do
+          it "should create one event" do
+            agent.receive events
+            expect(agent.the_created_events.count).to eq(1)
+          end
+        end
+
+        describe "and change settings have been set to true" do
+          before { agent.options['changes_only'] = 'true' }
+          it "should NOT create any events" do
+            agent.receive events
+            expect(agent.the_created_events.count).to eq(0)
+          end
+
+          describe "but actually, the ping failed" do
+
+            let(:failing_url)    { SecureRandom.uuid }
+            let(:event_with_a_failing_ping)    { Event.new.tap { |e| e.payload = { url: failing_url, headers_to_save: "" } } }
+            let(:events) do
+              [event_with_a_successful_ping, event_with_a_failing_ping]
+            end
+
+            it "should create an event" do
+              agent.receive events
+              expect(agent.the_created_events.count).to eq(1)
+            end
+          end
+        end
+
+        describe "and change settings have been set to false" do
+          before { agent.options['changes_only'] = 'false' }
+          it "should create one event" do
+            agent.receive events
+            expect(agent.the_created_events.count).to eq(1)
+          end
+        end
+
+      end
+
       describe "but the status code is not 200" do
         let(:status_code) { 500 }
 
