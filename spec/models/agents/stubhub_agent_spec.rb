@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Agents::StubhubAgent do
 
   let(:name) { 'Agent Name' }
-  let(:url) { 'http://www.stubhub.com/event/name-1-1-2014-12345' }
+  let(:url) { 'https://www.stubhub.com/event/name-1-1-2014-12345' }
   let(:parsed_body) { JSON.parse(body)['response']['docs'][0] }
   let(:valid_params) { { 'url' => parsed_body['url'] } }
   let(:body) { File.read(Rails.root.join('spec/data_fixtures/stubhub_data.json')) }
@@ -20,7 +20,7 @@ describe Agents::StubhubAgent do
                             } }
 
   before do
-      stub_request(:get, "http://www.stubhub.com/listingCatalog/select/?q=%2B%20stubhubDocumentType:event%0D%0A%2B%20event_id:#{stubhub_event_id}%0D%0A&rows=10&start=0&wt=json").
+      stub_request(:get, "https://www.stubhub.com/listingCatalog/select/?q=%2B%20stubhubDocumentType:event%0D%0A%2B%20event_id:#{stubhub_event_id}%0D%0A&rows=10&start=0&wt=json").
          to_return(:status => 200, :body => body, :headers => {})
 
     @stubhub_agent = described_class.new(name: name, options: valid_params)
