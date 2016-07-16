@@ -1,6 +1,7 @@
 module Agents
   class LiquidOutputAgent < Agent
     include WebRequestConcern
+    include FormConfigurable
 
     cannot_be_scheduled!
 
@@ -26,6 +27,10 @@ module Agents
         #"ns_media" => "true"
       }
     end
+
+    form_configurable :secrets
+    form_configurable :expected_receive_period_in_days
+    form_configurable :content, type: :text
 
     def working?
       last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
@@ -95,7 +100,7 @@ module Agents
         end
       end
 
-      template = Liquid::Template.parse("{{first_name}} {{last_name}}")
+      template = Liquid::Template.parse(options['content'] || "")
       content = template.render(memory['last_event'] || {})
 
       return [content, 200]
