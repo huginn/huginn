@@ -31,6 +31,7 @@ module Agents
     form_configurable :secrets
     form_configurable :expected_receive_period_in_days
     form_configurable :content, type: :text
+    form_configurable :mime_type
 
     def working?
       last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
@@ -103,7 +104,8 @@ module Agents
       template = Liquid::Template.parse(options['content'] || "")
       content = template.render(memory['last_event'] || {})
 
-      return [content, 200]
+      mime_type = options['mime_type'].present? ? options['mime_type'] : 'text/html'
+      return [content, 200, mime_type]
     end
   end
 end
