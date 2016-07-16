@@ -12,7 +12,7 @@ module Agents
 
     def default_options
       {
-        "secrets" => ["a-secret-key"],
+        "secrets" => "a-secret-key",
         "expected_receive_period_in_days" => 2,
         "template" => {
           #"title" => "XKCD comics as a feed",
@@ -32,18 +32,16 @@ module Agents
     end
 
     def validate_options
-      if options['secrets'].is_a?(Array) && options['secrets'].length > 0
-        options['secrets'].each do |secret|
-          case secret
-          when %r{[/.]}
-            errors.add(:base, "secret may not contain a slash or dot")
-          when String
-          else
-            errors.add(:base, "secret must be a string")
-          end
+      if options['secrets'].present?
+        case options['secrets']
+        when %r{[/.]}
+          errors.add(:base, "secret may not contain a slash or dot")
+        when String
+        else
+          errors.add(:base, "secret must be a string")
         end
       else
-        errors.add(:base, "Please specify one or more secrets for 'authenticating' incoming feed requests")
+        errors.add(:base, "Please specify one secret for 'authenticating' incoming feed requests")
       end
 
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
