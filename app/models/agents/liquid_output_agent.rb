@@ -84,6 +84,10 @@ module Agents
       interpolated['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
     end
 
+    def receive(incoming_events)
+      memory['last_event'] = incoming_events[-1].payload
+    end
+
     def receive_web_request(params, method, format)
       unless interpolated['secrets'].include?(params['secret'])
         if format =~ /json/
@@ -92,7 +96,11 @@ module Agents
           return ["Not Authorized", 401]
         end
       end
-      return ['hello!', 200]
+
+      template = Liquid::Template.parse("{{first_name}} {{last_name}}")
+      content = template.render(memory['last_event'] || {})
+
+      return [content, 200]
     end
   end
 end
