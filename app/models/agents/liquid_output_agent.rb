@@ -64,35 +64,6 @@ module Agents
       end
     end
 
-    def feed_ttl
-      (interpolated['ttl'].presence || 60).to_i
-    end
-
-    def feed_title
-      interpolated['template']['title'].presence || "#{name} Event Feed"
-    end
-
-    def feed_link
-      interpolated['template']['link'].presence || "https://#{ENV['DOMAIN']}"
-    end
-
-    def feed_url(options = {})
-      interpolated['template']['self'].presence ||
-        feed_link + Rails.application.routes.url_helpers.
-                    web_requests_path(agent_id: id || ':id',
-                                      user_id: user_id,
-                                      secret: options[:secret],
-                                      format: options[:format])
-    end
-
-    def feed_icon
-      interpolated['template']['icon'].presence || feed_link + '/favicon.ico'
-    end
-
-    def feed_description
-      interpolated['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
-    end
-
     def receive(incoming_events)
       memory['last_event'] = incoming_events[-1].payload
     end
