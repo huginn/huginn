@@ -32,6 +32,8 @@ module Agents
       {
         "secrets" => "a-secret-key",
         "expected_receive_period_in_days" => 2,
+        "content" => 'This is a Liquid template. Include variables from your last event, like {{this}} and {{that}}.',
+        "mime_type" => 'text/html',
       }
     end
 
