@@ -77,11 +77,17 @@ module Agents
         end
       end
 
-      template = Liquid::Template.parse(options['content'] || "")
-      content = template.render(memory['last_event'] || {})
-
-      mime_type = options['mime_type'].present? ? options['mime_type'] : 'text/html'
-      return [content, 200, mime_type]
+      return [liquified_content, 200, mime_type]
     end
+
+    def mime_type
+      options['mime_type'].present? ? options['mime_type'] : 'text/html'
+    end
+
+    def liquified_content
+      template = Liquid::Template.parse(options['content'] || "")
+      template.render(memory['last_event'] || {})
+    end
+
   end
 end
