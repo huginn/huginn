@@ -7,7 +7,24 @@ module Agents
 
     description  do
       <<-MD
-      Liquid Output
+        The Liquid Output Agent outputs events through a Liquid template you provide.  Use it to create a HTML page, or a json feed, or anything else that can be rendered as a string from your stream of Huginn data. 
+
+        This Agent will output data at:
+
+        `https://#{ENV['DOMAIN']}#{Rails.application.routes.url_helpers.web_requests_path(agent_id: ':id', user_id: user_id, secret: ':secret', format: :any_extension)}`
+
+        where `:secret` is thel secret specified in your options.  You can use any extension you wish.
+
+        Options:
+
+          * `secrets` - An array of tokens that the requestor must provide for light-weight authentication.
+          * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
+          * `content` - The content to display when someone requests this page.
+          * `mime_type` - The mime type to use when someone requests this page.
+
+        # Liquid Templating
+
+        The content you provide will be run as a Liquid template. The data from the last event received will be used when processing the Liquid template.
       MD
     end
 
