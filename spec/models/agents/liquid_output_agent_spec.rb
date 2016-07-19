@@ -84,7 +84,7 @@ describe Agents::LiquidOutputAgent do
       let(:second_key)   { SecureRandom.uuid }
       let(:second_value) { SecureRandom.uuid }
 
-      before { agent.options['mode'] = 'merge' }
+      before { agent.options['mode'] = 'Merge events' }
 
       let(:incoming_events) do
         last_payload = { key => value }

@@ -34,6 +34,7 @@ module Agents
         "expected_receive_period_in_days" => 2,
         "content" => 'This is a Liquid template. Include variables from your last event, like {{this}} and {{that}}.',
         "mime_type" => 'text/html',
+        "mode" => 'Last event in',
       }
     end
 
@@ -41,6 +42,7 @@ module Agents
     form_configurable :expected_receive_period_in_days
     form_configurable :content, type: :text
     form_configurable :mime_type
+    form_configurable :mode, type: :array, values: [ 'Last event in', 'Merge events']
 
     def working?
       last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
@@ -68,7 +70,7 @@ module Agents
       memory['last_event'] ||= {}
       incoming_events.each do |event|
         case options['mode']
-        when 'merge'
+        when 'Merge events'
           memory['last_event'] = memory['last_event'].merge(event.payload)
         else
           memory['last_event'] = event.payload
