@@ -69,15 +69,23 @@ module Agents
     end
 
     def receive_web_request(params, method, format)
-      unless interpolated['secrets'] == params['secret']
-        if format =~ /json/
-          return [{ error: "Not Authorized" }, 401]
-        else
-          return ["Not Authorized", 401]
-        end
+      unless this_request_has_been_authenticated?(params)
+        return the_unauthorized_response(format)
       end
 
       return [liquified_content, 200, mime_type]
+    end
+
+    private
+
+    def the_unauthorized_response(format)
+      message = "Not Authorized"
+      message = { error: message } if format =~ /json/ 
+      [message, 401]
+    end
+
+    def this_request_has_been_authenticated?(params)
+      interpolated['secrets'] == params['secret']
     end
 
     def mime_type
