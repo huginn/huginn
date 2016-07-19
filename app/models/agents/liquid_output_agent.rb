@@ -21,10 +21,34 @@ module Agents
           * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
           * `content` - The content to display when someone requests this page.
           * `mime_type` - The mime type to use when someone requests this page.
+          * `mode` - The behavior that determines what data is passed to the Liquid template.
 
         # Liquid Templating
 
         The content you provide will be run as a Liquid template. The data from the last event received will be used when processing the Liquid template.
+
+        # Modes
+
+        ### Merge events
+
+          The data for incoming events will be merged. So if two events come in like this:
+
+```
+{ 'a' => 'b',  'c' => 'd'}
+{ 'a' => 'bb', 'e' => 'f'}
+```
+
+          The final result will be:
+
+```
+{ 'a' => 'bb', 'c' => 'd', 'e' => 'f'}
+```
+
+        This merged version will be passed to the Liquid template.
+
+        ### Last event in
+
+          The data from the last event will be passed to the template.
       MD
     end
 
