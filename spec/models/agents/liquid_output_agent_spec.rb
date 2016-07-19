@@ -71,4 +71,35 @@ describe Agents::LiquidOutputAgent do
       expect(agent.memory['last_event'][key]).to equal(value)
     end
   end
+
+  describe "#receive_web_request?" do
+
+    let(:secrets) { SecureRandom.uuid }
+
+    let(:params) { { 'secret' => secrets } }
+
+    let(:method) { nil }
+    let(:format) { nil }
+
+    let(:mime_type) { SecureRandom.uuid }
+    let(:content) { "The key is {{#{key}}}." }
+
+    let(:key)   { SecureRandom.uuid }
+    let(:value) { SecureRandom.uuid }
+
+    before do
+      agent.options['secrets'] = secrets
+      agent.options['mime_type'] = mime_type
+      agent.options['content'] = content
+      agent.memory['last_event'] = { key => value }
+    end
+
+    it "render the results as a liquid template" do
+      result = agent.receive_web_request params, method, format
+
+      expect(result[0]).to eq("The key is #{value}.")
+      expect(result[1]).to eq(200)
+      expect(result[2]).to eq(mime_type)
+    end
+  end
 end
