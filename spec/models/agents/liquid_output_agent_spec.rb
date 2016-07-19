@@ -101,5 +101,23 @@ describe Agents::LiquidOutputAgent do
       expect(result[1]).to eq(200)
       expect(result[2]).to eq(mime_type)
     end
+
+    describe "but the secret provided does not match" do
+      before { params['secret'] = SecureRandom.uuid }
+
+      it "should return a 401 response" do
+        result = agent.receive_web_request params, method, format
+
+        expect(result[0]).to eq("Not Authorized")
+        expect(result[1]).to eq(401)
+      end
+
+      it "should return a 401 json response if the format is json" do
+        result = agent.receive_web_request params, method, 'json'
+
+        expect(result[0][:error]).to eq("Not Authorized")
+        expect(result[1]).to eq(401)
+      end
+    end
   end
 end
