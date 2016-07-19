@@ -69,22 +69,18 @@ module Agents
     end
 
     def receive_web_request(params, method, format)
-      unless this_request_has_been_authenticated?(params)
-        return the_unauthorized_response(format)
-      end
-
-      return [liquified_content, 200, mime_type]
+      valid_authentication?(params) ? [liquified_content, 200, mime_type]
+                                    : [unauthorized_content(format), 401]
     end
 
     private
 
-    def the_unauthorized_response(format)
-      message = "Not Authorized"
-      message = { error: message } if format =~ /json/ 
-      [message, 401]
+    def unauthorized_content(format)
+      format =~ /json/ ? { error: "Not Authorized" }
+                       : "Not Authorized"
     end
 
-    def this_request_has_been_authenticated?(params)
+    def valid_authentication?(params)
       interpolated['secrets'] == params['secret']
     end
 
