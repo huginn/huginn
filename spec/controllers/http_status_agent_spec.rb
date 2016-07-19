@@ -36,6 +36,9 @@ describe 'HttpStatusAgent' do
 
                        def f.set url, response, time = nil
                          sleep(time/1000) if time
+                         def response.to_hash
+                           to_h
+                         end
                          programmed_responses[url] = response
                        end
                      end
