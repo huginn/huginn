@@ -23,4 +23,42 @@ describe Agents::LiquidOutputAgent do
       expect(agent.reload).not_to be_working
     end
   end
+
+  describe "validation" do
+    before do
+      expect(agent).to be_valid
+    end
+
+    it "should validate presence and length of secrets" do
+      agent.options[:secrets] = ""
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = "foo"
+      expect(agent).to be_valid
+      agent.options[:secrets] = "foo/bar"
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = "foo.xml"
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = false
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = []
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = ["foo.xml"]
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = ["hello", true]
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = ["hello"]
+      expect(agent).not_to be_valid
+      agent.options[:secrets] = ["hello", "world"]
+      expect(agent).not_to be_valid
+    end
+
+    it "should validate presence of expected_receive_period_in_days" do
+      agent.options[:expected_receive_period_in_days] = ""
+      expect(agent).not_to be_valid
+      agent.options[:expected_receive_period_in_days] = 0
+      expect(agent).not_to be_valid
+      agent.options[:expected_receive_period_in_days] = -1
+      expect(agent).not_to be_valid
+    end
+  end
 end
