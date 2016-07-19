@@ -69,7 +69,7 @@ module Agents
     end
 
     def receive_web_request(params, method, format)
-      unless interpolated['secrets'].include?(params['secret'])
+      unless interpolated['secrets'] == params['secret']
         if format =~ /json/
           return [{ error: "Not Authorized" }, 401]
         else
