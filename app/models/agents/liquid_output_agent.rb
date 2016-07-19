@@ -66,13 +66,13 @@ module Agents
 
     def receive(incoming_events)
       memory['last_event'] ||= {}
-      case options['mode']
-      when 'merge'
-        incoming_events.each do |event|
+      incoming_events.each do |event|
+        case options['mode']
+        when 'merge'
           memory['last_event'] = memory['last_event'].merge(event.payload)
+        else
+          memory['last_event'] = event.payload
         end
-      else
-        memory['last_event'] = incoming_events[-1].payload
       end
     end
 
