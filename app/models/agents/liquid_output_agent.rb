@@ -65,7 +65,15 @@ module Agents
     end
 
     def receive(incoming_events)
-      memory['last_event'] = incoming_events[-1].payload
+      memory['last_event'] ||= {}
+      case options['mode']
+      when 'merge'
+        incoming_events.each do |event|
+          memory['last_event'] = memory['last_event'].merge(event.payload)
+        end
+      else
+        memory['last_event'] = incoming_events[-1].payload
+      end
     end
 
     def receive_web_request(params, method, format)

@@ -79,6 +79,26 @@ describe Agents::LiquidOutputAgent do
       expect(agent.memory['last_event'][key]).to equal(value)
     end
 
+    describe "but the mode is merge" do
+
+      let(:second_key)   { SecureRandom.uuid }
+      let(:second_value) { SecureRandom.uuid }
+
+      before { agent.options['mode'] = 'merge' }
+
+      let(:incoming_events) do
+        last_payload = { key => value }
+        [Struct.new(:payload).new( { key => SecureRandom.uuid, second_key => second_value } ),
+         Struct.new(:payload).new(last_payload)]
+      end
+
+      it "should merge all of the events passed to it" do
+        agent.receive incoming_events
+        expect(agent.memory['last_event'][key]).to equal(value)
+        expect(agent.memory['last_event'][second_key]).to equal(second_value)
+      end
+    end
+
   end
 
   describe "#receive_web_request?" do
