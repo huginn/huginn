@@ -61,4 +61,14 @@ describe Agents::LiquidOutputAgent do
       expect(agent).not_to be_valid
     end
   end
+
+  describe "#receive?" do
+    it "stores the last event in memory" do
+      key, value = SecureRandom.uuid, SecureRandom.uuid
+      last_payload = { key => value}
+      incoming_events = [Object.new, Object.new, Struct.new(:payload).new(last_payload)]
+      agent.receive incoming_events
+      expect(agent.memory['last_event'][key]).to equal(value)
+    end
+  end
 end
