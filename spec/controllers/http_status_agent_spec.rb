@@ -1,5 +1,9 @@
 require 'rails_helper'
 
+class MockResponse < Struct.new(:status, :headers, :url)
+  alias_method :to_hash, :to_h
+end
+
 describe 'HttpStatusAgent' do
 
   let(:agent) do
@@ -36,9 +40,6 @@ describe 'HttpStatusAgent' do
 
                        def f.set url, response, time = nil
                          sleep(time/1000) if time
-                         def response.to_hash
-                           to_h
-                         end
                          programmed_responses[url] = response
                        end
                      end
@@ -112,7 +113,7 @@ describe 'HttpStatusAgent' do
       let(:header_value) { SecureRandom.uuid }
 
       let(:event_with_a_successful_ping) do
-        agent.faraday.set(successful_url, Struct.new(:status, :headers, :url).new(status_code, {}, successful_url))
+        agent.faraday.set(successful_url, MockResponse.new(status_code, {}, successful_url))
         Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
       end
 
@@ -224,7 +225,7 @@ describe 'HttpStatusAgent' do
       describe "but the ping returns a status code of 0" do
 
         let(:event_with_a_successful_ping) do
-          agent.faraday.set(successful_url, Struct.new(:status, :headers, :url).new(0, {}, successful_url))
+          agent.faraday.set(successful_url, MockResponse.new(0, {}, successful_url))
           Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
         end
 
@@ -254,7 +255,7 @@ describe 'HttpStatusAgent' do
       describe "but the ping returns a status code of -1" do
 
         let(:event_with_a_successful_ping) do
-          agent.faraday.set(successful_url, Struct.new(:status, :headers, :url).new(-1, {}, successful_url))
+          agent.faraday.set(successful_url, MockResponse.new(-1, {}, successful_url))
           Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: "" } }
         end
 
@@ -315,7 +316,7 @@ describe 'HttpStatusAgent' do
 
       describe "with a header specified" do
         let(:event_with_a_successful_ping) do
-          agent.faraday.set(successful_url, Struct.new(:status, :headers, :url).new(status_code, {header => header_value}, successful_url))
+          agent.faraday.set(successful_url, MockResponse.new(status_code, {header => header_value}, successful_url))
           Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: header } }
         end
 
@@ -331,7 +332,7 @@ describe 'HttpStatusAgent' do
         let(:nonexistant_header) { SecureRandom.uuid }
 
         let(:event_with_a_successful_ping) do
-          agent.faraday.set(successful_url, Struct.new(:status, :headers, :url).new(status_code, {header => header_value}, successful_url))
+          agent.faraday.set(successful_url, MockResponse.new(status_code, {header => header_value}, successful_url))
           Event.new.tap { |e| e.payload = { url: successful_url, headers_to_save: header + "," + nonexistant_header } }
         end
 
