@@ -25,7 +25,7 @@
           <% if @agent.new_record? %>
             <div class="form-group type-select">
               <%= f.label :type %>
-              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [type.name.gsub(/^.*::/, '').underscore.humanize.titleize, type, {title: h(Agent.build_for_type(type.name,current_user,{}).html_description.lines.first.strip)}] }, @agent.type), {}, :class => 'form-control' %>
+              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [type.name.gsub(/^.*::/, '').underscore.humanize.titleize, type, {title: h(Agent.build_for_type(type.name,@agent_user,{}).html_description.lines.first.strip)}] }, @agent.type), {}, :class => 'form-control' %>
             </div>
           <% end %>
         </div>
@@ -66,7 +66,7 @@
                 <div class="form-group">
                   <%= f.label :control_targets %>
                   <%= f.select(:control_target_ids,
-                               options_for_select(current_user.agents.map {|s| [s.name, s.id] },
+                               options_for_select(@current_agents.map {|s| [s.name, s.id] },
                                                   @agent.control_target_ids),
                                {}, { multiple: true, size: 5, class: 'select2-linked-tags form-control', data: {url_prefix: '/agents'}}) %>
                 </div>
@@ -85,7 +85,7 @@
               <%= f.label :sources %>
               <span class="glyphicon glyphicon-question-sign hover-help" data-content="This Agent will receive events from the selected Agents."></span>
               <div class="link-region" data-can-receive-events="<%= @agent.can_receive_events? %>">
-                <% eventSources = (current_user.agents - [@agent]).find_all { |a| a.can_create_events? } %>
+                <% eventSources = (@current_agents - [@agent]).find_all { |a| a.can_create_events? } %>
                 <%= f.select(:source_ids,
                              options_for_select(eventSources.map {|s| [s.name, s.id] },
                                                 @agent.source_ids),
@@ -103,7 +103,7 @@
               <%= f.label :receivers %>
               <span class="glyphicon glyphicon-question-sign hover-help" data-content="Events created by this Agent will be sent to the selected Agents."></span>
               <div class="event-related-region">
-                <% eventTargets = (current_user.agents - [@agent]).find_all { |a| a.can_receive_events? } %>
+                <% eventTargets = (@current_agents - [@agent]).find_all { |a| a.can_receive_events? } %>
                 <%= f.select(:receiver_ids,
                              options_for_select(eventTargets.map {|s| [s.name, s.id] },
                                                 @agent.receiver_ids),
@@ -112,12 +112,12 @@
               </div>
             </div>
 
-            <% if current_user.scenario_count > 0 %>
+            <% if @agent_user.scenario_count > 0 %>
               <div class="form-group">
                 <%= f.label :scenarios %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="Use Scenarios to group sets of Agents, both for organization, and to make them easy to export and share."></span>
                 <%= f.select(:scenario_ids,
-                             options_for_select(current_user.scenarios.pluck(:name, :id), @agent.scenario_ids),
+                             options_for_select(@agent_user.scenarios.pluck(:name, :id), @agent.scenario_ids),
                              {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/scenarios'} }) %>
               </div>
             <% end %>

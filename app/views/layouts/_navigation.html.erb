@@ -12,17 +12,17 @@
   
   <% if user_signed_in? %>
     <ul class='nav navbar-nav'>
-      <%= nav_link "Agents", agents_path do %>
+      <%= nav_link "Agents", agents_path(user: nil) do %>
         <ul class='dropdown-menu' role='menu'>
-          <%= nav_link icon_tag('glyphicon-plus') + " New Agent", new_agent_path %>
-          <%= nav_link icon_tag('glyphicon-refresh') + " Run event propagation", propagate_agents_path, method: 'post' %>
-          <%= nav_link icon_tag('glyphicon-random') + " View Diagram", diagram_path %>
+          <%= nav_link icon_tag('glyphicon-plus') + " New Agent", new_agent_path(user: nil) %>
+          <%= nav_link icon_tag('glyphicon-refresh') + " Run event propagation", propagate_agents_path(user: nil), method: 'post' %>
+          <%= nav_link icon_tag('glyphicon-random') + " View Diagram", diagram_path(user: nil) %>
         </ul>
       <% end %>
-      <%= nav_link "Scenarios", scenarios_path %>
-      <%= nav_link "Events", events_path %>
-      <%= nav_link "Credentials", user_credentials_path %>
-      <%= nav_link "Services", services_path %>
+      <%= nav_link "Scenarios", scenarios_path(user: nil) %>
+      <%= nav_link "Events", events_path(user: nil) %>
+      <%= nav_link "Credentials", user_credentials_path(user: nil) %>
+      <%= nav_link "Services", services_path(user: nil) %>
     </ul>
   <% end %>
   

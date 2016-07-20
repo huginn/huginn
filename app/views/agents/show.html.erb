@@ -64,6 +64,13 @@
           <div class="tab-pane <%= agent_show_view(@agent).present? ? "" : "active" %>" id="details">
             <h2><%= @agent.name %> Details</h2>
 
+            <% if current_user != @agent_user %>
+            <p>
+              <b>User:</b>
+              <%= @agent.user.username.titleize %>
+            </p>
+            <% end %>
+
             <p>
               <b>Type:</b>
               <%= @agent.short_type.titleize %>

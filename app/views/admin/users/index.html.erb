@@ -24,7 +24,7 @@
               <td><%= link_to user.username, edit_admin_user_path(user) %></td>
               <td><%= user.email %></td>
               <td><%= user_account_state(user) %></td>
-              <td><%= user.agents.active.count %></td>
+              <td><%= link_to user.agents.active.count, agents_path(user: user.username) %></td>
               <td><%= user.agents.inactive.count %></td>
               <td title='<%= user.created_at %>'><%= time_ago_in_words user.created_at %> ago</td>
               <td>

@@ -2,11 +2,21 @@ class EventsController < ApplicationController
   before_action :load_event, except: :index
 
   def index
+    if params[:user]
+      if current_user.admin?
+        @agent_user = User.find_by!(username: params[:user])
+      else
+        render(text: 'error', status: 403) and return
+      end
+    else
+      @agent_user = current_user
+    end
+
     if params[:agent_id]
-      @agent = current_user.agents.find(params[:agent_id])
+      @agent = @agent_user.agents.find(params[:agent_id])
       @events = @agent.events.page(params[:page])
     else
-      @events = current_user.events.preload(:agent).page(params[:page])
+      @events = @agent_user.events.preload(:agent).page(params[:page])
     end
 
     respond_to do |format|
@@ -38,9 +48,23 @@ class EventsController < ApplicationController
     end
   end
 
+  # override default options
+  # to allow admin
+  def default_url_options
+    opts = {}
+    if @agent_user && current_user.admin? && current_user != @agent_user
+      opts[:user] = @agent_user.username
+    end
+    opts.merge(super)
+  end
+
   private
 
   def load_event
-    @event = current_user.events.find(params[:id])
+    if params[:user] && current_user.admin?
+      @event = User.find_by!(username: params[:user]).events.find(params[:id])
+    else
+      @event = current_user.events.find(params[:id])
+    end
   end
 end

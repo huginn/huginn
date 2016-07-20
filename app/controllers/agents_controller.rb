@@ -3,10 +3,12 @@ class AgentsController < ApplicationController
   include ActionView::Helpers::TextHelper
   include SortableTable
 
+  before_action :set_current_agents, :only => [:index, :handle_details_post, :run, :event_descriptions, :remove_events, :destroy_memory, :show, :new, :edit, :create, :update, :destroy, :validate, :complete]
+
   def index
     set_table_sort sorts: %w[name created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
 
-    @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
+    @agents = @current_agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
     if show_only_enabled_agents?
       @agents = @agents.where(disabled: false)
@@ -29,7 +31,8 @@ class AgentsController < ApplicationController
   end
 
   def handle_details_post
-    @agent = current_user.agents.find(params[:id])
+    
+    @agent = @current_agents.find(params[:id])
     if @agent.respond_to?(:handle_details_post)
       render :json => @agent.handle_details_post(params) || {}
     else
@@ -39,7 +42,8 @@ class AgentsController < ApplicationController
   end
 
   def run
-    @agent = current_user.agents.find(params[:id])
+    
+    @agent = @current_agents.find(params[:id])
     Agent.async_check(@agent.id)
 
     respond_to do |format|
@@ -67,7 +71,8 @@ class AgentsController < ApplicationController
   end
 
   def event_descriptions
-    html = current_user.agents.find(params[:ids].split(",")).group_by(&:type).map { |type, agents|
+    
+    html = @current_agents.find(params[:ids].split(",")).group_by(&:type).map { |type, agents|
       agents.map(&:html_event_description).uniq.map { |desc|
         "<p><strong>#{type}</strong><br />" + desc + "</p>"
       }
@@ -76,7 +81,8 @@ class AgentsController < ApplicationController
   end
 
   def remove_events
-    @agent = current_user.agents.find(params[:id])
+    
+    @agent = @current_agents.find(params[:id])
     @agent.events.delete_all
 
     respond_to do |format|
@@ -99,7 +105,8 @@ class AgentsController < ApplicationController
   end
 
   def destroy_memory
-    @agent = current_user.agents.find(params[:id])
+    
+    @agent = @current_agents.find(params[:id])
     @agent.update!(memory: {})
 
     respond_to do |format|
@@ -109,7 +116,8 @@ class AgentsController < ApplicationController
   end
 
   def show
-    @agent = current_user.agents.find(params[:id])
+    
+    @agent = @current_agents.find(params[:id])
 
     respond_to do |format|
       format.html
@@ -118,7 +126,8 @@ class AgentsController < ApplicationController
   end
 
   def new
-    agents = current_user.agents
+    
+    agents = @current_agents
 
     if id = params[:id]
       @agent = agents.build_clone(agents.find(id))
@@ -137,7 +146,7 @@ class AgentsController < ApplicationController
   end
 
   def edit
-    @agent = current_user.agents.find(params[:id])
+    @agent = @current_agents.find(params[:id])
     initialize_presenter
   end
 
@@ -157,7 +166,8 @@ class AgentsController < ApplicationController
   end
 
   def update
-    @agent = current_user.agents.find(params[:id])
+    
+    @agent = @current_agents.find(params[:id])
 
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
@@ -172,7 +182,8 @@ class AgentsController < ApplicationController
   end
 
   def leave_scenario
-    @agent = current_user.agents.find(params[:id])
+    @current_agents = current_user.agents
+    @agent = @current_agents.find(params[:id])
     @scenario = current_user.scenarios.find(params[:scenario_id])
     @agent.scenarios.destroy(@scenario)
 
@@ -183,7 +194,8 @@ class AgentsController < ApplicationController
   end
 
   def destroy
-    @agent = current_user.agents.find(params[:id])
+    
+    @agent = @current_agents.find(params[:id])
     @agent.destroy
 
     respond_to do |format|
@@ -208,6 +220,17 @@ class AgentsController < ApplicationController
     render json: @agent.complete_option(params[:attribute])
   end
 
+
+  # override default options
+  # to allow admin
+  def default_url_options
+    opts = {}
+    if @agent_user && current_user.admin? && current_user != @agent_user
+      opts[:user] = @agent_user.username
+    end
+    opts.merge(super)
+  end
+
   protected
 
   # Sanitize params[:return] to prevent open redirect attacks, a common security issue.
@@ -221,7 +244,7 @@ class AgentsController < ApplicationController
 
   def build_agent
     @agent = Agent.build_for_type(params[:agent].delete(:type),
-                                  current_user,
+                                  @agent_user,
                                   params[:agent])
   end
 
@@ -232,6 +255,19 @@ class AgentsController < ApplicationController
   end
 
   private
+  def set_current_agents
+    if params[:user]
+      if current_user.admin?
+        @agent_user = User.find_by!(username: params[:user])
+      else
+        render(text: 'error', status: 403) and return
+      end
+    else
+      @agent_user = current_user
+    end
+    @current_agents = @agent_user.agents
+  end
+
   def show_only_enabled_agents?
     !!cookies[:huginn_view_only_enabled_agents]
   end
