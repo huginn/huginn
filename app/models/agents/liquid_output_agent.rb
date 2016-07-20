@@ -13,7 +13,7 @@ module Agents
 
         `https://#{ENV['DOMAIN']}#{Rails.application.routes.url_helpers.web_requests_path(agent_id: ':id', user_id: user_id, secret: ':secret', format: :any_extension)}`
 
-        where `:secret` is thel secret specified in your options.  You can use any extension you wish.
+        where `:secret` is the secret specified in your options.  You can use any extension you wish.
 
         Options:
 
