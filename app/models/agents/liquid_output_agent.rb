@@ -17,7 +17,7 @@ module Agents
 
         Options:
 
-          * `secrets` - A token that the requestor must provide for light-weight authentication.
+          * `secret` - A token that the requestor must provide for light-weight authentication.
           * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
           * `content` - The content to display when someone requests this page.
           * `mime_type` - The mime type to use when someone requests this page.
@@ -54,7 +54,7 @@ module Agents
 
     def default_options
       {
-        "secrets" => "a-secret-key",
+        "secret" => "a-secret-key",
         "expected_receive_period_in_days" => 2,
         "content" => 'This is a Liquid template. Include variables from your last event, like {{this}} and {{that}}.',
         "mime_type" => 'text/html',
@@ -62,7 +62,7 @@ module Agents
       }
     end
 
-    form_configurable :secrets
+    form_configurable :secret
     form_configurable :expected_receive_period_in_days
     form_configurable :content, type: :text
     form_configurable :mime_type
@@ -73,8 +73,8 @@ module Agents
     end
 
     def validate_options
-      if options['secrets'].present?
-        case options['secrets']
+      if options['secret'].present?
+        case options['secret']
         when %r{[/.]}
           errors.add(:base, "secret may not contain a slash or dot")
         when String
@@ -115,7 +115,7 @@ module Agents
     end
 
     def valid_authentication?(params)
-      interpolated['secrets'] == params['secret']
+      interpolated['secret'] == params['secret']
     end
 
     def mime_type
