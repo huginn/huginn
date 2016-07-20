@@ -17,7 +17,7 @@ module Agents
 
         Options:
 
-          * `secrets` - An array of tokens that the requestor must provide for light-weight authentication.
+          * `secrets` - A token that the requestor must provide for light-weight authentication.
           * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
           * `content` - The content to display when someone requests this page.
           * `mime_type` - The mime type to use when someone requests this page.
