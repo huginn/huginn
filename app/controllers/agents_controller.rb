@@ -260,7 +260,7 @@ class AgentsController < ApplicationController
       if current_user.admin?
         @agent_user = User.find_by!(username: params[:user])
       else
-        render(text: 'error', status: 403) and return
+        render(text: 'unauthorized', status: 403) and return
       end
     else
       @agent_user = current_user

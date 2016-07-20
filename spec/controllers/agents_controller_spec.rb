@@ -24,6 +24,21 @@ describe AgentsController do
       get :index
       expect(assigns(:agents).map(&:disabled).uniq).to eq([false])
     end
+
+    it "should allow admin user to see another user's Agents" do
+      sign_in users(:jane)
+      get :index, :user => "bob"
+      expect(assigns(:agents).all? {|i| expect(i.user).to eq(users(:bob)) }).to be_truthy
+      expect(assigns(:agents).count).to eq(8)
+    end
+
+    it "should not allow non-admin user to see another user's Agents" do
+      sign_in users(:bob)
+      get :index, :user => "jane"
+      expect(response).to be_forbidden
+      expect(response.response_code).to eq(403)
+      expect(response.body).to eq("unauthorized")
+    end
   end
 
   describe "POST handle_details_post" do
