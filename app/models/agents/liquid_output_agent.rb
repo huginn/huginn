@@ -22,6 +22,7 @@ module Agents
           * `content` - The content to display when someone requests this page.
           * `mime_type` - The mime type to use when someone requests this page.
           * `mode` - The behavior that determines what data is passed to the Liquid template.
+          * `event_limit` - A limit applied to the events passed to a template when in "Last X events" mode. Can be a count like "1", or an amount of time like "1 day" or "5 minutes".
 
         # Liquid Templating
 
