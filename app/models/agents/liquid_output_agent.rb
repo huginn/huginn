@@ -147,8 +147,12 @@ module Agents
 
     def date_limit
       return nil unless options['event_limit'].to_s.include?(' ')
-      value, measure = options['event_limit'].split(' ')
-      value.to_i.send(measure.to_sym).ago
+      value, unit = options['event_limit'].split(' ')
+      value = Integer(value) rescue nil
+      return nil unless value
+      unit = unit.to_sym
+      return nil unless value.respond_to?(unit) && value.send(unit).respond_to?(:ago)
+      value.send(unit).ago
     end
 
   end
