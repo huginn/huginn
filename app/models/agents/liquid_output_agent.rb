@@ -125,7 +125,11 @@ module Agents
 
     def liquified_content
       template = Liquid::Template.parse(options['content'] || "")
-      template.render(memory['last_event'] || {})
+      template.render(data_for_liquid_template)
+    end
+
+    def data_for_liquid_template
+      memory['last_event'] || {}
     end
 
   end
