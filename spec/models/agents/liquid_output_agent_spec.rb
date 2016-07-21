@@ -205,7 +205,7 @@ describe Agents::LiquidOutputAgent do
 EOF
       end
 
-      it "should render the results as a liquid template from the last event in" do
+      it "should render the results as a liquid template from the last event in, limiting to 2" do
         agent.options['event_limit'] = 2
         result = agent.receive_web_request params, method, format
 
@@ -219,6 +219,48 @@ EOF
   
     <tr>
       <td>John Galt</td>
+      <td>Atlas Shrugged</td>
+    </tr>
+  
+</table>
+EOF
+      end
+
+      it "should render the results as a liquid template from the last event in, limiting to 1" do
+        agent.options['event_limit'] = 1
+        result = agent.receive_web_request params, method, format
+
+        expect(result[0]).to eq <<EOF
+<table>
+  
+    <tr>
+      <td>Howard Roark</td>
+      <td>The Fountainhead</td>
+    </tr>
+  
+</table>
+EOF
+      end
+
+      it "should render the results as a liquid template from the last event in, allowing no limit" do
+        agent.options['event_limit'] = ''
+        result = agent.receive_web_request params, method, format
+
+        expect(result[0]).to eq <<EOF
+<table>
+  
+    <tr>
+      <td>Howard Roark</td>
+      <td>The Fountainhead</td>
+    </tr>
+  
+    <tr>
+      <td>John Galt</td>
+      <td>Atlas Shrugged</td>
+    </tr>
+  
+    <tr>
+      <td>Dagny Taggart</td>
       <td>Atlas Shrugged</td>
     </tr>
   

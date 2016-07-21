@@ -131,14 +131,17 @@ module Agents
     def data_for_liquid_template
       case options['mode']
       when 'Last X events'
-        { 'events' => received_events.order(id: :desc).limit(events_to_show).to_a.map { |x| x.payload } }
+        events = received_events.order(id: :desc)
+        events = events.limit(events_to_show) if events_to_show > 0
+        events = events.to_a.map { |x| x.payload }
+        { 'events' => events }
       else
         memory['last_event'] || {}
       end
     end
 
     def events_to_show
-      options['event_limit']
+      options['event_limit'].to_i
     end
 
   end
