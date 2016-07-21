@@ -132,7 +132,8 @@ module Agents
       case options['mode']
       when 'Last X events'
         events = received_events.order(id: :desc)
-        events = events.limit(events_to_show) if events_to_show > 0
+        events = events.limit(count_limit) if count_limit > 0
+        events = events.select { |x| x.created_at > date_limit } if date_limit
         events = events.to_a.map { |x| x.payload }
         { 'events' => events }
       else
@@ -140,8 +141,15 @@ module Agents
       end
     end
 
-    def events_to_show
+    def count_limit
+      return 0 if options['event_limit'].to_s.include?(' ')
       options['event_limit'].to_i
+    end
+
+    def date_limit
+      return nil unless options['event_limit'].to_s.include?(' ')
+      splits = options['event_limit'].split(' ')
+      splits[0].to_i.send(splits[1].to_sym).ago
     end
 
   end
