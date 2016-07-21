@@ -49,6 +49,19 @@ module Agents
         ### Last event in
 
           The data from the last event will be passed to the template.
+
+        ### Last X events
+
+          All of the events received by this agent will be passed to the template as ```events```.
+
+          The number of events can be controlled via the ```event_limit``` option.
+          If ```event_limit``` is an integer X, the last X events will be passed
+          to the template.  If ```event_limit``` is an integer with a unit of
+          measure like "1 day" or "5 minutes" or "9 years", a date filter will
+          be applied to the events passed to the template.  If no ```event_limit```
+          is provided, then all of the events for the agent will be passed to
+          the template.
+
       MD
     end
 
@@ -59,6 +72,7 @@ module Agents
         "content" => 'This is a Liquid template. Include variables from your last event, like {{this}} and {{that}}.',
         "mime_type" => 'text/html',
         "mode" => 'Last event in',
+        "event_limit" => '',
       }
     end
 
@@ -66,7 +80,8 @@ module Agents
     form_configurable :expected_receive_period_in_days
     form_configurable :content, type: :text
     form_configurable :mime_type
-    form_configurable :mode, type: :array, values: [ 'Last event in', 'Merge events']
+    form_configurable :mode, type: :array, values: [ 'Last event in', 'Merge events', 'Last X events']
+    form_configurable :event_limit
 
     def working?
       last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
