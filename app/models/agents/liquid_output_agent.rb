@@ -91,6 +91,7 @@ module Agents
     end
 
     def receive(incoming_events)
+      return unless ['Merge events', 'Last event in'].include?(options['mode'])
       memory['last_event'] ||= {}
       incoming_events.each do |event|
         case options['mode']

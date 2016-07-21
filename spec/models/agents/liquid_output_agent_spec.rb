@@ -103,6 +103,23 @@ describe Agents::LiquidOutputAgent do
         expect(agent.memory['last_event'][key]).to equal(value)
         expect(agent.memory['last_event'][second_key]).to equal(second_value)
       end
+
+    end
+
+    describe "but the mode is anything else" do
+
+      before { agent.options['mode'] = SecureRandom.uuid }
+
+      let(:incoming_events) do
+        last_payload = { key => value }
+        [Struct.new(:payload).new(last_payload)]
+      end
+
+      it "should do nothing" do
+        agent.receive incoming_events
+        expect(agent.memory.keys.count).to equal(0)
+      end
+
     end
 
   end
