@@ -5,8 +5,8 @@ require 'rails_helper'
 describe Agents::LiquidOutputAgent do
   let(:agent) do
     _agent = Agents::LiquidOutputAgent.new(:name => 'My Data Output Agent')
-    _agent.options = _agent.default_options.merge('secrets' => ['secret1', 'secret2'], 'events_to_show' => 3)
-    _agent.options['secrets'] = "a secret"
+    _agent.options = _agent.default_options.merge('secret' => 'secret1', 'events_to_show' => 3)
+    _agent.options['secret'] = "a secret"
     _agent.user = users(:bob)
     _agent.sources << agents(:bob_website_agent)
     _agent.save!
@@ -29,26 +29,26 @@ describe Agents::LiquidOutputAgent do
       expect(agent).to be_valid
     end
 
-    it "should validate presence and length of secrets" do
-      agent.options[:secrets] = ""
+    it "should validate presence and length of secret" do
+      agent.options[:secret] = ""
       expect(agent).not_to be_valid
-      agent.options[:secrets] = "foo"
+      agent.options[:secret] = "foo"
       expect(agent).to be_valid
-      agent.options[:secrets] = "foo/bar"
+      agent.options[:secret] = "foo/bar"
       expect(agent).not_to be_valid
-      agent.options[:secrets] = "foo.xml"
+      agent.options[:secret] = "foo.xml"
       expect(agent).not_to be_valid
-      agent.options[:secrets] = false
+      agent.options[:secret] = false
       expect(agent).not_to be_valid
-      agent.options[:secrets] = []
+      agent.options[:secret] = []
       expect(agent).not_to be_valid
-      agent.options[:secrets] = ["foo.xml"]
+      agent.options[:secret] = ["foo.xml"]
       expect(agent).not_to be_valid
-      agent.options[:secrets] = ["hello", true]
+      agent.options[:secret] = ["hello", true]
       expect(agent).not_to be_valid
-      agent.options[:secrets] = ["hello"]
+      agent.options[:secret] = ["hello"]
       expect(agent).not_to be_valid
-      agent.options[:secrets] = ["hello", "world"]
+      agent.options[:secret] = ["hello", "world"]
       expect(agent).not_to be_valid
     end
 
@@ -73,6 +73,8 @@ describe Agents::LiquidOutputAgent do
        Struct.new(:payload).new( { key => SecureRandom.uuid } ),
        Struct.new(:payload).new(last_payload)]
     end
+
+    before { agent.options['mode'] = 'Last event in' }
 
     it "stores the last event in memory" do
       agent.receive incoming_events
@@ -103,9 +105,9 @@ describe Agents::LiquidOutputAgent do
 
   describe "#receive_web_request?" do
 
-    let(:secrets) { SecureRandom.uuid }
+    let(:secret) { SecureRandom.uuid }
 
-    let(:params) { { 'secret' => secrets } }
+    let(:params) { { 'secret' => secret } }
 
     let(:method) { nil }
     let(:format) { nil }
@@ -117,7 +119,7 @@ describe Agents::LiquidOutputAgent do
     let(:value) { SecureRandom.uuid }
 
     before do
-      agent.options['secrets'] = secrets
+      agent.options['secret'] = secret
       agent.options['mime_type'] = mime_type
       agent.options['content'] = content
       agent.memory['last_event'] = { key => value }
