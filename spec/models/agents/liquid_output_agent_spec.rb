@@ -74,11 +74,15 @@ describe Agents::LiquidOutputAgent do
        Struct.new(:payload).new(last_payload)]
     end
 
-    before { agent.options['mode'] = 'Last event in' }
+    describe "and the mode is merge" do
 
-    it "stores the last event in memory" do
-      agent.receive incoming_events
-      expect(agent.memory['last_event'][key]).to equal(value)
+      before { agent.options['mode'] = 'Last event in' }
+
+      it "stores the last event in memory" do
+        agent.receive incoming_events
+        expect(agent.memory['last_event'][key]).to equal(value)
+      end
+
     end
 
     describe "but the mode is merge" do
