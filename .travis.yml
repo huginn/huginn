@@ -44,6 +44,7 @@ before_install:
 script:
   - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec rake db:create db:migrate; else true; fi
   - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec rake $RSPEC_TASK; else ./build_docker_image.sh; fi
+  - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec pronto run -c origin/master; else true; fi
 notifications:
   irc:
     channels:
