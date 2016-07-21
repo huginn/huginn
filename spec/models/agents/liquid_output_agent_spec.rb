@@ -146,12 +146,32 @@ describe Agents::LiquidOutputAgent do
       agent.memory['last_event'] = { key => value }
     end
 
-    it "render the results as a liquid template" do
-      result = agent.receive_web_request params, method, format
+    describe "and the mode is last event in" do
 
-      expect(result[0]).to eq("The key is #{value}.")
-      expect(result[1]).to eq(200)
-      expect(result[2]).to eq(mime_type)
+      before { agent.options['mode'] = 'Last event in' }
+
+      it "should render the results as a liquid template from the last event in" do
+        result = agent.receive_web_request params, method, format
+
+        expect(result[0]).to eq("The key is #{value}.")
+        expect(result[1]).to eq(200)
+        expect(result[2]).to eq(mime_type)
+      end
+
+    end
+
+    describe "and the mode is merge events" do
+
+      before { agent.options['mode'] = 'Merge events' }
+
+      it "should render the results as a liquid template from the last event in" do
+        result = agent.receive_web_request params, method, format
+
+        expect(result[0]).to eq("The key is #{value}.")
+        expect(result[1]).to eq(200)
+        expect(result[2]).to eq(mime_type)
+      end
+
     end
 
     describe "but the secret provided does not match" do
