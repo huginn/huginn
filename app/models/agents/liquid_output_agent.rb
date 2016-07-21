@@ -147,8 +147,8 @@ module Agents
 
     def date_limit
       return nil unless options['event_limit'].to_s.include?(' ')
-      splits = options['event_limit'].split(' ')
-      splits[0].to_i.send(splits[1].to_sym).ago
+      value, measure = options['event_limit'].split(' ')
+      value.to_i.send(measure.to_sym).ago
     end
 
   end
