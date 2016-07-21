@@ -182,6 +182,10 @@ describe Agents::LiquidOutputAgent do
       it "should render the results as a liquid template from the last event in" do
 
         agents(:bob_website_agent).create_event payload: {
+          "name" => "Dagny Taggart",
+          "book" => "Atlas Shrugged"
+        }
+        agents(:bob_website_agent).create_event payload: {
           "name" => "John Galt",
           "book" => "Atlas Shrugged"
         }
