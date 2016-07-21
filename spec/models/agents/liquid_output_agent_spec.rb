@@ -144,6 +144,7 @@ describe Agents::LiquidOutputAgent do
       agent.options['mime_type'] = mime_type
       agent.options['content'] = content
       agent.memory['last_event'] = { key => value }
+      agents(:bob_website_agent).events.destroy_all
     end
 
     describe "and the mode is last event in" do
@@ -168,6 +169,55 @@ describe Agents::LiquidOutputAgent do
         result = agent.receive_web_request params, method, format
 
         expect(result[0]).to eq("The key is #{value}.")
+        expect(result[1]).to eq(200)
+        expect(result[2]).to eq(mime_type)
+      end
+
+    end
+
+    describe "and the mode is last X events" do
+
+      before { agent.options['mode'] = 'Last X events' }
+
+      it "should render the results as a liquid template from the last event in" do
+
+        agents(:bob_website_agent).create_event payload: {
+          "name" => "John Galt",
+          "book" => "Atlas Shrugged"
+        }
+        agents(:bob_website_agent).create_event payload: {
+          "name" => "Howard Roark",
+          "book" => "The Fountainhead"
+        }
+
+        agent.options['content'] = <<EOF
+<table>
+  {% for event in events %}
+    <tr>
+      <td>{{ event.name }}</td>
+      <td>{{ event.book }}</td>
+    </tr>
+  {% endfor %}
+</table>
+EOF
+
+        result = agent.receive_web_request params, method, format
+
+        expect(result[0]).to eq <<EOF
+<table>
+  
+    <tr>
+      <td>Howard Roark</td>
+      <td>The Fountainhead</td>
+    </tr>
+  
+    <tr>
+      <td>John Galt</td>
+      <td>Atlas Shrugged</td>
+    </tr>
+  
+</table>
+EOF
         expect(result[1]).to eq(200)
         expect(result[2]).to eq(mime_type)
       end

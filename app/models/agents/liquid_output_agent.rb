@@ -129,7 +129,12 @@ module Agents
     end
 
     def data_for_liquid_template
-      memory['last_event'] || {}
+      case options['mode']
+      when 'Last X events'
+        { 'events' => received_events.order(id: :desc).to_a.map { |x| x.payload } }
+      else
+        memory['last_event'] || {}
+      end
     end
 
   end
