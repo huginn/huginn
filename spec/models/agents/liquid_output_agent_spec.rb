@@ -177,9 +177,8 @@ describe Agents::LiquidOutputAgent do
 
     describe "and the mode is last X events" do
 
-      before { agent.options['mode'] = 'Last X events' }
-
-      it "should render the results as a liquid template from the last event in" do
+      before do
+        agent.options['mode'] = 'Last X events'
 
         agents(:bob_website_agent).create_event payload: {
           "name" => "Dagny Taggart",
@@ -204,7 +203,10 @@ describe Agents::LiquidOutputAgent do
   {% endfor %}
 </table>
 EOF
+      end
 
+      it "should render the results as a liquid template from the last event in" do
+        agent.options['event_limit'] = 2
         result = agent.receive_web_request params, method, format
 
         expect(result[0]).to eq <<EOF
@@ -222,8 +224,6 @@ EOF
   
 </table>
 EOF
-        expect(result[1]).to eq(200)
-        expect(result[2]).to eq(mime_type)
       end
 
     end

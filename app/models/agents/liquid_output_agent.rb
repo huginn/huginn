@@ -138,7 +138,7 @@ module Agents
     end
 
     def events_to_show
-      2
+      options['event_limit']
     end
 
   end
