@@ -4,6 +4,7 @@ module Agents
     include FormConfigurable
 
     cannot_be_scheduled!
+    cannot_create_events!
 
     description  do
       <<-MD
