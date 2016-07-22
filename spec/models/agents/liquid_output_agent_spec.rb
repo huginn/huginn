@@ -294,6 +294,32 @@ EOF
 EOF
       end
 
+      it "should not be case sensitive when limiting on time" do
+
+        one_event = agent.received_events.select { |x| x.payload['name'] == 'John Galt' }.first
+        one_event.created_at = 2.days.ago
+        one_event.save!
+
+        agent.options['event_limit'] = '1 DaY'
+        result = agent.receive_web_request params, method, format
+
+        expect(result[0]).to eq <<EOF
+<table>
+  
+    <tr>
+      <td>Howard Roark</td>
+      <td>The Fountainhead</td>
+    </tr>
+  
+    <tr>
+      <td>Dagny Taggart</td>
+      <td>Atlas Shrugged</td>
+    </tr>
+  
+</table>
+EOF
+      end
+
     end
 
     describe "but the secret provided does not match" do
