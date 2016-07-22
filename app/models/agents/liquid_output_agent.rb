@@ -70,13 +70,30 @@ module Agents
     end
 
     def default_options
+      content = <<EOF
+When you use the "Last event in" or "Merge events" option, you can use variables from the last event received, like this:
+
+Name: {{name}}
+Url:  {{url}}
+
+If you use the "Last X Events" mode, a set of events will be passed to your Liquid template.  You can use them like this:
+
+<table class="table">
+  {% for event in events %}
+    <tr>
+      <td>{{ event.title }}</td>
+      <td><a href="{{ event.url }}">Click here to see</a></td>
+    </tr>
+  {% endfor %}
+</table>
+EOF
       {
         "secret" => "a-secret-key",
         "expected_receive_period_in_days" => 2,
-        "content" => 'This is a Liquid template. Include variables from your last event, like {{this}} and {{that}}.',
         "mime_type" => 'text/html',
         "mode" => 'Last event in',
         "event_limit" => '',
+        "content" => content,
       }
     end
 
