@@ -368,6 +368,19 @@ EOF
         expect(result[0].include?("John Galt")).to eq(true)
       end
 
+      describe "but the mode was set to last X events with the wrong casing" do
+
+        before { agent.options['mode'] = 'LAST X EVENTS' }
+
+        it "should still work as last x events" do
+          result = agent.receive_web_request params, method, format
+          expect(result[0].include?("Howard Roark")).to eq(true)
+          expect(result[0].include?("Dagny Taggart")).to eq(true)
+          expect(result[0].include?("John Galt")).to eq(true)
+        end
+
+      end
+
     end
 
     describe "but the secret provided does not match" do

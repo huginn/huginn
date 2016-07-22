@@ -148,8 +148,8 @@ module Agents
     end
 
     def data_for_liquid_template
-      case options['mode']
-      when 'Last X events'
+      case options['mode'].to_s.downcase
+      when 'last x events'
         events = received_events
         events = events.where('events.created_at > ?', date_limit) if date_limit
         events = events.limit(count_limit) if count_limit
