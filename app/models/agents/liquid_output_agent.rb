@@ -168,6 +168,7 @@ module Agents
       return nil unless options['event_limit'].to_s.include?(' ')
       value, unit = options['event_limit'].split(' ')
       value = Integer(value) rescue nil
+      return nil unless value
       unit = unit.to_s.downcase
       return nil unless DATE_UNITS.include?(unit)
       value.send(unit.to_sym).ago

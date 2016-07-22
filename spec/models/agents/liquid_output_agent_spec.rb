@@ -320,6 +320,22 @@ EOF
 EOF
       end
 
+      it "it should continue to work when the event limit is wrong" do
+        agent.options['event_limit'] = 'five days'
+        result = agent.receive_web_request params, method, format
+
+        expect(result[0].include?("Howard Roark")).to eq(true)
+        expect(result[0].include?("Dagny Taggart")).to eq(true)
+        expect(result[0].include?("John Galt")).to eq(true)
+
+        agent.options['event_limit'] = '5 quibblequarks'
+        result = agent.receive_web_request params, method, format
+
+        expect(result[0].include?("Howard Roark")).to eq(true)
+        expect(result[0].include?("Dagny Taggart")).to eq(true)
+        expect(result[0].include?("John Galt")).to eq(true)
+      end
+
     end
 
     describe "but the secret provided does not match" do
