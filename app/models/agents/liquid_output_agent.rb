@@ -161,7 +161,7 @@ module Agents
     end
 
     def count_limit
-      Integer(options['event_limit']) rescue nil
+      Integer(options['event_limit']) rescue 5000
     end
 
     def date_limit
