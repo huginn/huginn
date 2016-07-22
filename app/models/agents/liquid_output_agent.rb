@@ -110,11 +110,11 @@ module Agents
     end
 
     def receive(incoming_events)
-      return unless ['Merge events', 'Last event in'].include?(options['mode'])
+      return unless ['merge events', 'last event in'].include?(mode)
       memory['last_event'] ||= {}
       incoming_events.each do |event|
-        case options['mode']
-        when 'Merge events'
+        case mode
+        when 'merge events'
           memory['last_event'] = memory['last_event'].merge(event.payload)
         else
           memory['last_event'] = event.payload
@@ -128,6 +128,10 @@ module Agents
     end
 
     private
+
+    def mode
+      options['mode'].to_s.downcase
+    end
 
     def unauthorized_content(format)
       format =~ /json/ ? { error: "Not Authorized" }
@@ -148,7 +152,7 @@ module Agents
     end
 
     def data_for_liquid_template
-      case options['mode'].to_s.downcase
+      case mode
       when 'last x events'
         events = received_events
         events = events.where('events.created_at > ?', date_limit) if date_limit

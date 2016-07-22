@@ -74,13 +74,22 @@ describe Agents::LiquidOutputAgent do
        Struct.new(:payload).new(last_payload)]
     end
 
-    describe "and the mode is merge" do
+    describe "and the mode is last event in" do
 
       before { agent.options['mode'] = 'Last event in' }
 
       it "stores the last event in memory" do
         agent.receive incoming_events
         expect(agent.memory['last_event'][key]).to equal(value)
+      end
+
+      describe "but the casing is wrong" do
+        before { agent.options['mode'] = 'LAST EVENT IN' }
+
+        it "stores the last event in memory" do
+          agent.receive incoming_events
+          expect(agent.memory['last_event'][key]).to equal(value)
+        end
       end
 
     end
@@ -102,6 +111,18 @@ describe Agents::LiquidOutputAgent do
         agent.receive incoming_events
         expect(agent.memory['last_event'][key]).to equal(value)
         expect(agent.memory['last_event'][second_key]).to equal(second_value)
+      end
+
+      describe "but the casing on the mode is wrong" do
+
+        before { agent.options['mode'] = 'MERGE EVENTS' }
+
+        it "should merge all of the events passed to it" do
+          agent.receive incoming_events
+          expect(agent.memory['last_event'][key]).to equal(value)
+          expect(agent.memory['last_event'][second_key]).to equal(second_value)
+        end
+
       end
 
     end
@@ -189,6 +210,18 @@ describe Agents::LiquidOutputAgent do
         expect(result[0]).to eq("The key is #{value}.")
         expect(result[1]).to eq(200)
         expect(result[2]).to eq(mime_type)
+      end
+
+      describe "but the casing is wrong" do
+        before { agent.options['mode'] = 'last event in' }
+
+        it "should render the results as a liquid template from the last event in" do
+          result = agent.receive_web_request params, method, format
+
+          expect(result[0]).to eq("The key is #{value}.")
+          expect(result[1]).to eq(200)
+          expect(result[2]).to eq(mime_type)
+        end
       end
 
     end
