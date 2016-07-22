@@ -6,6 +6,8 @@ module Agents
     cannot_be_scheduled!
     cannot_create_events!
 
+    DATE_UNITS = %w[second seconds minute minutes hour hours day days week weeks month months year years]
+
     description  do
       <<-MD
         The Liquid Output Agent outputs events through a Liquid template you provide.  Use it to create a HTML page, or a json feed, or anything else that can be rendered as a string from your stream of Huginn data. 
@@ -166,10 +168,8 @@ module Agents
       return nil unless options['event_limit'].to_s.include?(' ')
       value, unit = options['event_limit'].split(' ')
       value = Integer(value) rescue nil
-      return nil unless value
-      unit = unit.to_sym
-      return nil unless value.respond_to?(unit) && value.send(unit).respond_to?(:ago)
-      value.send(unit).ago
+      return nil unless DATE_UNITS.include?(unit)
+      value.send(unit.to_sym).ago
     end
 
   end
