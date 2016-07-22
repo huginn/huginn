@@ -124,6 +124,38 @@ describe Agents::LiquidOutputAgent do
 
   end
 
+  describe "#event_limit" do
+    it "should have a default of 5000" do
+      agent.options['event_limit'] = nil
+      expect(agent.send(:event_limit)).to eq(5000)
+
+      agent.options['event_limit'] = ''
+      expect(agent.send(:event_limit)).to eq(5000)
+
+      agent.options['event_limit'] = '  '
+      expect(agent.send(:event_limit)).to eq(5000)
+    end
+
+    it "should convert string count limits to integers" do
+      agent.options['event_limit'] = '1'
+      expect(agent.send(:event_limit)).to eq(1)
+
+      agent.options['event_limit'] = '2'
+      expect(agent.send(:event_limit)).to eq(2)
+
+      agent.options['event_limit'] = 3
+      expect(agent.send(:event_limit)).to eq(3)
+    end
+
+    it "should default to 5000 with invalid values" do
+      agent.options['event_limit'] = SecureRandom.uuid
+      expect(agent.send(:event_limit)).to eq(5000)
+
+      agent.options['event_limit'] = 'John Galt'
+      expect(agent.send(:event_limit)).to eq(5000)
+    end
+  end
+
   describe "#receive_web_request?" do
 
     let(:secret) { SecureRandom.uuid }
