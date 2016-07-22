@@ -152,7 +152,7 @@ module Agents
       when 'Last X events'
         events = received_events
         events = events.where('events.created_at > ?', date_limit) if date_limit
-        events = events.limit(event_limit) if event_limit
+        events = events.limit(count_limit) if count_limit
         events = events.to_a.map { |x| x.payload }
         { 'events' => events }
       else
@@ -160,7 +160,7 @@ module Agents
       end
     end
 
-    def event_limit
+    def count_limit
       Integer(options['event_limit']) rescue 5000
     end
 
