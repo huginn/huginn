@@ -175,6 +175,14 @@ describe Agents::LiquidOutputAgent do
       agent.options['event_limit'] = 'John Galt'
       expect(agent.send(:count_limit)).to eq(1000)
     end
+
+    it "should not allow event limits above 1000" do
+      agent.options['event_limit'] = '1001'
+      expect(agent.send(:count_limit)).to eq(1000)
+
+      agent.options['event_limit'] = '5000'
+      expect(agent.send(:count_limit)).to eq(1000)
+    end
   end
 
   describe "#receive_web_request?" do
