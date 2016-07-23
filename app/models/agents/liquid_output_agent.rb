@@ -182,7 +182,7 @@ EOF
     end
 
     def count_limit
-      Integer(options['event_limit']) rescue 5000
+      Integer(options['event_limit']) rescue 1000
     end
 
     def date_limit
