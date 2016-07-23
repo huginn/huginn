@@ -60,6 +60,17 @@ describe Agents::LiquidOutputAgent do
       agent.options[:expected_receive_period_in_days] = -1
       expect(agent).not_to be_valid
     end
+
+    it "should validate the event_limit" do
+      agent.options[:event_limit] = ""
+      expect(agent).to be_valid
+      agent.options[:event_limit] = "1"
+      expect(agent).to be_valid
+      agent.options[:event_limit] = "1001"
+      expect(agent).not_to be_valid
+      agent.options[:event_limit] = "10000"
+      expect(agent).not_to be_valid
+    end
   end
 
   describe "#receive?" do

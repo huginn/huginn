@@ -126,6 +126,13 @@ EOF
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
         errors.add(:base, "Please provide 'expected_receive_period_in_days' to indicate how many days can pass before this Agent is considered to be not working")
       end
+
+      if options['event_limit'].present?
+        if (options['event_limit'].to_i > 1000)
+          errors.add(:base, "For performance reasons, you cannot have an event limit greater than 1000.")
+        end
+      else
+      end
     end
 
     def receive(incoming_events)
