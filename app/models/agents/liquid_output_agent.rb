@@ -64,7 +64,9 @@ module Agents
           measure like "1 day" or "5 minutes" or "9 years", a date filter will
           be applied to the events passed to the template.  If no ```event_limit```
           is provided, then all of the events for the agent will be passed to
-          the template.
+          the template. 
+          
+          For performance, the maximum ```event_limit``` allowed is 1000."
 
       MD
     end
