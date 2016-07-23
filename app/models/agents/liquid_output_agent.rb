@@ -173,7 +173,7 @@ EOF
       when 'last x events'
         events = received_events
         events = events.where('events.created_at > ?', date_limit) if date_limit
-        events = events.limit(count_limit) if count_limit
+        events = events.limit count_limit
         events = events.to_a.map { |x| x.payload }
         { 'events' => events }
       else
