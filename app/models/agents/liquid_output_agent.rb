@@ -160,7 +160,7 @@ EOF
     end
 
     def mime_type
-      options['mime_type'].present? ? options['mime_type'] : 'text/html'
+      options['mime_type'].presence || 'text/html'
     end
 
     def liquified_content
