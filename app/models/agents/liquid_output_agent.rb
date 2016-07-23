@@ -128,7 +128,9 @@ EOF
       end
 
       if options['event_limit'].present?
-        if (options['event_limit'].to_i > 1000)
+        if((Integer(options['event_limit']) rescue false) == false)
+          errors.add(:base, "Event limit must be an integer that is less than 1001.")
+        elsif (options['event_limit'].to_i > 1000)
           errors.add(:base, "For performance reasons, you cannot have an event limit greater than 1000.")
         end
       else

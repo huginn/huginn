@@ -71,6 +71,11 @@ describe Agents::LiquidOutputAgent do
       agent.options[:event_limit] = "10000"
       expect(agent).not_to be_valid
     end
+
+    it "should should not allow non-integer event limits" do
+      agent.options[:event_limit] = "abc1234"
+      expect(agent).not_to be_valid
+    end
   end
 
   describe "#receive?" do
