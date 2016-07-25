@@ -228,7 +228,6 @@ module Agents
 
       if reload
         memory[:event_ids] = events.map(&:id)
-        save
       end
 
       events
