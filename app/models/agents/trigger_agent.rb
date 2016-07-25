@@ -1,6 +1,7 @@
 module Agents
   class TriggerAgent < Agent
     cannot_be_scheduled!
+    can_dry_run!
 
     VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value field!=value field>=value field>value not\ in]
 
