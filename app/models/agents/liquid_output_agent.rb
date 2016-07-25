@@ -31,6 +31,8 @@ module Agents
 
         The content you provide will be run as a Liquid template. The data from the last event received will be used when processing the Liquid template.
 
+        To learn more about Liquid templates, go here: [http://liquidmarkup.org](http://liquidmarkup.org "Liquid Templating")
+
         # Modes
 
         ### Merge events
