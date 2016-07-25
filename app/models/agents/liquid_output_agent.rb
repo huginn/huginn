@@ -56,7 +56,8 @@ module Agents
 
         ### Last X events
 
-          All of the events received by this agent will be passed to the template as ```events```.
+          All of the events received by this agent will be passed to the template
+          as the ```events``` array.
 
           The number of events can be controlled via the ```event_limit``` option.
           If ```event_limit``` is an integer X, the last X events will be passed
