@@ -33,7 +33,7 @@ describe Agents::PostAgent do
     stub_request(:any, /:/).to_return { |request|
       method = request.method
       @requests += 1
-      @sent_requests[method] << req = OpenStruct.new(uri: request.uri)
+      @sent_requests[method] << req = OpenStruct.new(uri: request.uri, headers: request.headers)
       case method
       when :get, :delete
         req.data = request.uri.query
@@ -137,6 +137,18 @@ describe Agents::PostAgent do
       expect(uri.path).to eq('/a_variable')
       expect(uri.query).to eq("existing_param=existing_value")
     end
+
+    it "interpolates outgoing headers with the event payload" do
+      @checker.options['headers'] = {
+        "Foo" => "{{ variable }}"
+      }
+      @event.payload = {
+        'variable' => 'a_variable'
+      }
+      @checker.receive([@event])
+      headers = @sent_requests[:post].first.headers
+      expect(headers["Foo"]).to eq("a_variable")
+    end
   end
 
   describe "#check" do
@@ -197,6 +209,15 @@ describe Agents::PostAgent do
       }.to change { @sent_requests[:post].length }.by(1)
 
       expect(@sent_requests[:post][0].data).to eq('<test>hello</test>')
+    end
+
+    it "interpolates outgoing headers" do
+      @checker.options['headers'] = {
+        "Foo" => "{% credential aws_key %}"
+      }
+      @checker.check
+      headers = @sent_requests[:post].first.headers
+      expect(headers["Foo"]).to eq("2222222222-jane")
     end
 
     describe "emitting events" do
