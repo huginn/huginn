@@ -67,7 +67,7 @@ module Agents
           is provided, then all of the events for the agent will be passed to
           the template. 
           
-          For performance, the maximum ```event_limit``` allowed is 1000."
+          For performance, the maximum ```event_limit``` allowed is 1000.
 
       MD
     end
