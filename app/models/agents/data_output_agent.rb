@@ -52,7 +52,7 @@ module Agents
         DataOutputAgent will select the last `events_to_show` entries of its received events sorted in the order specified by `events_order`, which is defaulted to the event creation time.
         So, if you have multiple source agents that may create many events in a run, you may want to either increase `events_to_show` to have a larger "window", or specify the `events_order` option to an appropriate value (like `date_published`) so events from various sources are properly mixed in the resulted feed.
 
-        There is also an option `events_list_order` to control the order of events listed in the output, with the same format as `events_order`.  It is defaulted to `#{Utils.jsonify(DEFAULT_EVENTS_ORDER['events_list_order'])}` so the latest entry is listed first.
+        There is also an option `events_list_order` that only controls the order of events listed in the final output, without attempting to maintain a total order of received events.  It has the same format as `events_order` and is defaulted to `#{Utils.jsonify(DEFAULT_EVENTS_ORDER['events_list_order'])}` so the selected events are listed in reverse order like most popular RSS feeds list their articles.
 
         # Liquid Templating
 
