@@ -7,7 +7,7 @@ end
 describe 'HttpStatusAgent' do
 
   let(:agent) do
-    Agents::HttpStatusAgent.new(:name => SecureRandom.uuid, :options => valid_params).tap do |a|
+    Agents::HttpStatusAgent.new( :name => SecureRandom.uuid, :options => valid_params).tap do |a|
       a.service = services(:generic)
       a.user = users(:jane)
       a.options['url'] = 'http://google.com'
