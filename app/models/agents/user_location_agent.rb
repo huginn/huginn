@@ -15,7 +15,7 @@ module Agents
 
       If you want to require a certain distance traveled, set `min_distance` to the minimum distance, in meters. Note that GPS readings and the measurement itself aren't exact, so don't rely on this for precision filtering.
 
-      To view the locations on a map, set `api_key` to your Google Maps JavaScript API key.
+      To view the locations on a map, set `api_key` to your [Google Maps JavaScript API key](https://developers.google.com/maps/documentation/javascript/get-api-key#key).
     MD
     end
 
