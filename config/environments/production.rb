@@ -79,7 +79,7 @@ Huginn::Application.configure do
 
   config.action_mailer.default_url_options = { :host => ENV['DOMAIN'] }
   config.action_mailer.asset_host = ENV['DOMAIN']
-  if ENV['ASSET_HOST']
+  if ENV['ASSET_HOST'].present?
     config.action_mailer.asset_host = ENV['ASSET_HOST']
   end
   config.action_mailer.perform_deliveries = true
