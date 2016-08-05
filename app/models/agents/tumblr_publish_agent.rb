@@ -1,10 +1,10 @@
-require "tumblr_client"
-
 module Agents
   class TumblrPublishAgent < Agent
     include TumblrConcern
 
     cannot_be_scheduled!
+
+    gem_dependency_check { defined?(Tumblr::Client) }
 
     description <<-MD
       The Tumblr Publish Agent publishes Tumblr posts from the events it receives.
@@ -57,8 +57,6 @@ module Agents
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
-
-    gem_dependency_check { defined?(Tumblr) }
 
     def validate_options
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
