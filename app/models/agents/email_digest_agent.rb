@@ -37,18 +37,16 @@ module Agents
     end
 
     def receive(incoming_events)
+      self.memory['events'] ||= []
       incoming_events.each do |event|
-        self.memory['queue'] ||= []
-        self.memory['queue'] << event.payload
-        self.memory['events'] ||= []
         self.memory['events'] << event.id
       end
     end
 
     def check
-      if self.memory['queue'] && self.memory['queue'].length > 0
-        ids = self.memory['events'].join(",")
-        groups = self.memory['queue'].map { |payload| present(payload) }
+      if self.memory['events'] && self.memory['events'].length > 0
+        payloads = received_events.unscoped.where(id: self.memory['events']).pluck(:payload).to_a
+        groups = payloads.map { |payload| present(payload) }
         recipients.each do |recipient|
           begin
             SystemMailer.send_message(
@@ -59,13 +57,13 @@ module Agents
               content_type: interpolated['content_type'],
               groups: groups
             ).deliver_now
-            log "Sent digest mail to #{recipient} with events [#{ids}]"
+
+            log "Sent digest mail to #{recipient}"
           rescue => e
-            error("Error sending digest mail to #{recipient} with events [#{ids}]: #{e.message}")
+            error("Error sending digest mail to #{recipient}: #{e.message}")
             raise
           end
         end
-        self.memory['queue'] = []
         self.memory['events'] = []
       end
     end
