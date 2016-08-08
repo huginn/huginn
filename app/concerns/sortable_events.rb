@@ -5,6 +5,8 @@ module SortableEvents
     validate :validate_events_order
   end
 
+  EVENTS_ORDER_KEY = 'events_order'.freeze
+
   def description_events_order(*args)
     self.class.description_events_order(*args)
   end
@@ -23,9 +25,9 @@ module SortableEvents
       !can_order_created_events?
     end
 
-    def description_events_order(events = 'events created in each run')
+    def description_events_order(events = 'events created in each run', events_order_key = EVENTS_ORDER_KEY)
       <<-MD.lstrip
-        To specify the order of #{events}, set `events_order` to an array of sort keys, each of which looks like either `expression` or `[expression, type, descending]`, as described as follows:
+        To specify the order of #{events}, set `#{events_order_key}` to an array of sort keys, each of which looks like either `expression` or `[expression, type, descending]`, as described as follows:
 
         * _expression_ is a Liquid template to generate a string to be used as sort key.
 
@@ -48,8 +50,8 @@ module SortableEvents
     self.class.cannot_order_created_events?
   end
 
-  def events_order
-    options['events_order']
+  def events_order(key = EVENTS_ORDER_KEY)
+    options[key]
   end
 
   module AutomaticSorter
@@ -102,8 +104,8 @@ module SortableEvents
   }
   EXPRESSION_TYPES = EXPRESSION_PARSER.keys.freeze
 
-  def validate_events_order
-    case order_by = events_order
+  def validate_events_order(events_order_key = EVENTS_ORDER_KEY)
+    case order_by = events_order(events_order_key)
     when nil
     when Array
       # Each tuple may be either [expression, type, desc] or just
@@ -113,29 +115,29 @@ module SortableEvents
         when String
           # ok
         else
-          errors.add(:base, "first element of each events_order tuple must be a Liquid template")
+          errors.add(:base, "first element of each #{events_order_key} tuple must be a Liquid template")
           break
         end
         case type
         when nil, *EXPRESSION_TYPES
           # ok
         else
-          errors.add(:base, "second element of each events_order tuple must be #{EXPRESSION_TYPES.to_sentence(last_word_connector: ' or ')}")
+          errors.add(:base, "second element of each #{events_order_key} tuple must be #{EXPRESSION_TYPES.to_sentence(last_word_connector: ' or ')}")
           break
         end
         if !desc.nil? && boolify(desc).nil?
-          errors.add(:base, "third element of each events_order tuple must be a boolean value")
+          errors.add(:base, "third element of each #{events_order_key} tuple must be a boolean value")
           break
         end
       end
     else
-      errors.add(:base, "events_order must be an array of arrays")
+      errors.add(:base, "#{events_order_key} must be an array of arrays")
     end
   end
 
   # Sort given events in order specified by the "events_order" option
-  def sort_events(events)
-    order_by = events_order.presence or
+  def sort_events(events, events_order_key = EVENTS_ORDER_KEY)
+    order_by = events_order(events_order_key).presence or
       return events
 
     orders = order_by.map { |_, _, desc = false| boolify(desc) }

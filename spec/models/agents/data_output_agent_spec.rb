@@ -142,7 +142,7 @@ describe Agents::DataOutputAgent do
           "url" => "http://imgs.xkcd.com/comics/evolving0.png",
           "title" => "Evolving yet again with a past date",
           "date" => '2014/05/05',
-          "hovertext" => "Something else"
+          "hovertext" => "A small text"
         }
       end
 
@@ -166,7 +166,7 @@ describe Agents::DataOutputAgent do
 
            <item>
             <title>Evolving yet again with a past date</title>
-            <description>Secret hovertext: Something else</description>
+            <description>Secret hovertext: A small text</description>
             <link>http://imgs.xkcd.com/comics/evolving0.png</link>
             <pubDate>#{Time.zone.parse(event3.payload['date']).rfc2822}</pubDate>
             <guid isPermaLink="false">#{event3.id}</guid>
@@ -216,7 +216,7 @@ describe Agents::DataOutputAgent do
           'items' => [
             {
               'title' => 'Evolving yet again with a past date',
-              'description' => 'Secret hovertext: Something else',
+              'description' => 'Secret hovertext: A small text',
               'link' => 'http://imgs.xkcd.com/comics/evolving0.png',
               'guid' => {"contents" => event3.id, "isPermaLink" => "false"},
               'pubDate' => Time.zone.parse(event3.payload['date']).rfc2822,
@@ -244,14 +244,20 @@ describe Agents::DataOutputAgent do
 
       describe 'ordering' do
         before do
-          agent.options['events_order'] = ['{{title}}']
+          agent.options['events_order'] = ['{{hovertext}}']
+          agent.options['events_list_order'] = ['{{title}}']
         end
 
         it 'can reorder the events_to_show last events based on a Liquid expression' do
+          agent.options['events_to_show'] = 2
+          asc_content, _status, _content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
+          expect(asc_content['items'].map {|i| i["title"] }).to eq(["Evolving", "Evolving again"])
+
+          agent.options['events_to_show'] = 40
           asc_content, _status, _content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
           expect(asc_content['items'].map {|i| i["title"] }).to eq(["Evolving", "Evolving again", "Evolving yet again with a past date"])
 
-          agent.options['events_order'] = [['{{title}}', 'string', true]]
+          agent.options['events_list_order'] = [['{{title}}', 'string', true]]
 
           desc_content, _status, _content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
           expect(desc_content['items']).to eq(asc_content['items'].reverse)
