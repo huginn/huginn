@@ -27,3 +27,16 @@ mv config/unicorn.rb.example config/unicorn.rb
 sed -ri 's/^listen .*$/listen ENV["PORT"]/' config/unicorn.rb
 sed -ri 's/^stderr_path.*$//' config/unicorn.rb
 sed -ri 's/^stdout_path.*$//' config/unicorn.rb
+
+# Add ENV variables to .env.example which are not present in it but usable
+cat >> /app/.env.example <<EOF
+ASSET_HOST=
+DEFAULT_SCENARIO_FILE=
+RAILS_SERVE_STATIC_FILES=
+SEED_EMAIL=
+SEED_PASSWORD=
+SEED_USERNAME=
+SMTP_OPENSSL_CA_FILE=
+SMTP_OPENSSL_CA_PATH=
+SMTP_OPENSSL_VERIFY_MODE=
+EOF
