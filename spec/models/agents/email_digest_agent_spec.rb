@@ -72,7 +72,6 @@ describe Agents::EmailDigestAgent do
     it "logs and re-raises mailer errors" do
       mock(SystemMailer).send_message(anything) { raise Net::SMTPAuthenticationError.new("Wrong password") }
 
-      @checker.memory[:queue] = [{:data => "Something you should know about"}]
       @checker.memory[:events] = [1]
       @checker.save!
 
@@ -81,8 +80,6 @@ describe Agents::EmailDigestAgent do
       }.to raise_error(/Wrong password/)
 
       expect(@checker.reload.memory[:events]).not_to be_empty
-      expect(@checker.reload.memory[:queue]).not_to be_empty
-
       expect(@checker.logs.last.message).to match(/Error sending digest mail .* Wrong password/)
     end
 
@@ -111,10 +108,6 @@ describe Agents::EmailDigestAgent do
       Agents::EmailDigestAgent.async_check(@checker1.id)
       expect(ActionMailer::Base.deliveries).to eq([])
 
-      @checker1.memory[:queue] = [{:data => "Something you should know about"},
-        {:title => "Foo", :url => "http://google.com", :bar => 2},
-        {"message" => "hi", :woah => "there"},
-        {"test" => 2}]
       @checker1.memory[:events] = [1, 2, 3, 4]
       @checker1.save!
 

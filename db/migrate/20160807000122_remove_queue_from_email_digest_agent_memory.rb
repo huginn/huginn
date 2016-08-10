@@ -1,8 +1,8 @@
 class RemoveQueueFromEmailDigestAgentMemory < ActiveRecord::Migration
   def up
-    Agents::EmailDigestAgent.all.each do |agent|
+    Agents::EmailDigestAgent.find_each do |agent|
       agent.memory.delete("queue")
-      agent.save!
+      agent.save!(validate: false)
     end
   end
 end
