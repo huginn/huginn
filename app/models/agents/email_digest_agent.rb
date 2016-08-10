@@ -7,7 +7,9 @@ module Agents
     cannot_create_events!
 
     description <<-MD
-      The Email Digest Agent collects any Events sent to it and sends them all via email when scheduled.
+      The Email Digest Agent collects any Events sent to it and sends them all via email when scheduled. The number of
+      used events also relies on the `Keep events` option of the emitting Agent, meaning that if events expire before
+      this agent is scheduled to run, they will not appear in the email.
 
       By default, the will have a `subject` and an optional `headline` before listing the Events.  If the Events'
       payloads contain a `message`, that will be highlighted, otherwise everything in
