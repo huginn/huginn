@@ -480,6 +480,12 @@ GEM
       rest-client
     ruby-growl (4.1)
       uuid (~> 2.3, >= 2.3.5)
+    ruby-trello (1.4.2)
+      activemodel (>= 3.2.0)
+      addressable (~> 2.3)
+      json
+      oauth (~> 0.4.5)
+      rest-client (~> 1.8.0)
     rufus-scheduler (3.0.9)
       tzinfo
     safe_yaml (1.0.4)
@@ -671,6 +677,7 @@ DEPENDENCIES
   rspec-rails (~> 3.1)
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
+  ruby-trello
   rufus-scheduler (~> 3.0.8)
   sass-rails (~> 5.0.3)
   select2-rails (~> 3.5.4)
@@ -696,5 +703,8 @@ DEPENDENCIES
   wunderground (~> 1.2.0)
   xmpp4r (~> 0.5.6)
 
+RUBY VERSION
+   ruby 2.2.4p230
+
 BUNDLED WITH
-   1.11.2
+   1.12.1
