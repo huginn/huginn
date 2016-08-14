@@ -22,6 +22,10 @@ module Agents
       If you do not specify `content_type`, then the recipient email server will determine the correct rendering.
 
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
+
+        # Ordering events in the output
+
+        #{description_events_order('events in the output')}
     MD
 
     def default_options
@@ -38,17 +42,16 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        self.memory['queue'] ||= []
-        self.memory['queue'] << event.payload
-        self.memory['events'] ||= []
-        self.memory['events'] << event.id
+        memory['events'] ||= []
+        memory['events'] << event.id
       end
     end
 
     def check
-      if self.memory['queue'] && self.memory['queue'].length > 0
+      if self.memory['events'] && self.memory['events'].length > 0
         ids = self.memory['events'].join(",")
-        groups = self.memory['queue'].map { |payload| present(payload) }
+        events = sort_events(Event.find(memory['events']))
+        groups = events.map { |event| present(event.payload) }
         recipients.each do |recipient|
           begin
             SystemMailer.send_message(
@@ -65,7 +68,6 @@ module Agents
             raise
           end
         end
-        self.memory['queue'] = []
         self.memory['events'] = []
       end
     end
