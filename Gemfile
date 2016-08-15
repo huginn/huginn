@@ -142,7 +142,10 @@ group :development do
   end
 
   group :test do
+    gem 'pronto', '~> 0.6'
+    gem 'pronto-rubocop', '~> 0.6', require: false
     gem 'coveralls', '~> 0.7.4', require: false
+    gem 'rubocop', require: false
     gem 'capybara-select2', require: false
     gem 'delorean'
     gem 'poltergeist'
