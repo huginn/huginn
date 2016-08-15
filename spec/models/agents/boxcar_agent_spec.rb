@@ -44,17 +44,17 @@ describe Agents::BoxcarAgent do
 
     it "should raise error when invalid response arrives" do
       stub(HTTParty).post { {"blah" => "blah"} }
-      expect{@checker.send_notification}.to raise_error
+      expect { @checker.send_notification({}) }.to raise_error(StandardError, /Invalid response from Boxcar:/)
     end
 
     it "should raise error when response says unauthorized" do
-      stub(HTTParty).post '{"Response":"Not authorized"}'
-      expect{@checker.send_notification}.to raise_error
+      stub(HTTParty).post { {"Response" => "Not authorized"} }
+      expect { @checker.send_notification({}) }.to raise_error(StandardError, /Not authorized/)
     end
 
     it "should raise error when response has an error" do
-      stub(HTTParty).post '{"error": {"message": "Sample error"}}'
-      expect{@checker.send_notification}.to raise_error
+      stub(HTTParty).post { {"error" => {"message" => "Sample error"}} }
+      expect { @checker.send_notification({}) }.to raise_error(StandardError, /Sample error/)
     end
   end
 end
