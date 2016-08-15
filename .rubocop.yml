@@ -1,0 +1,79 @@
+AllCops:
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  Exclude:
+    - 'vendor/gems/**/*'
+    - '**/*.yml'
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'doc/**/*'
+    - 'deployment/**/*'
+    - 'bin/**/*'
+
+Rails:
+  Enabled: true
+
+Style/StringLiterals:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Exclude:
+    - 'spec/**/*'
+
+Metrics/LineLength:
+  Enabled: false
+
+Style/FormatString:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Style/EmptyLinesAroundAccessModifier:
+  Enabled: false
+
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Style/NumericLiterals:
+  Exclude:
+    - 'spec/**/*'
+
+Style/StringLiteralsInInterpolation:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Style/TrailingCommaInLiteral:
+  Enabled: false
+
+Style/Alias:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
