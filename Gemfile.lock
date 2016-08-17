@@ -365,6 +365,9 @@ GEM
       evernote-thrift
       multi_json (~> 1.0)
       omniauth-oauth (~> 1.0)
+    omniauth-lifx (1.1.0)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.1)
     omniauth-oauth (1.0.1)
       oauth
       omniauth (~> 1.0)
@@ -651,6 +654,7 @@ DEPENDENCIES
   omniauth-37signals
   omniauth-dropbox
   omniauth-evernote
+  omniauth-lifx
   omniauth-tumblr
   omniauth-twitter
   omniauth-wunderlist!
