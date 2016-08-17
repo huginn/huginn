@@ -47,7 +47,7 @@ module Agents
 
     def check
       if self.memory['events'] && self.memory['events'].length > 0
-        payloads = received_events.unscoped.where(id: self.memory['events']).pluck(:payload).to_a
+        payloads = received_events.reorder("events.id ASC").where(id: self.memory['events']).pluck(:payload).to_a
         groups = payloads.map { |payload| present(payload) }
         recipients.each do |recipient|
           begin
