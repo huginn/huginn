@@ -16,6 +16,7 @@ module Agents
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
       Set `retweet` to either true or false.
       Set `favorite` to either true or false.
+      Set `emit_error_events` to true to emit an Event when the action failed, otherwise the action will be retried.
     MD
 
     def validate_options
@@ -24,6 +25,9 @@ module Agents
       end
       unless retweet? || favorite?
         errors.add(:base, "at least one action must be true")
+      end
+      if emit_error_events?.nil?
+        errors.add(:base, "emit_error_events must be set to 'true' or 'false'")
       end
     end
 
@@ -36,6 +40,7 @@ module Agents
         'expected_receive_period_in_days' => '2',
         'favorite' => 'false',
         'retweet' => 'true',
+        'emit_error_events' => 'false'
       }
     end
 
@@ -47,6 +52,10 @@ module Agents
       boolify(options['favorite'])
     end
 
+    def emit_error_events?
+      boolify(options['emit_error_events'])
+    end
+
     def receive(incoming_events)
       tweets = tweets_from_events(incoming_events)
 
@@ -54,6 +63,7 @@ module Agents
         twitter.favorite(tweets) if favorite?
         twitter.retweet(tweets) if retweet?
       rescue Twitter::Error => e
+        raise e unless emit_error_events?
         create_event :payload => {
           'success' => false,
           'error' => e.message,
@@ -71,4 +81,3 @@ module Agents
     end
   end
 end
-

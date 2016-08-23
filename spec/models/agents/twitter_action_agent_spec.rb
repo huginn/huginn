@@ -24,11 +24,11 @@ describe Agents::TwitterActionAgent do
 
     context 'when set up to retweet' do
       before do
-        @agent = build_agent({
-          'expected_receive_period_in_days' => '2',
+        @agent = build_agent(
           'favorite' => 'false',
           'retweet' => 'true',
-        })
+          'emit_error_events' => 'true'
+        )
         @agent.save!
       end
 
@@ -68,9 +68,9 @@ describe Agents::TwitterActionAgent do
     context 'when set up to favorite' do
       before do
         @agent = build_agent(
-          'expected_receive_period_in_days' => '2',
           'favorite' => 'true',
           'retweet' => 'false',
+          'emit_error_events' => 'true'
         )
         @agent.save!
       end
@@ -107,13 +107,48 @@ describe Agents::TwitterActionAgent do
         end
       end
     end
+
+    context 'with emit_error_events set to false' do
+      it 'does re-raises the exception on failure' do
+        agent = build_agent
+
+        stub(agent.twitter).retweet(anything) {
+          raise Twitter::Error.new('uh oh')
+        }
+
+       expect { agent.receive([@event1]) }.to raise_error(StandardError, /uh oh/)
+
+      end
+    end
   end
 
   describe "#validate_options" do
+    it 'the default options are valid' do
+      agent = build_agent(described_class.new.default_options)
+
+      expect(agent).to be_valid
+    end
+
+    context 'emit_error_events' do
+      it 'can be set to true' do
+        agent = build_agent(described_class.new.default_options.merge('emit_error_events' => 'true'))
+        expect(agent).to be_valid
+      end
+
+      it 'must be a boolean' do
+        agent = build_agent(described_class.new.default_options.merge('emit_error_events' => 'notbolean'))
+        expect(agent).not_to be_valid
+      end
+    end
+
+    it 'expected_receive_period_in_days must be set' do
+      agent = build_agent(described_class.new.default_options.merge('expected_receive_period_in_days' => ''))
+      expect(agent).not_to be_valid
+    end
+
     context 'when set up to neither favorite or retweet' do
       it 'is invalid' do
         agent = build_agent(
-          'expected_receive_period_in_days' => '2',
           'favorite' => 'false',
           'retweet' => 'false',
         )
@@ -129,11 +164,7 @@ describe Agents::TwitterActionAgent do
     end
 
     it 'checks if events have been received within the expected time period' do
-      agent = build_agent(
-        'expected_receive_period_in_days' => '2',
-        'favorite' => 'false',
-        'retweet' => 'true',
-      )
+      agent = build_agent
       agent.save!
 
       expect(agent).not_to be_working # No events received
@@ -147,10 +178,10 @@ describe Agents::TwitterActionAgent do
     end
   end
 
-  def build_agent(options)
+  def build_agent(options = {})
     described_class.new do |agent|
       agent.name = 'twitter stuff'
-      agent.options = options
+      agent.options = agent.default_options.merge(options)
       agent.service = services(:generic)
       agent.user = users(:bob)
     end
