@@ -16,12 +16,10 @@ class Delayed::Job
   scope :failed, -> { where("failed_at IS NOT NULL") }
 end
 
-def database_deadlocks_when_using_optimized_strategy?
+database_deadlocks_when_using_optimized_strategy = lambda do
   ENV["DATABASE_ADAPTER"] == "mysql2"
 end
 
-if database_deadlocks_when_using_optimized_strategy?
-  Delayed::Backend::ActiveRecord.configure do |config|
-    config.reserve_sql_strategy = :default_sql
-  end
-end
+Delayed::Backend::ActiveRecord.configure do |config|
+  config.reserve_sql_strategy = :default_sql
+end if database_deadlocks_when_using_optimized_strategy.call
