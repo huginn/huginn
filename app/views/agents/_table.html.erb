@@ -4,7 +4,7 @@
       <th></th>
       <th><%= sortable_column 'name', 'asc' %></th>
 
-      <% if defined?(locals) != nil && locals[:show_user] == true %>
+      <% if defined?(show_user) != nil && show_user == true %>
       <th><%= sortable_column 'users.username', 'asc', name: 'User' %></th>
       <% end %>
 
@@ -18,10 +18,10 @@
       <th></th>
     </tr>
 
-    <% @agents.each do |agent| %>
+    <% agents.each do |agent| %>
       <tr>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
-          <%= agent_type_icon(agent, @agents) %>
+          <%= agent_type_icon(agent, agents) %>
         </td>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <%= link_to agent.name, agent_path(agent, return: (defined?(return_to) && return_to) || request.path) %>
@@ -34,7 +34,7 @@
           <% end %>
         </td>
 
-        <% if defined?(locals) != nil && locals[:show_user] == true %>
+        <% if defined?(show_user) != nil && show_user == true %>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <%= link_to agent.user.username, admin_user_path(agent.user, return: (defined?(return_to) && return_to) || request.path) %>
           <br/>
@@ -94,4 +94,6 @@
   </table>
 </div>
 
-<%= paginate @agents, :theme => 'twitter-bootstrap-3' %>
+<% if defined? agents.preload %>
+<%= paginate agents, :theme => 'twitter-bootstrap-3' %>
+<% end %>

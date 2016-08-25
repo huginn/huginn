@@ -5,7 +5,7 @@
         <h2><%= current_user == @agent_user ? 'Your Agents' : "#{@agent_user.username}’s Agents" %></h2>
       </div>
 
-      <%= render 'agents/table' %>
+      <%= render partial: 'agents/table', locals: {agents: @agents} %>
 
       <br/>
 
@@ -15,6 +15,11 @@
         <%= link_to icon_tag('glyphicon-random') + ' View diagram', diagram_path, class: "btn btn-default" %>
         <%= link_to icon_tag('glyphicon-adjust') + toggle_disabled_text, toggle_visibility_agents_path, method: :put, class: "btn btn-default visibility-enabler" %>
       </div>
+
+      <h3>Shared Agents</h3>
+
+      <%= render partial: 'agents/table', locals: {agents: @shared_agents} %>
+
     </div>
   </div>
 </div>

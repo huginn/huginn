@@ -41,6 +41,10 @@ describe AgentsController do
     end
   end
 
+  describe "GET all" do
+    pending("it returns all Agents if the current user is an admin")
+  end
+
   describe "POST handle_details_post" do
     it "passes control to handle_details_post on the agent" do
       sign_in users(:bob)

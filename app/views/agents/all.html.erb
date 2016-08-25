@@ -5,7 +5,7 @@
         <h2>All Agents</h2>
       </div>
 
-      <%= render 'agents/table', locals: {show_user: true} %>
+      <%= render partial: 'agents/table', locals: {agents: @agents, show_user: true} %>
 
       <br/>
     </div>

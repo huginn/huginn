@@ -9,9 +9,11 @@ class AgentsController < ApplicationController
     set_table_sort sorts: %w[name created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
 
     @agents = @current_agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
+    @shared_agents = Agent.shared - @agents
 
     if show_only_enabled_agents?
       @agents = @agents.where(disabled: false)
+      @shared_agents = @shared_agents.where(disabled: false)
     end
 
     respond_to do |format|
