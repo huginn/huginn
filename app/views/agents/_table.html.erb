@@ -3,6 +3,11 @@
     <tr>
       <th></th>
       <th><%= sortable_column 'name', 'asc' %></th>
+
+      <% if defined?(locals) != nil && locals[:show_user] == true %>
+      <th><%= sortable_column 'users.username', 'asc', name: 'User' %></th>
+      <% end %>
+
       <th><%= sortable_column 'created_at', 'desc', name: 'Age' %></th>
       <th>Schedule</th>
       <th><%= sortable_column 'last_check_at', name: 'Last Check' %></th>
@@ -28,6 +33,15 @@
             </span>
           <% end %>
         </td>
+
+        <% if defined?(locals) != nil && locals[:show_user] == true %>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <%= link_to agent.user.username, edit_admin_user_path(agent.user, return: (defined?(return_to) && return_to) || request.path) %>
+          <br/>
+        </td>
+        <% end %>
+
+
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <%= time_ago_in_words agent.created_at %>
         </td>
