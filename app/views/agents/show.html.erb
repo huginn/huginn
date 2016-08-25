@@ -137,6 +137,11 @@
               </p>
             <% end %>
 
+            <p>
+              <b>Shared:</b>
+              <%= yes_no @agent.shared %>
+            <p>
+
             <% if @agent.can_create_events? %>
               <p>
                 <b>Event receivers:</b>
