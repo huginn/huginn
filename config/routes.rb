@@ -9,6 +9,7 @@ Huginn::Application.routes.draw do
     end
 
     collection do
+      get :shared
       put :toggle_visibility
       post :propagate
       get :type_details
