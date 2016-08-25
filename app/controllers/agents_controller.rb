@@ -20,6 +20,24 @@ class AgentsController < ApplicationController
     end
   end
 
+  def all
+    authenticate_admin!
+
+    set_table_sort sorts: %w[name users.username created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
+
+    # @agent_user = current_user
+    @agents = Agent.all.preload(:scenarios, :controllers).includes(:user).reorder(table_sort).page(params[:page])
+
+    if show_only_enabled_agents?
+      @agents = @agents.where(disabled: false)
+    end
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @agents }
+    end
+  end
+
   def toggle_visibility
     if show_only_enabled_agents?
       mark_all_agents_viewable

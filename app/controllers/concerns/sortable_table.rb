@@ -19,7 +19,7 @@ module SortableTable
     default = sort_options[:default] || { valid_sorts.first.to_sym => :desc }
 
     if params[:sort].present?
-      attribute, direction = params[:sort].downcase.split('.')
+      attribute, _, direction = params[:sort].downcase.rpartition('.')
       unless valid_sorts.include?(attribute)
         attribute, direction = default.to_a.first
       end
@@ -29,8 +29,14 @@ module SortableTable
 
     direction = direction.to_s == 'desc' ? 'desc' : 'asc'
 
+    if attribute.to_s.include?(".")
+      ordering = "#{attribute} #{direction.upcase}"
+    else
+      ordering = { attribute.to_sym => direction.to_sym }
+    end
+
     @table_sort_info = {
-      order: { attribute.to_sym => direction.to_sym },
+      order: ordering,
       attribute: attribute,
       direction: direction
     }
