@@ -88,7 +88,7 @@ describe Service do
     it "should work with twitter services" do
       twitter = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/twitter.json')))
       expect {
-        service = @user.services.initialize_or_update_via_omniauth(twitter)
+        service = @user.services.initialize_or_update_via_omniauth(twitter, ServiceOptionProviders::DefaultServiceOptionProvider.new)
         service.save!
       }.to change { @user.services.count }.by(1)
       service = @user.services.first
@@ -101,7 +101,7 @@ describe Service do
     it "should work with 37signals services" do
       signals = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/37signals.json')))
       expect {
-        service = @user.services.initialize_or_update_via_omniauth(signals)
+        service = @user.services.initialize_or_update_via_omniauth(signals, ServiceOptionProviders::ThirtySevenSignalsOptionProvider.new)
         service.save!
       }.to change { @user.services.count }.by(1)
       service = @user.services.first
@@ -116,7 +116,7 @@ describe Service do
     it "should work with github services" do
       signals = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/github.json')))
       expect {
-        service = @user.services.initialize_or_update_via_omniauth(signals)
+        service = @user.services.initialize_or_update_via_omniauth(signals, ServiceOptionProviders::DefaultServiceOptionProvider.new)
         service.save!
       }.to change { @user.services.count }.by(1)
       service = @user.services.first

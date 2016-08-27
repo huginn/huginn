@@ -57,17 +57,8 @@ class Service < ActiveRecord::Base
     (config = Devise.omniauth_configs[provider.to_sym]) && config.args[1]
   end
 
-  def self.provider_specific_options(omniauth)
-    case omniauth['provider'].to_sym
-      when :'37signals'
-        { user_id: omniauth['extra']['accounts'][0]['id'], name: omniauth['info']['name'] }
-      else
-        { name: omniauth['info']['nickname'] || omniauth['info']['name'] }
-    end
-  end
-
-  def self.initialize_or_update_via_omniauth(omniauth)
-    options = provider_specific_options(omniauth)
+  def self.initialize_or_update_via_omniauth(omniauth, option_provider)
+    options = option_provider.options(omniauth)
 
     find_or_initialize_by(provider: omniauth['provider'], uid: omniauth['uid'].to_s).tap do |service|
       service.assign_attributes token: omniauth['credentials']['token'],
