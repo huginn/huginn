@@ -88,7 +88,7 @@ describe Service do
     it "should work with twitter services" do
       twitter = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/twitter.json')))
       expect {
-        service = @user.services.initialize_or_update_via_omniauth(twitter, ServiceOptionProviders::DefaultServiceOptionProvider.new)
+        service = @user.services.initialize_or_update_via_omniauth(twitter)
         service.save!
       }.to change { @user.services.count }.by(1)
       service = @user.services.first
@@ -101,7 +101,7 @@ describe Service do
     it "should work with 37signals services" do
       signals = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/37signals.json')))
       expect {
-        service = @user.services.initialize_or_update_via_omniauth(signals, ServiceOptionProviders::ThirtySevenSignalsOptionProvider.new)
+        service = @user.services.initialize_or_update_via_omniauth(signals)
         service.save!
       }.to change { @user.services.count }.by(1)
       service = @user.services.first
@@ -116,7 +116,7 @@ describe Service do
     it "should work with github services" do
       signals = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/github.json')))
       expect {
-        service = @user.services.initialize_or_update_via_omniauth(signals, ServiceOptionProviders::DefaultServiceOptionProvider.new)
+        service = @user.services.initialize_or_update_via_omniauth(signals)
         service.save!
       }.to change { @user.services.count }.by(1)
       service = @user.services.first
@@ -124,6 +124,23 @@ describe Service do
       expect(service.name).to eq('dsander')
       expect(service.uid).to eq('12345')
       expect(service.token).to eq('agithubtoken')
+    end
+  end
+
+  describe 'omniauth options provider registry for non-conforming omniauth responses' do
+    describe '.register_options_provider' do
+      it 'allows gem developers to add their own options provider to the registry' do
+        Service.register_options_provider('test-omniauth-provider') do |omniauth|
+          { name: omniauth['special_field'] }
+        end
+
+        actual_options = Service.get_options({
+          'provider' => 'test-omniauth-provider',
+          'special_field' => 'A Great Name'
+        })
+
+        expect(actual_options[:name]).to eq('A Great Name')
+      end
     end
   end
 end
