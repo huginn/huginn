@@ -9,11 +9,13 @@ class AgentsController < ApplicationController
     set_table_sort sorts: %w[name created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
 
     @agents = @current_agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
-    @shared_agents = Agent.shared - @agents
+    
 
     if show_only_enabled_agents?
       @agents = @agents.where(disabled: false)
-      @shared_agents = @shared_agents.where(disabled: false)
+      @shared_agents = Agent.shared.where(disabled: false) - @agents
+    else
+      @shared_agents = Agent.shared - @agents
     end
 
     respond_to do |format|
@@ -27,7 +29,6 @@ class AgentsController < ApplicationController
 
     set_table_sort sorts: %w[name users.username created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
 
-    # @agent_user = current_user
     @agents = Agent.all.preload(:scenarios, :controllers).includes(:user).reorder(table_sort).page(params[:page])
 
     if show_only_enabled_agents?
@@ -51,7 +52,6 @@ class AgentsController < ApplicationController
   end
 
   def handle_details_post
-    
     @agent = @current_agents.find(params[:id])
     if @agent.respond_to?(:handle_details_post)
       render :json => @agent.handle_details_post(params) || {}
@@ -136,8 +136,11 @@ class AgentsController < ApplicationController
   end
 
   def show
-    
-    @agent = @current_agents.find(params[:id])
+    begin
+      @agent = @current_agents.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      @agent = Agent.shared.find(params[:id])
+    end
 
     respond_to do |format|
       format.html

@@ -2,17 +2,9 @@ module Agents
   class DryRunsController < ApplicationController
     include ActionView::Helpers::TextHelper
 
-    def index
-      if params[:user]
-        if current_user.admin?
-          @agent_user = User.find_by!(username: params[:user])
-        else
-          render(text: 'unauthorized', status: 403) and return
-        end
-      else
-        @agent_user = current_user
-      end
+    before_action :set_agent_user
 
+    def index
       @events = if params[:agent_id]
                   @agent_user.agents.find_by(id: params[:agent_id]).received_events.limit(5)
                 elsif params[:source_ids]
@@ -24,16 +16,6 @@ module Agents
     end
 
     def create
-      if params[:user]
-        if current_user.admin?
-          @agent_user = User.find_by!(username: params[:user])
-        else
-          render(text: 'unauthorized', status: 403) and return
-        end
-      else
-        @agent_user = current_user
-      end
-
       attrs = params[:agent] || {}
       if agent = @agent_user.agents.find_by(id: params[:agent_id])
         # POST /agents/:id/dry_run
@@ -66,6 +48,19 @@ module Agents
       end
 
       render layout: false
+    end
+
+    private
+    def set_agent_user
+      if params[:user]
+        if current_user.admin?
+          @agent_user = User.find_by!(username: params[:user])
+        else
+          render(text: 'unauthorized', status: 403) and return
+        end
+      else
+        @agent_user = current_user
+      end
     end
   end
 end
