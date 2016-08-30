@@ -2,7 +2,7 @@
   <div class='row'>
     <div class='col-md-12'>
       <div class="page-header">
-        <h2>Your Agents</h2>
+        <h2><%= session[:original_admin_user_id].present? ? "#{current_user.username}’s Agents" : 'Your Agents' %></h2>
       </div>
 
       <%= render 'agents/table' %>

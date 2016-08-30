@@ -60,9 +60,17 @@
     <li class="dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         Account
+        <% if user_signed_in? && session[:original_admin_user_id].present? %>
+          <span class="label label-warning"><%= current_user.username %></span>
+        <% end %>
         <b class="caret"></b>
       </a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        <% if user_signed_in? && session[:original_admin_user_id].present? %>
+          <li>
+            <%= link_to 'Switch Back to Admin User', switch_back_admin_users_path, tabindex: '-1' %>
+          </li>
+        <% end %>
         <li>
           <% if user_signed_in? %>
             <%= link_to 'Account', edit_user_registration_path, :tabindex => "-1" %>

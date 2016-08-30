@@ -24,12 +24,13 @@
               <td><%= link_to user.username, edit_admin_user_path(user) %></td>
               <td><%= user.email %></td>
               <td><%= user_account_state(user) %></td>
-              <td><%= user.agents.active.count %></td>
-              <td><%= user.agents.inactive.count %></td>
+              <td><%= link_to user.agents.active.count, switch_to_user_admin_user_path(user), data: { confirm: 'This will log you in as another user. Would you like to continue?' } %></td>
+              <td><%= link_to user.agents.inactive.count, switch_to_user_admin_user_path(user), data: { confirm: 'This will log you in as another user. Would you like to continue?' } %></td>
               <td title='<%= user.created_at %>'><%= time_ago_in_words user.created_at %> ago</td>
               <td>
                 <div class="btn-group btn-group-xs">
                   <% if user != current_user %>
+                    <%= link_to 'Become User', switch_to_user_admin_user_path(user), class: "btn btn-default", data: { confirm: 'This will log you in as another user. Would you like to continue?' } %>
                     <% if user.active? %>
                       <%= link_to 'Deactivate', deactivate_admin_user_path(user), method: :put, class: "btn btn-default" %>
                     <% else %>
