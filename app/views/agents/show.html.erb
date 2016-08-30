@@ -118,7 +118,7 @@
               <p>
                 <b>Event sources:</b>
                 <% if (agents = @agent.sources).length > 0 %>
-                  <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
+                  <%= agents.map { |agent| current_user == agent.user ? link_to(agent.name, agent_path(agent)) : agent.name }.to_sentence.html_safe %>
                 <% else %>
                   None
                 <% end %>

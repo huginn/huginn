@@ -131,11 +131,13 @@ class @AgentEditPage
 
   hideEventCreation: ->
     $(".event-related-region .select2-container").hide()
+    $(".event-related-region .shared-agent").hide()
     $(".event-related-region .cannot-create-events").show()
     $(".event-related-region").data("can-create-events", false)
 
   showEventCreation: ->
     $(".event-related-region .select2-container").show()
+    $(".event-related-region .shared-agent").show()
     $(".event-related-region .cannot-create-events").hide()
     $(".event-related-region").data("can-create-events", true)
 
