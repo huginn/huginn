@@ -6,7 +6,9 @@
           Your Events
           <% if @agent %>
             from <%= @agent.name %>
+            <% if @agent.user == current_user %>
             <%= render 'agents/mini_action_menu', agent: @agent, return_to: request.path %>
+            <% end %>
           <% end %>
         </h2>
       </div>
@@ -33,8 +35,10 @@
             <td>
               <div class="btn-group btn-group-xs">
                 <%= link_to 'Show', event_path(event, return: request.fullpath), class: "btn btn-default" %>
+                <% if current_user.admin? or current_user == event.user %>
                 <%= link_to 'Re-emit', reemit_event_path(event), method: :post, data: { confirm: 'Are you sure you want to duplicate this event and emit the new one now?' }, class: "btn btn-default" %>
                 <%= link_to 'Delete', event_path(event), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default" %>
+                <% end %>
               </div>
             </td>
           <% end %>

@@ -90,14 +90,14 @@
               </td>
               <td>
                 <% if current_user == agent.user %>
-                <div class="btn-group">
-                  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
-                    <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
-                  </button>
-                  <%= render 'agents/action_menu', agent: agent, return_to: (defined?(return_to) && return_to) || request.path %>
-                </div>
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                      <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
+                    </button>
+                    <%= render 'agents/action_menu', agent: agent, return_to: (defined?(return_to) && return_to) || request.path %>
+                  </div>
                 <% else %>
-                <% # stub: put a link to "Become User" here %>
+                  <%#= link_to 'Become User', switch_user_admin_user_path(agent.user), class: "btn btn-sm btn-default btn-info" %>
                 <% end %>
               </td>
             </tr>
