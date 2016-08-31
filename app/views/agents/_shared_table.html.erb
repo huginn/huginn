@@ -1,0 +1,103 @@
+<div class='table-responsive'>
+  <table class='table table-striped'>
+    <tr>
+      <th></th>
+      <th><%= sortable_column 'name', 'asc' %></th>
+      <th><%= sortable_column 'created_at', 'desc', name: 'Age' %></th>
+      <th>Schedule</th>
+      <th><%= sortable_column 'last_check_at', name: 'Last Check' %></th>
+      <th><%= sortable_column 'last_event_at', name: 'Last Event Out' %></th>
+      <th><%= sortable_column 'last_receive_at', name: 'Last Event In' %></th>
+      <th>Events Created</th>
+      <th>Working?</th>
+      <th><%= sortable_column 'users.username', 'asc', name: 'User' %></th>
+      <th></th>
+    </tr>
+
+    <% agents.each do |agent| %>
+      <tr>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <%= agent_type_icon(agent, agents) %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <% if current_user == agent.user %>
+          <%= link_to agent.name, agent_path(agent, return: (defined?(return_to) && return_to) || request.path) %>
+          <% else %>
+          <span><%= agent.name %></span>
+          <% end %>
+          <br/>
+          <span class='text-muted'><%= agent.short_type.titleize %></span>
+          <% if current_user == agent.user %>
+          <% if agent.scenarios.present? %>
+            <span>
+              <%= scenario_links(agent) %>
+            </span>
+          <% end %>
+          <% end %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <%= time_ago_in_words agent.created_at %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <% if agent.can_be_scheduled? %>
+            <%= agent_schedule(agent, ',<br/>') %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <% if agent.can_be_scheduled? %>
+            <%= agent.last_check_at ? time_ago_in_words(agent.last_check_at) + " ago" : "never" %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <% if agent.can_create_events? %>
+            <%= agent.last_event_at ? time_ago_in_words(agent.last_event_at) + " ago" : "never" %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <% if agent.can_receive_events? %>
+            <%= agent.last_receive_at ? time_ago_in_words(agent.last_receive_at) + " ago" : "never" %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <% if agent.can_create_events? %>
+            <%= link_to(agent.events_count || 0, agent_events_path(agent, return: (defined?(return_to) && return_to) || request.path)) %>
+          <% else %>
+            <span class='not-applicable'></span>
+          <% end %>
+        </td>
+        <td><%= working(agent) %></td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <% if current_user == agent.user %>
+            <span><%= agent.user.username %></span>
+          <% else %>
+            <%= link_to agent.user.username, edit_admin_user_path(agent.user, return: (defined?(return_to) && return_to) || request.path) %>
+          <% end %>
+        </td>
+        <td>
+          <% if current_user == agent.user %>
+            <div class="btn-group">
+              <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
+              </button>
+              <%= render 'agents/action_menu', agent: agent, return_to: (defined?(return_to) && return_to) || request.path %>
+            </div>
+          <% else %>
+            <%#= link_to 'Become User', switch_user_admin_user_path(agent.user), class: "btn btn-sm btn-default btn-info" %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+
+<% if defined? agents.preload %>
+<%= paginate agents, :theme => 'twitter-bootstrap-3' %>
+<% end %>
