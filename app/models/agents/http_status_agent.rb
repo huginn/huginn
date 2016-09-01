@@ -1,10 +1,7 @@
 module Agents
-
   class HttpStatusAgent < Agent
-
     include WebRequestConcern
     include FormConfigurable
-
     can_dry_run!
     can_order_created_events!
 
@@ -107,5 +104,4 @@ module Agents
       nil
     end
   end
-
 end

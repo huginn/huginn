@@ -2,7 +2,6 @@ module Agents
   class JabberAgent < Agent
     include LongRunnable
     include FormConfigurable
-
     cannot_be_scheduled!
 
     gem_dependency_check { defined?(Jabber) }

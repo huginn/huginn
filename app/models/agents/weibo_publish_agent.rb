@@ -3,7 +3,6 @@
 module Agents
   class WeiboPublishAgent < Agent
     include WeiboConcern
-
     cannot_be_scheduled!
 
     description <<-MD

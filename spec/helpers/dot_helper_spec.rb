@@ -18,11 +18,6 @@ describe DotHelper do
       end
     end
 
-    before do
-      stub(Agents::DotFoo).valid_type?("Agents::DotFoo") { true }
-      stub(Agents::DotBar).valid_type?("Agents::DotBar") { true }
-    end
-
     describe "#agents_dot" do
       before do
         @agents = [

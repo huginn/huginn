@@ -1,7 +1,6 @@
 module Agents
   class PushbulletAgent < Agent
     include FormConfigurable
-
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!

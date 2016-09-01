@@ -3,7 +3,6 @@ require 'rufus-scheduler'
 module Agents
   class SchedulerAgent < Agent
     include AgentControllerConcern
-
     cannot_be_scheduled!
     cannot_receive_events!
     cannot_create_events!

@@ -6,10 +6,6 @@ describe SortableEvents do
       include SortableEvents
 
       default_schedule 'never'
-
-      def self.valid_type?(name)
-        true
-      end
     end
   }
 
@@ -27,10 +23,6 @@ describe SortableEvents do
         include SortableEvents
 
         default_schedule 'never'
-
-        def self.valid_type?(name)
-          true
-        end
       end
     }
 
@@ -190,10 +182,6 @@ describe SortableEvents do
         can_order_created_events!
 
         attr_accessor :payloads_to_emit
-
-        def self.valid_type?(name)
-          true
-        end
 
         def check
           payloads_to_emit.each do |payload|

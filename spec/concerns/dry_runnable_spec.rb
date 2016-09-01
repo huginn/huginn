@@ -29,8 +29,6 @@ describe DryRunnable do
   end
 
   before do
-    stub(Agents::SandboxedAgent).valid_type?("Agents::SandboxedAgent") { true }
-
     @agent = Agents::SandboxedAgent.create(name: "some agent") { |agent|
       agent.user = users(:bob)
     }

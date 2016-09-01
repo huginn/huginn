@@ -4,7 +4,7 @@ require 'utils'
 # be sub-classed for many different purposes.  Agents can emit Events, as well as receive them and react in many different ways.
 # The basic Agent API is detailed on the Huginn wiki: https://github.com/cantino/huginn/wiki/Creating-a-new-agent
 class Agent < ActiveRecord::Base
-  include AssignableTypes
+  include Typeable
   include MarkdownClassAttributes
   include JSONSerializedField
   include RDBMSFunctions
@@ -16,8 +16,6 @@ class Agent < ActiveRecord::Base
   include SortableEvents
 
   markdown_class_attributes :description, :event_description
-
-  load_types_in "Agents"
 
   SCHEDULES = %w[every_1m every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
                  midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm never]
@@ -74,6 +72,11 @@ class Agent < ActiveRecord::Base
            end
     where(:type => type)
   }
+
+  def self.inherited(child)
+    AgentRegistry.register_agent(child)
+    super
+  end
 
   def short_type
     type.demodulize

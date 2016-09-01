@@ -1,7 +1,6 @@
 module Agents
   class JsonParseAgent < Agent
     include FormConfigurable
-
     cannot_be_scheduled!
 
     description <<-MD

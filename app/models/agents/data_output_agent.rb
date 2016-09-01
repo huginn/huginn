@@ -1,7 +1,6 @@
 module Agents
   class DataOutputAgent < Agent
     include WebRequestConcern
-
     cannot_be_scheduled!
     cannot_create_events!
 

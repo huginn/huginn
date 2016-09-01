@@ -3,7 +3,6 @@ module Agents
     include LongRunnable
     include FormConfigurable
     include FileHandling
-
     emits_file_pointer!
 
     default_schedule 'every_1h'

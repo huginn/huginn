@@ -3,7 +3,6 @@ require 'cgi'
 module Agents
   class PublicTransportAgent < Agent
     cannot_receive_events!
-
     default_schedule "every_2m"
 
     description <<-MD

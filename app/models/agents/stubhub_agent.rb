@@ -1,7 +1,6 @@
 module Agents
   class StubhubAgent < Agent
     cannot_receive_events!
-
     description <<-MD
       The StubHub Agent creates an event for a given StubHub Event.
 

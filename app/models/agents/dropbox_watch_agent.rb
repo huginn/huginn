@@ -1,7 +1,6 @@
 module Agents
   class DropboxWatchAgent < Agent
     include DropboxConcern
-
     cannot_receive_events!
     default_schedule "every_1m"
 

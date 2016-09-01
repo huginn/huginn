@@ -1,7 +1,6 @@
 module Agents
   class TwitterPublishAgent < Agent
     include TwitterConcern
-
     cannot_be_scheduled!
 
     description <<-MD

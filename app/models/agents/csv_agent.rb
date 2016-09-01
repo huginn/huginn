@@ -2,7 +2,6 @@ module Agents
   class CsvAgent < Agent
     include FormConfigurable
     include FileHandling
-
     cannot_be_scheduled!
     consumes_file_pointer!
 

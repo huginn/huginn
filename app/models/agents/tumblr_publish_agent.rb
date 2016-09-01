@@ -1,7 +1,6 @@
 module Agents
   class TumblrPublishAgent < Agent
     include TumblrConcern
-
     cannot_be_scheduled!
 
     gem_dependency_check { defined?(Tumblr::Client) }

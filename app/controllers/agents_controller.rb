@@ -49,7 +49,7 @@ class AgentsController < ApplicationController
   end
 
   def type_details
-    @agent = Agent.build_for_type(params[:type], current_user, {})
+    @agent = AgentBuilder.build_for_type(params[:type], current_user, {})
     initialize_presenter
 
     render json: {
@@ -220,7 +220,7 @@ class AgentsController < ApplicationController
   end
 
   def build_agent
-    @agent = Agent.build_for_type(params[:agent].delete(:type),
+    @agent = AgentBuilder.build_for_type(params[:agent].delete(:type),
                                   current_user,
                                   params[:agent])
   end

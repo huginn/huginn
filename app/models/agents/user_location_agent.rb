@@ -3,7 +3,6 @@ require 'securerandom'
 module Agents
   class UserLocationAgent < Agent
     cannot_be_scheduled!
-
     gem_dependency_check { defined?(Haversine) }
 
     description do <<-MD
