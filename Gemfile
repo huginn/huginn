@@ -186,6 +186,8 @@ ENV['DATABASE_ADAPTER'] ||=
 
 if_true(on_heroku) do
   gem 'rails_12factor', group: :production
+  # uncomment to use `rake heroku:restart`
+  # gem 'heroku-api'
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
