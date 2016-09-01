@@ -8,6 +8,17 @@ describe LiquidInterpolatable::Filters do
     end.new
   end
 
+  describe '#interpolate_string' do
+    before do
+      @agent = Agent.new
+    end
+
+    it 'should convert \n to line breaks' do
+      interpolated = @agent.send(:interpolate_string, '{{foo}}\n{{bar}}', Event.new(payload: {foo: 'test', bar: 'second line'}))
+      expect(interpolated).to eq("test\nsecond line")
+    end
+  end
+
   describe 'uri_escape' do
     it 'should escape a string for use in URI' do
       expect(@filter.uri_escape('abc:/?=')).to eq('abc%3A%2F%3F%3D')

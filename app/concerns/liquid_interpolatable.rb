@@ -92,7 +92,7 @@ module LiquidInterpolatable
 
   def interpolate_string(string, self_object = nil)
     interpolate_with(self_object) do
-      Liquid::Template.parse(string).render!(interpolation_context)
+      Liquid::Template.parse(string).render!(interpolation_context).gsub('\n', "\n")
     end
   end
 
