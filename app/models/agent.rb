@@ -65,6 +65,7 @@ class Agent < ActiveRecord::Base
   scope :active,   -> { where(disabled: false, deactivated: false) }
   scope :inactive, -> { where(['disabled = ? OR deactivated = ?', true, true]) }
   scope :shared, -> { where(shared: true) }
+  scope :available_to_user, lambda { |user| where("agents.user_id = ? or agents.shared = true", user.id) }
 
   scope :of_type, lambda { |type|
     type = case type
