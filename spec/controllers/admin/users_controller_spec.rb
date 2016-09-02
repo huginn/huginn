@@ -19,4 +19,41 @@ describe Admin::UsersController do
       end
     end
   end
+
+  describe 'GET #switch_to_user' do
+    it "switches to another user" do
+      sign_in users(:jane)
+
+      get :switch_to_user, :id => users(:bob).id
+      expect(response).to redirect_to(agents_path)
+      expect(subject.session[:original_admin_user_id]).to eq(users(:jane).id)
+    end
+
+    it "does not switch if not admin" do
+      sign_in users(:bob)
+
+      get :switch_to_user, :id => users(:jane).id
+      expect(response).to redirect_to(root_path)
+    end
+  end
+
+  describe 'GET #switch_back' do
+    it "switches to another user and back" do
+      sign_in users(:jane)
+
+      get :switch_to_user, :id => users(:bob).id
+      expect(response).to redirect_to(agents_path)
+      expect(subject.session[:original_admin_user_id]).to eq(users(:jane).id)
+
+      get :switch_back
+      expect(response).to redirect_to(admin_users_path)
+      expect(subject.session[:original_admin_user_id]).to be_nil
+    end
+
+    it "does not switch_back without having switched" do
+      sign_in users(:bob)
+      get :switch_back
+      expect(response).to redirect_to(root_path)
+    end
+  end
 end
