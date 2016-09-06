@@ -308,7 +308,7 @@ GEM
       actionmailer (>= 3.2)
       letter_opener (~> 1.0)
       railties (>= 3.2)
-    libv8 (3.16.14.13)
+    libv8 (3.16.14.15)
     liquid (3.0.6)
     listen (3.0.5)
       rb-fsevent (>= 0.9.3)
