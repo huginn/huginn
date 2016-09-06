@@ -443,7 +443,7 @@ module Agents
     end
 
     def use_namespaces?
-      if value = interpolated.key?('use_namespaces')
+      if interpolated.key?('use_namespaces')
         boolify(interpolated['use_namespaces'])
       else
         interpolated['extract'].none? { |name, extraction_details|
