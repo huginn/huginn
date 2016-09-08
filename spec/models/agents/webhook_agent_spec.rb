@@ -65,11 +65,6 @@ describe Agents::WebhookAgent do
       expect(out).to eq(['Event Created', 200])
     end
 
-    it 'should not accept empty code' do
-      agent.options['code'] = ''
-      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
-    end
-
     it 'should respond with `201` if the code option is empty, nil or missing' do
       agent.options['code'] = ''
       out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")

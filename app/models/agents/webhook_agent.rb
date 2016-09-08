@@ -100,7 +100,7 @@ module Agents
         errors.add(:base, "Must specify a secret for 'Authenticating' requests")
       end
 
-      unless !(options['code'].presence && options['code'].blank?)
+      if options['code'].present? && options['code'].to_s !~ /\A\s*(\d+|\{.*)\s*\z/
         errors.add(:base, "Must specify a code for request responses")
       end
     end
