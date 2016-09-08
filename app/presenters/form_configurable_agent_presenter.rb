@@ -43,7 +43,7 @@ class FormConfigurableAgentPresenter < Decorator
         @view.concat(@view.text_field_tag "agent[options][#{attribute}]", value, html_options.merge(:class => "form-control #{@agent.send(:boolify, value) != nil ? 'hidden' : ''}"))
       end
     when :array, :string
-      @view.text_field_tag "agent[options][#{attribute}]", value, html_options.merge(:class => 'form-control')
+      @view.text_field_tag "agent[options][#{attribute}]", value, html_options.deep_merge(:class => 'form-control', data: {cache_response: data[:cache_response] != false})
     end
   end
 end
