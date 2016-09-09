@@ -6,14 +6,15 @@ class AgentPropagateJob < ActiveJob::Base
   end
 
   def self.can_enqueue?
-    if Rails.configuration.active_job.queue_adapter == :delayed_job &&
-       Delayed::Job.where(failed_at: nil, queue: 'propagation').count > 0
-      return false
-    elsif Rails.configuration.active_job.queue_adapter == :resque &&
-          (Resque.size('propagation') > 0 ||
-           Resque.workers.select { |w| w.job && w.job['queue'] && w.job['queue']['propagation'] }.count > 0)
-      return false
+    case queue_adapter.name # not using class since it would load adapter dependent gems
+    when 'ActiveJob::QueueAdapters::DelayedJobAdapter'
+      return Delayed::Job.where(failed_at: nil, queue: 'propagation').count == 0
+    when 'ActiveJob::QueueAdapters::ResqueAdapter'
+      return Resque.size('propagation') == 0 &&
+             Resque.workers.select { |w| w.job && w.job['queue'] && w.job['queue']['propagation'] }.count == 0
+    else
+      raise NotImplementedError, "unsupported adapter: #{queue_adapter}"
     end
-    true
   end
+
 end
