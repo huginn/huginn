@@ -59,6 +59,26 @@ describe Agents::WebhookAgent do
       expect(out).to eq(['Event Created', 201])
     end
 
+    it 'should respond with customized response code if configured with `code` option' do
+      agent.options['code'] = '200'
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 200])
+    end
+
+    it 'should respond with `201` if the code option is empty, nil or missing' do
+      agent.options['code'] = ''
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201])
+      
+      agent.options['code'] = nil
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201])
+
+      agent.options.delete('code')
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201])
+    end
+
     describe "receiving events" do
 
       context "default settings" do

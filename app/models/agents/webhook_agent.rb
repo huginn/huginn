@@ -26,6 +26,7 @@ module Agents
           For example, "post,get" will enable POST and GET requests. Defaults
           to "post".
         * `response` - The response message to the request. Defaults to 'Event Created'.
+        * `code` - The response code to the request. Defaults to '201'.
         * `recaptcha_secret` - Setting this to a reCAPTCHA "secret" key makes your agent verify incoming requests with reCAPTCHA.  Don't forget to embed a reCAPTCHA snippet including your "site" key in the originating form(s).
         * `recaptcha_send_remote_addr` - Set this to true if your server is properly configured to set REMOTE_ADDR to the IP address of each visitor (instead of that of a proxy server).
       MD
@@ -53,6 +54,9 @@ module Agents
       # check the verbs
       verbs = (interpolated['verbs'] || 'post').split(/,/).map { |x| x.strip.downcase }.select { |x| x.present? }
       return ["Please use #{verbs.join('/').upcase} requests only", 401] unless verbs.include?(method)
+      
+      # check the code
+      code = (interpolated['code'].presence || 201).to_i
 
       # check the reCAPTCHA response if required
       if recaptcha_secret = interpolated['recaptcha_secret'].presence
@@ -84,7 +88,7 @@ module Agents
         create_event(payload: payload)
       end
 
-      [response_message, 201]
+      [response_message, code]
     end
 
     def working?
@@ -94,6 +98,10 @@ module Agents
     def validate_options
       unless options['secret'].present?
         errors.add(:base, "Must specify a secret for 'Authenticating' requests")
+      end
+
+      if options['code'].present? && options['code'].to_s !~ /\A\s*(\d+|\{.*)\s*\z/
+        errors.add(:base, "Must specify a code for request responses")
       end
     end
 
