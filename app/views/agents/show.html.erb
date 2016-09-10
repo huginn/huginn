@@ -118,7 +118,7 @@
               <p>
                 <b>Event sources:</b>
                 <% if (agents = @agent.sources).length > 0 %>
-                  <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
+                  <%= agents.map { |agent| current_user == agent.user ? link_to(agent.name, agent_path(agent)) : agent.name }.to_sentence.html_safe %>
                 <% else %>
                   None
                 <% end %>
@@ -129,6 +129,11 @@
                 <%= yes_no @agent.propagate_immediately %>
               </p>
             <% end %>
+
+            <p>
+              <b>Shared:</b>
+              <%= yes_no @agent.shared %>
+            <p>
 
             <% if @agent.can_create_events? %>
               <p>

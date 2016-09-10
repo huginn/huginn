@@ -10,6 +10,7 @@
       <th><%= sortable_column 'last_receive_at', name: 'Last Event In' %></th>
       <th>Events Created</th>
       <th>Working?</th>
+      <th><%= sortable_column 'users.username', 'asc', name: 'User' %></th>
       <th></th>
     </tr>
 
@@ -19,13 +20,19 @@
           <%= agent_type_icon(agent, agents) %>
         </td>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <% if current_user == agent.user %>
           <%= link_to agent.name, agent_path(agent, return: (defined?(return_to) && return_to) || request.path) %>
+          <% else %>
+          <span><%= agent.name %></span>
+          <% end %>
           <br/>
           <span class='text-muted'><%= agent.short_type.titleize %></span>
+          <% if current_user == agent.user %>
           <% if agent.scenarios.present? %>
             <span>
               <%= scenario_links(agent) %>
             </span>
+          <% end %>
           <% end %>
         </td>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
@@ -67,13 +74,24 @@
           <% end %>
         </td>
         <td><%= working(agent) %></td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <% if current_user == agent.user %>
+            <span><%= agent.user.username %></span>
+          <% else %>
+            <%= link_to agent.user.username, edit_admin_user_path(agent.user, return: (defined?(return_to) && return_to) || request.path) %>
+          <% end %>
+        </td>
         <td>
-          <div class="btn-group">
-            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
-              <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
-            </button>
-            <%= render 'agents/action_menu', agent: agent, return_to: (defined?(return_to) && return_to) || request.path %>
-          </div>
+          <% if current_user == agent.user %>
+            <div class="btn-group">
+              <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
+              </button>
+              <%= render 'agents/action_menu', agent: agent, return_to: (defined?(return_to) && return_to) || request.path %>
+            </div>
+          <% else %>
+            <%#= link_to 'Become User', switch_user_admin_user_path(agent.user), class: "btn btn-sm btn-default btn-info" %>
+          <% end %>
         </td>
       </tr>
     <% end %>

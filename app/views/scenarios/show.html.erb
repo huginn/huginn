@@ -10,7 +10,7 @@
         <blockquote><%= markdown(@scenario.description) %></blockquote>
       <% end %>
 
-      <%= render 'agents/table', :return_to => scenario_path(@scenario) %>
+      <%= render partial: 'agents/table', locals: {agents: @agents}, :return_to => scenario_path(@scenario) %>
 
       <br/>
 

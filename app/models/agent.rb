@@ -24,17 +24,17 @@ class Agent < ActiveRecord::Base
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ['1 hour', 1.hour], ['6 hours', 6.hours], ["1 day", 1.day], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n.days] })]
 
-  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :source_ids, :receiver_ids, :scenario_ids, :keep_events_for, :propagate_immediately, :drop_pending_events
+  attr_accessible :options, :memory, :name, :type, :schedule, :controller_ids, :control_target_ids, :disabled, :shared, :source_ids, :receiver_ids, :scenario_ids, :keep_events_for, :propagate_immediately, :drop_pending_events
 
   json_serialize :options, :memory
 
   validates_presence_of :name, :user
   validates_inclusion_of :keep_events_for, :in => EVENT_RETENTION_SCHEDULES.map(&:last)
-  validates :sources, owned_by: :user_id
-  validates :receivers, owned_by: :user_id
   validates :controllers, owned_by: :user_id
   validates :control_targets, owned_by: :user_id
   validates :scenarios, owned_by: :user_id
+  validate :validate_sources
+  validate :validate_receivers
   validate :validate_schedule
   validate :validate_options
 
@@ -64,6 +64,8 @@ class Agent < ActiveRecord::Base
 
   scope :active,   -> { where(disabled: false, deactivated: false) }
   scope :inactive, -> { where(['disabled = ? OR deactivated = ?', true, true]) }
+  scope :shared, -> { where(shared: true) }
+  scope :available_to_user, lambda { |user| where("agents.user_id = ? or agents.shared = true", user.id) }
 
   scope :of_type, lambda { |type|
     type = case type
@@ -268,6 +270,21 @@ class Agent < ActiveRecord::Base
   
   private
   
+  def validate_sources
+    return if sources.all? do |s|
+      s.shared || (s.user_id == user_id)
+    end
+    errors.add(:sources,"must be owned by you or shared")
+  end
+
+  def validate_receivers
+    return if shared
+    return if receivers.all? do |r|
+      user_id == r.user_id
+    end
+    errors.add(:receivers,"must be owned by you or receive from a shared agent")
+  end
+
   def validate_schedule
     unless cannot_be_scheduled?
       errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)

@@ -5,7 +5,7 @@
         <h2><%= session[:original_admin_user_id].present? ? "#{current_user.username}’s Agents" : 'Your Agents' %></h2>
       </div>
 
-      <%= render 'agents/table' %>
+      <%= render partial: 'agents/table', locals: {agents: @agents} %>
 
       <br/>
 
@@ -14,6 +14,10 @@
         <%= link_to icon_tag('glyphicon-refresh') + ' Run event propagation', propagate_agents_path, method: 'post', class: "btn btn-default" %>
         <%= link_to icon_tag('glyphicon-random') + ' View diagram', diagram_path, class: "btn btn-default" %>
         <%= link_to icon_tag('glyphicon-adjust') + toggle_disabled_text, toggle_visibility_agents_path, method: :put, class: "btn btn-default visibility-enabler" %>
+      </div>
+
+      <div class="btn-group">
+        <%= link_to 'Shared Agents', shared_agents_path, class: "btn btn-default" %>
       </div>
     </div>
   </div>
