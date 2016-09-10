@@ -3,7 +3,6 @@ class SetCharsetForMysql < ActiveRecord::Migration
     @all_models ||= [
       Agent,
       AgentLog,
-      Contact,
       Event,
       Link,
       Scenario,
@@ -23,7 +22,6 @@ class SetCharsetForMysql < ActiveRecord::Migration
         all_models.each { |model|
           table_name = model.table_name
 
-          # `contacts` may not exist
           next unless connection.table_exists? table_name
 
           model.columns.each { |column|
