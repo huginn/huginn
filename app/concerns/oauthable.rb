@@ -3,7 +3,6 @@ module Oauthable
 
   included do |base|
     @valid_oauth_providers = :all
-    attr_accessible :service_id
     validates_presence_of :service_id
   end
 

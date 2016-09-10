@@ -60,4 +60,15 @@ class ApplicationController < ActionController::Base
       @basecamp_agent = current_user.agents.where(type: 'Agents::BasecampAgent').first
     end
   end
+
+  def agent_params
+    return {} unless params[:agent]
+    @agent_params ||= begin
+      options = params[:agent].delete(:options) if params[:agent][:options].present?
+      params[:agent].permit(:memory, :name, :type, :schedule, :disabled, :keep_events_for, :propagate_immediately, :drop_pending_events,
+                            source_ids: [], receiver_ids: [], scenario_ids: [], controller_ids: [], control_target_ids: []).tap do |agent_params|
+        agent_params[:options] = options if options
+      end
+    end
+  end
 end

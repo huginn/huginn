@@ -33,8 +33,8 @@ Huginn::Application.configure do
 
   config.action_mailer.raise_delivery_errors = true
 
-  # Raise exception on mass assignment protection for Active Record models
-  config.active_record.mass_assignment_sanitizer = :strict
+  # Raise exception for unpermitted parameters
+  config.action_controller.action_on_unpermitted_parameters = :raise
 
   # Randomize the order test cases are executed.
   config.active_support.test_order = :random

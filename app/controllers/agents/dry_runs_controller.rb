@@ -14,7 +14,7 @@ module Agents
     end
 
     def create
-      attrs = params[:agent] || {}
+      attrs = agent_params
       if agent = current_user.agents.find_by(id: params[:agent_id])
         # POST /agents/:id/dry_run
         if attrs.present?
