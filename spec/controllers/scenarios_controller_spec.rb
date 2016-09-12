@@ -116,7 +116,7 @@ describe ScenariosController do
     it "will not create Scenarios for other users" do
       expect {
         post :create, :scenario => valid_attributes(:user_id => users(:jane).id)
-      }.to raise_error(ActiveModel::MassAssignmentSecurity::Error)
+      }.to raise_error(ActionController::UnpermittedParameters)
     end
   end
 
@@ -137,6 +137,12 @@ describe ScenariosController do
       post :update, :id => scenarios(:bob_weather).to_param, :scenario => { :name => "" }
       expect(assigns(:scenario)).to have(1).errors_on(:name)
       expect(response).to render_template("edit")
+    end
+
+    it 'adds an agent to the scenario' do
+      expect {
+        post :update, :id => scenarios(:bob_weather).to_param, :scenario => { :name => "new_name", :public => "1", agent_ids: scenarios(:bob_weather).agent_ids + [agents(:bob_website_agent).id] }
+      }.to change { scenarios(:bob_weather).agent_ids.length }.by(1)
     end
   end
 

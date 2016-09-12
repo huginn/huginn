@@ -280,6 +280,13 @@ describe AgentsController do
       expect(response).to render_template("edit")
     end
 
+    it 'does not allow to modify the agents user_id' do
+      sign_in users(:bob)
+      expect {
+        post :update, :id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:user_id => users(:jane).id)
+      }.to raise_error(ActionController::UnpermittedParameters)
+    end
+
     describe "redirecting back" do
       before do
         sign_in users(:bob)

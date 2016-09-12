@@ -12,11 +12,6 @@ class User < ActiveRecord::Base
   # This is in addition to a real persisted field like 'username'
   attr_accessor :login
 
-  ACCESSIBLE_ATTRIBUTES = [ :email, :username, :login, :password, :password_confirmation, :remember_me, :invitation_code ]
-
-  attr_accessible *ACCESSIBLE_ATTRIBUTES
-  attr_accessible *(ACCESSIBLE_ATTRIBUTES + [:admin]), :as => :admin
-
   validates_presence_of :username
   validates :username, uniqueness: { case_sensitive: false }
   validates_format_of :username, :with => /\A[a-zA-Z0-9_-]{3,15}\Z/, :message => "can only contain letters, numbers, underscores, and dashes, and must be between 3 and 15 characters in length."

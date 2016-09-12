@@ -69,7 +69,7 @@ describe UserCredentialsController do
     it "will not create UserCredentials for other users" do
       expect {
         post :create, :user_credential => valid_attributes(:user_id => users(:jane).id)
-      }.to raise_error(ActiveModel::MassAssignmentSecurity::Error)
+      }.to raise_error(ActionController::UnpermittedParameters)
     end
   end
 

@@ -160,7 +160,7 @@ class AgentsController < ApplicationController
     @agent = current_user.agents.find(params[:id])
 
     respond_to do |format|
-      if @agent.update_attributes(params[:agent])
+      if @agent.update_attributes(agent_params)
         format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
@@ -220,9 +220,9 @@ class AgentsController < ApplicationController
   end
 
   def build_agent
-    @agent = Agent.build_for_type(params[:agent].delete(:type),
+    @agent = Agent.build_for_type(agent_params[:type],
                                   current_user,
-                                  params[:agent])
+                                  agent_params.except(:type))
   end
 
   def initialize_presenter

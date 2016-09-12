@@ -1,6 +1,4 @@
 class Service < ActiveRecord::Base
-  attr_accessible :provider, :name, :token, :secret, :refresh_token, :expires_at, :global, :options, :uid
-
   serialize :options, Hash
 
   belongs_to :user, :inverse_of => :services

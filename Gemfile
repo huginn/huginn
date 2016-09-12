@@ -80,7 +80,6 @@ unless Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.5.0')
   exit 1
 end
 
-gem 'protected_attributes', '~>1.0.8' # This must be loaded before some other gems, like delayed_job.
 gem 'ace-rails-ap', '~> 2.0.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'

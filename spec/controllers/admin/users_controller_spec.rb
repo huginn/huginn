@@ -15,7 +15,7 @@ describe Admin::UsersController do
       it 'does not import the default scenario' do
         stub(DefaultScenarioImporter).import(is_a(User)) { fail "Should not attempt import" }
         sign_in users(:jane)
-        post :create, :user => {}
+        post :create, :user => {username: 'user'}
       end
     end
   end
