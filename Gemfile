@@ -38,7 +38,8 @@ gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
 gem 'hypdf', '~> 1.0.10'          # PDFInfoAgent
 
 # Weibo Agents
-gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
+# FIXME needs to loosen omniauth dependency
+#gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
 
 # GoogleCalendarPublishAgent
 gem "google-api-client", require: 'google/api_client'
@@ -46,11 +47,11 @@ gem "google-api-client", require: 'google/api_client'
 # Twitter Agents
 gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
-gem 'omniauth-twitter'
+gem 'omniauth-twitter', '~> 1.2.1'
 
 # Tumblr Agents
 gem 'tumblr_client', github: 'tumblr/tumblr_client', branch: 'master'  # '>= 0.8.5'
-gem 'omniauth-tumblr'
+gem 'omniauth-tumblr', '~> 1.2'
 
 # Dropbox Agents
 gem 'dropbox-api'
@@ -71,7 +72,7 @@ gem 'aws-sdk-core', '~> 2.2.15'
 
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
-gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
+gem 'omniauth-wunderlist'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
@@ -83,11 +84,11 @@ end
 gem 'ace-rails-ap', '~> 2.0.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
-gem 'coffee-rails', '~> 4.1.1'
+gem 'coffee-rails', '~> 4.2'
 gem 'daemons', '~> 1.1.9'
 gem 'delayed_job', '~> 4.1.0'
 gem 'delayed_job_active_record', github: 'collectiveidea/delayed_job_active_record', branch: 'master'
-gem 'devise', '~> 3.5.4'
+gem 'devise','~> 4.2.0'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware', github: 'lostisland/faraday_middleware', branch: 'master'  # '>= 0.10.1'
@@ -100,7 +101,7 @@ gem 'geokit', '~> 1.8.4'
 gem 'geokit-rails', '~> 2.0.1'
 gem 'httparty', '~> 0.13'
 gem 'httmultiparty', '~> 0.3.16'
-gem 'jquery-rails', '~> 3.1.3'
+gem 'jquery-rails', '~> 4.2.1'
 gem 'huginn_agent', '~> 0.4.0'
 gem 'json', '~> 1.8.1'
 gem 'jsonpathv2', '~> 0.0.8'
@@ -110,8 +111,8 @@ gem 'liquid', '~> 3.0.3'
 gem 'mini_magick'
 gem 'multi_xml'
 gem 'nokogiri', '1.6.8'
-gem 'omniauth'
-gem 'rails', '4.2.7.1'
+gem 'omniauth', '~> 1.3.1'
+gem 'rails', '~> 5.0.0.1'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'sass-rails',   '~> 5.0.6'
 gem 'select2-rails', '~> 3.5.4'
@@ -124,12 +125,12 @@ gem 'uglifier', '~> 2.7.2'
 group :development do
   gem 'better_errors', '~> 1.1'
   gem 'binding_of_caller'
-  gem 'quiet_assets'
   gem 'guard', '~> 2.13.0'
   gem 'guard-livereload', '~> 2.5.1'
   gem 'guard-rspec', '~> 4.6.4'
   gem 'rack-livereload', '~> 0.3.16'
-  gem 'letter_opener_web'
+  gem 'letter_opener_web', '~> 1.3.0'
+  gem 'web-console'
 
   gem 'capistrano', '~> 3.4.0'
   gem 'capistrano-rails', '~> 1.1'
@@ -138,6 +139,7 @@ group :development do
   if_true(ENV['SPRING']) do
     gem 'spring-commands-rspec', '~> 1.0.4'
     gem 'spring', '~> 1.6.3'
+    gem 'spring-watcher-listen', '~> 2.0.0'
   end
 
   group :test do
@@ -150,8 +152,9 @@ group :development do
     gem 'rr'
     gem 'rspec', '~> 3.5'
     gem 'rspec-collection_matchers', '~> 1.1.0'
-    gem 'rspec-rails', '~> 3.5.1'
-    gem 'rspec-html-matchers', '~> 0.7'
+    gem 'rspec-rails', '~> 3.5.2'
+    gem 'rspec-html-matchers', '~> 0.8'
+    gem 'rails-controller-testing'
     gem 'shoulda-matchers'
     gem 'vcr'
     gem 'webmock', '~> 1.17.4', require: false
@@ -160,8 +163,7 @@ group :development do
 end
 
 group :production do
-  gem 'rack', '> 1.5.0'
-  gem 'unicorn', '~> 4.9.0'
+  gem 'unicorn', '~> 5.1.0'
 end
 
 # Platform requirements.

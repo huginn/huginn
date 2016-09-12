@@ -13,8 +13,10 @@ Huginn::Application.configure do
   config.eager_load = false
 
   # Configure static asset server for tests with Cache-Control for performance
-  config.serve_static_files = true
-  config.static_cache_control = "public, max-age=3600"
+  config.public_file_server.enabled = true
+  config.public_file_server.headers = {
+    'Cache-Control' => 'public, max-age=3600'
+  }
 
   # Show full error reports and disable caching
   config.consider_all_requests_local       = true
@@ -25,6 +27,7 @@ Huginn::Application.configure do
 
   # Disable request forgery protection in test environment
   config.action_controller.allow_forgery_protection = false
+  config.action_mailer.perform_caching = false
 
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
@@ -35,9 +38,6 @@ Huginn::Application.configure do
 
   # Raise exception for unpermitted parameters
   config.action_controller.action_on_unpermitted_parameters = :raise
-
-  # Randomize the order test cases are executed.
-  config.active_support.test_order = :random
 
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr

@@ -24,18 +24,17 @@ matrix:
     - env: DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
     - env: RSPEC_TASK=spec:features
   include:
-    - rvm: 2.3.0
+    - rvm: 2.3.1
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - rvm: 2.3.0
+    - rvm: 2.3.1
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
-    - rvm: 2.3.0
+    - rvm: 2.3.1
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
-    - rvm: 2.3.0
+    - rvm: 2.3.1
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
 rvm:
-- 2.1
 - 2.2
-- 2.3.0
+- 2.3.1
 cache: bundler
 bundler_args: --without development production
 before_install:
