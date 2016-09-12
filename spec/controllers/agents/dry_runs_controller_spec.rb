@@ -93,7 +93,7 @@ describe Agents::DryRunsController do
       agent.save!
       url_from_event = "http://xkcd.com/?from_event=1".freeze
       expect {
-        post :create, params: {agent_id: agent, event: { url: url_from_event }}
+        post :create, params: {agent_id: agent, event: { url: url_from_event }.to_json}
       }.not_to change {
         [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
       }

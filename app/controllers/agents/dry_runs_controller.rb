@@ -8,6 +8,8 @@ module Agents
                 elsif params[:source_ids]
                   Event.where(agent_id: current_user.agents.where(id: params[:source_ids]).pluck(:id))
                        .order("id DESC").limit(5)
+                else
+                  []
                 end
 
       render layout: false

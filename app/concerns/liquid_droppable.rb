@@ -76,4 +76,10 @@ module LiquidDroppable
       URIDrop.new(self)
     end
   end
+
+  class ::ActiveRecord::Associations::CollectionProxy
+    def to_liquid
+      self.to_a.to_liquid
+    end
+  end
 end

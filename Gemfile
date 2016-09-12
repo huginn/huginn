@@ -39,7 +39,7 @@ gem 'hypdf', '~> 1.0.10'          # PDFInfoAgent
 
 # Weibo Agents
 # FIXME needs to loosen omniauth dependency
-#gem 'weibo_2', github: 'cantino/weibo_2', branch: 'master'
+gem 'weibo_2', github: 'dsander/weibo_2', branch: 'master'
 
 # GoogleCalendarPublishAgent
 gem "google-api-client", require: 'google/api_client'

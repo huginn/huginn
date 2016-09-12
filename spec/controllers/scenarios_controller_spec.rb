@@ -142,7 +142,7 @@ describe ScenariosController do
     it 'adds an agent to the scenario' do
       expect {
         post :update, params: {:id => scenarios(:bob_weather).to_param, :scenario => { :name => "new_name", :public => "1", agent_ids: scenarios(:bob_weather).agent_ids + [agents(:bob_website_agent).id] }}
-      }.to change { scenarios(:bob_weather).agent_ids.length }.by(1)
+      }.to change { scenarios(:bob_weather).reload.agent_ids.length }.by(1)
     end
   end
 

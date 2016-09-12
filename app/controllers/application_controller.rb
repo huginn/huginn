@@ -72,6 +72,7 @@ class ApplicationController < ActionController::Base
       params[:agent].permit(:memory, :name, :type, :schedule, :disabled, :keep_events_for, :propagate_immediately, :drop_pending_events, :service_id,
                             source_ids: [], receiver_ids: [], scenario_ids: [], controller_ids: [], control_target_ids: []).tap do |agent_params|
         agent_params[:options] = options if options
+        agent_params[:options].permit! if agent_params[:options].respond_to?(:permit!)
       end
     end
   end

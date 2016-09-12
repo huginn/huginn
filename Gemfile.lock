@@ -18,6 +18,17 @@ GIT
       delayed_job (>= 3.0, < 5)
 
 GIT
+  remote: git://github.com/dsander/weibo_2.git
+  revision: e5b77f21a7e9a666b582c48e16b1e96fca198cf8
+  branch: master
+  specs:
+    weibo_2 (0.1.7)
+      hashie (~> 3)
+      multi_json (~> 1)
+      oauth2 (~> 1)
+      rest-client (~> 1.8)
+
+GIT
   remote: git://github.com/lostisland/faraday_middleware.git
   revision: c5836ae55857272732b33eb0e0a98d60e995a376
   branch: master
@@ -683,6 +694,7 @@ DEPENDENCIES
   vcr
   web-console
   webmock (~> 1.17.4)
+  weibo_2!
   wunderground (~> 1.2.0)
   xmpp4r (~> 0.5.6)
 
