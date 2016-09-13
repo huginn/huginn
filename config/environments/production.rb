@@ -18,6 +18,16 @@ Huginn::Application.configure do
   # Apache or NGINX already handles this.
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
 
+  if ENV["RAILS_LOG_TO_STDOUT"].present? ||
+       ENV['ON_HEROKU'] ||
+       ENV['HEROKU_POSTGRESQL_ROSE_URL'] ||
+       ENV['HEROKU_POSTGRESQL_GOLD_URL'] ||
+       File.read(File.join(File.dirname(__FILE__), '../../Procfile')) =~ /intended for Heroku/
+    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger = ActiveSupport::TaggedLogging.new(logger)
+  end
+
   # Compress JavaScripts and CSS
   config.assets.js_compressor  = :uglifier
   config.assets.css_compressor = :sass

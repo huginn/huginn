@@ -183,10 +183,6 @@ ENV['DATABASE_ADAPTER'] ||=
     'mysql2'
   end
 
-if_true(on_heroku) do
-  gem 'rails_12factor', group: :production
-end
-
 if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
   gem 'pg', '~> 0.18.3'
 end
