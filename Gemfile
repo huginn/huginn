@@ -95,17 +95,15 @@ gem 'faraday_middleware', github: 'lostisland/faraday_middleware', branch: 'mast
 gem 'feed-normalizer'
 gem 'font-awesome-sass', '~> 4.3.2'
 gem 'foreman', '~> 0.63.0'
-# geokit-rails doesn't work with geokit 1.8.X but it specifies ~> 1.5
-# in its own Gemfile.
 gem 'geokit', '~> 1.8.4'
-gem 'geokit-rails', '~> 2.0.1'
+gem 'geokit-rails', '~> 2.2.0'
 gem 'httparty', '~> 0.13'
 gem 'httmultiparty', '~> 0.3.16'
 gem 'jquery-rails', '~> 4.2.1'
 gem 'huginn_agent', '~> 0.4.0'
 gem 'json', '~> 1.8.1'
 gem 'jsonpathv2', '~> 0.0.8'
-gem 'kaminari', '~> 0.16.1'
+gem 'kaminari', '~> 0.16.2'
 gem 'kramdown', '~> 1.3.3'
 gem 'liquid', '~> 3.0.3'
 gem 'mini_magick'
@@ -138,7 +136,7 @@ group :development do
 
   if_true(ENV['SPRING']) do
     gem 'spring-commands-rspec', '~> 1.0.4'
-    gem 'spring', '~> 1.6.3'
+    gem 'spring', '~> 1.7.2'
     gem 'spring-watcher-listen', '~> 2.0.0'
   end
 

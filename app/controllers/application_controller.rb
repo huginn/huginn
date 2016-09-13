@@ -12,10 +12,8 @@ class ApplicationController < ActionController::Base
     render template: 'application/undefined_agents'
   end
 
-  def redirect_back(fallback_path, *args)
-    redirect_to :back, *args
-  rescue ActionController::RedirectBackError
-    redirect_to fallback_path, *args
+  def redirect_back(fallback_path, **args)
+    super(fallback_location: fallback_path, **args)
   end
 
   protected
