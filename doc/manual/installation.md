@@ -110,7 +110,7 @@ Create a user for Huginn do not type the `mysql>`, this is part of the prompt. C
 
 Ensure you can use the InnoDB engine which is necessary to support long indexes
 
-    mysql> SET storage_engine=INNODB;
+    mysql> SET default_storage_engine=INNODB;
 
     # If this fails, check your MySQL config files (e.g. `/etc/mysql/*.cnf`, `/etc/mysql/conf.d/*`)
     # for the setting "innodb = off"
@@ -134,7 +134,7 @@ You should now see `ERROR 1049 (42000): Unknown database 'huginn_production'` wh
 You are done installing the database and can go back to the rest of the installation.
 
 
-## 6. Huginn
+## 5. Huginn
 
 ### Clone the Source
 
@@ -264,7 +264,7 @@ Export the init scripts:
 
     sudo bundle exec rake production:status
 
-## 7. Nginx
+## 6. Nginx
 
 **Note:** Nginx is the officially supported web server for Huginn. If you cannot or do not want to use Nginx as your web server, the wiki has a page on how to configure [apache](https://github.com/cantino/huginn/wiki/Apache-Huginn-configuration).
 
