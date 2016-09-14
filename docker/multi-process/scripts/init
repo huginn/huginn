@@ -43,7 +43,7 @@ grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
 
 eval "echo RAILS_ENV=${RAILS_ENV}" >> .env
 eval "echo START_MYSQL=${START_MYSQL}" >> .env
-echo "ON_HEROKU=true" >> .env
+echo "RAILS_LOG_TO_STDOUT=true" >> .env
 echo "RAILS_SERVE_STATIC_FILES=true" >> .env
 
 chmod ugo+r /app/.env
