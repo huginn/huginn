@@ -338,7 +338,7 @@ GEM
     net-ftp-list (3.2.8)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-ssh (2.9.2)
+    net-ssh (3.0.2)
     netrc (0.10.3)
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
