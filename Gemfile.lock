@@ -1,4 +1,13 @@
 GIT
+  remote: git://github.com/amatsuda/kaminari.git
+  revision: abbf93d557208ee1d0b612c612cd079f86ed54f4
+  branch: 0-17-stable
+  specs:
+    kaminari (0.17.0)
+      actionpack (>= 3.0.0)
+      activesupport (>= 3.0.0)
+
+GIT
   remote: git://github.com/cantino/twitter-stream.git
   revision: f7e7edb0bae013bffabf3598e7147773d9fd370f
   branch: huginn
@@ -288,9 +297,6 @@ GEM
     jsonpathv2 (0.0.8)
       multi_json
     jwt (1.4.1)
-    kaminari (0.16.3)
-      actionpack (>= 3.0.0)
-      activesupport (>= 3.0.0)
     kgio (2.10.0)
     kramdown (1.3.3)
     launchy (2.4.2)
@@ -633,7 +639,7 @@ DEPENDENCIES
   jquery-rails (~> 4.2.1)
   json (~> 1.8.1)
   jsonpathv2 (~> 0.0.8)
-  kaminari (~> 0.16.2)
+  kaminari!
   kramdown (~> 1.3.3)
   letter_opener_web (~> 1.3.0)
   liquid (~> 3.0.3)
