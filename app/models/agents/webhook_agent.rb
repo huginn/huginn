@@ -88,7 +88,7 @@ module Agents
         create_event(payload: payload)
       end
 
-      [response_message, code]
+      [interpolated(params)['response'] || 'Event Created', code]
     end
 
     def working?
@@ -107,10 +107,6 @@ module Agents
 
     def payload_for(params)
       Utils.value_at(params, interpolated['payload_path']) || {}
-    end
-
-    def response_message
-      interpolated['response'] || 'Event Created'
     end
   end
 end
