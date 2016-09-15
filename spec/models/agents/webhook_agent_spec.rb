@@ -49,6 +49,12 @@ describe Agents::WebhookAgent do
       expect(out).to eq(['', 201])
     end
 
+    it 'should respond with interpolated response message if configured with `response` option' do
+      agent.options['response'] = '{{some_key.people[1].name}}'
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['jon', 201])
+    end
+
     it 'should respond with `Event Created` if the response option is nil or missing' do
       agent.options['response'] = nil
       out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
