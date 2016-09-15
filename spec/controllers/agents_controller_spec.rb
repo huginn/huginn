@@ -205,7 +205,7 @@ describe AgentsController do
 
     it "creates Agents and accepts specifing a target agent" do
       sign_in users(:bob)
-      attributes = valid_attributes
+      attributes = valid_attributes(service_id: 1)
       attributes[:receiver_ids] = attributes[:source_ids]
       expect {
         expect {
