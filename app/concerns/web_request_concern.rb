@@ -113,6 +113,7 @@ module WebRequestConcern
       unless boolify(interpolated['disable_redirect_follow'])
         builder.use FaradayMiddleware::FollowRedirects
       end
+      builder.request :multipart
       builder.request :url_encoded
 
       if boolify(interpolated['disable_url_encoding'])
