@@ -60,6 +60,10 @@ class User < ActiveRecord::Base
     super && active?
   end
 
+  def has_scenarios?
+    scenario_count > 0
+  end
+
   def inactive_message
     active? ? super : :deactivated_account
   end

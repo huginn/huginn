@@ -1,20 +1,15 @@
 <% load_ace_editor! %>
 
-<% if @agent.errors.any? %>
+<% if @form.errors? %>
   <div class="row well model-errors">
-    <h2><%= pluralize(@agent.errors.count, "error") %> prohibited this Agent from being saved:</h2>
-    <% @agent.errors.full_messages.each do |msg| %>
-      <p class='text-warning'><%= msg %></p>
+    <h2><%= pluralize(@form.number_of_errors, "error") %> prohibited this Agent from being saved:</h2>
+    <% @form.error_messages.each do |msg| %>
+      <p class="text-warning"><%= msg %></p>
     <% end %>
   </div>
 <% end %>
 
-<%= form_for(@agent,
-             as: :agent,
-             url: @agent.new_record? ? agents_path : agent_path(@agent),
-             method: @agent.new_record? ? "POST" : "PUT",
-             html: { class: 'agent-form' }) do |f| %>
-
+<%= form_for @form.agent, @form.attrs do |f| %>
   <%= hidden_field_tag :return, params[:return] %>
 
   <div class="row">
@@ -22,10 +17,10 @@
       <div class="row">
 
         <div class="col-md-12">
-          <% if @agent.new_record? %>
+          <% if @form.agent_type_changeable? %>
             <div class="form-group type-select">
               <%= f.label :type %>
-              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [type.name.gsub(/^.*::/, '').underscore.humanize.titleize, type, {title: h(Agent.build_for_type(type.name,current_user,{}).html_description.lines.first.strip)}] }, @agent.type), {}, :class => 'form-control' %>
+              <%= f.select(*@form.agent_type_select) %>
             </div>
           <% end %>
         </div>
@@ -34,64 +29,57 @@
           <div class="col-md-12">
             <div class="form-group">
               <%= f.label :name %>
-              <%= f.text_field :name, :class => 'form-control' %>
+              <%= f.text_field :name, :class => "form-control" %>
             </div>
 
-            <div class='oauthable-form'>
-              <%= render partial: 'oauth_dropdown', locals: { agent: @agent } %>
+            <div class="oauthable-form">
+              <%= render partial: "oauth_dropdown", locals: { agent: @form.agent } %>
             </div>
 
             <div class="form-group">
-              <%= f.label :schedule, :class => 'control-label' %>
-              <div class="schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
+              <%= f.label :schedule, :class => "control-label" %>
+              <div class="schedule-region" data-can-be-scheduled="<%= @form.schedulable? %>">
                 <div class="can-be-scheduled">
-                  <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'form-control' %>
+                  <%= f.select(*@form.schedule_select) %>
                 </div>
-                <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
+                <span class="cannot-be-scheduled text-info">This type of Agent cannot be scheduled.</span>
               </div>
             </div>
 
-            <div class="controller-region" data-has-controllers="<%= !@agent.controllers.empty? %>">
+            <div class="controller-region" data-has-controllers="<%= !@form.controllers? %>">
               <div class="form-group">
                 <%= f.label :controllers %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run or controlled by these user-defined Agents."></span>
                 <div class="controller-list">
-                  <%= agent_controllers(@agent) || 'None' %>
+                  <%= agent_controllers(@form.agent) || "None" %>
                 </div>
               </div>
             </div>
 
-            <div class="control-link-region" data-can-control-other-agents="<%= @agent.can_control_other_agents? %>">
+            <div class="control-link-region" data-can-control-other-agents="<%= @form.controls_others? %>">
               <div class="can-control-other-agents">
                 <div class="form-group">
                   <%= f.label :control_targets %>
-                  <%= f.select(:control_target_ids,
-                               options_for_select(current_user.agents.map {|s| [s.name, s.id] },
-                                                  @agent.control_target_ids),
-                               {}, { multiple: true, size: 5, class: 'select2-linked-tags form-control', data: {url_prefix: '/agents'}}) %>
+                  <%= f.select(*@form.control_targets_select) %>
                 </div>
               </div>
             </div>
 
-            <div class='event-related-region' data-can-create-events="<%= @agent.can_create_events? %>">
+            <div class="event-related-region" data-can-create-events="<%= @form.creates_events? %>">
               <div class="form-group">
                 <%= f.label :keep_events_for, "Keep events" %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="In order to conserve disk space, you can choose to have events created by this Agent expire after a certain period of time.  Make sure you keep them long enough to allow any subsequent Agents to make use of them."></span>
-                <%= f.select :keep_events_for, options_for_select(Agent::EVENT_RETENTION_SCHEDULES, @agent.keep_events_for), {}, :class => 'form-control' %>
+                <%= f.select(*@form.keep_events_select) %>
               </div>
             </div>
 
             <div class="form-group">
               <%= f.label :sources %>
               <span class="glyphicon glyphicon-question-sign hover-help" data-content="This Agent will receive events from the selected Agents."></span>
-              <div class="link-region" data-can-receive-events="<%= @agent.can_receive_events? %>">
-                <% eventSources = (current_user.agents - [@agent]).find_all { |a| a.can_create_events? } %>
-                <%= f.select(:source_ids,
-                             options_for_select(eventSources.map {|s| [s.name, s.id] },
-                                                @agent.source_ids),
-                             {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/agents'} }) %>
-                <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
-                <%= f.label :propagate_immediately, :class => 'propagate-immediately' do %>Propagate immediately
+              <div class="link-region" data-can-receive-events="<%= @form.receives_events? %>">
+                <%= f.select(*@form.event_sources_select) %>
+                <span class="cannot-receive-events text-info">This type of Agent cannot receive events.</span>
+                <%= f.label :propagate_immediately, :class => "propagate-immediately" do %>Propagate immediately
                   <%= f.check_box :propagate_immediately %>
                   &nbsp;
                   <span class="glyphicon glyphicon-question-sign hover-help" data-content="Normally, Huginn moves Events from source Agents to receiving Agents once per minute. Checking this option will cause Events created by this Agent's sources to be received immediately. This can use more CPU resources, but will decrease the time between Event creation and being received by this Agent."></span>
@@ -103,29 +91,23 @@
               <%= f.label :receivers %>
               <span class="glyphicon glyphicon-question-sign hover-help" data-content="Events created by this Agent will be sent to the selected Agents."></span>
               <div class="event-related-region">
-                <% eventTargets = (current_user.agents - [@agent]).find_all { |a| a.can_receive_events? } %>
-                <%= f.select(:receiver_ids,
-                             options_for_select(eventTargets.map {|s| [s.name, s.id] },
-                                                @agent.receiver_ids),
-                             {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/agents'} }) %>
-                <span class='cannot-create-events text-info'>This type of Agent cannot create events.</span>
+                <%= f.select(*@form.event_targets_select) %>
+                <span class="cannot-create-events text-info">This type of Agent cannot create events.</span>
               </div>
             </div>
 
-            <% if current_user.scenario_count > 0 %>
+            <% if @form.has_scenarios? %>
               <div class="form-group">
                 <%= f.label :scenarios %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="Use Scenarios to group sets of Agents, both for organization, and to make them easy to export and share."></span>
-                <%= f.select(:scenario_ids,
-                             options_for_select(current_user.scenarios.pluck(:name, :id), @agent.scenario_ids),
-                             {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/scenarios'} }) %>
+                <%= f.select(*@form.scenarios_select) %>
               </div>
             <% end %>
 
           </div>
 
           <div class="col-md-12 agent-options">
-            <%= render partial: 'options', locals: { agent: @agent } %>
+            <%= render partial: "options", locals: { agent: @form.agent } %>
           </div>
         </div>
       </div>
@@ -134,15 +116,15 @@
     <div class="col-md-6">
       <div class="row">
         <div class="col-md-12">
-          <div class='well description'>
-            <%= @agent.html_description unless @agent.new_record? %>
+          <div class="well description">
+            <%= @form.html_description %>
           </div>
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-12">
-          <div class='well event-descriptions' style='display: none'></div>
+          <div class="well event-descriptions" style="display: none"></div>
         </div>
       </div>
     </div>
