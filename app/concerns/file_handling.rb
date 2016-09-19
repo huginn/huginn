@@ -5,11 +5,19 @@ module FileHandling
     { file_pointer: { file: file, agent_id: id } }
   end
 
+  def has_file_pointer?(event)
+    event.payload['file_pointer'] &&
+      event.payload['file_pointer']['file'] &&
+      event.payload['file_pointer']['agent_id']
+  end
+
   def get_io(event)
-    return nil unless event.payload['file_pointer'] &&
-                      event.payload['file_pointer']['file'] &&
-                      event.payload['file_pointer']['agent_id']
+    return nil unless has_file_pointer?(event)
     event.user.agents.find(event.payload['file_pointer']['agent_id']).get_io(event.payload['file_pointer']['file'])
+  end
+
+  def get_upload_io(event)
+    Faraday::UploadIO.new(get_io(event), MIME::Types.type_for(File.basename(event.payload['file_pointer']['file'])).first.try(:content_type))
   end
 
   def emitting_file_handling_agent_description
