@@ -113,4 +113,8 @@ module ApplicationHelper
 
     @highlighted_ranges.any? { |range| range.cover?(id) }
   end
+
+  def agent_type_to_human(type)
+    type.gsub(/^.*::/, '').underscore.humanize.titleize
+  end
 end

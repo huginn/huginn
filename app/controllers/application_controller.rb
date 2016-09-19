@@ -6,6 +6,12 @@ class ApplicationController < ActionController::Base
 
   helper :all
 
+  rescue_from 'ActiveRecord::SubclassNotFound' do
+    @undefined_agent_types = current_user.undefined_agent_types
+
+    render template: 'application/undefined_agents'
+  end
+
   def redirect_back(fallback_path, *args)
     redirect_to :back, *args
   rescue ActionController::RedirectBackError

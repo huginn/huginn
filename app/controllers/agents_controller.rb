@@ -208,6 +208,12 @@ class AgentsController < ApplicationController
     render json: @agent.complete_option(params[:attribute])
   end
 
+  def destroy_undefined
+    current_user.undefined_agents.destroy_all
+
+    redirect_back "All undefined Agents have been deleted."
+  end
+
   protected
 
   # Sanitize params[:return] to prevent open redirect attacks, a common security issue.

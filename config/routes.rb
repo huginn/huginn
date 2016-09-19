@@ -15,6 +15,7 @@ Huginn::Application.routes.draw do
       get :event_descriptions
       post :validate
       post :complete
+      delete :undefined, action: :destroy_undefined
     end
 
     resources :logs, :only => [:index] do

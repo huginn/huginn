@@ -75,4 +75,19 @@ class User < ActiveRecord::Base
   def requires_no_invitation_code?
     !!@requires_no_invitation_code
   end
+
+  def undefined_agent_types
+    agents.reorder('').group(:type).pluck(:type).select do |type|
+      begin
+        type.constantize
+        false
+      rescue NameError
+        true
+      end
+    end
+  end
+
+  def undefined_agents
+    agents.where(type: undefined_agent_types).select('id, schedule, type as undefined')
+  end
 end
