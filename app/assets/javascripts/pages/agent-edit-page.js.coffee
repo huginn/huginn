@@ -36,7 +36,7 @@ class @AgentEditPage
       @handleTypeChange(true)
 
       # Update the dropdown to match agent description as well as agent name
-      $('#agent_type').select2
+      $('select#agent_type').select2
         width: 'resolve'
         formatResult: formatAgentForSelect
         escapeMarkup: (m) ->
