@@ -25,7 +25,7 @@
           <% if @agent.new_record? %>
             <div class="form-group type-select">
               <%= f.label :type %>
-              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [type.name.gsub(/^.*::/, '').underscore.humanize.titleize, type, {title: h(Agent.build_for_type(type.name,current_user,{}).html_description.lines.first.strip)}] }, @agent.type), {}, :class => 'form-control' %>
+              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name,current_user,{}).html_description.lines.first.strip)}] }, @agent.type), {}, :class => 'form-control' %>
             </div>
           <% end %>
         </div>

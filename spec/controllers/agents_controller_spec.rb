@@ -434,4 +434,18 @@ describe AgentsController do
       expect(agent.reload.memory).to eq({ "test" => 42})
     end
   end
+
+  describe 'DELETE undefined' do
+    it 'removes an undefined agent from the database' do
+      sign_in users(:bob)
+      agent = agents(:bob_website_agent)
+      agent.update_attribute(:type, 'Agents::UndefinedAgent')
+      agent2 = agents(:jane_website_agent)
+      agent2.update_attribute(:type, 'Agents::UndefinedAgent')
+
+      expect {
+        delete :destroy_undefined
+      }.to change { Agent.count }.by(-1)
+    end
+  end
 end
