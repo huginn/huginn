@@ -139,6 +139,12 @@ bob_basecamp_agent:
   service: generic
   guid: <%= SecureRandom.hex %>
 
+bob_csv_agent:
+  type: Agents::CsvAgent
+  user: bob
+  name: "Bob's CsvAgent"
+  guid: <%= SecureRandom.hex %>
+
 jane_basecamp_agent:
   type: Agents::BasecampAgent
   user: jane
