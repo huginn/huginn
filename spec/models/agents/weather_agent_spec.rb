@@ -19,6 +19,16 @@ describe Agents::WeatherAgent do
   it "creates a valid agent" do
     expect(agent).to be_valid
   end
+
+  it "is valid with put-your-key-here or your-key" do
+    agent.options['api_key'] = 'put-your-key-here'
+    expect(agent).to be_valid
+    expect(agent.working?).to be_falsey
+
+    agent.options['api_key'] = 'your-key'
+    expect(agent).to be_valid
+    expect(agent.working?).to be_falsey
+  end
   
   describe "#service" do
     it "doesn't have a Service object attached" do

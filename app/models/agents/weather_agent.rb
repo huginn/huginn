@@ -57,11 +57,11 @@ module Agents
     default_schedule "8pm"
 
     def working?
-      event_created_within?((interpolated['expected_update_period_in_days'].presence || 2).to_i) && !recent_error_logs?
+      event_created_within?((interpolated['expected_update_period_in_days'].presence || 2).to_i) && !recent_error_logs? && key_setup?
     end
 
     def key_setup?
-      interpolated['api_key'].present? && interpolated['api_key'] != "your-key"
+      interpolated['api_key'].present? && interpolated['api_key'] != "your-key" && interpolated['api_key'] != "put-your-key-here"
     end
 
     def default_options
@@ -102,7 +102,7 @@ module Agents
     def validate_options
       errors.add(:base, "service must be set to 'forecastio' or 'wunderground'") unless ["forecastio", "wunderground"].include?(weather_provider)
       errors.add(:base, "location is required") unless location.present?
-      errors.add(:base, "api_key is required") unless key_setup?
+      errors.add(:base, "api_key is required") unless interpolated['api_key'].present?
       errors.add(:base, "which_day selection is required") unless which_day.present?
     end
 
