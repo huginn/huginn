@@ -25,7 +25,7 @@ module Utils
     begin
       URI(uri)
     rescue URI::Error
-      URI(uri.to_s.gsub(/[^\-_.!~*'()a-zA-Z\d;\/?:@&=+$,\[\]]+/) { |unsafe|
+      URI(uri.to_s.gsub(/[^\-_.!~*'()a-zA-Z\d;\/?:@&=+$,]+/) { |unsafe|
             unsafe.bytes.each_with_object(String.new) { |uc, s|
               s << sprintf('%%%02X', uc)
             }
