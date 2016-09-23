@@ -8,7 +8,7 @@ module Agents
     description <<-MD
       The Trigger Agent will watch for a specific value in an Event payload.
 
-      The `rules` array contains hashes of `path`, `value`, and `type`.  The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax.
+      The `rules` array contains hashes of `path`, `value`, and `type`.  The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax. For simple events, this is usually just the name of the field you want, like 'text' for the text key of the event.
 
       The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.  Note that regex patterns are matched case insensitively.  If you want case sensitive matching, prefix your pattern with `(?-i)`.
 
