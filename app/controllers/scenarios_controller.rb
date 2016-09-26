@@ -1,3 +1,5 @@
+require 'agents_exporter'
+
 class ScenariosController < ApplicationController
   include SortableTable
   skip_before_action :authenticate_user!, only: :export
