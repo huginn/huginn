@@ -60,6 +60,14 @@ bob_weather_agent:
   keep_events_for: <%= 45.days %>
   options: <%= { :location => 94102, :lat => 37.779329, :lng => -122.41915, :api_key => 'test' }.to_json.inspect %>
 
+bob_formatting_agent:
+  type: Agents::EventFormattingAgent
+  user: bob
+  name: "Formatting Agent"
+  guid: <%= SecureRandom.hex %>
+  keep_events_for: <%= 45.days %>
+  options: <%= { instructions: {}, mode: 'clean' }.to_json.inspect %>
+
 jane_weather_agent:
   type: Agents::WeatherAgent
   user: jane

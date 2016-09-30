@@ -69,7 +69,7 @@ class @Utils
               json = $(e.target).find('.payload-editor').val()
               json = '{}' if json == ''
               try
-                payload = JSON.parse(json)
+                payload = JSON.parse(json.replace(/\\\\([n|r|t])/g, "\\$1"))
                 throw true unless payload.constructor is Object
                 if Object.keys(payload).length == 0
                   json = ''
