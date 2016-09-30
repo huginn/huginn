@@ -443,7 +443,7 @@ class AgentDrop
     @object.short_type
   end
 
-  [
+  METHODS = [
     :name,
     :type,
     :options,
@@ -456,7 +456,9 @@ class AgentDrop
     :disabled,
     :keep_events_for,
     :propagate_immediately,
-  ].each { |attr|
+  ]
+
+  METHODS.each { |attr|
     define_method(attr) {
       @object.__send__(attr)
     } unless method_defined?(attr)
