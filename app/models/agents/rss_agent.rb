@@ -104,7 +104,15 @@ module Agents
         begin
           response = faraday.get(url)
           if response.success?
-            feed = FeedNormalizer::FeedNormalizer.parse(response.body, loose: true)
+            body = response.body
+
+            unless body.valid_encoding?
+              guessed_encoding = body.force_encoding('BINARY')[/\A[^\n]+? encoding="([\w-]+)"/, 1]
+              encoding = Encoding.find(guessed_encoding.presence || 'UTF-8') rescue 'UTF-8'
+              body = body.force_encoding(encoding).encode('UTF-8', undef: :replace, invalid: :replace)
+            end
+
+            feed = FeedNormalizer::FeedNormalizer.parse(body, loose: true)
             feed.clean! if boolify(interpolated['clean'])
             new_events.concat feed_to_events(feed)
           else

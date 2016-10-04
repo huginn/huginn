@@ -9,7 +9,9 @@ describe Agents::RssAgent do
 
     stub_request(:any, /github.com/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/github_rss.atom")), :status => 200)
     stub_request(:any, /SlickdealsnetFP/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/slickdeals.atom")), :status => 200)
-    stub_request(:any, /onethingwell.org/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/onethingwell.atom")), :status => 200)
+    stub_request(:any, /onethingwell\.org/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/onethingwell.atom")), :status => 200)
+    stub_request(:any, /imagens\.globoradio.globo\.com/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/arnaldo-jabor-o-comentario-de-arnaldo-jabor.xml")), :status => 200)
+    stub_request(:any, /unknown-encoding\.com/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/unknown-encoding.xml")), :status => 200)
   end
 
   let(:agent) do
@@ -150,12 +152,36 @@ describe Agents::RssAgent do
     end
   end
 
-  context "parsing feeds" do
+  context "encoding" do
+    it 'transcodes to UTF8' do
+      @valid_options['url'] = 'http://imagens.globoradio.globo.com/cbn/podcast/comentaristas/arnaldo-jabor/arnaldo-jabor-o-comentario-de-arnaldo-jabor.xml'
+      expect {
+        expect {
+          agent.check
+        }.not_to change { agent.logs.errors.count }
+      }.to change { agent.events.count }.by(5)
+
+      pp agent.events.last
+    end
+
+    it 'ignores unknown encodings' do
+      @valid_options['url'] = 'http://unknown-encoding.com/test'
+      expect {
+        expect {
+          agent.check
+        }.not_to change { agent.logs.errors.count }
+      }.to change { agent.events.count }.by(5)
+
+      pp agent.events.last
+    end
+  end
+
+  context "capturing multiple categories" do
     before do
       @valid_options['url'] = 'http://onethingwell.org/rss'
     end
 
-    it "captures multiple categories" do
+    it "outputs multiple categories correctly" do
       agent.check
       first, *, third = agent.events.take(3)
       expect(first.payload['categories']).to eq(["csv", "crossplatform", "utilities"])
