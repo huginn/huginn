@@ -29,7 +29,7 @@ grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
 
 eval "echo PORT=${PORT:-${PORT:-3000}}" >> .env
 eval "echo RAILS_ENV=${RAILS_ENV:-${RAILS_ENV:-production}}" >> .env
-eval "echo ON_HEROKU=true" >> .env
+eval "echo RAILS_LOG_TO_STDOUT=true" >> .env
 eval "echo RAILS_SERVE_STATIC_FILES=true" >> .env
 
 chmod ugo+r /app/.env

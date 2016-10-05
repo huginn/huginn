@@ -14,15 +14,19 @@ Huginn::Application.configure do
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
 
-  # Enable Rack::Cache to put a simple HTTP cache in front of your application
-  # Add `rack-cache` to your Gemfile before enabling this.
-  # For large-scale production use, consider using a caching reverse proxy like
-  # NGINX, varnish or squid.
-  # config.action_dispatch.rack_cache = true
-
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
-  config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+
+  if ENV["RAILS_LOG_TO_STDOUT"].present? ||
+       ENV['ON_HEROKU'] ||
+       ENV['HEROKU_POSTGRESQL_ROSE_URL'] ||
+       ENV['HEROKU_POSTGRESQL_GOLD_URL'] ||
+       File.read(File.join(File.dirname(__FILE__), '../../Procfile')) =~ /intended for Heroku/
+    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger = ActiveSupport::TaggedLogging.new(logger)
+  end
 
   # Compress JavaScripts and CSS
   config.assets.js_compressor  = :uglifier
@@ -31,14 +35,16 @@ Huginn::Application.configure do
   # Don't fallback to assets pipeline if a precompiled asset is missed
   config.assets.compile = false
 
-  # Generate digests for assets URLs
-  config.assets.digest = true
-
   # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
+
+  # Mount Action Cable outside main process or domain
+  # config.action_cable.mount_path = nil
+  # config.action_cable.url = 'wss://example.com/cable'
+  # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = ENV['FORCE_SSL'] == 'true'
@@ -47,7 +53,7 @@ Huginn::Application.configure do
   config.log_level = :info
 
   # Prepend all log lines with the following tags
-  config.log_tags = [ :uuid ] # :subdomain
+  config.log_tags = [ :request_id ] # :subdomain
 
   # Use a different logger for distributed setups
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
@@ -85,5 +91,6 @@ Huginn::Application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
+  config.action_mailer.perform_caching = false
   # smtp_settings moved to config/initializers/action_mailer.rb
 end

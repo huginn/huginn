@@ -1,3 +1,5 @@
+require 'time_tracker'
+
 module Agents
 
   class HttpStatusAgent < Agent

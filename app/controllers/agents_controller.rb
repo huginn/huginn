@@ -196,9 +196,9 @@ class AgentsController < ApplicationController
     build_agent
 
     if @agent.validate_option(params[:attribute])
-      render text: 'ok'
+      render plain: 'ok'
     else
-      render text: 'error', status: 403
+      render plain: 'error', status: 403
     end
   end
 

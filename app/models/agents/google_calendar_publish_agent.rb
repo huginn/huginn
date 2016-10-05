@@ -91,7 +91,8 @@ module Agents
     end
 
     def receive(incoming_events)
-     incoming_events.each do |event|
+      require 'google_calendar'
+      incoming_events.each do |event|
         calendar = GoogleCalendar.new(interpolate_options(options, event), Rails.logger)
 
         calendar_event = JSON.parse(calendar.publish_as(interpolated(event)['calendar_id'], event.payload["message"]).response.body)

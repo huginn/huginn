@@ -12,18 +12,16 @@ class ApplicationController < ActionController::Base
     render template: 'application/undefined_agents'
   end
 
-  def redirect_back(fallback_path, *args)
-    redirect_to :back, *args
-  rescue ActionController::RedirectBackError
-    redirect_to fallback_path, *args
+  def redirect_back(fallback_path, **args)
+    super(fallback_location: fallback_path, **args)
   end
 
   protected
 
   def configure_permitted_parameters
-    devise_parameter_sanitizer.for(:sign_up) { |u| u.permit(:username, :email, :password, :password_confirmation, :remember_me, :invitation_code) }
-    devise_parameter_sanitizer.for(:sign_in) { |u| u.permit(:login, :username, :email, :password, :remember_me) }
-    devise_parameter_sanitizer.for(:account_update) { |u| u.permit(:username, :email, :password, :password_confirmation, :current_password) }
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:username, :email, :password, :password_confirmation, :remember_me, :invitation_code])
+    devise_parameter_sanitizer.permit(:sign_in, keys: [:login, :username, :email, :password, :remember_me])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:username, :email, :password, :password_confirmation, :current_password])
   end
 
   def authenticate_admin!
@@ -74,6 +72,7 @@ class ApplicationController < ActionController::Base
       params[:agent].permit(:memory, :name, :type, :schedule, :disabled, :keep_events_for, :propagate_immediately, :drop_pending_events, :service_id,
                             source_ids: [], receiver_ids: [], scenario_ids: [], controller_ids: [], control_target_ids: []).tap do |agent_params|
         agent_params[:options] = options if options
+        agent_params[:options].permit! if agent_params[:options].respond_to?(:permit!)
       end
     end
   end

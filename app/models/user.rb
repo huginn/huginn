@@ -88,6 +88,6 @@ class User < ActiveRecord::Base
   end
 
   def undefined_agents
-    agents.where(type: undefined_agent_types).select('id, schedule, type as undefined')
+    agents.where(type: undefined_agent_types).select('id, schedule, events_count, type as undefined')
   end
 end

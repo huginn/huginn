@@ -6,7 +6,7 @@ class AgentPropagateJob < ActiveJob::Base
   end
 
   def self.can_enqueue?
-    case queue_adapter.name # not using class since it would load adapter dependent gems
+    case queue_adapter.class.name # not using class since it would load adapter dependent gems
     when 'ActiveJob::QueueAdapters::DelayedJobAdapter'
       return Delayed::Job.where(failed_at: nil, queue: 'propagation').count == 0
     when 'ActiveJob::QueueAdapters::ResqueAdapter'

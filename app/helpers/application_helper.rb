@@ -117,4 +117,10 @@ module ApplicationHelper
   def agent_type_to_human(type)
     type.gsub(/^.*::/, '').underscore.humanize.titleize
   end
+
+  private
+
+  def user_omniauth_authorize_path(provider)
+    send "user_#{provider}_omniauth_authorize_path"
+  end
 end

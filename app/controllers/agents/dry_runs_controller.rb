@@ -8,6 +8,8 @@ module Agents
                 elsif params[:source_ids]
                   Event.where(agent_id: current_user.agents.where(id: params[:source_ids]).pluck(:id))
                        .order("id DESC").limit(5)
+                else
+                  []
                 end
 
       render layout: false
@@ -18,7 +20,7 @@ module Agents
       if agent = current_user.agents.find_by(id: params[:agent_id])
         # POST /agents/:id/dry_run
         if attrs.present?
-          attrs.merge!(memory: agent.memory)
+          attrs = attrs.merge(memory: agent.memory)
           type = agent.type
           agent = Agent.build_for_type(type, current_user, attrs)
         end

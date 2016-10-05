@@ -144,8 +144,12 @@ bob_manual_event_agent:
 bob_basecamp_agent:
   type: Agents::BasecampAgent
   user: bob
+  name: "bob basecamp agent"
   service: generic
   guid: <%= SecureRandom.hex %>
+  options: <%= {
+      :project_id => "12345",
+    }.to_json.inspect %>
 
 bob_csv_agent:
   type: Agents::CsvAgent
@@ -156,8 +160,12 @@ bob_csv_agent:
 jane_basecamp_agent:
   type: Agents::BasecampAgent
   user: jane
+  name: "jane basecamp agent"
   service: generic
   guid: <%= SecureRandom.hex %>
+  options: <%= {
+      :project_id => "12345",
+    }.to_json.inspect %>
 
 
 bob_data_output_agent:
