@@ -52,14 +52,6 @@ module Utils
     end
   end
 
-  def self.percent_encode(string, pattern = /[^\-_.!~*'()a-zA-Z\d;\/?:@&=+$,\[\]]+/)
-    string.gsub(pattern) { |unsafe|
-      unsafe.bytes.each_with_object(String.new) { |b, s|
-        s << sprintf('%%%02X', b)
-      }
-    }
-  end
-
   def self.interpolate_jsonpaths(value, data, options = {})
     if options[:leading_dollarsign_is_jsonpath] && value[0] == '$'
       Utils.values_at(data, value).first.to_s
