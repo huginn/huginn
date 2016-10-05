@@ -1146,7 +1146,7 @@ fire: hot
 
       it "should check url with unescaped brackets in the path component" do
         event = @events[7]
-        expect(event.payload['url']).to eq("http://example.org/path%5B%5D?query[]=foo")
+        expect(event.payload['url']).to eq("http://[::1]/path%5B%5D?query[]=foo")
       end
     end
   end
