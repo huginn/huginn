@@ -84,17 +84,17 @@ describe Agents::RssAgent do
 
     it "should track ids and not re-emit the same item when seen again" do
       agent.check
-      expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| e.payload['id'] })
+      expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| e.payload['update_id'] })
 
       newest_id = agent.memory['seen_ids'][0]
-      expect(agent.events.first.payload['id']).to eq(newest_id)
+      expect(agent.events.first.payload['update_id']).to eq(newest_id)
       agent.memory['seen_ids'] = agent.memory['seen_ids'][1..-1] # forget the newest id
 
       expect {
         agent.check
       }.to change { agent.events.count }.by(1)
 
-      expect(agent.events.first.payload['id']).to eq(newest_id)
+      expect(agent.events.first.payload['update_id']).to eq(newest_id)
       expect(agent.memory['seen_ids'][0]).to eq(newest_id)
     end
 
@@ -142,11 +142,15 @@ describe Agents::RssAgent do
       @valid_options['url'] = 'http://feeds.feedburner.com/SlickdealsnetFP?format=atom'
     end
 
-    it "calculates content MD5 sums" do
+    it "calculates content MD5 sums and last updated date" do
       expect {
         agent.check
       }.to change { agent.events.count }.by(79)
-      expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| Digest::MD5.hexdigest(e.payload['content']) })
+      expect(agent.memory['seen_ids']).to eq(agent.events.map {|e| 
+        t = Time.parse e.payload['last_updated']
+        suffix = (t.to_i).to_s 
+        Digest::MD5.hexdigest(e.payload['content']) + suffix
+      })
     end
   end
 
