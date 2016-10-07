@@ -38,7 +38,7 @@ module FeedjiraExtension
     include SAXMachine
 
     def content=(content)
-      super
+      @content = content
 
       begin
         addr = Mail::Address.new(content)
