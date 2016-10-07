@@ -166,10 +166,13 @@ group :production do
 end
 
 # Platform requirements.
+require 'rbconfig'
 gem 'ffi', '>= 1.9.4'		# required by typhoeus; 1.9.4 has fixes for *BSD.
 gem 'tzinfo', '>= 1.2.0'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
+# BSD systems require rb-kqueue for "listen" to avoid polling for changes.
+gem 'rb-kqueue', '>= 0.2', require: /bsd|dragonfly/i === RbConfig::CONFIG['target_os']
 
 
 on_heroku = ENV['ON_HEROKU'] ||
