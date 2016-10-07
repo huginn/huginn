@@ -191,6 +191,8 @@ module Agents
     end
 
     def latest_events(reload = false)
+      received_events = received_events().reorder(id: :asc)
+
       events =
         if (event_ids = memory[:event_ids]) &&
            memory[:events_order] == events_order &&
@@ -208,8 +210,7 @@ module Agents
 
         new_events =
           if last_event_id = memory[:last_event_id]
-            received_events.where(Event.arel_table[:id].gt(last_event_id)).
-              order(id: :asc).to_a
+            received_events.where(Event.arel_table[:id].gt(last_event_id)).to_a
           else
             source_ids.flat_map { |source_id|
               # dig twice as many events as the number of

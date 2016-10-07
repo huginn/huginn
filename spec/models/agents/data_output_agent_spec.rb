@@ -242,13 +242,53 @@ describe Agents::DataOutputAgent do
         })
       end
 
+      context 'with more events' do
+        let!(:event4) do
+          agents(:bob_website_agent).create_event payload: {
+            'site_title' => 'XKCD',
+            'url' => 'http://imgs.xkcd.com/comics/comic1.png',
+            'title' => 'Comic 1',
+            'date' => '',
+            'hovertext' => 'Hovertext for Comic 1'
+          }
+        end
+
+        let!(:event5) do
+          agents(:bob_website_agent).create_event payload: {
+            'site_title' => 'XKCD',
+            'url' => 'http://imgs.xkcd.com/comics/comic2.png',
+            'title' => 'Comic 2',
+            'date' => '',
+            'hovertext' => 'Hovertext for Comic 2'
+          }
+        end
+
+        let!(:event6) do
+          agents(:bob_website_agent).create_event payload: {
+            'site_title' => 'XKCD',
+            'url' => 'http://imgs.xkcd.com/comics/comic3.png',
+            'title' => 'Comic 3',
+            'date' => '',
+            'hovertext' => 'Hovertext for Comic 3'
+          }
+        end
+
+        describe 'limiting' do
+          it 'can select the last `events_to_show` events' do
+            agent.options['events_to_show'] = 2
+            content, _status, _content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
+            expect(content['items'].map {|i| i["title"] }).to eq(["Comic 3", "Comic 2"])
+          end
+        end
+      end
+
       describe 'ordering' do
         before do
           agent.options['events_order'] = ['{{hovertext}}']
           agent.options['events_list_order'] = ['{{title}}']
         end
 
-        it 'can reorder the events_to_show last events based on a Liquid expression' do
+        it 'can reorder the last `events_to_show` events based on a Liquid expression' do
           agent.options['events_to_show'] = 2
           asc_content, _status, _content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
           expect(asc_content['items'].map {|i| i["title"] }).to eq(["Evolving", "Evolving again"])
