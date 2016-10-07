@@ -2,6 +2,17 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Oct 06, 2016   | `RssAgent` is reimplemented migrating its underlying feed parser from FeedNormalizer to Feedjira. [1564](https://github.com/cantino/huginn/pull/1564)     |
+| Oct 05, 2016   | Migrate to Rails 5. [1688](https://github.com/cantino/huginn/pull/1688)                                      |
+| Oct 05, 2016   | Improve URL normalization in `WebsiteAgent`. [1719](https://github.com/cantino/huginn/pull/1719)             |
+| Oct 05, 2016   | `PushoverAgent` now treats parameter options as templates rather than default values. [1720](https://github.com/cantino/huginn/pull/1720) |
+| Sep 19, 2016   | Add multipart file upload to `PostAgent`. [1690](https://github.com/cantino/huginn/pull/1690)                |
+| Sep 08, 2016   | Allow `TwitterUserAgent` to retry failed actions. [1645](https://github.com/cantino/huginn/pull/1645)        |
+| Aug 16, 2016   | `EmailDigestAgent` now relies on received events, rather in memory. [1624](https://github.com/cantino/huginn/pull/1624) |
+| Aug 08, 2016   | `DataOutputAgent` now limits events after ordering. [1444](https://github.com/cantino/huginn/pull/1444)      |
+| Aug 05, 2016   | Add `api_key` option to `UserLocationAgent`. [1613](https://github.com/cantino/huginn/pull/1613)             |
+| Jul 25, 2016   | Add `LiquidOutputAgent`. [1587](https://github.com/cantino/huginn/pull/1587)                                 |
+| Jul 25, 2016   | Allow `PostAgent` headers to interpolate event data. [1606](https://github.com/cantino/huginn/pull/1606)     |
 | Jul 25, 2016   | Remove `smtp.yml` configuration file, the SMTP configuration now needs to be done via environment variables. [1595](https://github.com/cantino/huginn/pull/1595) |
 | Jul 25, 2016   | Change `jsonpath` gem to a fork located at [https://github.com/Skarlso/jsonpathv2](https://github.com/Skarlso/jsonpathv2) [1596](https://github.com/cantino/huginn/pull/1596) |
 | Jul 20, 2016   | Add redirection information to the `HttpStatusAgent` [1590](https://github.com/cantino/huginn/pull/1590) |
