@@ -8,7 +8,7 @@
 
 ### Manual installation
 
-Manual installation instructions which will guide through the steps to install Huginn on any Ubuntu 12.04/14.04 or Debian 6/7 server.
+Manual installation instructions which will guide through the steps to install Huginn on any Ubuntu 12.04/14.04/16.04 or Debian 6/7 server.
 
 - [Install](manual/README.md) Requirements, directory structures and installation from source.
 - [Update](manual/update.md) Update your installation.
