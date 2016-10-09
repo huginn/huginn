@@ -212,7 +212,7 @@ GEM
       oauth (>= 0.4.1)
     execjs (2.6.0)
     extlib (0.9.16)
-    faraday (0.9.1)
+    faraday (0.9.2)
       multipart-post (>= 1.2, < 3)
     feedjira (2.0.0)
       faraday (~> 0.9)
@@ -222,7 +222,7 @@ GEM
     ffi (1.9.10)
     font-awesome-sass (4.3.2.1)
       sass (~> 3.2)
-    forecast_io (2.0.0)
+    forecast_io (2.0.1)
       faraday
       hashie
       multi_json
@@ -267,7 +267,7 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    hashie (3.4.4)
+    hashie (3.4.6)
     haversine (0.3.0)
     hipchat (1.2.0)
       httparty
@@ -705,4 +705,4 @@ RUBY VERSION
    ruby 2.3.1p112
 
 BUNDLED WITH
-   1.12.5
+   1.13.2
