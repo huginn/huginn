@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-# Ruby 2.0 is the minimum requirement
-ruby ['2.0.0', RUBY_VERSION].max
+# Ruby 2.2.2 is the minimum requirement
+ruby ['2.2.2', RUBY_VERSION].max
 
 # Load vendored dotenv gem and .env file
 require File.join(File.dirname(__FILE__), 'lib/gemfile_helper.rb')
@@ -116,7 +116,6 @@ gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'sass-rails',   '~> 5.0.6'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
-gem 'string-scrub'	# for ruby <2.1
 gem 'therubyracer', '~> 0.12.2'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '~> 2.7.2'

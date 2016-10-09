@@ -4,7 +4,7 @@
 
 ### Supported Unix distributions by this guide
 
-- Ubuntu (14.04 and 12.04)
+- Ubuntu (16.04, 14.04 and 12.04)
 - Debian (Jessie and Wheezy)
 
 ### Unsupported Unix distributions
@@ -27,7 +27,7 @@ Please consider using a virtual machine to run Huginn on Windows.
 
 ## Ruby versions
 
-Huginn requires Ruby (MRI) 2.0, 2.1 or 2.2
+Huginn requires Ruby (MRI) 2.2 or 2.3.
 You will have to use the standard MRI implementation of Ruby.
 We love [JRuby](http://jruby.org/) and [Rubinius](http://rubini.us/) but Huginn needs several Gems that have native extensions.
 
