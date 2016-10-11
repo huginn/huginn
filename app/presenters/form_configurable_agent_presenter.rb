@@ -23,7 +23,9 @@ class FormConfigurableAgentPresenter < Decorator
       @view.content_tag 'div' do
         @view.concat @view.text_area_tag("agent[options][#{attribute}]", value, html_options.merge(class: 'form-control', rows: 3))
         if data[:ace].present?
-          @view.concat @view.content_tag('div', '', class: 'ace-editor', data: { source: "[name='agent[options][#{attribute}]']" })
+          ace_options = { source: "[name='agent[options][#{attribute}]']", mode: '', theme: ''}.deep_symbolize_keys!
+          ace_options.deep_merge!(data[:ace].deep_symbolize_keys) if data[:ace].is_a?(Hash)
+          @view.concat @view.content_tag('div', '', class: 'ace-editor', data: ace_options)
         end
       end
     when :boolean
