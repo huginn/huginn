@@ -177,20 +177,28 @@ class @AgentEditPage
   buildAce: ->
     $(".ace-editor").each ->
       unless $(this).data('initialized')
-        $(this).data('initialized', true)
-        $source = $($(this).data('source')).hide()
+        $this = $(this)
+        $this.data('initialized', true)
+        $source = $($this.data('source')).hide()
         editor = ace.edit(this)
-        $(this).data('ace-editor', editor)
+        $this.data('ace-editor', editor)
         session = editor.getSession()
         session.setTabSize(2)
         session.setUseSoftTabs(true)
         session.setUseWrapMode(false)
 
         setSyntax = ->
-          switch $("[name='agent[options][language]']").val()
-            when 'JavaScript' then session.setMode("ace/mode/javascript")
-            when 'CoffeeScript' then session.setMode("ace/mode/coffee")
-            else session.setMode("ace/mode/text")
+          if mode = $this.data('mode')
+            session.setMode("ace/mode/" + mode)
+
+          if theme = $this.data('theme')
+            editor.setTheme("ace/theme/" + theme);
+
+          if mode = $("[name='agent[options][language]']").val()
+            switch mode
+              when 'JavaScript' then session.setMode("ace/mode/javascript")
+              when 'CoffeeScript' then session.setMode("ace/mode/coffee")
+              else session.setMode("ace/mode/" + mode)
 
         $("[name='agent[options][language]']").on 'change', setSyntax
         setSyntax()
