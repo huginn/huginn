@@ -2,7 +2,9 @@
 
 require_relative './pre_runner_boot'
 
-agent_runner = AgentRunner.new
+except = []
+except << DelayedJobWorker if Rails.configuration.active_job.queue_adapter != :delayed_job
+agent_runner = AgentRunner.new(except: except)
 
 # We need to wait a bit to let delayed_job set it's traps so we can override them
 Thread.new do

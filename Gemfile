@@ -86,8 +86,17 @@ gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
 gem 'coffee-rails', '~> 4.2'
 gem 'daemons', '~> 1.1.9'
-gem 'delayed_job', '~> 4.1.0'
-gem 'delayed_job_active_record', github: 'collectiveidea/delayed_job_active_record', branch: 'master'
+
+if_true(!ENV['BACKGROUND_JOB_PROCESSOR'] || ENV['BACKGROUND_JOB_PROCESSOR'] == 'delayed_job') do
+  gem 'delayed_job', '~> 4.1.0'
+  gem 'delayed_job_active_record', github: 'collectiveidea/delayed_job_active_record', branch: 'master'
+end
+
+if_true(ENV['BACKGROUND_JOB_PROCESSOR'] == 'resque') do
+  gem 'resque', '~> 1.26.0', require: false
+  gem 'sinatra', '2.0.0.beta2'
+end
+
 gem 'devise','~> 4.2.0'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'

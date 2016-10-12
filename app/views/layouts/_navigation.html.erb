@@ -80,7 +80,11 @@
         </li>
         <% if user_signed_in? && current_user.admin %>
           <li>
-            <%= link_to 'Job Management', jobs_path, :tabindex => '-1' %>
+            <% if ENV['RESQUE_WEB'].present? && Rails.configuration.active_job.queue_adapter == :resque %>
+              <%= link_to 'Job Management', '/resque', :tabindex => '-1' %>
+            <% elsif Rails.configuration.active_job.queue_adapter == :delayed_job %>
+              <%= link_to 'Job Management', jobs_path, :tabindex => '-1' %>
+            <% end %>
           </li>
           <li>
             <%= link_to 'User Management', admin_users_path, tabindex: '-1' %>
