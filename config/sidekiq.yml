@@ -1,0 +1,4 @@
+---
+:queues:
+  - propagation
+  - default
