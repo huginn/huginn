@@ -1,7 +1,7 @@
 if Rails.configuration.active_job.queue_adapter == :delayed_job
   class WorkerStatus
     class << self
-      def pending
+      def pending(start)
         Delayed::Job.pending.where("run_at <= ?", start).count
       end
 
@@ -21,7 +21,7 @@ if Rails.configuration.active_job.queue_adapter == :delayed_job
 else
   class WorkerStatus
     class << self
-      def pending
+      def pending(_)
         Sidekiq::Queue.new.size
       end
 

@@ -20,7 +20,7 @@ class WorkerStatusController < ApplicationController
     end
 
     render json: {
-      pending: WorkerStatus.pending,
+      pending: WorkerStatus.pending(start),
       awaiting_retry: WorkerStatus.awaiting_retry,
       recent_failures: WorkerStatus.recent_failures,
       event_count: count,
