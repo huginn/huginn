@@ -56,7 +56,7 @@ describe HuginnScheduler do
     end
   end
 
-  describe "cleanup_failed_jobs!" do
+  describe "cleanup_failed_jobs!", processor: :delayed_job do
     before do
       3.times do |i|
         Delayed::Job.create(failed_at: Time.now - i.minutes)
