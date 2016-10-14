@@ -52,11 +52,12 @@ jobs: bundle exec rails runner bin/threaded.rb
 ###################
 # Sidekiq workers #
 ###################
-# WARNING: Using Sidekiq with Huginn is not tested enough in production, only use it when you know how
-# how to set up redis and want to help ensuring everything works.
+# WARNING: Using Sidekiq with Huginn has not been heavily tested yet and is very beta.
+# Only use this when you know how to setup redis and want to help us test this feature.
 #
-# All "dj" workers processes need to be disabled for resque to work.
-#
-# Configure BACKGROUND_JOB_PROCESSOR=sidekiq in your .env file and uncomment the sidekiq worker process
-#
+# Steps:
+# 1. Disable all "dj" workers processes
+# 2. Configure BACKGROUND_JOB_PROCESSOR=sidekiq in your .env file
+# 3. If your redis server is not running locally configure REDIS_URL
+# 4. Uncomment this line:
 #sidekiq: bundle exec sidekiq
