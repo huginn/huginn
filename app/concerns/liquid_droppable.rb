@@ -18,6 +18,11 @@ module LiquidDroppable
         yield [name, __send__(name)]
       }
     end
+
+    def as_json
+      return {} unless defined?(self.class::METHODS)
+      Hash[self.class::METHODS.map { |m| [m, send(m).as_json]}]
+    end
   end
 
   included do
@@ -33,12 +38,10 @@ module LiquidDroppable
     self.class::Drop.new(self)
   end
 
-  class MatchDataDrop < Liquid::Drop
-    def initialize(object)
-      @object = object
-    end
+  class MatchDataDrop < Drop
+    METHODS = %w[pre_match post_match names size]
 
-    %w[pre_match post_match names size].each { |attr|
+    METHODS.each { |attr|
       define_method(attr) {
         @object.__send__(attr)
       }
@@ -64,7 +67,9 @@ module LiquidDroppable
   require 'uri'
 
   class URIDrop < Drop
-    URI::Generic::COMPONENT.each { |attr|
+    METHODS = URI::Generic::COMPONENT
+
+    METHODS.each { |attr|
       define_method(attr) {
         @object.__send__(attr)
       }

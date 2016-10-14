@@ -264,4 +264,59 @@ describe LiquidInterpolatable::Filters do
       expect(agent.interpolated['cleaned']).to eq('FOObar ZOObar')
     end
   end
+
+  context 'as_object' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'returns an array that was splitted in liquid tags' do
+      agent.interpolation_context['something'] = 'test,string,abc'
+      agent.options['array'] = "{{something | split: ',' | as_object}}"
+      expect(agent.interpolated['array']).to eq(['test', 'string', 'abc'])
+    end
+
+    it 'returns an object that was not modified in liquid' do
+      agent.interpolation_context['something'] = {'nested' => {'abc' => 'test'}}
+      agent.options['object'] = "{{something.nested | as_object}}"
+      expect(agent.interpolated['object']).to eq({"abc" => 'test'})
+    end
+
+    context 'as_json' do
+      def ensure_safety(obj)
+        JSON.parse(JSON.dump(obj))
+      end
+
+      it 'it converts "complex" objects' do
+        agent.interpolation_context['something'] = {'nested' => Service.new}
+        agent.options['object'] = "{{something | as_object}}"
+        expect(agent.interpolated['object']).to eq({'nested'=> ensure_safety(Service.new.as_json)})
+      end
+
+      it 'works with AgentDrops' do
+        agent.interpolation_context['something'] = agent
+        agent.options['object'] = "{{something | as_object}}"
+        expect(agent.interpolated['object']).to eq(ensure_safety(agent.to_liquid.as_json.stringify_keys))
+      end
+
+      it 'works with EventDrops' do
+        event = Event.new(payload: {some: 'payload'}, agent: agent, created_at: Time.now)
+        agent.interpolation_context['something'] = event
+        agent.options['object'] = "{{something | as_object}}"
+        expect(agent.interpolated['object']).to eq(ensure_safety(event.to_liquid.as_json.stringify_keys))
+      end
+
+      it 'works with MatchDataDrops' do
+        match = "test string".match(/\A(?<word>\w+)\s(.+?)\z/)
+        agent.interpolation_context['something'] = match
+        agent.options['object'] = "{{something | as_object}}"
+        expect(agent.interpolated['object']).to eq(ensure_safety(match.to_liquid.as_json.stringify_keys))
+      end
+
+      it 'works with URIDrops' do
+        uri = URI.parse("https://google.com?q=test")
+        agent.interpolation_context['something'] = uri
+        agent.options['object'] = "{{something | as_object}}"
+        expect(agent.interpolated['object']).to eq(ensure_safety(uri.to_liquid.as_json.stringify_keys))
+      end
+    end
+  end
 end
