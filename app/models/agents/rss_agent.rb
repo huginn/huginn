@@ -151,16 +151,20 @@ module Agents
           end
         end
       end
+      memory['seen_ids'].slice!(new_events.count, memory['seen_ids'].count - new_events.count)#~ cut the old ids off of the stack
       log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
     end
 
     def check_and_track(entry_id)
       memory['seen_ids'] ||= []
-      if memory['seen_ids'].include?(entry_id)
+      index = memory['seen_ids'].index(entry_id)
+      if index != nil
+	memory['seen_ids'].delete_at(index)#~ stack beahviour. Put each ID from the 'new_events' on top, even if it has already existed. Will result in old not used IDs to end up at the bottom of the stack
+	memory['seen_ids'].unshift entry_id
         false
       else
         memory['seen_ids'].unshift entry_id
-        memory['seen_ids'].pop if memory['seen_ids'].length > 500
+        #~ memory['seen_ids'].pop if memory['seen_ids'].length > 500
         true
       end
     end
