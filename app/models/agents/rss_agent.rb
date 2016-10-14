@@ -164,7 +164,6 @@ module Agents
         false
       else
         memory['seen_ids'].unshift entry_id
-        #~ memory['seen_ids'].pop if memory['seen_ids'].length > 500
         true
       end
     end
