@@ -1,3 +1,4 @@
+# This configuration file is only used by sidekiq, per default Huginn uses delayed_job and this file is ignored
 ---
 :queues:
   - propagation
