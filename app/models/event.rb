@@ -11,7 +11,7 @@ class Event < ActiveRecord::Base
 
   json_serialize :payload
 
-  belongs_to :user
+  belongs_to :user, optional: true
   belongs_to :agent, :counter_cache => true
 
   has_many :agent_logs_as_inbound_event, :class_name => "AgentLog", :foreign_key => :inbound_event_id, :dependent => :nullify

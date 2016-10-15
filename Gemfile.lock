@@ -18,9 +18,9 @@ GIT
       simple_oauth (~> 0.3.0)
 
 GIT
-  remote: git://github.com/collectiveidea/delayed_job_active_record.git
-  revision: 36f434c4fd660e8f11ce932be117e9c71dde7212
-  branch: master
+  remote: git://github.com/dsander/delayed_job_active_record.git
+  revision: b314972ccc92e0e8b03b1589174d8fb9a82b3cd0
+  branch: rails5
   specs:
     delayed_job_active_record (4.1.1)
       activerecord (>= 3.0, < 5.1)
