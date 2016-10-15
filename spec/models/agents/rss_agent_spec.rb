@@ -166,10 +166,10 @@ describe Agents::RssAgent do
       expect(agent.memory['seen_ids'][0]).to eq(newest_id)
     end
 
-    it "should truncate the seen_ids in memory at 500 items" do
+    it "should truncate the seen_ids in memory to the last seen items" do
       agent.memory['seen_ids'] = ['x'] * 490
       agent.check
-      expect(agent.memory['seen_ids'].length).to eq(500)
+      expect(agent.memory['seen_ids'].length).to eq(20)
     end
 
     it "should support an array of URLs" do

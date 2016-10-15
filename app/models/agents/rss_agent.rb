@@ -151,7 +151,9 @@ module Agents
           end
         end
       end
-      memory['seen_ids'].slice!(new_events.count, memory['seen_ids'].count - new_events.count)#~ cut the old ids off of the stack
+      if(memory['seen_ids'])#~if fetching fails first time or is empty, array does not exist yet
+        memory['seen_ids'].slice!(new_events.count, memory['seen_ids'].count - new_events.count)#~ cut the old ids off of the stack
+      end
       log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
     end
 
