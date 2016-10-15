@@ -3,10 +3,10 @@
 # Agents' `last_error_log_at` column.  These are often used to determine if an Agent is `working?`.
 class AgentLog < ActiveRecord::Base
   belongs_to :agent
-  belongs_to :inbound_event, :class_name => "Event"
-  belongs_to :outbound_event, :class_name => "Event"
+  belongs_to :inbound_event, :class_name => "Event", optional: true
+  belongs_to :outbound_event, :class_name => "Event", optional: true
 
-  validates_presence_of :agent, :message
+  validates_presence_of :message
   validates_numericality_of :level, :only_integer => true, :greater_than_or_equal_to => 0, :less_than => 5
 
   before_validation :scrub_message
