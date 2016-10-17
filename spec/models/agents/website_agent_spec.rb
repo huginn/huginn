@@ -739,6 +739,22 @@ describe Agents::WebsiteAgent do
         expect(event.payload['response_info']).to eq('The reponse was 200 OK.')
       end
 
+      it "should be formatted by template after extraction" do
+        @valid_options['template'] = {
+          'url' => '{{url}}',
+          'title' => '{{title | upcase}}',
+          'summary' => '{{title}}: {{hovertext | truncate: 20}}',
+        }
+        @checker.options = @valid_options
+        @checker.check
+        event = Event.last
+        expect(event.payload).to eq({
+                                      'title' => 'EVOLVING',
+                                      'url' => 'http://imgs.xkcd.com/comics/evolving.png',
+                                      'summary' => 'Evolving: Biologists play r...',
+                                    })
+      end
+
       describe "XML" do
         before do
           stub_request(:any, /github_rss/).to_return(
