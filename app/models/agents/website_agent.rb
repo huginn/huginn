@@ -124,13 +124,17 @@ module Agents
 
       # Liquid Templating
 
-      In Liquid templating, the following variable is available:
+      In Liquid templating, the following variables are available except when invoked by `data_from_event`:
+
+      * `_url_`: The URL specified to fetch the content from.
 
       * `_response_`: A response object with the following keys:
 
           * `status`: HTTP status as integer. (Almost always 200)
 
           * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
+
+          * `url`: The final URL of the fetched page, following redirects.
 
       # Ordering Events
 
@@ -328,6 +332,7 @@ module Agents
       raise "Failed: #{response.inspect}" unless consider_response_successful?(response)
 
       interpolation_context.stack {
+        interpolation_context['_url_'] = uri.to_s
         interpolation_context['_response_'] = ResponseDrop.new(response)
         handle_data(response.body, response.env[:url], existing_payload)
       }
@@ -602,6 +607,11 @@ module Agents
       # Integer value of HTTP status
       def status
         @object.status
+      end
+
+      # The URL
+      def url
+        @object.env.url.to_s
       end
     end
 

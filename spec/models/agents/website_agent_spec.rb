@@ -8,6 +8,10 @@ describe Agents::WebsiteAgent do
                                            headers: {
                                              'X-Status-Message' => 'OK'
                                            })
+      stub_request(:any, /xkcd\.com\/index$/).to_return(status: 301,
+                                                        headers: {
+                                                          'Location' => 'http://xkcd.com/'
+                                                        })
       @valid_options = {
         'name' => "XKCD",
         'expected_update_period_in_days' => "2",
@@ -729,14 +733,20 @@ describe Agents::WebsiteAgent do
       end
 
       it "should interpolate _response_" do
+        @valid_options['url'] = 'http://xkcd.com/index'
         @valid_options['extract']['response_info'] =
           @valid_options['extract']['url'].merge(
-            'value' => '"{{ "The reponse was " | append:_response_.status | append:" " | append:_response_.headers.X-Status-Message | append:"." }}"'
+            'value' => '{{ "The reponse from " | append:_response_.url | append:" was " | append:_response_.status | append:" " | append:_response_.headers.X-Status-Message | append:"." | to_xpath }}'
+          )
+        @valid_options['extract']['original_url'] =
+          @valid_options['extract']['url'].merge(
+            'value' => '{{ _url_ | to_xpath }}'
           )
         @checker.options = @valid_options
         @checker.check
         event = Event.last
-        expect(event.payload['response_info']).to eq('The reponse was 200 OK.')
+        expect(event.payload['response_info']).to eq('The reponse from http://xkcd.com/ was 200 OK.')
+        expect(event.payload['original_url']).to eq('http://xkcd.com/index')
       end
 
       it "should be formatted by template after extraction" do
