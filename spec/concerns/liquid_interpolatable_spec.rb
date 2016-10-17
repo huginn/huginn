@@ -106,6 +106,10 @@ describe LiquidInterpolatable::Filters do
       expect(@filter.to_uri(123, 'http://example.com/dir/1')).to eq(URI('http://example.com/dir/123'))
     end
 
+    it 'should normalize a URL' do
+      expect(@filter.to_uri('a[]', 'http://example.com/dir/1')).to eq(URI('http://example.com/dir/a%5B%5D'))
+    end
+
     it 'should return a URI value in interpolation' do
       expect(@agent.interpolated['foo']).to eq('/dir/1')
     end
@@ -140,8 +144,8 @@ describe LiquidInterpolatable::Filters do
       expect(@filter.uri_expand(nil)).to eq('')
       expect(@filter.uri_expand('')).to eq('')
       expect(@filter.uri_expand(5)).to eq('5')
-      expect(@filter.uri_expand([])).to eq('[]')
-      expect(@filter.uri_expand({})).to eq('{}')
+      expect(@filter.uri_expand([])).to eq('%5B%5D')
+      expect(@filter.uri_expand({})).to eq('%7B%7D')
       expect(@filter.uri_expand(URI('/'))).to eq('/')
       expect(@filter.uri_expand(URI('http:google.com'))).to eq('http:google.com')
       expect(@filter.uri_expand(URI('http:/google.com'))).to eq('http:/google.com')
