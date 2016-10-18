@@ -134,7 +134,7 @@ module Agents
 
           * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
 
-          * `url`: The final URL of the fetched page, following redirects.
+          * `url`: The final URL of the fetched page, following redirects.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _request_.url }}` and `{{ content | rebase_hrefs: _request_.url }}`.
 
       # Ordering Events
 
