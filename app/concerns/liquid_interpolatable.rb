@@ -130,9 +130,9 @@ module LiquidInterpolatable
     # fragment.
     def to_uri(uri, base_uri = nil)
       if base_uri
-        URI(base_uri) + uri.to_s
+        Utils.normalize_uri(base_uri) + Utils.normalize_uri(uri.to_s)
       else
-        URI(uri.to_s)
+        Utils.normalize_uri(uri.to_s)
       end
     rescue URI::Error
       nil
@@ -151,7 +151,7 @@ module LiquidInterpolatable
       else
         url = url.to_s
         begin
-          uri = URI(url)
+          uri = Utils.normalize_uri(url)
         rescue URI::Error
           return url
         end
@@ -172,7 +172,7 @@ module LiquidInterpolatable
             case response.status
             when 301, 302, 303, 307
               if location = response['location']
-                uri += location
+                uri += Utils.normalize_uri(location)
                 next
               end
             end
