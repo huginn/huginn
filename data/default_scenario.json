@@ -104,11 +104,11 @@
         "extract": {
           "title": {
             "css": "item title",
-            "value": ".//text()"
+            "value": "string(.)"
           },
           "url": {
             "css": "item link",
-            "value": ".//text()"
+            "value": "string(.)"
           }
         }
       },

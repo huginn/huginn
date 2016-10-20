@@ -507,7 +507,7 @@ describe Agents::WebsiteAgent do
         expect(event.payload['num_links']).to eq("9")
       end
 
-      it "should return all texts concatenated if XPath returns many text nodes" do
+      it "should return everything concatenated if XPath returns many nodes" do
         rel_site = {
           'name' => "XKCD",
           'expected_update_period_in_days' => 2,
@@ -523,7 +523,26 @@ describe Agents::WebsiteAgent do
         rel.save!
         rel.check
         event = Event.last
-        expect(event.payload['slogan']).to eq("A webcomic of romance, sarcasm, math, and language.")
+        expect(event.payload['slogan']).to eq("A webcomic of romance, sarcasm, math, &amp; language.")
+      end
+
+      it "should return a string value returned by XPath" do
+        rel_site = {
+          'name' => "XKCD",
+          'expected_update_period_in_days' => 2,
+          'type' => "html",
+          'url' => "http://xkcd.com",
+          'mode' => "on_change",
+          'extract' => {
+            'slogan' => {'css' => "#slogan", 'value' => "string(.)"}
+          }
+        }
+        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel.user = users(:bob)
+        rel.save!
+        rel.check
+        event = Event.last
+        expect(event.payload['slogan']).to eq("A webcomic of romance, sarcasm, math, & language.")
       end
 
       it "should interpolate _response_" do
@@ -653,9 +672,9 @@ describe Agents::WebsiteAgent do
             'url' => 'http://example.com/cdata_rss.atom',
             'mode' => 'on_change',
             'extract' => {
-              'author' => { 'xpath' => '/feed/entry/author/name', 'value' => './/text()'},
-              'title' => { 'xpath' => '/feed/entry/title', 'value' => './/text()' },
-              'content' => { 'xpath' => '/feed/entry/content', 'value' => './/text()' },
+              'author' => { 'xpath' => '/feed/entry/author/name', 'value' => 'string(.)'},
+              'title' => { 'xpath' => '/feed/entry/title', 'value' => 'string(.)' },
+              'content' => { 'xpath' => '/feed/entry/content', 'value' => 'string(.)' },
             }
           }, keep_events_for: 2.days)
           @checker.user = users(:bob)
@@ -1001,8 +1020,8 @@ fire: hot
               'type' => 'html',
               'data_from_event' => '{{ some_object.some_data }}',
               'extract' => {
-                'title' => { 'css' => ".title", 'value' => ".//text()" },
-                'body' => { 'css' => "div span.body", 'value' => ".//text()" }
+                'title' => { 'css' => ".title", 'value' => "string(.)" },
+                'body' => { 'css' => "div span.body", 'value' => "string(.)" }
               }
             )
           end
