@@ -101,7 +101,7 @@ if_true(!ENV['BACKGROUND_JOB_PROCESSOR'] || ENV['BACKGROUND_JOB_PROCESSOR'] == '
 end
 
 if_true(ENV['BACKGROUND_JOB_PROCESSOR'] == 'sidekiq') do
-  gem 'sidekiq', '~> 4.2.2', require: false
+  gem 'sidekiq', '~> 4.2.3', require: false
   gem 'sidekiq-failures', '~> 0.4.5', require: false
 end
 

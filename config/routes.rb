@@ -76,8 +76,6 @@ Huginn::Application.routes.draw do
     end
 
     constraints admin_constraint do
-      require 'sidekiq/web'
-
       mount Sidekiq::Web => '/sidekiq'
     end
   else

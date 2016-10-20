@@ -29,6 +29,9 @@ if Rails.configuration.active_job.queue_adapter == :delayed_job
 elsif Rails.configuration.active_job.queue_adapter == :sidekiq
   require 'sidekiq'
   require 'sidekiq-failures'
+  require 'sidekiq/web'
+
+  Sidekiq::Web.set :sessions, false
 
   Sidekiq.configure_server do |config|
     config.redis = { url: ENV['REDIS_URL'].presence || 'redis://localhost:6379/1' }

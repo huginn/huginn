@@ -580,10 +580,10 @@ GEM
     shellany (0.0.1)
     shoulda-matchers (3.0.0)
       activesupport (>= 4.0.0)
-    sidekiq (4.2.2)
+    sidekiq (4.2.3)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
-      rack-protection (~> 1.5)
+      rack-protection (>= 1.5.0)
       redis (~> 3.2, >= 3.2.1)
     sidekiq-failures (0.4.5)
       sidekiq (>= 2.16.0)
@@ -765,7 +765,7 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   select2-rails (~> 3.5.4)
   shoulda-matchers
-  sidekiq (~> 4.2.2)
+  sidekiq (~> 4.2.3)
   sidekiq-failures (~> 0.4.5)
   slack-notifier (~> 1.0.0)
   spectrum-rails
