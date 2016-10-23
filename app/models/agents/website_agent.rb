@@ -26,6 +26,7 @@ module Agents
       * Set the `url_from_event` option to a Liquid template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
       * Alternatively, set `data_from_event` to a Liquid template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
+      * Setting the "include_url" option to true will pass the input URL back out in the payload which is useful for later constructing various messages referring to the initial URL.
 
       # Supported Document Types
 
@@ -106,6 +107,8 @@ module Agents
 
       Set `http_success_codes` to an array of status codes (e.g., `[404, 422]`) to treat HTTP response codes beyond 200 as successes.
 
+      Set `include_url` to output the original URL as part of the payload.
+
       # Liquid Templating
 
       In Liquid templating, the following variable is available:
@@ -139,6 +142,7 @@ module Agents
           'url' => "http://xkcd.com",
           'type' => "html",
           'mode' => "on_change",
+          'include_url' => false,
           'extract' => {
             'url' => { 'css' => "#comic img", 'value' => "@src" },
             'title' => { 'css' => "#comic img", 'value' => "@alt" },
@@ -342,6 +346,10 @@ module Agents
           if name.to_s == 'url' && url.present?
             result[name] = (url + Utils.normalize_uri(result[name])).to_s
           end
+        end
+
+        if include_url
+          result['url'] = (url + Utils.normalize_uri(result[name])).to_s
         end
 
         if store_payload!(old_events, result)
