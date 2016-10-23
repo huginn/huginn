@@ -15,7 +15,7 @@ class AdoptXpathInWebsiteAgent < ActiveRecord::Migration
       agent.options['extract'].each { |name, extraction|
         case
         when extraction.delete('text')
-          extraction['value'] = './/text()'
+          extraction['value'] = 'string(.)'
         when attr = extraction.delete('attr')
           extraction['value'] = "@#{attr}"
         end

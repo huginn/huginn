@@ -10,8 +10,8 @@ jane_website_agent:
                  :expected_update_period_in_days => 2,
                  :mode => :on_change,
                  :extract => {
-                     :title => {:css => "item title", :value => './/text()'},
-                     :url => {:css => "item link", :value => './/text()'}
+                     :title => {:css => "item title", :value => 'string(.)'},
+                     :url => {:css => "item link", :value => 'string(.)'}
                  }
                }.to_json.inspect %>
 
