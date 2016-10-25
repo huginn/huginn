@@ -46,6 +46,8 @@ module WebRequestConcern
             # Never try to transcode a binary content
             next
           end
+          # Return body as binary if default_encoding is nil
+          next if encoding.nil?
         end
         body.encode!(Encoding::UTF_8, encoding)
       end
@@ -89,6 +91,9 @@ module WebRequestConcern
     end
   end
 
+  # The default encoding for a text content with no `charset`
+  # specified in the Content-Type header.  Override this and make it
+  # return nil if you want to detect the encoding on your own.
   def default_encoding
     Encoding::UTF_8
   end

@@ -318,110 +318,293 @@ describe Agents::WebsiteAgent do
     end
 
     describe 'encoding' do
-      it 'should be forced with force_encoding option' do
-        huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /no-encoding/).to_return(body: {
-            value: huginn,
-          }.to_json.encode(Encoding::EUC_JP).b, headers: {
-            'Content-Type' => 'application/json',
-          }, status: 200)
-        site = {
-          'name' => "Some JSON Response",
-          'expected_update_period_in_days' => "2",
-          'type' => "json",
-          'url' => "http://no-encoding.example.com",
-          'mode' => 'on_change',
-          'extract' => {
-            'value' => { 'path' => 'value' },
-          },
-          'force_encoding' => 'EUC-JP',
-        }
-        checker = Agents::WebsiteAgent.new(name: "No Encoding Site", options: site)
-        checker.user = users(:bob)
-        checker.save!
-
-        expect { checker.check }.to change { Event.count }.by(1)
-        event = Event.last
-        expect(event.payload['value']).to eq(huginn)
+      let :huginn do
+        "\u{601d}\u{8003}"
       end
 
-      it 'should be overridden with force_encoding option' do
-        huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /wrong-encoding/).to_return(body: {
-            value: huginn,
-          }.to_json.encode(Encoding::EUC_JP).b, headers: {
-            'Content-Type' => 'application/json; UTF-8',
-          }, status: 200)
-        site = {
-          'name' => "Some JSON Response",
-          'expected_update_period_in_days' => "2",
-          'type' => "json",
-          'url' => "http://wrong-encoding.example.com",
-          'mode' => 'on_change',
-          'extract' => {
-            'value' => { 'path' => 'value' },
-          },
-          'force_encoding' => 'EUC-JP',
-        }
-        checker = Agents::WebsiteAgent.new(name: "Wrong Encoding Site", options: site)
-        checker.user = users(:bob)
-        checker.save!
-
-        expect { checker.check }.to change { Event.count }.by(1)
-        event = Event.last
-        expect(event.payload['value']).to eq(huginn)
+      let :odin do
+        "\u{d3}\u{f0}inn"
       end
 
-      it 'should be determined by charset in Content-Type' do
-        huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /charset-euc-jp/).to_return(body: {
-            value: huginn,
-          }.to_json.encode(Encoding::EUC_JP), headers: {
-            'Content-Type' => 'application/json; charset=EUC-JP',
-          }, status: 200)
-        site = {
-          'name' => "Some JSON Response",
-          'expected_update_period_in_days' => "2",
-          'type' => "json",
-          'url' => "http://charset-euc-jp.example.com",
-          'mode' => 'on_change',
-          'extract' => {
-            'value' => { 'path' => 'value' },
-          },
-        }
-        checker = Agents::WebsiteAgent.new(name: "Charset reader", options: site)
-        checker.user = users(:bob)
-        checker.save!
-
-        expect { checker.check }.to change { Event.count }.by(1)
-        event = Event.last
-        expect(event.payload['value']).to eq(huginn)
+      let :url do
+        'http://encoding-test.example.com/'
       end
 
-      it 'should default to UTF-8 when unknown charset is found' do
-        huginn = "\u{601d}\u{8003}"
-        stub_request(:any, /charset-unknown/).to_return(body: {
-            value: huginn,
-          }.to_json.b, headers: {
-            'Content-Type' => 'application/json; charset=unicode',
-          }, status: 200)
-        site = {
-          'name' => "Some JSON Response",
-          'expected_update_period_in_days' => "2",
-          'type' => "json",
-          'url' => "http://charset-unknown.example.com",
-          'mode' => 'on_change',
-          'extract' => {
-            'value' => { 'path' => 'value' },
-          },
-        }
-        checker = Agents::WebsiteAgent.new(name: "Charset reader", options: site)
-        checker.user = users(:bob)
-        checker.save!
+      let :content_type do
+        raise 'define me'
+      end
 
-        expect { checker.check }.to change { Event.count }.by(1)
-        event = Event.last
-        expect(event.payload['value']).to eq(huginn)
+      let :body do
+        raise 'define me'
+      end
+
+      before do
+        stub_request(:any, url).to_return(
+          headers: {
+            'Content-Type' => content_type,
+          },
+          body: body.b,
+          status: 200)
+      end
+
+      let :options do
+        {
+          'name' => 'Some agent',
+          'expected_update_period_in_days' => '2',
+          'url' => url,
+          'mode' => 'on_change',
+        }
+      end
+
+      let :checker do
+        Agents::WebsiteAgent.create!(name: 'Encoding Checker', options: options) { |agent|
+          agent.user = users(:bob)
+        }
+      end
+
+      context 'with no encoding information' do
+        context 'for a JSON file' do
+          let :content_type do
+            'application/json'
+          end
+
+          let :body do
+            {
+              value: huginn,
+            }.to_json
+          end
+
+          let :options do
+            super().merge(
+              'type' => 'json',
+              'extract' => {
+                'value' => { 'path' => 'value' }
+              }
+            )
+          end
+
+          it 'should be assumed to be UTF-8' do
+            expect { checker.check }.to change { Event.count }.by(1)
+            event = Event.last
+            expect(event.payload['value']).to eq(huginn)
+          end
+        end
+
+        context 'for an HTML file' do
+          let :content_type do
+            'text/html'
+          end
+
+          let :options do
+            super().merge(
+              'type' => 'html',
+              'extract' => {
+                'value' => { 'css' => 'title', 'value' => 'string(.)' }
+              }
+            )
+          end
+
+          context 'with a charset in the header' do
+            let :content_type do
+              super() + '; charset=iso-8859-1'
+            end
+
+            let :body do
+              <<-HTML.encode(Encoding::ISO_8859_1)
+<!DOCTYPE html>
+<title>#{odin}</title>
+<p>Hello, world.
+              HTML
+            end
+
+            it 'should be detected from it' do
+              expect { checker.check }.to change { Event.count }.by(1)
+              event = Event.last
+              expect(event.payload['value']).to eq(odin)
+            end
+          end
+
+          context 'with no charset in the header' do
+            let :body do
+              <<-HTML.encode(Encoding::ISO_8859_1)
+<!DOCTYPE html>
+<meta charset="iso-8859-1">
+<title>#{odin}</title>
+<p>Hello, world.
+              HTML
+            end
+
+            it 'should be detected from a meta tag' do
+              expect { checker.check }.to change { Event.count }.by(1)
+              event = Event.last
+              expect(event.payload['value']).to eq(odin)
+            end
+          end
+
+          context 'with charset desclarations both in the header and in the content' do
+            let :content_type do
+              super() + '; charset=iso-8859-1'
+            end
+
+            let :body do
+              <<-HTML.encode(Encoding::ISO_8859_1)
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>#{odin}</title>
+<p>Hello, world.
+              HTML
+            end
+
+            it 'should be detected as that of the header' do
+              expect { checker.check }.to change { Event.count }.by(1)
+              event = Event.last
+              expect(event.payload['value']).to eq(odin)
+            end
+          end
+        end
+
+        context 'for an XML file' do
+          let :content_type do
+            'application/xml'
+          end
+
+          let :options do
+            super().merge(
+              'type' => 'xml',
+              'extract' => {
+                'value' => { 'xpath' => '/root/message', 'value' => 'string(.)' }
+              }
+            )
+          end
+
+          context 'with a charset in the header' do
+            let :content_type do
+              super() + '; charset=euc-jp'
+            end
+
+            let :body do
+              <<-XML.encode(Encoding::EUC_JP)
+<?xml version="1.0"?>
+<root>
+  <message>#{huginn}</message>
+</root>
+              XML
+            end
+
+            it 'should be detected from it' do
+              expect { checker.check }.to change { Event.count }.by(1)
+              event = Event.last
+              expect(event.payload['value']).to eq(huginn)
+            end
+          end
+
+          context 'with no charset in the header' do
+            context 'but in XML declaration' do
+              let :body do
+                <<-XML.encode(Encoding::EUC_JP)
+<?xml version="1.0" encoding="euc-jp"?>
+<root>
+  <message>#{huginn}</message>
+</root>
+                XML
+              end
+
+              it 'should be detected' do
+                expect { checker.check }.to change { Event.count }.by(1)
+                event = Event.last
+                expect(event.payload['value']).to eq(huginn)
+              end
+            end
+
+            context 'but having a BOM' do
+              let :body do
+                <<-XML.encode(Encoding::UTF_16LE)
+\u{feff}<?xml version="1.0"?>
+<root>
+  <message>#{huginn}</message>
+</root>
+                XML
+              end
+
+              it 'should be detected' do
+                expect { checker.check }.to change { Event.count }.by(1)
+                event = Event.last
+                expect(event.payload['value']).to eq(huginn)
+              end
+            end
+          end
+        end
+      end
+
+      context 'when force_encoding option is specified' do
+        let :options do
+          super().merge(
+            'force_encoding' => 'EUC-JP'
+          )
+        end
+
+        context 'for a JSON file' do
+          let :content_type do
+            'application/json'
+          end
+
+          let :body do
+            {
+              value: huginn,
+            }.to_json.encode(Encoding::EUC_JP)
+          end
+
+          let :options do
+            super().merge(
+              'type' => 'json',
+              'extract' => {
+                'value' => { 'path' => 'value' }
+              }
+            )
+          end
+
+          it 'should be forced' do
+            expect { checker.check }.to change { Event.count }.by(1)
+            event = Event.last
+            expect(event.payload['value']).to eq(huginn)
+          end
+        end
+
+        context 'for an HTML file' do
+          let :content_type do
+            'text/html'
+          end
+
+          context 'with charset specified in the header and the content' do
+            let :content_type do
+              super() + '; charset=UTF-8'
+            end
+
+            let :body do
+              <<-HTML.encode(Encoding::EUC_JP)
+<!DOCTYPE html>
+<meta charset="UTF-8"/>
+<title>#{huginn}</title>
+<p>Hello, world.
+              HTML
+            end
+
+            let :options do
+              super().merge(
+                'type' => 'html',
+                'extract' => {
+                  'value' => { 'css' => 'title', 'value' => 'string(.)' }
+                }
+              )
+            end
+
+            it 'should still be forced' do
+              expect { checker.check }.to change { Event.count }.by(1)
+              event = Event.last
+              expect(event.payload['value']).to eq(huginn)
+            end
+          end
+        end
       end
     end
 
