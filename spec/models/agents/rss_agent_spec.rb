@@ -251,6 +251,12 @@ describe Agents::RssAgent do
       expect(event.payload['enclosure']).to eq({ "url" => "http://c.1tw.org/images/2015/itsy.png", "type" => "image/png", "length" => "48249" })
       expect(event.payload['image']).to eq("http://c.1tw.org/images/2015/itsy.png")
     end
+
+    it "ignores an empty author" do
+      agent.check
+      event = agent.events.first
+      expect(event.payload['authors']).to eq([])
+    end
   end
 
   describe 'logging errors with the feed url' do
