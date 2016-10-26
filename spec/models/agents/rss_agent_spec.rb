@@ -9,7 +9,7 @@ describe Agents::RssAgent do
 
     stub_request(:any, /github.com/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/github_rss.atom")), :status => 200)
     stub_request(:any, /SlickdealsnetFP/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/slickdeals.atom")), :status => 200)
-    stub_request(:any, /onethingwell.org/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/onethingwell.atom")), :status => 200)
+    stub_request(:any, /onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")), status: 200)
   end
 
   let(:agent) do
