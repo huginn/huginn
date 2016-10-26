@@ -8,6 +8,10 @@ module FeedjiraExtension
   ENCLOSURE_ATTRS = %i[url type length]
 
   class Author < Struct.new(*AUTHOR_ATTRS)
+    def empty?
+      all?(&:nil?)
+    end
+
     def to_json(options = nil)
       members.flat_map { |key|
         if value = self[key].presence
@@ -110,10 +114,14 @@ module FeedjiraExtension
           ].each do |name|
             sax_config.top_level_elements[name].clear
 
-            elements name, class: RssAuthor, as: :authors
+            elements name, class: RssAuthor, as: :_authors
           end
         else
-          elements :author, class: AtomAuthor, as: :authors
+          elements :author, class: AtomAuthor, as: :_authors
+        end
+
+        def authors
+          _authors.reject(&:empty?)
         end
 
         def alternate_link
