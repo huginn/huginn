@@ -45,8 +45,8 @@ module FeedjiraExtension
       rescue
         self.name = content
       else
-        self.name = addr.name
-        self.email = addr.address
+        self.name = addr.name rescue nil
+        self.email = addr.address rescue nil
       end
     end
 
