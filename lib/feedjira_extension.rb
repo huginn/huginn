@@ -13,8 +13,8 @@ module FeedjiraExtension
     end
 
     def to_json(options = nil)
-      members.flat_map { |key|
-        if value = self[key].presence
+      each_pair.flat_map { |key, value|
+        if value.presence
           case key
           when :email
             "<#{value}>"
