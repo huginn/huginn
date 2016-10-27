@@ -8,9 +8,13 @@ module FeedjiraExtension
   ENCLOSURE_ATTRS = %i[url type length]
 
   class Author < Struct.new(*AUTHOR_ATTRS)
+    def empty?
+      all?(&:nil?)
+    end
+
     def to_json(options = nil)
-      members.flat_map { |key|
-        if value = self[key].presence
+      each_pair.flat_map { |key, value|
+        if value.presence
           case key
           when :email
             "<#{value}>"
@@ -45,8 +49,8 @@ module FeedjiraExtension
       rescue
         self.name = content
       else
-        self.name = addr.name
-        self.email = addr.address
+        self.name = addr.name rescue nil
+        self.email = addr.address rescue nil
       end
     end
 
@@ -76,6 +80,12 @@ module FeedjiraExtension
       attribute attr
     end
 
+    def empty?
+      LINK_ATTRS.all? { |attr|
+        __send__(attr).nil?
+      }
+    end
+
     def to_json(options = nil)
       LINK_ATTRS.each_with_object({}) { |key, hash|
         if value = __send__(key)
@@ -90,10 +100,20 @@ module FeedjiraExtension
 
     value :href
 
+    def empty?
+      !href.is_a?(String)
+    end
+
     def to_json(options = nil)
-      {
-        href: href
-      }.to_json(options)
+      case href
+      when String
+        { href: href }
+      else
+        # Ignore non-string values, because SaxMachine leaks its
+        # internal value :no_buffer when the content of an element
+        # is empty.
+        {}
+      end.to_json(options)
     end
   end
 
@@ -110,10 +130,14 @@ module FeedjiraExtension
           ].each do |name|
             sax_config.top_level_elements[name].clear
 
-            elements name, class: RssAuthor, as: :authors
+            elements name, class: RssAuthor, as: :_authors
           end
         else
-          elements :author, class: AtomAuthor, as: :authors
+          elements :author, class: AtomAuthor, as: :_authors
+        end
+
+        def authors
+          _authors.reject(&:empty?)
         end
 
         def alternate_link
@@ -166,14 +190,18 @@ module FeedjiraExtension
           when /FeedBurner/
             elements :'atok10:link', class: AtomLink, as: :atom_links
 
-              def links
-                @links ||= [*rss_links, *atom_links]
-              end
+            def _links
+              [*rss_links, *atom_links]
+            end
           else
-            alias_method :links, :rss_links
+            alias_method :_links, :rss_links
           end
         else
-          elements :link, class: AtomLink, as: :links
+          elements :link, class: AtomLink, as: :_links
+        end
+
+        def links
+          _links.reject(&:empty?)
         end
 
         def alternate_link
