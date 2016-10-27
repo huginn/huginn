@@ -8,8 +8,10 @@ describe Agents::RssAgent do
     }
 
     stub_request(:any, /github.com/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/github_rss.atom")), :status => 200)
+    stub_request(:any, /bad.github.com/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/github_rss.atom")).gsub(/<link [^>]+\/>/, '<link/>'), status: 200)
     stub_request(:any, /SlickdealsnetFP/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/slickdeals.atom")), :status => 200)
     stub_request(:any, /onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")), status: 200)
+    stub_request(:any, /bad.onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")).gsub(/(?<=<link>)[^<]*/, ''), status: 200)
   end
 
   let(:agent) do
@@ -256,6 +258,30 @@ describe Agents::RssAgent do
       agent.check
       event = agent.events.first
       expect(event.payload['authors']).to eq([])
+    end
+
+    context 'with an empty link in RSS' do
+      before do
+        @valid_options['url'] = 'http://bad.onethingwell.org/rss'
+      end
+
+      it "does not leak :no_buffer" do
+        agent.check
+        event = agent.events.first
+        expect(event.payload['links']).to eq([])
+      end
+    end
+
+    context 'with an empty link in RSS' do
+      before do
+        @valid_options['url'] = "https://bad.github.com/cantino/huginn/commits/master.atom"
+      end
+
+      it "does not leak :no_buffer" do
+        agent.check
+        event = agent.events.first
+        expect(event.payload['links']).to eq([])
+      end
     end
   end
 
