@@ -94,12 +94,12 @@ module Agents
 
       Set `uniqueness_look_back` to limit the number of events checked for uniqueness (typically for performance).  This defaults to the larger of #{UNIQUENESS_LOOK_BACK} or #{UNIQUENESS_FACTOR}x the number of detected received results.
 
-      Set `force_encoding` to an encoding name (such as `UTF-8` and `ISO-8859-1`) if the website is known to respond with a missing, invalid, or wrong charset in the Content-Type header.  Below are the steps to detect the encoding of a fetched content:
+      Set `force_encoding` to an encoding name (such as `UTF-8` and `ISO-8859-1`) if the website is known to respond with a missing, invalid, or wrong charset in the Content-Type header.  Below are the steps used by Huginn to detect the encoding of fetched content:
 
-      1. If `force_encoding` is given, use the value.
-      2. If the Content-Type header contains a charset parameter, use the value.
-      3. When `type` is `html` or `xml`, check for the presence of a BOM, XML declaration with attribute "encoding", and an HTML meta tag with charset information.
-      4. Fall back to UTF-8 (not ISO-8859-1).
+      1. If `force_encoding` is given, that value is used.
+      2. If the Content-Type header contains a charset parameter, that value is used.
+      3. When `type` is `html` or `xml`, Huginn checks for the presence of a BOM, XML declaration with attribute "encoding", or an HTML meta tag with charset information, and uses that if found.
+      4. Huginn falls back to UTF-8 (not ISO-8859-1).
 
       Set `user_agent` to a custom User-Agent name if the website does not like the default value (`#{default_user_agent}`).
 
