@@ -124,7 +124,11 @@ module Agents
 
       # Liquid Templating
 
-      In Liquid templating, the following variables are available except when invoked by `data_from_event`:
+      In Liquid templating, the following variables are available:
+
+      * `_loop_`: An object that holds information about the iteration on extracted items, only available in the `template` option.  It has the same structure as the [forloop](https://help.shopify.com/themes/liquid/objects/for-loops) object in a `for` loop.  For example, `{{ _loop_.index }}` expands to a 1-based index for each extracted item.  Indices are in the order of appearance in a document unaffected by `events_order`, and reset per document.
+
+      The variables below are not defined when processing `data_from_event`.
 
       * `_url_`: The URL specified to fetch the content from.
 
@@ -390,6 +394,7 @@ module Agents
         result =
           if template
             interpolate_with(extracted) do
+              interpolation_context['_loop_'] = LoopDrop.new(index, num_tuples)
               interpolate_options(template)
             end
           else
@@ -619,6 +624,35 @@ module Agents
     class HeaderDrop < LiquidDroppable::Drop
       def before_method(name)
         @object[name.tr('_', '-')]
+      end
+    end
+
+    class LoopDrop < Liquid::Drop
+      def initialize(index0, length)
+        @index0 = index0
+        @length = length
+      end
+
+      attr_reader :index0, :length
+
+      def index
+        @index0 + 1
+      end
+
+      def first
+        @index0.zero?
+      end
+
+      def last
+        @index0 == @length - 1
+      end
+
+      def rindex
+        @length - @index0
+      end
+
+      def rindex0
+        @length - @index0 - 1
       end
     end
   end
