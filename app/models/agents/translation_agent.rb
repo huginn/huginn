@@ -7,7 +7,7 @@ module Agents
 
       Services are provided using Microsoft Translator. You can [sign up](https://datamarket.azure.com/dataset/bing/microsofttranslator) and [register your application](https://datamarket.azure.com/developer/applications/register) to get `client_id` and `client_secret` which are required to use this agent.
       
-      `to` must be filled with a [translator language code](http://msdn.microsoft.com/en-us/library/hh456380.aspx).
+      `to` must be filled with a [translator language code](https://msdn.microsoft.com/en-us/library/hh456380.aspx).
 
       Specify what you would like to translate in `content` field, you can use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) specify which part of the payload you want to translate.
 
@@ -34,7 +34,7 @@ module Agents
     end
 
     def translate(text, to, access_token)
-      translate_uri = URI 'http://api.microsofttranslator.com/v2/Ajax.svc/Translate'
+      translate_uri = URI 'https://api.microsofttranslator.com/v2/Ajax.svc/Translate'
       params = {
         'text' => text,
         'to' => to
@@ -63,7 +63,7 @@ module Agents
       auth_uri = URI "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
       response = postform auth_uri, :client_id => interpolated['client_id'],
                                     :client_secret => interpolated['client_secret'],
-                                    :scope => "http://api.microsofttranslator.com",
+                                    :scope => "https://api.microsofttranslator.com",
                                     :grant_type => "client_credentials"
       access_token = JSON.parse(response.body)["access_token"]
       incoming_events.each do |event|
