@@ -523,36 +523,38 @@ module Agents
 
     def extract_each(&block)
       interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
-        output[name] = block.call(extraction_details)
+        values = []
+        block.call(extraction_details, values)
+        log "Values extracted: #{values}"
+        output[name] = values
       }
     end
 
     def extract_json(doc)
-      extract_each { |extraction_details|
-        result = Utils.values_at(doc, extraction_details['path'])
-        log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
-        result
+      extract_each { |extraction_details, values|
+        log "Extracting #{extraction_type} at #{extraction_details['path']}"
+        Utils.values_at(doc, extraction_details['path']).each { |value|
+          values << value
+        }
       }
     end
 
     def extract_text(doc)
-      extract_each { |extraction_details|
+      extract_each { |extraction_details, values|
         regexp = Regexp.new(extraction_details['regexp'])
+        log "Extracting #{extraction_type} with #{regexp}"
         case index = extraction_details['index']
         when /\A\d+\z/
           index = index.to_i
         end
-        result = []
         doc.scan(regexp) {
-          result << Regexp.last_match[index]
+          values << Regexp.last_match[index]
         }
-        log "Extracting #{extraction_type} at #{regexp}: #{result}"
-        result
       }
     end
 
     def extract_xml(doc)
-      extract_each { |extraction_details|
+      extract_each { |extraction_details, values|
         case
         when css = extraction_details['css']
           nodes = doc.css(css)
@@ -561,22 +563,21 @@ module Agents
         else
           raise '"css" or "xpath" is required for HTML or XML extraction'
         end
+        log "Extracting #{extraction_type} at #{xpath || css}"
         case nodes
         when Nokogiri::XML::NodeSet
-          result = nodes.map { |node|
+          nodes.each { |node|
             case value = node.xpath(extraction_details['value'] || '.')
             when Float
               # Node#xpath() returns any numeric value as float;
               # convert it to integer as appropriate.
               value = value.to_i if value.to_i == value
             end
-            value.to_s
+            values << value.to_s
           }
         else
           raise "The result of HTML/XML extraction was not a NodeSet"
         end
-        log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
-        result
       }
     end
 
