@@ -1,6 +1,7 @@
 GIT
-  remote: git://github.com/amatsuda/kaminari.git
+  remote: https://github.com/amatsuda/kaminari.git
   revision: abbf93d557208ee1d0b612c612cd079f86ed54f4
+  ref: abbf93d557208ee1d0b612c612cd079f86ed54f4
   branch: 0-17-stable
   specs:
     kaminari (0.17.0)
@@ -8,7 +9,7 @@ GIT
       activesupport (>= 3.0.0)
 
 GIT
-  remote: git://github.com/cantino/twitter-stream.git
+  remote: https://github.com/cantino/twitter-stream.git
   revision: f7e7edb0bae013bffabf3598e7147773d9fd370f
   branch: huginn
   specs:
@@ -18,7 +19,7 @@ GIT
       simple_oauth (~> 0.3.0)
 
 GIT
-  remote: git://github.com/dsander/delayed_job_active_record.git
+  remote: https://github.com/dsander/delayed_job_active_record.git
   revision: b314972ccc92e0e8b03b1589174d8fb9a82b3cd0
   branch: rails5
   specs:
@@ -27,7 +28,7 @@ GIT
       delayed_job (>= 3.0, < 5)
 
 GIT
-  remote: git://github.com/dsander/weibo_2.git
+  remote: https://github.com/dsander/weibo_2.git
   revision: e5b77f21a7e9a666b582c48e16b1e96fca198cf8
   branch: master
   specs:
@@ -38,7 +39,7 @@ GIT
       rest-client (~> 1.8)
 
 GIT
-  remote: git://github.com/lostisland/faraday_middleware.git
+  remote: https://github.com/lostisland/faraday_middleware.git
   revision: 59088da02940d0ee2010b2e3156343346767c31e
   branch: master
   specs:
@@ -46,8 +47,9 @@ GIT
       faraday (>= 0.7.4, < 1.0)
 
 GIT
-  remote: git://github.com/tumblr/tumblr_client.git
+  remote: https://github.com/tumblr/tumblr_client.git
   revision: 0c59b04e49f2a8c89860613b18cf4e8f978d8dc7
+  ref: 0c59b04e49f2a8c89860613b18cf4e8f978d8dc7
   branch: master
   specs:
     tumblr_client (0.8.5)
@@ -703,4 +705,4 @@ RUBY VERSION
    ruby 2.3.3p222
 
 BUNDLED WITH
-   1.13.6
+   1.13.7
