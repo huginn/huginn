@@ -396,8 +396,13 @@ module Agents
             extracted
           end
 
-        if payload_url = result['url'].presence
-          result['url'] = (url + Utils.normalize_uri(payload_url)).to_s
+        # url may be URI, string or nil
+        if (payload_url = result['url'].presence) && (url = url.presence)
+          begin
+            result['url'] = (Utils.normalize_uri(url) + Utils.normalize_uri(payload_url)).to_s
+          rescue URI::Error
+            error "Cannot resolve url: <#{payload_url}> on <#{url}>"
+          end
         end
 
         if store_payload!(old_events, result)
