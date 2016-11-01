@@ -111,9 +111,22 @@ module Agents
 
       Set `http_success_codes` to an array of status codes (e.g., `[404, 422]`) to treat HTTP response codes beyond 200 as successes.
 
+      If a `template` option is given, it is used as a Liquid template for each event created by this Agent, instead of directly emitting the results of extraction as events.  In the template, keys of extracted data can be interpolated, and some additional variables are also available as explained in the next section.  For example:
+
+          "template": {
+            "url": "{{ url }}",
+            "title": "{{ title }}",
+            "description": "{{ body_text }}",
+            "last_modified": "{{ _response_.headers.Last-Modified | date: '%FT%T' }}"
+          }
+
+      In the `on_change` mode, change is detected based on the resulted event payload after applying this option.  If you want to add some keys to each event but ignore any change in them, set `mode` to `all` and put a DeDuplicationAgent downstream.
+
       # Liquid Templating
 
-      In Liquid templating, the following variable is available:
+      In Liquid templating, the following variables are available except when invoked by `data_from_event`:
+
+      * `_url_`: The URL specified to fetch the content from.
 
       * `_response_`: A response object with the following keys:
 
@@ -121,14 +134,18 @@ module Agents
 
           * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
 
+          * `url`: The final URL of the fetched page, following redirects.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _request_.url }}` and `{{ content | rebase_hrefs: _request_.url }}`.
+
       # Ordering Events
 
       #{description_events_order}
     MD
 
     event_description do
+      keys = options['template'].presence || options['extract'].keys
+
       "Events will have the following fields:\n\n    %s" % [
-        Utils.pretty_print(Hash[options['extract'].keys.map { |key|
+        Utils.pretty_print(Hash[keys.map { |key|
           [key, "..."]
         }])
       ]
@@ -157,6 +174,7 @@ module Agents
       errors.add(:base, "either url, url_from_event, or data_from_event are required") unless options['url'].present? || options['url_from_event'].present? || options['data_from_event'].present?
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
       validate_extract_options!
+      validate_template_options!
       validate_http_success_codes!
 
       # Check for optional fields
@@ -281,6 +299,15 @@ module Agents
       end
     end
 
+    def validate_template_options!
+      template = options['template'].presence or return
+
+      unless Hash === template &&
+             template.each_pair.all? { |key, value| String === value }
+        errors.add(:base, 'template must be a hash of strings.')
+      end
+    end
+
     def check
       check_urls(interpolated['url'])
     end
@@ -305,6 +332,7 @@ module Agents
       raise "Failed: #{response.inspect}" unless consider_response_successful?(response)
 
       interpolation_context.stack {
+        interpolation_context['_url_'] = uri.to_s
         interpolation_context['_response_'] = ResponseDrop.new(response)
         handle_data(response.body, response.env[:url], existing_payload)
       }
@@ -343,20 +371,33 @@ module Agents
             extract_xml(doc)
         end
 
-      num_unique_lengths = interpolated['extract'].keys.map { |name| output[name].length }.uniq
-
-      if num_unique_lengths.length != 1
+      if output.each_value.each_cons(2).any? { |m, n| m.size != n.size }
         raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
       end
 
-      old_events = previous_payloads num_unique_lengths.first
-      num_unique_lengths.first.times do |index|
-        result = {}
-        interpolated['extract'].keys.each do |name|
-          result[name] = output[name][index]
-          if name.to_s == 'url' && url.present?
-            result[name] = (url + Utils.normalize_uri(result[name])).to_s
+      num_tuples = output.each_value.first.size
+
+      old_events = previous_payloads num_tuples
+
+      template = options['template'].presence
+
+      num_tuples.times do |index|
+        extracted = {}
+        interpolated['extract'].each_key do |name|
+          extracted[name] = output[name][index]
+        end
+
+        result =
+          if template
+            interpolate_with(extracted) do
+              interpolate_options(template)
+            end
+          else
+            extracted
           end
+
+        if payload_url = result['url'].presence
+          result['url'] = (url + Utils.normalize_uri(payload_url)).to_s
         end
 
         if store_payload!(old_events, result)
@@ -566,6 +607,11 @@ module Agents
       # Integer value of HTTP status
       def status
         @object.status
+      end
+
+      # The URL
+      def url
+        @object.env.url.to_s
       end
     end
 
