@@ -35,7 +35,9 @@ module Agents
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
-      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
+      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor except when it has `repeat` set to true.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
+
+      For extractors with `repeat` set to true, their first matches will be included in all extracts.  This is useful such as when you want to include the title of a page in all events created from the page.
 
       # Scraping HTML and XML
 
@@ -44,7 +46,8 @@ module Agents
           "extract": {
             "url": { "css": "#comic img", "value": "@src" },
             "title": { "css": "#comic img", "value": "@title" },
-            "body_text": { "css": "div.main", "value": "string(.)" }
+            "body_text": { "css": "div.main", "value": "string(.)" },
+            "page_title": { "css": "title", "value": "string(.)", "repeat": true }
           }
 
       "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and `string(.)` gives a string with all the enclosed text nodes concatenated without entity escaping (such as `&amp;`). To extract the innerHTML, use `./node()`; and to extract the outer HTML, use `.`.
@@ -379,21 +382,24 @@ module Agents
             extract_xml(doc)
         end
 
-      if output.each_value.each_cons(2).any? { |m, n| m.size != n.size }
-        raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
-      end
-
-      num_tuples = output.each_value.first.size
+      num_tuples = output.each_value.inject(nil) { |num, value|
+        case size = value.size
+        when Float::INFINITY
+          num
+        when Integer
+          if num && num != size
+            raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
+          end
+          size
+        end
+      } or raise "At least one non-repeat key is required"
 
       old_events = previous_payloads num_tuples
 
       template = options['template'].presence
 
-      num_tuples.times do |index|
-        extracted = {}
-        interpolated['extract'].each_key do |name|
-          extracted[name] = output[name][index]
-        end
+      num_tuples.times.zip(*output.values) do |index, *values|
+        extracted = output.each_key.lazy.zip(values).to_h
 
         result =
           if template
@@ -523,8 +529,14 @@ module Agents
 
     def extract_each(&block)
       interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
-        values = []
-        block.call(extraction_details, values)
+        if boolify(extraction_details['repeat'])
+          values = Repeater.new { |repeater|
+            block.call(extraction_details, repeater)
+          }
+        else
+          values = []
+          block.call(extraction_details, values)
+        end
         log "Values extracted: #{values}"
         output[name] = values
       }
@@ -603,6 +615,31 @@ module Agents
       Integer(value) >= 0
     rescue
       false
+    end
+
+    class Repeater < Enumerator
+      # Repeater.new { |y|
+      #   # ...
+      #   y << value
+      # } #=> [value, ...]
+      def initialize(&block)
+        @value = nil
+        super(Float::INFINITY) { |y|
+          loop { y << @value }
+        }
+        catch(@done = Object.new) {
+          block.call(self)
+        }
+      end
+
+      def <<(value)
+        @value = value
+        throw @done
+      end
+
+      def to_s
+        "[#{@value.inspect}, ...]"
+      end
     end
 
     # Wraps Faraday::Response
