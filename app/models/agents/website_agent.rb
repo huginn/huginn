@@ -27,6 +27,8 @@ module Agents
       * Alternatively, set `data_from_event` to a Liquid template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
 
+      If a created Event has a key named `url` containing a relative URL, it is automatically resolved using the request URL as base.
+
       # Supported Document Types
 
       The `type` value can be `xml`, `html`, `json`, or `text`.
