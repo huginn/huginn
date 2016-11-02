@@ -750,19 +750,50 @@ describe Agents::WebsiteAgent do
       end
 
       it "should be formatted by template after extraction" do
-        @valid_options['template'] = {
-          'url' => '{{url}}',
-          'title' => '{{title | upcase}}',
-          'summary' => '{{title}}: {{hovertext | truncate: 20}}',
-        }
+        stub_request(:any, /onethingwell/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")),
+                                                     status: 200)
+        @valid_options.update(
+          'type' => 'xml',
+          'url' => 'http://example.com/onethingwell.rss',
+          'extract' => {
+            'title' => { 'xpath' => '/rss/channel/item/title', 'value' => 'string(.)' },
+            'url' => { 'xpath' => '/rss/channel/item/link', 'value' => 'string(.)' },
+            'pubDate' => { 'xpath' => '/rss/channel/item/pubDate', 'value' => 'string(.)' },
+          },
+          'template' => {
+            'url' => '{{url}}',
+            'title' => '{{title | upcase}}',
+            'published_at' => '{{pubDate | date: "%FT%T"}}',
+            'loop_info' => '{{_loop_.index0}}/{{_loop_.index}}/{{_loop_.rindex0}}/{{_loop_.rindex}}/{{_loop_.length}}{% if _loop_.first %}(first){% endif %}{% if _loop_.last %}(last){% endif %}',
+          }
+        )
         @checker.options = @valid_options
-        @checker.check
-        event = Event.last
-        expect(event.payload).to eq({
-                                      'title' => 'EVOLVING',
-                                      'url' => 'http://imgs.xkcd.com/comics/evolving.png',
-                                      'summary' => 'Evolving: Biologists play r...',
+        expect { @checker.check }.to change { Event.count }.by(20)
+        first, second, *, penultimate, last = Event.last(20)
+        expect(first.payload).to eq({
+                                      "url" => "http://onethingwell.org/post/127163643556",
+                                      "title" => "CSVFIX",
+                                      "published_at" => "2015-08-20T17:00:10",
+                                      "loop_info" => "0/1/19/20/20(first)",
                                     })
+        expect(second.payload).to eq({
+                                       "loop_info" => "1/2/18/19/20",
+                                       "published_at" => "2015-08-20T15:00:19",
+                                       "title" => "GEMINI",
+                                       "url" => "http://onethingwell.org/post/127157126678",
+                                     })
+        expect(penultimate.payload).to eq({
+                                            "loop_info" => "18/19/1/2/20",
+                                            "published_at" => "2015-07-31T15:00:10",
+                                            "title" => "FORD",
+                                            "url" => "http://onethingwell.org/post/125515167956",
+                                          })
+        expect(last.payload).to eq({
+                                     "url" => "http://onethingwell.org/post/125509667816",
+                                     "title" => "SHOWGOERS",
+                                     "published_at" => "2015-07-31T13:00:13",
+                                     "loop_info" => "19/20/0/1/20(last)",
+                                   })
       end
 
       describe "XML" do
