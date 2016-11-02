@@ -36,7 +36,7 @@ module Agents
     end
 
     def check
-      response = HTTParty.get("http://reddit.com/r/#{options['subreddit']}", headers: {"User-Agent" => "ravenflightv0.1"})
+      response = HTTParty.get("http://reddit.com/r/#{options['subreddit']}", headers: {"User-Agent" => "huginn-crawler"})
       items = extract_reddit_items(response.body)
       qualified_items = items.reject { |item| item.score < options['minimum_score'].to_i }
       new_items = qualified_items.reject { |item| already_evented? item }
