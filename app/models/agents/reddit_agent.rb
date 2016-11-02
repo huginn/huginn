@@ -13,7 +13,7 @@ module Agents
             "title": "New Disney/Pixar Short \"Piper\"",
             "url": "https://vimeo.com/189901272",
             "comments_url": "https://www.reddit.com/r/videos/comments/5arlo9/new_disneypixar_short_piper/",
-  			    "score": 6172
+            "score": 6172
           }
     MD
 
@@ -30,9 +30,9 @@ module Agents
     end
 
     def validate_options
-			unless %w[expected_update_period_in_days subreddit minimum_score].all? { |field| options[field].present? }
-				errors.add(:base, "All fields are required")
-			end
+      unless %w[expected_update_period_in_days subreddit minimum_score].all? { |field| options[field].present? }
+        errors.add(:base, "All fields are required")
+      end
     end
 
     def check
