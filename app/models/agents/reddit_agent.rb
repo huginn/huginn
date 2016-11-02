@@ -40,7 +40,6 @@ module Agents
       items = extract_reddit_items(response.body)
       qualified_items = items.reject { |item| item.score < options['minimum_score'].to_i }
       new_items = qualified_items.reject { |item| already_evented? item }
-      puts new_items.map(&:title).join("\n")
       new_items.each do |item|
         create_event :payload => item.to_h
       end
