@@ -1160,8 +1160,9 @@ fire: hot
             @event.payload = {
               'something' => 'some value',
               'some_object' => {
-                'some_data' => { hello: 'world' }.to_json
-              }
+                'some_data' => { hello: 'world', href: '/world' }.to_json
+              },
+              url: 'http://example.com/'
             }
             @event.save!
 
@@ -1169,7 +1170,8 @@ fire: hot
               'type' => 'json',
               'data_from_event' => '{{ some_object.some_data }}',
               'extract' => {
-                'value' => { 'path' => 'hello' }
+                'value' => { 'path' => 'hello' },
+                'url' => { 'path' => 'href' },
               }
             )
           end
@@ -1178,7 +1180,7 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq({ 'value' => 'world' })
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world' })
           end
 
           it "should support merge mode" do
@@ -1187,7 +1189,7 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world'))
+            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world'))
           end
 
           it "should output an error when nothing can be found at the path" do
