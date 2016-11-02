@@ -38,7 +38,7 @@ module Agents
     def check
       response = HTTParty.get("http://reddit.com/r/#{options['subreddit']}", headers: {"User-Agent" => "ravenflightv0.1"})
       items = extract_reddit_items(response.body)
-      qualified_items = items.reject { |item| item.score < options['minimum_score'] }
+      qualified_items = items.reject { |item| item.score < options['minimum_score'].to_i }
       new_items = qualified_items.reject { |item| already_evented? item }
       puts new_items.map(&:title).join("\n")
 			# event = {items: new_items.map(&:to_h)}
