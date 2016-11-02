@@ -669,25 +669,6 @@ describe Agents::WebsiteAgent do
         )
       end
 
-      it "should turn relative urls to absolute" do
-        rel_site = {
-          'name' => "XKCD",
-          'expected_update_period_in_days' => "2",
-          'type' => "html",
-          'url' => "http://xkcd.com",
-          'mode' => "on_change",
-          'extract' => {
-            'url' => {'css' => "#topLeft a", 'value' => "@href"},
-          }
-        }
-        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
-        rel.user = users(:bob)
-        rel.save!
-        rel.check
-        event = Event.last
-        expect(event.payload['url']).to eq("http://xkcd.com/about")
-      end
-
       it "should return an integer value if XPath evaluates to one" do
         rel_site = {
           'name' => "XKCD",
@@ -1198,7 +1179,11 @@ fire: hot
               'some_object' => {
                 'some_data' => { hello: 'world', href: '/world' }.to_json
               },
-              url: 'http://example.com/'
+              url: 'http://example.com/',
+              'headers' => {
+                'Content-Type' => 'application/json'
+              },
+              'status' => 200
             }
             @event.save!
 
@@ -1208,6 +1193,12 @@ fire: hot
               'extract' => {
                 'value' => { 'path' => 'hello' },
                 'url' => { 'path' => 'href' },
+              },
+              'template' => {
+                'value' => '{{ value }}',
+                'url' => '{{ url | to_uri: _response_.url }}',
+                'type' => '{{ _response_.headers.content_type }}',
+                'status' => '{{ _response_.status }}'
               }
             )
           end
@@ -1216,7 +1207,7 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world' })
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => '200' })
           end
 
           it "should support merge mode" do
@@ -1225,7 +1216,7 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world'))
+            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => '200'))
           end
 
           it "should output an error when nothing can be found at the path" do
@@ -1362,6 +1353,9 @@ fire: hot
         'mode' => 'all',
         'extract' => {
           'url' => { 'css' => "a", 'value' => "@href" },
+        },
+        'template' => {
+          'url' => '{{ url | to_uri }}',
         }
       }
       @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)

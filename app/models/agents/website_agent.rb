@@ -27,8 +27,6 @@ module Agents
       * Alternatively, set `data_from_event` to a Liquid template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
 
-      If a created Event has a key named `url` containing a relative URL, it is automatically resolved using the request URL as base.
-
       # Supported Document Types
 
       The `type` value can be `xml`, `html`, `json`, or `text`.
@@ -121,6 +119,7 @@ module Agents
       If a `template` option is given, its value must be a hash, whose key-value pairs are interpolated after extraction for each iteration and merged with the payload.  In the template, keys of extracted data can be interpolated, and some additional variables are also available as explained in the next section.  For example:
 
           "template": {
+            "url": "{{ url | to_uri: _request_.url }}",
             "description": "{{ body_text }}",
             "last_modified": "{{ _response_.headers.Last-Modified | date: '%FT%T' }}"
           }
@@ -129,17 +128,17 @@ module Agents
 
       # Liquid Templating
 
-      In Liquid templating, the following variables are available except when invoked by `data_from_event`:
+      In Liquid templating, the following variables are available:
 
-      * `_url_`: The URL specified to fetch the content from.
+      * `_url_`: The URL specified to fetch the content from.  When parsing `data_from_event`, this is not set.
 
       * `_response_`: A response object with the following keys:
 
-          * `status`: HTTP status as integer. (Almost always 200)
+          * `status`: HTTP status as integer. (Almost always 200)  When parsing `data_from_event`, this is set to the value of the `status` key in the incoming Event.
 
-          * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
+          * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.  When parsing `data_from_event`, this is constructed from the value of the `headers` key in the incoming Event.
 
-          * `url`: The final URL of the fetched page, following redirects.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _request_.url }}` and `{{ content | rebase_hrefs: _request_.url }}`.
+          * `url`: The final URL of the fetched page, following redirects.  When parsing `data_from_event`, this is set to the value of the `url` key in the incoming Event.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _request_.url }}` and `{{ content | rebase_hrefs: _request_.url }}`.
 
       # Ordering Events
 
@@ -366,6 +365,8 @@ module Agents
     end
 
     def handle_data(body, url, existing_payload)
+      # Beware, url may be a URI object, string or nil
+
       doc = parse(body)
 
       if extract_full_json?
@@ -398,15 +399,6 @@ module Agents
 
         if template
           result.update(interpolate_options(template, extracted))
-        end
-
-        # url may be URI, string or nil
-        if (payload_url = result['url'].presence) && (url = url.presence)
-          begin
-            result['url'] = (Utils.normalize_uri(url) + Utils.normalize_uri(payload_url)).to_s
-          rescue URI::Error
-            error "Cannot resolve url: <#{payload_url}> on <#{url}>"
-          end
         end
 
         if store_payload!(old_events, result)
@@ -450,7 +442,10 @@ module Agents
     end
 
     def handle_event_data(data, event, existing_payload)
-      handle_data(data, event.payload['url'], existing_payload)
+      interpolation_context.stack {
+        interpolation_context['_response_'] = ResponseFromEventDrop.new(event)
+        handle_data(data, event.payload['url'].presence, existing_payload)
+      }
     rescue => e
       error "Error when handling event data: #{e.message}\n#{e.backtrace.join("\n")}", inbound_event: event
     end
@@ -684,6 +679,27 @@ module Agents
       # The URL
       def url
         @object.env.url.to_s
+      end
+    end
+
+    class ResponseFromEventDrop < LiquidDroppable::Drop
+      def headers
+        case headers = @object.payload[:headers]
+        when Hash
+          HeaderDrop.new(Faraday::Utils::Headers.from(headers))
+        else
+          HeaderDrop.new({})
+        end
+      end
+
+      # Integer value of HTTP status
+      def status
+        @object.payload[:status]
+      end
+
+      # The URL
+      def url
+        @object.payload[:url]
       end
     end
 
