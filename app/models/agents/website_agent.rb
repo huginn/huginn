@@ -144,13 +144,19 @@ module Agents
     MD
 
     event_description do
-      keys = options['template'].presence || options['extract'].keys
+      if keys = event_keys
+        "Events will have the following fields:\n\n    %s" % [
+          Utils.pretty_print(Hash[event_keys.map { |key|
+                                    [key, "..."]
+                                  }])
+        ]
+      else
+        "Events will be the raw JSON returned by the URL."
+      end
+    end
 
-      "Events will have the following fields:\n\n    %s" % [
-        Utils.pretty_print(Hash[keys.map { |key|
-          [key, "..."]
-        }])
-      ]
+    def event_keys
+      (options['template'].presence || options['extract']).try(:keys)
     end
 
     def working?

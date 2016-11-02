@@ -757,6 +757,10 @@ describe Agents::WebsiteAgent do
         }
         @checker.options = @valid_options
         @checker.check
+
+        expect(@checker.event_keys).to contain_exactly('url', 'title', 'summary')
+        expect(@checker.event_description.scan(/"(\w+)": "\.\.\."/).flatten).to contain_exactly('url', 'title', 'summary')
+
         event = Event.last
         expect(event.payload).to eq({
                                       'title' => 'EVOLVING',
@@ -926,6 +930,9 @@ describe Agents::WebsiteAgent do
           checker.user = users(:bob)
           checker.save!
 
+          expect(checker.event_keys).to contain_exactly('version', 'title')
+          expect(checker.event_description.scan(/"(\w+)": "\.\.\."/).flatten).to contain_exactly('version', 'title')
+
           checker.check
           event = Event.last
           expect(event.payload['version']).to eq(2)
@@ -988,6 +995,8 @@ describe Agents::WebsiteAgent do
           checker.user = users(:bob)
           checker.save!
 
+          expect(checker.event_keys).to be_nil
+          expect(checker.event_description).to match(/Events will be the raw JSON returned by the URL/)
           checker.check
           event = Event.last
           expect(event.payload['response']['version']).to eq(2)
