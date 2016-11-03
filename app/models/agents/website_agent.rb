@@ -564,14 +564,7 @@ module Agents
         case nodes
         when Nokogiri::XML::NodeSet
           result = nodes.map { |node|
-            value = node.xpath(extraction_details['value'] || '.')
-            if value.is_a?(Nokogiri::XML::NodeSet)
-              child = value.first
-              if child && child.cdata?
-                value = child.text
-              end
-            end
-            case value
+            case value = node.xpath(extraction_details['value'] || '.')
             when Float
               # Node#xpath() returns any numeric value as float;
               # convert it to integer as appropriate.
