@@ -15,6 +15,7 @@ describe Agents::GoogleFlightsAgent do
       'origin' => 'BOS',
       'destination' => 'SFO',
       'date' => '2016-04-11',
+      'preferredCabin' => 'COACH',
       'childCount' => 0,
       'infantInSeatCount' => 0,
       'infantInLapCount'=> 0,
@@ -45,6 +46,11 @@ describe Agents::GoogleFlightsAgent do
 
     it "should require adultCount" do 
       @checker.options['adultCount'] = nil
+      expect(@checker).not_to be_valid
+    end
+    
+    it "should require preferredCabin" do 
+      @checker.options['preferredCabin'] = nil
       expect(@checker).not_to be_valid
     end
 
