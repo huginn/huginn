@@ -84,7 +84,7 @@ module Agents
 
       # Deal with failures
       if measured_result.result
-        final_url = boolify(interpolated['disable_redirect_follow']) ? url : measured_result.result.to_hash[:url]
+        final_url = boolify(interpolated['disable_redirect_follow']) ? url : measured_result.result.env.url.to_s
         payload.merge!({ 'final_url' => final_url, 'redirected' => (url != final_url), 'response_received' => true, 'status' => current_status })
         # Deal with headers
         if local_headers.present?
