@@ -66,7 +66,8 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          check_this_url interpolated[:url], header_array(interpolated[:headers_to_save])
+          check_this_url event.payload[:url] || interpolated[:url],
+                         header_array(event.payload[:headers_to_save] || interpolated[:headers_to_save])
         end
       end
     end
