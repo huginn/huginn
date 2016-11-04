@@ -88,7 +88,7 @@ module Agents
         payload.merge!({ 'final_url' => final_url, 'redirected' => (url != final_url), 'response_received' => true, 'status' => current_status })
         # Deal with headers
         if local_headers.present?
-          header_results = measured_result.result.headers.select {|header, value| local_headers.include?(header)}
+          header_results = measured_result.result.headers.slice(*local_headers)
           # Fill in headers that we wanted, but weren't returned
           local_headers.each { |header| header_results[header] = nil unless header_results.has_key?(header) }
           payload.merge!({ 'headers' => header_results })
