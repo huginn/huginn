@@ -66,6 +66,22 @@ module Agents
               "copyright": "...",
               "icon": "http://example.com/icon.png",
               "authors": [ "..." ],
+
+              "itunes_block": "no",
+              "itunes_categories": [
+                "Technology", "Gadgets",
+                "TV & Film",
+                "Arts", "Food"
+              ],
+              "itunes_complete": "yes",
+              "itunes_explicit": "yes",
+              "itunes_image": "http://...",
+              "itunes_new_feed_url": "http://...",
+              "itunes_owners": [ "John Doe <john.doe@example.com>" ],
+              "itunes_subtitle": "...",
+              "itunes_summary": "...",
+              "language": "en-US",
+
               "date_published": "2014-09-11T01:30:00-07:00",
               "last_updated": "2014-09-11T01:30:00-07:00"
             },
@@ -84,6 +100,16 @@ module Agents
             "enclosure": {
               "url" => "http://example.com/file.mp3", "type" => "audio/mpeg", "length" => "123456789"
             },
+
+            "itunes_block": "no",
+            "itunes_closed_captioned": "yes",
+            "itunes_duration": "04:34",
+            "itunes_explicit": "yes",
+            "itunes_image": "http://...",
+            "itunes_order": "1",
+            "itunes_subtitle": "...",
+            "itunes_summary": "...",
+
             "date_published": "2014-09-11T01:30:00-0700",
             "last_updated": "2014-09-11T01:30:00-0700"
           }
@@ -91,7 +117,8 @@ module Agents
       Some notes:
 
       - The `feed` key is present only if `include_feed_info` is set to true.
-      - Each element in `authors` is a string normalized in the format "*name* <*email*> (*url*)", where each space-separated part is optional.
+      - The keys starting with `itunes_`, and `language` are only present when the feed is a podcast.  See [Podcasts Connect Help](https://help.apple.com/itc/podcasts_connect/#/itcb54353390) for details.
+      - Each element in `authors` and `itunes_owners` is a string normalized in the format "*name* <*email*> (*url*)", where each space-separated part is optional.
       - Timestamps are converted to the ISO 8601 format.
     MD
 
@@ -206,7 +233,38 @@ module Agents
         authors: feed.authors,
         date_published: feed.date_published,
         last_updated: feed.last_updated,
+        **itunes_feed_data(feed)
       }
+    end
+
+    def itunes_feed_data(feed)
+      data = {}
+      case feed
+      when Feedjira::Parser::ITunesRSS
+        %i[
+          itunes_block
+          itunes_categories
+          itunes_complete
+          itunes_explicit
+          itunes_image
+          itunes_new_feed_url
+          itunes_owners
+          itunes_subtitle
+          itunes_summary
+          language
+        ].each { |attr|
+          if value = feed.try(attr).presence
+            data[attr] =
+              case attr
+              when :itunes_summary
+                clean_fragment(value)
+              else
+                value
+              end
+          end
+        }
+      end
+      data
     end
 
     def entry_data(entry)
@@ -224,7 +282,30 @@ module Agents
         categories: Array(entry.try(:categories)),
         date_published: entry.date_published,
         last_updated: entry.last_updated,
+        **itunes_entry_data(entry)
       }
+    end
+
+    def itunes_entry_data(entry)
+      data = {}
+      case entry
+      when Feedjira::Parser::ITunesRSSItem
+        %i[
+          itunes_block
+          itunes_closed_captioned
+          itunes_duration
+          itunes_explicit
+          itunes_image
+          itunes_order
+          itunes_subtitle
+          itunes_summary
+        ].each { |attr|
+          if value = entry.try(attr).presence
+            data[attr] = value
+          end
+        }
+      end
+      data
     end
 
     def feed_to_events(feed)
