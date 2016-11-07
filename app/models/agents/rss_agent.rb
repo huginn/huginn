@@ -80,6 +80,7 @@ module Agents
             "content": "Some content",
             "authors": [ "Some Author <email@address>" ],
             "categories": [ "..." ],
+            "image": "http://example.com/...",
             "enclosure": {
               "url" => "http://example.com/file.mp3", "type" => "audio/mpeg", "length" => "123456789"
             },
