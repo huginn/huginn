@@ -109,7 +109,7 @@ gem 'liquid', '~> 3.0.3'
 gem 'loofah', '~> 2.0'
 gem 'mini_magick'
 gem 'multi_xml'
-gem 'nokogiri', '1.6.8'
+gem 'nokogiri'
 gem 'omniauth', '~> 1.3.1'
 gem 'rails', '~> 5.0.0.1'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
