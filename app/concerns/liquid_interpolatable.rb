@@ -129,10 +129,11 @@ module LiquidInterpolatable
     # userinfo, host, port, registry, path, opaque, query, and
     # fragment.
     def to_uri(uri, base_uri = nil)
-      if base_uri
-        Utils.normalize_uri(base_uri) + Utils.normalize_uri(uri.to_s)
-      else
+      case base_uri
+      when nil, ''
         Utils.normalize_uri(uri.to_s)
+      else
+        Utils.normalize_uri(base_uri) + Utils.normalize_uri(uri.to_s)
       end
     rescue URI::Error
       nil
