@@ -80,16 +80,6 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 [wiki]: https://github.com/cantino/huginn/wiki
 [novice-setup-guide]: https://github.com/cantino/huginn/wiki/Novice-setup-guide
 
-### Nitrous Quickstart
-
-You can quickly create a free development environment for this Huginn project in the cloud on www.nitrous.io:
-
-<a href="https://www.nitrous.io/quickstart?repo=https://github.com/cantino/huginn">
-  <img src="https://nitrous-image-icons.s3.amazonaws.com/quickstart.png" alt="Nitrous Quickstart" width=142 height=34>
-</a>
-
-In the IDE, start Huginn via `Run > Start Huginn` and access your site via `Preview > 3000`.
-
 ### Develop
 
 All agents have specs! And there's also acceptance tests that simulate running Huginn in a headless browser. 
