@@ -36,5 +36,3 @@ deployment/cookbooks
 manifest.yml
 config/unicorn.rb
 db/schema.rb
-nitrous-post-create.sh
-nitrous.json
