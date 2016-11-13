@@ -12,6 +12,7 @@ class @AgentEditPage
         catch err
           e.preventDefault()
           alert 'Sorry, there appears to be an error in your JSON input. Please fix it before continuing.'
+          return false
 
       if $(".link-region").length && $(".link-region").data("can-receive-events") == false
         $(".link-region .select2-linked-tags option:selected").removeAttr('selected')
