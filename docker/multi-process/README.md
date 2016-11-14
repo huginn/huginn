@@ -17,8 +17,8 @@ The scripts/init script is aware of mysql and postgres linked containers through
 
 and
 
-    POSTGRESQL_PORT_5432_TCP_ADDR
-    POSTGRESQL_PORT_5432_TCP_PORT
+    POSTGRES_PORT_5432_TCP_ADDR
+    POSTGRES_PORT_5432_TCP_PORT
 
 Its recommended to use an image that allows you to create a database via environmental variables at docker run, like `paintedfox / postgresql` or `centurylink / mysql`, so the db is populated when this script runs.
 
