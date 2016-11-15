@@ -32,8 +32,8 @@ module Agents
 
     def default_options
       {
-        auth_token: 'xxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        chat_id: 'xxxxxxxx'
+        auth_token: 'xxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        chat_id: 'xxxxxxxxxxxxxxxx'
       }
     end
 
@@ -79,7 +79,12 @@ module Agents
     def send_telegram_message(method, params)
       params[:chat_id] = interpolated['chat_id']
       params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
-      HTTMultiParty.post telegram_bot_uri(method), query: params
+
+      txt_message = params[:text].scan /.{1,4096}\W/m
+      txt_message.each do | message |
+        params[:text] = message
+        HTTMultiParty.post telegram_bot_uri(method), query: params
+      end
     end
 
     def load_field(event, field)
