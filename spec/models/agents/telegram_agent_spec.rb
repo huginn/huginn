@@ -56,7 +56,17 @@ describe Agents::TelegramAgent do
 
       expect(@sent_messages).to eq([
         { sendMessage: { text: 'Looks like its going to rain' } },
-        { sendMessage: { text: 'Another text message' } }
+        { sendMessage: { text: 'Another text message' } },
+      ])
+    end
+
+    it 'splits a long message into multiple parts' do
+      event = event_with_payload text: 'x' * 4095 + ' y'
+      @checker.receive [event]
+
+      expect(@sent_messages).to eq([
+        { sendMessage: { text: 'x' * 4095 } },
+        { sendMessage: { text: ' y' } }
       ])
     end
 
