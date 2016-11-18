@@ -63,6 +63,7 @@ class @AgentEditPage
               if aVal < bVal
                 return -1
             0
+      .select2('open')
 
     else
       @enableDryRunButton()
