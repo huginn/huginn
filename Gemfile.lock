@@ -38,6 +38,14 @@ GIT
       rest-client (~> 1.8)
 
 GIT
+  remote: git://github.com/goodwill/capybara-select2.git
+  revision: 585192e4bb0db8d52e761ab68f08c17294806447
+  specs:
+    capybara-select2 (1.0.1)
+      capybara
+      rspec
+
+GIT
   remote: git://github.com/lostisland/faraday_middleware.git
   revision: c5836ae55857272732b33eb0e0a98d60e995a376
   branch: master
@@ -136,16 +144,13 @@ GEM
     capistrano-rails (1.1.3)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
-    capybara (2.6.2)
+    capybara (2.10.1)
       addressable
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    capybara-select2 (1.0.1)
-      capybara
-      rspec
     chronic (0.10.2)
     cliver (0.3.2)
     coderay (1.1.0)
@@ -603,7 +608,7 @@ DEPENDENCIES
   capistrano (~> 3.4.0)
   capistrano-bundler (~> 1.1.4)
   capistrano-rails (~> 1.1)
-  capybara-select2
+  capybara-select2!
   coffee-rails (~> 4.2)
   coveralls (~> 0.7.4)
   daemons (~> 1.1.9)

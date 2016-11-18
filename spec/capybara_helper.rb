@@ -11,6 +11,16 @@ end
 
 Capybara.javascript_driver = :poltergeist
 Capybara.default_max_wait_time = CAPYBARA_TIMEOUT
+module Capybara::Select2
+  module CloseBeforeSelecting
+    def select2(value, options = {})
+      page.execute_script('$(".select2.select2-container--open").prev("select").select2("close")')
+      super
+    end
+  end
+
+  prepend CloseBeforeSelecting
+end
 
 RSpec.configure do |config|
   config.include Warden::Test::Helpers
