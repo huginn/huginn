@@ -114,7 +114,7 @@ gem 'omniauth', '~> 1.3.1'
 gem 'rails', '~> 5.0.0.1'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'sass-rails',   '~> 5.0.6'
-gem 'select2-rails', '~> 3.5.4'
+gem 'select2-rails'
 gem 'spectrum-rails'
 gem 'therubyracer', '~> 0.12.2'
 gem 'typhoeus', '~> 0.6.3'
