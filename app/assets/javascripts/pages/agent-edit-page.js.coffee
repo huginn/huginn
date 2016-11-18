@@ -39,12 +39,30 @@ class @AgentEditPage
       # Update the dropdown to match agent description as well as agent name
       $('select#agent_type').select2
         width: 'resolve'
-        formatResult: formatAgentForSelect
-        escapeMarkup: (m) ->
-          m
-        matcher: (term, text, opt) ->
-          description = opt.attr('title')
-          text.toUpperCase().indexOf(term.toUpperCase()) >= 0 or description.toUpperCase().indexOf(term.toUpperCase()) >= 0
+        templateResult: formatAgentForSelect
+        escapeMarkup: (m) -> m
+        matcher: (params, data) ->
+          term = params.term
+          option = data.element
+          if term == null or $.trim(term) == ''
+            return $.extend(false, { sortKey: [option.index] }, data)
+
+          term = term.toUpperCase()
+          text = data.text
+          if (pos = text.toUpperCase().indexOf(term)) >= 0
+            return $.extend(false, { sortKey: [1, pos, option.index] }, data)
+          if (pos = option.title.toUpperCase().indexOf(term)) >= 0
+            return $.extend(false, { sortKey: [2, pos, option.index] }, data)
+          null
+        sorter: (data) ->
+          data.sort (a, b) ->
+            for aVal, i in a.sortKey
+              bVal = b.sortKey[i]
+              if aVal > bVal
+                return 1
+              if aVal < bVal
+                return -1
+            0
 
     else
       @enableDryRunButton()
@@ -222,10 +240,11 @@ class @AgentEditPage
     @updateFromEditors()
     Utils.handleDryRunButton(e.target)
 
-  formatAgentForSelect = (agent) ->
-    originalOption = agent.element
-    description = agent.element[0].title
-    '<strong>' + agent.text + '</strong><br/>' + description
+  formatAgentForSelect = (data) ->
+    if data.title == ''
+      '<strong>' + data.text + '</strong>'
+    else
+      '<strong>' + data.text + '</strong><br/>' + data.title
 
 $ ->
   Utils.registerPage(AgentEditPage, forPathsMatching: /^agents/)
