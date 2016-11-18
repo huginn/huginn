@@ -15,6 +15,8 @@ $ ->
 
   # Select2 Selects
   $(".select2").select2(width: 'resolve')
+  $('select').on 'select2:close', ->
+    this.focus()
 
   $(".select2-linked-tags").select2(
     width: 'resolve',
