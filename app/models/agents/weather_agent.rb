@@ -12,22 +12,22 @@ module Agents
 
       #{'## Include `forecast_io` and `wunderground` in your Gemfile to use this Agent!' if dependencies_missing?}
 
-      You also must select `which_day` you would like to get the weather for where the number 0 is for today and 1 is for tomorrow and so on. Weather is only returned for 1 week at a time.
+      You also must select when you would like to get the weather forecast for using the `which_day` option, where the number 1 represents today, 2 represents tomorrow and so on. Weather forecast inforation is only returned for at most one week at a time.
 
-      The weather can be provided by either Wunderground or Dark Sky. To choose which `service` to use, enter either `darksky` or `wunderground`.
+      The weather forecast information can be provided by either Wunderground or Dark Sky. To choose which `service` to use, enter either `darksky` or `wunderground`.
 
       The `location` should be:
 
       * For Wunderground: A US zipcode, or any location that Wunderground supports. To find one, search [wunderground.com](https://wunderground.com) and copy the location part of the URL.  For example, a result for San Francisco gives `https://www.wunderground.com/US/CA/San_Francisco.html` and London, England gives `https://www.wunderground.com/q/zmw:00000.1.03772`.  The locations in each are `US/CA/San_Francisco` and `zmw:00000.1.03772`, respectively.
-      * For Dark Sky: `location` must be a comma-separated string of co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
+      * For Dark Sky: `location` must be a comma-separated string of map co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
 
-      You must setup an [API key for Wunderground](https://www.wunderground.com/weather/api/) in order to use this Agent with Wunderground.
+      You must set up an [API key for Wunderground](https://www.wunderground.com/weather/api/) in order to use this Agent with Wunderground.
 
-      You must setup an [API key for Dark Sky](https://darksky.net/dev/) in order to use this Agent with Dark Sky.
+      You must set up an [API key for Dark Sky](https://darksky.net/dev/) in order to use this Agent with Dark Sky.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
-      If you want to see the returned texts in your language, then set the `language` parameter in ISO 639-1 format.
+      If you want to see the returned texts in your language, set the `language` parameter in ISO 639-1 format.
     MD
 
     event_description <<-MD
