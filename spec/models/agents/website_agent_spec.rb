@@ -786,6 +786,7 @@ describe Agents::WebsiteAgent do
               'title' => { 'xpath' => '/feed/entry', 'value' => 'normalize-space(./title)' },
               'url' => { 'xpath' => '/feed/entry', 'value' => './link[1]/@href' },
               'thumbnail' => { 'xpath' => '/feed/entry', 'value' => './thumbnail/@url' },
+              'page_title': { 'xpath': '/feed/title', 'value': 'string(.)', 'repeat' => true }
             }
           }, keep_events_for: 2.days)
           @checker.user = users(:bob)
@@ -796,7 +797,10 @@ describe Agents::WebsiteAgent do
           expect {
             @checker.check
           }.to change { Event.count }.by(20)
-          event = Event.last
+          events = Event.last(20)
+          expect(events.size).to eq(20)
+          expect(events.map { |event| event.payload['page_title'] }.uniq).to eq(['Recent Commits to huginn:master'])
+          event = events.last
           expect(event.payload['title']).to eq('Shift to dev group')
           expect(event.payload['url']).to eq('https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af')
           expect(event.payload['thumbnail']).to eq('https://avatars3.githubusercontent.com/u/365751?s=30')
@@ -942,6 +946,7 @@ describe Agents::WebsiteAgent do
         it "can handle arrays" do
           json = {
             'response' => {
+              'status' => 'ok',
               'data' => [
                 {'title' => "first", 'version' => 2},
                 {'title' => "second", 'version' => 2.5}
@@ -956,8 +961,9 @@ describe Agents::WebsiteAgent do
             'url' => "http://json-site.com",
             'mode' => 'on_change',
             'extract' => {
-              :title => {'path' => "response.data[*].title"},
-              :version => {'path' => "response.data[*].version"}
+              'title' => { 'path' => "response.data[*].title" },
+              'version' => { 'path' => "response.data[*].version" },
+              'status' => { 'path' => "response.status", 'repeat' => true },
             }
           }
           checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
@@ -969,9 +975,11 @@ describe Agents::WebsiteAgent do
           }.to change { Event.count }.by(2)
 
           (event2, event1) = Event.last(2)
+          expect(event1.payload['status']).to eq('ok')
           expect(event1.payload['version']).to eq(2.5)
           expect(event1.payload['title']).to eq("second")
 
+          expect(event2.payload['status']).to eq('ok')
           expect(event2.payload['version']).to eq(2)
           expect(event2.payload['title']).to eq("first")
         end
@@ -1007,6 +1015,7 @@ describe Agents::WebsiteAgent do
       describe "text parsing" do
         before do
           stub_request(:any, /text-site/).to_return(body: <<-EOF, status: 200)
+VERSION 1
 water: wet
 fire: hot
           EOF
@@ -1017,6 +1026,7 @@ fire: hot
             'url' => 'http://text-site.com',
             'mode' => 'on_change',
             'extract' => {
+              'version' => { 'regexp' => '^VERSION (.+)$', index: 1, repeat: true },
               'word' => { 'regexp' => '^(.+?): (.+)$', index: 1 },
               'property' => { 'regexp' => '^(.+?): (.+)$', index: '2' },
             }
@@ -1027,7 +1037,7 @@ fire: hot
         end
 
         it "works with regexp with named capture" do
-          @checker.options = @checker.options.merge('extract' => {
+          @checker.options = @checker.options.deep_merge('extract' => {
             'word' => { 'regexp' => '^(?<word>.+?): (?<property>.+)$', index: 'word' },
             'property' => { 'regexp' => '^(?<word>.+?): (?<property>.+)$', index: 'property' },
           })
@@ -1037,8 +1047,10 @@ fire: hot
           }.to change { Event.count }.by(2)
 
           event1, event2 = Event.last(2)
+          expect(event1.payload['version']).to eq('1')
           expect(event1.payload['word']).to eq('water')
           expect(event1.payload['property']).to eq('wet')
+          expect(event2.payload['version']).to eq('1')
           expect(event2.payload['word']).to eq('fire')
           expect(event2.payload['property']).to eq('hot')
         end
@@ -1049,8 +1061,10 @@ fire: hot
           }.to change { Event.count }.by(2)
 
           event1, event2 = Event.last(2)
+          expect(event1.payload['version']).to eq('1')
           expect(event1.payload['word']).to eq('water')
           expect(event1.payload['property']).to eq('wet')
+          expect(event2.payload['version']).to eq('1')
           expect(event2.payload['word']).to eq('fire')
           expect(event2.payload['property']).to eq('hot')
         end
