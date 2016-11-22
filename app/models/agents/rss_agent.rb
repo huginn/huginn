@@ -132,7 +132,7 @@ module Agents
         begin
           response = faraday.get(url)
           if response.success?
-            feed = Feedjira::Feed.parse(response.body)
+            feed = Feedjira::Feed.parse(preprocessed_body(response))
             new_events.concat feed_to_events(feed)
           else
             error "Failed to fetch #{url}: #{response.inspect}"
@@ -168,6 +168,20 @@ module Agents
 
     unless dependencies_missing?
       require 'feedjira_extension'
+    end
+
+    def preprocessed_body(response)
+      body = response.body
+      case body.encoding
+      when Encoding::ASCII_8BIT
+        # Encoding is unknown from the Content-Type, so let the SAX
+        # parser detect it from the content.
+      else
+        # Encoding is already known, so do not let the parser detect
+        # it from the XML declaration in the content.
+        body.sub!(/(<\?xml(?:\s+\w+\s*=\s*(['"]).*?\2)*)\s+encoding\s*=\s*(['"]).*?\3/, '\\1')
+      end
+      body
     end
 
     def feed_data(feed)

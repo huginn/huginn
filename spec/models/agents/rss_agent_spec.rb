@@ -12,6 +12,7 @@ describe Agents::RssAgent do
     stub_request(:any, /SlickdealsnetFP/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/slickdeals.atom")), :status => 200)
     stub_request(:any, /onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")), status: 200)
     stub_request(:any, /bad.onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")).gsub(/(?<=<link>)[^<]*/, ''), status: 200)
+    stub_request(:any, /iso-8859-1/).to_return(body: File.binread(Rails.root.join("spec/data_fixtures/iso-8859-1.rss")), headers: { 'Content-Type' => 'application/rss+xml; charset=ISO-8859-1' }, status: 200)
   end
 
   let(:agent) do
@@ -281,6 +282,18 @@ describe Agents::RssAgent do
         agent.check
         event = agent.events.first
         expect(event.payload['links']).to eq([])
+      end
+    end
+
+    context 'with the encoding declared in both headers and the content' do
+      before do
+        @valid_options['url'] = 'http://example.org/iso-8859-1.rss'
+      end
+
+      it "decodes the content properly" do
+        agent.check
+        event = agent.events.first
+        expect(event.payload['title']).to eq('Mëkanïk Zaïn')
       end
     end
   end
