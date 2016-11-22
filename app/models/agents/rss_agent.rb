@@ -179,7 +179,7 @@ module Agents
       else
         # Encoding is already known, so do not let the parser detect
         # it from the XML declaration in the content.
-        body.sub!(/(<\?xml(?:\s+\w+\s*=\s*(['"]).*?\2)*)\s+encoding\s*=\s*(['"]).*?\3/, '\\1')
+        body.sub!(/(\A\u{FEFF}?\s*<\?xml(?:\s+\w+\s*=\s*(['"]).*?\2)*)\s+encoding\s*=\s*(['"]).*?\3/, '\\1')
       end
       body
     end
