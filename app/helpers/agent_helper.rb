@@ -82,6 +82,12 @@ module AgentHelper
     end
   end
 
+  def agent_type_select_options
+    Rails.cache.fetch('agent_type_select_options') do
+      [['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name, User.new(id: 0), {}).html_description.lines.first.strip)}] }
+    end
+  end
+
   private
 
   def links_counter_cache(agents)
