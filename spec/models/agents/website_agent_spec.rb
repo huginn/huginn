@@ -1198,7 +1198,7 @@ fire: hot
                 'value' => '{{ value }}',
                 'url' => '{{ url | to_uri: _response_.url }}',
                 'type' => '{{ _response_.headers.content_type }}',
-                'status' => '{{ _response_.status }}'
+                'status' => '{{ _response_.status | as_object }}'
               }
             )
           end
@@ -1207,7 +1207,7 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => '200' })
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200 })
           end
 
           it "should support merge mode" do
@@ -1216,7 +1216,7 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => '200'))
+            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200))
           end
 
           it "should output an error when nothing can be found at the path" do

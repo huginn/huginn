@@ -134,7 +134,7 @@ module Agents
 
       * `_response_`: A response object with the following keys:
 
-          * `status`: HTTP status as integer. (Almost always 200)  When parsing `data_from_event`, this is set to the value of the `status` key in the incoming Event.
+          * `status`: HTTP status as integer. (Almost always 200)  When parsing `data_from_event`, this is set to the value of the `status` key in the incoming Event, if it is a number or a string convertible to an integer.
 
           * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.  When parsing `data_from_event`, this is constructed from the value of the `headers` key in the incoming Event.
 
@@ -694,7 +694,7 @@ module Agents
 
       # Integer value of HTTP status
       def status
-        @object.payload[:status]
+        Integer(@object.payload[:status]) rescue nil
       end
 
       # The URL
