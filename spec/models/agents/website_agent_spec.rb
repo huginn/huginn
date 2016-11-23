@@ -1219,6 +1219,24 @@ fire: hot
             expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200))
           end
 
+          it "should convert headers and status in the event data properly" do
+            @event.payload[:status] = '201'
+            @event.payload[:headers] = [['Content-Type', 'application/rss+xml']]
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/rss+xml', 'status' => 201 })
+          end
+
+          it "should ignore inconvertible headers and status in the event data" do
+            @event.payload[:status] = 'ok'
+            @event.payload[:headers] = ['Content-Type', 'Content-Length']
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => '', 'status' => nil })
+          end
+
           it "should output an error when nothing can be found at the path" do
             @checker.options = @checker.options.merge(
               'data_from_event' => '{{ some_object.mistake }}'
