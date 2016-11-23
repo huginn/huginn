@@ -79,7 +79,7 @@ describe 'HttpStatusAgent' do
       let(:successful_url) { "http://#{SecureRandom.uuid}/" }
 
       let(:status_code) { 200 }
-      let(:header) { SecureRandom.uuid }
+      let(:header) { 'X-Some-Header' }
       let(:header_value) { SecureRandom.uuid }
 
       before do
@@ -317,7 +317,7 @@ describe 'HttpStatusAgent' do
 
       end
 
-      describe "with a header specified" do
+      describe "with a response with a header" do
         before do
           stub_request(:get, successful_url).to_return(
             status: status_code,
@@ -329,13 +329,27 @@ describe 'HttpStatusAgent' do
           Event.new(payload: { url: successful_url, headers_to_save: header })
         end
 
-        it "should return the header value" do
+        it "should save the header value according to headers_to_save" do
           agent.receive events
           event = created_events.last
           expect(event[:payload]['headers']).not_to be_nil
           expect(event[:payload]['headers'][header]).to eq(header_value)
         end
 
+        context "regarding case-insensitivity" do
+          let(:event_with_a_successful_ping) do
+            super().tap { |event|
+              event.payload[:headers_to_save].swapcase!
+            }
+          end
+
+          it "should save the header value according to headers_to_save" do
+            agent.receive events
+            event = created_events.last
+            expect(event[:payload]['headers']).not_to be_nil
+            expect(event[:payload]['headers'][header.swapcase]).to eq(header_value)
+          end
+        end
       end
 
       describe "with existing and non-existing headers specified" do
