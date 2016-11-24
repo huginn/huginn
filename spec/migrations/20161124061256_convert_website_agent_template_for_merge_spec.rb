@@ -26,13 +26,15 @@ describe ConvertWebsiteAgentTemplateForMerge do
     {
       'url' => '{{url}}',
       'title' => '{{ title }}',
-      'description' => '{{ hovertext }}'
+      'description' => '{{ hovertext }}',
+      'comment' => '{{ comment }}'
     }
   end
 
   let :new_template do
     {
-      'description' => '{{ hovertext }}'
+      'description' => '{{ hovertext }}',
+      'comment' => '{{ comment }}'
     }
   end
 
@@ -45,7 +47,7 @@ describe ConvertWebsiteAgentTemplateForMerge do
       'name' => "XKCD",
       'expected_update_period_in_days' => "2",
       'type' => "html",
-      'url' => "http://xkcd.com",
+      'url' => "{{ url | default: 'http://xkcd.com/' }}",
       'mode' => 'on_change',
       'extract' => old_extract,
       'template' => old_template

@@ -10,7 +10,8 @@ class ConvertWebsiteAgentTemplateForMerge < ActiveRecord::Migration[5.0]
       end
 
       template.delete_if { |key, value|
-        value.match(/\A\{\{\s*#{Regexp.quote(key)}\s*\}\}\z/)
+        extract.key?(key) &&
+          value.match(/\A\{\{\s*#{Regexp.quote(key)}\s*\}\}\z/)
       }
 
       agent.save!(validate: false)
