@@ -530,9 +530,10 @@ module Agents
         log "Values extracted: #{values}"
         begin
           output[name] = values
-          output.hidden_keys << name if boolify(extraction_details['hidden'])
-        rescue ArgumentError
+        rescue UnevenSizeError
           raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
+        else
+          output.hidden_keys << name if boolify(extraction_details['hidden'])
         end
       }
     end
@@ -612,6 +613,9 @@ module Agents
       false
     end
 
+    class UnevenSizeError < ArgumentError
+    end
+
     class Output
       def initialize
         @hash = {}
@@ -626,7 +630,7 @@ module Agents
         case size = value.size
         when Integer
           if @size && @size != size
-            raise ArgumentError, 'got an uneven size'
+            raise UnevenSizeError, 'got an uneven size'
           end
           @size = size
         end
