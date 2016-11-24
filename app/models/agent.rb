@@ -370,7 +370,7 @@ class Agent < ActiveRecord::Base
     def receive!(options={})
       Agent.transaction do
         scope = Agent.
-                select("agents.id AS receiver_agent_id, events.id AS event_id").
+                select("agents.id AS receiver_agent_id, sources.type AS source_agent_type, agents.type AS receiver_agent_type, events.id AS event_id").
                 joins("JOIN links ON (links.receiver_id = agents.id)").
                 joins("JOIN agents AS sources ON (links.source_id = sources.id)").
                 joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)").
@@ -379,10 +379,11 @@ class Agent < ActiveRecord::Base
           scope = scope.where("agents.id in (?)", options[:only_receivers])
         end
 
-        sql = scope.to_sql()
+        sql = scope.to_sql
 
         agents_to_events = {}
-        Agent.connection.select_rows(sql).each do |receiver_agent_id, event_id|
+        Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_type, receiver_agent_type, event_id|
+          next unless const_defined?(source_agent_type) && const_defined?(receiver_agent_type)
           agents_to_events[receiver_agent_id.to_i] ||= []
           agents_to_events[receiver_agent_id.to_i] << event_id
         end
@@ -417,6 +418,7 @@ class Agent < ActiveRecord::Base
       return if schedule == 'never'
       types = where(:schedule => schedule).group(:type).pluck(:type)
       types.each do |type|
+        next unless const_defined?(type)
         type.constantize.bulk_check(schedule)
       end
     end
