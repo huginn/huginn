@@ -651,9 +651,22 @@ describe Agents::WebsiteAgent do
         @checker.options = @valid_options
         @checker.check
         event = Event.last
-        expect(event.payload['url']).to eq("http://imgs.xkcd.com/comics/evolving.png")
-        expect(event.payload['title']).to eq("Evolving")
-        expect(event.payload['hovertext']).to match(/^Biologists play reverse/)
+        expect(event.payload).to match(
+          'url' => 'http://imgs.xkcd.com/comics/evolving.png',
+          'title' => 'Evolving',
+          'hovertext' => /^Biologists play reverse/
+        )
+      end
+
+      it "should exclude hidden keys" do
+        @valid_options['extract']['hovertext']['hidden'] = true
+        @checker.options = @valid_options
+        @checker.check
+        event = Event.last
+        expect(event.payload).to match(
+          'url' => 'http://imgs.xkcd.com/comics/evolving.png',
+          'title' => 'Evolving'
+        )
       end
 
       it "should turn relative urls to absolute" do
@@ -749,9 +762,9 @@ describe Agents::WebsiteAgent do
         expect(event.payload['original_url']).to eq('http://xkcd.com/index')
       end
 
-      it "should be formatted by template after extraction" do
+      it "should format and merge values in template after extraction" do
+        @valid_options['extract']['hovertext']['hidden'] = true
         @valid_options['template'] = {
-          'url' => '{{url}}',
           'title' => '{{title | upcase}}',
           'summary' => '{{title}}: {{hovertext | truncate: 20}}',
         }
