@@ -48,11 +48,6 @@ describe Agents::GoogleFlightsAgent do
       @checker.options['adultCount'] = nil
       expect(@checker).not_to be_valid
     end
-    
-    it "should require preferredCabin" do 
-      @checker.options['preferredCabin'] = nil
-      expect(@checker).not_to be_valid
-    end
 
     it "should require Origin" do 
       @checker.options['origin'] = nil
