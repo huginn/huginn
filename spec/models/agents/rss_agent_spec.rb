@@ -295,6 +295,13 @@ describe Agents::RssAgent do
         event = agent.events.first
         expect(event.payload['title']).to eq('Mëkanïk Zaïn')
       end
+
+      it "decodes the content properly with force_encoding specified" do
+        @valid_options['force_encoding'] = 'iso-8859-1'
+        agent.check
+        event = agent.events.first
+        expect(event.payload['title']).to eq('Mëkanïk Zaïn')
+      end
     end
   end
 
