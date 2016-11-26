@@ -1,5 +1,8 @@
 class Scenario < ActiveRecord::Base
   include HasGuid
+  include JSONSerializedField
+
+  json_serialize :shared_memory
 
   belongs_to :user, :counter_cache => :scenario_count, :inverse_of => :scenarios
   has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :scenario
