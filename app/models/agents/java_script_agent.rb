@@ -122,6 +122,16 @@ module Agents
       context["setMemory"] = lambda do |a, x|
         memory.replace(clean_nans(x))
       end
+      context["getSharedMemory"] = lambda { |a, s| 
+
+        scenario_memory(s).to_json }
+      context["setSharedMemoryKey"] = lambda do |a, s, x, y|
+        scenario_memory(s)[x] = clean_nans(y)
+      end
+      context["setSharedMemory"] = lambda do |a, s, x|
+        scenario_memory(s).replace(clean_nans(x))
+      end
+
       context["deleteKey"] = lambda { |a, x| memory.delete(x).to_json }
       context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
       context["unescapeHtml"] = lambda { |a, x| CGI.unescapeHTML(x) }
@@ -155,6 +165,10 @@ module Agents
       c.save!
     end
 
+    def scenario_memory(scen)
+      return scenarios.where(:name => scen).shared_memory
+    end
+
     def setup_javascript
       <<-JS
         function Agent() {};
@@ -179,6 +193,22 @@ module Agents
 
         Agent.setMemory = function(obj) {
           setMemory(obj);
+        }
+
+        Agent.sharedMemory = function(scen, key, value) {
+          if (typeof(scen) !== "undefined" && typeof(key) !== "undefined" && typeof(value) !== "undefined") {
+            setSharedMemoryKey(scen, key, value);
+          } else if (typeof(scen) !== "undefined" && typeof(key) !== "undefined") {
+            return JSON.parse(getSharedMemory(scen))[key];
+          } else if (typeof(scen) !== "undefined") {
+            return JSON.parse(getSharedMemory(scen));
+          } else {
+            doLog('Illegal sharedMemory Call')
+          }
+        }
+
+        Agent.setSharedMemory = function(scen, obj) {
+          setSharedMemory(scen, obj);
         }
 
         Agent.credential = function(name, value) {
