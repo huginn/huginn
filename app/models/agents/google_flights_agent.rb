@@ -60,6 +60,7 @@ module Agents
         'seniorCount'=> 0,
         'return_date' => '2016-04-18',
         'roundtrip' => true,
+        'preferredCabin' => 'COACH',
         'solutions'=> 3
       }
     end
@@ -69,6 +70,7 @@ module Agents
     form_configurable :origin, type: :string
     form_configurable :destination, type: :string
     form_configurable :date, type: :string
+    form_configurable :preferredCabin, type: :array, values: %w(COACH PREMIUM_COACH BUSINESS FIRST)
     form_configurable :childCount
     form_configurable :infantInSeatCount
     form_configurable :infantInLapCount
@@ -101,9 +103,9 @@ module Agents
 
     def post_params
       if round_trip?
-        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[ {:origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s }, {:origin=> interpolated["destination"].to_s , :destination=> interpolated["origin"].to_s , :date=> interpolated["return_date"].to_s } ], :solutions=> interpolated["solutions"]}}
+        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[ {:origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s , :preferredCabin=> interpolated["preferredCabin"].to_s }, {:origin=> interpolated["destination"].to_s , :destination=> interpolated["origin"].to_s , :date=> interpolated["return_date"].to_s , :preferredCabin=> interpolated["preferredCabin"].to_s} ], :solutions=> interpolated["solutions"]}}
       else
-        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[{:kind=>"qpxexpress#sliceInput", :origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s }], :solutions=> interpolated["solutions"]}}
+        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[{:kind=>"qpxexpress#sliceInput", :origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s , :preferredCabin=> interpolated["preferredCabin"].to_s }], :solutions=> interpolated["solutions"]}}
       end
     end
 

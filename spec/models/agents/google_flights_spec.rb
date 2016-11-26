@@ -15,6 +15,7 @@ describe Agents::GoogleFlightsAgent do
       'origin' => 'BOS',
       'destination' => 'SFO',
       'date' => '2016-04-11',
+      'preferredCabin' => 'COACH',
       'childCount' => 0,
       'infantInSeatCount' => 0,
       'infantInLapCount'=> 0,
