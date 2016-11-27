@@ -37,6 +37,8 @@ module Agents
 
       Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor except when it has `repeat` set to true.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
 
+      For extractors with `hidden` set to true, they will be excluded from the payloads of events created by the Agent, but can be used and interpolated in the `template` option explained below.
+
       For extractors with `repeat` set to true, their first matches will be included in all extracts.  This is useful such as when you want to include the title of a page in all events created from the page.
 
       # Scraping HTML and XML
@@ -116,11 +118,9 @@ module Agents
 
       Set `http_success_codes` to an array of status codes (e.g., `[404, 422]`) to treat HTTP response codes beyond 200 as successes.
 
-      If a `template` option is given, it is used as a Liquid template for each event created by this Agent, instead of directly emitting the results of extraction as events.  In the template, keys of extracted data can be interpolated, and some additional variables are also available as explained in the next section.  For example:
+      If a `template` option is given, its value must be a hash, whose key-value pairs are interpolated after extraction for each iteration and merged with the payload.  In the template, keys of extracted data can be interpolated, and some additional variables are also available as explained in the next section.  For example:
 
           "template": {
-            "url": "{{ url }}",
-            "title": "{{ title }}",
             "description": "{{ body_text }}",
             "last_modified": "{{ _response_.headers.Last-Modified | date: '%FT%T' }}"
           }
@@ -159,7 +159,11 @@ module Agents
     end
 
     def event_keys
-      (options['template'].presence || options['extract']).try(:keys)
+      extract = options['extract'] or return nil
+
+      extract.each_with_object([]) { |(key, value), keys|
+        keys << key unless boolify(value['hidden'])
+      } | (options['template'].presence.try!(:keys) || [])
     end
 
     def working?
@@ -382,33 +386,19 @@ module Agents
             extract_xml(doc)
         end
 
-      num_tuples = output.each_value.inject(nil) { |num, value|
-        case size = value.size
-        when Float::INFINITY
-          num
-        when Integer
-          if num && num != size
-            raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
-          end
-          size
-        end
-      } or raise "At least one non-repeat key is required"
+      num_tuples = output.size or
+        raise "At least one non-repeat key is required"
 
       old_events = previous_payloads num_tuples
 
       template = options['template'].presence
 
-      num_tuples.times.zip(*output.values) do |index, *values|
-        extracted = output.each_key.lazy.zip(values).to_h
+      output.each do |extracted|
+        result = extracted.except(*output.hidden_keys)
 
-        result =
-          if template
-            interpolate_with(extracted) do
-              interpolate_options(template)
-            end
-          else
-            extracted
-          end
+        if template
+          result.update(interpolate_options(template, extracted))
+        end
 
         # url may be URI, string or nil
         if (payload_url = result['url'].presence) && (url = url.presence)
@@ -528,7 +518,7 @@ module Agents
     end
 
     def extract_each(&block)
-      interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
+      interpolated['extract'].each_with_object(Output.new) { |(name, extraction_details), output|
         if boolify(extraction_details['repeat'])
           values = Repeater.new { |repeater|
             block.call(extraction_details, repeater)
@@ -538,7 +528,13 @@ module Agents
           block.call(extraction_details, values)
         end
         log "Values extracted: #{values}"
-        output[name] = values
+        begin
+          output[name] = values
+        rescue UnevenSizeError
+          raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
+        else
+          output.hidden_keys << name if boolify(extraction_details['hidden'])
+        end
       }
     end
 
@@ -615,6 +611,38 @@ module Agents
       Integer(value) >= 0
     rescue
       false
+    end
+
+    class UnevenSizeError < ArgumentError
+    end
+
+    class Output
+      def initialize
+        @hash = {}
+        @size = nil
+        @hidden_keys = []
+      end
+
+      attr_reader :size
+      attr_reader :hidden_keys
+
+      def []=(key, value)
+        case size = value.size
+        when Integer
+          if @size && @size != size
+            raise UnevenSizeError, 'got an uneven size'
+          end
+          @size = size
+        end
+
+        @hash[key] = value
+      end
+
+      def each
+        @size.times.zip(*@hash.values) do |index, *values|
+          yield @hash.each_key.lazy.zip(values).to_h
+        end
+      end
     end
 
     class Repeater < Enumerator
