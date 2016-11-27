@@ -91,7 +91,7 @@ gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', br
 gem 'devise','~> 4.2.0'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
-gem 'faraday_middleware', '>= 0.10.1'
+gem 'faraday_middleware', github: 'lostisland/faraday_middleware', branch: 'master'  # '>= 0.10.1'
 gem 'feedjira', '~> 2.0'
 gem 'font-awesome-sass', '~> 4.3.2'
 gem 'foreman', '~> 0.63.0'
