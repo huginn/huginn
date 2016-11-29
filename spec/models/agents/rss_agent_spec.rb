@@ -12,11 +12,8 @@ describe Agents::RssAgent do
     stub_request(:any, /SlickdealsnetFP/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/slickdeals.atom")), :status => 200)
     stub_request(:any, /onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")), status: 200)
     stub_request(:any, /bad.onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")).gsub(/(?<=<link>)[^<]*/, ''), status: 200)
-<<<<<<< HEAD
     stub_request(:any, /iso-8859-1/).to_return(body: File.binread(Rails.root.join("spec/data_fixtures/iso-8859-1.rss")), headers: { 'Content-Type' => 'application/rss+xml; charset=ISO-8859-1' }, status: 200)
-=======
     stub_request(:any, /podcast/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/podcast.rss")), status: 200)
->>>>>>> Add podcast tags to events emitted by RssAgent
   end
 
   let(:agent) do
