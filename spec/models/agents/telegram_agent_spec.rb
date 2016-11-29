@@ -15,8 +15,9 @@ describe Agents::TelegramAgent do
   end
 
   def stub_methods
-    stub.any_instance_of(Agents::TelegramAgent).send_telegram_message do |method, params|
-      @sent_messages << { method => params }
+
+    stub(HTTMultiParty).post do |url, args|
+      @sent_messages << { url.split('/').last.to_sym => args[:query] }
     end
 
     stub.any_instance_of(Agents::TelegramAgent).load_file do |_url|
@@ -55,18 +56,18 @@ describe Agents::TelegramAgent do
       @checker.receive [event_0, event_1]
 
       expect(@sent_messages).to eq([
-        { sendMessage: { text: 'Looks like its going to rain' } },
-        { sendMessage: { text: 'Another text message' } },
+        { sendMessage: { text: 'Looks like its going to rain', :chat_id=>"xxxxxxxx" } },
+        { sendMessage: { text: 'Another text message', :chat_id=>"xxxxxxxx" } }
       ])
     end
 
-    it 'splits a long message into multiple parts' do
-      event = event_with_payload text: 'x' * 4095 + ' y'
+    it 'splits a long text message into multiple parts' do
+      event = event_with_payload text: 'x' * 4095 + " y"
       @checker.receive [event]
 
       expect(@sent_messages).to eq([
-        { sendMessage: { text: 'x' * 4095 } },
-        { sendMessage: { text: ' y' } }
+        { sendMessage: { text: 'x' * 4095 + " ", :chat_id=>"xxxxxxxx" } },
+        { sendMessage: { text: 'y', :chat_id=>"xxxxxxxx" } }
       ])
     end
 
@@ -74,28 +75,28 @@ describe Agents::TelegramAgent do
       event = event_with_payload photo: 'https://example.com/image.png'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ sendPhoto: { photo: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ sendPhoto: { photo: :stubbed_file, :chat_id=>"xxxxxxxx" } }])
     end
 
     it 'accepts audio key and uses :send_audio to send the file' do
       event = event_with_payload audio: 'https://example.com/sound.mp3'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ sendAudio: { audio: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ sendAudio: { audio: :stubbed_file, :chat_id=>"xxxxxxxx" } }])
     end
 
     it 'accepts document key and uses :send_document to send the file' do
       event = event_with_payload document: 'https://example.com/document.pdf'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ sendDocument: { document: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ sendDocument: { document: :stubbed_file, :chat_id=>"xxxxxxxx" } }])
     end
 
     it 'accepts video key and uses :send_video to send the file' do
       event = event_with_payload video: 'https://example.com/video.avi'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ sendVideo: { video: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ sendVideo: { video: :stubbed_file, :chat_id=>"xxxxxxxx" } }])
     end
   end
 

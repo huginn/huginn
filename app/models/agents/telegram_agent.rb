@@ -79,8 +79,12 @@ module Agents
     def send_telegram_message(method, params)
       params[:chat_id] = interpolated['chat_id']
       params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
-      params[:text].scan(/.{1,4096}/m).each do | message |
-        params[:text] = message
+      if params[:text] && params[:text].length > 4096
+        params[:text].scan(/.{1,4096}/m).each do | message |
+          params[:text] = message
+          HTTMultiParty.post telegram_bot_uri(method), query: params
+        end
+      else
         HTTMultiParty.post telegram_bot_uri(method), query: params
       end
     end
