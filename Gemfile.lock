@@ -68,6 +68,13 @@ GIT
       oauth
       simple_oauth
 
+GIT
+  remote: https://github.com/yubuylov/huginn_mysql2_agent.git
+  revision: 5db95d73cd3016a6ac9860ce9cdb4e8d19cd9f0f
+  specs:
+    huginn_mysql2_agent (0.1)
+      huginn_agent (~> 0.2)
+
 PATH
   remote: vendor/gems/dotenv-2.0.1
   specs:
@@ -640,6 +647,7 @@ DEPENDENCIES
   httmultiparty (~> 0.3.16)
   httparty (~> 0.13)
   huginn_agent (~> 0.4.0)
+  huginn_mysql2_agent!
   hypdf (~> 1.0.10)
   jquery-rails (~> 4.2.1)
   json (~> 1.8.1)

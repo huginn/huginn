@@ -23,6 +23,11 @@ module Agents
       * `this.memory(keyToSet, valueToSet)`
       * `this.setMemory(object)` (replaces the Agent's memory with the provided object)
       * `this.deleteKey(key)` (deletes a key from memory and returns the value)
+      * `this.sharedMemory(scenarioName)`
+      * `this.sharedMemory(scenarioName, key)`
+      * `this.sharedMemory(scenarioName, keyToSet, valueToSet)`
+      * `this.setSharedMemory(scenarioName, object)`
+      * `this.deleteSharedMemoryKey(scenarioName, key)
       * `this.credential(name)`
       * `this.credential(name, valueToSet)`
       * `this.options()`
@@ -122,17 +127,20 @@ module Agents
       context["setMemory"] = lambda do |a, x|
         memory.replace(clean_nans(x))
       end
-      context["getSharedMemory"] = lambda { |a, s| 
-
-        scenario_memory(s).to_json }
-      context["setSharedMemoryKey"] = lambda do |a, s, x, y|
-        scenario_memory(s)[x] = clean_nans(y)
-      end
-      context["setSharedMemory"] = lambda do |a, s, x|
-        scenario_memory(s).replace(clean_nans(x))
-      end
-
       context["deleteKey"] = lambda { |a, x| memory.delete(x).to_json }
+      context["getSharedMemory"] = lambda { |a, s| scenario_memory(s).to_json }
+      context["setSharedMemoryKey"] = lambda do |a, s, x, y|
+        smem = scenario_memory(s)
+        smem[x] = clean_nans(y)
+        log smem[x]
+        scenario_memory_upd(s,smem)
+      end
+      context["setSharedMemory"] = lambda { |a, s, x| scenario_memory_upd(s,clean_nans(x)) }
+      context["deleteSharedMemoryKey"] = lambda { |a, s, x| 
+        smem = scenario_memory(s)
+        r = smem.delete(x).to_json
+        scenario_memory_upd(s,smem)
+        return r}
       context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
       context["unescapeHtml"] = lambda { |a, x| CGI.unescapeHTML(x) }
       context['getCredential'] = lambda { |a, k| credential(k); }
@@ -166,7 +174,11 @@ module Agents
     end
 
     def scenario_memory(scen)
-      return scenarios.where(:name => scen).shared_memory
+      return scenarios.where(:name => scen).limit(1).pluck(:shared_memory)[0]
+    end
+
+    def scenario_memory_upd(scen,mem)
+      return scenarios.where(:name => scen).update(shared_memory: mem)
     end
 
     def setup_javascript
@@ -195,6 +207,10 @@ module Agents
           setMemory(obj);
         }
 
+        Agent.deleteKey = function(key) {
+          return JSON.parse(deleteKey(key));
+        }
+
         Agent.sharedMemory = function(scen, key, value) {
           if (typeof(scen) !== "undefined" && typeof(key) !== "undefined" && typeof(value) !== "undefined") {
             setSharedMemoryKey(scen, key, value);
@@ -203,12 +219,16 @@ module Agents
           } else if (typeof(scen) !== "undefined") {
             return JSON.parse(getSharedMemory(scen));
           } else {
-            doLog('Illegal sharedMemory Call')
+            doLog('Illegal sharedMemory Call: must specify scenario')
           }
         }
 
         Agent.setSharedMemory = function(scen, obj) {
           setSharedMemory(scen, obj);
+        }
+
+        Agent.deleteSharedMemoryKey = function(scen, key) {
+          return JSON.parse(deleteSharedMemoryKey(scen, key));
         }
 
         Agent.credential = function(name, value) {
@@ -233,10 +253,6 @@ module Agents
 
         Agent.error = function(message) {
           doError(message);
-        }
-
-        Agent.deleteKey = function(key) {
-          return JSON.parse(deleteKey(key));
         }
 
         Agent.escapeHtml = function(html) {
