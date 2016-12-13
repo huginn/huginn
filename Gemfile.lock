@@ -39,11 +39,11 @@ GIT
 
 GIT
   remote: git://github.com/lostisland/faraday_middleware.git
-  revision: c5836ae55857272732b33eb0e0a98d60e995a376
+  revision: 59088da02940d0ee2010b2e3156343346767c31e
   branch: master
   specs:
     faraday_middleware (0.10.0)
-      faraday (>= 0.7.4, < 0.10)
+      faraday (>= 0.7.4, < 1.0)
 
 GIT
   remote: git://github.com/tumblr/tumblr_client.git
@@ -617,7 +617,7 @@ DEPENDENCIES
   dropbox-api
   em-http-request (~> 1.1.2)
   evernote_oauth
-  faraday (~> 0.9.0)
+  faraday (~> 0.9)
   faraday_middleware!
   feedjira (~> 2.1)
   ffi (>= 1.9.4)
