@@ -9,7 +9,8 @@ class @ScenarioFormPage
   enabledSelect2: () ->
     $('.select2-fountawesome-icon').select2
       width: '100%'
-      formatResult: @format
-      
+      escapeMarkup: (m) -> m
+      templateResult: @format
+
 $ ->
   Utils.registerPage(ScenarioFormPage, forPathsMatching: /^scenarios/)
