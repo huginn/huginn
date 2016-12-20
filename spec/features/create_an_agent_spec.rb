@@ -38,7 +38,7 @@ describe "Creating a new agent", js: true do
       visit new_agent_path
     end
     it "shows all options for agents that can be scheduled, create and receive events" do
-      select2("Website Agent", from: "Type")
+      select2("Website Agent scrapes", from: "Type")
       expect(page).not_to have_content('This type of Agent cannot create events.')
     end
 
@@ -49,9 +49,8 @@ describe "Creating a new agent", js: true do
   end
 
   it "allows to click on on the agent name in select2 tags" do
-    agent = agents(:bob_weather_agent)
     visit new_agent_path
-    select2("Website Agent", from: "Type")
+    select2("Website Agent scrapes", from: "Type")
     select2("SF Weather", from: 'Sources')
     click_on "SF Weather"
     expect(page).to have_content "Editing your WeatherAgent"
@@ -63,7 +62,7 @@ describe "Creating a new agent", js: true do
     end
 
     it "does not send previously configured sources when the current agent does not support them" do
-      select2("Website Agent", from: "Type")
+      select2("Website Agent scrapes", from: "Type")
       select2("SF Weather", from: 'Sources')
       select2("Webhook Agent", from: "Type")
       fill_in(:agent_name, with: "No sources")
@@ -85,7 +84,7 @@ describe "Creating a new agent", js: true do
     end
 
     it "does not send previously configured receivers when the current agent does not support them" do
-      select2("Website Agent", from: "Type")
+      select2("Website Agent scrapes", from: "Type")
       select2("ZKCD", from: 'Receivers')
       select2("Email Agent", from: "Type")
       fill_in(:agent_name, with: "No receivers")
