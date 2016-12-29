@@ -39,6 +39,14 @@ GIT
       rest-client (~> 1.8)
 
 GIT
+  remote: https://github.com/jmettraux/rufus-scheduler.git
+  revision: 5ca549179f2e47b9e79551b9a1f3e4e273c35ac0
+  ref: 5ca549179f2e47b9e79551b9a1f3e4e273c35ac0
+  specs:
+    rufus-scheduler (3.3.2)
+      tzinfo
+
+GIT
   remote: https://github.com/lostisland/faraday_middleware.git
   revision: 59088da02940d0ee2010b2e3156343346767c31e
   branch: master
@@ -479,8 +487,6 @@ GEM
       rest-client
     ruby-growl (4.1)
       uuid (~> 2.3, >= 2.3.5)
-    rufus-scheduler (3.0.9)
-      tzinfo
     safe_yaml (1.0.4)
     sass (3.4.14)
     sass-rails (5.0.6)
@@ -675,7 +681,7 @@ DEPENDENCIES
   rspec-rails (~> 3.5.2)
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
-  rufus-scheduler (~> 3.0.8)
+  rufus-scheduler!
   sass-rails (~> 5.0.6)
   select2-rails (~> 3.5.4)
   shoulda-matchers
@@ -702,7 +708,7 @@ DEPENDENCIES
   xmpp4r (~> 0.5.6)
 
 RUBY VERSION
-   ruby 2.3.3p222
+   ruby 2.3.1p112
 
 BUNDLED WITH
    1.13.7
