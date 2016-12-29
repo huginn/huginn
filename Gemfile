@@ -117,7 +117,7 @@ gem 'mini_magick'
 gem 'multi_xml'
 gem 'nokogiri'
 gem 'omniauth', '~> 1.3.1'
-gem 'rails', '~> 5.0.0.1'
+gem 'rails', '~> 5.0.1'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'sass-rails',   '~> 5.0.6'
 gem 'select2-rails', '~> 3.5.4'
@@ -134,7 +134,7 @@ group :development do
   gem 'guard-rspec', '~> 4.6.4'
   gem 'rack-livereload', '~> 0.3.16'
   gem 'letter_opener_web', '~> 1.3.0'
-  gem 'web-console'
+  gem 'web-console', '>= 3.3.0'
 
   gem 'capistrano', '~> 3.4.0'
   gem 'capistrano-rails', '~> 1.1'
