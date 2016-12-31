@@ -68,7 +68,7 @@ namespace :foreman do
 end
 
 # If you want to use rvm on your server and have it maintained by Capistrano, uncomment these lines:
-#   set :rvm_ruby_string, '2.3.1@huginn'
+#   set :rvm_ruby_string, '2.3.3@huginn'
 #   set :rvm_type, :user
 #   before 'deploy', 'rvm:install_rvm'
 #   before 'deploy', 'rvm:install_ruby'
