@@ -119,6 +119,15 @@ describe LiquidInterpolatable::Filters do
       @agent.interpolation_context['s'] = 'foo/index.html'
       expect(@agent.interpolated['foo']).to eq('/dir/foo/index.html')
     end
+
+    it 'should normalize a URI value if an empty base URI is given' do
+      @agent.options['foo'] = '{{ u | to_uri: b }}'
+      @agent.interpolation_context['u'] = "\u{3042}"
+      @agent.interpolation_context['b'] = ""
+      expect(@agent.interpolated['foo']).to eq('%E3%81%82')
+      @agent.interpolation_context['b'] = nil
+      expect(@agent.interpolated['foo']).to eq('%E3%81%82')
+    end
   end
 
   describe 'uri_expand' do

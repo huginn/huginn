@@ -3,6 +3,7 @@ sudo: required
 language: ruby
 services:
   - docker
+  - mysql
   - postgresql
 env:
   global:
@@ -37,9 +38,6 @@ rvm:
 - 2.3.1
 cache: bundler
 bundler_args: --without development production
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y mysql-server
 script:
   - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec rake db:create db:migrate; else true; fi
   - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec rake $RSPEC_TASK; else ./build_docker_image.sh; fi

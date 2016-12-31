@@ -74,6 +74,13 @@ describe Agent do
       Agent.run_schedule("midnight")
     end
 
+    it "ignores unknown types" do
+      Agent.where(id: agents(:bob_weather_agent).id).update_all type: 'UnknownTypeAgent'
+      mock(Agents::WeatherAgent).bulk_check("midnight").once
+      mock(Agents::WebsiteAgent).bulk_check("midnight").once
+      Agent.run_schedule("midnight")
+    end
+
     it "only runs agents with the given schedule" do
       do_not_allow(Agents::WebsiteAgent).async_check
       Agent.run_schedule("blah")
@@ -283,10 +290,34 @@ describe Agent do
         Agent.receive!
       end
 
-      it "should not propogate to disabled Agents" do
+      it "should not propagate to disabled Agents" do
         Agent.async_check(agents(:bob_weather_agent).id)
         agents(:bob_rain_notifier_agent).update_attribute :disabled, true
         mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
+        Agent.receive!
+      end
+
+      it "should not propagate to Agents with unknown types" do
+        Agent.async_check(agents(:jane_weather_agent).id)
+        Agent.async_check(agents(:bob_weather_agent).id)
+
+        Agent.where(id: agents(:bob_rain_notifier_agent).id).update_all type: 'UnknownTypeAgent'
+
+        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
+        mock(Agent).async_receive(agents(:jane_rain_notifier_agent).id, anything).times(1)
+
+        Agent.receive!
+      end
+
+      it "should not propagate from Agents with unknown types" do
+        Agent.async_check(agents(:jane_weather_agent).id)
+        Agent.async_check(agents(:bob_weather_agent).id)
+
+        Agent.where(id: agents(:bob_weather_agent).id).update_all type: 'UnknownTypeAgent'
+
+        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
+        mock(Agent).async_receive(agents(:jane_rain_notifier_agent).id, anything).times(1)
+
         Agent.receive!
       end
 

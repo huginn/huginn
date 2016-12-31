@@ -651,28 +651,22 @@ describe Agents::WebsiteAgent do
         @checker.options = @valid_options
         @checker.check
         event = Event.last
-        expect(event.payload['url']).to eq("http://imgs.xkcd.com/comics/evolving.png")
-        expect(event.payload['title']).to eq("Evolving")
-        expect(event.payload['hovertext']).to match(/^Biologists play reverse/)
+        expect(event.payload).to match(
+          'url' => 'http://imgs.xkcd.com/comics/evolving.png',
+          'title' => 'Evolving',
+          'hovertext' => /^Biologists play reverse/
+        )
       end
 
-      it "should turn relative urls to absolute" do
-        rel_site = {
-          'name' => "XKCD",
-          'expected_update_period_in_days' => "2",
-          'type' => "html",
-          'url' => "http://xkcd.com",
-          'mode' => "on_change",
-          'extract' => {
-            'url' => {'css' => "#topLeft a", 'value' => "@href"},
-          }
-        }
-        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
-        rel.user = users(:bob)
-        rel.save!
-        rel.check
+      it "should exclude hidden keys" do
+        @valid_options['extract']['hovertext']['hidden'] = true
+        @checker.options = @valid_options
+        @checker.check
         event = Event.last
-        expect(event.payload['url']).to eq("http://xkcd.com/about")
+        expect(event.payload).to match(
+          'url' => 'http://imgs.xkcd.com/comics/evolving.png',
+          'title' => 'Evolving'
+        )
       end
 
       it "should return an integer value if XPath evaluates to one" do
@@ -749,9 +743,9 @@ describe Agents::WebsiteAgent do
         expect(event.payload['original_url']).to eq('http://xkcd.com/index')
       end
 
-      it "should be formatted by template after extraction" do
+      it "should format and merge values in template after extraction" do
+        @valid_options['extract']['hovertext']['hidden'] = true
         @valid_options['template'] = {
-          'url' => '{{url}}',
           'title' => '{{title | upcase}}',
           'summary' => '{{title}}: {{hovertext | truncate: 20}}',
         }
@@ -1185,7 +1179,11 @@ fire: hot
               'some_object' => {
                 'some_data' => { hello: 'world', href: '/world' }.to_json
               },
-              url: 'http://example.com/'
+              url: 'http://example.com/',
+              'headers' => {
+                'Content-Type' => 'application/json'
+              },
+              'status' => 200
             }
             @event.save!
 
@@ -1195,6 +1193,12 @@ fire: hot
               'extract' => {
                 'value' => { 'path' => 'hello' },
                 'url' => { 'path' => 'href' },
+              },
+              'template' => {
+                'value' => '{{ value }}',
+                'url' => '{{ url | to_uri: _response_.url }}',
+                'type' => '{{ _response_.headers.content_type }}',
+                'status' => '{{ _response_.status | as_object }}'
               }
             )
           end
@@ -1203,7 +1207,7 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world' })
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200 })
           end
 
           it "should support merge mode" do
@@ -1212,7 +1216,25 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world'))
+            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200))
+          end
+
+          it "should convert headers and status in the event data properly" do
+            @event.payload[:status] = '201'
+            @event.payload[:headers] = [['Content-Type', 'application/rss+xml']]
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/rss+xml', 'status' => 201 })
+          end
+
+          it "should ignore inconvertible headers and status in the event data" do
+            @event.payload[:status] = 'ok'
+            @event.payload[:headers] = ['Content-Type', 'Content-Length']
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => '', 'status' => nil })
           end
 
           it "should output an error when nothing can be found at the path" do
@@ -1349,6 +1371,9 @@ fire: hot
         'mode' => 'all',
         'extract' => {
           'url' => { 'css' => "a", 'value' => "@href" },
+        },
+        'template' => {
+          'url' => '{{ url | to_uri }}',
         }
       }
       @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)

@@ -13,6 +13,7 @@ describe Agents::RssAgent do
     stub_request(:any, /onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")), status: 200)
     stub_request(:any, /bad.onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")).gsub(/(?<=<link>)[^<]*/, ''), status: 200)
     stub_request(:any, /iso-8859-1/).to_return(body: File.binread(Rails.root.join("spec/data_fixtures/iso-8859-1.rss")), headers: { 'Content-Type' => 'application/rss+xml; charset=ISO-8859-1' }, status: 200)
+    stub_request(:any, /podcast/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/podcast.rss")), status: 200)
   end
 
   let(:agent) do
@@ -294,6 +295,161 @@ describe Agents::RssAgent do
         agent.check
         event = agent.events.first
         expect(event.payload['title']).to eq('Mëkanïk Zaïn')
+      end
+
+      it "decodes the content properly with force_encoding specified" do
+        @valid_options['force_encoding'] = 'iso-8859-1'
+        agent.check
+        event = agent.events.first
+        expect(event.payload['title']).to eq('Mëkanïk Zaïn')
+      end
+    end
+
+    context 'with podcast elements' do
+      before do
+        @valid_options['url'] = 'http://example.com/podcast.rss'
+        @valid_options['include_feed_info'] = true
+      end
+
+      let :feed_info do
+        {
+          "id" => nil,
+          "type" => "rss",
+          "url" => "http://www.example.com/podcasts/everything/index.html",
+          "links" => [ { "href" => "http://www.example.com/podcasts/everything/index.html" } ],
+          "title" => "All About Everything",
+          "description" => "All About Everything is a show about everything. Each week we dive into any subject known to man and talk about it as much as we can. Look for our podcast in the Podcasts app or in the iTunes Store",
+          "copyright" => "℗ & © 2014 John Doe & Family",
+          "generator" => nil,
+          "icon" => nil,
+          "authors" => [
+            "John Doe"
+          ],
+          "date_published" => nil,
+          "last_updated" => nil,
+          "itunes_categories" => [
+            "Technology", "Gadgets",
+            "TV & Film",
+            "Arts", "Food"
+          ],
+          "itunes_complete" => "yes",
+          "itunes_explicit" => "no",
+          "itunes_image" => "http://example.com/podcasts/everything/AllAboutEverything.jpg",
+          "itunes_owners" => ["John Doe <john.doe@example.com>"],
+          "itunes_subtitle" => "A show about everything",
+          "itunes_summary" => "All About Everything is a show about everything. Each week we dive into any subject known to man and talk about it as much as we can. Look for our podcast in the Podcasts app or in the iTunes Store",
+          "language" => "en-us"
+        }
+      end
+
+      it "is parsed correctly" do
+        expect {
+          agent.check
+        }.to change { agent.events.count }.by(4)
+
+        expect(agent.events.map(&:payload)).to match([
+          {
+            "feed" => feed_info,
+            "id" => "http://example.com/podcasts/archive/aae20140601.mp3",
+            "url" => nil,
+            "urls" => [],
+            "links" => [],
+            "title" => "Red,Whine, & Blue",
+            "description" => nil,
+            "content" => nil,
+            "image" => nil,
+            "enclosure" => {
+              "url" => "http://example.com/podcasts/everything/AllAboutEverythingEpisode4.mp3",
+              "type" => "audio/mpeg",
+              "length" => "498537"
+            },
+            "authors" => ["<Various>"],
+            "categories" => [],
+            "date_published" => "2016-03-11T01:15:00+00:00",
+            "last_updated" => "2016-03-11T01:15:00+00:00",
+            "itunes_duration" => "03:59",
+            "itunes_explicit" => "no",
+            "itunes_image" => "http://example.com/podcasts/everything/AllAboutEverything/Episode4.jpg",
+            "itunes_subtitle" => "Red + Blue != Purple",
+            "itunes_summary" => "This week we talk about surviving in a Red state if you are a Blue person. Or vice versa."
+          },
+          {
+            "feed" => feed_info,
+            "id" => "http://example.com/podcasts/archive/aae20140697.m4v",
+            "url" => nil,
+            "urls" => [],
+            "links" => [],
+            "title" => "The Best Chili",
+            "description" => nil,
+            "content" => nil,
+            "image" => nil,
+            "enclosure" => {
+              "url" => "http://example.com/podcasts/everything/AllAboutEverythingEpisode2.m4v",
+              "type" => "video/x-m4v",
+              "length" => "5650889"
+            },
+            "authors" => ["Jane Doe"],
+            "categories" => [],
+            "date_published" => "2016-03-10T02:00:00-07:00",
+            "last_updated" => "2016-03-10T02:00:00-07:00",
+            "itunes_closed_captioned" => "Yes",
+            "itunes_duration" => "04:34",
+            "itunes_explicit" => "no",
+            "itunes_image" => "http://example.com/podcasts/everything/AllAboutEverything/Episode3.jpg",
+            "itunes_subtitle" => "Jane and Eric",
+            "itunes_summary" => "This week we talk about the best Chili in the world. Which chili is better?"
+          },
+          {
+            "feed" => feed_info,
+            "id" => "http://example.com/podcasts/archive/aae20140608.mp4",
+            "url" => nil,
+            "urls" => [],
+            "links" => [],
+            "title" => "Socket Wrench Shootout",
+            "description" => nil,
+            "content" => nil,
+            "image" => nil,
+            "enclosure" => {
+              "url" => "http://example.com/podcasts/everything/AllAboutEverythingEpisode2.mp4",
+              "type" => "video/mp4",
+              "length" => "5650889"
+            },
+            "authors" => ["Jane Doe"],
+            "categories" => [],
+            "date_published" => "2016-03-09T13:00:00-05:00",
+            "last_updated" => "2016-03-09T13:00:00-05:00",
+            "itunes_duration" => "04:34",
+            "itunes_explicit" => "no",
+            "itunes_image" => "http://example.com/podcasts/everything/AllAboutEverything/Episode2.jpg",
+            "itunes_subtitle" => "Comparing socket wrenches is fun!",
+            "itunes_summary" => "This week we talk about metric vs. Old English socket wrenches. Which one is better? Do you really need both? Get all of your answers here."
+          },
+          {
+            "feed" => feed_info,
+            "id" => "http://example.com/podcasts/archive/aae20140615.m4a",
+            "url" => nil,
+            "urls" => [],
+            "links" => [],
+            "title" => "Shake Shake Shake Your Spices",
+            "description" => nil,
+            "content" => nil,
+            "image" => nil,
+            "enclosure" => {
+              "url" => "http://example.com/podcasts/everything/AllAboutEverythingEpisode3.m4a",
+              "type" => "audio/x-m4a",
+              "length" => "8727310"
+            },
+            "authors" => ["John Doe"],
+            "categories" => [],
+            "date_published" => "2016-03-08T12:00:00+00:00",
+            "last_updated" => "2016-03-08T12:00:00+00:00",
+            "itunes_duration" => "07:04",
+            "itunes_explicit" => "no",
+            "itunes_image" => "http://example.com/podcasts/everything/AllAboutEverything/Episode1.jpg",
+            "itunes_subtitle" => "A short primer on table spices",
+            "itunes_summary" => "This week we talk about <a href=\"https://itunes/apple.com/us/book/antique-trader-salt-pepper/id429691295?mt=11\">salt and pepper shakers</a>, comparing and contrasting pour rates, construction materials, and overall aesthetics. Come and join the party!"
+          }
+        ])
       end
     end
   end
