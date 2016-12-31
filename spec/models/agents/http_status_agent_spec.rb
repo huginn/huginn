@@ -5,10 +5,12 @@ describe 'HttpStatusAgent' do
     stub_request(:get, 'http://google.com/')
   end
 
+  let(:default_url) { 'http://google.com/' }
+
   let(:agent_options) do
     {
-      url: 'http://google.com/',
-      headers_to_save: 'Server'
+      url: "{{ url | default: '#{default_url}' }}",
+      headers_to_save: '{{ headers_to_save }}',
     }
   end
 
@@ -55,11 +57,10 @@ describe 'HttpStatusAgent' do
   describe "check" do
     let(:url) { "http://#{SecureRandom.uuid}/" }
 
+    let(:default_url) { url }
+
     let(:agent_options) do
-      {
-        url: url,
-        headers_to_save: ''
-      }
+      super().merge(headers_to_save: '')
     end
 
     it "should check the url" do
@@ -77,6 +78,7 @@ describe 'HttpStatusAgent' do
     describe "with an event with a successful ping" do
 
       let(:successful_url) { "http://#{SecureRandom.uuid}/" }
+      let(:default_url) { successful_url }
 
       let(:status_code) { 200 }
       let(:header) { 'X-Some-Header' }
@@ -84,10 +86,6 @@ describe 'HttpStatusAgent' do
 
       before do
         stub_request(:get, successful_url).to_return(status: status_code)
-      end
-
-      let(:agent_options) do
-        super().merge(url: successful_url)
       end
 
       let(:event_with_a_successful_ping) do
