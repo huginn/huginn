@@ -80,7 +80,7 @@ module Agents
           }
         end
         # you can't tweet too fast, give it a minute, i mean... 10 seconds
-        sleep 10
+        sleep 10 if incoming_events.length > 1
       end
     end
 
