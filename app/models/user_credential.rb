@@ -1,7 +1,11 @@
+require 'attr_encrypted'
+
 class UserCredential < ActiveRecord::Base
   MODES = %w[text java_script]
 
   belongs_to :user
+
+  attr_encrypted :credential_value, key: Huginn::Application.config.encryption_key
 
   validates_presence_of :credential_name
   validates_presence_of :credential_value

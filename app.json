@@ -9,6 +9,9 @@
         "APP_SECRET_TOKEN": {
             "generator": "secret"
         },
+        "APP_ENCRYPTION_PASSPHRASE": {
+            "generator": "secret"
+        },
         "PROCFILE_PATH": "deployment/heroku/Procfile.heroku",
         "ON_HEROKU": "true",
         "FORCE_SSL": "true",

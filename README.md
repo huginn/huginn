@@ -62,7 +62,7 @@ The quickest and easiest way to check out Huginn is to use the official Docker i
 If you just want to play around, you can simply fork this repository, then perform the following steps:
 
 * Run `git remote add upstream https://github.com/cantino/huginn.git` to add the main repository as a remote for your fork.
-* Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` variable.
+* Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` and `APP_ENCRYPTION_PASSPHRASE` variables.
 * Make sure that you have MySQL or PostgreSQL installed. (On a Mac, the easiest way is with [Homebrew](http://brew.sh/). If you're going to use PostgreSQL, you'll need to prepend all commands below with `DATABASE_ADAPTER=postgresql`.)
 * Run `bundle` to install dependencies
 * Run `bundle exec rake db:create`, `bundle exec rake db:migrate`, and then `bundle exec rake db:seed` to create a development database with some example Agents.
@@ -71,8 +71,8 @@ If you just want to play around, you can simply fork this repository, then perfo
 * Read the [wiki][wiki] for usage examples and to get started making new Agents.
 * Periodically run `git fetch upstream` and then `git checkout master && git merge upstream/master` to merge in the newest version of Huginn.
 
-Note: By default, emails are intercepted in the `development` Rails environment, which is what you just setup.  You can view 
-them at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener). If you'd like to send real emails via SMTP when playing 
+Note: By default, emails are intercepted in the `development` Rails environment, which is what you just setup.  You can view
+them at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener). If you'd like to send real emails via SMTP when playing
 with Huginn locally, set `SEND_EMAIL_IN_DEVELOPMENT` to `true` in your `.env` file.
 
 If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
@@ -83,13 +83,13 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 
 ### Develop
 
-All agents have specs! And there's also acceptance tests that simulate running Huginn in a headless browser. 
+All agents have specs! And there's also acceptance tests that simulate running Huginn in a headless browser.
 
-* Install PhantomJS 2.1.1 or greater: 
-  * Using [Node Package Manager](https://www.npmjs.com/): `npm install phantomjs` 
+* Install PhantomJS 2.1.1 or greater:
+  * Using [Node Package Manager](https://www.npmjs.com/): `npm install phantomjs`
   * Using [Homebrew](http://brew.sh/) on OSX `brew install phantomjs`
 * Run all specs with `bundle exec rspec`
-* Run a specific spec with `bundle exec rspec path/to/specific/test_spec.rb`. 
+* Run a specific spec with `bundle exec rspec path/to/specific/test_spec.rb`.
 * Read more about rspec for rails [here](https://github.com/rspec/rspec-rails).
 
 ## Deployment

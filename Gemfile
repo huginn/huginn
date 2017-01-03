@@ -88,6 +88,7 @@ unless Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.5.0')
 end
 
 gem 'ace-rails-ap', '~> 2.0.1'
+gem 'attr_encrypted', '~> 3.0.0'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
 gem 'coffee-rails', '~> 4.2'
