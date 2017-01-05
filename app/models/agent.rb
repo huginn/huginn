@@ -445,19 +445,20 @@ class AgentDrop
     @object.short_type
   end
 
-  METHODS = [
-    :name,
-    :type,
-    :options,
-    :memory,
-    :sources,
-    :receivers,
-    :schedule,
-    :controllers,
-    :control_targets,
-    :disabled,
-    :keep_events_for,
-    :propagate_immediately,
+  METHODS = %i[
+    id
+    name
+    type
+    options
+    memory
+    sources
+    receivers
+    schedule
+    controllers
+    control_targets
+    disabled
+    keep_events_for
+    propagate_immediately
   ]
 
   METHODS.each { |attr|

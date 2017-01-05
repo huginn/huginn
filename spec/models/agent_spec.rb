@@ -1013,11 +1013,11 @@ describe AgentDrop do
     expect(@efa.to_liquid.class).to be(AgentDrop)
   end
 
-  it 'should have .type and .name' do
-    t = '{{agent.type}}: {{agent.name}}'
-    expect(interpolate(t, @wsa1)).to eq('WebsiteAgent: XKCD')
-    expect(interpolate(t, @wsa2)).to eq('WebsiteAgent: Dilbert')
-    expect(interpolate(t, @efa)).to eq('EventFormattingAgent: Formatter')
+  it 'should have .id, .type and .name' do
+    t = '[{{agent.id}}]{{agent.type}}: {{agent.name}}'
+    expect(interpolate(t, @wsa1)).to eq("[#{@wsa1.id}]WebsiteAgent: XKCD")
+    expect(interpolate(t, @wsa2)).to eq("[#{@wsa2.id}]WebsiteAgent: Dilbert")
+    expect(interpolate(t, @efa)).to eq("[#{@efa.id}]EventFormattingAgent: Formatter")
   end
 
   it 'should have .options' do
