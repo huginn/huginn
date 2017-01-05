@@ -479,7 +479,7 @@ GEM
       rest-client
     ruby-growl (4.1)
       uuid (~> 2.3, >= 2.3.5)
-    rufus-scheduler (3.0.9)
+    rufus-scheduler (3.3.2)
       tzinfo
     safe_yaml (1.0.4)
     sass (3.4.14)
@@ -675,7 +675,7 @@ DEPENDENCIES
   rspec-rails (~> 3.5.2)
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
-  rufus-scheduler (~> 3.0.8)
+  rufus-scheduler (~> 3.3.2)
   sass-rails (~> 5.0.6)
   select2-rails (~> 3.5.4)
   shoulda-matchers

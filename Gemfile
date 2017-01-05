@@ -118,7 +118,7 @@ gem 'multi_xml'
 gem 'nokogiri'
 gem 'omniauth', '~> 1.3.1'
 gem 'rails', '~> 5.0.1'
-gem 'rufus-scheduler', '~> 3.0.8', require: false
+gem 'rufus-scheduler', '~> 3.3.2', require: false
 gem 'sass-rails',   '~> 5.0.6'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
