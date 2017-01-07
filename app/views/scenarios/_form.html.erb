@@ -51,7 +51,7 @@
       <div class="form-group">
         <div>
           <%= f.label :icon %>
-          <%= f.select(:icon, options_for_select(Scenario.icons), {},
+          <%= f.select(:icon, options_for_select(Scenario.icons, @scenario.icon), {},
             {:style => "font-family:'FontAwesome', Arial;", :class => 'select2-fountawesome-icon'}) %>
         </div>
       </div>
