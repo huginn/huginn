@@ -123,7 +123,7 @@
       "guid": "d86b069650edadfc61db9df767c8b65c",
       "options": {
         "instructions": {
-          "message": "<h2>{{title}}</h2><img src=\"{{url}}\"/> <p>{{hovertext}}</p>"
+          "message": "<h2>{{title}}</h2><img src=\"https:{{url}}\"/> <p>{{hovertext}}</p>"
         },
         "matchers": [
 
