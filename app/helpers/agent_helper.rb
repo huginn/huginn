@@ -32,10 +32,14 @@ module AgentHelper
       agent_controllers(agent, delimiter) || 'Never'
     else
       [
-        agent.schedule.humanize.titleize,
+        builtin_schedule_name(agent.schedule),
         *(agent_controllers(agent, delimiter))
       ].join(delimiter).html_safe
     end
+  end
+
+  def builtin_schedule_name(schedule)
+    schedule == 'every_7d' ? 'Every Monday' : schedule.humanize.titleize
   end
 
   def agent_controllers(agent, delimiter = ', ')
