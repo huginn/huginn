@@ -39,6 +39,10 @@ module AgentHelper
   end
 
   def builtin_schedule_name(schedule)
+    AgentHelper.builtin_schedule_name(schedule)
+  end
+
+  def self.builtin_schedule_name(schedule)
     schedule == 'every_7d' ? 'Every Monday' : schedule.humanize.titleize
   end
 
