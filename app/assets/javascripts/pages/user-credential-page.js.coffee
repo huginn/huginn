@@ -22,4 +22,4 @@ class @UserCredentialPage
       $textarea.val(editor.getSession().getValue())
 
 $ ->
-  Utils.registerPage(UserCredentialPage, forPathsMatching: /^user_credentials\/\d+/)
+  Utils.registerPage(UserCredentialPage, forPathsMatching: /^user_credentials\/(\d+|new)/)
