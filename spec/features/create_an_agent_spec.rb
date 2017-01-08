@@ -63,6 +63,7 @@ describe "Creating a new agent", js: true do
 
     it "does not send previously configured sources when the current agent does not support them" do
       select2("Website Agent scrapes", from: "Type")
+      sleep 0.5
       select2("SF Weather", from: 'Sources')
       select2("Webhook Agent", from: "Type")
       fill_in(:agent_name, with: "No sources")
@@ -74,6 +75,7 @@ describe "Creating a new agent", js: true do
 
     it "does not send previously configured control targets when the current agent does not support them" do
       select2("Commander Agent", from: "Type")
+      sleep 0.5
       select2("SF Weather", from: 'Control targets')
       select2("Webhook Agent", from: "Type")
       fill_in(:agent_name, with: "No control targets")
@@ -85,6 +87,7 @@ describe "Creating a new agent", js: true do
 
     it "does not send previously configured receivers when the current agent does not support them" do
       select2("Website Agent scrapes", from: "Type")
+      sleep 0.5
       select2("ZKCD", from: 'Receivers')
       select2("Email Agent", from: "Type")
       fill_in(:agent_name, with: "No receivers")
