@@ -1,6 +1,5 @@
 module Agents
   class LiquidOutputAgent < Agent
-    include WebRequestConcern
     include FormConfigurable
 
     cannot_be_scheduled!
