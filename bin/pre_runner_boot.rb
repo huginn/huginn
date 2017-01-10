@@ -8,6 +8,6 @@ end
 
 Rails.configuration.cache_classes = true
 
-Dotenv.load if ENV['APP_SECRET_TOKEN'].blank? or ENV['APP_ENCRYPTION_PASSPHRASE'].blank?
+Dotenv.load if ENV['APP_SECRET_TOKEN'].blank?
 
 require 'agent_runner'
