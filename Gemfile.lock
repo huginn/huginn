@@ -55,6 +55,22 @@ GIT
       faraday (>= 0.7.4, < 1.0)
 
 GIT
+  remote: https://github.com/sferik/twitter.git
+  revision: d11707edf4abd13f7ada0eef57fc1eaa1062d75b
+  specs:
+    twitter (5.15.0)
+      addressable (~> 2.3)
+      buftok (~> 0.2.0)
+      equalizer (~> 0.0.11)
+      http (~> 2.0)
+      http-form_data (~> 1.0)
+      http_parser.rb (~> 0.6.0)
+      memoizable (~> 0.4.0)
+      multipart-post (~> 2.0)
+      naught (~> 1.0)
+      simple_oauth (~> 0.3.0)
+
+GIT
   remote: https://github.com/tumblr/tumblr_client.git
   revision: 0c59b04e49f2a8c89860613b18cf4e8f978d8dc7
   ref: 0c59b04e49f2a8c89860613b18cf4e8f978d8dc7
@@ -284,10 +300,14 @@ GEM
       httparty (>= 0.7.3)
       mimemagic
       multipart-post
-    http (0.6.4)
+    http (2.1.0)
+      addressable (~> 2.3)
+      http-cookie (~> 1.0)
+      http-form_data (~> 1.0.1)
       http_parser.rb (~> 0.6.0)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
+    http-form_data (1.0.1)
     http_parser.rb (0.6.0)
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
@@ -341,7 +361,7 @@ GEM
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     mysql2 (0.3.20)
-    naught (1.0.0)
+    naught (1.1.0)
     nenv (0.2.0)
     net-ftp-list (3.2.8)
     net-scp (1.2.1)
@@ -551,17 +571,6 @@ GEM
       builder (>= 2.1.2)
       jwt (>= 0.1.2)
       multi_json (>= 1.3.0)
-    twitter (5.14.0)
-      addressable (~> 2.3)
-      buftok (~> 0.2.0)
-      equalizer (~> 0.0.9)
-      faraday (~> 0.9.0)
-      http (~> 0.6.0)
-      http_parser.rb (~> 0.6.0)
-      json (~> 1.8)
-      memoizable (~> 0.4.0)
-      naught (~> 1.0)
-      simple_oauth (~> 0.3.0)
     typhoeus (0.6.9)
       ethon (>= 0.7.1)
     tzinfo (1.2.3)
@@ -695,7 +704,7 @@ DEPENDENCIES
   therubyracer (~> 0.12.3)
   tumblr_client!
   twilio-ruby (~> 3.11.5)
-  twitter (~> 5.14.0)
+  twitter!
   twitter-stream!
   typhoeus (~> 0.6.3)
   tzinfo (>= 1.2.0)

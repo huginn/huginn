@@ -51,7 +51,7 @@ gem 'weibo_2', github: 'dsander/weibo_2', branch: 'master'
 gem 'google-api-client', '~> 0.7.1', require: 'google/api_client'
 
 # Twitter Agents
-gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
+gem 'twitter', github: 'sferik/twitter' # Must to be loaded before cantino-twitter-stream.
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 gem 'omniauth-twitter', '~> 1.3.0'
 
