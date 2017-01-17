@@ -17,8 +17,8 @@ class ScenarioImportsController < ApplicationController
   private
 
   def scenario_import_params
-    merges = params[:scenario_import].delete(:merges)
-    params.require(:scenario_import).permit(:url, :data, :file, :do_import) do |params|
+    merges = params[:scenario_import].delete(:merges).try(:permit!)
+    params.require(:scenario_import).permit(:url, :data, :file, :do_import).tap do |params|
       params[:merges] = merges
     end
   end
