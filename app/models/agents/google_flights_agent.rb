@@ -7,7 +7,7 @@ module Agents
 
 
     description <<-MD
-      The GoogleFlightsAgent will tell you the minimum airline prices between a pair of cities. The api limit is 50 requests/day.
+      The GoogleFlightsAgent will tell you the minimum airline prices between a pair of cities.
 
       Follow the documentation [here](https://developers.google.com/qpx-express/v1/prereqs#get-a-google-account) to retrieve an api key.
       After you get to the google developer console, created a project, enabled qpx express api then you can choose `api key` credential to be created.
