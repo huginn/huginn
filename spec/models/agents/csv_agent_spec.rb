@@ -132,7 +132,7 @@ describe Agents::CsvAgent do
       end
 
       it "handles quotes correctly" do
-        event = event_with_contents("\"one\",\"two\"\n1,2\n\"\"2, two\",3")
+        event = event_with_contents("\"one\",\"two\"\n1,2\n\"\"\"2, two\",3")
         expect { @checker.receive([event]) }.to change(Event, :count).by(2)
         expect(Event.last.payload).to eq(@checker.options['data_key'] => {'one' => '"2, two', 'two' => '3'})
       end
