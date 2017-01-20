@@ -19,7 +19,7 @@ shared_examples_for Oauthable do
   describe "valid_services_for" do
     it "should return all available services without specifying valid_oauth_providers" do
       @agent = Agents::OauthableTestAgent.new
-      expect(@agent.valid_services_for(users(:bob)).collect(&:id).sort).to eq([services(:generic), services(:global)].collect(&:id).sort)
+      expect(@agent.valid_services_for(users(:bob)).collect(&:id).sort).to eq([services(:generic), services(:twitter), services(:global)].collect(&:id).sort)
     end
 
     it "should filter the services based on the agent defaults" do
