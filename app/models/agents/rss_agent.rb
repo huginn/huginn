@@ -31,6 +31,7 @@ module Agents
           * `force_encoding` - Set `force_encoding` to an encoding name if the website is known to respond with a missing, invalid or wrong charset in the Content-Type header.  Note that a text content without a charset is taken as encoded in UTF-8 (not ISO-8859-1).
           * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
           * `max_events_per_run` - Limit number of events created (items parsed) per run for feed.
+          * `max_ids` - Limit number of ids that get remebered to not emmit an event again (default: 500).
 
         # Ordering Events
 
@@ -105,6 +106,10 @@ module Agents
         errors.add(:base, "Please provide 'expected_update_period_in_days' to indicate how many days can pass without an update before this Agent is considered to not be working")
       end
 
+      if options['max_ids'].present? && options['max_ids'].to_i < 1
+        errors.add(:base, "Please provide 'max_ids' as a positive number bigger then 0 indicating how many IDs should be saved to distinguish between new and old IDs in RSS feeds. Delete option to use default (500).")
+      end
+
       validate_web_request_options!
       validate_events_order
     end
@@ -151,21 +156,18 @@ module Agents
           end
         end
       end
-      if(memory['seen_ids'])#~if fetching fails first time or is empty, array does not exist yet
-        memory['seen_ids'].slice!(new_events.count, memory['seen_ids'].count - new_events.count)#~ cut the old ids off of the stack
-      end
       log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
     end
 
     def check_and_track(entry_id)
       memory['seen_ids'] ||= []
-      index = memory['seen_ids'].index(entry_id)
-      if index != nil
-	memory['seen_ids'].delete_at(index)#~ stack beahviour. Put each ID from the 'new_events' on top, even if it has already existed. Will result in old not used IDs to end up at the bottom of the stack
-	memory['seen_ids'].unshift entry_id
+      if memory['seen_ids'].include?(entry_id)
         false
       else
         memory['seen_ids'].unshift entry_id
+        while memory['seen_ids'].length > ((interpolated['max_ids'].presence || 500).to_i) do
+          memory['seen_ids'].pop
+        end
         true
       end
     end
