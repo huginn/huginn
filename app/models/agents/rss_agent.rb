@@ -107,7 +107,7 @@ module Agents
       end
 
       if options['max_ids'].present? && options['max_ids'].to_i < 1
-        errors.add(:base, "Please provide 'max_ids' as a positive number bigger then 0 indicating how many IDs should be saved to distinguish between new and old IDs in RSS feeds. Delete option to use default (500).")
+        errors.add(:base, "Please provide 'max_ids' as a number bigger than 0 indicating how many IDs should be saved to distinguish between new and old IDs in RSS feeds. Delete option to use default (500).")
       end
 
       validate_web_request_options!
@@ -165,9 +165,7 @@ module Agents
         false
       else
         memory['seen_ids'].unshift entry_id
-        while memory['seen_ids'].length > ((interpolated['max_ids'].presence || 500).to_i) do
-          memory['seen_ids'].pop
-        end
+		memory['seen_ids'].pop(memory['seen_ids'].length - ((options['max_ids'].presence || 500).to_i)) if memory['seen_ids'].length > ((options['max_ids'].presence || 500).to_i)
         true
       end
     end
