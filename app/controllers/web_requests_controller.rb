@@ -28,7 +28,7 @@ class WebRequestsController < ApplicationController
 
         status = status || 200
 
-        if status.in?([301, 302])
+        if status.to_s.in?(["301", "302"])
           redirect_to content, status: status
         elsif content.is_a?(String)
           render plain: content, :status => status, :content_type => content_type || 'text/plain'

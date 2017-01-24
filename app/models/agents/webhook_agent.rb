@@ -104,7 +104,7 @@ module Agents
         errors.add(:base, "Must specify a code for request responses")
       end
 
-      if options['code'].in?(['301', '302']) && !options['response'].present?
+      if options['code'].to_s.in?(['301', '302']) && !options['response'].present?
         errors.add(:base, "Must specify a url for request redirect")
       end
     end
