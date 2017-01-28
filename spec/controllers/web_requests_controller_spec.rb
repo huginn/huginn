@@ -10,7 +10,7 @@ describe WebRequestsController do
         memory[:web_request_values] = params
         memory[:web_request_format] = format
         memory[:web_request_method] = method
-        ["success", 200, memory['content_type']]
+        ["success", (options[:status] || 200).to_i, memory['content_type']]
       else
         ["failure", 404]
       end
@@ -83,6 +83,13 @@ describe WebRequestsController do
     @agent.save!
     get :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"}
     expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8')
+  end
+
+  it 'should redirect correctly' do
+    @agent.options['status'] = 302
+    @agent.save
+    post :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret"}, format: :json
+    expect(response).to redirect_to('success')
   end
 
   it "should fail on incorrect users" do
