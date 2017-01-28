@@ -1,3 +1,5 @@
+<% content_for :title,  (@scenario ? @scenario.name + "'s " : "") + "Agent event flow" -%>
+
 <% content_for :head do %>
   <%= javascript_include_tag "diagram" %>
 <% end %>
