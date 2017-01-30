@@ -134,12 +134,13 @@ describe Agents::TwitterStreamAgent do
     end
 
     it "returns now workers if no agent is active" do
-      mock(Agents::TwitterStreamAgent).active { [] }
+      @agent.destroy
+      expect(Agents::TwitterStreamAgent.active).to be_empty
       expect(Agents::TwitterStreamAgent.setup_worker).to eq([])
     end
 
     it "returns a worker for an active agent" do
-      mock(Agents::TwitterStreamAgent).active { [@agent] }
+      expect(Agents::TwitterStreamAgent.active).to eq([@agent])
       workers = Agents::TwitterStreamAgent.setup_worker
       expect(workers).to be_a(Array)
       expect(workers.length).to eq(1)
@@ -151,9 +152,9 @@ describe Agents::TwitterStreamAgent do
 
     it "correctly maps keywords to agents" do
       agent2 = @agent.dup
-      agent2.id = 123455
       agent2.options[:filters] = ['agent2']
-      mock(Agents::TwitterStreamAgent).active { [@agent, agent2] }
+      agent2.save!
+      expect(Agents::TwitterStreamAgent.active.order(:id).pluck(:id)).to eq([@agent.id, agent2.id])
 
       workers = Agents::TwitterStreamAgent.setup_worker
       filter_to_agent_map = workers.first.config[:filter_to_agent_map]
