@@ -17,7 +17,7 @@ module Agents
 
       All the default options must exist. For `infantInSeatCount`, `infantInLapCount`, `seniorCount`, and `childCount`, leave them to the default value of `0` if you do not need them.
 
-      Make sure `date` and `return_date` is in this date format: `YYYY-MM-DAY`. You can use liquid formatting to dynamically assign a date in the future. For example to set the departure date 21 days from today, you'd use {% assign current_date = 'now' | date: '%s' %}{{current_date | plus: 1814000 | date: '%Y-%m-%d'}}
+      Make sure `date` and `return_date` is in this date format: `YYYY-MM-DAY`. You can use liquid formatting to dynamically assign a date in the future. For example to set the departure date 21 days from today, you'd use `{% assign current_date = 'now' | date: '%s' %}{{current_date | plus: 1814000 | date: '%Y-%m-%d'}}`
 
       You can choose one way tickets only by setting `roundtrip` to `false`.
 
