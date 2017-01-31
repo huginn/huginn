@@ -2,7 +2,7 @@ module Agents
   class RedditAgent < Agent
     cannot_receive_events!
 
-  	default_schedule "every_1d"
+    default_schedule "every_1d"
 
     description <<-MD
       The Reddit Agent will scrape a subreddit frontpage for entries above an upvote treshold.
@@ -36,7 +36,7 @@ module Agents
     end
 
     def check
-      response = HTTParty.get("http://reddit.com/r/#{options['subreddit']}", headers: {"User-Agent" => "huginn-crawler"})
+      response = HTTParty.get("https://reddit.com/r/#{interpolated['subreddit']}", headers: {"User-Agent" => "huginn-crawler"})
       items = extract_reddit_items(response.body)
       qualified_items = items.reject { |item| item.score < options['minimum_score'].to_i }
       new_items = qualified_items.reject { |item| already_evented? item }
@@ -53,8 +53,9 @@ module Agents
 
     # Check if it was already reported
     def already_evented?(reddit_item)
-      @previous_event_urls ||= events.pluck(:payload).map {|p| p['comments_url']}
-      @previous_event_urls.include? reddit_item.comments_url
+      @previous_event_urls ||= events.order(created_at: :desc).limit(1000)
+        .pluck(:payload).each.with_object({}) { |payload, hash| hash[payload['comments_url']] = true }
+      @previous_event_urls.has_key?(reddit_item.comments_url)
     end
 
     class RedditItem
