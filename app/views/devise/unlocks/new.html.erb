@@ -9,9 +9,9 @@
         <%= devise_error_messages! %>
 
         <div class="form-group">
-         <%= f.label :email, class: 'col-md-2 col-md-offset-2 control-label' %>
+         <%= f.label :login, class: 'col-md-2 col-md-offset-2 control-label' %>
           <div class="col-md-6">
-            <%= f.email_field :email, autofocus: true, class: 'form-control' %>
+            <%= f.text_field :login, autofocus: true, class: 'form-control' %>
           </div>
         </div>
 
