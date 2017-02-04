@@ -456,7 +456,7 @@ module Agents
           else
             result.each do |cat, val|
               if val > interpolated['min_value'].to_f
-                event.payload['nb_cats'] << (event.payload['nb_cats'].size == 0 ? cat : " "+cat)
+                event.payload['nb_cats'] << (event.payload['nb_cats'].length == 0 ? cat : " "+cat)
               end
             end
           end
