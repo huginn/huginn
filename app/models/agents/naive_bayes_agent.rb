@@ -389,6 +389,7 @@ module Agents
       To load trained data into an agent's memory, create a Manual Agent with `nb_cats : =loadYML` and `nb_content : your-well-formed-training-data-here`. Use the text input box, not the form view, by clicking "Toggle View" when inputting your training data else whitespace errors occur in the YML. Then submit this to your Naive Bayes Agent.
       
       Low frequency words that increase processing time and may overfit - tokens with a count less than x (measured by summing across all classes) - can be removed: Set `nb_cats : =purgeTokens` and `nb_content : integer-value`.
+
       Categories can be similarly deleted by `nb_cats : =delCat` and `nb_content : categories to delete`.
       
       **See [the NBayes ruby gem](https://github.com/oasic/nbayes) and [this blog post](http://blog.oasic.net/2012/06/naive-bayes-for-ruby.html) for more information about the Naive Bayes implementation used here.**
@@ -402,6 +403,7 @@ module Agents
           'nb_content' => 'birch oak elm conifer',
           'nb_cats' => 'trees plants'
         }        
+
     MD
 
     def validate_options
@@ -421,7 +423,7 @@ module Agents
 #    form_configurable :expected_receive_period_in_days
 
     def working?
-      event_created_within?((options['expected_receive_period_in_days'].presence || 7).to_i) && !recent_error_logs? 
+      event_created_within?((interpolated['expected_receive_period_in_days'].presence || 7).to_i) && !recent_error_logs? 
     end
 
     def receive(incoming_events)
@@ -443,17 +445,17 @@ module Agents
               c.starts_with?('-') ? nbayes.untrain(event.payload['nb_content'].split(/\s+/), c[1..-1]) : nbayes.train(event.payload['nb_content'].split(/\s+/), c)
             end
             memory['data'] = nbayes.dump(0)
-            if options['propagate_training_events'] = "true"
+            if interpolated['propagate_training_events'] = "true"
               create_event payload: event.payload
             end
           end
         else
           result = nbayes.classify(event.payload['nb_content'].split(/\s+/))
-          if options['min_value'].to_f == 1
+          if interpolated['min_value'].to_f == 1
             result.max_class
           else
             result.each do |cat, val|
-              if val > options['min_value'].to_f
+              if val > interpolated['min_value'].to_f
                 event.payload['nb_cats'] << (event.payload['nb_cats'].size == 0 ? cat : " "+cat)
               end
             end
@@ -501,3 +503,7 @@ module Agents
     end
   end
 end
+
+
+
+
