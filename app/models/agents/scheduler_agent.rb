@@ -42,7 +42,7 @@ module Agents
 
       ## Timezones
 
-      You can optionally specify a timezone (default: `#{Time.zone.name}`) after the day-of-week field.
+      You can optionally specify a timezone (default: `#{Time.zone.name}`) after the day-of-week field using the labels in the [tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 
       * `0 22 * * 1-5 Europe/Paris`: every day of the week when it's 22:00 in Paris
 
