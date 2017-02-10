@@ -342,7 +342,7 @@ module NBayes
       if arg.instance_of? String
         File.open(arg, "w") {|f| YAML.dump(self, f) }
       else
-        YAML.dump(self) # XXX only line modified so far for Huginn Agent
+        YAML.dump(self) # XXX only line modified so far for Huginn Agent NO LONGER NEEDED
       end
     end
 
@@ -367,7 +367,7 @@ module Agents
     description <<-MD
       The Naive Bayes Agent uses incoming Events from certain sources as a training set for Naive Bayes Machine Learning. Then it classifies Events from other sources and adds category tags to them accordingly.
       
-      All incoming events should have these two fields in their payloads, likely via the Event Formatting Agent:
+      All incoming events should have these two fields in their payloads, likely via the Event Formatting or Javascript Agent:
       
         * `nb_content` for the content used for classification, space separated. 
         * `nb_cats` for the classification categories, space separated.
@@ -444,7 +444,7 @@ module Agents
             cats.each do |c|
               c.starts_with?('-') ? nbayes.untrain(event.payload['nb_content'].split(/\s+/), c[1..-1]) : nbayes.train(event.payload['nb_content'].split(/\s+/), c)
             end
-            memory['data'] = nbayes.dump(0)
+            memory['data'] = YAML.dump(nbayes)
             if interpolated['propagate_training_events'] = "true"
               create_event payload: event.payload
             end
@@ -464,17 +464,18 @@ module Agents
         end
       end
     end
-    
-    def load(yml)
-      if yml.nil?
+
+    def load(dat)
+      if dat.nil?
         nbayes = NBayes::Base.new
-      elsif yml[0..2] == "---"
-        nbayes = self.class.from_yml(yml)
+      elsif dat[0..2] == "---"
+        nbayes = self.class.from_yml(dat)
       else
-        nbayes = self.class.from(yml)
+        nbayes = self.class.from(dat)
       end
       nbayes
     end
+    
     
     def self.from_yml(yml_data)
       nbayes = YAML.load(yml_data)
@@ -492,14 +493,14 @@ module Agents
         end
       end  # each vocab word
       remove_list.keys.each {|token| nbayes.vocab.delete(token) }
-      memory['data'] = nbayes.dump(0)
+      memory['data'] = YAML.dump(nbayes)
     end
 
     # Delete an entire category from the classification data
     def delete_category(category)
       nbayes = load(memory['data'])
       nbayes.data.delete_category(category)
-      memory['data'] = nbayes.dump(0)
+      memory['data'] = YAML.dump(nbayes)
     end
   end
 end
