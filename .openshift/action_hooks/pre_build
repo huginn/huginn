@@ -6,19 +6,34 @@
 
 echo "-> Pre-build step"
 
-STORED_ASSETS="${OPENSHIFT_DATA_DIR}/assets"
-LIVE_ASSETS="${OPENSHIFT_REPO_DIR}/public/assets"
+pushd ${OPENSHIFT_REPO_DIR} > /dev/null
 
-# Ensure our stored assets directory exists
-if [ ! -d "${STORED_ASSETS}" ]; then
-  echo "  Creating permanent assets directory"
-  mkdir "${STORED_ASSETS}"
-fi
+cp -a -f .env.example .env
 
-# Create symlink to stored assets unless we're uploading our own assets
-if [ -d "${LIVE_ASSETS}" ]; then
-  echo "  WARNING: Assets included in git repository, not using stored assets"
-else
-  echo "  Restoring stored assets"
-  ln -s "${STORED_ASSETS}" "${LIVE_ASSETS}"
-fi
+\sed -r -i -e "s/^#? *DOMAIN *=.+/DOMAIN=${OPENSHIFT_APP_DNS}:80/" \
+          -e "s/^#? *PORT *=.+/PORT=80/" .env
+
+\sed -r -i -e "s/^#? *DATABASE_ENCODING *=.+/DATABASE_ENCODING=utf8/" \
+          -e "s/^#? *DATABASE_NAME *=.+/DATABASE_NAME=${OPENSHIFT_APP_NAME}/" \
+          -e "s/^#? *DATABASE_USERNAME *=.+/DATABASE_USERNAME=${OPENSHIFT_MYSQL_DB_USERNAME}/" \
+          -e "s/^#? *DATABASE_PASSWORD *=.+/DATABASE_PASSWORD=${OPENSHIFT_MYSQL_DB_PASSWORD}/" \
+          -e "s/^#? *DATABASE_HOST *=.+/DATABASE_HOST=${OPENSHIFT_MYSQL_DB_HOST}/" \
+          -e "s/^#? *DATABASE_PORT *=.+/DATABASE_PORT=${OPENSHIFT_MYSQL_DB_PORT}/" \
+          -e "s@^#? *DATABASE_SOCKET *=.+@DATABASE_SOCKET=${OPENSHIFT_MYSQL_DB_SOCKET}@" .env
+
+# Just for completeness; not strictly necessary
+\sed -r -i -e "s/^#? *APP_SECRET_TOKEN *=.+/APP_SECRET_TOKEN=${APP_SECRET_TOKEN}/" \
+          -e "s/^#? *RAILS_ENV *=.+/RAILS_ENV=production/" \
+          -e "s/^#? *INVITATION_CODE *=.+/INVITATION_CODE=${INVITATION_CODE}/" .env
+
+\sed -r -i -e "s/^#? *SMTP_DOMAIN *=.+/SMTP_DOMAIN=${SMTP_DOMAIN}/" \
+          -e "s/^#? *SMTP_USER_NAME *=.+/SMTP_USER_NAME=${SMTP_USER_NAME}/" \
+          -e "s/^#? *SMTP_PASSWORD *=.+/SMTP_PASSWORD=${SMTP_PASSWORD}/" \
+          -e "s/^#? *SMTP_SERVER *=.+/SMTP_SERVER=${SMTP_SERVER}/" \
+          -e "s/^#? *EMAIL_FROM_ADDRESS *=.+/EMAIL_FROM_ADDRESS=${SMTP_USER_NAME}/" .env
+
+\sed -r -i -e 's/^#?(.+= *)$/#\1/' .env
+
+chmod ugo+r ${OPENSHIFT_REPO_DIR}/.env
+
+source ${OPENSHIFT_REPO_DIR}/.env
