@@ -43,8 +43,9 @@ check_login!
 info = capture("rhc app show")
 just_made = false
 if info =~ /must specify an application/i
+  nginx_cartridge = 'http://cartreflect-claytondev.rhcloud.com/reflect?github=gsterjov/openshift-nginx-cartridge'
   foreman_cartridge = 'http://cartreflect-claytondev.rhcloud.com/reflect?github=cantino/huginn-openshift-foreman-cartridge'
-  cmd = "rhc app create huginn ruby-2.0 mysql-5.5 #{foreman_cartridge} -s -r tmp-huginn"
+  cmd = "rhc app create huginn #{nginx_cartridge} mysql-5.5 #{foreman_cartridge} -s -r tmp-huginn"
   puts "It looks like you don't have an OpenShift app set up yet for this repo. I can make one for you."
   if yes?("Would you like me to create an OpenShift app for you now in this repo?")
     puts "Okay, this may take a moment..."
@@ -120,7 +121,7 @@ if first_time
       seed_password = nag "Finally, what password would you like to use?", noecho: true
       puts "\nJust a moment..."
 
-      result = capture("rhc ssh huginn 'cd $OPENSHIFT_REPO_DIR && RAILS_ENV=production bundle exec rake db:seed SEED_EMAIL=#{seed_email} SEED_USERNAME=#{seed_username} SEED_PASSWORD=#{seed_password}'")
+      result = capture("rhc ssh huginn 'unset GEM_HOME; . $OPENSHIFT_DATA_DIR/rvm/scripts/rvm && rvm use ruby-2.4.0 && cd $OPENSHIFT_REPO_DIR && bundle exec rake db:seed RAILS_ENV=production SEED_EMAIL=#{seed_email} SEED_USERNAME=#{seed_username} SEED_PASSWORD=#{seed_password}'")
       puts result
       if result =~ /Validation failed/
         puts "ERROR:"
