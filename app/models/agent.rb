@@ -418,7 +418,7 @@ class Agent < ActiveRecord::Base
       return if schedule == 'never'
       types = where(:schedule => schedule).group(:type).pluck(:type)
       types.each do |type|
-        next unless const_defined?(type)
+        next unless valid_type?(type)
         type.constantize.bulk_check(schedule)
       end
     end
