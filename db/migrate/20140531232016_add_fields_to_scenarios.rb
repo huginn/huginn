@@ -1,4 +1,4 @@
-class AddFieldsToScenarios < ActiveRecord::Migration
+class AddFieldsToScenarios < ActiveRecord::Migration[4.2]
   def change
     add_column :scenarios, :description, :text
     add_column :scenarios, :public, :boolean, :default => false, :null => false

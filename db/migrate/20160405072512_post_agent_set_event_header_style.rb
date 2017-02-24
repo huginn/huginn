@@ -1,4 +1,4 @@
-class PostAgentSetEventHeaderStyle < ActiveRecord::Migration
+class PostAgentSetEventHeaderStyle < ActiveRecord::Migration[4.2]
   def up
     Agent.of_type("Agents::PostAgent").each do |post_agent|
       if post_agent.send(:boolify, post_agent.options['emit_events']) &&

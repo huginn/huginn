@@ -1,6 +1,6 @@
 require 'liquid_migrator'
 
-class MigrateAgentsToLiquidTemplating < ActiveRecord::Migration
+class MigrateAgentsToLiquidTemplating < ActiveRecord::Migration[4.2]
   class Agent < ActiveRecord::Base
     include JSONSerializedField
     json_serialize :options, :memory

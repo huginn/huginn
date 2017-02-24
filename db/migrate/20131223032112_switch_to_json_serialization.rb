@@ -1,4 +1,4 @@
-class SwitchToJsonSerialization < ActiveRecord::Migration
+class SwitchToJsonSerialization < ActiveRecord::Migration[4.2]
   FIELDS = {
     :agents => [:options, :memory],
     :events => [:payload]

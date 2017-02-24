@@ -1,4 +1,4 @@
-class ResetDataOutputAgents < ActiveRecord::Migration
+class ResetDataOutputAgents < ActiveRecord::Migration[4.2]
   def up
     Agents::DataOutputAgent.find_each do |agent|
       agent.memory = {}

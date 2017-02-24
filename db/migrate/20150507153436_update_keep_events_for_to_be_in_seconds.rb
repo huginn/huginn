@@ -1,4 +1,4 @@
-class UpdateKeepEventsForToBeInSeconds < ActiveRecord::Migration
+class UpdateKeepEventsForToBeInSeconds < ActiveRecord::Migration[4.2]
   class Agent < ActiveRecord::Base; end
 
   SECONDS_IN_DAY = 60 * 60 * 24
