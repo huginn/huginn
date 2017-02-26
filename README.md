@@ -15,7 +15,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Watch for air travel or shopping deals
 * Follow your project names on Twitter and get updates when people mention them
 * Scrape websites and receive emails when they change
-* Connect to Adioso, HipChat, Basecamp, Growl, FTP, IMAP, Jabber, JIRA, MQTT, nextbus, Pushbullet, Pushover, RSS, Bash, Slack, StubHub, translation APIs, Twilio, Twitter, Wunderground, and Weibo, to name a few.
+* Connect to Adioso, HipChat, Basecamp, Growl, FTP, IMAP, Jabber, JIRA, MQTT, nextbus, Pushbullet, Pushover, Pushsafer, RSS, Bash, Slack, StubHub, translation APIs, Twilio, Twitter, Wunderground, and Weibo, to name a few.
 * Send digest emails with things that you care about at specific times during the day
 * Track counts of high frequency events and send an SMS within moments when they spike, such as the term "san francisco emergency"
 * Send and receive WebHooks
