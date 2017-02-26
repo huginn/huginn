@@ -161,7 +161,7 @@ describe Agents::PushsaferAgent do
     end
 
     it "should validate presence of privatekey" do
-      @checker.options[:privatekey] = ""
+      @checker.options[:k] = ""
       expect(@checker).not_to be_valid
     end
 
