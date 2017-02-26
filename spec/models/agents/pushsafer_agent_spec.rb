@@ -11,9 +11,9 @@ describe Agents::PushsaferAgent do
                                            u: "{{ u | default: 'http://someurl.com' }}",
                                            ut: "{{ ut | default: 'Some Url Title' }}",
                                            s: "{{ s | default: '1' }}",
-										   i: "{{ i | default: '1' }}",
-										   v: "{{ v | default: '0' }}",
-										   l: "{{ l | default: '0' }}",
+					   i: "{{ i | default: '1' }}",
+					   v: "{{ v | default: '0' }}",
+					   l: "{{ l | default: '0' }}",
                                            expected_receive_period_in_days: '1'
                                          })
 
@@ -74,7 +74,7 @@ describe Agents::PushsaferAgent do
       event.save!
 
       @checker.receive([event])
-      expect(@sent_notifications[0]['title']).to eq('Some new title')
+      expect(@sent_notifications[0]['t']).to eq('Some new title')
     end
 
     it 'should make sure event url overrides default url' do
