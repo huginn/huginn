@@ -25,9 +25,9 @@ module Agents
       * `u` - a supplementary URL or URL scheme to show with your message - `512` Character Limit
       * `ut` - a title for your supplementary URL, otherwise just the URL is shown - `512` Character Limit
       * `s` - the id of one of the sounds supported by device clients to override the user's default sound choice. [See Pushsafer API description for sound options.](https://www.pushsafer.com/en/pushapi)
-	  * `i` - the id of one of the icons. [See Pushsafer API description for sound options.](https://www.pushsafer.com/en/pushapi)
-	  * `v` - how often the device should vibrate (0-3).
-	  * `l` - Integer number 0-43200: Time in minutes, after which message automatically gets purged.
+      * `i` - the id of one of the icons. [See Pushsafer API description for sound options.](https://www.pushsafer.com/en/pushapi)
+      * `v` - how often the device should vibrate (0-3).
+      * `l` - Integer number 0-43200: Time in minutes, after which message automatically gets purged.
 
     MD
 
@@ -40,9 +40,9 @@ module Agents
         'u' => '{{ u }}',
         'ut' => '{{ ut }}',
         's' => '{{ s }}',
-		'i' => '{{ i }}',
-		'v' => '{{ v }}',
-		'l' => '{{ l }}',
+	'i' => '{{ i }}',
+	'v' => '{{ v }}',
+	'l' => '{{ l }}',
         'expected_receive_period_in_days' => '1'
       }
     end
@@ -75,9 +75,9 @@ module Agents
             u
             ut
             s
-			i
-			v
-			l
+            i
+            v
+            l
           ].each do |key|
             if value = String.try_convert(interpolated[key].presence)
               case key
