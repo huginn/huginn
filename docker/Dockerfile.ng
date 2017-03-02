@@ -1,0 +1,213 @@
+FROM usualoma/ruby-with-therubyracer:2.4.0-alpine
+
+LABEL author="Andrew Cantino (@cantino)" \
+      contributors="Akinori MUSHA (@knu), Dominik Sander (@dsander), George Opritescu (@International), Glenn 'devalias' Grant (@alias1), Ian Blenke (@ianblenke)" \
+      maintainer="Glenn 'devalias' Grant <glenn@devalias.net> (@alias1)" \
+      repo="https://github.com/cantino/huginn"
+
+ENV HUGINN_HOME="/usr/src/huginn" \
+    HUGINN_USER=huginn \
+    HUGINN_GROUP=huginn \
+    SQLITE_VERSION=1.3.13 \
+    LC_ALL=en_US.UTF-8 \
+    #\
+    # These are from the .env.example but are required early
+    RAILS_ENV=production \
+    ON_HEROKU=true 
+
+RUN set -ex \
+    && addgroup $HUGINN_GROUP \
+    && adduser -s "/bin/sh" -H -h "$HUGINN_HOME" -D -G $HUGINN_GROUP $HUGINN_USER
+
+WORKDIR $HUGINN_HOME
+
+# TODO: Make sure to reinstate the Gemfile.lock when we're ready
+
+#COPY ["Gemfile", "Gemfile.lock", "$HUGINN_HOME/"]
+COPY ["Gemfile", "$HUGINN_HOME/"]
+COPY lib/gemfile_helper.rb "$HUGINN_HOME/lib/"
+#COPY vendor/gems "$HUGINN_HOME/vendor/gems"
+
+# TODO: Do we need to vendor dotenv? Can't we just include it at the top of the Gemfile?
+
+RUN set -ex \
+    \
+    # Add build dependencies
+    && apk add --no-cache --virtual .build-dependencies \
+        build-base \
+        linux-headers \
+        postgresql-dev \
+        mariadb-dev \
+        sqlite-dev \
+    \
+    # Add runtime dependencies
+    && apk add --no-cache \
+        tzdata \
+        libpq \
+        mariadb-client-libs \
+        libcurl \
+        su-exec \
+        git \
+        #sudo \
+    \
+    # Hack to avoid "fatal: Not a git repository" from bundler
+    && git init \
+    \
+    # Install Gemfile dependencies
+    #&& chown -R huginn:huginn "$HUGINN_HOME" \
+    #&& su-exec huginn echo "gem 'sqlite3', '~> $SQLITE_VERSION'" >> "$HUGINN_HOME/Gemfile" \
+    && echo "gem 'sqlite3', '~> $SQLITE_VERSION'" >> "$HUGINN_HOME/Gemfile" \
+    && INSTALL_ALL_DBS=true bundle install --without test development --jobs 4 \
+    #--deployment # See http://bundler.io/bundle_install.html
+    #--path vendor/bundle --jobs 4
+    \
+    # Cleanup ruby caches
+    && INSTALL_ALL_DBS=true bundle clean \
+    #&& rm -rf /root/.gem/specs/* \
+    #&& rm -rf /root/.bundle/cache/* \
+    #&& rm -rf /usr/local/lib/ruby/gems/2.4.0/cache/* \
+    \
+    # Cleanup transient dependencies/caches
+    && apk del .build-dependencies \
+    && rm -rf /var/cache/apk/* \
+    && rm -rf /var/lib/apk/* \
+    && rm -rf /etc/apk/cache/*
+
+# TODO: git init is a hack to avoid "fatal: Not a git repository (or any of the parent directories): .git" when runnings rails/etc
+#   Better to just figure how to solve it properly..
+
+# TODO: Whats the benefit of running this to the /vendor dir? Can we chagne it? Will it use system rubyracer either way?
+# TODO: Should we be bundle installing with --deployment / --path vendor? Or to system?
+# TODO: Is there any way/benefit to specify the DB we want in an efficient way, so we don't need the other overhead files? Does it even make much size difference?
+# TODO: Do we need to keep git as a runtime dependency? It adds a solid chunk to our image size..
+
+# TODO: Add postgresql-dev, then delete all files but these? https://packages.debian.org/sid/i386/libpq-dev/filelist
+# TODO: Add mariadb-dev, then delete all files but these? http://packages.ubuntu.com/trusty/i386/libmysqlclient-dev/filelist
+# http://stackoverflow.com/questions/16304311/use-mariadb-instead-of-mysql-in-my-rails-project
+# https://packages.debian.org/sid/i386/libmariadbd-dev/filelist
+
+# Old Dependencies for reference
+#apt-get update
+#$minimal_apt_get_install build-essential checkinstall git-core \
+#  zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev \
+#  libncurses5-dev libffi-dev libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev \
+#  graphviz libgraphviz-dev \
+#  libmysqlclient-dev libpq-dev libsqlite3-dev \
+#  ruby2.3 ruby2.3-dev
+
+# TODO: Put together a little script that will easily parse out all the .env.example lines to copy into here
+
+# See .env.example for descriptions/usage
+ENV APP_SECRET_TOKEN=REPLACE_ME_NOW! \
+    #ON_HEROKU=true \
+    PORT=3000 \
+    DOMAIN=localhost:3000 \
+    ASSET_HOST= \
+    DATABASE_ADAPTER=mysql2 \
+    DATABASE_ENCODING=utf8m4 \
+    DATABASE_RECONNECT=true \
+    DATABASE_NAME=huginn \
+    DATABASE_POOL=20 \
+    DATABASE_USERNAME=huginn \
+    DATABASE_PASSWORD=huginn \
+    DATABASE_HOST=db \
+    DATABASE_PORT=3306 \
+    DATABASE_SOCKET= \
+    #RAILS_ENV=production \
+    FORCE_SSL=false \
+    INVITATION_CODE=try-huginn \
+    SKIP_INVITATION_CODE=false \
+    REQUIRE_CONFIRMED_EMAIL=false \
+    ALLOW_UNCONFIRMED_ACCESS_FOR=2.days \
+    CONFIRM_WITHIN=3.days \
+    MIN_PASSWORD_LENGTH=8 \
+    RESET_PASSWORD_WITHIN=6.hours \
+    LOCK_STRATEGY=failed_attempts \
+    MAX_FAILED_LOGIN_ATTEMPTS=10 \
+    UNLOCK_STRATEGY=both \
+    UNLOCK_AFTER=1.hour \
+    REMEMBER_FOR=4.weeks \
+    IMPORT_DEFAULT_SCENARIO_FOR_ALL_USERS=true \
+    DEFAULT_SCENARIO_FILE= \
+    SMTP_DOMAIN= \
+    SMTP_USER_NAME= \
+    SMTP_PASSWORD= \
+    SMTP_SERVER=smtp.gmail.com \
+    SMTP_PORT=587 \
+    SMTP_AUTHENTICATION=plain \
+    SMTP_ENABLE_STARTTLS_AUTO=true \
+    SEND_EMAIL_IN_DEVELOPMENT=false \
+    EMAIL_FROM_ADDRESS=from_address@gmail.com \
+    AGENT_LOG_LENGTH=200 \
+    TWITTER_OAUTH_KEY= \
+    TWITTER_OAUTH_SECRET= \
+    THIRTY_SEVEN_SIGNALS_OAUTH_KEY= \
+    THIRTY_SEVEN_SIGNALS_OAUTH_SECRET= \
+    GITHUB_OAUTH_KEY= \
+    GITHUB_OAUTH_SECRET= \
+    TUMBLR_OAUTH_KEY= \
+    TUMBLR_OAUTH_SECRET= \
+    DROPBOX_OAUTH_KEY= \
+    DROPBOX_OAUTH_SECRET= \
+    WUNDERLIST_OAUTH_KEY= \
+    WUNDERLIST_OAUTH_SECRET= \
+    EVERNOTE_OAUTH_KEY= \
+    EVERNOTE_OAUTH_SECRET= \
+    USE_EVERNOTE_SANDBOX=false \
+    AWS_ACCESS_KEY_ID= \
+    AWS_ACCESS_KEY= \
+    AWS_SANDBOX=false \
+    ADDITIONAL_GEMS= \
+    FARADAY_HTTP_BACKEND=typhoeus \
+    DEFAULT_HTTP_USER_AGENT="Huginn - https://github.com/cantino/huginn" \
+    ALLOW_JSONPATH_EVAL=false \
+    ENABLE_INSECURE_AGENTS=false \
+    ENABLE_SECOND_PRECISION_SCHEDULE=false \
+    SCHEDULER_FREQUENCY=0.3 \
+    EVENT_EXPIRATION_CHECK=6h \
+    USE_GRAPHVIZ_DOT= \
+    DIAGRAM_DEFAULT_LAYOUT= \
+    TIMEZONE="Pacific Time (US & Canada)" \
+    FAILED_JOBS_TO_KEEP=100 \
+    DELAYED_JOB_MAX_RUNTIME=2 \
+    DELAYED_JOB_SLEEP_DELAY=10
+
+COPY . "$HUGINN_HOME"
+
+# TODO: Need to tune the .dockerignore, or prevent some things being copied here
+#  eg.
+#    Gemfile.lock has caused issues in testing
+#    .env is causing issues by overwriting our defaults
+#    etc
+
+# TODOREMOVE: This is a hack to ensure the Gemfile accurately represents our changes
+RUN set -ex \
+    && bundle update rails
+
+RUN set -ex \
+    && mkdir -p "$HUGINN_HOME/tmp/pids" \
+    && mkdir -p "$HUGINN_HOME/tmp/sockets" \
+    && mkdir -p "$HUGINN_HOME/log" \
+    && cp "$HUGINN_HOME/config/unicorn.rb.example" "$HUGINN_HOME/config/unicorn.rb" \
+    && chown -R $HUGINN_USER:$HUGINN_GROUP "$HUGINN_HOME"
+
+# TODO: This copy of unicorn config file isn't ideal.. particularly if they've made one already. Need to check if it exists.. maybe best done in the init script too..
+
+# TODO: Do we want to use CMD, or ENTRYPOINT, or both? https://docs.docker.com/engine/reference/builder/#/entrypoint
+#   Tbh, the way we are using this init script feels a lot like an entrypoint. Compare/contrast and probaly set it up that way..
+
+#COPY docker/init.ng "$HUGINN_HOME/bin/init"
+COPY docker/init.ng "/huginn-init.sh"
+
+# TODO: Put some checks in the init script for security relevant settings that need to be changed. Eg. APP_SECRET_TOKEN, INVITATION_CODE, default admin account?
+# TODO: We should check this init script more and refactor if needed
+
+#COPY docker-entrypoint.sh /
+#ENTRYPOINT ["/docker-entrypoint.sh"]
+
+EXPOSE 3000
+
+USER huginn
+
+CMD ["/huginn-init.sh"]
+#CMD ["/bin/sh"]
