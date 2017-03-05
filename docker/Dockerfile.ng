@@ -57,12 +57,12 @@ RUN set -ex \
     #&& chown -R huginn:huginn "$HUGINN_HOME" \
     #&& su-exec huginn echo "gem 'sqlite3', '~> $SQLITE_VERSION'" >> "$HUGINN_HOME/Gemfile" \
     && echo "gem 'sqlite3', '~> $SQLITE_VERSION'" >> "$HUGINN_HOME/Gemfile" \
-    && INSTALL_ALL_DBS=true bundle install --without test development --jobs 4 \
+    && INSTALL_ALL_DATABASE_ADAPTERS=true bundle install --without test development --jobs 4 \
     #--deployment # See http://bundler.io/bundle_install.html
     #--path vendor/bundle --jobs 4
     \
     # Cleanup ruby caches
-    && INSTALL_ALL_DBS=true bundle clean \
+    && INSTALL_ALL_DATABASE_ADAPTERS=true bundle clean \
     #&& rm -rf /root/.gem/specs/* \
     #&& rm -rf /root/.bundle/cache/* \
     #&& rm -rf /usr/local/lib/ruby/gems/2.4.0/cache/* \

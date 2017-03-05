@@ -201,11 +201,11 @@ ENV['DATABASE_ADAPTER'] ||=
     'mysql2'
   end
 
-if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql' || !!ENV['INSTALL_ALL_DBS']) do
+if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql' || !!ENV['INSTALL_ALL_DATABASE_ADAPTERS']) do
   gem 'pg', '~> 0.18.4'
 end
 
-if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2' || !!ENV['INSTALL_ALL_DBS']) do
+if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2' || !!ENV['INSTALL_ALL_DATABASE_ADAPTERS']) do
   gem 'mysql2', '~> 0.4.5'
 end
 
