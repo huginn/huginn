@@ -13,12 +13,12 @@ fi
 # is a mysql or postgresql database linked?
 # requires that the mysql or postgresql containers have exposed
 # port 3306 and 5432 respectively.
-if [ -n "${MYSQL_PORT_3306_TCP_ADDR}" ]; then
+if [[ -n "${MYSQL_PORT_3306_TCP_ADDR}" || ("${DATABASE_ADAPTER}" == "mysql2" && -n "${DATABASE_HOST}") ]]; then
   DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
   DATABASE_HOST=${DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
   DATABASE_PORT=${DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
   DATABASE_ENCODING=${DATABASE_ENCODING:-utf8mb4}
-elif [ -n "${POSTGRES_PORT_5432_TCP_ADDR}" ]; then
+elif [[ -n "${POSTGRES_PORT_5432_TCP_ADDR}" || "${DATABASE_ADAPTER}" == "postgresql" ]]; then
   DATABASE_ADAPTER=${DATABASE_ADAPTER:-postgresql}
   DATABASE_HOST=${DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
   DATABASE_PORT=${DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
