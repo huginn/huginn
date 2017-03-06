@@ -198,7 +198,9 @@ if [ -n "\${DATABASE_INITIAL_CONNECT_MAX_RETRIES}" ]; then
 fi
 
 # We may need to try and create a database
-sudo -u huginn -EH bundle exec rake db:create
+if [ -z "\${DO_NOT_CREATE_DATABASE}" ]; then
+  sudo -u huginn -EH bundle exec rake db:create
+fi
 
 # Assuming we have a created database, run the migrations and seed it idempotently.
 if [ -z "\${DO_NOT_MIGRATE}" ]; then
