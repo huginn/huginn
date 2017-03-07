@@ -61,6 +61,7 @@ describe Agents::RssAgent do
   describe "emitting RSS events" do
     it "should emit items as events for an Atom feed" do
       agent.options['include_feed_info'] = true
+      agent.options['include_sort_info'] = true
 
       expect {
         agent.check
@@ -68,7 +69,7 @@ describe Agents::RssAgent do
 
       first, *, last = agent.events.last(20)
       [first, last].each do |event|
-        expect(first.payload['feed']).to include({
+        expect(event.payload['feed']).to include({
                                                    "type" => "atom",
                                                    "title" => "Recent Commits to huginn:master",
                                                    "url" => "https://github.com/cantino/huginn/commits/master",
@@ -98,6 +99,7 @@ describe Agents::RssAgent do
       expect(first.payload['authors']).to eq(["cantino (https://github.com/cantino)"])
       expect(first.payload['date_published']).to be_nil
       expect(first.payload['last_updated']).to eq("2014-07-16T22:26:22-07:00")
+      expect(first.payload['sort_info']).to eq({ 'position' => 20, 'count' => 20 })
       expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af")
       expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af"])
       expect(last.payload['links']).to eq([
@@ -110,11 +112,13 @@ describe Agents::RssAgent do
       expect(last.payload['authors']).to eq(["CloCkWeRX (https://github.com/CloCkWeRX)"])
       expect(last.payload['date_published']).to be_nil
       expect(last.payload['last_updated']).to eq("2014-07-01T16:37:47+09:30")
+      expect(last.payload['sort_info']).to eq({ 'position' => 1, 'count' => 20 })
     end
 
     it "should emit items as events in the order specified in the events_order option" do
       expect {
         agent.options['events_order'] = ['{{title | replace_regex: "^[[:space:]]+", "" }}']
+        agent.options['include_sort_info'] = true
         agent.check
       }.to change { agent.events.count }.by(20)
 
@@ -122,9 +126,11 @@ describe Agents::RssAgent do
       expect(first.payload['title'].strip).to eq('upgrade rails and gems')
       expect(first.payload['url']).to eq("https://github.com/cantino/huginn/commit/87a7abda23a82305d7050ac0bb400ce36c863d01")
       expect(first.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/87a7abda23a82305d7050ac0bb400ce36c863d01"])
+      expect(first.payload['sort_info']).to eq({ 'position' => 20, 'count' => 20 })
       expect(last.payload['title'].strip).to eq('Dashed line in a diagram indicates propagate_immediately being false.')
       expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535")
       expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535"])
+      expect(last.payload['sort_info']).to eq({ 'position' => 1, 'count' => 20 })
     end
 
     it "should emit items as events for a FeedBurner RSS 2.0 feed" do
