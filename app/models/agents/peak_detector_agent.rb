@@ -12,6 +12,8 @@ module Agents
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
 
       You may set `window_duration_in_days` to change the default memory window length of `14` days, `min_peak_spacing_in_days` to change the default minimum peak spacing of `2` days (peaks closer together will be ignored), and `std_multiple` to change the default standard deviation threshold multiple of `3`.
+
+      You may set `min_events` for the minimal number of accumulated events before the agent starts detecting.
     MD
 
     event_description <<-MD
@@ -26,8 +28,8 @@ module Agents
     MD
 
     def validate_options
-      unless options['expected_receive_period_in_days'].present? && options['message'].present? && options['value_path'].present?
-        errors.add(:base, "expected_receive_period_in_days, value_path, and message are required")
+      unless options['expected_receive_period_in_days'].present? && options['message'].present? && options['value_path'].present? && options['min_events'].present?
+        errors.add(:base, "expected_receive_period_in_days, value_path, min_events and message are required")
       end
     end
 
@@ -36,7 +38,8 @@ module Agents
         'expected_receive_period_in_days' => "2",
         'group_by_path' => "filter",
         'value_path' => "count",
-        'message' => "A peak of {{count}} was found in {{filter}}"
+        'message' => "A peak of {{count}} was found in {{filter}}",
+        'min_events' => '4',
       }
     end
 
@@ -58,7 +61,9 @@ module Agents
       memory['peaks'] ||= {}
       memory['peaks'][group] ||= []
 
-      if memory['data'][group].length > 4 && (memory['peaks'][group].empty? || memory['peaks'][group].last < event.created_at.to_i - peak_spacing)
+      return if memory['data'][group].length <= options['min_events'].to_i
+
+      if memory['peaks'][group].empty? || memory['peaks'][group].last < event.created_at.to_i - peak_spacing
         average_value, standard_deviation = stats_for(group, :skip_last => 1)
         newest_value, newest_time = memory['data'][group][-1].map(&:to_f)
 
