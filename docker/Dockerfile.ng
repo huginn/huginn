@@ -171,6 +171,8 @@ ENV APP_SECRET_TOKEN=REPLACE_ME_NOW! \
 
 COPY . "$HUGINN_HOME"
 
+COPY docker/config/unicorn.rb "$HUGINN_HOME/config/unicorn.rb"
+
 # TODO: Need to tune the .dockerignore, or prevent some things being copied here
 #  eg.
 #    .env is causing issues by overwriting our defaults
@@ -180,7 +182,6 @@ RUN set -ex \
     && mkdir -p "$HUGINN_HOME/tmp/pids" \
     && mkdir -p "$HUGINN_HOME/tmp/sockets" \
     && mkdir -p "$HUGINN_HOME/log" \
-    && cp "$HUGINN_HOME/config/unicorn.rb.example" "$HUGINN_HOME/config/unicorn.rb" \
     && chown -R $HUGINN_USER:$HUGINN_GROUP "$HUGINN_HOME"
 
 # TODO: This copy of unicorn config file isn't ideal.. particularly if they've made one already. Need to check if it exists.. maybe best done in the init script too..
