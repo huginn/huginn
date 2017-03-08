@@ -1,4 +1,4 @@
-FROM usualoma/ruby-with-therubyracer:2.4.0-alpine
+FROM usualoma/ruby-with-therubyracer:2.3.0-alpine
 
 LABEL author="Andrew Cantino (@cantino)" \
       contributors="Akinori MUSHA (@knu), Dominik Sander (@dsander), George Opritescu (@International), Glenn 'devalias' Grant (@alias1), Ian Blenke (@ianblenke)" \
@@ -21,10 +21,7 @@ RUN set -ex \
 
 WORKDIR $HUGINN_HOME
 
-# TODO: Make sure to reinstate the Gemfile.lock when we're ready
-
-#COPY ["Gemfile", "Gemfile.lock", "$HUGINN_HOME/"]
-COPY ["Gemfile", "$HUGINN_HOME/"]
+COPY ["Gemfile", "Gemfile.lock", "$HUGINN_HOME/"]
 COPY lib/gemfile_helper.rb "$HUGINN_HOME/lib/"
 #COPY vendor/gems "$HUGINN_HOME/vendor/gems"
 
@@ -176,13 +173,8 @@ COPY . "$HUGINN_HOME"
 
 # TODO: Need to tune the .dockerignore, or prevent some things being copied here
 #  eg.
-#    Gemfile.lock has caused issues in testing
 #    .env is causing issues by overwriting our defaults
 #    etc
-
-# TODOREMOVE: This is a hack to ensure the Gemfile accurately represents our changes
-RUN set -ex \
-    && bundle update rails
 
 RUN set -ex \
     && mkdir -p "$HUGINN_HOME/tmp/pids" \
