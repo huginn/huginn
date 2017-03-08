@@ -131,7 +131,7 @@ gem 'rufus-scheduler', '~> 3.3.2', require: false
 gem 'sass-rails',   '~> 5.0.6'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
-gem 'therubyracer', '~> 0.12.2'
+gem 'therubyracer', '~> 0.12.3'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '~> 2.7.2'
 
