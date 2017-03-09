@@ -9,10 +9,12 @@ describe FormConfigurableAgentPresenter do
     form_configurable :text, type: :text, roles: :completable
     form_configurable :boolean, type: :boolean
     form_configurable :array, type: :array, values: [1, 2, 3]
+    form_configurable :json, type: :json
   end
 
   before(:all) do
-    @presenter = FormConfigurableAgentPresenter.new(FormConfigurableAgentPresenterAgent.new, ActionController::Base.new.view_context)
+    agent = FormConfigurableAgentPresenterAgent.new(options: { json: {} })
+    @presenter = FormConfigurableAgentPresenter.new(agent, ActionController::Base.new.view_context)
   end
 
   it "works for the type :string" do
@@ -36,6 +38,14 @@ describe FormConfigurableAgentPresenter do
   it "works for the type :array" do
     expect(@presenter.option_field_for(:array)).to(
       have_tag('input', with: {:'data-attribute' => 'array', role: 'completable form-configurable', type: 'text', name: 'agent[options][array]'})
+    )
+  end
+
+  it "works for the type :json" do
+    expect(@presenter.option_field_for(:json)).to(
+      have_tag('textarea',
+               with: {:'data-attribute' => 'json', role: 'form-configurable', name: 'agent[options][json]'},
+               seen: "{\n}")
     )
   end
 end

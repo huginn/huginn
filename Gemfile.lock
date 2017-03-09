@@ -70,7 +70,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    ace-rails-ap (2.0.1)
+    ace-rails-ap (4.1.2)
     actioncable (5.0.1)
       actionpack (= 5.0.1)
       nio4r (~> 1.2)
@@ -596,7 +596,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  ace-rails-ap (~> 2.0.1)
+  ace-rails-ap (~> 4.1.0)
   aws-sdk-core (~> 2.2.15)
   better_errors (~> 1.1)
   binding_of_caller
