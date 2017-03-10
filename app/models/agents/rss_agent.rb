@@ -169,17 +169,12 @@ module Agents
         end
       end
 
-      created_event_count = 0
-      sort_events(new_events).each.with_index do |event, index|
-        entry_id = event.payload[:id]
-        if check_and_track(entry_id)
-          unless max_events && max_events > 0 && index >= max_events
-            created_event_count += 1
-            create_event(event)
-          end
-        end
-      end
-      log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
+      events = sort_events(new_events).select.with_index { |event, index|
+        check_and_track(event.payload[:id]) &&
+          !(max_events && max_events > 0 && index >= max_events)
+      }
+      create_events(events)
+      log "Fetched #{urls.to_sentence} and created #{events.size} event(s)."
     end
 
     def check_and_track(entry_id)
