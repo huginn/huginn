@@ -8,7 +8,8 @@ describe Agents::PeakDetectorAgent do
           'expected_receive_period_in_days' => "2",
           'group_by_path' => "filter",
           'value_path' => "count",
-          'message' => "A peak was found"
+          'message' => "A peak was found",
+          'min_events' => "4",
         }
     }
 
@@ -67,6 +68,15 @@ describe Agents::PeakDetectorAgent do
                                   :values => [1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 10, 1].map {|i| [i]},
                                   :pattern => { 'filter' => "something" })
       expect(@agent.memory['peaks']['something'].length).to eq(2)
+    end
+
+    it 'waits and accumulates min events before triggering for peaks' do
+      @agent.options['min_peak_spacing_in_days'] = 1/24.0
+      @agent.options['min_events'] = '10'
+      @agent.receive build_events(:keys => ['count'],
+                                  :values => [1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 10, 1].map {|i| [i]},
+                                  :pattern => { 'filter' => "something" })
+      expect(@agent.memory['peaks']['something'].length).to eq(1)
     end
   end
 
