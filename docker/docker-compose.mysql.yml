@@ -1,0 +1,41 @@
+version: '2.1'
+
+services:
+  huginn:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.ng
+    # image: cantino/huginn
+    ports:
+      - 3000:3000
+    # env_file:
+    #   - ../.env
+    environment:
+      # These values override the env_file
+      DATABASE_HOST: db
+      DATABASE_NAME: huginn
+      DATABASE_USERNAME: huginn
+      DATABASE_PASSWORD: huginn
+      DATABASE_ENCODING: utf8
+      # INTENTIONALLY_SLEEP: 10
+      #DATABASE_INITIAL_CONNECT_MAX_RETRIES: 5
+      # MYSQL_PORT_3306_TCP_ADDR: mysql
+      # MYSQL_PORT_3306_TCP_PORT: 3306
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_USER: huginn
+      MYSQL_PASSWORD: huginn
+      MYSQL_DATABASE: huginn
+    restart: unless-stopped
+    volumes:
+      - dbvolume:/var/lib/mysql
+      #- ./dbinit:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  dbvolume:

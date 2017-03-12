@@ -3,7 +3,7 @@ Docker image for Huginn using the production environment and separate container 
 
 This image runs a linkable [Huginn](https://github.com/cantino/huginn) instance.
 
-It was inspired by the [official docker container for huginn](https://registry.hub.docker.com/u/cantino/huginn)
+It was inspired by the [official docker container for huginn](https://hub.docker.com/r/cantino/huginn/)
 
 The scripts/init script generates a .env file containing the variables as passed as per normal Huginn documentation.
 The same environment variables that would be used for Heroku PaaS deployment are used by this script.

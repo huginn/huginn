@@ -10,12 +10,21 @@ git_source(:github) do |repo_name|
 end if Gem::Version.new(Bundler::VERSION) < Gem::Version.new('2')
 
 # Load vendored dotenv gem and .env file
-require File.join(File.dirname(__FILE__), 'lib/gemfile_helper.rb')
-GemfileHelper.load_dotenv do |dotenv_dir|
-  path dotenv_dir do
-    gem 'dotenv'
-    gem 'dotenv-rails'
+gemfile_helper = File.join(File.dirname(__FILE__), 'lib/gemfile_helper.rb')
+if File.exist?(gemfile_helper)
+  require gemfile_helper
+  GemfileHelper.load_dotenv do |dotenv_dir|
+    if !dotenv_dir.empty?
+      path dotenv_dir do
+        gem 'dotenv'
+        gem 'dotenv-rails'
+      end
+    end
   end
+else
+  STDOUT.puts "WARNING: No gemfile_helper detected. Not using dotenv to manage environment variables."
+  STDOUT.puts "  If you need this, make sure the following path exists:"
+  STDOUT.puts "    #{gemfile_helper}"
 end
 
 # Introduces a scope for gem loading based on a condition
@@ -122,7 +131,7 @@ gem 'rufus-scheduler', '~> 3.3.2', require: false
 gem 'sass-rails',   '~> 5.0.6'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
-gem 'therubyracer', '~> 0.12.2'
+gem 'therubyracer', '~> 0.12.3'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '~> 2.7.2'
 
@@ -179,11 +188,11 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 # BSD systems require rb-kqueue for "listen" to avoid polling for changes.
 gem 'rb-kqueue', '>= 0.2', require: /bsd|dragonfly/i === RbConfig::CONFIG['target_os']
 
-
+procfile_path = File.join(File.dirname(__FILE__), 'Procfile')
 on_heroku = ENV['ON_HEROKU'] ||
             ENV['HEROKU_POSTGRESQL_ROSE_URL'] ||
             ENV['HEROKU_POSTGRESQL_GOLD_URL'] ||
-            File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
+            (File.exists?(procfile_path) && File.read(procfile_path) =~ /intended for Heroku/)
 
 ENV['DATABASE_ADAPTER'] ||=
   if on_heroku
@@ -192,14 +201,22 @@ ENV['DATABASE_ADAPTER'] ||=
     'mysql2'
   end
 
-if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
+if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql' || !!ENV['INSTALL_ALL_DATABASE_ADAPTERS']) do
   gem 'pg', '~> 0.18.3'
 end
 
-if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
+if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2' || !!ENV['INSTALL_ALL_DATABASE_ADAPTERS']) do
   gem 'mysql2', '~> 0.3.20'
 end
 
-GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|
-  gem *args
+if File.exist?(gemfile_helper)
+  require gemfile_helper
+  GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|
+    gem *args
+  end
+else
+  STDOUT.puts "WARNING: No gemfile_helper detected. Not parsing additional agent gems from ENV['ADDITIONAL_GEMS']."
+  STDOUT.puts "  If you need this, make sure the following path exists:"
+  STDOUT.puts "    #{gemfile_helper}"
+  STDOUT.puts "  ENV['ADDITIONAL_GEMS']=#{ENV['ADDITIONAL_GEMS']}"
 end
