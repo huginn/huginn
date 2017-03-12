@@ -74,7 +74,7 @@
         <li>
           <% if user_signed_in? %>
             <%= link_to 'Account', edit_user_registration_path, :tabindex => "-1" %>
-          <% else %>
+          <% elsif User.allow_signup? %>
             <%= link_to 'Sign up', new_user_registration_path, :tabindex => "-1" %>
           <% end %>
         </li>

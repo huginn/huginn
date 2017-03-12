@@ -7,20 +7,22 @@
 
         <h2>Sign up</h2>
 
-        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: 'form-horizontal' }) do |f| %>
-          <%= devise_error_messages! %>
-          <% if ENV['ON_HEROKU'] && User.count.zero? %>
-          <div class="heroku-instructions">
-            <% app_name = request.host[/\A[^.]+/] %>
-            <p>If you are the owner of this application, take the following steps to complete the setup:</p>
+        <% if User.allow_signup? %>
 
-            <ul>
-              <li>Read <a href="https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku" target="_target">this document</a> carefully if you are going to try out Huginn for free on <a href="https://id.heroku.com/" target="_target">Heroku</a>.</li>
+          <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: 'form-horizontal' }) do |f| %>
+            <%= devise_error_messages! %>
+            <% if ENV['ON_HEROKU'] && User.count.zero? %>
+            <div class="heroku-instructions">
+              <% app_name = request.host[/\A[^.]+/] %>
+              <p>If you are the owner of this application, take the following steps to complete the setup:</p>
 
-              <li>Install the <a href="https://toolbelt.heroku.com/" target="_target">Heroku Toolbelt</a> and run <kbd>heroku login</kbd>, if you haven't already.</li>
+              <ul>
+                <li>Read <a href="https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku" target="_target">this document</a> carefully if you are going to try out Huginn for free on <a href="https://id.heroku.com/" target="_target">Heroku</a>.</li>
 
-              <li>Run the following commands:<br />
-                <%= content_tag :pre do -%>
+                <li>Install the <a href="https://toolbelt.heroku.com/" target="_target">Heroku Toolbelt</a> and run <kbd>heroku login</kbd>, if you haven't already.</li>
+
+                <li>Run the following commands:<br />
+                  <%= content_tag :pre do -%>
 git clone https://github.com/cantino/huginn.git <%= content_tag :var, app_name %>
 cd <%= content_tag :var, app_name %>
 heroku git:remote -a <%= content_tag :var, app_name %>
@@ -30,32 +32,36 @@ bundle
 bin/setup_heroku
 <%- end %>
 
-              <li>This command will create an admin account for you.</li>
-            </ul>
-          </div>
-          <% end %>
+                <li>This command will create an admin account for you.</li>
+              </ul>
+            </div>
+            <% end %>
 
-          <% if User.using_invitation_code? %>
+            <% if User.using_invitation_code? %>
+              <div class="form-group">
+                <%= f.label :invitation_code, class: 'col-md-4 control-label' %>
+                <div class="col-md-6">
+                  <%= f.text_field :invitation_code, class: 'form-control' %>
+                  <span class="help-inline">We are not yet open to the public.  If you have an invitation code, please enter it here.</span>
+                </div>
+              </div>
+            <% end %>
+
+            <%= render partial: 'common_registration_fields', locals: { f: f } %>
+
             <div class="form-group">
-              <%= f.label :invitation_code, class: 'col-md-4 control-label' %>
-              <div class="col-md-6">
-                <%= f.text_field :invitation_code, class: 'form-control' %>
-                <span class="help-inline">We are not yet open to the public.  If you have an invitation code, please enter it here.</span>
+              <div class="col-md-offset-4 col-md-10">
+                <%= f.submit "Sign up", class: "btn btn-primary" %>
               </div>
             </div>
+
           <% end %>
 
-          <%= render partial: 'common_registration_fields', locals: { f: f } %>
+          <%= render "devise/shared/links" %>
 
-          <div class="form-group">
-            <div class="col-md-offset-4 col-md-10">
-              <%= f.submit "Sign up", class: "btn btn-primary" %>
-            </div>
-          </div>
-
+        <% else %>
+          Self-signup is disabled. Please ask your administrator to create an account.
         <% end %>
-
-        <%= render "devise/shared/links" %>
       </div>
     </div>
   </div>
