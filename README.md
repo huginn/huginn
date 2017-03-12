@@ -92,6 +92,14 @@ All agents have specs! And there's also acceptance tests that simulate running H
 * Run a specific spec with `bundle exec rspec path/to/specific/test_spec.rb`. 
 * Read more about rspec for rails [here](https://github.com/rspec/rspec-rails).
 
+## Using Huginn Agent gems
+
+Huginn Agents can now be written as external gems and be added to your Huginn installation with the `ADDITIONAL_GEMS` environment variable. See the `Additional Agent gems` section of `.env.example` for more information.
+
+If you'd like to write your own Huginn Agent Gem, please see [huginn_agent](https://github.com/cantino/huginn_agent).
+
+Our general intention is to encourage complex and specific Agents to be written as Gems, while continuing to add new general-purpose Agents to the core Huginn repository.
+
 ## Deployment
 
 ### Heroku
