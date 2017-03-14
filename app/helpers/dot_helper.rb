@@ -8,25 +8,23 @@ module DotHelper
         } rescue false)
       decorate_svg(svg, agents).html_safe
     else
-      # Google chart request url
-      url = URI("https://chart.googleapis.com/chart")
-      http = Net::HTTP.new(url.host, url.port)
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      request = Net::HTTP::Post.new(url)
-      request.body = URI.encode_www_form(cht: 'gv', chl: agents_dot(agents))
-      response = http.request(request)
+      # Google chart request url 
+      faraday = Faraday.new { |builder|
+        builder.request :url_encoded
+        builder.adapter Faraday.default_adapter
+      }
+      response = faraday.post('https://chart.googleapis.com/chart', { cht: 'gv', chl: agents_dot(agents) })
 
-
-      if response.code=='200'
+      case response.status
+      when 200
         # Display Base64-Encoded images
-        tag('img', src: 'data:image/jpg;base64,'+Base64.encode64(response.read_body))
-      elsif response.code=='400'
+        tag('img', src: 'data:image/jpg;base64,'+Base64.encode64(response.body))
+      when 400
         "The diagram can't be displayed because it has too many nodes. Max allowed is 80."
-      elsif response.code=='413'
+      when 413
         "The diagram can't be displayed because it is too large."
       else
-        "Unknow error. Response code is "+response.code
+        "Unknow error. Response code is #{response.status}."
       end
     end
   end
