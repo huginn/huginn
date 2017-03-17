@@ -33,6 +33,8 @@ Additionally, the database variables may be overridden from the above as per the
     DATABASE_HOST
     DATABASE_PORT
 
+When connecting to an external database and your user does not have the permission to create the Huginn database please make sure it exists and set the `DO_NOT_CREATE_DATABASE` environment variable.
+
 This script will run database migrations (rake db:migrate) which should be idempotent.
 
 It will also seed the database (rake db:seed) unless this is defined:

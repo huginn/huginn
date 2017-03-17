@@ -44,8 +44,12 @@ esac
 
 sudo -u huginn -H -E bundle install --without test development --path vendor/bundle
 
+if [[ -z "${DO_NOT_CREATE_DATABASE}" && -z $1 ]]; then
+  sudo -u huginn -H -E bundle exec rake db:create RAILS_ENV=${RAILS_ENV}
+fi
+
 if [ -z $1 ]; then
-  sudo -u huginn -H -E bundle exec rake db:create db:migrate RAILS_ENV=${RAILS_ENV}
+  sudo -u huginn -H -E bundle exec rake db:migrate RAILS_ENV=${RAILS_ENV}
 fi
 
 if [[ -z "${DO_NOT_SEED}" && -z $1 ]]; then
