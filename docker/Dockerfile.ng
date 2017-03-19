@@ -33,19 +33,19 @@ RUN set -ex \
     && apk add --no-cache --virtual .build-dependencies \
         build-base \
         linux-headers \
-        postgresql-dev \
         mariadb-dev \
+        postgresql-dev \
         sqlite-dev \
     \
     # Add runtime dependencies
     && apk add --no-cache \
-        tzdata \
+        git \
+        libcurl \
         libpq \
         mariadb-client-libs \
-        libcurl \
+        sqlite-libs \
         su-exec \
-        git \
-        #sudo \
+        tzdata \
     \
     # Hack to avoid "fatal: Not a git repository" from bundler
     && git init \
@@ -58,6 +58,10 @@ RUN set -ex \
     #--deployment # See http://bundler.io/bundle_install.html
     #--path vendor/bundle --jobs 4
     \
+    # HACK: Prevent overwriting this with the later copy.. should we just add the sqlite gem to the gemfile always?
+    && cp Gemfile Gemfile.bak \
+    && cp Gemfile.lock Gemfile.lock.bak \
+    \
     # Cleanup ruby caches
     && INSTALL_ALL_DATABASE_ADAPTERS=true bundle clean \
     #&& rm -rf /root/.gem/specs/* \
@@ -65,7 +69,7 @@ RUN set -ex \
     #&& rm -rf /usr/local/lib/ruby/gems/2.4.0/cache/* \
     \
     # Cleanup transient dependencies/caches
-    && apk del .build-dependencies \
+    && apk del --purge .build-dependencies \
     && rm -rf /var/cache/apk/* \
     && rm -rf /var/lib/apk/* \
     && rm -rf /etc/apk/cache/*
@@ -171,7 +175,7 @@ ENV APP_SECRET_TOKEN=REPLACE_ME_NOW! \
 
 COPY . "$HUGINN_HOME"
 
-COPY docker/config/unicorn.rb "$HUGINN_HOME/config/unicorn.rb"
+#COPY docker/config/unicorn.rb "$HUGINN_HOME/config/unicorn.rb"
 
 # TODO: Need to tune the .dockerignore, or prevent some things being copied here
 #  eg.
@@ -182,6 +186,28 @@ RUN set -ex \
     && mkdir -p "$HUGINN_HOME/tmp/pids" \
     && mkdir -p "$HUGINN_HOME/tmp/sockets" \
     && mkdir -p "$HUGINN_HOME/log" \
+    \
+    # HACK: Restore these from previous build so we don't overwrite the sqlite gem..
+    && mv Gemfile.bak Gemfile \
+    && mv Gemfile.lock.bak Gemfile.lock \
+    \
+    # HACK: We need a database connection to precompile the assets, use sqlite for that
+    #&& cp Gemfile Gemfile.bak \
+    #&& echo "gem 'sqlite3', '~> $SQLITE_VERSION'" >> "$HUGINN_HOME/Gemfile" \
+    #&& RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle install --without test development --jobs 4 \
+    && RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle exec rake assets:clean assets:precompile \
+    \
+    # Bundle again to get rid of the sqlite3 gem
+    #&& cp Gemfile.bak Gemfile \
+    #&& RAILS_ENV=production APP_SECRET_TOKEN=secret ON_HEROKU=true bundle install --without test development --jobs 4 \
+    #&& INSTALL_ALL_DATABASE_ADAPTERS=true bundle install --without test development --jobs 4 \
+    \
+    # Configure the unicorn server
+    && mv config/unicorn.rb.example config/unicorn.rb \
+    && sed -ri 's/^listen .*$/listen ENV["PORT"]/' config/unicorn.rb \
+    && sed -ri 's/^stderr_path.*$//' config/unicorn.rb \
+    && sed -ri 's/^stdout_path.*$//' config/unicorn.rb \
+    \
     && chown -R $HUGINN_USER:$HUGINN_GROUP "$HUGINN_HOME"
 
 # TODO: This copy of unicorn config file isn't ideal.. particularly if they've made one already. Need to check if it exists.. maybe best done in the init script too..
