@@ -27,18 +27,18 @@ module Agents
     end
 
     def working?
-      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(options['expected_update_period_in_days']) && !recent_error_logs?
     end
 
     def default_options
       {
         'expected_update_period_in_days' => '10',
-        'blog_name' => '{{blog_name}}',
+        'blog_name' => 'someblog',
       }
     end
 
     def check
-      liked = tumblr.blog_likes(interpolated['blog_name'])
+      liked = tumblr.blog_likes(options['blog_name'])
       memory[:ids] ||= []
 
       if liked['liked_posts']
@@ -51,7 +51,7 @@ module Agents
         end
       elsif liked['status'] && liked['msg']
         # If there was a problem fetching likes (like 403 Forbidden or 404 Not Found) create an error message.
-        error "Error finding liked posts for #{interpolated['blog_name']}: #{liked['status']} #{liked['msg']}"
+        error "Error finding liked posts for #{options['blog_name']}: #{liked['status']} #{liked['msg']}"
       end
     end
   end
