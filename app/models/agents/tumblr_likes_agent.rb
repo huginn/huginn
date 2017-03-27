@@ -38,14 +38,18 @@ module Agents
     end
 
     def check
-      liked = tumblr.blog_likes(options['blog_name'])
       memory[:ids] ||= []
+      memory[:last_liked] ||= 0
+
+      # Request Likes of blog_name after the last stored timestamp (or default of 0)
+      liked = tumblr.blog_likes(options['blog_name'], after: memory[:last_liked])
 
       if liked['liked_posts']
         # Loop over all liked posts which came back from Tumblr, add to memory, and create events.
         liked['liked_posts'].each do |post|
           unless memory[:ids].include?(post['id'])
             memory[:ids].push(post['id'])
+            memory[:last_liked] = post['liked_timestamp'] if post['liked_timestamp'] > memory[:last_liked]
             create_event(payload: post)
           end
         end
