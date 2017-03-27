@@ -53,6 +53,9 @@ module Agents
         # If there was a problem fetching likes (like 403 Forbidden or 404 Not Found) create an error message.
         error "Error finding liked posts for #{options['blog_name']}: #{liked['status']} #{liked['msg']}"
       end
+
+      # Store only the last 50 (maximum the API will return) IDs in memory to prevent performance issues.
+      memory[:ids] = memory[:ids].last(50) if memory[:ids].length > 50
     end
   end
 end
