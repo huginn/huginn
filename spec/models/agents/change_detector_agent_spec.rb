@@ -95,4 +95,62 @@ describe Agents::ChangeDetectorAgent do
       }.to change(Event, :count).by(0)
     end
   end
+
+  describe "#receive using last_property to track lowest value" do
+    before :each do
+      @event = create_event("100")
+    end
+
+    before do
+      # Evaluate the output as number and detect a new lowest value
+      @checker.options['property'] = '{% assign drop = last_property | minus: output %}{% if last_property == blank or drop > 0 %}{{ output | default: last_property }}{% else %}{{ last_property }}{% endif %}'
+    end
+
+    it "creates events when the value drops" do
+      @checker.receive([@event])
+
+      event = create_event("90")
+      expect {
+        @checker.receive([event])
+      }.to change(Event, :count).by(1)
+      expect(@checker.memory['last_property']).to eq "90"
+    end
+
+    it "does not create event when the value does not change" do
+      @checker.receive([@event])
+
+      event = create_event("100")
+      expect {
+        @checker.receive([event])
+      }.not_to change(Event, :count)
+      expect(@checker.memory['last_property']).to eq "100"
+    end
+
+    it "does not create event when the value rises" do
+      @checker.receive([@event])
+
+      event = create_event("110")
+      expect {
+        @checker.receive([event])
+      }.not_to change(Event, :count)
+      expect(@checker.memory['last_property']).to eq "100"
+    end
+
+    it "does not create event when the value is blank" do
+      @checker.receive([@event])
+
+      event = create_event("")
+      expect {
+        @checker.receive([event])
+      }.not_to change(Event, :count)
+      expect(@checker.memory['last_property']).to eq "100"
+    end
+
+    it "creates events when memory is empty" do
+      expect {
+        @checker.receive([@event])
+      }.to change(Event, :count).by(1)
+      expect(@checker.memory['last_property']).to eq "100"
+    end
+  end
 end
