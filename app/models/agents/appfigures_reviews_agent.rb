@@ -40,6 +40,12 @@ module Agents
       },
       'author' => {
         'path' => 'reviews[*].author'
+      },
+      'version' => {
+        'path' => 'reviews[*].version'
+      },
+      'app' => {
+        'path' => 'reviews[*].product_name'
       }
     }.freeze
 
