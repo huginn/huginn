@@ -57,7 +57,7 @@ module Agents
 
         # Liquid Templating
 
-        In Liquid templating, the following variable is available:
+        In [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variable is available:
 
         * `events`: An array of events being output, sorted in the given order, up to `events_to_show` in number.  For example, if source events contain a site title in the `site_title` key, you can refer to it in `template.title` by putting `{{events.first.site_title}}`.
 
