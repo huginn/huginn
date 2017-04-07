@@ -95,9 +95,9 @@ It will install all that's required and setup default Huginn
 ```
 $ vagrant ssh
 Logs you in to the server
-vagrant-box$ cd /home/vagrant/app
-vagrant-box$ rails server -b 0.0.0.0
+vagrant@vagrant:~/app$ rails server -b 0.0.0.0
 ```
+Huginn is located in /home/vagrant/app
 
 In you browser go to http://localhost:3000 and login to Huginn using admin/password.
 
