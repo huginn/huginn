@@ -8,6 +8,7 @@ LABEL author="Andrew Cantino (@cantino)" \
 ENV HUGINN_HOME="/usr/src/huginn" \
     HUGINN_USER=huginn \
     HUGINN_GROUP=huginn \
+    SCRIPTS_HOME="/docker/scripts" \
     SQLITE_VERSION=1.3.13 \
     LC_ALL=en_US.UTF-8 \
     #\
@@ -15,90 +16,25 @@ ENV HUGINN_HOME="/usr/src/huginn" \
     RAILS_ENV=production \
     ON_HEROKU=true 
 
-RUN set -ex \
-    && addgroup $HUGINN_GROUP \
-    && adduser -s "/bin/sh" -H -h "$HUGINN_HOME" -D -G $HUGINN_GROUP $HUGINN_USER
-
 WORKDIR $HUGINN_HOME
+
+COPY docker/scripts/ "$SCRIPTS_HOME/"
+
+RUN set -ex \
+    && $SCRIPTS_HOME/adduser.alpine.sh
 
 COPY ["Gemfile", "Gemfile.lock", "$HUGINN_HOME/"]
 COPY lib/gemfile_helper.rb "$HUGINN_HOME/lib/"
 #COPY vendor/gems "$HUGINN_HOME/vendor/gems"
 
-# TODO: Do we need to vendor dotenv? Can't we just include it at the top of the Gemfile?
-
 RUN set -ex \
-    \
-    # Add build dependencies
-    && apk add --no-cache --virtual .build-dependencies \
-        build-base \
-        linux-headers \
-        mariadb-dev \
-        postgresql-dev \
-        sqlite-dev \
-    \
-    # Add runtime dependencies
-    && apk add --no-cache \
-        git \
-        libcurl \
-        libpq \
-        mariadb-client-libs \
-        sqlite-libs \
-        su-exec \
-        tzdata \
-    \
-    # Hack to avoid "fatal: Not a git repository" from bundler
-    && git init \
-    \
-    # Install Gemfile dependencies
-    #&& chown -R huginn:huginn "$HUGINN_HOME" \
-    #&& su-exec huginn echo "gem 'sqlite3', '~> $SQLITE_VERSION'" >> "$HUGINN_HOME/Gemfile" \
-    && echo "gem 'sqlite3', '~> $SQLITE_VERSION'" >> "$HUGINN_HOME/Gemfile" \
-    && INSTALL_ALL_DATABASE_ADAPTERS=true bundle install --without test development --jobs 4 \
-    #--deployment # See http://bundler.io/bundle_install.html
-    #--path vendor/bundle --jobs 4
-    \
-    # HACK: Prevent overwriting this with the later copy.. should we just add the sqlite gem to the gemfile always?
-    && cp Gemfile Gemfile.bak \
-    && cp Gemfile.lock Gemfile.lock.bak \
-    \
-    # Cleanup ruby caches
-    && INSTALL_ALL_DATABASE_ADAPTERS=true bundle clean \
-    #&& rm -rf /root/.gem/specs/* \
-    #&& rm -rf /root/.bundle/cache/* \
-    #&& rm -rf /usr/local/lib/ruby/gems/2.4.0/cache/* \
-    \
-    # Cleanup transient dependencies/caches
-    && apk del --purge .build-dependencies \
-    && rm -rf /var/cache/apk/* \
-    && rm -rf /var/lib/apk/* \
-    && rm -rf /etc/apk/cache/*
-
-# TODO: git init is a hack to avoid "fatal: Not a git repository (or any of the parent directories): .git" when runnings rails/etc
-#   Better to just figure how to solve it properly..
-
-# TODO: Whats the benefit of running this to the /vendor dir? Can we chagne it? Will it use system rubyracer either way?
-# TODO: Should we be bundle installing with --deployment / --path vendor? Or to system?
-# TODO: Is there any way/benefit to specify the DB we want in an efficient way, so we don't need the other overhead files? Does it even make much size difference?
-# TODO: Do we need to keep git as a runtime dependency? It adds a solid chunk to our image size..
-
-# TODO: Add postgresql-dev, then delete all files but these? https://packages.debian.org/sid/i386/libpq-dev/filelist
-# TODO: Add mariadb-dev, then delete all files but these? http://packages.ubuntu.com/trusty/i386/libmysqlclient-dev/filelist
-# http://stackoverflow.com/questions/16304311/use-mariadb-instead-of-mysql-in-my-rails-project
-# https://packages.debian.org/sid/i386/libmariadbd-dev/filelist
-
-# Old Dependencies for reference
-#apt-get update
-#$minimal_apt_get_install build-essential checkinstall git-core \
-#  zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev \
-#  libncurses5-dev libffi-dev libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev \
-#  graphviz libgraphviz-dev \
-#  libmysqlclient-dev libpq-dev libsqlite3-dev \
-#  ruby2.3 ruby2.3-dev
-
-# TODO: Put together a little script that will easily parse out all the .env.example lines to copy into here
+    && $SCRIPTS_HOME/dependencies-build.alpine.sh \
+    && $SCRIPTS_HOME/dependencies-runtime.alpine.sh \
+    && $SCRIPTS_HOME/dependencies-gemfile.sh \
+    && $SCRIPTS_HOME/dependencies-cleanup.alpine.sh
 
 # See .env.example for descriptions/usage
+# See also: https://github.com/docker/docker/issues/32455
 ENV APP_SECRET_TOKEN=REPLACE_ME_NOW! \
     #ON_HEROKU=true \
     PORT=3000 \
@@ -175,58 +111,18 @@ ENV APP_SECRET_TOKEN=REPLACE_ME_NOW! \
 
 COPY . "$HUGINN_HOME"
 
-#COPY docker/config/unicorn.rb "$HUGINN_HOME/config/unicorn.rb"
-
-# TODO: Need to tune the .dockerignore, or prevent some things being copied here
-#  eg.
-#    .env is causing issues by overwriting our defaults
-#    etc
-
 RUN set -ex \
-    && mkdir -p "$HUGINN_HOME/tmp/pids" \
-    && mkdir -p "$HUGINN_HOME/tmp/sockets" \
-    && mkdir -p "$HUGINN_HOME/log" \
-    \
-    # HACK: Restore these from previous build so we don't overwrite the sqlite gem..
-    && mv Gemfile.bak Gemfile \
-    && mv Gemfile.lock.bak Gemfile.lock \
-    \
-    # HACK: We need a database connection to precompile the assets, use sqlite for that
-    #&& cp Gemfile Gemfile.bak \
-    #&& echo "gem 'sqlite3', '~> $SQLITE_VERSION'" >> "$HUGINN_HOME/Gemfile" \
-    #&& RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle install --without test development --jobs 4 \
-    && RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle exec rake assets:clean assets:precompile \
-    \
-    # Bundle again to get rid of the sqlite3 gem
-    #&& cp Gemfile.bak Gemfile \
-    #&& RAILS_ENV=production APP_SECRET_TOKEN=secret ON_HEROKU=true bundle install --without test development --jobs 4 \
-    #&& INSTALL_ALL_DATABASE_ADAPTERS=true bundle install --without test development --jobs 4 \
-    \
-    # Configure the unicorn server
-    && mv config/unicorn.rb.example config/unicorn.rb \
-    && sed -ri 's/^listen .*$/listen ENV["PORT"]/' config/unicorn.rb \
-    && sed -ri 's/^stderr_path.*$//' config/unicorn.rb \
-    && sed -ri 's/^stdout_path.*$//' config/unicorn.rb \
-    \
-    && chown -R $HUGINN_USER:$HUGINN_GROUP "$HUGINN_HOME"
+    && $SCRIPTS_HOME/huginn-setup.sh
 
-# TODO: This copy of unicorn config file isn't ideal.. particularly if they've made one already. Need to check if it exists.. maybe best done in the init script too..
-
-# TODO: Do we want to use CMD, or ENTRYPOINT, or both? https://docs.docker.com/engine/reference/builder/#/entrypoint
-#   Tbh, the way we are using this init script feels a lot like an entrypoint. Compare/contrast and probaly set it up that way..
-
-#COPY docker/init.ng "$HUGINN_HOME/bin/init"
 COPY docker/init.ng "/huginn-init.sh"
-
-# TODO: Put some checks in the init script for security relevant settings that need to be changed. Eg. APP_SECRET_TOKEN, INVITATION_CODE, default admin account?
-# TODO: We should check this init script more and refactor if needed
 
 #COPY docker-entrypoint.sh /
 #ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 3000
 
-USER huginn
+USER $HUGINN_USER
 
+# TODO: Make our entrypoint the init to setup the env.. then pass through whatever commands we need in CMD
 CMD ["/huginn-init.sh"]
 #CMD ["/bin/sh"]
