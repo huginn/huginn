@@ -3,8 +3,8 @@ version: '2.1'
 services:
   huginn:
     build:
-      context: ../
-      dockerfile: docker/Dockerfile.ng
+      context: ../../
+      dockerfile: docker/alpine/Dockerfile
     # image: cantino/huginn
     ports:
       - 3000:3000
