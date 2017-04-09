@@ -2,8 +2,8 @@
 
 set -ex
 
-FILE="docker-compose.dev.yml"
-PROJECT="huginn-single-dev"
+FILE="docker-compose.mysql.dev.yml"
+PROJECT="huginn-single-process-mysql-dev"
 
 if [[ -z "$@" ]]; then
   exec docker-compose --file "$FILE" --project-name "$PROJECT" up --build

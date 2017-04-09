@@ -1,48 +1,35 @@
-# This needs at least compose 1.6.0
-version: '2'
+version: '2.1'
 
 services:
-  postgresdata:
-    image: postgres:9.5
-    command: /bin/true
-
-  postgres:
-    image: postgres:9.5
-    volumes_from:
-      - postgresdata
-    environment:
-      POSTGRES_PASSWORD: myhuginnpassword
-      POSTGRES_USER: huginn
-
   huginn_web:
     image: cantino/huginn-single-process
-    restart: always
+    ports:
+      - 3000:3000
     extends:
       file: environment.yml
       service: huginn_base
     environment:
       DATABASE_ADAPTER: postgresql
-      POSTGRES_PORT_5432_TCP_ADDR: postgres
+      POSTGRES_PORT_5432_TCP_ADDR: db
       POSTGRES_PORT_5432_TCP_PORT: 5432
-    ports:
-      - 3000:3000
-    links:
-      - postgres
+    depends_on:
+      - db
+    restart: unless-stopped
 
   huginn_threaded:
     image: cantino/huginn-single-process
-    restart: always
     extends:
       file: environment.yml
       service: huginn_base
     environment:
       DATABASE_ADAPTER: postgresql
-      POSTGRES_PORT_5432_TCP_ADDR: postgres
+      POSTGRES_PORT_5432_TCP_ADDR: db
       POSTGRES_PORT_5432_TCP_PORT: 5432
-    links:
-      - postgres
-    command: /scripts/init bin/threaded.rb
-
+    command: /docker/scripts/init bin/threaded.rb
+    depends_on:
+      - db
+    restart: unless-stopped
+    
   # huginn_schedule:
   #   image: cantino/huginn-single-process
   #   extends:
@@ -50,12 +37,12 @@ services:
   #     service: huginn_base
   #   environment:
   #     DATABASE_ADAPTER: postgresql
-  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
+  #     POSTGRES_PORT_5432_TCP_ADDR: db
   #     POSTGRES_PORT_5432_TCP_PORT: 5432
-  #   links:
-  #     - postgres
-  #   command: /scripts/init bin/schedule.rb
-
+  #   command: /docker/scripts/init bin/schedule.rb
+  #   depends_on:
+  #     - db
+  #   restart: unless-stopped
 
   # huginn_twitter_stream:
   #   image: cantino/huginn-single-process
@@ -64,12 +51,12 @@ services:
   #     service: huginn_base
   #   environment:
   #     DATABASE_ADAPTER: postgresql
-  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
+  #     POSTGRES_PORT_5432_TCP_ADDR: db
   #     POSTGRES_PORT_5432_TCP_PORT: 5432
-  #   links:
-  #     - postgres
-  #   command: /scripts/init bin/twitter_stream.rb
-
+  #   command: /docker/scripts/init bin/twitter_stream.rb
+  #   depends_on:
+  #     - db
+  #   restart: unless-stopped
 
   # huginn_dj1:
   #   image: cantino/huginn-single-process
@@ -77,10 +64,24 @@ services:
   #     file: environment.yml
   #     service: huginn_base
   #   environment:
-  #     DATABASE_ADAPTER: postgresql
-  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
+  #     DATABASE_ADAPTER: db
+  #     POSTGRES_PORT_5432_TCP_ADDR: db
   #     POSTGRES_PORT_5432_TCP_PORT: 5432
-  #   links:
-  #     - postgres
-  #   command: /scripts/init script/delayed_job run
+  #   command: /docker/scripts/init script/delayed_job run
+  #   depends_on:
+  #     - db
+  #   restart: unless-stopped
 
+  db:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: huginn
+      POSTGRES_PASSWORD: huginn
+      POSTGRES_DB: huginn
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: unless-stopped
+    volumes:
+      - dbvolume:/var/lib/postgresql/data/pgdata
+
+volumes:
+  dbvolume:

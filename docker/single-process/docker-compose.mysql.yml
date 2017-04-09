@@ -1,0 +1,43 @@
+version: '2.1'
+
+services:
+  huginn_web:
+    image: cantino/huginn-single-process
+    ports:
+      - 3000:3000
+    extends:
+      file: environment.yml
+      service: huginn_base
+    environment:
+      MYSQL_PORT_3306_TCP_ADDR: db
+      MYSQL_PORT_3306_TCP_PORT: 3306
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  huginn_threaded:
+    image: cantino/huginn-single-process
+    extends:
+      file: environment.yml
+      service: huginn_base
+    environment:
+      MYSQL_PORT_3306_TCP_ADDR: db
+      MYSQL_PORT_3306_TCP_PORT: 3306
+    command: /docker/scripts/init bin/threaded.rb
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_USER: huginn
+      MYSQL_PASSWORD: huginn
+      MYSQL_DATABASE: huginn
+    restart: unless-stopped
+    volumes:
+      - dbvolume:/var/lib/mysql
+
+volumes:
+  dbvolume:
