@@ -114,15 +114,12 @@ COPY . "$HUGINN_HOME"
 RUN set -ex \
     && $SCRIPTS_HOME/huginn-setup.sh
 
-COPY docker/init.ng "/huginn-init.sh"
-
-#COPY docker-entrypoint.sh /
-#ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["$SCRIPTS_HOME/huginn-entrypoint.sh"]
 
 EXPOSE 3000
 
 USER $HUGINN_USER
 
 # TODO: Make our entrypoint the init to setup the env.. then pass through whatever commands we need in CMD
-CMD ["/huginn-init.sh"]
+#CMD ["$SCRIPTS_HOME/huginn-entrypoint.sh"]
 #CMD ["/bin/sh"]

@@ -74,3 +74,4 @@ else
   suIfRequired bundle exec rails runner "$@" 
   #RAILS_ENV=${RAILS_ENV}
 fi
+# TODO: We should be calling 'exec' here to pass to unicorn properly..
