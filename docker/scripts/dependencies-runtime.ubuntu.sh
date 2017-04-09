@@ -1,7 +1,7 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env sh
+set -ex
 
-# TODO: This has been transferred into the new format for the single-process files. Once we do it for multi-process we can probably delete this
+# TODO: This was copied verbatim from the old 'prepare' script. It should be refactored to separate build deps from runtime deps
 
 cat > /etc/dpkg/dpkg.cfg.d/01_nodoc <<EOF
 # Delete locales
@@ -17,12 +17,16 @@ EOF
 
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
+
 minimal_apt_get_install='apt-get install -y --no-install-recommends'
 
 apt-get update
 apt-get dist-upgrade -y --no-install-recommends
+
 $minimal_apt_get_install software-properties-common
+
 add-apt-repository -y ppa:brightbox/ruby-ng
+
 apt-get update
 $minimal_apt_get_install build-essential checkinstall git-core \
   zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev \
@@ -30,21 +34,8 @@ $minimal_apt_get_install build-essential checkinstall git-core \
   graphviz libgraphviz-dev \
   libmysqlclient-dev libpq-dev libsqlite3-dev \
   ruby2.3 ruby2.3-dev
+
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
+
 gem install --no-ri --no-rdoc bundler
-
-apt-get purge -y python3* rsyslog rsync manpages
-rm -rf /var/lib/apt/lists/*
-rm -rf /usr/share/doc/
-rm -rf /usr/share/man/
-rm -rf /usr/share/locale/
-rm -rf /var/log/*
-
-# add a huginn group and user
-adduser --group huginn
-adduser --disabled-login --ingroup huginn --gecos 'Huginn' --no-create-home --home /app huginn
-passwd -d huginn
-
-mkdir -p /app/lib/
-mkdir -p /app/vendor/gems

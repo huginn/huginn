@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+# TODO: This has been transferred into the new format for the single-process files. Once we do it for multi-process we can probably delete this
+
 cd /app
 
 export LC_ALL=en_US.UTF-8

@@ -1,9 +1,9 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -ex
 
 export LC_ALL=en_US.UTF-8
 
-cd /app
+cd $HUGINN_HOME
 
 # Configure database based on linked container
 if [ -n "${MYSQL_PORT_3306_TCP_ADDR}" ]; then
@@ -22,18 +22,18 @@ USE_GRAPHVIZ_DOT=${USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
 
 # Default to the environment variable values set in .env.example
 IFS="="
-grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
+grep = "$HUGINN_HOME/.env.example" | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
   while read var value ; do
     eval "echo \"$var=\${$var:-\${HUGINN_$var-\$value}}\""
-  done | grep -v -e ^= > /app/.env
+  done | grep -v -e ^= > "$HUGINN_HOME/.env"
 
-eval "echo PORT=${PORT:-${PORT:-3000}}" >> .env
-eval "echo RAILS_ENV=${RAILS_ENV:-${RAILS_ENV:-production}}" >> .env
-eval "echo RAILS_LOG_TO_STDOUT=true" >> .env
-eval "echo RAILS_SERVE_STATIC_FILES=true" >> .env
+eval "echo PORT=${PORT:-${PORT:-3000}}" >> "$HUGINN_HOME/.env"
+eval "echo RAILS_ENV=${RAILS_ENV:-${RAILS_ENV:-production}}" >> "$HUGINN_HOME/.env"
+eval "echo RAILS_LOG_TO_STDOUT=true" >> "$HUGINN_HOME/.env"
+eval "echo RAILS_SERVE_STATIC_FILES=true" >> "$HUGINN_HOME/.env"
 
-chmod ugo+r /app/.env
-source /app/.env
+chmod ugo+r "$HUGINN_HOME/.env"
+source "$HUGINN_HOME/.env"
 
 # use default port number if it is still not set
 case "${DATABASE_ADAPTER}" in
@@ -42,18 +42,18 @@ case "${DATABASE_ADAPTER}" in
   *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
 esac
 
-sudo -u huginn -H -E bundle install --without test development --path vendor/bundle
+sudo -u $HUGINN_USER -H -E bundle install --without test development --path vendor/bundle
 
 if [ -z $1 ]; then
-  sudo -u huginn -H -E bundle exec rake db:create db:migrate RAILS_ENV=${RAILS_ENV}
+  sudo -u $HUGINN_USER -H -E bundle exec rake db:create db:migrate RAILS_ENV=${RAILS_ENV}
 fi
 
 if [[ -z "${DO_NOT_SEED}" && -z $1 ]]; then
-  sudo -u huginn -H -E bundle exec rake db:seed RAILS_ENV=${RAILS_ENV}
+  sudo -u $HUGINN_USER -H -E bundle exec rake db:seed RAILS_ENV=${RAILS_ENV}
 fi
 
 if [ -z $1 ]; then
-  exec sudo -u huginn -H -E bundle exec unicorn -c config/unicorn.rb
+  exec sudo -u $HUGINN_USER -H -E bundle exec unicorn -c config/unicorn.rb
 else
-  exec sudo -u huginn -H -E bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
+  exec sudo -u $HUGINN_USER -H -E bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
 fi
