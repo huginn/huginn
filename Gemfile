@@ -163,7 +163,6 @@ group :development do
     gem 'shoulda-matchers'
     gem 'vcr'
     gem 'webmock', '~> 1.17.4', require: false
-    gem 'database_cleaner', '~> 1.5.3'
   end
 end
 
