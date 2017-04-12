@@ -31,7 +31,7 @@ module Agents
           * `force_encoding` - Set `force_encoding` to an encoding name if the website is known to respond with a missing, invalid or wrong charset in the Content-Type header.  Note that a text content without a charset is taken as encoded in UTF-8 (not ISO-8859-1).
           * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
           * `max_events_per_run` - Limit number of events created (items parsed) per run for feed.
-          * `max_ids` - Limit number of ids that get remebered to not emmit an event again (default: 500).
+          * `remembered_id_count` - Number of IDs to keep track of and avoid re-emitting (default: 500).
 
         # Ordering Events
 
@@ -106,8 +106,8 @@ module Agents
         errors.add(:base, "Please provide 'expected_update_period_in_days' to indicate how many days can pass without an update before this Agent is considered to not be working")
       end
 
-      if options['max_ids'].present? && options['max_ids'].to_i < 1
-        errors.add(:base, "Please provide 'max_ids' as a number bigger than 0 indicating how many IDs should be saved to distinguish between new and old IDs in RSS feeds. Delete option to use default (500).")
+      if options['remembered_id_count'].present? && options['remembered_id_count'].to_i < 1
+        errors.add(:base, "Please provide 'remembered_id_count' as a number bigger than 0 indicating how many IDs should be saved to distinguish between new and old IDs in RSS feeds. Delete option to use default (500).")
       end
 
       validate_web_request_options!
@@ -159,13 +159,17 @@ module Agents
       log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
     end
 
+    def remembered_id_count
+      (options['remembered_id_count'].presence || 500).to_i
+    end
+
     def check_and_track(entry_id)
       memory['seen_ids'] ||= []
       if memory['seen_ids'].include?(entry_id)
         false
       else
         memory['seen_ids'].unshift entry_id
-		memory['seen_ids'].pop(memory['seen_ids'].length - ((options['max_ids'].presence || 500).to_i)) if memory['seen_ids'].length > ((options['max_ids'].presence || 500).to_i)
+		    memory['seen_ids'].pop(memory['seen_ids'].length - remembered_id_count) if memory['seen_ids'].length > remembered_id_count
         true
       end
     end
