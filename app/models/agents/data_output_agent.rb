@@ -246,9 +246,7 @@ module Agents
 
       source_events = sort_events(latest_events(), 'events_list_order')
 
-      interpolation_context.stack do
-        interpolation_context['events'] = source_events
-
+      interpolate_with('events' => source_events) do
         items = source_events.map do |event|
           interpolated = interpolate_options(options['template']['item'], event)
           interpolated['guid'] = {'_attributes' => {'isPermaLink' => 'false'},

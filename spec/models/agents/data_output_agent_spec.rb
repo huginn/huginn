@@ -324,6 +324,28 @@ describe Agents::DataOutputAgent do
 
           expect(content['title']).to eq('XKCD comics as a feed (XKCD)')
         end
+
+        context "with event with \"events\"" do
+          before do
+            agent.sources.first.create_event payload: {
+              'site_title' => 'XKCD',
+              'url' => 'http://imgs.xkcd.com/comics/comicX.png',
+              'title' => 'Comic X',
+              'date' => '',
+              'hovertext' => 'Hovertext for Comic X',
+              'events' => 'Events!'
+            }
+            agent.options['template']['item']['events_data'] = "{{ events }}"
+            agent.save!
+          end
+
+          it "can access the value without being overridden" do
+            content, status, content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
+            expect(status).to eq(200)
+
+            expect(content['items'].first['events_data']).to eq('Events!')
+          end
+        end
       end
 
       describe "with a specified icon" do
