@@ -125,7 +125,7 @@ describe Agents::DryRunsController do
       results = assigns(:results)
       expect(results[:events]).to be_a(Array)
       expect(results[:events].length).to eq(1)
-      expect(results[:events].first['created_at']).to eq('Tue, Apr 11, 17')
+      expect(results[:events].first['created_at']).to eq(Date.today.strftime('%a, %b %d, %y'))
     end
   end
 end
