@@ -173,7 +173,7 @@ describe Agents::RssAgent do
     end
     
     it "should truncate the seen_ids in memory at amount of items configured in options" do
-      agent.options['max_ids'] = "600"
+      agent.options['remembered_id_count'] = "600"
       agent.memory['seen_ids'] = ['x'] * 590
       agent.check
       expect(agent.memory['seen_ids'].length).to eq(600)
@@ -181,19 +181,20 @@ describe Agents::RssAgent do
     
     it "should truncate the seen_ids after configuring a lower limit of items when check is executed" do
       agent.memory['seen_ids'] = ['x'] * 600
-      agent.options['max_ids'] = "400"
+      agent.options['remembered_id_count'] = "400"
       expect(agent.memory['seen_ids'].length).to eq(600)
       agent.check
       expect(agent.memory['seen_ids'].length).to eq(400)
     end
     
     it "should truncate the seen_ids at default after removing custom limit" do
-      agent.options['max_ids'] = "600"
+      agent.options['remembered_id_count'] = "600"
       agent.memory['seen_ids'] = ['x'] * 590
       agent.check
       expect(agent.memory['seen_ids'].length).to eq(600)
-      
-      agent.options.delete('max_ids')
+
+      agent.options.delete('remembered_id_count')
+      agent.memory['seen_ids'] = ['x'] * 590
       agent.check
       expect(agent.memory['seen_ids'].length).to eq(500)
     end
