@@ -26,6 +26,8 @@ module Agents
 
       If `suppress_on_empty_output` is set to true, no event is emitted when `output` is empty.
 
+      It's possible to pass custom input properties and receive them in the output.
+
       *Warning*: This type of Agent runs arbitrary commands on your system, #{Agents::ShellCommandAgent.should_run? ? "but is **currently enabled**" : "and is **currently disabled**"}.
       Only enable this Agent if you trust everyone using your Huginn installation.
       You can enable this Agent in your .env file by setting `ENABLE_INSECURE_AGENTS` to `true`.
@@ -51,6 +53,10 @@ module Agents
           'suppress_on_empty_output' => false,
           'expected_update_period_in_days' => 1
       }
+    end
+
+    def default_options_keys
+      default_options.keys << 'stdin'
     end
 
     def validate_options
@@ -94,7 +100,6 @@ module Agents
         command = opts['command']
         path = opts['path']
         stdin = opts['stdin']
-
         result, errors, exit_status = run_command(path, command, stdin)
 
         payload = {
@@ -103,7 +108,7 @@ module Agents
           'exit_status' => exit_status,
           'errors' => errors,
           'output' => result,
-        }
+        }.merge(build_optional_param(opts))
 
         unless suppress_event?(payload)
           created_event = create_event payload: payload
@@ -112,6 +117,12 @@ module Agents
         log("Ran '#{command}' under '#{path}'", outbound_event: created_event, inbound_event: event)
       else
         log("Unable to run because insecure agents are not enabled.  Edit ENABLE_INSECURE_AGENTS in the Huginn .env configuration.")
+      end
+    end
+
+    def build_optional_param(opts)
+       opts.select do |k,v|
+        !default_options_keys.include?(k)
       end
     end
 

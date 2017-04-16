@@ -85,6 +85,25 @@ describe Agents::ShellCommandAgent do
       expect(Event.last.payload[:output]).to eq("fake pwd output")
     end
 
+    it "should create an event with optional params" do
+      checker = build_agent(
+        {
+          path: @valid_path,
+          command: 'pwd',
+          expected_update_period_in_days: '1',
+          A: '1',
+          B: '2'
+        }
+      )
+      stub(checker).run_command(@valid_path, 'pwd', nil) { ["fake pwd output", "", 0] }
+      expect { checker.check }.to change { Event.count }.by(1)
+      expect(Event.last.payload[:path]).to eq(@valid_path)
+      expect(Event.last.payload[:command]).to eq('pwd')
+      expect(Event.last.payload[:output]).to eq("fake pwd output")
+      expect(Event.last.payload[:A]).to eq("1")
+      expect(Event.last.payload[:B]).to eq("2")
+    end
+
     it "should create an event when checking (unstubbed)" do
       expect { @checker2.check }.to change { Event.count }.by(1)
       expect(Event.last.payload[:path]).to eq(@valid_path)
@@ -140,6 +159,26 @@ describe Agents::ShellCommandAgent do
       expect(Event.last.payload[:output]).to eq("fake ls output")
     end
 
+    it "creates events with optional params" do
+      checker = build_agent(
+        {
+          path: @valid_path,
+          command: 'pwd',
+          expected_update_period_in_days: '1',
+          A: '1',
+          B: '2'
+        }
+      )
+      stub(checker).run_command(@valid_path, @event.payload[:cmd], nil) { ["fake ls output", "", 0] }
+      checker.options[:command] = "{{cmd}}"
+      checker.receive([@event])
+      expect(Event.last.payload[:path]).to eq(@valid_path)
+      expect(Event.last.payload[:command]).to eq(@event.payload[:cmd])
+      expect(Event.last.payload[:output]).to eq("fake ls output")
+      expect(Event.last.payload[:A]).to eq("1")
+      expect(Event.last.payload[:B]).to eq("2")
+    end
+
     it "creates events (unstubbed)" do
       @checker2.receive([@event])
       expect(Event.last.payload[:path]).to eq(@valid_path)
@@ -154,5 +193,12 @@ describe Agents::ShellCommandAgent do
         @checker.receive([@event])
       }.not_to change { Event.count }
     end
+  end
+
+  def build_agent(options)
+    checker = Agents::ShellCommandAgent.new(name: 'somename', options: options)
+    checker.user = users(:jane)
+    checker.save!
+    checker
   end
 end
