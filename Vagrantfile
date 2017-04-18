@@ -11,9 +11,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.network "forwarded_port", guest: 3000, host: 3000, auto_correct: true
   config.vm.network "forwarded_port", guest: 80, host: 8080, auto_correct: true
-  config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder ".", "/home/vagrant/app", type: "rsync", rsync__exclude: ".git/"
-
+  
   config.vm.provider "virtualbox" do |vb|
    vb.memory = "1024"
   end
@@ -96,9 +94,9 @@ Vagrant.configure("2") do |config|
    gem install bundler
 
    echo 'export RAILS_ENV=development' >> ~/.bash_profile
-   echo 'cd ~/app' >> ~/.bash_profile
+   echo 'cd /vagrant' >> ~/.bash_profile
 
-   cd /home/vagrant/app
+   cd /vagrant
    cp .env.example .env
    sed -i 's/DATABASE_PASSWORD=""/DATABASE_PASSWORD="root"/g' .env
 
@@ -109,11 +107,11 @@ Vagrant.configure("2") do |config|
    RAILS_ENV=development bundle exec rake db:seed
 
    echo 'alias huginn-server="rails server -b 0.0.0.0"' >> ~/.bash_profile
-   echo 'alias huginn-worker="bundle exec rails runner bin/threaded.rb"' >> ~/.bash_profile
+   echo 'alias huginn-worker="nohup bundle exec rails runner bin/threaded.rb > tmp/worker.log &"' >> ~/.bash_profile
 
    echo "-------"
-   echo "Use: huginn-worker command to start the worker"
-   echo "Use: huginn-server command to start the server "
+   echo "Use: '$: huginn-worker' command to start the worker in the background with output redirected to tmp/worker.log"
+   echo "Use: '$: huginn-server' command to start the server "
   SHELL
 
 end

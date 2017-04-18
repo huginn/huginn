@@ -91,16 +91,17 @@ $ cd huginn
 $ vagrant up
 ```
 It will install all that's required and setup default Huginn app ready for development.
+Huginn is located in /vagrant
 
 ```
 $ vagrant ssh
 ...
 Logs you in to the server
 ...
-vagrant@vagrant:~/app$ bundle exec rails runner bin/threaded.rb
-vagrant@vagrant:~/app$ rails server -b 0.0.0.0
+vagrant@vagrant:/vagrant$ bundle exec rails runner bin/threaded.rb > tmp/worker.log &
+vagrant@vagrant:/vagrant$ rails server -b 0.0.0.0
 ```
-Huginn is located in /home/vagrant/app
+Alternatively you can use '$ huginn-worker' or '$ huginn-server' aliases to run huginn workers and server
 
 In you browser go to http://localhost:3000 and login to Huginn using admin/password.
 
