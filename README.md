@@ -90,11 +90,14 @@ $ git clone https://github.com/cantino/huginn.git
 $ cd huginn
 $ vagrant up
 ```
-It will install all that's required and setup default Huginn
+It will install all that's required and setup default Huginn app ready for development.
 
 ```
 $ vagrant ssh
+...
 Logs you in to the server
+...
+vagrant@vagrant:~/app$ bundle exec rails runner bin/threaded.rb
 vagrant@vagrant:~/app$ rails server -b 0.0.0.0
 ```
 Huginn is located in /home/vagrant/app
