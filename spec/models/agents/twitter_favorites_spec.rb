@@ -2,7 +2,9 @@ require 'rails_helper'
 
 describe Agents::TwitterFavorites do
   before do
-    stub_request(:any, /tectonic/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/user_fav_tweets.json")), status: 200)
+    stub_request(:any, /tectonic.*[?&]tweet_mode=extended/).
+      to_return(body: File.read(Rails.root.join("spec/data_fixtures/user_fav_tweets.json")),
+                status: 200)
   end
 
   before do

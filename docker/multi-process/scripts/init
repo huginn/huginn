@@ -5,6 +5,14 @@ export LC_ALL=en_US.UTF-8
 
 cd /app
 
+# Do we have a Rails secret yet?
+# If not, generate one, but persist it for the container's lifetime.
+if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW .env.example; then
+  echo 'Generating random APP_SECRET_TOKEN.'
+  secret=$(dd if=/dev/urandom bs=36 count=1 | openssl base64)
+  sed -i.orig "s:REPLACE_ME_NOW:$secret:" .env.example
+fi
+
 # Cleanup any leftover pid file
 if [ -f /app/tmp/pids/server.pid ]; then
   rm /app/tmp/pids/server.pid
@@ -13,12 +21,12 @@ fi
 # is a mysql or postgresql database linked?
 # requires that the mysql or postgresql containers have exposed
 # port 3306 and 5432 respectively.
-if [ -n "${MYSQL_PORT_3306_TCP_ADDR}" ]; then
+if [[ -n "${MYSQL_PORT_3306_TCP_ADDR}" || ("${DATABASE_ADAPTER}" == "mysql2" && -n "${DATABASE_HOST}") ]]; then
   DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
   DATABASE_HOST=${DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
   DATABASE_PORT=${DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
   DATABASE_ENCODING=${DATABASE_ENCODING:-utf8mb4}
-elif [ -n "${POSTGRES_PORT_5432_TCP_ADDR}" ]; then
+elif [[ -n "${POSTGRES_PORT_5432_TCP_ADDR}" || "${DATABASE_ADAPTER}" == "postgresql" ]]; then
   DATABASE_ADAPTER=${DATABASE_ADAPTER:-postgresql}
   DATABASE_HOST=${DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
   DATABASE_PORT=${DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
@@ -198,7 +206,9 @@ if [ -n "\${DATABASE_INITIAL_CONNECT_MAX_RETRIES}" ]; then
 fi
 
 # We may need to try and create a database
-sudo -u huginn -EH bundle exec rake db:create
+if [ -z "\${DO_NOT_CREATE_DATABASE}" ]; then
+  sudo -u huginn -EH bundle exec rake db:create
+fi
 
 # Assuming we have a created database, run the migrations and seed it idempotently.
 if [ -z "\${DO_NOT_MIGRATE}" ]; then

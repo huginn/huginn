@@ -117,5 +117,15 @@ describe Agents::DryRunsController do
       expect(results[:events][0]).to eql({"message" => "bar"})
     end
 
+    it 'sets created_at of the dry-runned event' do
+      agent = agents(:bob_formatting_agent)
+      agent.options['instructions'] = {'created_at' => '{{created_at | date: "%a, %b %d, %y"}}'}
+      agent.save
+      post :create, params: {agent_id: agent, event: {test: 1}.to_json}
+      results = assigns(:results)
+      expect(results[:events]).to be_a(Array)
+      expect(results[:events].length).to eq(1)
+      expect(results[:events].first['created_at']).to eq(Date.today.strftime('%a, %b %d, %y'))
+    end
   end
 end

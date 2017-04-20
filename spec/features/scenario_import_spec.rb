@@ -43,4 +43,13 @@ describe ScenarioImportsController do
     click_on 'Finish Import'
     expect(page).to have_text('Import successful!')
   end
+
+  it 'imports a scenario which requires a service' do
+    visit new_scenario_imports_path
+    attach_file('Option 2: Upload a Scenario JSON File', File.join(Rails.root, 'spec/data_fixtures/twitter_scenario.json'))
+    click_on 'Start Import'
+    check('I confirm that I want to import these Agents.')
+    expect { click_on 'Finish Import' }.to change(Scenario, :count).by(1)
+    expect(page).to have_text('Import successful!')
+  end
 end

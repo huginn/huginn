@@ -25,7 +25,7 @@
           <% if @agent.new_record? %>
             <div class="form-group type-select">
               <%= f.label :type %>
-              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name,current_user,{}).html_description.lines.first.strip)}] }, @agent.type), {}, class: 'form-control', autofocus: true %>
+              <%= f.select :type, options_for_select(agent_type_select_options, @agent.type), {}, class: 'form-control', autofocus: true %>
             </div>
           <% end %>
         </div>
@@ -45,7 +45,7 @@
               <%= f.label :schedule, :class => 'control-label' %>
               <div class="schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
                 <div class="can-be-scheduled">
-                  <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'form-control' %>
+                  <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [builtin_schedule_name(s), s] }, @agent.schedule), {}, :class => 'form-control' %>
                 </div>
                 <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
               </div>

@@ -270,7 +270,7 @@ class ScenarioImport
     def each_field
       boolean = [["True", "true"], ["False", "false"]]
       yield 'name', name if name.requires_merge?
-      yield 'schedule', schedule, Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] } if self['schedule'].present? && schedule.requires_merge?
+      yield 'schedule', schedule, Agent::SCHEDULES.map {|s| [AgentHelper.builtin_schedule_name(s), s] } if self['schedule'].present? && schedule.requires_merge?
       yield 'keep_events_for', keep_events_for, Agent::EVENT_RETENTION_SCHEDULES if self['keep_events_for'].present? && keep_events_for.requires_merge?
       yield 'propagate_immediately', propagate_immediately, boolean if self['propagate_immediately'].present? && propagate_immediately.requires_merge?
       yield 'disabled', disabled, boolean if disabled.requires_merge?

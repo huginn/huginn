@@ -7,18 +7,23 @@ module Agents
 
 
     description <<-MD
-      The GoogleFlightsAgent will tell you the minimum airline prices between a pair of cities. The api limit is 50 requests/day.
+      The GoogleFlightsAgent will tell you the minimum airline prices between a pair of cities.
 
-      Follow their documentation here (https://developers.google.com/qpx-express/v1/prereqs#get-a-google-account) to retrieve an api key.
+      Follow the documentation [here](https://developers.google.com/qpx-express/v1/prereqs#get-a-google-account) to retrieve an api key.
       After you get to the google developer console, created a project, enabled qpx express api then you can choose `api key` credential to be created.
+      Note that at present you're limited to 50 queries per day free and after that are billed $0.035 per query.
 
       The `origin` and `destination` options require an [airport code](http://www.expedia.com/daily/airports/AirportCodes.asp).
 
       All the default options must exist. For `infantInSeatCount`, `infantInLapCount`, `seniorCount`, and `childCount`, leave them to the default value of `0` if you do not need them.
 
-      Make sure `date` and `return_date` is in this date format: `YYYY-MM-DAY`.
+      Make sure `date` and `return_date` is in this date format: `YYYY-MM-DAY`. You can use liquid formatting to dynamically assign a date in the future. For example to set the departure date 21 days from today, you'd use `{% assign current_date = 'now' | date: '%s' %}{{current_date | plus: 1814000 | date: '%Y-%m-%d'}}`
 
       You can choose one way tickets only by setting `roundtrip` to `false`.
+
+      You can limit to specific airlines using the `permittedCarrier` option and the two-letter IATA airline codes of choice. [https://en.wikipedia.org/wiki/List_of_airline_codes](https://en.wikipedia.org/wiki/List_of_airline_codes). Multiple airlines can be chosen, separated by commas.
+      
+      You can alternately limit your search to a specific set of airlines with the `alliance` option, to choose among the three Google-recognized ones, ONEWORLD, STAR and SKYTEAM.
 
       You can limit the number of `solutions` returned. The first solution will be the lowest priced ticket.
     MD
@@ -60,7 +65,10 @@ module Agents
         'seniorCount'=> 0,
         'return_date' => '2016-04-18',
         'roundtrip' => true,
-        'solutions'=> 3
+        'preferredCabin' => 'COACH',
+        'solutions'=> 3,
+        'permittedCarrier' => '',
+        'alliance' => ''
       }
     end
 
@@ -69,6 +77,9 @@ module Agents
     form_configurable :origin, type: :string
     form_configurable :destination, type: :string
     form_configurable :date, type: :string
+    form_configurable :preferredCabin, type: :array, values: %w(COACH PREMIUM_COACH BUSINESS FIRST)
+    form_configurable :permittedCarrier, type: :string
+    form_configurable :alliance, type: :array, values: %w(ONEWORLD SKYTEAM STAR)
     form_configurable :childCount
     form_configurable :infantInSeatCount
     form_configurable :infantInLapCount
@@ -101,9 +112,9 @@ module Agents
 
     def post_params
       if round_trip?
-        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[ {:origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s }, {:origin=> interpolated["destination"].to_s , :destination=> interpolated["origin"].to_s , :date=> interpolated["return_date"].to_s } ], :solutions=> interpolated["solutions"]}}
+        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[ {:origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s , :preferredCabin=> interpolated["preferredCabin"].to_s , :permittedCarrier=> interpolated["permittedCarrier"].to_s , :alliance=> interpolated["alliance"].to_s }, {:origin=>interpolated["destination"].to_s , :destination=> interpolated["origin"].to_s , :date=> interpolated["return_date"].to_s , :preferredCabin=> interpolated["preferredCabin"].to_s , :permittedCarrier=> interpolated["permittedCarrier"].to_s , :alliance=>interpolated["alliance"].to_s } ], :solutions=> interpolated["solutions"]}}
       else
-        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[{:kind=>"qpxexpress#sliceInput", :origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s }], :solutions=> interpolated["solutions"]}}
+        post_params = {:request=>{:passengers=>{:kind=>"qpxexpress#passengerCounts", :adultCount=> interpolated["adultCount"], :childCount=> interpolated["childCount"], :infantInLapCount=>interpolated["infantInLapCount"], :infantInSeatCount=>interpolated['infantInSeatCount'], :seniorCount=>interpolated["seniorCount"]}, :slice=>[{:kind=>"qpxexpress#sliceInput", :origin=> interpolated["origin"].to_s , :destination=> interpolated["destination"].to_s , :date=> interpolated["date"].to_s , :preferredCabin=> interpolated["preferredCabin"].to_s , :permittedCarrier=> interpolated["permittedCarrier"].to_s , :alliance=>interpolated["alliance"].to_s }], :solutions=> interpolated["solutions"]}}
       end
     end
 

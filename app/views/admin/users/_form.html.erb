@@ -22,7 +22,7 @@
 <div class="row">
   <div class="col-md-12">
     <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, admin_users_path, class: "btn btn-default" %>
-    <% if @user.persisted? %>
+    <% if @user.persisted? && @user.active? && @user != current_user %>
       <%= link_to 'Become User', switch_to_user_admin_user_path(@user), class: "btn btn-default btn-info", data: { confirm: 'This will log you in as another user. Would you like to continue?' } %>
     <% end %>
   </div>

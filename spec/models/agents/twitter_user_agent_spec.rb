@@ -3,7 +3,9 @@ require 'rails_helper'
 describe Agents::TwitterUserAgent do
   before do
     # intercept the twitter API request for @tectonic's user profile
-    stub_request(:any, "https://api.twitter.com/1.1/statuses/user_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true&screen_name=tectonic").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+    stub_request(:any, "https://api.twitter.com/1.1/statuses/user_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true&screen_name=tectonic&tweet_mode=extended").
+      to_return(body: File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")),
+                status: 200)
 
     @opts = {
       :username => "tectonic",
@@ -44,7 +46,7 @@ describe Agents::TwitterUserAgent do
 
   describe "#check that if choose time line is false then username is required" do
     before do
-      stub_request(:any, "https://api.twitter.com/1.1/statuses/home_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
+      stub_request(:any, "https://api.twitter.com/1.1/statuses/home_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true&tweet_mode=extended").to_return(:body => File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")), :status => 200)
     end
 
     it 'requires username unless choose_home_time_line is true' do

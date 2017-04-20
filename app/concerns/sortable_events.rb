@@ -6,6 +6,7 @@ module SortableEvents
   end
 
   EVENTS_ORDER_KEY = 'events_order'.freeze
+  EVENTS_DESCRIPTION = 'events created in each run'.freeze
 
   def description_events_order(*args)
     self.class.description_events_order(*args)
@@ -25,7 +26,7 @@ module SortableEvents
       !can_order_created_events?
     end
 
-    def description_events_order(events = 'events created in each run', events_order_key = EVENTS_ORDER_KEY)
+    def description_events_order(events = EVENTS_DESCRIPTION, events_order_key = EVENTS_ORDER_KEY)
       <<-MD.lstrip
         To specify the order of #{events}, set `#{events_order_key}` to an array of sort keys, each of which looks like either `expression` or `[expression, type, descending]`, as described as follows:
 
@@ -38,6 +39,17 @@ module SortableEvents
         Sort keys listed earlier take precedence over ones listed later.  For example, if you want to sort articles by the date and then by the author, specify `[["{{date}}", "time"], "{{author}}"]`.
 
         Sorting is done stably, so even if all events have the same set of sort key values the original order is retained.  Also, a special Liquid variable `_index_` is provided, which contains the zero-based index number of each event, which means you can exactly reverse the order of events by specifying `[["{{_index_}}", "number", true]]`.
+
+        #{description_include_sort_info if events == EVENTS_DESCRIPTION}
+      MD
+    end
+
+    def description_include_sort_info
+      <<-MD.lstrip
+        If the `include_sort_info` option is set, each created event will have a `sort_info` key whose value is a hash containing the following keys:
+
+        * `position`: 1-based index of each event after the sort
+        * `count`: Total number of events sorted
       MD
     end
   end
@@ -54,16 +66,37 @@ module SortableEvents
     options[key]
   end
 
+  def include_sort_info?
+    boolify(interpolated['include_sort_info'])
+  end
+
+  def create_events(events)
+    if include_sort_info?
+      count = events.count
+      events.each.with_index(1) do |event, position|
+        event.payload[:sort_info] = {
+          position: position,
+          count: count
+        }
+        create_event(event)
+      end
+    else
+      events.each do |event|
+        create_event(event)
+      end
+    end
+  end
+
   module AutomaticSorter
     def check
-      return super unless events_order
+      return super unless events_order || include_sort_info?
       sorting_events do
         super
       end
     end
 
     def receive(incoming_events)
-      return super unless events_order
+      return super unless events_order || include_sort_info?
       # incoming events should be processed sequentially
       incoming_events.each do |event|
         sorting_events do
@@ -88,10 +121,8 @@ module SortableEvents
       @sortable_events = []
       yield
     ensure
-      events, @sortable_events = @sortable_events, nil
-      sort_events(events).each do |event|
-        create_event(event)
-      end
+      events, @sortable_events = sort_events(@sortable_events), nil
+      create_events(events)
     end
   end
 

@@ -23,11 +23,9 @@ module Agents
 
       The WebsiteAgent can also scrape based on incoming events.
 
-      * Set the `url_from_event` option to a Liquid template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
-      * Alternatively, set `data_from_event` to a Liquid template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
+      * Set the `url_from_event` option to a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
+      * Alternatively, set `data_from_event` to a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
-
-      If a created Event has a key named `url` containing a relative URL, it is automatically resolved using the request URL as base.
 
       # Supported Document Types
 
@@ -35,7 +33,11 @@ module Agents
 
       To tell the Agent how to parse the content, specify `extract` as a hash with keys naming the extractions and values of hashes.
 
-      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
+      Note that for all of the formats, whatever you extract MUST have the same number of matches for each extractor except when it has `repeat` set to true.  E.g., if you're extracting rows, all extractors must match all rows.  For generating CSS selectors, something like [SelectorGadget](http://selectorgadget.com) may be helpful.
+
+      For extractors with `hidden` set to true, they will be excluded from the payloads of events created by the Agent, but can be used and interpolated in the `template` option explained below.
+
+      For extractors with `repeat` set to true, their first matches will be included in all extracts.  This is useful such as when you want to include the title of a page in all events created from the page.
 
       # Scraping HTML and XML
 
@@ -44,7 +46,8 @@ module Agents
           "extract": {
             "url": { "css": "#comic img", "value": "@src" },
             "title": { "css": "#comic img", "value": "@title" },
-            "body_text": { "css": "div.main", "value": "string(.)" }
+            "body_text": { "css": "div.main", "value": "string(.)" },
+            "page_title": { "css": "title", "value": "string(.)", "repeat": true }
           }
 
       "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and `string(.)` gives a string with all the enclosed text nodes concatenated without entity escaping (such as `&amp;`). To extract the innerHTML, use `./node()`; and to extract the outer HTML, use `.`.
@@ -113,11 +116,10 @@ module Agents
 
       Set `http_success_codes` to an array of status codes (e.g., `[404, 422]`) to treat HTTP response codes beyond 200 as successes.
 
-      If a `template` option is given, it is used as a Liquid template for each event created by this Agent, instead of directly emitting the results of extraction as events.  In the template, keys of extracted data can be interpolated, and some additional variables are also available as explained in the next section.  For example:
+      If a `template` option is given, its value must be a hash, whose key-value pairs are interpolated after extraction for each iteration and merged with the payload.  In the template, keys of extracted data can be interpolated, and some additional variables are also available as explained in the next section.  For example:
 
           "template": {
-            "url": "{{ url }}",
-            "title": "{{ title }}",
+            "url": "{{ url | to_uri: _response_.url }}",
             "description": "{{ body_text }}",
             "last_modified": "{{ _response_.headers.Last-Modified | date: '%FT%T' }}"
           }
@@ -126,17 +128,17 @@ module Agents
 
       # Liquid Templating
 
-      In Liquid templating, the following variables are available except when invoked by `data_from_event`:
+      In [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variables are available:
 
-      * `_url_`: The URL specified to fetch the content from.
+      * `_url_`: The URL specified to fetch the content from.  When parsing `data_from_event`, this is not set.
 
       * `_response_`: A response object with the following keys:
 
-          * `status`: HTTP status as integer. (Almost always 200)
+          * `status`: HTTP status as integer. (Almost always 200)  When parsing `data_from_event`, this is set to the value of the `status` key in the incoming Event, if it is a number or a string convertible to an integer.
 
-          * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.
+          * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.  When parsing `data_from_event`, this is constructed from the value of the `headers` key in the incoming Event, if it is a hash.
 
-          * `url`: The final URL of the fetched page, following redirects.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _request_.url }}` and `{{ content | rebase_hrefs: _request_.url }}`.
+          * `url`: The final URL of the fetched page, following redirects.  When parsing `data_from_event`, this is set to the value of the `url` key in the incoming Event.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _response_.url }}` and `{{ content | rebase_hrefs: _response_.url }}`.
 
       # Ordering Events
 
@@ -156,7 +158,11 @@ module Agents
     end
 
     def event_keys
-      (options['template'].presence || options['extract']).try(:keys)
+      extract = options['extract'] or return nil
+
+      extract.each_with_object([]) { |(key, value), keys|
+        keys << key unless boolify(value['hidden'])
+      } | (options['template'].presence.try!(:keys) || [])
     end
 
     def working?
@@ -359,6 +365,8 @@ module Agents
     end
 
     def handle_data(body, url, existing_payload)
+      # Beware, url may be a URI object, string or nil
+
       doc = parse(body)
 
       if extract_full_json?
@@ -379,38 +387,18 @@ module Agents
             extract_xml(doc)
         end
 
-      if output.each_value.each_cons(2).any? { |m, n| m.size != n.size }
-        raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
-      end
-
-      num_tuples = output.each_value.first.size
+      num_tuples = output.size or
+        raise "At least one non-repeat key is required"
 
       old_events = previous_payloads num_tuples
 
       template = options['template'].presence
 
-      num_tuples.times do |index|
-        extracted = {}
-        interpolated['extract'].each_key do |name|
-          extracted[name] = output[name][index]
-        end
+      output.each do |extracted|
+        result = extracted.except(*output.hidden_keys)
 
-        result =
-          if template
-            interpolate_with(extracted) do
-              interpolate_options(template)
-            end
-          else
-            extracted
-          end
-
-        # url may be URI, string or nil
-        if (payload_url = result['url'].presence) && (url = url.presence)
-          begin
-            result['url'] = (Utils.normalize_uri(url) + Utils.normalize_uri(payload_url)).to_s
-          rescue URI::Error
-            error "Cannot resolve url: <#{payload_url}> on <#{url}>"
-          end
+        if template
+          result.update(interpolate_options(template, extracted))
         end
 
         if store_payload!(old_events, result)
@@ -454,7 +442,10 @@ module Agents
     end
 
     def handle_event_data(data, event, existing_payload)
-      handle_data(data, event.payload['url'], existing_payload)
+      interpolation_context.stack {
+        interpolation_context['_response_'] = ResponseFromEventDrop.new(event)
+        handle_data(data, event.payload['url'].presence, existing_payload)
+      }
     rescue => e
       error "Error when handling event data: #{e.message}\n#{e.backtrace.join("\n")}", inbound_event: event
     end
@@ -522,37 +513,51 @@ module Agents
     end
 
     def extract_each(&block)
-      interpolated['extract'].each_with_object({}) { |(name, extraction_details), output|
-        output[name] = block.call(extraction_details)
+      interpolated['extract'].each_with_object(Output.new) { |(name, extraction_details), output|
+        if boolify(extraction_details['repeat'])
+          values = Repeater.new { |repeater|
+            block.call(extraction_details, repeater)
+          }
+        else
+          values = []
+          block.call(extraction_details, values)
+        end
+        log "Values extracted: #{values}"
+        begin
+          output[name] = values
+        rescue UnevenSizeError
+          raise "Got an uneven number of matches for #{interpolated['name']}: #{interpolated['extract'].inspect}"
+        else
+          output.hidden_keys << name if boolify(extraction_details['hidden'])
+        end
       }
     end
 
     def extract_json(doc)
-      extract_each { |extraction_details|
-        result = Utils.values_at(doc, extraction_details['path'])
-        log "Extracting #{extraction_type} at #{extraction_details['path']}: #{result}"
-        result
+      extract_each { |extraction_details, values|
+        log "Extracting #{extraction_type} at #{extraction_details['path']}"
+        Utils.values_at(doc, extraction_details['path']).each { |value|
+          values << value
+        }
       }
     end
 
     def extract_text(doc)
-      extract_each { |extraction_details|
+      extract_each { |extraction_details, values|
         regexp = Regexp.new(extraction_details['regexp'])
+        log "Extracting #{extraction_type} with #{regexp}"
         case index = extraction_details['index']
         when /\A\d+\z/
           index = index.to_i
         end
-        result = []
         doc.scan(regexp) {
-          result << Regexp.last_match[index]
+          values << Regexp.last_match[index]
         }
-        log "Extracting #{extraction_type} at #{regexp}: #{result}"
-        result
       }
     end
 
     def extract_xml(doc)
-      extract_each { |extraction_details|
+      extract_each { |extraction_details, values|
         case
         when css = extraction_details['css']
           nodes = doc.css(css)
@@ -561,22 +566,21 @@ module Agents
         else
           raise '"css" or "xpath" is required for HTML or XML extraction'
         end
+        log "Extracting #{extraction_type} at #{xpath || css}"
         case nodes
         when Nokogiri::XML::NodeSet
-          result = nodes.map { |node|
+          nodes.each { |node|
             case value = node.xpath(extraction_details['value'] || '.')
             when Float
               # Node#xpath() returns any numeric value as float;
               # convert it to integer as appropriate.
               value = value.to_i if value.to_i == value
             end
-            value.to_s
+            values << value.to_s
           }
         else
           raise "The result of HTML/XML extraction was not a NodeSet"
         end
-        log "Extracting #{extraction_type} at #{xpath || css}: #{result}"
-        result
       }
     end
 
@@ -604,6 +608,63 @@ module Agents
       false
     end
 
+    class UnevenSizeError < ArgumentError
+    end
+
+    class Output
+      def initialize
+        @hash = {}
+        @size = nil
+        @hidden_keys = []
+      end
+
+      attr_reader :size
+      attr_reader :hidden_keys
+
+      def []=(key, value)
+        case size = value.size
+        when Integer
+          if @size && @size != size
+            raise UnevenSizeError, 'got an uneven size'
+          end
+          @size = size
+        end
+
+        @hash[key] = value
+      end
+
+      def each
+        @size.times.zip(*@hash.values) do |index, *values|
+          yield @hash.each_key.lazy.zip(values).to_h
+        end
+      end
+    end
+
+    class Repeater < Enumerator
+      # Repeater.new { |y|
+      #   # ...
+      #   y << value
+      # } #=> [value, ...]
+      def initialize(&block)
+        @value = nil
+        super(Float::INFINITY) { |y|
+          loop { y << @value }
+        }
+        catch(@done = Object.new) {
+          block.call(self)
+        }
+      end
+
+      def <<(value)
+        @value = value
+        throw @done
+      end
+
+      def to_s
+        "[#{@value.inspect}, ...]"
+      end
+    end
+
     # Wraps Faraday::Response
     class ResponseDrop < LiquidDroppable::Drop
       def headers
@@ -618,6 +679,24 @@ module Agents
       # The URL
       def url
         @object.env.url.to_s
+      end
+    end
+
+    class ResponseFromEventDrop < LiquidDroppable::Drop
+      def headers
+        headers = Faraday::Utils::Headers.from(@object.payload[:headers]) rescue {}
+
+        HeaderDrop.new(headers)
+      end
+
+      # Integer value of HTTP status
+      def status
+        Integer(@object.payload[:status]) rescue nil
+      end
+
+      # The URL
+      def url
+        @object.payload[:url]
       end
     end
 

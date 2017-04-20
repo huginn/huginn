@@ -19,8 +19,8 @@ class Agent < ActiveRecord::Base
 
   load_types_in "Agents"
 
-  SCHEDULES = %w[every_1m every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d
-                 midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm never]
+  SCHEDULES = %w[every_1m every_2m every_5m every_10m every_30m every_1h every_2h every_5h every_12h every_1d every_2d every_7d] +
+              %w[midnight 1am 2am 3am 4am 5am 6am 7am 8am 9am 10am 11am noon 1pm 2pm 3pm 4pm 5pm 6pm 7pm 8pm 9pm 10pm 11pm never]
 
   EVENT_RETENTION_SCHEDULES = [["Forever", 0], ['1 hour', 1.hour], ['6 hours', 6.hours], ["1 day", 1.day], *([2, 3, 4, 5, 7, 14, 21, 30, 45, 90, 180, 365].map {|n| ["#{n} days", n.days] })]
 
@@ -293,10 +293,10 @@ class Agent < ActiveRecord::Base
 
   class << self
     def build_clone(original)
-      new(original.slice(:type, :options, :schedule, :controller_ids, :control_target_ids,
+      new(original.slice(:type, :options, :service_id, :schedule, :controller_ids, :control_target_ids,
                          :source_ids, :keep_events_for, :propagate_immediately, :scenario_ids)) { |clone|
         # Give it a unique name
-        2.upto(count) do |i|
+        2.step do |i|
           name = '%s (%d)' % [original.name, i]
           unless exists?(name: name)
             clone.name = name
@@ -370,7 +370,7 @@ class Agent < ActiveRecord::Base
     def receive!(options={})
       Agent.transaction do
         scope = Agent.
-                select("agents.id AS receiver_agent_id, events.id AS event_id").
+                select("agents.id AS receiver_agent_id, sources.type AS source_agent_type, agents.type AS receiver_agent_type, events.id AS event_id").
                 joins("JOIN links ON (links.receiver_id = agents.id)").
                 joins("JOIN agents AS sources ON (links.source_id = sources.id)").
                 joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)").
@@ -379,10 +379,11 @@ class Agent < ActiveRecord::Base
           scope = scope.where("agents.id in (?)", options[:only_receivers])
         end
 
-        sql = scope.to_sql()
+        sql = scope.to_sql
 
         agents_to_events = {}
-        Agent.connection.select_rows(sql).each do |receiver_agent_id, event_id|
+        Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_type, receiver_agent_type, event_id|
+          next unless const_defined?(source_agent_type) && const_defined?(receiver_agent_type)
           agents_to_events[receiver_agent_id.to_i] ||= []
           agents_to_events[receiver_agent_id.to_i] << event_id
         end
@@ -417,6 +418,7 @@ class Agent < ActiveRecord::Base
       return if schedule == 'never'
       types = where(:schedule => schedule).group(:type).pluck(:type)
       types.each do |type|
+        next unless valid_type?(type)
         type.constantize.bulk_check(schedule)
       end
     end
@@ -443,19 +445,20 @@ class AgentDrop
     @object.short_type
   end
 
-  METHODS = [
-    :name,
-    :type,
-    :options,
-    :memory,
-    :sources,
-    :receivers,
-    :schedule,
-    :controllers,
-    :control_targets,
-    :disabled,
-    :keep_events_for,
-    :propagate_immediately,
+  METHODS = %i[
+    id
+    name
+    type
+    options
+    memory
+    sources
+    receivers
+    schedule
+    controllers
+    control_targets
+    disabled
+    keep_events_for
+    propagate_immediately
   ]
 
   METHODS.each { |attr|

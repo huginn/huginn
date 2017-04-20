@@ -32,10 +32,18 @@ module AgentHelper
       agent_controllers(agent, delimiter) || 'Never'
     else
       [
-        agent.schedule.humanize.titleize,
+        builtin_schedule_name(agent.schedule),
         *(agent_controllers(agent, delimiter))
       ].join(delimiter).html_safe
     end
+  end
+
+  def builtin_schedule_name(schedule)
+    AgentHelper.builtin_schedule_name(schedule)
+  end
+
+  def self.builtin_schedule_name(schedule)
+    schedule == 'every_7d' ? 'Every Monday' : schedule.humanize.titleize
   end
 
   def agent_controllers(agent, delimiter = ', ')
@@ -79,6 +87,12 @@ module AgentHelper
       icon_tag('glyphicon-transfer')
     else
       icon_tag('glyphicon-unchecked')
+    end
+  end
+
+  def agent_type_select_options
+    Rails.cache.fetch('agent_type_select_options') do
+      [['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name, User.new(id: 0), {}).html_description.lines.first.strip)}] }
     end
   end
 

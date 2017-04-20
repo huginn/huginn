@@ -26,12 +26,16 @@ class WebRequestsController < ApplicationController
       if agent
         content, status, content_type = agent.trigger_web_request(request)
 
-        if content.is_a?(String)
-          render plain: content, :status => status || 200, :content_type => content_type || 'text/plain'
+        status = status || 200
+
+        if status.to_s.in?(["301", "302"])
+          redirect_to content, status: status
+        elsif content.is_a?(String)
+          render plain: content, :status => status, :content_type => content_type || 'text/plain'
         elsif content.is_a?(Hash)
-          render :json => content, :status => status || 200
+          render :json => content, :status => status
         else
-          head(status || 200)
+          head(status)
         end
       else
         render plain: "agent not found", :status => 404

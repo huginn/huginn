@@ -66,6 +66,22 @@ module Agents
               "copyright": "...",
               "icon": "http://example.com/icon.png",
               "authors": [ "..." ],
+
+              "itunes_block": "no",
+              "itunes_categories": [
+                "Technology", "Gadgets",
+                "TV & Film",
+                "Arts", "Food"
+              ],
+              "itunes_complete": "yes",
+              "itunes_explicit": "yes",
+              "itunes_image": "http://...",
+              "itunes_new_feed_url": "http://...",
+              "itunes_owners": [ "John Doe <john.doe@example.com>" ],
+              "itunes_subtitle": "...",
+              "itunes_summary": "...",
+              "language": "en-US",
+
               "date_published": "2014-09-11T01:30:00-07:00",
               "last_updated": "2014-09-11T01:30:00-07:00"
             },
@@ -84,6 +100,16 @@ module Agents
             "enclosure": {
               "url" => "http://example.com/file.mp3", "type" => "audio/mpeg", "length" => "123456789"
             },
+
+            "itunes_block": "no",
+            "itunes_closed_captioned": "yes",
+            "itunes_duration": "04:34",
+            "itunes_explicit": "yes",
+            "itunes_image": "http://...",
+            "itunes_order": "1",
+            "itunes_subtitle": "...",
+            "itunes_summary": "...",
+
             "date_published": "2014-09-11T01:30:00-0700",
             "last_updated": "2014-09-11T01:30:00-0700"
           }
@@ -91,7 +117,8 @@ module Agents
       Some notes:
 
       - The `feed` key is present only if `include_feed_info` is set to true.
-      - Each element in `authors` is a string normalized in the format "*name* <*email*> (*url*)", where each space-separated part is optional.
+      - The keys starting with `itunes_`, and `language` are only present when the feed is a podcast.  See [Podcasts Connect Help](https://help.apple.com/itc/podcasts_connect/#/itcb54353390) for details.
+      - Each element in `authors` and `itunes_owners` is a string normalized in the format "*name* <*email*> (*url*)", where each space-separated part is optional.
       - Timestamps are converted to the ISO 8601 format.
     MD
 
@@ -132,7 +159,7 @@ module Agents
         begin
           response = faraday.get(url)
           if response.success?
-            feed = Feedjira::Feed.parse(response.body)
+            feed = Feedjira::Feed.parse(preprocessed_body(response))
             new_events.concat feed_to_events(feed)
           else
             error "Failed to fetch #{url}: #{response.inspect}"
@@ -142,17 +169,12 @@ module Agents
         end
       end
 
-      created_event_count = 0
-      sort_events(new_events).each.with_index do |event, index|
-        entry_id = event.payload[:id]
-        if check_and_track(entry_id)
-          unless max_events && max_events > 0 && index >= max_events
-            created_event_count += 1
-            create_event(event)
-          end
-        end
-      end
-      log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
+      events = sort_events(new_events).select.with_index { |event, index|
+        check_and_track(event.payload[:id]) &&
+          !(max_events && max_events > 0 && index >= max_events)
+      }
+      create_events(events)
+      log "Fetched #{urls.to_sentence} and created #{events.size} event(s)."
     end
 
     def check_and_track(entry_id)
@@ -168,6 +190,20 @@ module Agents
 
     unless dependencies_missing?
       require 'feedjira_extension'
+    end
+
+    def preprocessed_body(response)
+      body = response.body
+      case body.encoding
+      when Encoding::ASCII_8BIT
+        # Encoding is unknown from the Content-Type, so let the SAX
+        # parser detect it from the content.
+      else
+        # Encoding is already known, so do not let the parser detect
+        # it from the XML declaration in the content.
+        body.sub!(/(?<noenc>\A\u{FEFF}?\s*<\?xml(?:\s+\w+(?<av>\s*=\s*(?:'[^']*'|"[^"]*")))*?)\s+encoding\g<av>/, '\\k<noenc>')
+      end
+      body
     end
 
     def feed_data(feed)
@@ -192,7 +228,38 @@ module Agents
         authors: feed.authors,
         date_published: feed.date_published,
         last_updated: feed.last_updated,
+        **itunes_feed_data(feed)
       }
+    end
+
+    def itunes_feed_data(feed)
+      data = {}
+      case feed
+      when Feedjira::Parser::ITunesRSS
+        %i[
+          itunes_block
+          itunes_categories
+          itunes_complete
+          itunes_explicit
+          itunes_image
+          itunes_new_feed_url
+          itunes_owners
+          itunes_subtitle
+          itunes_summary
+          language
+        ].each { |attr|
+          if value = feed.try(attr).presence
+            data[attr] =
+              case attr
+              when :itunes_summary
+                clean_fragment(value)
+              else
+                value
+              end
+          end
+        }
+      end
+      data
     end
 
     def entry_data(entry)
@@ -210,7 +277,30 @@ module Agents
         categories: Array(entry.try(:categories)),
         date_published: entry.date_published,
         last_updated: entry.last_updated,
+        **itunes_entry_data(entry)
       }
+    end
+
+    def itunes_entry_data(entry)
+      data = {}
+      case entry
+      when Feedjira::Parser::ITunesRSSItem
+        %i[
+          itunes_block
+          itunes_closed_captioned
+          itunes_duration
+          itunes_explicit
+          itunes_image
+          itunes_order
+          itunes_subtitle
+          itunes_summary
+        ].each { |attr|
+          if value = entry.try(attr).presence
+            data[attr] = value
+          end
+        }
+      end
+      data
     end
 
     def feed_to_events(feed)
