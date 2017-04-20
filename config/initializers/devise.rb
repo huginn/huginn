@@ -161,7 +161,7 @@ Devise.setup do |config|
   config.lock_strategy = Utils.if_present(ENV['LOCK_STRATEGY'], :to_sym) || :failed_attempts
 
   # Defines which key will be used when locking and unlocking an account
-  config.unlock_keys = [ :email ]
+  config.unlock_keys = [ :login ]
 
   # Defines which strategy will be used to unlock an account.
   # :email = Sends an unlock link to the user email

@@ -101,9 +101,9 @@ describe JobsController do
     end
 
     it "run the queued job" do
-      expect(Delayed::Job.last.run_at.to_s).not_to eq(Time.zone.now.to_s)
+      expect(Delayed::Job.last.run_at.to_i).not_to be_within(2).of(Time.zone.now.to_i)
       post :retry_queued
-      expect(Delayed::Job.last.run_at.to_s).to eq(Time.zone.now.to_s)
+      expect(Delayed::Job.last.run_at.to_i).to be_within(2).of(Time.zone.now.to_i)
     end
   end
 end

@@ -68,7 +68,7 @@ module Agents
         errors.add(:base, "command must be a shell command line string or an array of command line arguments.")
       end
 
-      unless File.directory?(options['path'])
+      unless File.directory?(interpolated['path'])
         errors.add(:base, "#{options['path']} is not a real directory.")
       end
     end

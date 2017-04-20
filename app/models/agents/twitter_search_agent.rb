@@ -84,7 +84,7 @@ module Agents
 
     def check
       since_id = memory['since_id'] || nil
-      opts = {include_entities: true}
+      opts = {include_entities: true, tweet_mode: 'extended'}
       opts.merge! result_type: interpolated[:result_type] if interpolated[:result_type].present?
       opts.merge! since_id: since_id unless since_id.nil?
 

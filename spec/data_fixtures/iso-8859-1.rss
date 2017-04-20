@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+    <channel>
+        <title>Zeuhl</title>
+        <link>http://example.net/</link>
+        <item>
+            <title>Mëkanïk Zaïn</title>
+            <link>http://example.net/post/1</link>
+            <guid>http://example.net/post/1</guid>
+            <pubDate>Mon, 21 Nov 2016 17:00:10 +0100</pubDate>
+        </item>
+    </channel>
+</rss>

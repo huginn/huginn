@@ -96,6 +96,20 @@ class HuginnScheduler < LongRunnable::Worker
   include LongRunnable
 
   FAILED_JOBS_TO_KEEP = 100
+  SCHEDULE_TO_CRON = {
+    '1m'  => '*/1 * * * *',
+    '2m'  => '*/2 * * * *',
+    '5m'  => '*/5 * * * *',
+    '10m' => '*/10 * * * *',
+    '30m' => '*/30 * * * *',
+    '1h'  => '0 * * * *',
+    '2h'  => '0 */2 * * *',
+    '5h'  => '0 */5 * * *',
+    '12h' => '0 */12 * * *',
+    '1d'  => '0 0 * * *',
+    '2d'  => '0 0 */2 * *',
+    '7d'  => '0 0 * * 1',
+  }
 
   def setup
     tzinfo_friendly_timezone = ActiveSupport::TimeZone::MAPPING[ENV['TIMEZONE'].presence || "Pacific Time (US & Canada)"]
@@ -116,8 +130,8 @@ class HuginnScheduler < LongRunnable::Worker
     end
 
     # Schedule repeating events.
-    %w[1m 2m 5m 10m 30m 1h 2h 5h 12h 1d 2d 7d].each do |schedule|
-      every schedule do
+    SCHEDULE_TO_CRON.keys.each do |schedule|
+      cron "#{SCHEDULE_TO_CRON[schedule]} #{tzinfo_friendly_timezone}"  do
         run_schedule "every_#{schedule}"
       end
     end

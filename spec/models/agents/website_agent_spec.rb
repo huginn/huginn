@@ -651,28 +651,22 @@ describe Agents::WebsiteAgent do
         @checker.options = @valid_options
         @checker.check
         event = Event.last
-        expect(event.payload['url']).to eq("http://imgs.xkcd.com/comics/evolving.png")
-        expect(event.payload['title']).to eq("Evolving")
-        expect(event.payload['hovertext']).to match(/^Biologists play reverse/)
+        expect(event.payload).to match(
+          'url' => 'http://imgs.xkcd.com/comics/evolving.png',
+          'title' => 'Evolving',
+          'hovertext' => /^Biologists play reverse/
+        )
       end
 
-      it "should turn relative urls to absolute" do
-        rel_site = {
-          'name' => "XKCD",
-          'expected_update_period_in_days' => "2",
-          'type' => "html",
-          'url' => "http://xkcd.com",
-          'mode' => "on_change",
-          'extract' => {
-            'url' => {'css' => "#topLeft a", 'value' => "@href"},
-          }
-        }
-        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
-        rel.user = users(:bob)
-        rel.save!
-        rel.check
+      it "should exclude hidden keys" do
+        @valid_options['extract']['hovertext']['hidden'] = true
+        @checker.options = @valid_options
+        @checker.check
         event = Event.last
-        expect(event.payload['url']).to eq("http://xkcd.com/about")
+        expect(event.payload).to match(
+          'url' => 'http://imgs.xkcd.com/comics/evolving.png',
+          'title' => 'Evolving'
+        )
       end
 
       it "should return an integer value if XPath evaluates to one" do
@@ -749,9 +743,9 @@ describe Agents::WebsiteAgent do
         expect(event.payload['original_url']).to eq('http://xkcd.com/index')
       end
 
-      it "should be formatted by template after extraction" do
+      it "should format and merge values in template after extraction" do
+        @valid_options['extract']['hovertext']['hidden'] = true
         @valid_options['template'] = {
-          'url' => '{{url}}',
           'title' => '{{title | upcase}}',
           'summary' => '{{title}}: {{hovertext | truncate: 20}}',
         }
@@ -786,6 +780,7 @@ describe Agents::WebsiteAgent do
               'title' => { 'xpath' => '/feed/entry', 'value' => 'normalize-space(./title)' },
               'url' => { 'xpath' => '/feed/entry', 'value' => './link[1]/@href' },
               'thumbnail' => { 'xpath' => '/feed/entry', 'value' => './thumbnail/@url' },
+              'page_title': { 'xpath': '/feed/title', 'value': 'string(.)', 'repeat' => true }
             }
           }, keep_events_for: 2.days)
           @checker.user = users(:bob)
@@ -796,7 +791,10 @@ describe Agents::WebsiteAgent do
           expect {
             @checker.check
           }.to change { Event.count }.by(20)
-          event = Event.last
+          events = Event.last(20)
+          expect(events.size).to eq(20)
+          expect(events.map { |event| event.payload['page_title'] }.uniq).to eq(['Recent Commits to huginn:master'])
+          event = events.last
           expect(event.payload['title']).to eq('Shift to dev group')
           expect(event.payload['url']).to eq('https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af')
           expect(event.payload['thumbnail']).to eq('https://avatars3.githubusercontent.com/u/365751?s=30')
@@ -942,6 +940,7 @@ describe Agents::WebsiteAgent do
         it "can handle arrays" do
           json = {
             'response' => {
+              'status' => 'ok',
               'data' => [
                 {'title' => "first", 'version' => 2},
                 {'title' => "second", 'version' => 2.5}
@@ -956,8 +955,9 @@ describe Agents::WebsiteAgent do
             'url' => "http://json-site.com",
             'mode' => 'on_change',
             'extract' => {
-              :title => {'path' => "response.data[*].title"},
-              :version => {'path' => "response.data[*].version"}
+              'title' => { 'path' => "response.data[*].title" },
+              'version' => { 'path' => "response.data[*].version" },
+              'status' => { 'path' => "response.status", 'repeat' => true },
             }
           }
           checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
@@ -969,9 +969,11 @@ describe Agents::WebsiteAgent do
           }.to change { Event.count }.by(2)
 
           (event2, event1) = Event.last(2)
+          expect(event1.payload['status']).to eq('ok')
           expect(event1.payload['version']).to eq(2.5)
           expect(event1.payload['title']).to eq("second")
 
+          expect(event2.payload['status']).to eq('ok')
           expect(event2.payload['version']).to eq(2)
           expect(event2.payload['title']).to eq("first")
         end
@@ -1007,6 +1009,7 @@ describe Agents::WebsiteAgent do
       describe "text parsing" do
         before do
           stub_request(:any, /text-site/).to_return(body: <<-EOF, status: 200)
+VERSION 1
 water: wet
 fire: hot
           EOF
@@ -1017,6 +1020,7 @@ fire: hot
             'url' => 'http://text-site.com',
             'mode' => 'on_change',
             'extract' => {
+              'version' => { 'regexp' => '^VERSION (.+)$', index: 1, repeat: true },
               'word' => { 'regexp' => '^(.+?): (.+)$', index: 1 },
               'property' => { 'regexp' => '^(.+?): (.+)$', index: '2' },
             }
@@ -1027,7 +1031,7 @@ fire: hot
         end
 
         it "works with regexp with named capture" do
-          @checker.options = @checker.options.merge('extract' => {
+          @checker.options = @checker.options.deep_merge('extract' => {
             'word' => { 'regexp' => '^(?<word>.+?): (?<property>.+)$', index: 'word' },
             'property' => { 'regexp' => '^(?<word>.+?): (?<property>.+)$', index: 'property' },
           })
@@ -1037,8 +1041,10 @@ fire: hot
           }.to change { Event.count }.by(2)
 
           event1, event2 = Event.last(2)
+          expect(event1.payload['version']).to eq('1')
           expect(event1.payload['word']).to eq('water')
           expect(event1.payload['property']).to eq('wet')
+          expect(event2.payload['version']).to eq('1')
           expect(event2.payload['word']).to eq('fire')
           expect(event2.payload['property']).to eq('hot')
         end
@@ -1049,8 +1055,10 @@ fire: hot
           }.to change { Event.count }.by(2)
 
           event1, event2 = Event.last(2)
+          expect(event1.payload['version']).to eq('1')
           expect(event1.payload['word']).to eq('water')
           expect(event1.payload['property']).to eq('wet')
+          expect(event2.payload['version']).to eq('1')
           expect(event2.payload['word']).to eq('fire')
           expect(event2.payload['property']).to eq('hot')
         end
@@ -1171,7 +1179,11 @@ fire: hot
               'some_object' => {
                 'some_data' => { hello: 'world', href: '/world' }.to_json
               },
-              url: 'http://example.com/'
+              url: 'http://example.com/',
+              'headers' => {
+                'Content-Type' => 'application/json'
+              },
+              'status' => 200
             }
             @event.save!
 
@@ -1181,6 +1193,12 @@ fire: hot
               'extract' => {
                 'value' => { 'path' => 'hello' },
                 'url' => { 'path' => 'href' },
+              },
+              'template' => {
+                'value' => '{{ value }}',
+                'url' => '{{ url | to_uri: _response_.url }}',
+                'type' => '{{ _response_.headers.content_type }}',
+                'status' => '{{ _response_.status | as_object }}'
               }
             )
           end
@@ -1189,7 +1207,7 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world' })
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200 })
           end
 
           it "should support merge mode" do
@@ -1198,7 +1216,25 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world'))
+            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200))
+          end
+
+          it "should convert headers and status in the event data properly" do
+            @event.payload[:status] = '201'
+            @event.payload[:headers] = [['Content-Type', 'application/rss+xml']]
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/rss+xml', 'status' => 201 })
+          end
+
+          it "should ignore inconvertible headers and status in the event data" do
+            @event.payload[:status] = 'ok'
+            @event.payload[:headers] = ['Content-Type', 'Content-Length']
+            expect {
+              @checker.receive([@event])
+            }.to change { Event.count }.by(1)
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => '', 'status' => nil })
           end
 
           it "should output an error when nothing can be found at the path" do
@@ -1335,6 +1371,9 @@ fire: hot
         'mode' => 'all',
         'extract' => {
           'url' => { 'css' => "a", 'value' => "@href" },
+        },
+        'template' => {
+          'url' => '{{ url | to_uri }}',
         }
       }
       @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)

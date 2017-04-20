@@ -66,7 +66,8 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          check_this_url interpolated[:url], header_array(interpolated[:headers_to_save])
+          check_this_url interpolated[:url],
+                         header_array(interpolated[:headers_to_save])
         end
       end
     end
@@ -84,11 +85,11 @@ module Agents
 
       # Deal with failures
       if measured_result.result
-        final_url = boolify(interpolated['disable_redirect_follow']) ? url : measured_result.result.to_hash[:url]
+        final_url = boolify(interpolated['disable_redirect_follow']) ? url : measured_result.result.env.url.to_s
         payload.merge!({ 'final_url' => final_url, 'redirected' => (url != final_url), 'response_received' => true, 'status' => current_status })
         # Deal with headers
         if local_headers.present?
-          header_results = measured_result.result.headers.select {|header, value| local_headers.include?(header)}
+          header_results = measured_result.result.headers.slice(*local_headers)
           # Fill in headers that we wanted, but weren't returned
           local_headers.each { |header| header_results[header] = nil unless header_results.has_key?(header) }
           payload.merge!({ 'headers' => header_results })

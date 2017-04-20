@@ -63,6 +63,7 @@ If you just want to play around, you can simply fork this repository, then perfo
 
 * Run `git remote add upstream https://github.com/cantino/huginn.git` to add the main repository as a remote for your fork.
 * Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` variable.
+* Make sure that you have MySQL or PostgreSQL installed. (On a Mac, the easiest way is with [Homebrew](http://brew.sh/). If you're going to use PostgreSQL, you'll need to prepend all commands below with `DATABASE_ADAPTER=postgresql`.)
 * Run `bundle` to install dependencies
 * Run `bundle exec rake db:create`, `bundle exec rake db:migrate`, and then `bundle exec rake db:seed` to create a development database with some example Agents.
 * Run `bundle exec foreman start`, visit [http://localhost:3000/][localhost], and login with the username of `admin` and the password of `password`.
@@ -91,13 +92,21 @@ All agents have specs! And there's also acceptance tests that simulate running H
 * Run a specific spec with `bundle exec rspec path/to/specific/test_spec.rb`. 
 * Read more about rspec for rails [here](https://github.com/rspec/rspec-rails).
 
+## Using Huginn Agent gems
+
+Huginn Agents can now be written as external gems and be added to your Huginn installation with the `ADDITIONAL_GEMS` environment variable. See the `Additional Agent gems` section of `.env.example` for more information.
+
+If you'd like to write your own Huginn Agent Gem, please see [huginn_agent](https://github.com/cantino/huginn_agent).
+
+Our general intention is to encourage complex and specific Agents to be written as Gems, while continuing to add new general-purpose Agents to the core Huginn repository.
+
 ## Deployment
 
 ### Heroku
 
 Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup. Read the [documentation](https://github.com/cantino/huginn/blob/master/doc/heroku/install.md) while you are waiting and be sure to click 'View it' after launch!)
 
-Huginn works on the free version of Heroku [with significant limitations](https://github.com/cantino/huginn/blob/master/doc/heroku/install.md). For non-experimental use, we strongly recommend Heroku's cheapest paid plan or our Docker container.
+Huginn launches on the free version of Heroku [with significant limitations](https://github.com/cantino/huginn/blob/master/doc/heroku/install.md). For non-experimental use, we strongly recommend Heroku's 1GB paid plan or our Docker container.
 
 Please see [the Huginn Wiki](https://github.com/cantino/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 

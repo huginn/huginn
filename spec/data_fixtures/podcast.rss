@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>All About Everything</title>
+    <link>http://www.example.com/podcasts/everything/index.html</link>
+    <language>en-us</language>
+    <copyright>&#x2117; &amp; &#xA9; 2014 John Doe &amp; Family</copyright>
+    <itunes:subtitle>A show about everything</itunes:subtitle>
+    <itunes:author>John Doe</itunes:author>
+    <itunes:summary>All About Everything is a show about everything. Each week we dive into any subject known to man and talk about it as much as we can. Look for our podcast in the Podcasts app or in the iTunes Store</itunes:summary>
+    <description>All About Everything is a show about everything. Each week we dive into any subject known to man and talk about it as much as we can. Look for our podcast in the Podcasts app or in the iTunes Store</description>
+    <itunes:owner>
+      <itunes:name>John Doe</itunes:name>
+      <itunes:email>john.doe@example.com</itunes:email>
+    </itunes:owner>
+    <itunes:complete>yes</itunes:complete>
+    <itunes:image href="http://example.com/podcasts/everything/AllAboutEverything.jpg"/>
+    <itunes:category text="Technology">
+      <itunes:category text="Gadgets"/>
+    </itunes:category>
+    <itunes:category text="TV &amp; Film"/>
+    <itunes:category text="Arts">
+      <itunes:category text="Food"/>
+    </itunes:category>
+    <itunes:explicit>no</itunes:explicit>
+    <item>
+      <title>Shake Shake Shake Your Spices</title>
+      <itunes:author>John Doe</itunes:author>
+      <itunes:subtitle>A short primer on table spices</itunes:subtitle>
+      <itunes:summary><![CDATA[This week we talk about <a href="https://itunes/apple.com/us/book/antique-trader-salt-pepper/id429691295?mt=11">salt and pepper shakers</a>, comparing and contrasting pour rates, construction materials, and overall aesthetics. Come and join the party!]]></itunes:summary>
+      <itunes:image href="http://example.com/podcasts/everything/AllAboutEverything/Episode1.jpg"/>
+      <enclosure length="8727310" type="audio/x-m4a" url="http://example.com/podcasts/everything/AllAboutEverythingEpisode3.m4a"/>
+      <guid>http://example.com/podcasts/archive/aae20140615.m4a</guid>
+      <pubDate>Tue, 08 Mar 2016 12:00:00 GMT</pubDate>
+      <itunes:duration>07:04</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>Socket Wrench Shootout</title>
+      <itunes:author>Jane Doe</itunes:author>
+      <itunes:subtitle>Comparing socket wrenches is fun!</itunes:subtitle>
+      <itunes:summary>This week we talk about metric vs. Old English socket wrenches. Which one is better? Do you really need both? Get all of your answers here.</itunes:summary>
+      <itunes:image href="http://example.com/podcasts/everything/AllAboutEverything/Episode2.jpg"/>
+      <enclosure length="5650889" type="video/mp4" url="http://example.com/podcasts/everything/AllAboutEverythingEpisode2.mp4"/>
+      <guid>http://example.com/podcasts/archive/aae20140608.mp4</guid>
+      <pubDate>Wed, 09 Mar 2016 13:00:00 EST</pubDate>
+      <itunes:duration>04:34</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>The Best Chili</title>
+      <itunes:author>Jane Doe</itunes:author>
+      <itunes:subtitle>Jane and Eric</itunes:subtitle>
+      <itunes:summary>This week we talk about the best Chili in the world. Which chili is better?</itunes:summary>
+      <itunes:image href="http://example.com/podcasts/everything/AllAboutEverything/Episode3.jpg"/>
+      <enclosure length="5650889" type="video/x-m4v" url="http://example.com/podcasts/everything/AllAboutEverythingEpisode2.m4v"/>
+      <guid>http://example.com/podcasts/archive/aae20140697.m4v</guid>
+      <pubDate>Thu, 10 Mar 2016 02:00:00 -0700</pubDate>
+      <itunes:duration>04:34</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+      <itunes:isClosedCaptioned>Yes</itunes:isClosedCaptioned>
+    </item>
+    <item>
+      <title>Red,Whine, &amp; Blue</title>
+      <itunes:author>Various</itunes:author>
+      <itunes:subtitle>Red + Blue != Purple</itunes:subtitle>
+      <itunes:summary>This week we talk about surviving in a Red state if you are a Blue person. Or vice versa.</itunes:summary>
+      <itunes:image href="http://example.com/podcasts/everything/AllAboutEverything/Episode4.jpg"/>
+      <enclosure length="498537" type="audio/mpeg" url="http://example.com/podcasts/everything/AllAboutEverythingEpisode4.mp3"/>
+      <guid>http://example.com/podcasts/archive/aae20140601.mp3</guid>
+      <pubDate>Fri, 11 Mar 2016 01:15:00 +3000</pubDate>
+      <itunes:duration>03:59</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+  </channel>
+</rss>
