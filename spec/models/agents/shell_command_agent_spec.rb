@@ -85,23 +85,20 @@ describe Agents::ShellCommandAgent do
       expect(Event.last.payload[:output]).to eq("fake pwd output")
     end
 
-    it "should create an event with optional params" do
+    it "should not create an event with optional params" do
       checker = build_agent(
         {
           path: @valid_path,
           command: 'pwd',
           expected_update_period_in_days: '1',
+          merge: true,
           A: '1',
           B: '2'
         }
       )
       stub(checker).run_command(@valid_path, 'pwd', nil) { ["fake pwd output", "", 0] }
       expect { checker.check }.to change { Event.count }.by(1)
-      expect(Event.last.payload[:path]).to eq(@valid_path)
-      expect(Event.last.payload[:command]).to eq('pwd')
-      expect(Event.last.payload[:output]).to eq("fake pwd output")
-      expect(Event.last.payload[:A]).to eq("1")
-      expect(Event.last.payload[:B]).to eq("2")
+      expect(Event.last.payload.keys).not_to include('A', 'B')
     end
 
     it "should create an event when checking (unstubbed)" do
@@ -159,24 +156,47 @@ describe Agents::ShellCommandAgent do
       expect(Event.last.payload[:output]).to eq("fake ls output")
     end
 
-    it "creates events with optional params" do
-      checker = build_agent(
-        {
-          path: @valid_path,
-          command: 'pwd',
-          expected_update_period_in_days: '1',
-          A: '1',
-          B: '2'
-        }
-      )
-      stub(checker).run_command(@valid_path, @event.payload[:cmd], nil) { ["fake ls output", "", 0] }
-      checker.options[:command] = "{{cmd}}"
-      checker.receive([@event])
-      expect(Event.last.payload[:path]).to eq(@valid_path)
-      expect(Event.last.payload[:command]).to eq(@event.payload[:cmd])
-      expect(Event.last.payload[:output]).to eq("fake ls output")
-      expect(Event.last.payload[:A]).to eq("1")
-      expect(Event.last.payload[:B]).to eq("2")
+    context 'with merge set to true' do
+
+      it "creates events with optional params" do
+        checker = build_agent(
+          {
+            path: @valid_path,
+            command: 'pwd',
+            expected_update_period_in_days: '1',
+            merge: true,
+            A: '1',
+            B: '2'
+          }
+        )
+        stub(checker).run_command(@valid_path, @event.payload[:cmd], nil) { ["fake ls output", "", 0] }
+        checker.options[:command] = "{{cmd}}"
+        checker.receive([@event])
+        expect(Event.last.payload[:path]).to eq(@valid_path)
+        expect(Event.last.payload[:command]).to eq(@event.payload[:cmd])
+        expect(Event.last.payload[:output]).to eq("fake ls output")
+        expect(Event.last.payload[:A]).to eq("1")
+        expect(Event.last.payload[:B]).to eq("2")
+      end
+    end
+
+    context 'merge set to false' do
+      it "does not create events with optional params" do
+        checker = build_agent(
+          {
+            path: @valid_path,
+            command: 'pwd',
+            expected_update_period_in_days: '1',
+            merge: false,
+            A: '1',
+            B: '2'
+          }
+        )
+        stub(checker).run_command(@valid_path, @event.payload[:cmd], nil) { ["fake ls output", "", 0] }
+        checker.options[:command] = "{{cmd}}"
+        checker.receive([@event])
+        expect(Event.last.payload.keys).not_to include('A', 'B')
+      end
     end
 
     it "creates events (unstubbed)" do
