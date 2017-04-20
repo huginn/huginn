@@ -7,7 +7,7 @@ module Agents
     description <<-MD
       The Translation Agent will attempt to translate text between natural languages.
 
-      Services are provided using Google Translate. You can [sign up](https://cloud.google.com/translate/) and [register your application](https://datamarket.azure.com/developer/applications/register) to get `client_id` and `client_secret` which are required to use this agent.
+      Services are provided using Google Translate. You can [sign up](https://cloud.google.com/translate/) to get `GOOGLE_API_KEY` which is required to use this agent.
 
     MD
 
