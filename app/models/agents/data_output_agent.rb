@@ -28,6 +28,7 @@ module Agents
           * `ns_media` - Add [yahoo media namespace](https://en.wikipedia.org/wiki/Media_RSS) in output xml
           * `ns_itunes` - Add [itunes compatible namespace](http://lists.apple.com/archives/syndication-dev/2005/Nov/msg00002.html) in output xml
           * `rss_content_type` - Content-Type for RSS output (default: `application/rss+xml`)
+          * `response_headers` - A JSON object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
           * `push_hubs` - Set to a list of PubSubHubbub endpoints you want to publish an update to every time this agent receives an event. (default: none)  Popular hubs include [Superfeedr](https://pubsubhubbub.superfeedr.com/) and [Google](https://pubsubhubbub.appspot.com/).  Note that publishing updates will make your feed URL known to the public, so if you want to keep it secret, set up a reverse proxy to serve your feed via a safe URL and specify it in `template.self`.
 
         If you'd like to output RSS tags with attributes, such as `enclosure`, use something like the following in your `template`:
@@ -278,7 +279,7 @@ module Agents
             'items' => simplify_item_for_json(items)
           }
 
-          return [content, 200]
+          return [content, 200, "application/json", interpolated['response_headers'].presence]
         else
           hub_links = push_hubs.map { |hub|
             <<-XML
@@ -290,7 +291,7 @@ module Agents
                   .to_xml(skip_types: true, root: "items", skip_instruct: true, indent: 1)
                   .gsub(%r{^</?items>\n}, '')
 
-          return [<<-XML, 200, rss_content_type]
+          return [<<-XML, 200, rss_content_type, interpolated['response_headers'].presence]
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" #{xml_namespace}>
 <channel>

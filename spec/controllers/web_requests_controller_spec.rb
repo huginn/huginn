@@ -10,7 +10,7 @@ describe WebRequestsController do
         memory[:web_request_values] = params
         memory[:web_request_format] = format
         memory[:web_request_method] = method
-        ["success", (options[:status] || 200).to_i, memory['content_type']]
+        ["success", (options[:status] || 200).to_i, memory['content_type'], memory['response_headers']]
       else
         ["failure", 404]
       end
@@ -83,6 +83,21 @@ describe WebRequestsController do
     @agent.save!
     get :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"}
     expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8')
+  end
+
+  it "can accept custom response headers to return" do
+    @agent.memory['response_headers'] = {"Access-Control-Allow-Origin" => "*"}
+    @agent.save!
+    get :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"}
+    expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+  end
+
+  it "can accept multiple custom response headers to return" do
+    @agent.memory['response_headers'] = {"Access-Control-Allow-Origin" => "*", "X-My-Custom-Header" => "hello"}
+    @agent.save!
+    get :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"}
+    expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+    expect(response.headers['X-My-Custom-Header']).to eq('hello')
   end
 
   it 'should redirect correctly' do

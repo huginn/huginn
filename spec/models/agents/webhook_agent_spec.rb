@@ -55,6 +55,12 @@ describe Agents::WebhookAgent do
       expect(out).to eq(['jon', 201])
     end
 
+    it 'should respond with custom response header if configured with `response_headers` option' do
+      agent.options['response_headers'] = {"X-My-Custom-Header" => 'hello'}
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201, "text/plain", {"X-My-Custom-Header" => 'hello'}])
+    end
+
     it 'should respond with `Event Created` if the response option is nil or missing' do
       agent.options['response'] = nil
       out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")

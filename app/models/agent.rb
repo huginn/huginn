@@ -96,7 +96,7 @@ class Agent < ActiveRecord::Base
 
   def receive_web_request(params, method, format)
     # Implement me in your subclass of Agent.
-    ["not implemented", 404]
+    ["not implemented", 404, "text/plain", {}] # last two elements in response array are optional
   end
 
   # alternate method signature for receive_web_request
