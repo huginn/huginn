@@ -169,7 +169,7 @@ module Agents
         false
       else
         memory['seen_ids'].unshift entry_id
-		    memory['seen_ids'].pop(memory['seen_ids'].length - remembered_id_count) if memory['seen_ids'].length > remembered_id_count
+        memory['seen_ids'].pop(memory['seen_ids'].length - remembered_id_count) if memory['seen_ids'].length > remembered_id_count
         true
       end
     end
