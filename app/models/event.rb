@@ -96,7 +96,7 @@ class EventDrop
     super
   end
 
-  def before_method(key)
+  def liquid_method_missing(key)
     @payload[key]
   end
 
