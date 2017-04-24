@@ -311,7 +311,7 @@ GEM
       letter_opener (~> 1.0)
       railties (>= 3.2)
     libv8 (3.16.14.15)
-    liquid (3.0.6)
+    liquid (4.0.0)
     listen (3.0.5)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
@@ -644,7 +644,7 @@ DEPENDENCIES
   kaminari!
   kramdown (~> 1.3.3)
   letter_opener_web (~> 1.3.0)
-  liquid (~> 3.0.3)
+  liquid (~> 4.0)
   listen (~> 3.0.5)
   loofah (~> 2.0)
   mini_magick
