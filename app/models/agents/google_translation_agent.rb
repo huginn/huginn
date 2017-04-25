@@ -1,5 +1,4 @@
-require 'google/apis/translate_v2'
-
+require 'google/api_client'
 module Agents
   class GoogleTranslationAgent < Agent
     cannot_be_scheduled!
@@ -52,15 +51,38 @@ module Agents
         translated_event = {}
         opts = interpolated(event)
         opts['content'].each_pair do |key, value|
-          result = translate_service.list_translations(value, opts['to'], source: translate_from)
-          translated_event[key] = result.translations.last.translated_text
+          result = translate(value)
+          translated_event[key] = result.data.translations.last.translated_text
         end
         create_event payload: translated_event
       end
     end
 
+    def google_client
+      @google_client ||= Google::APIClient.new(
+        {
+          application_name: "Huginn",
+          application_version: "0.0.1",
+          key: options['google_api_key'],
+          authorization: nil
+        }
+      )
+    end
+
     def translate_service
-      @translate_service ||= Google::Apis::TranslateV2::TranslateService.new.tap {|service| service.key = options['google_api_key']}
+      @translate_service ||= google_client.discovered_api('translate','v2')
+    end
+
+    def translate(value)
+      google_client.execute(
+        :api_method => translate_service.translations.list,
+        :parameters => {
+          'format' => 'text',
+          'source' => translate_from,
+          'target' => options["to"],
+          'q' => value
+        }
+      )
     end
   end
 end

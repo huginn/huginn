@@ -1,13 +1,13 @@
 require 'rails_helper'
 
-describe Agents::GoogleTranslationAgent do
+describe Agents::GoogleTranslationAgent, :vcr do
   before do
     @valid_params = {
       name: "somename",
       options: {
-        to: "fi",
+        to: "sv",
         from: "en",
-        google_api_key: 'someapikey',
+        google_api_key: 'some_api_key',
         expected_receive_period_in_days: 1,
         content: {
           text: "{{message}}",
@@ -23,24 +23,10 @@ describe Agents::GoogleTranslationAgent do
     @event = Event.new
     @event.agent = agents(:jane_weather_agent)
     @event.payload = {
-      message: "somevalue",
-      xyz: "someothervalue"
+      message: "hey what are you doing",
+      xyz: "do tell more"
     }
 
-    stub_request(:any, /googleapis/).to_return(
-      body: JSON.dump({
-        "data": {
-          "translations": [
-            {
-              "translatedText": "someresponse",
-              "detectedSourceLanguage": "en"
-            }
-          ]
-        }
-      }),
-      status: 200,
-      headers: {'Content-Type' => 'application/json'}
-    )
   end
 
   describe "#receive" do
