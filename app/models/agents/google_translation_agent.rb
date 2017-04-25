@@ -7,6 +7,7 @@ module Agents
       The Translation Agent will attempt to translate text between natural languages.
 
       Services are provided using Google Translate. You can [sign up](https://cloud.google.com/translate/) to get `google_api_key` which is required to use this agent.
+      The service is **not free**.
 
       `to` must be filled with a [translator language code](https://cloud.google.com/translate/docs/languages).
 
@@ -75,12 +76,12 @@ module Agents
 
     def translate(value)
       google_client.execute(
-        :api_method => translate_service.translations.list,
-        :parameters => {
-          'format' => 'text',
-          'source' => translate_from,
-          'target' => options["to"],
-          'q' => value
+        api_method: translate_service.translations.list,
+        parameters: {
+          format: 'text',
+          source: translate_from,
+          target: options["to"],
+          q: value
         }
       )
     end
