@@ -628,7 +628,7 @@ DEPENDENCIES
   foreman (~> 0.63.0)
   geokit (~> 1.8.4)
   geokit-rails (~> 2.2.0)
-  google-api-client
+  google-api-client (~> 0.7.1)
   guard (~> 2.13.0)
   guard-livereload (~> 2.5.1)
   guard-rspec (~> 4.6.4)

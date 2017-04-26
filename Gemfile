@@ -47,8 +47,8 @@ gem 'hypdf', '~> 1.0.10'          # PDFInfoAgent
 # FIXME needs to loosen omniauth dependency
 gem 'weibo_2', github: 'dsander/weibo_2', branch: 'master'
 
-# GoogleCalendarPublishAgent
-gem "google-api-client", require: 'google/api_client'
+# GoogleCalendarPublishAgent and GoogleTranslateAgent
+gem 'google-api-client', '~> 0.7.1', require: 'google/api_client'
 
 # Twitter Agents
 gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
