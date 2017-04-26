@@ -702,7 +702,7 @@ module Agents
 
     # Wraps Faraday::Utils::Headers
     class HeaderDrop < LiquidDroppable::Drop
-      def before_method(name)
+      def liquid_method_missing(name)
         @object[name.tr('_', '-')]
       end
     end
