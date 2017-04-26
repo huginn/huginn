@@ -10,8 +10,7 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.network "forwarded_port", guest: 3000, host: 3000, auto_correct: true
-  config.vm.network "forwarded_port", guest: 80, host: 8080, auto_correct: true
-  
+
   config.vm.provider "virtualbox" do |vb|
    vb.memory = "1024"
   end
@@ -32,21 +31,6 @@ Vagrant.configure("2") do |config|
     apt-get install -y libgdbm3 libgdbm-dev libsqlite3-dev
     apt-get install -y libreadline-dev libssl-dev libffi-dev libcurl3
     apt-get install -y libxml2-dev libxslt1-dev python-software-properties
-
-    echo "++++++++++ IPTABLES ++++++++++++++"
-    # Open Up some ports in the firewall
-    echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-    echo iptables-persistent iptables-persistent/autosave_v6 boolean false | debconf-set-selections
-    apt-get install -y iptables-persistent
-    iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
-    iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
-    iptables -A INPUT -p tcp -m tcp --dport 3000 -j ACCEPT
-    iptables -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
-    iptables -A INPUT -p tcp -m tcp --dport 2222 -j ACCEPT
-
-    iptables-save > /etc/iptables/rules.v4
-
-    /etc/init.d/netfilter-persistent reload
 
   SHELL
 
