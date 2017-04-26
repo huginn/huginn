@@ -28,7 +28,7 @@ class WebRequestsController < ApplicationController
       if agent
         content, status, content_type, headers = agent.trigger_web_request(request)
 
-        if headers.presence
+        if headers.present?
           headers.each do |k,v|
             response.headers[k] = v
           end
