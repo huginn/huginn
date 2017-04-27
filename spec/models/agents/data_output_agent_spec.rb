@@ -193,7 +193,7 @@ describe Agents::DataOutputAgent do
         XML
       end
 
-      describe "with cumstom rss_content_type given" do
+      describe "with custom rss_content_type given" do
         before do
           agent.options['rss_content_type'] = 'text/xml'
           agent.save!
@@ -253,6 +253,19 @@ describe Agents::DataOutputAgent do
             }
           ]
         })
+      end
+
+      describe "with custom response_headers given" do
+        before do
+          agent.options['response_headers'] = {"Access-Control-Allow-Origin" => "*", "X-My-Custom-Header" => "hello"}
+          agent.save!
+        end
+
+        it "can respond with custom headers" do
+          content, status, content_type, response_headers = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(response_headers).to eq({"Access-Control-Allow-Origin" => "*", "X-My-Custom-Header" => "hello"})
+        end
       end
 
       context 'with more events' do
