@@ -134,6 +134,9 @@ describe Agents::ShellCommandAgent do
     describe "with unbundle" do
       before do
         @checker.options[:command] = 'echo $BUNDLE_GEMFILE'
+        if ENV['TRAVIS'] == 'true'
+          stub.proxy(Bundler).original_env { |env| env.except('BUNDLE_GEMFILE') }
+        end
       end
 
       context "unspecified" do
