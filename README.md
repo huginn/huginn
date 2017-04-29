@@ -4,7 +4,7 @@
 
 ## What is Huginn?
 
-Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events, propagating them along a directed graph.  Think of it as a hackable Yahoo! Pipes plus IFTTT on your own server.  You always know who has your data.  You do.
+Huginn is a system for building agents that perform automated tasks for you online.  They can read the web, watch for events, and take actions on your behalf.  Huginn's Agents create and consume events, propagating them along a directed graph.  Think of it as a hackable version of IFTTT or Zapier on your own server.  You always know who has your data.  You do.
 
 ![the origin of the name](https://raw.githubusercontent.com/cantino/huginn/master/doc/imgs/the-name.png)
 
@@ -25,7 +25,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cantino/huginn?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Changelog #199](https://img.shields.io/badge/changelog-%23199-lightgrey.svg)](https://changelog.com/199)
 
-Join us in our [Gitter room](https://gitter.im/cantino/huginn) to discuss the project and follow [@tectonic](https://twitter.com/tectonic) for updates as Huginn evolves.
+Join us in our [Gitter room](https://gitter.im/cantino/huginn) to discuss the project.
 
 ### Join us!
 
@@ -131,6 +131,8 @@ We assume your deployment will run over SSL. This is a very good idea! However, 
 ## License
 
 Huginn is provided under the MIT License.
+
+Huginn was originally created by [@cantino](https://github.com/cantino) in 2013. Since then, many people's dedicated contributions have made it what it is today.
 
 [![Build Status](https://travis-ci.org/cantino/huginn.svg)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.svg)](https://coveralls.io/r/cantino/huginn) [![Dependency Status](https://gemnasium.com/cantino/huginn.svg)](https://gemnasium.com/cantino/huginn) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=282580)](https://www.bountysource.com/trackers/282580-huginn?utm_source=282580&utm_medium=shield&utm_campaign=TRACKER_BADGE)
 
