@@ -28,15 +28,6 @@ class Event < ActiveRecord::Base
     where("expires_at IS NOT NULL AND expires_at < ?", Time.now)
   }
 
-  case ActiveRecord::Base.connection
-  when ActiveRecord::ConnectionAdapters::AbstractMysqlAdapter
-    # Protect the Event table from InnoDB's AUTO_INCREMENT Counter
-    # Initialization by always keeping the latest event.
-    scope :to_expire, -> { expired.where.not(id: maximum(:id)) }
-  else
-    scope :to_expire, -> { expired }
-  end
-
   scope :with_location, -> {
     where.not(lat: nil).where.not(lng: nil)
   }
@@ -81,11 +72,9 @@ class Event < ActiveRecord::Base
   # Look for Events whose `expires_at` is present and in the past.  Remove those events and then update affected Agents'
   # `events_counts` cache columns.  This method is called by bin/schedule.rb periodically.
   def self.cleanup_expired!
-    transaction do
-      affected_agents = Event.to_expire.group("agent_id").pluck(:agent_id)
-      Event.to_expire.delete_all
-      Agent.where(id: affected_agents).update_all "events_count = (select count(*) from events where agent_id = agents.id)"
-    end
+    affected_agents = Event.expired.group("agent_id").pluck(:agent_id)
+    Event.expired.delete_all
+    Agent.where(:id => affected_agents).update_all "events_count = (select count(*) from events where agent_id = agents.id)"
   end
 
   protected
