@@ -71,8 +71,8 @@ If you just want to play around, you can simply fork this repository, then perfo
 * Read the [wiki][wiki] for usage examples and to get started making new Agents.
 * Periodically run `git fetch upstream` and then `git checkout master && git merge upstream/master` to merge in the newest version of Huginn.
 
-Note: By default, emails are intercepted in the `development` Rails environment, which is what you just setup.  You can view 
-them at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener). If you'd like to send real emails via SMTP when playing 
+Note: By default, emails are intercepted in the `development` Rails environment, which is what you just setup.  You can view
+them at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener). If you'd like to send real emails via SMTP when playing
 with Huginn locally, set `SEND_EMAIL_IN_DEVELOPMENT` to `true` in your `.env` file.
 
 If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
@@ -81,15 +81,39 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 [wiki]: https://github.com/cantino/huginn/wiki
 [novice-setup-guide]: https://github.com/cantino/huginn/wiki/Novice-setup-guide
 
+### Using Vagrant
+
+If you have Vagrant or want to [install it and use it](https://www.vagrantup.com/), you can use the Vagrant script to test out Huginn on Ubuntu 16.04 LTS box and [Virtual Box](https://www.virtualbox.org/).
+
+```
+$ git clone https://github.com/cantino/huginn.git
+$ cd huginn
+$ vagrant up
+```
+It will install all that's required and setup default Huginn app ready for development.
+Huginn is located in /vagrant
+
+```
+$ vagrant ssh
+...
+Logs you in to the server
+...
+vagrant@vagrant:/vagrant$ bundle exec rails runner bin/threaded.rb > tmp/worker.log &
+vagrant@vagrant:/vagrant$ rails server -b 0.0.0.0
+```
+Alternatively you can use '$ huginn-worker' or '$ huginn-server' aliases to run huginn workers and server
+
+In you browser go to http://localhost:3000 and login to Huginn using admin/password.
+
 ### Develop
 
-All agents have specs! And there's also acceptance tests that simulate running Huginn in a headless browser. 
+All agents have specs! And there's also acceptance tests that simulate running Huginn in a headless browser.
 
-* Install PhantomJS 2.1.1 or greater: 
-  * Using [Node Package Manager](https://www.npmjs.com/): `npm install phantomjs` 
+* Install PhantomJS 2.1.1 or greater:
+  * Using [Node Package Manager](https://www.npmjs.com/): `npm install phantomjs`
   * Using [Homebrew](http://brew.sh/) on OSX `brew install phantomjs`
 * Run all specs with `bundle exec rspec`
-* Run a specific spec with `bundle exec rspec path/to/specific/test_spec.rb`. 
+* Run a specific spec with `bundle exec rspec path/to/specific/test_spec.rb`.
 * Read more about rspec for rails [here](https://github.com/rspec/rspec-rails).
 
 ## Using Huginn Agent gems
@@ -135,4 +159,3 @@ Huginn is provided under the MIT License.
 Huginn was originally created by [@cantino](https://github.com/cantino) in 2013. Since then, many people's dedicated contributions have made it what it is today.
 
 [![Build Status](https://travis-ci.org/cantino/huginn.svg)](https://travis-ci.org/cantino/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.svg)](https://coveralls.io/r/cantino/huginn) [![Dependency Status](https://gemnasium.com/cantino/huginn.svg)](https://gemnasium.com/cantino/huginn) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=282580)](https://www.bountysource.com/trackers/282580-huginn?utm_source=282580&utm_medium=shield&utm_campaign=TRACKER_BADGE)
-
