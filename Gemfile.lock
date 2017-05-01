@@ -110,6 +110,8 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.3.8)
     arel (7.1.4)
+    attr_encrypted (3.0.3)
+      encryptor (~> 3.0.0)
     autoparse (0.3.3)
       addressable (>= 2.3.1)
       extlib (>= 0.9.15)
@@ -201,6 +203,7 @@ GEM
     em-websocket (0.5.1)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.6.0)
+    encryptor (3.0.0)
     equalizer (0.0.11)
     erector (0.10.0)
       treetop (>= 1.2.3)
@@ -597,6 +600,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap (~> 2.0.1)
+  attr_encrypted (~> 3.0.0)
   aws-sdk-core (~> 2.2.15)
   better_errors (~> 1.1)
   binding_of_caller

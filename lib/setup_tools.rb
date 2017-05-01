@@ -42,6 +42,10 @@ module SetupTools
       puts "Setting up APP_SECRET_TOKEN..."
       set_value 'APP_SECRET_TOKEN', SecureRandom.hex(64)
     end
+    unless $config['APP_ENCRYPTION_PASSPHRASE']
+      puts "Setting up APP_ENCRYPTION_PASSPHRASE..."
+      set_value 'APP_ENCRYPTION_PASSPHRASE', SecureRandom.hex(64)
+    end
     set_value 'RAILS_ENV', "production"
     set_value 'FORCE_SSL', "true"
     set_value 'USE_GRAPHVIZ_DOT', 'dot'

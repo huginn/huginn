@@ -1,7 +1,11 @@
+require 'attr_encrypted'
+
 class UserCredential < ActiveRecord::Base
   MODES = %w[text java_script]
 
   belongs_to :user
+
+  attr_encrypted :credential_value, key: ENV['APP_ENCRYPTION_PASSPHRASE'], unless: ENV['APP_ENCRYPTION_PASSPHRASE'].blank?
 
   validates_presence_of :credential_name
   validates_presence_of :credential_value
@@ -10,7 +14,7 @@ class UserCredential < ActiveRecord::Base
   validates_uniqueness_of :credential_name, :scope => :user_id
 
   before_validation :default_mode_to_text
-  before_save :trim_fields
+  before_validation :trim_fields
 
   protected
 
