@@ -1,0 +1,26 @@
+{
+	"name": "cantino/huginn",
+	"installpath": "/tmp/huginn",
+	"provisioner": "deployment/fodor/provisioner.sh",
+	"text": {
+		"complete": "User/Pass: huginn/huginn123 - please change"
+	},
+	"links": [
+		{
+			"title": "HTTP",
+			"url": "http://{{DOMAIN}}/"
+		},
+		{
+			"title": "Further reading",
+			"url": "https://github.com/cantino/huginn/wiki"
+		}
+	],
+	"size": {
+		"suggested": "2gb",
+		"required": "512mb"
+	},
+	"distro": "ubuntu-14-04-x64",
+	"description": "Build agents that monitor and act on your behalf. Your agents are standing by!",
+	"keywords": ["fodor", "huginn"],
+	"homepage": "https://github.com/cantino/huginn"
+}

@@ -110,6 +110,10 @@ Huginn launches on the free version of Heroku [with significant limitations](htt
 
 Please see [the Huginn Wiki](https://github.com/huginn/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
+### Fodor - automated install on DigitalOcean droplet
+
+[![deploy-with-fodor-image](https://img.shields.io/badge/Install%20on%20DigitalOcean-with%20Fodor.xyz-cc382c.svg)](https://fodor.xyz/provision/cantino/huginn)
+
 ### Manual installation on any server
 
 Have a look at the [installation guide](https://github.com/huginn/huginn/blob/master/doc/manual/README.md).
