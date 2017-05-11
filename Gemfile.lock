@@ -343,7 +343,7 @@ GEM
     net-ssh (3.0.2)
     netrc (0.10.3)
     nio4r (1.2.1)
-    nokogiri (1.7.1)
+    nokogiri (1.7.2)
       mini_portile2 (~> 2.1.0)
     notiffany (0.0.8)
       nenv (~> 0.1)
