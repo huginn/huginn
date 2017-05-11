@@ -78,22 +78,43 @@ describe DotHelper do
         }x)
       end
 
-      it "generates a richer DOT script" do
-        expect(agents_dot(@agents, rich: true)).to match(%r{
-          \A
-          digraph \x20 "Agent \x20 Event \x20 Flow" \{
-            node \[ [^\]]+ \];
-            edge \[ [^\]]+ \];
-            (?<foo>\w+) \[label=foo,tooltip="Dot \x20 Foo",URL="#{Regexp.quote(agent_path(@foo))}"\];
-            \k<foo> -> (?<bar1>\w+) \[style=dashed\];
-            \k<foo> -> (?<bar2>\w+) \[color="\#999999"\];
-            \k<bar1> \[label=bar1,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar1))}"\];
-            \k<bar2> \[label=bar2,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar2))}",style="rounded,dashed",color="\#999999",fontcolor="\#999999"\];
-            \k<bar2> -> (?<bar3>\w+) \[style=dashed,color="\#999999"\];
-            \k<bar3> \[label=bar3,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar3))}"\];
-          \}
-          \z
-        }x)
+      if ENV['USE_GRAPHVIZ_DOT']
+        it "generates a richer DOT script" do
+          expect(agents_dot(@agents, rich: true)).to match(%r{
+            \A
+            digraph \x20 "Agent \x20 Event \x20 Flow" \{
+              graph \[ [^\]]+ \];
+              node \[ [^\]]+ \];
+              edge \[ [^\]]+ \];
+              (?<foo>\w+) \[label=foo,tooltip="Dot \x20 Foo",URL="#{Regexp.quote(agent_path(@foo))}"\];
+              \k<foo> -> (?<bar1>\w+) \[style=dashed\];
+              \k<foo> -> (?<bar2>\w+) \[color="\#999999"\];
+              \k<bar1> \[label=bar1,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar1))}"\];
+              \k<bar2> \[label=bar2,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar2))}",style="rounded,dashed",color="\#999999",fontcolor="\#999999"\];
+              \k<bar2> -> (?<bar3>\w+) \[style=dashed,color="\#999999"\];
+              \k<bar3> \[label=bar3,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar3))}"\];
+            \}
+            \z
+          }x)
+        end
+      else
+        it "generates a richer DOT script" do
+          expect(agents_dot(@agents, rich: true)).to match(%r{
+            \A
+            digraph \x20 "Agent \x20 Event \x20 Flow" \{
+              node \[ [^\]]+ \];
+              edge \[ [^\]]+ \];
+              (?<foo>\w+) \[label=foo,tooltip="Dot \x20 Foo",URL="#{Regexp.quote(agent_path(@foo))}"\];
+              \k<foo> -> (?<bar1>\w+) \[style=dashed\];
+              \k<foo> -> (?<bar2>\w+) \[color="\#999999"\];
+              \k<bar1> \[label=bar1,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar1))}"\];
+              \k<bar2> \[label=bar2,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar2))}",style="rounded,dashed",color="\#999999",fontcolor="\#999999"\];
+              \k<bar2> -> (?<bar3>\w+) \[style=dashed,color="\#999999"\];
+              \k<bar3> \[label=bar3,tooltip="Dot \x20 Bar",URL="#{Regexp.quote(agent_path(@bar3))}"\];
+            \}
+            \z
+          }x)
+        end
       end
     end
   end
