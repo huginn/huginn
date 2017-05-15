@@ -19,8 +19,9 @@ class FormConfigurableAgentPresenter < Decorator
     html_options = {role: (data[:roles] + ['form-configurable']).join(' '), data: {attribute: attribute}}
 
     case data[:type]
-    when :text
+    when :text, :json
       @view.content_tag 'div' do
+        value = Utils.pretty_jsonify(value) if value.is_a?(Hash) && data[:type] == :json
         @view.concat @view.text_area_tag("agent[options][#{attribute}]", value, html_options.merge(class: 'form-control', rows: 3))
         if data[:ace].present?
           ace_options = { source: "[name='agent[options][#{attribute}]']", mode: '', theme: ''}.deep_symbolize_keys!
