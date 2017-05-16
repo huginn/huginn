@@ -15,7 +15,7 @@ services:
       POSTGRES_USER: huginn
 
   huginn_web:
-    image: cantino/huginn-single-process
+    image: huginn/huginn-single-process
     restart: always
     extends:
       file: environment.yml
@@ -30,7 +30,7 @@ services:
       - postgres
 
   huginn_threaded:
-    image: cantino/huginn-single-process
+    image: huginn/huginn-single-process
     restart: always
     extends:
       file: environment.yml
@@ -44,7 +44,7 @@ services:
     command: /scripts/init bin/threaded.rb
 
   # huginn_schedule:
-  #   image: cantino/huginn-single-process
+  #   image: huginn/huginn-single-process
   #   extends:
   #     file: environment.yml
   #     service: huginn_base
@@ -58,7 +58,7 @@ services:
 
 
   # huginn_twitter_stream:
-  #   image: cantino/huginn-single-process
+  #   image: huginn/huginn-single-process
   #   extends:
   #     file: environment.yml
   #     service: huginn_base
@@ -72,7 +72,7 @@ services:
 
 
   # huginn_dj1:
-  #   image: cantino/huginn-single-process
+  #   image: huginn/huginn-single-process
   #   extends:
   #     file: environment.yml
   #     service: huginn_base
