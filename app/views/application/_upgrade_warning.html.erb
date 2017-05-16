@@ -24,3 +24,20 @@ TWITTER_OAUTH_SECRET=<%= @twitter_oauth_secret %>
     <% end %>
   </div>
 <% end -%>
+<% if @outdated_docker_image_namespace %>
+  <dir class="container">
+    <div class="alert alert-danger" role="alert">
+      <p>
+        <b>Warning!</b> You need to change the namespace of the Huginn Docker image you are using.
+      </p>
+      <br/>
+      <p>
+        Since Huginn moved to a GitHub organization we also changed the namespace of the Docker images. Please change your configuration to the new namespace:
+        <ul>
+          <li><code>cantino/huginn</code> is now <code>huginn/huginn</code></li>
+          <li><code>cantino/huginn-single-process</code> is now <code>huginn/huginn-single-process</code></li>
+        </ul>
+      </p>
+    </div>
+  </dir>
+<% end -%>

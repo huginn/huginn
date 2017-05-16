@@ -32,6 +32,7 @@ class ApplicationController < ActionController::Base
     return unless current_user
     twitter_oauth_check
     basecamp_auth_check
+    outdated_docker_image_namespace_check
   end
 
   def filtered_agent_return_link(options = {})
@@ -63,6 +64,10 @@ class ApplicationController < ActionController::Base
     unless Devise.omniauth_providers.include?(:'37signals')
       @basecamp_agent = current_user.agents.where(type: 'Agents::BasecampAgent').first
     end
+  end
+
+  def outdated_docker_image_namespace_check
+    @outdated_docker_image_namespace = ENV['OUTDATED_DOCKER_IMAGE_NAMESPACE'] == 'true'
   end
 
   def agent_params
