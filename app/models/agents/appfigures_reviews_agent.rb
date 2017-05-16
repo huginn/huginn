@@ -77,7 +77,7 @@ module Agents
     private
 
     def build_default_options
-      options['filter'] << "&products=#{options['products']}" if options['products'].present?
+      options['filter'] << "&product=#{options['products']}" if options['products'].present?
       options['url'] = "https://api.appfigures.com/v2/reviews"
       options['url'] << "#{options['filter']}" if options['filter'].present?
       options['headers'] = auth_header(
