@@ -65,8 +65,8 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress http://cache.ruby-lang.org/pub/ruby/2.3/ruby-2.3.3.tar.bz2 | tar xj
-    cd ruby-2.3.3
+    curl -L --progress http://cache.ruby-lang.org/pub/ruby/2.3/ruby-2.3.4.tar.bz2 | tar xj
+    cd ruby-2.3.4
     ./configure --disable-install-rdoc
     make -j`nproc`
     sudo make install
