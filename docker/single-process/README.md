@@ -75,11 +75,27 @@ Manual startup and linking to a MySQL container:
         -e DATABASE_PASSWORD=somethingsecret \
         huginn/huginn-single-process /scripts/init bin/threaded.rb
 
+__NOTE:__ If you have issues with huginn using the wrong system time you can mount the following volumes into the container:
+
+    ```
+    -v /etc/timezone:/etc/timezone \
+    -v /etc/localtime:/etc/localtime \
+
+    ```
+
 ## Environment Variables
 
 Other Huginn 12factored environment variables of note, as generated and put into the .env file as per Huginn documentation. All variables of the [.env.example](https://github.com/huginn/huginn/blob/master/.env.example) can be used to override the defaults which a read from the current `.env.example`.
 
 For variables in the .env.example that are commented out, the default is to not include that variable in the generated .env file.
+
+__NOTE:__ The following environent variables should be included in your `docker run` statement for improved security and right timing:
+
+    ```
+    -e TIMEZONE="Your timezone from rake time:zones:all" \
+    -e APP_SECRET_TOKEN=YourIndividualSecretToken \
+    -e INVITATION_CODE=YourIndividualInviteCode \
+    ```
 
 ## Building on your own
 
