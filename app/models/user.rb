@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
   validates_presence_of :username
   validates :username, uniqueness: { case_sensitive: false }
   validates_format_of :username, :with => /\A[a-zA-Z0-9_-]{3,15}\Z/, :message => "can only contain letters, numbers, underscores, and dashes, and must be between 3 and 15 characters in length."
-  validates_inclusion_of :invitation_code, :on => :create, :in => INVITATION_CODES, :message => "is not valid", if: -> { !requires_no_invitation_code? && User.using_invitation_code? }
+  validates_inclusion_of :invitation_code, :on => :create, :in => INVITATION_CODES, :message => "is not valid", if: -> { !requires_no_invitation_code? && User.using_invitation_code? && User.allow_signup? }
 
   has_many :user_credentials, :dependent => :destroy, :inverse_of => :user
   has_many :events, -> { order("events.created_at desc") }, :dependent => :delete_all, :inverse_of => :user
@@ -62,6 +62,10 @@ class User < ActiveRecord::Base
 
   def inactive_message
     active? ? super : :deactivated_account
+  end
+
+  def self.allow_signup?
+    ENV['DISABLE_SIGNUP'] != 'true'
   end
 
   def self.using_invitation_code?

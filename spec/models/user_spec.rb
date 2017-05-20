@@ -29,6 +29,18 @@ describe User do
         end
       end
       
+      context "when configured to prevent signup" do
+        before do
+          stub(User).allow_signup? {false}
+        end
+
+        it "rejects all invitation codes" do
+          User::INVITATION_CODES.each do |v|
+            should_not allow_value(v).for(:invitation_code)
+          end
+        end
+      end
+
       context "when configured not to use invitation codes" do
         before do
           stub(User).using_invitation_code? {false}
