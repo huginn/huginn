@@ -77,9 +77,11 @@ Manual startup and linking to a MySQL container:
 
 ## Environment Variables
 
-Other Huginn 12factored environment variables of note, as generated and put into the .env file as per Huginn documentation. All variables of the [.env.example](https://github.com/huginn/huginn/blob/master/.env.example) can be used to override the defaults which a read from the current `.env.example`.
+Other Huginn [12factored](https://12factor.net/) environment variables of note are generated and put into the .env file as per Huginn documentation. All variables of the [.env.example](https://github.com/huginn/huginn/blob/master/.env.example) can be used to override the defaults which a read from the current `.env.example`.
 
 For variables in the .env.example that are commented out, the default is to not include that variable in the generated .env file.
+
+In newer versions of Docker you are able to pass your own .env file in to the container with the `--env-file` parameter.
 
 ## Building on your own
 
