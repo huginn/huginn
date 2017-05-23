@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+export RAILS_ENV=test
+bundle install --with test development --path vendor/bundle -j 4
+bundle exec rake db:drop
+bundle exec rake db:create
+bundle exec rake db:migrate
+
+if [[ -z "$@" ]]; then
+  bundle exec rake spec
+else
+  exec "$@"
+fi

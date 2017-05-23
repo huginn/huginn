@@ -52,20 +52,22 @@ esac
 
 sudo -u huginn -H -E bundle install --without test development --path vendor/bundle
 
+export RAILS_ENV=${RAILS_ENV}
+
 if [[ -z "${DO_NOT_CREATE_DATABASE}" && -z $1 ]]; then
-  sudo -u huginn -H -E bundle exec rake db:create RAILS_ENV=${RAILS_ENV}
+  sudo -u huginn -H -E bundle exec rake db:create
 fi
 
 if [ -z $1 ]; then
-  sudo -u huginn -H -E bundle exec rake db:migrate RAILS_ENV=${RAILS_ENV}
+  sudo -u huginn -H -E bundle exec rake db:migrate
 fi
 
 if [[ -z "${DO_NOT_SEED}" && -z $1 ]]; then
-  sudo -u huginn -H -E bundle exec rake db:seed RAILS_ENV=${RAILS_ENV}
+  sudo -u huginn -H -E bundle exec rake db:seed
 fi
 
 if [ -z $1 ]; then
   exec sudo -u huginn -H -E bundle exec unicorn -c config/unicorn.rb
 else
-  exec sudo -u huginn -H -E bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
+  exec sudo -u huginn -H -E bundle exec "$@"
 fi
