@@ -13,34 +13,7 @@ if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW .env.e
   sed -i.orig "s:REPLACE_ME_NOW:$secret:" .env.example
 fi
 
-# Configure database based on linked container
-if [ -n "${MYSQL_PORT_3306_TCP_ADDR}" ]; then
-  DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
-  DATABASE_HOST=${DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
-  DATABASE_PORT=${DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
-  DATABASE_ENCODING=${DATABASE_ENCODING:-utf8mb4}
-elif [ -n "${POSTGRES_PORT_5432_TCP_ADDR}" ]; then
-  DATABASE_ADAPTER=${DATABASE_ADAPTER:-postgresql}
-  DATABASE_HOST=${DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
-  DATABASE_PORT=${DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
-  DATABASE_ENCODING=utf8
-fi
-
-USE_GRAPHVIZ_DOT=${USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
-
-# Default to the environment variable values set in .env.example
-IFS="="
-grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
-  while read var value ; do
-    eval "echo \"$var=\${$var:-\${HUGINN_$var-\$value}}\""
-  done | grep -v -e ^= > /app/.env
-
-eval "echo PORT=${PORT:-${PORT:-3000}}" >> .env
-eval "echo RAILS_ENV=${RAILS_ENV:-${RAILS_ENV:-production}}" >> .env
-eval "echo RAILS_LOG_TO_STDOUT=true" >> .env
-eval "echo RAILS_SERVE_STATIC_FILES=true" >> .env
-
-chmod ugo+r /app/.env
+/scripts/setup_env
 source /app/.env
 
 # use default port number if it is still not set

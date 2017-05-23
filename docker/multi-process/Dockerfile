@@ -20,7 +20,8 @@ COPY . /app
 ARG OUTDATED_DOCKER_IMAGE_NAMESPACE=false
 ENV OUTDATED_DOCKER_IMAGE_NAMESPACE ${OUTDATED_DOCKER_IMAGE_NAMESPACE}
 
-ADD ["docker/scripts/setup", "docker/multi-process/scripts/init", "/scripts/"]
+ADD ["docker/scripts/setup", "docker/scripts/setup_env", "docker/multi-process/scripts/init", "/scripts/"]
+
 RUN /scripts/setup
 
 VOLUME /var/lib/mysql
