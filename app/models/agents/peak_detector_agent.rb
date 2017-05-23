@@ -15,7 +15,7 @@ module Agents
 
       You may set `min_events` for the minimal number of accumulated events before the agent starts detecting.
 
-      You may set `search_url` to point to something else than Twitter search.
+      You may set `search_url` to point to something else than Twitter search. Default value is `https://twitter.com/search?q=%{q}` where `%{q}` will be replaced with group name.
     MD
 
     event_description <<-MD
@@ -30,7 +30,7 @@ module Agents
     MD
 
     def validate_options
-      unless options['expected_receive_period_in_days'].present? && options['message'].present? && options['value_path'].present? && options['min_events'].present? && options['search_url'].present?
+      unless options['expected_receive_period_in_days'].present? && options['message'].present? && options['value_path'].present? && options['min_events'].present?
         errors.add(:base, "expected_receive_period_in_days, value_path, min_events and message are required")
       end
     end

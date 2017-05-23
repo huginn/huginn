@@ -9,8 +9,7 @@ describe Agents::PeakDetectorAgent do
           'group_by_path' => "filter",
           'value_path' => "count",
           'message' => "A peak was found",
-          'min_events' => "4",
-          'search_url' => "https://twitter.com/search?q=%{q}"
+          'min_events' => "4"
         }
     }
 
@@ -88,11 +87,6 @@ describe Agents::PeakDetectorAgent do
 
     it "should validate presence of message" do
       @agent.options['message'] = nil
-      expect(@agent).not_to be_valid
-    end
-
-    it "should validate presence of search_url" do
-      @agent.options['search_url'] = nil
       expect(@agent).not_to be_valid
     end
 
