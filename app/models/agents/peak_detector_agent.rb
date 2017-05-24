@@ -4,6 +4,8 @@ module Agents
   class PeakDetectorAgent < Agent
     cannot_be_scheduled!
 
+    DEFAULT_SEARCH_URL = 'https://twitter.com/search?q={q}'
+
     description <<-MD
       The Peak Detector Agent will watch for peaks in an event stream.  When a peak is detected, the resulting Event will have a payload message of `message`.  You can include extractions in the message, for example: `I saw a bar of: {{foo.bar}}`, have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
@@ -15,7 +17,7 @@ module Agents
 
       You may set `min_events` for the minimal number of accumulated events before the agent starts detecting.
 
-      You may set `search_url` to point to something else than Twitter search. Default value is `https://twitter.com/search?q=%{q}` where `%{q}` will be replaced with group name.
+      You may set `search_url` to point to something else than Twitter search, using the URI Template syntax defined in [RFC 6570](https://tools.ietf.org/html/rfc6570). Default value is `#{DEFAULT_SEARCH_URL}` where `{q}` will be replaced with group name.
     MD
 
     event_description <<-MD
@@ -33,6 +35,15 @@ module Agents
       unless options['expected_receive_period_in_days'].present? && options['message'].present? && options['value_path'].present? && options['min_events'].present?
         errors.add(:base, "expected_receive_period_in_days, value_path, min_events and message are required")
       end
+      begin
+        tmpl = search_url
+      rescue => e
+        errors.add(:base, "search_url must be a valid URI template: #{e.message}")
+      else
+        unless tmpl.keys.include?('q')
+          errors.add(:base, "search_url must include a variable named 'q'")
+        end
+      end
     end
 
     def default_options
@@ -42,7 +53,6 @@ module Agents
         'value_path' => "count",
         'message' => "A peak of {{count}} was found in {{filter}}",
         'min_events' => '4',
-        'search_url' => 'https://twitter.com/search?q=%{q}'
       }
     end
 
@@ -56,6 +66,10 @@ module Agents
         remember group, event
         check_for_peak group, event
       end
+    end
+
+    def search_url
+      Addressable::Template.new(options[:search_url].presence || DEFAULT_SEARCH_URL)
     end
 
     private

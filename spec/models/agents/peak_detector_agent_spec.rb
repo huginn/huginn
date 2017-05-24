@@ -99,5 +99,13 @@ describe Agents::PeakDetectorAgent do
       @agent.options['value_path'] = ""
       expect(@agent).not_to be_valid
     end
+
+    it "should validate search_url" do
+      @agent.options['search_url'] = 'https://twitter.com/'
+      expect(@agent).not_to be_valid
+
+      @agent.options['search_url'] = 'https://twitter.com/{q}'
+      expect(@agent).to be_valid
+    end
   end
 end
