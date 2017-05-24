@@ -14,6 +14,8 @@ module Agents
       You may set `window_duration_in_days` to change the default memory window length of `14` days, `min_peak_spacing_in_days` to change the default minimum peak spacing of `2` days (peaks closer together will be ignored), and `std_multiple` to change the default standard deviation threshold multiple of `3`.
 
       You may set `min_events` for the minimal number of accumulated events before the agent starts detecting.
+
+      You may set `search_url` to point to something else than Twitter search. Default value is `https://twitter.com/search?q=%{q}` where `%{q}` will be replaced with group name.
     MD
 
     event_description <<-MD
@@ -40,6 +42,7 @@ module Agents
         'value_path' => "count",
         'message' => "A peak of {{count}} was found in {{filter}}",
         'min_events' => '4',
+        'search_url' => 'https://twitter.com/search?q=%{q}'
       }
     end
 

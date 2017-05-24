@@ -9,7 +9,7 @@ describe Agents::PeakDetectorAgent do
           'group_by_path' => "filter",
           'value_path' => "count",
           'message' => "A peak was found",
-          'min_events' => "4",
+          'min_events' => "4"
         }
     }
 
