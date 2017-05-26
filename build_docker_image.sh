@@ -17,3 +17,7 @@ if [[ -n "${DOCKER_USER}" && "${TRAVIS_PULL_REQUEST}" = 'false' && "${TRAVIS_BRA
 else
   echo "Docker image are only pushed for builds of the master branch when Docker Hub credentials are present."
 fi
+
+if [[ $DOCKER_IMAGE == "huginn/huginn" ]]; then
+  DOCKER_IMAGE=huginn/huginn-test DOCKERFILE=docker/test/Dockerfile ./build_docker_image.sh
+fi
