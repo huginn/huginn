@@ -161,8 +161,17 @@ module Agents
       end
     end
 
+    def parse_csv_options(mo)
+      options = {
+        col_sep: separator(mo),
+        headers: boolify(mo['with_header']),
+      }
+      options[:liberal_parsing] = true if CSV::DEFAULT_OPTIONS.key?(:liberal_parsing)
+      options
+    end
+
     def parse_csv(io, mo, array = nil)
-      CSV.new(io, col_sep: separator(mo), headers: boolify(mo['with_header'])).each do |row|
+      CSV.new(io, **parse_csv_options(mo)).each do |row|
         if block_given?
           yield get_payload(row, mo)
         else

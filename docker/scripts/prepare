@@ -27,7 +27,7 @@ $minimal_apt_get_install build-essential checkinstall git-core \
   libncurses5-dev libffi-dev libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev \
   graphviz libgraphviz-dev \
   libmysqlclient-dev libpq-dev libsqlite3-dev \
-  ruby2.3 ruby2.3-dev
+  ruby2.4 ruby2.4-dev
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 gem install --no-ri --no-rdoc bundler

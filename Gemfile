@@ -51,9 +51,9 @@ gem 'weibo_2', github: 'dsander/weibo_2', branch: 'master'
 gem 'google-api-client', '~> 0.7.1', require: 'google/api_client'
 
 # Twitter Agents
-gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
+gem 'twitter', github: 'sferik/twitter' # Must to be loaded before cantino-twitter-stream.
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
-gem 'omniauth-twitter', '~> 1.2.1'
+gem 'omniauth-twitter', '~> 1.3.0'
 
 # Tumblr Agents
 gem 'tumblr_client', github: 'tumblr/tumblr_client', branch: 'master', ref: '0c59b04e49f2a8c89860613b18cf4e8f978d8dc7'  # '>= 0.8.5'
@@ -122,7 +122,7 @@ gem 'rufus-scheduler', '~> 3.3.2', require: false
 gem 'sass-rails', '~> 5.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
-gem 'therubyracer', '~> 0.12.2'
+gem 'therubyracer', '~> 0.12.3'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '~> 2.7.2'
 
@@ -162,7 +162,7 @@ group :development do
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'
     gem 'vcr'
-    gem 'webmock', '~> 1.17.4', require: false
+    gem 'webmock', '~> 2.3'
   end
 end
 
