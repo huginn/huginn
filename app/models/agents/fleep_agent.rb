@@ -9,7 +9,7 @@ module Agents
     description <<-MD
       The Fleep Agent sends messages to a Fleep conversation
 
-      To authenticate you need to set the `fleep_conversation_webhook_url`, you can get one by configuring a generic webhook like described here: https://fleep.io/blog/integrations/webhooks/
+      To authenticate you need to set the `fleep_conversation_webhook_url`, you can get one by configuring a generic webhook like described here: [Fleep Webhooks](https://fleep.io/blog/integrations/webhooks/)
 
       You can provide a `user` and a `message`.
 
