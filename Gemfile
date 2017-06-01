@@ -133,7 +133,7 @@ group :development do
   gem 'guard-livereload', '~> 2.5.1'
   gem 'guard-rspec', '~> 4.6.4'
   gem 'rack-livereload', '~> 0.3.16'
-  gem 'letter_opener_web', '~> 1.3.0'
+  gem 'letter_opener_web', '~> 1.3.1'
   gem 'web-console', '>= 3.3.0'
 
   gem 'capistrano', '~> 3.4.0'
