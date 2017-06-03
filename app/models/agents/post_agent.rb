@@ -66,6 +66,7 @@ module Agents
       {
         'post_url' => "http://www.example.com",
         'expected_receive_period_in_days' => '1',
+        'expected_update_period_in_days' => '1',
         'content_type' => 'form',
         'method' => 'post',
         'payload' => {
@@ -79,7 +80,17 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      return false if recent_error_logs?
+
+      if interpolated['expected_update_period_in_days'].present?
+        return false unless event_created_within?(interpolated['expected_update_period_in_days'])
+      end
+
+      if interpolated['expected_receive_period_in_days'].present?
+        return false unless last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago
+      end
+
+      true
     end
 
     def method
@@ -87,8 +98,8 @@ module Agents
     end
 
     def validate_options
-      unless options['post_url'].present? && options['expected_receive_period_in_days'].present?
-        errors.add(:base, "post_url and expected_receive_period_in_days are required fields")
+      unless options['post_url'].present?
+        errors.add(:base, "post_url is a required field")
       end
 
       if options['payload'].present? && %w[get delete].include?(method) && !options['payload'].is_a?(Hash)
