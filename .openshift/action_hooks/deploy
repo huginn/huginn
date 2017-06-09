@@ -1,0 +1,120 @@
+#!/bin/bash -l
+# This deploy hook gets executed after dependencies are resolved and the
+# build hook has been run but before the application has been started back
+# up again.  This script gets executed directly, so it could be python, php,
+# ruby, etc.
+
+ruby_version="2.4.0"
+set -x -e
+
+##########################################
+foreman_control="$OPENSHIFT_FOREMAN_DIR"/bin/control
+if grep -q "scl enable ruby" "$foreman_control"; then
+    echo "Patching Foreman"
+    sed -r -i -e "s#^ *scl enable ruby.+foreman start.+\$#    unset GEM_HOME\n    . \"\$OPENSHIFT_DATA_DIR\"/rvm/scripts/rvm\n    rvm use ruby-${ruby_version}\n    bundle exec \"foreman start --root=\$OPENSHIFT_REPO_DIR\" > \$OPENSHIFT_FOREMAN_LOG_DIR/foreman.log 2>\&1 \&#" "$foreman_control"
+fi
+
+##########################################
+echo "Setting up environment"
+
+pushd ${OPENSHIFT_REPO_DIR} > /dev/null
+
+cp -a -f .env.example .env
+
+sed -r -i -e "s/^ *DOMAIN *=.+/DOMAIN=${OPENSHIFT_APP_DNS}:80/" \
+          -e "s/^ *PORT *=.+/PORT=80/" .env
+
+sed -r -i -e "s/^ *DATABASE_ENCODING *=.+/DATABASE_ENCODING=utf8/" \
+          -e "s/^ *DATABASE_NAME *=.+/DATABASE_NAME=${OPENSHIFT_APP_NAME}/" \
+          -e "s/^ *DATABASE_USERNAME *=.+/DATABASE_USERNAME=${OPENSHIFT_MYSQL_DB_USERNAME}/" \
+          -e "s/^ *DATABASE_PASSWORD *=.+/DATABASE_PASSWORD=${OPENSHIFT_MYSQL_DB_PASSWORD}/" \
+          -e "s/^#? *DATABASE_HOST *=.+/DATABASE_HOST=${OPENSHIFT_MYSQL_DB_HOST}/" \
+          -e "s/^#? *DATABASE_PORT *=.+/DATABASE_PORT=${OPENSHIFT_MYSQL_DB_PORT}/" \
+          -e "s#^\#? *DATABASE_SOCKET *=.+#DATABASE_SOCKET=${OPENSHIFT_MYSQL_DB_SOCKET}#" .env
+
+# Just for completeness; not strictly necessary
+sed -r -i -e "s/^ *APP_SECRET_TOKEN *=.+/APP_SECRET_TOKEN=${APP_SECRET_TOKEN}/" \
+          -e "s/^#? *RAILS_ENV *=.+/RAILS_ENV=production/" \
+          -e "s/^ *INVITATION_CODE *=.+/INVITATION_CODE=${INVITATION_CODE}/" .env
+
+sed -r -i -e "s/^ *SMTP_DOMAIN *=.+/SMTP_DOMAIN=${SMTP_DOMAIN}/" \
+          -e "s/^ *SMTP_USER_NAME *=.+/SMTP_USER_NAME=${SMTP_USER_NAME}/" \
+          -e "s/^ *SMTP_PASSWORD *=.+/SMTP_PASSWORD=${SMTP_PASSWORD}/" \
+          -e "s/^ *SMTP_SERVER *=.+/SMTP_SERVER=${SMTP_SERVER}/" \
+          -e "s/^ *EMAIL_FROM_ADDRESS *=.+/EMAIL_FROM_ADDRESS=${SMTP_USER_NAME}/" .env
+
+chmod ugo+r ${OPENSHIFT_REPO_DIR}/.env
+
+source ${OPENSHIFT_REPO_DIR}/.env
+
+mkdir -p log tmp/pids tmp/sockets
+
+cp -a -f config/unicorn.rb.example config/unicorn.rb
+
+echo "jobs: bundle exec rails runner bin/threaded.rb" > Procfile
+echo "web: bundle exec unicorn -c config/unicorn.rb" >> Procfile
+
+sed -r -i -e "s#^ *set :deploy_to.+#set :deploy_to, '${OPENSHIFT_REPO_DIR}'#" config/deploy.rb
+
+sed -r -i -e "s#/home/huginn/huginn/#${OPENSHIFT_REPO_DIR}#" \
+          -e "s/0.0.0.0:80/${OPENSHIFT_NGINX_IP}:${OPENSHIFT_NGINX_PORT}/" \
+          -e "s/^( *listen \[::\].*)/#\1/" \
+          -e "s/YOUR_SERVER_FQDN/${OPENSHIFT_APP_DNS}/" \
+          -e "s#/var/log/nginx/#${OPENSHIFT_NGINX_DIR}logs/#" \
+          -e "s/^( *gzip_static on.*)/#\1/" deployment/nginx/huginn
+
+ln -sf deployment/nginx/huginn nginx.conf
+
+##########################################
+unset GEM_HOME
+export GNUPGHOME="$OPENSHIFT_DATA_DIR"/gpg
+
+if [ ! -f "$OPENSHIFT_DATA_DIR"/rvm/scripts/rvm ]; then
+  echo "Installing mpapis public key"
+  mkdir -p "$GNUPGHOME"
+  chmod 700 "$GNUPGHOME"
+  \curl -sSL https://rvm.io/mpapis.asc | gpg --import -
+
+  set +x +e
+  echo "Installing RVM and Ruby"
+  \curl -sSL https://get.rvm.io | bash -s stable --path "$OPENSHIFT_DATA_DIR"/rvm
+  . "$OPENSHIFT_DATA_DIR"/rvm/scripts/rvm
+
+  sed -i "$OPENSHIFT_DATA_DIR"/rvm/scripts/functions/detect_system -e 's/-RedHat/-CentOS/'
+  cat >> "$OPENSHIFT_DATA_DIR"/rvm/scripts/functions/requirements/centos <<EOF
+  requirements_centos_before_update() { return 0; }
+  requirements_centos_libs_install() { return 0; }
+  requirements_centos_before_install_epel() { return 0; }
+  requirements_centos_before_update_check_epel() { return 0; }
+EOF
+
+  rvm install ruby-${ruby_version}
+else
+  set +x +e
+  . "$OPENSHIFT_DATA_DIR"/rvm/scripts/rvm
+fi
+
+rvm use ruby-${ruby_version}
+set -x -e
+
+resolv_rb="$OPENSHIFT_DATA_DIR"/rvm/rubies/ruby-${ruby_version}/lib/ruby/${ruby_version}/resolv.rb
+if ! grep -q "OPENSHIFT_NGINX_IP" $resolv_rb; then
+    echo "Patching resolv.rb"
+    sed -r -i -e 's/^( *def +self.bind_random_port.+)/\1\n      bind_host = ENV["OPENSHIFT_NGINX_IP"] || "0.0.0.0"/' \
+        -e 's/^( *bind_host *= *)"0.0.0.0"(.*)/\1ENV["OPENSHIFT_NGINX_IP"] || "0.0.0.0"\2/' $resolv_rb
+fi
+
+[ -f "$OPENSHIFT_DATA_DIR"/rvm/gems/ruby-${ruby_version}/bin/bundle ] || gem install rake bundler --no-ri --no-rdoc
+
+##########################################
+echo "Installing gems"
+bundle install --deployment --without development test
+set +x +e
+##########################################
+echo "Migrating"
+bundle exec rake db:migrate RAILS_ENV=production
+
+echo "Compiling assets"
+bundle exec rake assets:precompile RAILS_ENV=production
+
+popd > /dev/null
