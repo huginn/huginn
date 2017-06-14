@@ -4,7 +4,7 @@ module Agents
     cannot_be_scheduled!
 
     description <<-MD
-      The DeDuplicationAgent receives a stream of events and remits the event if it is not a duplicate.
+      The De-duplication Agent receives a stream of events and remits the event if it is not a duplicate.
 
       `property` the value that should be used to determine the uniqueness of the event (empty to use the whole payload)
 
@@ -29,10 +29,10 @@ module Agents
     form_configurable :lookback
     form_configurable :expected_update_period_in_days
 
-    before_create :initialize_memory
+    after_initialize :initialize_memory
 
     def initialize_memory
-      memory['properties'] = []
+      memory['properties'] ||= []
     end
 
     def validate_options

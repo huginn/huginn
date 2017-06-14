@@ -1,0 +1,19 @@
+<div id="enable-disable-agents" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="enableAgentLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Confirm</h4>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <%= form_for(scenario, as: :scenario, url: enable_or_disable_all_agents_scenario_path(scenario), method: 'PUT') do |f| %>
+          <%= f.hidden_field :disabled, value: '', id: "scenario-disabled-value" %>
+          <%= f.button 'No', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
+          <%= f.submit 'Yes', class: 'btn btn-primary' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

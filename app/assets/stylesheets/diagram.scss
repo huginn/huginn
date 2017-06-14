@@ -1,0 +1,26 @@
+.agent-diagram {
+  position: relative;
+  z-index: auto;
+
+  svg.diagram {
+    position: absolute;
+    z-index: 1;
+  }
+
+  .overlay-container {
+    z-index: auto;
+
+    .overlay {
+      z-index: auto;
+      width: 100%;
+      height: 100%;
+
+      .badge {
+        position: absolute;
+        display: none;
+        color: white !important;
+        z-index: 2;
+      }
+    }
+  }
+}

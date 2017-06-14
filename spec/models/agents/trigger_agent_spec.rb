@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::TriggerAgent do
   before do
@@ -56,6 +56,27 @@ describe Agents::TriggerAgent do
 
       @checker.options['keep_event'] = 'tralse'
       expect(@checker).not_to be_valid
+    end
+
+    it "validates that 'must_match' is a positive integer, not greater than the number of rules, if provided" do
+      @checker.options['must_match'] = '1'
+      expect(@checker).to be_valid
+
+      @checker.options['must_match'] = '0'
+      expect(@checker).not_to be_valid
+
+      @checker.options['must_match'] = 'wrong'
+      expect(@checker).not_to be_valid
+
+      @checker.options['must_match'] = ''
+      expect(@checker).to be_valid
+
+      @checker.options.delete('must_match')
+      expect(@checker).to be_valid
+
+      @checker.options['must_match'] = '2'
+      expect(@checker).not_to be_valid
+      expect(@checker.errors[:base].first).to match(/equal to or less than the number of rules/)
     end
 
     it "should validate the three fields in each rule" do
@@ -249,6 +270,28 @@ describe Agents::TriggerAgent do
       }.to change { Event.count }.by(1)
     end
 
+    it "handles array of `not in` comparisons" do
+      @event.payload['foo']['bar']['baz'] = "hello world"
+      @checker.options['rules'].first['type'] = "not in"
+      @checker.options['rules'].first['value'] = ["hello world", "hello world"]
+
+      expect {
+        @checker.receive([@event])
+      }.not_to change { Event.count }
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello world"]
+
+      expect {
+        @checker.receive([@event])
+      }.not_to change { Event.count }
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello here"]
+
+      expect {
+        @checker.receive([@event])
+      }.to change { Event.count }.by(1)
+    end
+
     it "does fine without dots in the path" do
       @event.payload = { 'hello' => "world" }
       @checker.options['rules'].first['type'] = "field==value"
@@ -283,23 +326,59 @@ describe Agents::TriggerAgent do
       }.to change { Event.count }.by(2)
     end
 
-    it "handles ANDing rules together" do
-      @checker.options['rules'] << {
-        'type' => "field>=value",
-        'value' => "4",
-        'path' => "foo.bing"
-      }
+    describe "with multiple rules" do
+      before do
+        @checker.options['rules'] << {
+          'type' => "field>=value",
+          'value' => "4",
+          'path' => "foo.bing"
+        }
+      end
 
-      @event.payload['foo']["bing"] = "5"
+      it "handles ANDing rules together" do
+        @event.payload['foo']["bing"] = "5"
 
-      expect {
-        @checker.receive([@event])
-      }.to change { Event.count }.by(1)
+        expect {
+          @checker.receive([@event])
+        }.to change { Event.count }.by(1)
 
-      @checker.options['rules'].last['value'] = 6
-      expect {
-        @checker.receive([@event])
-      }.not_to change { Event.count }
+        @event.payload['foo']["bing"] = "2"
+
+        expect {
+          @checker.receive([@event])
+        }.not_to change { Event.count }
+      end
+
+      it "can accept a partial rule set match when 'must_match' is present and less than the total number of rules" do
+        @checker.options['must_match'] = "1"
+
+        @event.payload['foo']["bing"] = "5" # 5 > 4
+
+        expect {
+          @checker.receive([@event])
+        }.to change { Event.count }.by(1)
+
+        @event.payload['foo']["bing"] = "2" # 2 !> 4
+
+        expect {
+          @checker.receive([@event])
+        }.to change { Event.count }         # but the first one matches
+
+
+        @checker.options['must_match'] = "2"
+
+        @event.payload['foo']["bing"] = "5" # 5 > 4
+
+        expect {
+          @checker.receive([@event])
+        }.to change { Event.count }.by(1)
+
+        @event.payload['foo']["bing"] = "2" # 2 !> 4
+
+        expect {
+          @checker.receive([@event])
+        }.not_to change { Event.count }     # only 1 matches, we needed 2
+      end
     end
 
     describe "when 'keep_event' is true" do

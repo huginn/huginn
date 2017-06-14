@@ -1,0 +1,18 @@
+<!-- Nav tabs -->
+<ul id="resultTabs" class="nav nav-tabs agent-dry-run-tabs" role="tablist">
+  <li role="presentation" class="<%= @results[:events].empty? ? '' : 'active' %>"><a href="#tabEvents" aria-controls="tabEvents" role="tab" data-toggle="tab">Events</a></li>
+  <li role="presentation" class="<%= @results[:events].empty? ? 'active' : '' %>"><a href="#tabLog" aria-controls="tabLog" role="tab" data-toggle="tab">Log</a></li>
+  <li role="presentation"><a href="#tabMemory" aria-controls="tabMemory" role="tab" data-toggle="tab">Memory</a></li>
+</ul>
+<!-- Tab panes -->
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane <%= @results[:events].empty? ? '' : 'active' %>" id="tabEvents">
+    <pre class="agent-dry-run-events"><%= Utils.pretty_print(@results[:events], false) %></pre>
+  </div>
+  <div role="tabpanel" class="tab-pane <%= @results[:events].empty? ? 'active' : ''%>" id="tabLog">
+    <pre><small class="agent-dry-run-log"><%= @results[:log] %></small></pre>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="tabMemory">
+    <pre class="agent-dry-run-memory"><%= Utils.pretty_print(@results[:memory], false) %></pre>
+  </div>
+</div>

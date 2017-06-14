@@ -1,0 +1,15 @@
+<p>
+  Data for this Agent is available at these URLs:
+</p>
+
+
+<ul>
+  <% url = lambda { |format| web_requests_url(:agent_id => @agent.id, :user_id => current_user.id, :secret => @agent.options['secret'], :format => format) } %>
+  <li><%= link_to url.call(:html), url.call(:html), :target => :blank %></li>
+  <li><%= link_to url.call(:json), url.call(:json), :target => :blank %></li>
+  <li><%= link_to url.call(:xml), url.call(:xml), :target => :blank %></li>
+</ul>
+
+<p>
+  ... or any other extension you wish, as the extension does not change the content or mime type.
+</p>

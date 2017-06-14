@@ -1,4 +1,4 @@
-class AdoptXpathInWebsiteAgent < ActiveRecord::Migration
+class AdoptXpathInWebsiteAgent < ActiveRecord::Migration[4.2]
   class Agent < ActiveRecord::Base
     include JSONSerializedField
     json_serialize :options
@@ -15,7 +15,7 @@ class AdoptXpathInWebsiteAgent < ActiveRecord::Migration
       agent.options['extract'].each { |name, extraction|
         case
         when extraction.delete('text')
-          extraction['value'] = './/text()'
+          extraction['value'] = 'string(.)'
         when attr = extraction.delete('attr')
           extraction['value'] = "@#{attr}"
         end

@@ -12,32 +12,47 @@ class AgentsExporter
 
   def as_json(opts = {})
     {
-      :name => options[:name].presence || 'No name provided',
-      :description => options[:description].presence || 'No description provided',
-      :source_url => options[:source_url],
-      :guid => options[:guid],
-      :tag_fg_color => options[:tag_fg_color],
-      :tag_bg_color => options[:tag_bg_color],
-      :exported_at => Time.now.utc.iso8601,
-      :agents => agents.map { |agent| agent_as_json(agent) },
-      :links => links
+      schema_version: 1,
+      name: options[:name].presence || 'No name provided',
+      description: options[:description].presence || 'No description provided',
+      source_url: options[:source_url],
+      guid: options[:guid],
+      tag_fg_color: options[:tag_fg_color],
+      tag_bg_color: options[:tag_bg_color],
+      icon: options[:icon],
+      exported_at: Time.now.utc.iso8601,
+      agents: agents.map { |agent| agent_as_json(agent) },
+      links: links,
+      control_links: control_links
     }
   end
 
   def agents
-    options[:agents].to_a
+    options[:agents].sort_by{|agent| agent.guid}.to_a
   end
 
   def links
     agent_ids = agents.map(&:id)
 
     contained_links = agents.map.with_index do |agent, index|
-      agent.links_as_source.where(:receiver_id => agent_ids).map do |link|
-        { :source => index, :receiver => agent_ids.index(link.receiver_id) }
+      agent.links_as_source.where(receiver_id: agent_ids).map do |link|
+        { source: index, receiver: agent_ids.index(link.receiver_id) }
       end
     end
 
     contained_links.flatten.compact
+  end
+
+  def control_links
+    agent_ids = agents.map(&:id)
+
+    contained_controller_links = agents.map.with_index do |agent, index|
+      agent.control_links_as_controller.where(control_target_id: agent_ids).map do |control_link|
+        { controller: index, control_target: agent_ids.index(control_link.control_target_id) }
+      end
+    end
+
+    contained_controller_links.flatten.compact
   end
 
   def agent_as_json(agent)

@@ -5,7 +5,7 @@ module Agents
     cannot_create_events!
 
     description <<-MD
-      This agent is triggered by schedule or an incoming event and commands other agents ("targets") to run, disable, configure, or enable themselves.
+      The Commander Agent is triggered by schedule or an incoming event, and commands other agents ("targets") to run, disable, configure, or enable themselves.
 
       # Action types
 
@@ -19,9 +19,9 @@ module Agents
 
       * `configure`: Target Agents have their options updated with the contents of `configure_options`.
 
-      Here's a tip: you can use Liquid templating to dynamically determine the action type.  For example:
+      Here's a tip: you can use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating to dynamically determine the action type.  For example:
 
-      - To create a CommanderAgent that receives an event from a WeatherAgent every morning to kick an agent flow that is only useful in a nice weather, try this: `{% if conditions contains 'Sunny' or conditions contains 'Cloudy' %}run{% endif %}`
+      - To create a CommanderAgent that receives an event from a WeatherAgent every morning to kick an agent flow that is only useful in a nice weather, try this: `{% if conditions contains 'Sunny' or conditions contains 'Cloudy' %}` `run{% endif %}`
 
       - Likewise, if you have a scheduled agent flow specially crafted for rainy days, try this: `{% if conditions contains 'Rain' %}enable{% else %}disabled{% endif %}`
 
@@ -36,7 +36,7 @@ module Agents
       true
     end
 
-    def check!
+    def check
       control!
     end
 

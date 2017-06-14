@@ -3,12 +3,14 @@ require 'json'
 module Agents
   class GoogleCalendarPublishAgent < Agent
     cannot_be_scheduled!
+    no_bulk_receive!
 
     gem_dependency_check { defined?(Google) && defined?(Google::APIClient) }
 
     description <<-MD
+      The Google Calendar Publish Agent creates events on your Google Calendar.
+
       #{'## Include `google-api-client` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The GoogleCalendarPublishAgent creates events on your google calendar.
 
       This agent relies on service accounts, rather than oauth.
 
@@ -18,23 +20,22 @@ module Agents
       2. New project -> Huginn
       3. APIs & Auth -> Enable google calendar
       4. Credentials -> Create new Client ID -> Service Account
-      5. Persist the generated private key to a path, ie: `/home/hugin/a822ccdefac89fac6330f95039c492dfa3ce6843.p12`
+      5. Persist the generated private key to a path, ie: `/home/huginn/a822ccdefac89fac6330f95039c492dfa3ce6843.p12`
       6. Grant access via google calendar UI to the service account email address for each calendar you wish to manage. For a whole google apps domain, you can [delegate authority](https://developers.google.com/+/domains/authentication/delegation)
 
 
       Agent Configuration:
 
-      `calendar_id` - The id the calendar you want to publish to. Typically your google account email address.
+      `calendar_id` - The id the calendar you want to publish to. Typically your google account email address.  Liquid formatting (e.g. `{{ cal_id }}`) is allowed here in order to extract the calendar_id from the incoming event.
 
       `google` A hash of configuration options for the agent.
 
       `google` `service_account_email` - The authorised service account.
 
-      `google` `key_file` - The path to the key file.
+      `google` `key_file` OR `google` `key` - The path to the key file or the key itself.  [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) formatting is supported if you want to use a Credential.  (E.g., `{% credential google_key %}`)
 
       `google` `key_secret` - The secret for the key, typically 'notasecret'
 
-      
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -90,11 +91,12 @@ module Agents
     end
 
     def receive(incoming_events)
-     incoming_events.each do |event|
-        calendar = GoogleCalendar.new(options, Rails.logger)
+      require 'google_calendar'
+      incoming_events.each do |event|
+        calendar = GoogleCalendar.new(interpolate_options(options, event), Rails.logger)
 
-        calendar_event = JSON.parse(calendar.publish_as(options['calendar_id'], event.payload["message"]).response.body)
-  
+        calendar_event = JSON.parse(calendar.publish_as(interpolated(event)['calendar_id'], event.payload["message"]).response.body)
+
         create_event :payload => {
           'success' => true,
           'published_calendar_event' => calendar_event,

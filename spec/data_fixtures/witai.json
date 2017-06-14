@@ -1,0 +1,27 @@
+{
+  "msg_id":"x",
+  "_text":"x",
+  "outcomes": [
+    {
+      "_text": "set the temperature to 22 degrees at 7 PM",
+      "intent": "get_temparature",
+      "entities": {
+        "datetime": [
+          {
+            "grain": "hour",
+            "type": "value",
+            "value": "2015-03-27T21:00:00.000-07:00"
+          }
+        ],
+        "temperature": [
+          {
+            "type": "value",
+            "value": 34,
+            "unit": "degree"
+          }
+        ]
+      },
+      "confidence": 0.554
+    }
+  ]
+}

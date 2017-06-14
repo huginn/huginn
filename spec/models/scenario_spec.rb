@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Scenario do
   let(:new_instance) { users(:bob).scenarios.build(:name => "some scenario") }
@@ -62,6 +62,37 @@ describe Scenario do
       expect {
         new_instance.destroy
       }.to change { users(:bob).reload.scenario_count }.by(-1)
+    end
+  end
+
+  context '#unique_agents' do
+    it "equals agents when no agents are shared" do
+      agent_ids        = scenarios(:bob_weather).agents.map(&:id).sort
+      unique_agent_ids = scenarios(:bob_weather).send(:unique_agent_ids).sort
+      expect(agent_ids).to eq(unique_agent_ids)
+    end
+
+    it "includes only agents that are not present in two scnearios" do
+      unique_agent_ids = scenarios(:jane_weather).send(:unique_agent_ids)
+      expect(unique_agent_ids).to eq([agents(:jane_rain_notifier_agent).id])
+    end
+
+    it "returns no agents when all are also used in a different scenario" do
+      expect(scenarios(:jane_weather_duplicate).send(:unique_agent_ids)).to eq([])
+    end
+  end
+
+  context '#destroy_with_mode' do
+    it "only destroys the scenario when no mode is passed" do
+      expect { scenarios(:jane_weather).destroy_with_mode('') }.not_to change(Agent, :count)
+    end
+
+    it "only destroys unique agents when 'unique_agents' is passed" do
+      expect { scenarios(:jane_weather).destroy_with_mode('unique_agents') }.to change(Agent, :count).by(-1)
+    end
+
+    it "destroys all agents when 'all_agents' is passed" do
+      expect { scenarios(:jane_weather).destroy_with_mode('all_agents') }.to change(Agent, :count).by(-2)
     end
   end
 end

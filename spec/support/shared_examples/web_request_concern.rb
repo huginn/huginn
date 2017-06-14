@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 shared_examples_for WebRequestConcern do
   let(:agent) do
@@ -140,6 +140,50 @@ shared_examples_for WebRequestConcern do
     it "should not disable SSL verification if disable_ssl_verification option is false" do
       agent.options['disable_ssl_verification'] = false
       expect(agent.faraday.ssl.verify).to eq(true)
+    end
+
+    it "should use faradays default params_encoder" do
+      expect(agent.faraday.options.params_encoder).to eq(nil)
+      agent.options['disable_url_encoding'] = 'false'
+      expect(agent.faraday.options.params_encoder).to eq(nil)
+      agent.options['disable_url_encoding'] = false
+      expect(agent.faraday.options.params_encoder).to eq(nil)
+    end
+
+    it "should use WebRequestConcern::DoNotEncoder when disable_url_encoding is truthy" do
+      agent.options['disable_url_encoding'] = true
+      expect(agent.faraday.options.params_encoder).to eq(WebRequestConcern::DoNotEncoder)
+      agent.options['disable_url_encoding'] = 'true'
+      expect(agent.faraday.options.params_encoder).to eq(WebRequestConcern::DoNotEncoder)
+    end
+
+    describe "redirect follow" do
+      it "should use FollowRedirects by default" do
+        expect(agent.faraday.builder.handlers).to include(FaradayMiddleware::FollowRedirects)
+      end
+
+      it "should not use FollowRedirects when disabled" do
+        agent.options['disable_redirect_follow'] = true
+        expect(agent.faraday.builder.handlers).not_to include(FaradayMiddleware::FollowRedirects)
+      end
+    end
+  end
+
+  describe WebRequestConcern::DoNotEncoder do
+    it "should not encode special characters" do
+      expect(WebRequestConcern::DoNotEncoder.encode('GetRss?CategoryNr=39207' => 'test')).to eq('GetRss?CategoryNr=39207=test')
+    end
+
+    it "should work without a value present" do
+      expect(WebRequestConcern::DoNotEncoder.encode('GetRss?CategoryNr=39207' => nil)).to eq('GetRss?CategoryNr=39207')
+    end
+
+    it "should work without an empty value" do
+      expect(WebRequestConcern::DoNotEncoder.encode('GetRss?CategoryNr=39207' => '')).to eq('GetRss?CategoryNr=39207=')
+    end
+
+    it "should return the value when decoding" do
+      expect(WebRequestConcern::DoNotEncoder.decode('val')).to eq(['val'])
     end
   end
 end

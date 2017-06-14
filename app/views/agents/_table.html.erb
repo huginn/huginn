@@ -1,7 +1,9 @@
 <div class='table-responsive'>
   <table class='table table-striped'>
     <tr>
+      <th></th>
       <th><%= sortable_column 'name', 'asc' %></th>
+      <th><%= sortable_column 'created_at', 'desc', name: 'Age' %></th>
       <th>Schedule</th>
       <th><%= sortable_column 'last_check_at', name: 'Last Check' %></th>
       <th><%= sortable_column 'last_event_at', name: 'Last Event Out' %></th>
@@ -14,7 +16,10 @@
     <% @agents.each do |agent| %>
       <tr>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
-          <%= link_to agent.name, agent_path(agent) %>
+          <%= agent_type_icon(agent, @agents) %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <%= link_to agent.name, agent_path(agent, return: (defined?(return_to) && return_to) || request.path) %>
           <br/>
           <span class='text-muted'><%= agent.short_type.titleize %></span>
           <% if agent.scenarios.present? %>
@@ -22,6 +27,9 @@
               <%= scenario_links(agent) %>
             </span>
           <% end %>
+        </td>
+        <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
+          <%= time_ago_in_words agent.created_at %>
         </td>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_be_scheduled? %>
@@ -53,7 +61,7 @@
         </td>
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <% if agent.can_create_events? %>
-            <%= link_to(agent.events_count || 0, agent_events_path(agent)) %>
+            <%= link_to(agent.events_count || 0, agent_events_path(agent, return: (defined?(return_to) && return_to) || request.path)) %>
           <% else %>
             <span class='not-applicable'></span>
           <% end %>
@@ -64,7 +72,7 @@
             <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
               <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
             </button>
-            <%= render 'agents/action_menu', :agent => agent, :returnTo => (defined?(returnTo) && returnTo) || "index" %>
+            <%= render 'agents/action_menu', agent: agent, return_to: (defined?(return_to) && return_to) || request.path %>
           </div>
         </td>
       </tr>

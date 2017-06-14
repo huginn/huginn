@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 shared_examples_for EmailConcern do
   let(:valid_options) {
@@ -35,7 +35,7 @@ shared_examples_for EmailConcern do
       expect(agent).not_to be_valid
     end
 
-    it "should validate that recipients, when provided, is one or more valid email addresses" do
+    it "should validate that recipients, when provided, is one or more valid email addresses or Liquid commands" do
       agent.options['recipients'] = ''
       expect(agent).to be_valid
 
@@ -46,6 +46,12 @@ shared_examples_for EmailConcern do
       expect(agent).to be_valid
 
       agent.options['recipients'] = ['bob@example.com']
+      expect(agent).to be_valid
+
+      agent.options['recipients'] = '{{ email }}'
+      expect(agent).to be_valid
+
+      agent.options['recipients'] = '{% if x %}a@x{% else %}b@y{% endif %}'
       expect(agent).to be_valid
 
       agent.options['recipients'] = ['bob@example.com', 'jane@example.com']

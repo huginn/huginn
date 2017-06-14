@@ -1,20 +1,59 @@
-sudo: false
+dist: trusty
+sudo: required
 language: ruby
+services:
+  - docker
+  - mysql
+  - postgresql
 env:
   global:
     - APP_SECRET_TOKEN=b2724973fd81c2f4ac0f92ac48eb3f0152c4a11824c122bcf783419a4c51d8b9bba81c8ba6a66c7de599677c7f486242cf819775c433908e77c739c5c8ae118d
+    - RSPEC_TASK=spec:nofeatures
+    - COVERALLS_PARALLEL=true
+    - secure: fzmSI7PQz6CJiIJNAtLAuy3TMmYCrK4bUil3uufh8JkHfpSGWOZt2i6fZ8yZ7pzwG5Aw7eZDgdFsNcEPJlgUDJhlwjg+QxCJslhotTQ9qI3Ieo85peWlU9dZFTOZcrCu0net/hY2FE4ZpTRb5r8A/DRv9ukA8P8tShhePCjckgg=
+    - secure: YjW07LpRSiC9xB6PhLQ4LVv2VphvF3IacV43PLfvzdagjy14yAwKXTUlSadgRaMbndB2dlCTe3YcY11a/xtX/2HDrF14NHPXQdL7e2dJUS3CDLSKZK26x1SOiaaDIrl1jO1xr5kOUd+564MAcNUzDTJQR4CrWl/5t6EwW4iYQVc=
+    - secure: RJiSTB9Anax6uL6mgYY1m42w71ohlsfIlVCk7ho6W19ZfSzQOfom0mBdeNwfgmXsMMnvnqatfxSg8k3C//pRtI/tjzAovHd7t1YIN1IkDNf9uSpzrIeXXc4fSHaVxnl512oI/eBQy9MSBjVZjrg5XEzLKKEGsZCai+ZKB4PS+nM=
   matrix:
     - DATABASE_ADAPTER=mysql2
-    - DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres ON_HEROKU=true
+    - DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
+    - DOCKER_IMAGE=cantino/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
+    - DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
+    - DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
+    - DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
+    - RSPEC_TASK=spec:features
+matrix:
+  exclude:
+    - env: DOCKER_IMAGE=cantino/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
+    - env: DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
+    - env: DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
+    - env: DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
+    - env: RSPEC_TASK=spec:features
+  include:
+    - rvm: 2.4.1
+      env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
+    - rvm: 2.4.1
+      env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
+    - rvm: 2.4.1
+      env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
+    - rvm: 2.4.1
+      env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
+    - rvm: 2.4.1
+      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
+    - rvm: 2.4.1
+      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
+    - rvm: 2.3.4
+      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
+    - rvm: 2.3.4
+      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
 rvm:
-- 2.0.0
-- 2.1.5
-- 2.2.0
+- 2.2
+- 2.3.4
+- 2.4.1
 cache: bundler
 bundler_args: --without development production
-before_script:
-- bundle exec rake db:create db:migrate
-script: bundle exec rake
+script:
+  - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec rake db:create db:migrate; else true; fi
+  - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec rake $RSPEC_TASK; else ./build_docker_image.sh; fi
 notifications:
   irc:
     channels:
@@ -23,9 +62,4 @@ notifications:
     - "<%{author}> %{branch} - %{commit} (%{commit_message}): %{message}"
     - 'Change view : %{compare_url}'
     - 'Build details : %{build_url}'
-  webhooks:
-    urls:
-      - https://webhooks.gitter.im/e/5f92cc0393c6f1defe0d
-    on_success: change  # options: [always|never|change] default: always
-    on_failure: always  # options: [always|never|change] default: always
-    on_start: false     # default: false
+  webhooks: https://coveralls.io/webhook?repo_token=COVERALLS_REPO_TOKEN

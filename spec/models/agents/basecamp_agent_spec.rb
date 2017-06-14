@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'models/concerns/oauthable'
 
 describe Agents::BasecampAgent do

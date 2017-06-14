@@ -1,39 +1,42 @@
 #!/bin/bash
 set -e
 
-# Initialize variables used by Huginn at installation time
-
-# Huginn is 12factor aware, embrace that fact for use inside of docker
-ON_HEROKU=${ON_HEROKU:-true}
-
-# Shallow clone the huginn project repo
-git clone --depth 1 https://github.com/cantino/huginn /app
-
 cd /app
 
-# add a huginn group and user
-adduser --group huginn
-adduser --disabled-login --ingroup huginn --gecos 'Huginn' --no-create-home --home /app huginn
-adduser huginn sudo
-passwd -d huginn
+export LC_ALL=en_US.UTF-8
 
-# Change the ownership to huginn
-chown -R huginn:huginn /app
-
-# create required tmp and log directories
+# Ensure the huginn user has access to the required directories
 sudo -u huginn -H mkdir -p tmp/pids tmp/cache tmp/sockets log
-chmod -R u+rwX log tmp
+sudo -u huginn -H touch log/production.log
+# Get rid of annoying "fatal: Not a git repository (or any of the parent directories): .git" messages
+sudo -u huginn -H git init
 
-# install gems required by Huginn, use local cache if available
-if [ -d "/scripts/cache" ]; then
-  mv /scripts/cache vendor/
-  chown -R huginn:huginn vendor/cache
-fi
-sudo -u huginn -H bundle install --deployment --without development test
+# HACK: We need a database connection to precompile the assets, use sqlite for that
+cp Gemfile Gemfile.bak
+echo "gem 'sqlite3', '~> 1.3.11'" >> /app/Gemfile
+RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle install --without test development --path vendor/bundle -j 4
+RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle exec rake assets:clean assets:precompile
 
-# silence setlocale message (THANKS DEBIAN!)
-cat > /etc/default/locale <<EOF
-LC_ALL=en_US.UTF-8
-LANG=en_US.UTF-8
+# Bundle again to get rid of the sqlite3 gem
+cp Gemfile.bak Gemfile
+RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=sqlite3 ON_HEROKU=true bundle install --without test development --path vendor/bundle -j 4
+chown huginn:huginn Gemfile.lock
+
+# Configure the unicorn server
+mv config/unicorn.rb.example config/unicorn.rb
+sed -ri 's/^listen .*$/listen ENV["PORT"]/' config/unicorn.rb
+sed -ri 's/^stderr_path.*$//' config/unicorn.rb
+sed -ri 's/^stdout_path.*$//' config/unicorn.rb
+
+# Add ENV variables to .env.example which are not present in it but usable
+cat >> /app/.env.example <<EOF
+ASSET_HOST=
+DEFAULT_SCENARIO_FILE=
+RAILS_SERVE_STATIC_FILES=
+SEED_EMAIL=
+SEED_PASSWORD=
+SEED_USERNAME=
+SMTP_OPENSSL_CA_FILE=
+SMTP_OPENSSL_CA_PATH=
+SMTP_OPENSSL_VERIFY_MODE=
 EOF
-

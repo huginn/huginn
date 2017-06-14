@@ -7,15 +7,23 @@ module Agents
     default_schedule "every_2m"
 
     description <<-MD
+      The Public Transport Request Agent generates Events based on NextBus GPS transit predictions.
+
       Specify the following user settings:
 
-      * stops (array)
       * agency (string)
+      * stops (array)
       * alert_window_in_minutes (integer)
 
-      This Agent generates Events based on NextBus GPS transit predictions.  First, select an agency by visiting [http://www.nextbus.com/predictor/agencySelector.jsp](http://www.nextbus.com/predictor/agencySelector.jsp) and finding your transit system.  Once you find it, copy the part of the URL after `?a=`.  For example, for the San Francisco MUNI system, you would end up on [http://www.nextbus.com/predictor/stopSelector.jsp?a=**sf-muni**](http://www.nextbus.com/predictor/stopSelector.jsp?a=sf-muni) and copy "sf-muni".  Put that into this Agent's agency setting.
+      First, select an agency by visiting [http://www.nextbus.com/predictor/adaAgency.jsp](http://www.nextbus.com/predictor/adaAgency.jsp) and finding your transit system.  Once you find it, copy the part of the URL after `?a=`.  For example, for the San Francisco MUNI system, you would end up on [http://www.nextbus.com/predictor/adaDirection.jsp?a=**sf-muni**](http://www.nextbus.com/predictor/adaDirection.jsp?a=sf-muni) and copy "sf-muni".  Put that into this Agent's agency setting.
 
-      Next, find the stop tags that you care about.  To find the tags for the sf-muni system, for the N route, visit this URL:
+      Next, find the stop tags that you care about. 
+
+      Select your destination and lets use the n-judah route. The link should be [http://www.nextbus.com/predictor/adaStop.jsp?a=sf-muni&r=N](http://www.nextbus.com/predictor/adaStop.jsp?a=sf-muni&r=N) Once you find it, copy the part of the URL after `r=`.
+
+      The link may not work, but we're just trying to get the part after the r=, so even if it gives an error, continue to the next step.
+
+      To find the tags for the sf-muni system, for the N route, visit this URL:
       [http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=sf-muni&r=**N**](http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=sf-muni&r=N)
 
       The tags are listed as tag="1234". Copy that number and add the route before it, separated by a pipe '&#124;' symbol.  Once you have one or more tags from that page, add them to this Agent's stop list.  E.g,

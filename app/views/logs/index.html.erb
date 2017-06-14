@@ -13,13 +13,13 @@
 
         <td>
           <div class="btn-group btn-group-xs">
-            <% if log.inbound_event_id.present? %>
+            <% if log.inbound_event.present? %>
               <%= link_to 'Event In', event_path(log.inbound_event), class: "btn btn-default" %>
             <% else %>
               <%= link_to 'Event In', '#', class: "btn btn-default disabled" %>
             <% end %>
 
-            <% if log.outbound_event_id.present? %>
+            <% if log.outbound_event.present? %>
               <%= link_to 'Event Out', event_path(log.outbound_event), class: "btn btn-default" %>
             <% else %>
               <%= link_to 'Event Out', '#', class: "btn btn-default disabled" %>

@@ -6,8 +6,9 @@ module Agents
     gem_dependency_check { defined?(MQTT) }
 
     description <<-MD
+      The MQTT Agent allows both publication and subscription to an MQTT topic.
+
       #{'## Include `mqtt` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The MQTT agent allows both publication and subscription to an MQTT topic.
 
       MQTT is a generic transport protocol for machine to machine communication.
 
@@ -30,7 +31,7 @@ module Agents
       Example configuration:
 
       <pre><code>{
-        'uri' => 'mqtts://user:pass@locahost:8883'
+        'uri' => 'mqtts://user:pass@localhost:8883'
         'ssl' => :TLSv1,
         'ca_file' => './ca.pem',
         'cert_file' => './client.crt',
@@ -81,7 +82,7 @@ module Agents
 
     def default_options
       {
-        'uri' => 'mqtts://user:pass@locahost:8883',
+        'uri' => 'mqtts://user:pass@localhost:8883',
         'ssl' => :TLSv1,
         'ca_file'  => './ca.pem',
         'cert_file' => './client.crt',
@@ -108,7 +109,7 @@ module Agents
     def receive(incoming_events)
       mqtt_client.connect do |c|
         incoming_events.each do |event|
-          c.publish(interpolated(event)['topic'], event)
+          c.publish(interpolated(event)['topic'], event.payload['message'])
         end
       end
     end

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 shared_examples_for LiquidInterpolatable do
   before(:each) do
@@ -30,7 +30,7 @@ shared_examples_for LiquidInterpolatable do
       })
     end
 
-    it "should work with arrays", focus: true do
+    it "should work with arrays" do
       @checker.options = {"value" => ["{{variable}}", "Much array", "Hey, {{hello_world}}"]}
       expect(@checker.interpolate_options(@checker.options, @event)).to eq({
         "value" => ["hello", "Much array", "Hey, Hello world"]
@@ -91,10 +91,11 @@ shared_examples_for LiquidInterpolatable do
         expect(@checker.interpolate_string("{% credential aws_key %}", {})).to eq('2222222222-jane')
       end
 
-      it "should raise an exception for undefined credentials" do
+      it "should not raise an exception for undefined credentials" do
         expect {
-          @checker.interpolate_string("{% credential unknown %}", {})
-        }.to raise_error
+          result = @checker.interpolate_string("{% credential unknown %}", {})
+          expect(result).to eq('')
+        }.not_to raise_error
       end
     end
 

@@ -6,6 +6,7 @@ module Agents
 
     description <<-MD
   		The Adioso Agent will tell you the minimum airline prices between a pair of cities, and within a certain period of time.
+
       The currency is USD. Please make sure that the difference between `start_date` and `end_date` is less than 150 days. You will need to contact [Adioso](http://adioso.com/)
   		for a `username` and `password`.
     MD

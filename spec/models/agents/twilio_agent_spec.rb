@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::TwilioAgent do
   before do
@@ -20,8 +20,8 @@ describe Agents::TwilioAgent do
     @event.save!
 
     @sent_messages = []
-    stub.any_instance_of(Agents::TwilioAgent).send_message { |message| @sent_messages << message}
-    stub.any_instance_of(Agents::TwilioAgent).make_call {}
+    stub.any_instance_of(Twilio::REST::Messages).create { |message| @sent_messages << message[:body]}
+    stub.any_instance_of(Twilio::REST::Calls).create
   end
 
   describe '#receive' do
@@ -51,7 +51,6 @@ describe Agents::TwilioAgent do
       @checker.receive([@event])
       expect(@checker.memory[:pending_calls]).not_to eq({})
     end
-
   end
 
   describe '#working?' do

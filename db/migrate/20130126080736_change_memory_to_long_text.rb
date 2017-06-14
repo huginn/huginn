@@ -1,6 +1,6 @@
 # PG allows arbitrarily long text fields but MySQL has default limits. Make those limits larger if we're using MySQL.
 
-class ChangeMemoryToLongText < ActiveRecord::Migration
+class ChangeMemoryToLongText < ActiveRecord::Migration[4.2]
   def up
     if mysql?
       change_column :agents, :memory, :text, :limit => 4294967295

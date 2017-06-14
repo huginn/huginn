@@ -11,7 +11,7 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: @event }
+      format.json { render json: @events }
     end
   end
 
@@ -24,14 +24,16 @@ class EventsController < ApplicationController
 
   def reemit
     @event.reemit!
-    redirect_to :back, :notice => "Event re-emitted"
+    respond_to do |format|
+      format.html { redirect_back event_path(@event), notice: 'Event re-emitted.' }
+    end
   end
 
   def destroy
     @event.destroy
 
     respond_to do |format|
-      format.html { redirect_to events_path }
+      format.html { redirect_back events_path, notice: 'Event deleted.' }
       format.json { head :no_content }
     end
   end

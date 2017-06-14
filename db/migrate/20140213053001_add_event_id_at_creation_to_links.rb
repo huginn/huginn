@@ -1,4 +1,4 @@
-class AddEventIdAtCreationToLinks < ActiveRecord::Migration
+class AddEventIdAtCreationToLinks < ActiveRecord::Migration[4.2]
   class Link < ActiveRecord::Base; end
   class Event < ActiveRecord::Base; end
 

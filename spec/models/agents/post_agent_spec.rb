@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'ostruct'
 
 describe Agents::PostAgent do
@@ -33,25 +33,35 @@ describe Agents::PostAgent do
     stub_request(:any, /:/).to_return { |request|
       method = request.method
       @requests += 1
-      @sent_requests[method] << req = OpenStruct.new(uri: request.uri)
+      @sent_requests[method] << req = OpenStruct.new(uri: request.uri, headers: request.headers)
       case method
       when :get, :delete
         req.data = request.uri.query
       else
-        case request.headers['Content-Type'][/\A[^;\s]+/]
+        content_type = request.headers['Content-Type'][/\A[^;\s]+/]
+        case content_type
         when 'application/x-www-form-urlencoded'
           req.data = request.body
         when 'application/json'
           req.data = ActiveSupport::JSON.decode(request.body)
+        when 'text/xml'
+          req.data = Hash.from_xml(request.body)
+        when Agents::PostAgent::MIME_RE
+          req.data = request.body
         else
           raise "unexpected Content-Type: #{content_type}"
         end
       end
-      { status: 200, body: "ok" }
+      { status: 200, body: "<html>a webpage!</html>", headers: { 'Content-type' => 'text/html' } }
     }
   end
 
   it_behaves_like WebRequestConcern
+  it_behaves_like 'FileHandlingConsumer'
+
+  it 'renders the description markdown without errors' do
+    expect { @checker.description }.not_to raise_error
+  end
 
   describe "making requests" do
     it "can make requests of each type" do
@@ -132,6 +142,36 @@ describe Agents::PostAgent do
       expect(uri.path).to eq('/a_variable')
       expect(uri.query).to eq("existing_param=existing_value")
     end
+
+    it "interpolates outgoing headers with the event payload" do
+      @checker.options['headers'] = {
+        "Foo" => "{{ variable }}"
+      }
+      @event.payload = {
+        'variable' => 'a_variable'
+      }
+      @checker.receive([@event])
+      headers = @sent_requests[:post].first.headers
+      expect(headers["Foo"]).to eq("a_variable")
+    end
+
+    it 'makes a multipart request when receiving a file_pointer' do
+      WebMock.reset!
+      stub_request(:post, "http://www.example.com/").
+        with(headers: {
+               'Accept-Encoding' => 'gzip,deflate',
+               'Content-Type' => /\Amultipart\/form-data; boundary=/,
+               'User-Agent' => 'Huginn - https://github.com/cantino/huginn'
+        }) { |request|
+        qboundary = Regexp.quote(request.headers['Content-Type'][/ boundary=(.+)/, 1])
+        /\A--#{qboundary}\r\nContent-Disposition: form-data; name="default"\r\n\r\nvalue\r\n--#{qboundary}\r\nContent-Disposition: form-data; name="file"; filename="local.path"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n--#{qboundary}--\r\n\r\n\z/ === request.body
+      }.to_return(status: 200, body: "", headers: {})
+      event = Event.new(payload: {file_pointer: {agent_id: 111, file: 'test'}})
+      io_mock = mock()
+      mock(@checker).get_io(event) { StringIO.new("testdata") }
+      @checker.options['no_merge'] = true
+      @checker.receive([event])
+    end
   end
 
   describe "#check" do
@@ -152,6 +192,27 @@ describe Agents::PostAgent do
       expect(@sent_requests[:post][0].data).to eq(@checker.options['payload'])
     end
 
+    it "sends options['payload'] as XML as a POST request" do
+      @checker.options['content_type'] = 'xml'
+      expect {
+        @checker.check
+      }.to change { @sent_requests[:post].length }.by(1)
+
+      expect(@sent_requests[:post][0].data.keys).to eq([ 'post' ])
+      expect(@sent_requests[:post][0].data['post']).to eq(@checker.options['payload'])
+    end
+
+    it "sends options['payload'] as XML with custom root element name, as a POST request" do
+      @checker.options['content_type'] = 'xml'
+      @checker.options['xml_root'] = 'foobar'
+      expect {
+        @checker.check
+      }.to change { @sent_requests[:post].length }.by(1)
+
+      expect(@sent_requests[:post][0].data.keys).to eq([ 'foobar' ])
+      expect(@sent_requests[:post][0].data['foobar']).to eq(@checker.options['payload'])
+    end
+
     it "sends options['payload'] as a GET request" do
       @checker.options['method'] = 'get'
       expect {
@@ -161,6 +222,77 @@ describe Agents::PostAgent do
       }.not_to change { @sent_requests[:post].length }
 
       expect(@sent_requests[:get][0].data).to eq(@checker.options['payload'].to_query)
+    end
+
+    it "sends options['payload'] as a string POST request when content-type continas a MIME type" do
+      @checker.options['payload'] = '<test>hello</test>'
+      @checker.options['content_type'] = 'application/xml'
+      expect {
+        @checker.check
+      }.to change { @sent_requests[:post].length }.by(1)
+
+      expect(@sent_requests[:post][0].data).to eq('<test>hello</test>')
+    end
+
+    it "interpolates outgoing headers" do
+      @checker.options['headers'] = {
+        "Foo" => "{% credential aws_key %}"
+      }
+      @checker.check
+      headers = @sent_requests[:post].first.headers
+      expect(headers["Foo"]).to eq("2222222222-jane")
+    end
+
+    describe "emitting events" do
+      context "when emit_events is not set to true" do
+        it "does not emit events" do
+          expect {
+            @checker.check
+          }.not_to change { @checker.events.count }
+        end
+      end
+
+      context "when emit_events is set to true" do
+        before do
+          @checker.options['emit_events'] = 'true'
+          @checker.save!
+        end
+
+        it "emits the response status" do
+          expect {
+            @checker.check
+          }.to change { @checker.events.count }.by(1)
+          expect(@checker.events.last.payload['status']).to eq 200
+        end
+
+        it "emits the body" do
+          @checker.check
+          expect(@checker.events.last.payload['body']).to eq '<html>a webpage!</html>'
+        end
+
+        it "emits the response headers capitalized by default" do
+          @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
+        end
+
+        it "emits the response headers capitalized" do
+          @checker.options['event_headers_style'] = 'capitalized'
+          @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
+        end
+
+        it "emits the response headers downcased" do
+          @checker.options['event_headers_style'] = 'downcased'
+          @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'content-type' => 'text/html' })
+        end
+
+        it "emits the response headers snakecased" do
+          @checker.options['event_headers_style'] = 'snakecased'
+          @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'content_type' => 'text/html' })
+        end
+      end
     end
   end
 
@@ -246,6 +378,25 @@ describe Agents::PostAgent do
       expect(@checker).to be_valid
     end
 
+    it "should not validate payload as a hash if content_type includes a MIME type and method is not get or delete" do
+      @checker.options['no_merge'] = 'true'
+      @checker.options['content_type'] = 'text/xml'
+      @checker.options['payload'] = "test"
+      expect(@checker).to be_valid
+
+      @checker.options['method'] = 'get'
+      expect(@checker).not_to be_valid
+
+      @checker.options['method'] = 'delete'
+      expect(@checker).not_to be_valid
+    end
+
+    it "requires `no_merge` to be set to true when content_type contains a MIME type" do
+      @checker.options['content_type'] = 'text/xml'
+      @checker.options['payload'] = "test"
+      expect(@checker).not_to be_valid
+    end
+
     it "requires headers to be a hash, if present" do
       @checker.options['headers'] = [1,2,3]
       expect(@checker).not_to be_valid
@@ -260,6 +411,23 @@ describe Agents::PostAgent do
       expect(@checker).to be_valid
 
       @checker.options['headers'] = { "Authorization" => "foo bar" }
+      expect(@checker).to be_valid
+    end
+
+    it "requires emit_events to be true or false" do
+      @checker.options['emit_events'] = 'what?'
+      expect(@checker).not_to be_valid
+
+      @checker.options.delete('emit_events')
+      expect(@checker).to be_valid
+
+      @checker.options['emit_events'] = 'true'
+      expect(@checker).to be_valid
+
+      @checker.options['emit_events'] = 'false'
+      expect(@checker).to be_valid
+
+      @checker.options['emit_events'] = true
       expect(@checker).to be_valid
     end
   end

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::DeDuplicationAgent do
   def create_event(output=nil)
@@ -37,6 +37,19 @@ describe Agents::DeDuplicationAgent do
     it "should validate presence of property" do
       @checker.options[:expected_update_period_in_days] = nil
       expect(@checker).not_to be_valid
+    end
+  end
+
+  describe '#initialize_memory' do
+    it 'sets properties to an empty array' do
+      expect(@checker.memory['properties']).to eq([])
+    end
+
+    it 'does not override an existing value' do
+      @checker.memory['properties'] = [1,2,3]
+      @checker.save
+      @checker.reload
+      expect(@checker.memory['properties']).to eq([1,2,3])
     end
   end
 
@@ -122,6 +135,15 @@ describe Agents::DeDuplicationAgent do
         @checker.receive([@event])
       }.to change(Event, :count).by(1)
       expect(@checker.memory['properties'].last).to eq('3023526198')
+    end
+
+    it "should still work after the memory was cleared" do
+      @checker.memory = {}
+      @checker.save
+      @checker.reload
+      expect {
+        @checker.receive([@event])
+      }.not_to raise_error
     end
   end
 end

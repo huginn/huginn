@@ -13,7 +13,7 @@ module Agents
     cattr_reader :second_precision_enabled
 
     description <<-MD
-      This agent periodically takes an action on target Agents according to a user-defined schedule.
+      The Scheduler Agent periodically takes an action on target Agents according to a user-defined schedule.
 
       # Action types
 
@@ -42,7 +42,7 @@ module Agents
 
       ## Timezones
 
-      You can optionally specify a timezone (default: `#{Time.zone.name}`) after the day-of-week field.
+      You can optionally specify a timezone (default: `#{Time.zone.name}`) after the day-of-week field using the labels in the [tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 
       * `0 22 * * 1-5 Europe/Paris`: every day of the week when it's 22:00 in Paris
 
@@ -85,10 +85,6 @@ module Agents
 
     def working?
       true
-    end
-
-    def check!
-      control!
     end
 
     def validate_options

@@ -2,6 +2,9 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
+  devise:
+    failure:
+      deactivated_account: "Your account has been deactivated by an administrator."
   datetime:
     distance_in_words:
       half_a_minute: "half a minute"

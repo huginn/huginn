@@ -1,0 +1,20 @@
+<% if @events && @events.length > 0 %>
+  <h5>Recently received events: </h5>
+  <% @events.each do |event| %>
+    <%= link_to '#', class: 'dry-run-event-sample', 'data-payload' => event.payload.to_json do %>
+      <pre><%= truncate event.payload.to_json, :length => 90, :omission => "" %></pre>
+    <% end %>
+  <% end %>
+<% end %>
+
+<h5>Event to send<%= params[:with_event_mode] == 'maybe' ? ' (Optional)' : '' %></h5>
+<form class="dry-run-form" method="post">
+  <div class="form-group">
+    <textarea rows="10" name="event" class="payload-editor" data-height="200">
+      {}
+    </textarea>
+  </div>
+  <div class="form-group">
+    <input value="Dry Run" class="btn btn-primary" type="submit" />
+  </div>
+</form>

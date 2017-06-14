@@ -7,8 +7,9 @@ module Agents
     cannot_receive_events!
 
     description <<-MD
+      The Weibo User Agent follows the timeline of a specified Weibo user. It uses this endpoint: http://open.weibo.com/wiki/2/statuses/user_timeline/en
+
       #{'## Include `weibo_2` in your Gemfile to use this Agent!' if dependencies_missing?}
-      The WeiboUserAgent follows the timeline of a specified Weibo user. It uses this endpoint: http://open.weibo.com/wiki/2/statuses/user_timeline/en
 
       You must first set up a Weibo app and generate an `acess_token` to authenticate with. Provide that, along with the `app_key` and `app_secret` for your Weibo app in the options.
 

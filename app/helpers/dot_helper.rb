@@ -1,21 +1,30 @@
 module DotHelper
-  def render_agents_diagram(agents)
+  def render_agents_diagram(agents, layout: nil)
     if (command = ENV['USE_GRAPHVIZ_DOT']) &&
        (svg = IO.popen([command, *%w[-Tsvg -q1 -o/dev/stdout /dev/stdin]], 'w+') { |dot|
-          dot.print agents_dot(agents, true)
+          dot.print agents_dot(agents, rich: true, layout: layout)
           dot.close_write
           dot.read
         } rescue false)
       decorate_svg(svg, agents).html_safe
     else
-      uriquery = URI.encode_www_form(cht: 'gv', chl: agents_dot(agents))
-      #Get query maximum length should be under 2048 bytes with including "chart?" of google chart request url
-      if uriquery.length > 2042
-        "Too many agent to display, please check unused agents"
+      # Google chart request url 
+      faraday = Faraday.new { |builder|
+        builder.request :url_encoded
+        builder.adapter Faraday.default_adapter
+      }
+      response = faraday.post('https://chart.googleapis.com/chart', { cht: 'gv', chl: agents_dot(agents) })
+
+      case response.status
+      when 200
+        # Display Base64-Encoded images
+        tag('img', src: 'data:image/jpg;base64,'+Base64.encode64(response.body))
+      when 400
+        "The diagram can't be displayed because it has too many nodes. Max allowed is 80."
+      when 413
+        "The diagram can't be displayed because it is too large."
       else
-        tag('img', src: URI('https://chart.googleapis.com/chart').tap { |uri|
-              uri.query = uriquery
-	    })
+        "Unknow error. Response code is #{response.status}."
       end
     end
   end
@@ -125,7 +134,7 @@ module DotHelper
     DotDrawer.draw(vars, &block)
   end
 
-  def agents_dot(agents, rich = false)
+  def agents_dot(agents, rich: false, layout: nil)
     draw(agents: agents,
          agent_id: ->agent { 'a%d' % agent.id },
          agent_label: ->agent {
@@ -158,7 +167,10 @@ module DotHelper
       end
 
       block('digraph', 'Agent Event Flow') {
-        # statement 'graph', rankdir: 'LR'
+        layout ||= ENV['DIAGRAM_DEFAULT_LAYOUT'].presence
+        if rich && /\A[a-z]+\z/ === layout
+          statement 'graph', layout: layout, overlap: 'false'
+        end
         statement 'node',
                   shape: 'box',
                   style: 'rounded',
@@ -197,7 +209,6 @@ module DotHelper
       root << svg
       root << overlay_container = Nokogiri::XML::Node.new('div', doc) { |div|
         div['class'] = 'overlay-container'
-        div['style'] = "width: #{svg['width']}; height: #{svg['height']}"
       }
       overlay_container << overlay = Nokogiri::XML::Node.new('div', doc) { |div|
         div['class'] = 'overlay'

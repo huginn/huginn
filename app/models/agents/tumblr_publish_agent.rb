@@ -1,15 +1,15 @@
-require "tumblr_client"
-
 module Agents
   class TumblrPublishAgent < Agent
     include TumblrConcern
 
     cannot_be_scheduled!
 
-    description <<-MD
-      #{'## Include `tumblr_client` and `omniauth-tumblr` in your Gemfile to use this Agent!' if dependencies_missing?}
+    gem_dependency_check { defined?(Tumblr::Client) }
 
-      The TumblrPublishAgent publishes Tumblr posts from the events it receives.
+    description <<-MD
+      The Tumblr Publish Agent publishes Tumblr posts from the events it receives.
+
+      #{'## Include `tumblr_client` and `omniauth-tumblr` in your Gemfile to use this Agent!' if dependencies_missing?}
 
       To be able to use this Agent you need to authenticate with Tumblr in the [Services](/services) section first.
 
@@ -17,9 +17,9 @@ module Agents
 
       **Required fields:**
 
-      `blog_name` Your Tumblr URL (e.g. "mustardhamsters.tumblr.com") 
+      `blog_name` Your Tumblr URL (e.g. "mustardhamsters.tumblr.com")
 
-      `post_type` One of [text, photo, quote, link, chat, audio, video] 
+      `post_type` One of [text, photo, quote, link, chat, audio, video, reblog]
 
 
       -------------
@@ -35,13 +35,13 @@ module Agents
       * `format` html, markdown
       * `slug` short text summary at end of the post URL
 
-      **Text** `title` `body` 
+      **Text** `title` `body`
 
       **Photo** `caption` `link`  `source`
 
       **Quote** `quote` `source`
 
-      **Link** `title` `url` `description` 
+      **Link** `title` `url` `description`
 
       **Chat** `title` `conversation`
 
@@ -49,6 +49,7 @@ module Agents
 
       **Video** `caption` `embed`
 
+      **Reblog** `id` `reblog_key` `comment`
 
       -------------
 
@@ -56,8 +57,6 @@ module Agents
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
-
-    gem_dependency_check { defined?(Tumblr) }
 
     def validate_options
       errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
@@ -90,6 +89,9 @@ module Agents
           'conversation' => "{{conversation}}",
           'external_url' => "{{external_url}}",
           'embed' => "{{embed}}",
+          'id' => "{{id}}",
+          'reblog_key' => "{{reblog_key}}",
+          'comment' => "{{comment}}",
         },
       }
     end
@@ -105,19 +107,25 @@ module Agents
         options = interpolated(event)['options']
         begin
           post = publish_post(blog_name, post_type, options)
+          if !post.has_key?('id')
+            log("Failed to create #{post_type} post on #{blog_name}: #{post.to_json}, options: #{options.to_json}")
+            return
+          end
+          expanded_post = get_post(blog_name, post["id"])
           create_event :payload => {
             'success' => true,
             'published_post' => "["+blog_name+"] "+post_type,
             'post_id' => post["id"],
             'agent_id' => event.agent_id,
-            'event_id' => event.id
+            'event_id' => event.id,
+            'post' => expanded_post
           }
         end
       end
     end
 
-    def publish_post(blog_name, post_type, options)      
-      options_obj = { 
+    def publish_post(blog_name, post_type, options)
+      options_obj = {
           :state => options['state'],
           :tags => options['tags'],
           :tweet => options['tweet'],
@@ -157,7 +165,19 @@ module Agents
         options_obj[:caption] = options['caption']
         options_obj[:embed] = options['embed']
         tumblr.video(blog_name, options_obj)
+      when "reblog"
+        options_obj[:id] = options['id']
+        options_obj[:reblog_key] = options['reblog_key']
+        options_obj[:comment] = options['comment']
+        tumblr.reblog(blog_name, options_obj)
       end
+    end
+
+    def get_post(blog_name, id)
+      obj = tumblr.posts(blog_name, {
+        :id => id
+      })
+      obj["posts"].first
     end
   end
 end

@@ -1,3 +1,5 @@
+# :markup: markdown
+
 module LiquidInterpolatable
   extend ActiveSupport::Concern
 
@@ -15,7 +17,9 @@ module LiquidInterpolatable
     interpolated
   rescue Liquid::Error => e
     errors.add(:options, "has an error with Liquid templating: #{e.message}")
-    false
+  rescue
+    # Calling `interpolated` without an incoming may naturally fail
+    # with various errors when an agent expects one.
   end
 
   # Return the current interpolation context.  Use this in your Agent
@@ -88,7 +92,9 @@ module LiquidInterpolatable
 
   def interpolate_string(string, self_object = nil)
     interpolate_with(self_object) do
-      Liquid::Template.parse(string).render!(interpolation_context)
+      catch :as_object do
+        Liquid::Template.parse(string).render!(interpolation_context)
+      end
     end
   end
 
@@ -123,13 +129,78 @@ module LiquidInterpolatable
     # userinfo, host, port, registry, path, opaque, query, and
     # fragment.
     def to_uri(uri, base_uri = nil)
-      if base_uri
-        URI(base_uri) + uri.to_s
+      case base_uri
+      when nil, ''
+        Utils.normalize_uri(uri.to_s)
       else
-        URI(uri.to_s)
+        Utils.normalize_uri(base_uri) + Utils.normalize_uri(uri.to_s)
       end
     rescue URI::Error
       nil
+    end
+
+    # Get the destination URL of a given URL by recursively following
+    # redirects, up to 5 times in a row.  If a given string is not a
+    # valid absolute HTTP URL or in case of too many redirects, the
+    # original string is returned.  If any network/protocol error
+    # occurs while following redirects, the last URL followed is
+    # returned.
+    def uri_expand(url, limit = 5)
+      case url
+      when URI
+        uri = url
+      else
+        url = url.to_s
+        begin
+          uri = Utils.normalize_uri(url)
+        rescue URI::Error
+          return url
+        end
+      end
+
+      http = Faraday.new do |builder|
+        builder.adapter :net_http
+        # builder.use FaradayMiddleware::FollowRedirects, limit: limit
+        # ...does not handle non-HTTP URLs.
+      end
+
+      limit.times do
+        begin
+          case uri
+          when URI::HTTP
+            return uri.to_s unless uri.host
+            response = http.head(uri)
+            case response.status
+            when 301, 302, 303, 307
+              if location = response['location']
+                uri += Utils.normalize_uri(location)
+                next
+              end
+            end
+          end
+        rescue URI::Error, Faraday::Error, SystemCallError => e
+          logger.error "#{e.class} in #{__method__}(#{url.inspect}) [uri=#{uri.to_s.inspect}]: #{e.message}:\n#{e.backtrace.join("\n")}"
+        end
+
+        return uri.to_s
+      end
+
+      logger.error "Too many rediretions in #{__method__}(#{url.inspect}) [uri=#{uri.to_s.inspect}]"
+
+      url
+    end
+
+    # Rebase URIs contained in attributes in a given HTML fragment
+    def rebase_hrefs(input, base_uri)
+      Utils.rebase_hrefs(input, base_uri) rescue input
+    end
+
+    # Unescape (basic) HTML entities in a string
+    #
+    # This currently decodes the following entities only: "&apos;",
+    # "&quot;", "&lt;", "&gt;", "&amp;", "&#dd;" and "&#xhh;".
+    def unescape(input)
+      CGI.unescapeHTML(input) rescue input
     end
 
     # Escape a string for use in XPath expression
@@ -148,6 +219,107 @@ module LiquidInterpolatable
         'concat(' << subs.join(', ') << ')'
       end
     end
+
+    def regex_replace(input, regex, replacement = nil)
+      input.to_s.gsub(Regexp.new(regex), unescape_replacement(replacement.to_s))
+    end
+
+    def regex_replace_first(input, regex, replacement = nil)
+      input.to_s.sub(Regexp.new(regex), unescape_replacement(replacement.to_s))
+    end
+
+    # Serializes data as JSON
+    def json(input)
+      JSON.dump(input)
+    end
+
+    # Returns a Ruby object
+    #
+    # It can be used as a JSONPath replacement for Agents that only support Liquid:
+    #
+    # Event:   {"something": {"nested": {"data": 1}}}
+    # Liquid:  {{something.nested | as_object}}
+    # Returns: {"data": 1}
+    #
+    # Splitting up a string with Liquid filters and return the Array:
+    #
+    # Event:   {"data": "A,B,C"}}
+    # Liquid:  {{data | split: ',' | as_object}}
+    # Returns: ['A', 'B', 'C']
+    #
+    # as_object ALWAYS has be the last filter in a Liquid expression!
+    def as_object(object)
+      throw :as_object, object.as_json
+    end
+
+    private
+
+    def logger
+      @@logger ||=
+        if defined?(Rails)
+          Rails.logger
+        else
+          require 'logger'
+          Logger.new(STDERR)
+        end
+    end
+
+    BACKSLASH = "\\".freeze
+
+    UNESCAPE = {
+      "a" => "\a",
+      "b" => "\b",
+      "e" => "\e",
+      "f" => "\f",
+      "n" => "\n",
+      "r" => "\r",
+      "s" => " ",
+      "t" => "\t",
+      "v" => "\v",
+    }
+
+    # Unescape a replacement text for use in the second argument of
+    # gsub/sub.  The following escape sequences are recognized:
+    #
+    # - "\\" (backslash itself)
+    # - "\a" (alert)
+    # - "\b" (backspace)
+    # - "\e" (escape)
+    # - "\f" (form feed)
+    # - "\n" (new line)
+    # - "\r" (carriage return)
+    # - "\s" (space)
+    # - "\t" (horizontal tab)
+    # - "\u{XXXX}" (unicode codepoint)
+    # - "\v" (vertical tab)
+    # - "\xXX" (hexadecimal character)
+    # - "\1".."\9" (numbered capture groups)
+    # - "\+" (last capture group)
+    # - "\k<name>" (named capture group)
+    # - "\&" or "\0" (complete matched text)
+    # - "\`" (string before match)
+    # - "\'" (string after match)
+    #
+    # Octal escape sequences are deliberately unsupported to avoid
+    # conflict with numbered capture groups.  Rather obscure Emacs
+    # style character codes ("\C-x", "\M-\C-x" etc.) are also omitted
+    # from this implementation.
+    def unescape_replacement(s)
+      s.gsub(/\\(?:([\d+&`'\\]|k<\w+>)|u\{([[:xdigit:]]+)\}|x([[:xdigit:]]{2})|(.))/) {
+        if c = $1
+          BACKSLASH + c
+        elsif c = ($2 && [$2.to_i(16)].pack('U')) ||
+                  ($3 && [$3.to_i(16)].pack('C'))
+          if c == BACKSLASH
+            BACKSLASH + c
+          else
+            c
+          end
+        else
+          UNESCAPE[$4] || $4
+        end
+      }
+    end
   end
   Liquid::Template.register_filter(LiquidInterpolatable::Filters)
 
@@ -159,9 +331,7 @@ module LiquidInterpolatable
       end
 
       def render(context)
-        credential = context.registers[:agent].credential(@credential_name)
-        raise "No user credential named '#{@credential_name}' defined" if credential.nil?
-        credential
+        context.registers[:agent].credential(@credential_name)
       end
     end
 
@@ -173,4 +343,100 @@ module LiquidInterpolatable
   end
   Liquid::Template.register_tag('credential', LiquidInterpolatable::Tags::Credential)
   Liquid::Template.register_tag('line_break', LiquidInterpolatable::Tags::LineBreak)
+
+  module Blocks
+    # Replace every occurrence of a given regex pattern in the first
+    # "in" block with the result of the "with" block in which the
+    # variable `match` is set for each iteration, which can be used as
+    # follows:
+    #
+    # - `match[0]` or just `match`: the whole matching string
+    # - `match[1]`..`match[n]`: strings matching the numbered capture groups
+    # - `match.size`: total number of the elements above (n+1)
+    # - `match.names`: array of names of named capture groups
+    # - `match[name]`..: strings matching the named capture groups
+    # - `match.pre_match`: string preceding the match
+    # - `match.post_match`: string following the match
+    # - `match.***`: equivalent to `match['***']` unless it conflicts with the existing methods above
+    #
+    # If named captures (`(?<name>...)`) are used in the pattern, they
+    # are also made accessible as variables.  Note that if numbered
+    # captures are used mixed with named captures, you could get
+    # unexpected results.
+    #
+    # Example usage:
+    #
+    #     {% regex_replace "\w+" in %}Use me like this.{% with %}{{ match | capitalize }}{% endregex_replace %}
+    #     {% assign fullname = "Doe, John A." %}
+    #     {% regex_replace_first "\A(?<name1>.+), (?<name2>.+)\z" in %}{{ fullname }}{% with %}{{ name2 }} {{ name1 }}{% endregex_replace_first %}
+    #
+    #     Use Me Like This.
+    #
+    #     John A. Doe
+    #
+    class RegexReplace < Liquid::Block
+      Syntax = /\A\s*(#{Liquid::QuotedFragment})(?:\s+in)?\s*\z/
+
+      def initialize(tag_name, markup, tokens)
+        super
+
+        case markup
+        when Syntax
+          @regexp = $1
+        else
+          raise Liquid::SyntaxError, 'Syntax Error in regex_replace tag - Valid syntax: regex_replace pattern in'
+        end
+        @in_block = Liquid::BlockBody.new
+        @with_block = nil
+      end
+
+      def parse(tokens)
+        if more = parse_body(@in_block, tokens)
+          @with_block = Liquid::BlockBody.new
+          parse_body(@with_block, tokens)
+       end
+     end
+
+      def nodelist
+        if @with_block
+          [@in_block, @with_block]
+        else
+          [@in_block]
+        end
+      end
+
+      def unknown_tag(tag, markup, tokens)
+        return super unless tag == 'with'.freeze
+        @with_block = Liquid::BlockBody.new
+      end
+
+      def render(context)
+        begin
+          regexp = Regexp.new(context[@regexp].to_s)
+        rescue ::SyntaxError => e
+          raise Liquid::SyntaxError, "Syntax Error in regex_replace tag - #{e.message}"
+        end
+
+        subject = @in_block.render(context)
+
+        subject.send(first? ? :sub : :gsub, regexp) {
+          next '' unless @with_block
+          m = Regexp.last_match
+          context.stack do
+            m.names.each do |name|
+              context[name] = m[name]
+            end
+            context['match'.freeze] = m
+            @with_block.render(context)
+          end
+        }
+      end
+
+      def first?
+        @tag_name.end_with?('_first'.freeze)
+      end
+    end
+  end
+  Liquid::Template.register_tag('regex_replace',       LiquidInterpolatable::Blocks::RegexReplace)
+  Liquid::Template.register_tag('regex_replace_first', LiquidInterpolatable::Blocks::RegexReplace)
 end

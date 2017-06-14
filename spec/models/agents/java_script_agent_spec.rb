@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::JavaScriptAgent do
   before do
@@ -21,6 +21,21 @@ describe Agents::JavaScriptAgent do
       expect(@agent).not_to be_valid
       @agent.options.delete('code')
       expect(@agent).not_to be_valid
+    end
+
+    it "checks for a valid 'language', but allows nil" do
+      expect(@agent).to be_valid
+      @agent.options['language'] = ''
+      expect(@agent).to be_valid
+      @agent.options.delete('language')
+      expect(@agent).to be_valid
+      @agent.options['language'] = 'foo'
+      expect(@agent).not_to be_valid
+
+      %w[javascript JavaScript coffeescript CoffeeScript].each do |valid_language|
+        @agent.options['language'] = valid_language
+        expect(@agent).to be_valid
+      end
     end
 
     it "accepts a credential, but it must exist" do
@@ -74,11 +89,10 @@ describe Agents::JavaScriptAgent do
       }.to change { Event.count }.by(2)
     end
 
-
     describe "using credentials as code" do
       before do
         @agent.user.user_credentials.create :credential_name => 'code-foo', :credential_value => 'Agent.check = function() { this.log("ran it"); };'
-        @agent.options['code'] = 'credential:code-foo'
+        @agent.options['code'] = "credential:code-foo\n\n"
         @agent.save!
       end
 
@@ -118,7 +132,9 @@ describe Agents::JavaScriptAgent do
         expect(AgentLog.last.message).to match(/oh no/)
         expect(AgentLog.last.level).to eq(4)
       end
+    end
 
+    describe "getMemory" do
       it "won't store NaNs" do
         @agent.options['code'] = 'Agent.check = function() { this.memory("foo", NaN); };'
         @agent.save!
@@ -126,6 +142,124 @@ describe Agents::JavaScriptAgent do
         expect(@agent.memory['foo']).to eq('NaN') # string
         @agent.save!
         expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "it stores an Array" do
+        @agent.options['code'] = 'Agent.check = function() {
+          var arr = [1,2];
+          this.memory("foo", arr);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq([1,2])
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "it stores a Hash" do
+        @agent.options['code'] = 'Agent.check = function() {
+          var obj = {};
+          obj["one"] = 1;
+          obj["two"] = [1,2];
+          this.memory("foo", obj);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq({"one"=>1, "two"=> [1,2]})
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "it stores a nested Hash" do
+        @agent.options['code'] = 'Agent.check = function() {
+          var u = {};
+          u["one"] = 1;
+          u["two"] = 2;
+          var obj = {};
+          obj["three"] = 3;
+          obj["four"] = u;
+          this.memory("foo", obj);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq({"three"=>3, "four"=>{"one"=>1, "two"=>2}})
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "it stores null" do
+        @agent.options['code'] = 'Agent.check = function() {
+          this.memory("foo", "test");
+          this.memory("foo", null);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq(nil)
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "it stores false" do
+        @agent.options['code'] = 'Agent.check = function() {
+          this.memory("foo", "test");
+          this.memory("foo", false);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to eq(false)
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+    end
+
+    describe "setMemory" do
+      it "stores an object" do
+        @agent.options['code'] = 'Agent.check = function() {
+          var u = {};
+          u["one"] = 1;
+          u["two"] = 2;
+          this.setMemory(u);
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory).to eq({ "one" => 1, "two" => 2 })
+        @agent.save!
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+    end
+
+    describe "deleteKey" do
+      it "deletes a memory key" do
+        @agent.memory = { foo: "baz" }
+        @agent.options['code'] = 'Agent.check = function() {
+          this.deleteKey("foo");
+          };'
+        @agent.save!
+        @agent.check
+        expect(@agent.memory['foo']).to be_nil
+        expect { @agent.reload.memory }.not_to raise_error
+      end
+
+      it "returns the string value of the deleted key" do
+        @agent.memory = { foo: "baz" }
+        @agent.options['code'] = 'Agent.check = function() {
+          this.createEvent({ message: this.deleteKey("foo")});
+          };'
+        @agent.save!
+        @agent.check
+        created_event = @agent.events.last
+        expect(created_event.payload).to eq('message' => "baz")
+      end
+
+      it "returns the hash value of the deleted key" do
+        @agent.memory = { foo: { baz: 'test' }  }
+        @agent.options['code'] = 'Agent.check = function() {
+          this.createEvent({ message: this.deleteKey("foo")});
+          };'
+        @agent.save!
+        @agent.check
+        created_event = @agent.events.last
+        expect(created_event.payload).to eq('message' => { 'baz' => 'test' })
       end
     end
 
@@ -159,6 +293,20 @@ describe Agents::JavaScriptAgent do
         expect(log1.level).to eq(3)
         expect(log2.message).to eq("WOAH!")
         expect(log2.level).to eq(4)
+      end
+    end
+
+    describe "escaping and unescaping HTML" do
+      it "can escape and unescape html with this.escapeHtml and this.unescapeHtml in the javascript environment" do
+        @agent.options['code'] = 'Agent.check = function() { this.createEvent({ escaped: this.escapeHtml(\'test \"escaping\" <characters>\'), unescaped: this.unescapeHtml(\'test &quot;unescaping&quot; &lt;characters&gt;\')}); };'
+        @agent.save!
+        expect {
+          expect {
+            @agent.check
+          }.not_to change { AgentLog.count }
+        }.to change { Event.count}.by(1)
+        created_event = @agent.events.last
+        expect(created_event.payload).to eq({ 'escaped' => 'test &quot;escaping&quot; &lt;characters&gt;', 'unescaped' => 'test "unescaping" <characters>'})
       end
     end
 
@@ -222,6 +370,46 @@ describe Agents::JavaScriptAgent do
 
           }.not_to change { AgentLog.count }
         }.not_to change { Event.count }
+      end
+    end
+
+    describe "using CoffeeScript" do
+      it "will accept a 'language' of 'CoffeeScript'" do
+        @agent.options['code'] = 'Agent.check = -> this.log("hello from coffeescript")'
+        @agent.options['language'] = 'CoffeeScript'
+        @agent.save!
+        expect {
+          @agent.check
+        }.not_to raise_error
+        expect(AgentLog.last.message).to eq("hello from coffeescript")
+      end
+    end
+
+    describe "user credentials" do
+      it "can access an existing credential" do
+        @agent.send(:set_credential, 'test', 'hello')
+        @agent.options['code'] = 'Agent.check = function() { this.log(this.credential("test")); };'
+        @agent.save!
+        @agent.check
+        expect(AgentLog.last.message).to eq("hello")
+      end
+
+      it "will create a new credential" do
+        @agent.options['code'] = 'Agent.check = function() { this.credential("test","1234"); };'
+        @agent.save!
+        expect {
+          @agent.check
+        }.to change(UserCredential, :count).by(1)
+      end
+
+      it "updates an existing credential" do
+        @agent.send(:set_credential, 'test', 1234)
+        @agent.options['code'] = 'Agent.check = function() { this.credential("test","12345"); };'
+        @agent.save!
+        expect {
+          @agent.check
+        }.to change(UserCredential, :count).by(0)
+        expect(@agent.user.user_credentials.last.credential_value).to eq('12345')
       end
     end
   end

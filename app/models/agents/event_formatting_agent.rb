@@ -1,9 +1,10 @@
 module Agents
   class EventFormattingAgent < Agent
     cannot_be_scheduled!
+    can_dry_run!
 
     description <<-MD
-      An Event Formatting Agent allows you to format incoming Events, adding new fields as needed.
+      The Event Formatting Agent allows you to format incoming Events, adding new fields as needed.
 
       For example, here is a possible Event:
 
@@ -94,8 +95,6 @@ module Agents
       ]
     end
 
-    after_save :clear_matchers
-
     def validate_options
       errors.add(:base, "instructions and mode need to be present.") unless options['instructions'].present? && options['mode'].present?
 
@@ -119,12 +118,15 @@ module Agents
     end
 
     def receive(incoming_events)
+      matchers = compiled_matchers
+
       incoming_events.each do |event|
         interpolate_with(event) do
-          interpolation_context.merge(perform_matching(event.payload))
-          formatted_event = interpolated['mode'].to_s == "merge" ? event.payload.dup : {}
-          formatted_event.merge! interpolated['instructions']
-          create_event :payload => formatted_event
+          apply_compiled_matchers(matchers, event) do
+            formatted_event = interpolated['mode'].to_s == "merge" ? event.payload.dup : {}
+            formatted_event.merge! interpolated['instructions']
+            create_event payload: formatted_event
+          end
         end
       end
     end
@@ -163,49 +165,47 @@ module Agents
       end
     end
 
-    def perform_matching(payload)
-      matchers.inject(payload.dup) { |hash, matcher|
-        matcher[hash]
-      }
+    def compiled_matchers
+      if matchers = options['matchers']
+        matchers.map { |matcher|
+          regexp, path, to = matcher.values_at(*%w[regexp path to])
+          [Regexp.new(regexp), path, to]
+        }
+      end
     end
 
-    def matchers
-      @matchers ||=
-        if matchers = options['matchers']
-          matchers.map { |matcher|
-            regexp, path, to = matcher.values_at(*%w[regexp path to])
-            re = Regexp.new(regexp)
-            proc { |hash|
-              mhash = {}
-              value = interpolate_string(path, hash)
-              if value.is_a?(String) && (m = re.match(value))
-                m.to_a.each_with_index { |s, i|
-                  mhash[i.to_s] = s
-                }
-                m.names.each do |name|
-                  mhash[name] = m[name]
-                end if m.respond_to?(:names)
-              end
-              if to
-                case value = hash[to]
-                when Hash
-                  value.update(mhash)
-                else
-                  hash[to] = mhash
-                end
-              else
-                hash.update(mhash)
-              end
-              hash
-            }
-          }
-        else
-          []
+    def apply_compiled_matchers(matchers, event, &block)
+      return yield if matchers.nil?
+
+      # event.payload.dup does not work; HashWithIndifferentAccess is
+      # a source of trouble here.
+      hash = {}.update(event.payload)
+
+      matchers.each do |re, path, to|
+        m = re.match(interpolate_string(path, hash)) or next
+
+        mhash =
+          if to
+            case value = hash[to]
+            when Hash
+              value
+            else
+              hash[to] = {}
+            end
+          else
+            hash
+          end
+
+        m.size.times do |i|
+          mhash[i.to_s] = m[i]
         end
-    end
 
-    def clear_matchers
-      @matchers = nil
+        m.names.each do |name|
+          mhash[name] = m[name]
+        end
+      end
+
+      interpolate_with(hash, &block)
     end
   end
 end

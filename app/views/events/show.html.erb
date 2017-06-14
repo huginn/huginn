@@ -1,8 +1,13 @@
+<% content_for :title, "Event " + @event.id.to_s -%>
+
 <div class='container'>
   <div class='row'>
     <div class='col-md-12'>
       <div class="page-header">
-        <h2>Event from <%= @event.agent.name %></h2>
+        <h2>
+          Event from <%= @event.agent.name %>
+          <%= render 'agents/mini_action_menu', agent: @event.agent, return_to: event_path(@event) %>
+        </h2>
       </div>
 
       <p>
@@ -17,7 +22,7 @@
 
       <% if @event.lat && @event.lng %>
         <% content_for :head do -%>
-<%= javascript_include_tag "https://maps.googleapis.com/maps/api/js?sensor=false" %>
+<%= javascript_include_tag "https://maps.googleapis.com/maps/api/js?key=#{@event.agent.options[:api_key]}" %>
 <%= javascript_include_tag "map_marker" %>
         <% end -%>
 
@@ -46,7 +51,7 @@
 
       <br />
       <div class="btn-group">
-        <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, events_path, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, filtered_agent_return_link || events_path, class: "btn btn-default" %>
       </div>
     </div>
   </div>

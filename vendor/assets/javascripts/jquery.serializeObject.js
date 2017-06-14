@@ -1,40 +1,146 @@
-//
-// Use internal $.serializeArray to get list of form elements which is
-// consistent with $.serialize
-//
-// From version 2.0.0, $.serializeObject will stop converting [name] values
-// to camelCase format. This is *consistent* with other serialize methods:
-//
-//   - $.serialize
-//   - $.serializeArray
-//
-// If you require camel casing, you can either download version 1.0.4 or map
-// them yourself.
-//
+/**
+ * jQuery serializeObject
+ * @copyright 2014, macek <paulmacek@gmail.com>
+ * @link https://github.com/macek/jquery-serialize-object
+ * @license BSD
+ * @version 2.5.0
+ */
+(function(root, factory) {
 
-(function($){
-  $.fn.serializeObject = function () {
-    "use strict";
+  // AMD
+  if (typeof define === "function" && define.amd) {
+    define(["exports", "jquery"], function(exports, $) {
+      return factory(exports, $);
+    });
+  }
 
-    var result = {};
-    var extend = function (i, element) {
-      var node = result[element.name];
+  // CommonJS
+  else if (typeof exports !== "undefined") {
+    var $ = require("jquery");
+    factory(exports, $);
+  }
 
-  // If node with same name exists already, need to convert it to an array as it
-  // is a multi-value field (i.e., checkboxes)
+  // Browser
+  else {
+    factory(root, (root.jQuery || root.Zepto || root.ender || root.$));
+  }
 
-      if ('undefined' !== typeof node && node !== null) {
-        if ($.isArray(node)) {
-          node.push(element.value);
-        } else {
-          result[element.name] = [node, element.value];
-        }
-      } else {
-        result[element.name] = element.value;
-      }
-    };
+}(this, function(exports, $) {
 
-    $.each(this.serializeArray(), extend);
-    return result;
+  var patterns = {
+    validate: /^[a-z_][a-z0-9_]*(?:\[(?:\d*|[a-z0-9_]+)\])*$/i,
+    key:      /[a-z0-9_]+|(?=\[\])/gi,
+    push:     /^$/,
+    fixed:    /^\d+$/,
+    named:    /^[a-z0-9_]+$/i
   };
-})(jQuery);
+
+  function FormSerializer(helper, $form) {
+
+    // private variables
+    var data     = {},
+        pushes   = {};
+
+    // private API
+    function build(base, key, value) {
+      base[key] = value;
+      return base;
+    }
+
+    function makeObject(root, value) {
+
+      var keys = root.match(patterns.key), k;
+
+      // nest, nest, ..., nest
+      while ((k = keys.pop()) !== undefined) {
+        // foo[]
+        if (patterns.push.test(k)) {
+          var idx = incrementPush(root.replace(/\[\]$/, ''));
+          value = build([], idx, value);
+        }
+
+        // foo[n]
+        else if (patterns.fixed.test(k)) {
+          value = build([], k, value);
+        }
+
+        // foo; foo[bar]
+        else if (patterns.named.test(k)) {
+          value = build({}, k, value);
+        }
+      }
+
+      return value;
+    }
+
+    function incrementPush(key) {
+      if (pushes[key] === undefined) {
+        pushes[key] = 0;
+      }
+      return pushes[key]++;
+    }
+
+    function encode(pair) {
+      switch ($('[name="' + pair.name + '"]', $form).attr("type")) {
+        case "checkbox":
+          return pair.value === "on" ? true : pair.value;
+        default:
+          return pair.value;
+      }
+    }
+
+    function addPair(pair) {
+      if (!patterns.validate.test(pair.name)) return this;
+      var obj = makeObject(pair.name, encode(pair));
+      data = helper.extend(true, data, obj);
+      return this;
+    }
+
+    function addPairs(pairs) {
+      if (!helper.isArray(pairs)) {
+        throw new Error("formSerializer.addPairs expects an Array");
+      }
+      for (var i=0, len=pairs.length; i<len; i++) {
+        this.addPair(pairs[i]);
+      }
+      return this;
+    }
+
+    function serialize() {
+      return data;
+    }
+
+    function serializeJSON() {
+      return JSON.stringify(serialize());
+    }
+
+    // public API
+    this.addPair = addPair;
+    this.addPairs = addPairs;
+    this.serialize = serialize;
+    this.serializeJSON = serializeJSON;
+  }
+
+  FormSerializer.patterns = patterns;
+
+  FormSerializer.serializeObject = function serializeObject() {
+    return new FormSerializer($, this).
+      addPairs(this.serializeArray()).
+      serialize();
+  };
+
+  FormSerializer.serializeJSON = function serializeJSON() {
+    return new FormSerializer($, this).
+      addPairs(this.serializeArray()).
+      serializeJSON();
+  };
+
+  if (typeof $.fn !== "undefined") {
+    $.fn.serializeObject = FormSerializer.serializeObject;
+    $.fn.serializeJSON   = FormSerializer.serializeJSON;
+  }
+
+  exports.FormSerializer = FormSerializer;
+
+  return FormSerializer;
+}));

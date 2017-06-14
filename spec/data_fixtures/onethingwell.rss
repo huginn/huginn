@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+    <channel>
+        <description>A weblog about simple, useful software (on any platform).</description>
+        <title>One Thing Well</title>
+        <generator>Tumblr (3.0; @onethingwell)</generator>
+        <link>http://onethingwell.org/</link>
+        <item>
+            <title>CSVfix</title>
+            <description>&lt;a href="http://neilb.bitbucket.org/csvfix/"&gt;CSVfix&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;CSVfix is a command-line tool specifically designed to deal with CSV data. With it you can, among other things:&lt;/p&gt; &lt;ul&gt;&lt;li&gt;Reorder, remove, split and merge fields&lt;/li&gt; &lt;li&gt;Convert case, trim leading &amp; trailing spaces&lt;/li&gt; &lt;li&gt;Search for specific content using regular expressions&lt;/li&gt; &lt;li&gt;Filter out duplicate data or data on exclusion lists&lt;/li&gt; &lt;li&gt;Enrich with data from other sources&lt;/li&gt; &lt;li&gt;Add sequence numbers and file source information&lt;/li&gt; &lt;li&gt;Split large CSV files into smaller files based on field contents&lt;/li&gt; &lt;li&gt;Perform arithmetic calculations on individual fields&lt;/li&gt; &lt;li&gt;Validate CSV data against a collection of validation rules&lt;/li&gt; &lt;li&gt;Convert between CSV and fixed format, XML, SQL and DSV&lt;/li&gt; &lt;/ul&gt;&lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/127163643556</link>
+            <guid>http://onethingwell.org/post/127163643556</guid>
+            <pubDate>Thu, 20 Aug 2015 17:00:10 +0100</pubDate>
+            <category>csv</category>
+            <category>crossplatform</category>
+            <category>utilities</category>
+            <dc:creator></dc:creator>
+        </item>
+        <item>
+            <title>Gemini</title>
+            <description>&lt;a href="http://macpaw.com/gemini"&gt;Gemini&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Find and remove identical files on your Mac&lt;/p&gt; &lt;/blockquote&gt; &lt;p&gt;&lt;a href="https://geo.itunes.apple.com/us/app/gemini-the-duplicate-finder/id463541543?mt=12&amp;at=11l8NA"&gt;App Store&lt;/a&gt;&lt;/p&gt;</description>
+            <link>http://onethingwell.org/post/127157126678</link>
+            <guid>http://onethingwell.org/post/127157126678</guid>
+            <pubDate>Thu, 20 Aug 2015 15:00:19 +0100</pubDate>
+            <category>osx</category>
+            <category>utilities</category>
+        </item>
+        <item>
+            <title>FilePizza</title>
+            <description>&lt;a href="https://github.com/kern/filepizza"&gt;FilePizza&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;FilePizza enables fast and private peer-to-peer file transfers in your web browser.&lt;/p&gt; &lt;p&gt;By using &lt;a href="http://www.webrtc.org/"&gt;WebRTC&lt;/a&gt;, FilePizza eliminates the initial upload traditionally required when sharing files via file sharing services (e.g. Dropbox). Instead of transmitting files through an intermediary server, the sender initializes a transfer and receives a “tempalink” they can distribute. When recipients click on this link, they connect directly to the sender’s browser to complete the download. Because the file never touches the server, the transfer is fast, private, and secure.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/127151806940</link>
+            <guid>http://onethingwell.org/post/127151806940</guid>
+            <pubDate>Thu, 20 Aug 2015 13:00:07 +0100</pubDate>
+            <category>web</category>
+        </item>
+        <item>
+            <title>itsycal</title>
+            <description>&lt;a href="http://www.mowglii.com/itsycal/"&gt;itsycal&lt;/a&gt;: &lt;p&gt;&lt;img src="http://c.1tw.org/images/2015/itsy.png" alt="A screenshot of Itsycal" width="100%" border="0"/&gt;&lt;/p&gt; &lt;blockquote&gt; &lt;p&gt;Itsycal is a tiny [keyboard controlled] calendar for your Mac’s menu bar.&lt;/p&gt; &lt;p&gt;If you want, it will display your calendar events as a companion to the Mac Calendar app. You can also create and delete (but not edit) events.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/127083371981</link>
+            <guid>http://onethingwell.org/post/127083371981</guid>
+            <pubDate>Wed, 19 Aug 2015 17:00:23 +0100</pubDate>
+            <category>calendar</category>
+            <category>menubar</category>
+            <category>osx</category>
+            <enclosure url="http://c.1tw.org/images/2015/itsy.png" length="48249" type="image/png" />
+        </item>
+        <item>
+            <title>Magic Wormhole</title>
+            <description>&lt;a href="https://github.com/warner/magic-wormhole"&gt;Magic Wormhole&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Get things from one computer to another, safely.&lt;/p&gt; &lt;p&gt;This package provides a library and a command-line tool named wormhole, which makes it possible to get short pieces of text (and arbitrary-sized files) from one computer to another. The two endpoints are identified by using identical “wormhole codes”: in general, the sending machine generates and displays the code, which must then be typed into the receiving machine.&lt;/p&gt; &lt;p&gt;The codes are short and human-pronounceable, using a phonetically-distinct wordlist. The receiving side offers tab-completion on the codewords, so usually only a few characters must be typed. Wormhole codes are single-use and do not need to be memorized.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/127076852518</link>
+            <guid>http://onethingwell.org/post/127076852518</guid>
+            <pubDate>Wed, 19 Aug 2015 15:00:26 +0100</pubDate>
+            <category>files</category>
+            <category>transfer</category>
+            <category>cli</category>
+            <category>crossplatform</category>
+        </item>
+        <item>
+            <title>q</title>
+            <description>&lt;a href="http://harelba.github.io/q/"&gt;q&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;q is a command line tool that allows direct execution of SQL-like queries on CSVs/TSVs (and any other tabular text files).&lt;/p&gt; &lt;p&gt;q treats ordinary files as database tables, and supports all SQL constructs, such as WHERE, GROUP BY, JOINs etc. It supports automatic column name and column type detection, and provides full support for multiple encodings.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/127071468395</link>
+            <guid>http://onethingwell.org/post/127071468395</guid>
+            <pubDate>Wed, 19 Aug 2015 13:00:28 +0100</pubDate>
+            <category>csv</category>
+            <category>sql</category>
+            <category>cli</category>
+            <category>crossplatform</category>
+        </item>
+        <item>
+            <title>Loose Leaves</title>
+            <description>&lt;a href="https://looseleav.es"&gt;Loose Leaves&lt;/a&gt;: &lt;p&gt;&lt;img src="http://c.1tw.org/images/2015/looseleaves.jpg" alt="A screenshot of Loose Leaves publishing Markdown text to the web" width="100%" border="0"/&gt;&lt;/p&gt; &lt;blockquote&gt; &lt;p&gt;Loose Leaves for Mac lets you instantly create lightweight, beautiful, hosted pages from the Markdown you write.&lt;/p&gt; &lt;p&gt;Just select the Markdown you want to share, use the keyboard shortcut (⇧⌘C), and you instantly get back a secure link you can pass around.&lt;/p&gt; &lt;p&gt;Try Loose Leaves for posting drafts to Slack, notes to Twitter, project documents to Trello, or wherever you need to share your words.&lt;/p&gt; &lt;/blockquote&gt; &lt;p&gt;&lt;a href="https://geo.itunes.apple.com/us/app/loose-leaves/id1011627372?ls=1&amp;mt=12&amp;at=11l8NA"&gt;App Store&lt;/a&gt;&lt;/p&gt;</description>
+            <link>http://onethingwell.org/post/127001339891</link>
+            <guid>http://onethingwell.org/post/127001339891</guid>
+            <pubDate>Tue, 18 Aug 2015 17:00:19 +0100</pubDate>
+            <category>osx</category>
+            <category>markdown</category>
+            <category>publishing</category>
+        </item>
+        <item>
+            <title>Stand</title>
+            <description>&lt;a href="https://getstandapp.com"&gt;Stand&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Stand is a small Mac utility app that reminds you to stand once every hour by sending you a notification at the time you choose.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/126994664474</link>
+            <guid>http://onethingwell.org/post/126994664474</guid>
+            <pubDate>Tue, 18 Aug 2015 15:00:19 +0100</pubDate>
+            <category>osx</category>
+            <category>notifications</category>
+            <category>health</category>
+        </item>
+        <item>
+            <title>GoTTY</title>
+            <description>&lt;a href="https://github.com/yudai/gotty"&gt;GoTTY&lt;/a&gt;: &lt;p&gt;&lt;img src="http://c.1tw.org/images/2015/gotty.gif" alt="An animated screenshot showing GoTTY displaying the output of 'top' and an interactive 'vi' session in a browser window." width="100%" border="0"/&gt;&lt;/p&gt; &lt;blockquote&gt; &lt;p&gt;GoTTY is a simple command line tool that turns your CLI tools into web applications.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/126989247907</link>
+            <guid>http://onethingwell.org/post/126989247907</guid>
+            <pubDate>Tue, 18 Aug 2015 13:00:25 +0100</pubDate>
+            <category>browser</category>
+            <category>cli</category>
+            <category>terminal</category>
+            <category>linux</category>
+            <category>osx</category>
+        </item>
+        <item>
+            <title>Miller</title>
+            <description>&lt;a href="http://johnkerl.org/miller/doc/"&gt;Miller&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Miller is like sed, awk, cut, join, and sort for name-indexed data such as CSV.&lt;/p&gt; &lt;/blockquote&gt; &lt;h4&gt; See also&lt;/h4&gt; &lt;ul&gt;&lt;li&gt;&lt;a href="http://onethingwell.org/post/16122304567/cvskit"&gt;cvskit&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="http://onethingwell.org/post/112136270664/xsv"&gt;xsv&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt;
+            </description>
+            <link>http://onethingwell.org/post/126918320001</link>
+            <guid>http://onethingwell.org/post/126918320001</guid>
+            <pubDate>Mon, 17 Aug 2015 17:00:25 +0100</pubDate>
+            <category>cli</category>
+            <category>csv</category>
+            <category>crossplatform</category>
+        </item>
+        <item>
+            <title>termtile</title>
+            <description>&lt;a href="https://github.com/apaszke/termtile"&gt;termtile&lt;/a&gt;: &lt;p&gt;&lt;img src="http://c.1tw.org/images/2015/termtile.gif" alt="An animated screenshot showing termtile resizing and moving iTerm windows." width="100%" border="0"/&gt;&lt;/p&gt; &lt;blockquote&gt; &lt;p&gt;termtile is a set of scripts, which set you free from your mouse and touchpad. Don’t distract yourself and manage all your terminal windows with a handful of commands.&lt;/p&gt; &lt;p&gt;All scripts are written in AppleScript, so they are unfortunately limited to OS X at the moment.&lt;/p&gt; &lt;/blockquote&gt; &lt;p&gt;With a command line interface–&lt;code&gt;ll&lt;/code&gt; makes a window fill the left half of your screen, &lt;code&gt;cen&lt;/code&gt; centers a window, &lt;code&gt;tile&lt;/code&gt; puts windows on a two by two grid, &lt;span class="amp"&gt;&amp;&lt;/span&gt;c..&lt;/p&gt;</description>
+            <link>http://onethingwell.org/post/126911729191</link>
+            <guid>http://onethingwell.org/post/126911729191</guid>
+            <pubDate>Mon, 17 Aug 2015 15:00:11 +0100</pubDate>
+            <category>osx</category>
+            <category>windowmanagers</category>
+            <category>cli</category>
+        </item>
+        <item>
+            <title>pex</title>
+            <description>&lt;a href="https://github.com/pantsbuild/pex"&gt;pex&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;pex is a library for generating .pex (Python EXecutable) files which are executable Python environments in the spirit of &lt;a href="http://virtualenv.org/"&gt;virtualenvs&lt;/a&gt;.&lt;/p&gt; &lt;p&gt;pex… makes the deployment of Python applications as simple as &lt;code&gt;cp&lt;/code&gt;. pex files may even include multiple platform-specific Python distributions, meaning that a single pex file can be portable across Linux and OS X.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/126906360476</link>
+            <guid>http://onethingwell.org/post/126906360476</guid>
+            <pubDate>Mon, 17 Aug 2015 13:00:15 +0100</pubDate>
+            <category>python</category>
+            <category>packages</category>
+            <category>development</category>
+        </item>
+        <item>
+            <title>Tufte CSS</title>
+            <description>&lt;a href="http://www.daveliepmann.com/tufte-css/"&gt;Tufte CSS&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Tufte CSS provides tools to style web articles using the ideas demonstrated by &lt;a href="https://en.wikipedia.org/wiki/Edward_Tufte"&gt;Edward Tufte&lt;/a&gt;’s books and handouts. Tufte’s style is known for its simplicity, extensive use of sidenotes, tight integration of graphics with text, and carefully chosen typography.&lt;/p&gt; &lt;/blockquote&gt; &lt;p&gt;&lt;small&gt;Via &lt;a href="https://projects.metafilter.com/4676/Tufte-CSS"&gt;MetaFilter Projects&lt;/a&gt;.&lt;/small&gt;&lt;/p&gt;</description>
+            <link>http://onethingwell.org/post/126675602938</link>
+            <guid>http://onethingwell.org/post/126675602938</guid>
+            <pubDate>Fri, 14 Aug 2015 17:00:32 +0100</pubDate>
+            <category>web</category>
+            <category>design</category>
+            <category>css</category>
+        </item>
+        <item>
+            <title>drive</title>
+            <description>&lt;a href="https://github.com/odeke-em/drive"&gt;drive&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;&lt;code&gt;drive&lt;/code&gt; is a tiny program to pull or push &lt;a href="https://www.google.com/drive/"&gt;Google Drive&lt;/a&gt; files.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/126669045710</link>
+            <guid>http://onethingwell.org/post/126669045710</guid>
+            <pubDate>Fri, 14 Aug 2015 15:00:04 +0100</pubDate>
+            <category>google</category>
+            <category>storage</category>
+            <category>crossplatform</category>
+        </item>
+        <item>
+            <title>mycli</title>
+            <description>&lt;a href="http://mycli.net"&gt;mycli&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Mycli is a command line interface for MySQL, MariaDB, and Percona with auto-completion and syntax highlighting.&lt;/p&gt; &lt;/blockquote&gt; &lt;h4&gt; See also&lt;/h4&gt; &lt;ul&gt;&lt;li&gt;&lt;a href="http://onethingwell.org/post/109879472006/pgcli"&gt;pgcli&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt;
+            </description>
+            <link>http://onethingwell.org/post/126663781661</link>
+            <guid>http://onethingwell.org/post/126663781661</guid>
+            <pubDate>Fri, 14 Aug 2015 13:00:31 +0100</pubDate>
+            <category>cli</category>
+            <category>mysql</category>
+            <category>crossplatform</category>
+        </item>
+        <item>
+            <title>Resflash</title>
+            <description>&lt;a href="http://stable.rcesoftware.com/resflash/"&gt;Resflash&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Resflash is a tool for building &lt;a href="http://www.openbsd.org/"&gt;OpenBSD&lt;/a&gt; images for embedded and cloud systems in a reproducible way.&lt;/p&gt; &lt;p&gt;Resflash exclusively uses read-only and memory-backed filesystems, and because the partitions are only written to during system upgrades… filesystems are not subject to corruption or &lt;code&gt;fsck&lt;/code&gt; due to power loss - and even cheap flash drives can last virtually forever. Resflash images can be written to any bootable flash media, such as USB drives, SD cards, or Compact Flash, or even conventional hard drives or SSDs.&lt;/p&gt; &lt;/blockquote&gt; &lt;p&gt;&lt;small&gt;Via &lt;a href="https://twitter.com/nixcraft/status/624637300215971840"&gt;@nixcraft&lt;/a&gt;.&lt;/small&gt;&lt;/p&gt;</description>
+            <link>http://onethingwell.org/post/126588833246</link>
+            <guid>http://onethingwell.org/post/126588833246</guid>
+            <pubDate>Thu, 13 Aug 2015 15:00:21 +0100</pubDate>
+            <category>bsd</category>
+            <category>images</category>
+        </item>
+        <item>
+            <title>Numi</title>
+            <description>&lt;a href="http://numi.io"&gt;Numi&lt;/a&gt;: &lt;p&gt;&lt;img src="http://c.1tw.org/images/2015/numi.png" alt="A screenshot of Numi showing its currency &amp; unit conversion features, date handling and CSS unit support." width="100%" border="0"/&gt;&lt;/p&gt; &lt;p&gt;Numi is a calculator for OS X with support for all sorts of everyday maths tasks, from dates, currency conversion and quick percentage calculations to CSS units.&lt;/p&gt;</description>
+            <link>http://onethingwell.org/post/126583572564</link>
+            <guid>http://onethingwell.org/post/126583572564</guid>
+            <pubDate>Thu, 13 Aug 2015 13:00:33 +0100</pubDate>
+            <category>calculators</category>
+            <category>osx</category>
+        </item>
+        <item>
+            <title>MatrixPen</title>
+            <description>&lt;a href="http://richardallen.me/matrixpen/"&gt;MatrixPen&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;MatrixPen takes the hassle out of drawing to an 8x8 LED matrix from an &lt;a href="https://en.wikipedia.org/wiki/Arduino" title="Arduino"&gt;Arduino&lt;/a&gt;. Draw on your Mac and export straight to code. Leave the bitshifting to us.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/125522030053</link>
+            <guid>http://onethingwell.org/post/125522030053</guid>
+            <pubDate>Fri, 31 Jul 2015 17:00:21 +0100</pubDate>
+            <category>arduino</category>
+            <category>osx</category>
+        </item>
+        <item>
+            <title>FORD</title>
+            <description>&lt;a href="https://github.com/cmacmackin/ford/"&gt;FORD&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Automatically generates FORtran Documentation from comments within the code.&lt;/p&gt; &lt;p&gt;The goal of FORD is to be able to reliably produce documentation for modern Fortran software which is informative and nice to look at. The documentation should be easy to write and non-obtrusive within the code.&lt;/p&gt; &lt;/blockquote&gt;
+            </description>
+            <link>http://onethingwell.org/post/125515167956</link>
+            <guid>http://onethingwell.org/post/125515167956</guid>
+            <pubDate>Fri, 31 Jul 2015 15:00:10 +0100</pubDate>
+            <category>fortran</category>
+            <category>documentation</category>
+            <category>crossplatform</category>
+        </item>
+        <item>
+            <title>Showgoers</title>
+            <description>&lt;a href="http://showgoers.tv/" onmouseover="javascript:void(0)"&gt;Showgoers&lt;/a&gt;: &lt;blockquote&gt; &lt;p&gt;Showgoers is a Chrome browser extension to synchronize your Netflix player with someone else so that you can co-watch the same movie on different computers with no hassle. Syncing up your player is as easy as sharing a URL.&lt;/p&gt; &lt;/blockquote&gt;&lt;script&gt;some code&lt;/script&gt;</description>
+            <link>http://onethingwell.org/post/125509667816</link>
+            <guid>http://onethingwell.org/post/125509667816</guid>
+            <pubDate>Fri, 31 Jul 2015 13:00:13 +0100</pubDate>
+            <category>netflix</category>
+            <category>chrome</category>
+            <category>extensions</category>
+        </item>
+    </channel>
+</rss>
