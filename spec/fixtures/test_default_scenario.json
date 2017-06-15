@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "name": "default-scenario",
+  "description": "This scenario has a few agents to get you started. Feel free to change them or delete them as you see fit!",
+  "source_url": false,
+  "guid": "ee4299225e6531c401a8bbbce0771ce4",
+  "tag_fg_color": "#ffffff",
+  "tag_bg_color": "#5bc0de",
+  "exported_at": "2016-04-03T18:24:42Z",
+  "agents": [
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "Rain Notifier",
+      "disabled": false,
+      "guid": "361ee2e955d4726b52c8b044d4f75e25",
+      "options": {
+        "expected_receive_period_in_days": "2",
+        "rules": [
+          {
+            "type": "regex",
+            "value": "rain|storm",
+            "path": "conditions"
+          }
+        ],
+        "message": "Just so you know, it looks like '{{conditions}}' tomorrow in {{location}}"
+      },
+      "keep_events_for": 0,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::EmailDigestAgent",
+      "name": "Morning Digest",
+      "disabled": false,
+      "guid": "b34eaee75d8dc67843c3bd257c213852",
+      "options": {
+        "subject": "Your Morning Digest",
+        "expected_receive_period_in_days": "30"
+      },
+      "schedule": "6am",
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::WeatherAgent",
+      "name": "SF Weather Agent",
+      "disabled": false,
+      "guid": "bdae6dfdf9d01a123ddd513e695fd466",
+      "options": {
+        "location": "94103",
+        "api_key": "put-your-key-here"
+      },
+      "schedule": "10pm",
+      "keep_events_for": 0
+    }
+  ],
+  "links": [
+    {
+      "source": 2,
+      "receiver": 0
+    },
+    {
+      "source": 0,
+      "receiver": 1
+    }
+  ],
+  "control_links": [
+
+  ]
+}

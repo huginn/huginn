@@ -1,0 +1,12 @@
+## This file is used for deployment to cloudfoundry.
+
+---
+applications:
+- name: huginn
+  url: <app-url>
+  path: .
+  memory: 512M
+  command: nohup foreman start --procfile Procfile.CF
+  instances: 1
+  services:
+    - huginn-db

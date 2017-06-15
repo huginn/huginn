@@ -1,6 +1,6 @@
 # Increase handler size to 16MB (consistent with events.payload)
 
-class ChangeHandlerToMediumText < ActiveRecord::Migration
+class ChangeHandlerToMediumText < ActiveRecord::Migration[4.2]
   def up
     if mysql?
       change_column :delayed_jobs, :handler, :text, :limit => 16777215

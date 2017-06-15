@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::UserLocationAgent do
   before do
@@ -6,7 +6,8 @@ describe Agents::UserLocationAgent do
                                   :name => 'something',
                                   :options => { :secret => 'my_secret',
                                     :max_accuracy => '50',
-                                    :min_distance => '50' })
+                                    :min_distance => '50',
+                                    :api_key => 'api_key' })
     @agent.save!
   end
 

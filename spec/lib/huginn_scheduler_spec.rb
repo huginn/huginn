@@ -1,20 +1,23 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'huginn_scheduler'
 
 describe HuginnScheduler do
   before(:each) do
+    @rufus_scheduler = Rufus::Scheduler.new
     @scheduler = HuginnScheduler.new
-    stub
+    stub(@scheduler).setup {}
+    @scheduler.setup!(@rufus_scheduler, Mutex.new)
   end
 
-  it "should stop the scheduler" do
-    mock.instance_of(Rufus::Scheduler).stop
-    @scheduler.stop
+  after(:each) do
+    @rufus_scheduler.shutdown(:wait)
   end
 
   it "schould register the schedules with the rufus scheduler and run" do
-    mock.instance_of(Rufus::Scheduler).join
-    @scheduler.run!
+    mock(@rufus_scheduler).join
+    scheduler = HuginnScheduler.new
+    scheduler.setup!(@rufus_scheduler, Mutex.new)
+    scheduler.run
   end
 
   it "should run scheduled agents" do
@@ -61,7 +64,7 @@ describe HuginnScheduler do
       @keep = Delayed::Job.order(:failed_at)[1]
     end
 
-    it "work with set FAILED_JOBS_TO_KEEP env variable", focus: true do
+    it "work with set FAILED_JOBS_TO_KEEP env variable" do
       expect { @scheduler.send(:cleanup_failed_jobs!) }.to change(Delayed::Job, :count).by(-1)
       expect { @scheduler.send(:cleanup_failed_jobs!) }.to change(Delayed::Job, :count).by(0)
       expect(@keep.id).to eq(Delayed::Job.order(:failed_at)[0].id)
@@ -75,10 +78,21 @@ describe HuginnScheduler do
       ENV['FAILED_JOBS_TO_KEEP'] = old
     end
   end
+
+  context "#setup_worker" do
+    it "should return an array with an instance of itself" do
+      workers = HuginnScheduler.setup_worker
+      expect(workers).to be_a(Array)
+      expect(workers.first).to be_a(HuginnScheduler)
+      expect(workers.first.id).to eq('HuginnScheduler')
+    end
+  end
 end
 
 describe Rufus::Scheduler do
   before :each do
+    Agent.delete_all
+
     @taoe, Thread.abort_on_exception = Thread.abort_on_exception, false
     @oso, @ose, $stdout, $stderr = $stdout, $stderr, StringIO.new, StringIO.new
 
@@ -97,7 +111,7 @@ describe Rufus::Scheduler do
   end
 
   after :each do
-    @scheduler.shutdown
+    @scheduler.shutdown(:wait)
 
     Thread.abort_on_exception = @taoe
     $stdout, $stderr = @oso, @ose

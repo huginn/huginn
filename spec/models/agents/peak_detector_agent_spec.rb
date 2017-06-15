@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::PeakDetectorAgent do
   before do
@@ -8,7 +8,8 @@ describe Agents::PeakDetectorAgent do
           'expected_receive_period_in_days' => "2",
           'group_by_path' => "filter",
           'value_path' => "count",
-          'message' => "A peak was found"
+          'message' => "A peak was found",
+          'min_events' => "4"
         }
     }
 
@@ -68,6 +69,15 @@ describe Agents::PeakDetectorAgent do
                                   :pattern => { 'filter' => "something" })
       expect(@agent.memory['peaks']['something'].length).to eq(2)
     end
+
+    it 'waits and accumulates min events before triggering for peaks' do
+      @agent.options['min_peak_spacing_in_days'] = 1/24.0
+      @agent.options['min_events'] = '10'
+      @agent.receive build_events(:keys => ['count'],
+                                  :values => [1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 10, 1].map {|i| [i]},
+                                  :pattern => { 'filter' => "something" })
+      expect(@agent.memory['peaks']['something'].length).to eq(1)
+    end
   end
 
   describe "validation" do
@@ -88,6 +98,14 @@ describe Agents::PeakDetectorAgent do
     it "should validate presence of value_path" do
       @agent.options['value_path'] = ""
       expect(@agent).not_to be_valid
+    end
+
+    it "should validate search_url" do
+      @agent.options['search_url'] = 'https://twitter.com/'
+      expect(@agent).not_to be_valid
+
+      @agent.options['search_url'] = 'https://twitter.com/{q}'
+      expect(@agent).to be_valid
     end
   end
 end

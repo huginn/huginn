@@ -1,0 +1,38 @@
+# This needs at least compose 1.6.0
+version: '2'
+
+services:
+  mysqldata:
+    image: mysql:5.7
+    command: /bin/true
+
+  mysql:
+    image: mysql:5.7
+    volumes_from:
+      - mysqldata
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: myrootpassword
+      MYSQL_DATABASE: huginn
+      MYSQL_USER: huginn
+      MYSQL_PASSWORD: myhuginnpassword
+
+  huginn:
+    build:
+      context: ../../
+      dockerfile: docker/multi-process/Dockerfile
+    restart: always
+    environment:
+      HUGINN_DATABASE_NAME: huginn
+      HUGINN_DATABASE_USERNAME: root
+      HUGINN_DATABASE_PASSWORD: myrootpassword
+      INTENTIONALLY_SLEEP: 10
+      #DATABASE_INITIAL_CONNECT_MAX_RETRIES: 5
+      PORT: 3000
+      MYSQL_PORT_3306_TCP_ADDR: mysql
+      MYSQL_PORT_3306_TCP_PORT: 3306
+    ports:
+      - 3000:3000
+    links:
+      - mysql

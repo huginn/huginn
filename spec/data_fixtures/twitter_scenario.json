@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "name": "Twitter",
+  "description": "No description provided",
+  "source_url": false,
+  "guid": "d91bf1508595a65b4a00b74d59857918",
+  "tag_fg_color": "#ffffff",
+  "tag_bg_color": "#5bc0de",
+  "icon": "pencil",
+  "exported_at": "2017-01-17T19:08:31Z",
+  "agents": [
+    {
+      "type": "Agents::TwitterStreamAgent",
+      "name": "Twitter Counts",
+      "disabled": false,
+      "guid": "03c77bb9ec0fb2415f7c399ba849289d",
+      "options": {
+        "filters": [
+          "ruby vulnerability",
+          "rails security",
+          "huginn"
+        ],
+        "expected_update_period_in_days": "2",
+        "generate": "counts"
+      },
+      "schedule": "every_10m",
+      "keep_events_for": 604800
+    }
+ ],
+  "links": [
+  ],
+  "control_links": [
+
+  ]
+}

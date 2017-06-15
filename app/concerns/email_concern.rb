@@ -13,7 +13,7 @@ module EmailConcern
     if options['recipients'].present?
       emails = options['recipients']
       emails = [emails] if emails.is_a?(String)
-      unless emails.all? { |email| email =~ Devise.email_regexp }
+      unless emails.all? { |email| email =~ Devise.email_regexp || email =~ /\{/ }
         errors.add(:base, "'when provided, 'recipients' should be an email address or an array of email addresses")
       end
     end

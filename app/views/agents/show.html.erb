@@ -1,8 +1,10 @@
+<% content_for :title, @agent.name -%>
+
 <div class='container agent-show'>
   <div class='row'>
     <div class='col-md-2'>
         <ul class="nav nav-pills nav-stacked" id="show-tabs">
-          <li><%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, agents_path %></li>
+          <li><%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, filtered_agent_return_link || agents_path %></li>
 
           <% if agent_show_view(@agent).present? %>
             <li class='active'><a href="#summary" data-toggle="tab"><span class='glyphicon glyphicon-picture'></span> Summary</a></li>
@@ -14,15 +16,15 @@
 
           <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><span class='glyphicon glyphicon-list-alt'></span> Logs</a></li>
 
-          <% if @agent.can_create_events? && @agent.events.count > 0 %>
-            <li><%= link_to icon_tag('glyphicon-random') + ' Events'.html_safe, agent_events_path(@agent) %></li>
+          <% if @agent.can_create_events? && @agent.events_count > 0 %>
+            <li><%= link_to icon_tag('glyphicon-random') + ' Events'.html_safe, agent_events_path(@agent, return: request.fullpath) %></li>
           <% else %>
             <li class='disabled'><a><span class='glyphicon glyphicon-random'></span> Events</a></li>
           <% end %>
 
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span></a>
-            <%= render 'agents/action_menu', :agent => @agent, :returnTo => "show" %>
+            <%= render 'agents/action_menu', :agent => @agent, :return_to => "show" %>
           </li>
         </ul>
       </div>
@@ -103,7 +105,7 @@
             <% if @agent.can_create_events? %>
               <p>
                 <b>Events created:</b>
-                <%= link_to @agent.events.count, agent_events_path(@agent) %>
+                <%= link_to @agent.events_count, agent_events_path(@agent) %>
               </p>
             <% end %>
 
@@ -161,13 +163,18 @@
               <b>Options:</b>
               <pre><%= Utils.pretty_jsonify @agent.options || {} %></pre>
             </p>
-
-            <p>
-              <b>Memory:</b>
-              <pre><%= Utils.pretty_jsonify @agent.memory || {} %></pre>
-            </p>
+            <% if @agent.memory.present? %>
+              <p id="memory" data-agent-id="<%= @agent.id %>">
+                <b>Memory:</b>
+                <i class="fa fa-spinner fa-pulse spinner"></i>
+                <i class="fa fa-trash action-icon clear"></i>
+                <a id="toggle-memory" href="#">Show</a>
+                <pre class="memory hidden"><%= Utils.pretty_jsonify @agent.memory || {} %></pre>
+              </p>
+            <% end %>
           </div>
         </div>
       </div>
   </div>
 </div>
+

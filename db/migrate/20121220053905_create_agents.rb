@@ -1,4 +1,4 @@
-class CreateAgents < ActiveRecord::Migration
+class CreateAgents < ActiveRecord::Migration[4.2]
   def change
     create_table :agents do |t|
       t.integer :user_id

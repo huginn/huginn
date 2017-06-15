@@ -5,6 +5,12 @@ jane_weather:
   public: false
   guid: random-guid-generated-by-bob
 
+jane_weather_duplicate:
+  name: Jane's duplicated, incomplete weather alert Scenario
+  user: jane
+  public: false
+  guid: random-guid-generated-by-jane2
+
 bob_weather:
   name: Bob's weather alert Scenario
   user: bob

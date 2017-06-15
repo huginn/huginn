@@ -1,4 +1,4 @@
-class AddControlLinks < ActiveRecord::Migration
+class AddControlLinks < ActiveRecord::Migration[4.2]
   def change
     create_table :control_links do |t|
       t.integer :controller_id, null: false

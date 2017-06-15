@@ -1,8 +1,6 @@
 class Scenario < ActiveRecord::Base
   include HasGuid
 
-  attr_accessible :name, :agent_ids, :description, :public, :source_url, :tag_fg_color, :tag_bg_color
-
   belongs_to :user, :counter_cache => :scenario_count, :inverse_of => :scenarios
   has_many :scenario_memberships, :dependent => :destroy, :inverse_of => :scenario
   has_many :agents, :through => :scenario_memberships, :inverse_of => :scenarios
@@ -16,9 +14,35 @@ class Scenario < ActiveRecord::Base
 
   validate :agents_are_owned
 
-  protected
+  def destroy_with_mode(mode)
+    case mode
+    when 'all_agents'
+      Agent.destroy(agents.pluck(:id))
+    when 'unique_agents'
+      Agent.destroy(unique_agent_ids)
+    end
+
+    destroy
+  end
+
+  def self.icons
+    @icons ||= begin
+      YAML.load_file(Rails.root.join('config/icons.yml'))
+    end
+  end
+
+  private
+
+  def unique_agent_ids
+    agents.joins(:scenario_memberships)
+          .group('scenario_memberships.agent_id')
+          .having('count(scenario_memberships.agent_id) = 1')
+          .pluck('scenario_memberships.agent_id')
+  end
 
   def agents_are_owned
-    errors.add(:agents, "must be owned by you") unless agents.all? {|s| s.user == user }
+    unless agents.all? { |s| s.user == user }
+      errors.add(:agents, 'must be owned by you')
+    end
   end
 end

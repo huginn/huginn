@@ -1,0 +1,44 @@
+#!/bin/bash
+set -e
+
+export LC_ALL=en_US.UTF-8
+
+cd /app
+
+# Do we have a Rails secret yet?
+# If not, generate one, but persist it for the container's lifetime.
+if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW .env.example; then
+  echo 'Generating random APP_SECRET_TOKEN.'
+  secret=$(dd if=/dev/urandom bs=36 count=1 | openssl base64)
+  sed -i.orig "s:REPLACE_ME_NOW:$secret:" .env.example
+fi
+
+/scripts/setup_env
+source /app/.env
+
+# use default port number if it is still not set
+case "${DATABASE_ADAPTER}" in
+  mysql2) DATABASE_PORT=${DATABASE_PORT:-3306} ;;
+  postgresql) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
+  *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
+esac
+
+sudo -u huginn -H -E bundle install --without test development --path vendor/bundle
+
+if [[ -z "${DO_NOT_CREATE_DATABASE}" && -z $1 ]]; then
+  sudo -u huginn -H -E bundle exec rake db:create RAILS_ENV=${RAILS_ENV}
+fi
+
+if [ -z $1 ]; then
+  sudo -u huginn -H -E bundle exec rake db:migrate RAILS_ENV=${RAILS_ENV}
+fi
+
+if [[ -z "${DO_NOT_SEED}" && -z $1 ]]; then
+  sudo -u huginn -H -E bundle exec rake db:seed RAILS_ENV=${RAILS_ENV}
+fi
+
+if [ -z $1 ]; then
+  exec sudo -u huginn -H -E bundle exec unicorn -c config/unicorn.rb
+else
+  exec sudo -u huginn -H -E bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
+fi

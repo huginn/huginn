@@ -1,3 +1,5 @@
+<% load_ace_editor! %>
+
 <%= form_for(@user_credential, :method => @user_credential.new_record? ? "POST" : "PUT") do |f| %>
   <% if @user_credential.errors.any? %>
     <div class="row well">
@@ -40,5 +42,3 @@
     </div>
   </div>
 <% end %>
-
-<%= javascript_include_tag "user_credentials" %>

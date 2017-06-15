@@ -1,5 +1,5 @@
 <% content_for :head do -%>
-<%= javascript_include_tag "https://maps.googleapis.com/maps/api/js?sensor=false" %>
+<%= javascript_include_tag "https://maps.googleapis.com/maps/api/js?key=#{@agent.options[:api_key]}" %>
 <%= javascript_include_tag "map_marker" %>
 <% end -%>
 

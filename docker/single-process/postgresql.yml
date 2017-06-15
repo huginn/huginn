@@ -1,0 +1,86 @@
+# This needs at least compose 1.6.0
+version: '2'
+
+services:
+  postgresdata:
+    image: postgres:9.5
+    command: /bin/true
+
+  postgres:
+    image: postgres:9.5
+    volumes_from:
+      - postgresdata
+    environment:
+      POSTGRES_PASSWORD: myhuginnpassword
+      POSTGRES_USER: huginn
+
+  huginn_web:
+    image: huginn/huginn-single-process
+    restart: always
+    extends:
+      file: environment.yml
+      service: huginn_base
+    environment:
+      DATABASE_ADAPTER: postgresql
+      POSTGRES_PORT_5432_TCP_ADDR: postgres
+      POSTGRES_PORT_5432_TCP_PORT: 5432
+    ports:
+      - 3000:3000
+    links:
+      - postgres
+
+  huginn_threaded:
+    image: huginn/huginn-single-process
+    restart: always
+    extends:
+      file: environment.yml
+      service: huginn_base
+    environment:
+      DATABASE_ADAPTER: postgresql
+      POSTGRES_PORT_5432_TCP_ADDR: postgres
+      POSTGRES_PORT_5432_TCP_PORT: 5432
+    links:
+      - postgres
+    command: /scripts/init bin/threaded.rb
+
+  # huginn_schedule:
+  #   image: huginn/huginn-single-process
+  #   extends:
+  #     file: environment.yml
+  #     service: huginn_base
+  #   environment:
+  #     DATABASE_ADAPTER: postgresql
+  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
+  #     POSTGRES_PORT_5432_TCP_PORT: 5432
+  #   links:
+  #     - postgres
+  #   command: /scripts/init bin/schedule.rb
+
+
+  # huginn_twitter_stream:
+  #   image: huginn/huginn-single-process
+  #   extends:
+  #     file: environment.yml
+  #     service: huginn_base
+  #   environment:
+  #     DATABASE_ADAPTER: postgresql
+  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
+  #     POSTGRES_PORT_5432_TCP_PORT: 5432
+  #   links:
+  #     - postgres
+  #   command: /scripts/init bin/twitter_stream.rb
+
+
+  # huginn_dj1:
+  #   image: huginn/huginn-single-process
+  #   extends:
+  #     file: environment.yml
+  #     service: huginn_base
+  #   environment:
+  #     DATABASE_ADAPTER: postgresql
+  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
+  #     POSTGRES_PORT_5432_TCP_PORT: 5432
+  #   links:
+  #     - postgres
+  #   command: /scripts/init script/delayed_job run
+

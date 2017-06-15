@@ -1,0 +1,6 @@
+<div class="btn-group">
+  <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+    <span class="caret"></span>
+  </button>
+  <%= render 'agents/action_menu', agent: agent, return_to: (defined?(return_to) && return_to) || request.path %>
+</div>

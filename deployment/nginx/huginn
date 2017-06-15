@@ -1,0 +1,70 @@
+## Huginn
+##
+## Lines starting with two hashes (##) are comments with information.
+## Lines starting with one hash (#) are configuration parameters that can be uncommented.
+##
+###################################
+##         configuration         ##
+###################################
+##
+## See installation.md#using-https for additional HTTPS configuration details.
+
+upstream huginn {
+  server unix:/home/huginn/huginn/tmp/sockets/unicorn.socket fail_timeout=0;
+}
+
+## Normal HTTP host
+server {
+  listen 0.0.0.0:80 default_server;
+  listen [::]:80 ipv6only=on default_server;
+  server_name YOUR_SERVER_FQDN; ## Replace this with something like huginn.example.com
+  server_tokens off; ## Don't show the nginx version number, a security best practice
+  root /home/huginn/huginn/public;
+
+  ## Increase this if you want to upload large attachments
+  client_max_body_size 20m;
+
+  ## Individual nginx logs for this Huginn vhost
+  access_log  /var/log/nginx/huginn_access.log;
+  error_log   /var/log/nginx/huginn_error.log;
+
+  location / {
+    ## Serve static files from defined root folder.
+    ## @huginn is a named location for the upstream fallback, see below.
+    try_files $uri $uri/index.html $uri.html @huginn;
+  }
+
+  ## If a file, which is not found in the root folder is requested,
+  ## then the proxy passes the request to the upsteam (huginn unicorn).
+  location @huginn {
+    ## If you use HTTPS make sure you disable gzip compression
+    ## to be safe against BREACH attack.
+    # gzip off;
+
+    proxy_read_timeout      300;
+    proxy_connect_timeout   300;
+    proxy_redirect          off;
+
+    proxy_set_header    Host                $http_host;
+    proxy_set_header    X-Real-IP           $remote_addr;
+    proxy_set_header    X-Forwarded-For     $proxy_add_x_forwarded_for;
+    proxy_set_header    X-Forwarded-Proto   $scheme;
+    proxy_set_header    X-Frame-Options     SAMEORIGIN;
+
+    proxy_pass http://huginn;
+  }
+
+  ## Enable gzip compression as per rails guide:
+  ## http://guides.rubyonrails.org/asset_pipeline.html#gzip-compression
+  ## WARNING: If you are using relative urls remove the block below
+  ## See config/application.rb under "Relative url support" for the list of
+  ## other files that need to be changed for relative url support
+  location ~ ^/(assets)/ {
+    root /home/huginn/huginn/public;
+    gzip_static on; # to serve pre-gzipped version
+    expires max;
+    add_header Cache-Control public;
+  }
+
+  error_page 502 /502.html;
+}

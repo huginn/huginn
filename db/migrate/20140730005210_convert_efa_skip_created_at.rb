@@ -1,4 +1,4 @@
-class ConvertEfaSkipCreatedAt < ActiveRecord::Migration
+class ConvertEfaSkipCreatedAt < ActiveRecord::Migration[4.2]
   def up
     Agent.where(type: 'Agents::EventFormattingAgent').each do |agent|
       agent.options_will_change!

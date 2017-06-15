@@ -6,8 +6,9 @@ module Agents
     default_schedule "every_1m"
 
     description <<-MD
+      The Dropbox Watch Agent watches the given `dir_to_watch` and emits events with the detected changes.
+      
       #{'## Include the `dropbox-api` and `omniauth-dropbox` gems in your `Gemfile` and set `DROPBOX_OAUTH_KEY` and `DROPBOX_OAUTH_SECRET` in your environment to use Dropbox Agents.' if dependencies_missing?}
-      The _DropboxWatchAgent_ watches the given `dir_to_watch` and emits events with the detected changes.
     MD
 
     event_description <<-MD

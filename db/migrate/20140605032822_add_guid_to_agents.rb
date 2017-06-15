@@ -1,4 +1,4 @@
-class AddGuidToAgents < ActiveRecord::Migration
+class AddGuidToAgents < ActiveRecord::Migration[4.2]
   class Agent < ActiveRecord::Base; end
 
   def change

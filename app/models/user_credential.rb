@@ -1,8 +1,6 @@
 class UserCredential < ActiveRecord::Base
   MODES = %w[text java_script]
 
-  attr_accessible :credential_name, :credential_value, :mode
-
   belongs_to :user
 
   validates_presence_of :credential_name

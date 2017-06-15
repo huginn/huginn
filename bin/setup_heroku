@@ -81,9 +81,15 @@ unless $config['DOMAIN']
   first_time = true
 end
 
-set_value 'BUILDPACK_URL', "https://github.com/ddollar/heroku-buildpack-multi.git"
+set_value 'BUILDPACK_URL', "https://github.com/heroku/heroku-buildpack-multi.git"
 set_value 'PROCFILE_PATH', "deployment/heroku/Procfile.heroku", force: false
 set_value 'ON_HEROKU', "true"
+
+unless $config['DATABASE_URL']
+  puts "Setting up the postgres addon"
+  puts capture("heroku addons:add heroku-postgresql")
+  puts
+end
 
 unless $config['SMTP_DOMAIN'] && $config['SMTP_USER_NAME'] && $config['SMTP_PASSWORD'] && $config['SMTP_SERVER'] && $config['EMAIL_FROM_ADDRESS']
   puts "Okay, let's setup outgoing email settings.  The simplest solution is to use the free sendgrid Heroku addon."
@@ -154,7 +160,7 @@ if first_time
   puts
   puts "\t#{$config['INVITATION_CODE']}"
   puts
-  puts "We recommend that you read https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku and setup Pingdom to keep your app awake!"
+  puts "We strongly recommend that you read https://github.com/cantino/huginn/blob/master/doc/heroku/install.md thoroughly!"
 end
 
 puts

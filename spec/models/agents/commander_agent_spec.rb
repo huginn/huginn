@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Agents::CommanderAgent do
   let(:valid_params) {
@@ -19,10 +19,10 @@ describe Agents::CommanderAgent do
 
   it_behaves_like AgentControllerConcern
 
-  describe "check!" do
+  describe "check" do
     it "should command targets" do
       stub(agent).control!.once { nil }
-      agent.check!
+      agent.check
     end
   end
 

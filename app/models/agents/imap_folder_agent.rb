@@ -6,93 +6,57 @@ module Agents
   class ImapFolderAgent < Agent
     cannot_receive_events!
 
+    can_dry_run!
+
     default_schedule "every_30m"
 
     description <<-MD
+      The Imap Folder Agent checks an IMAP server in specified folders and creates Events based on new mails found since the last run. In the first visit to a folder, this agent only checks for the initial status and does not create events.
 
-      The ImapFolderAgent checks an IMAP server in specified folders
-      and creates Events based on new mails found since the last run.
-      In the first visit to a foler, this agent only checks for the
-      initial status and does not create events.
-
-      Specify an IMAP server to connect with `host`, and set `ssl` to
-      true if the server supports IMAP over SSL.  Specify `port` if
-      you need to connect to a port other than standard (143 or 993
-      depending on the `ssl` value).
+      Specify an IMAP server to connect with `host`, and set `ssl` to true if the server supports IMAP over SSL.  Specify `port` if you need to connect to a port other than standard (143 or 993 depending on the `ssl` value).
 
       Specify login credentials in `username` and `password`.
 
       List the names of folders to check in `folders`.
 
-      To narrow mails by conditions, build a `conditions` hash with
-      the following keys:
+      To narrow mails by conditions, build a `conditions` hash with the following keys:
 
-      - "subject"
-      - "body"
+      - `subject`
+      - `body`
+          Specify a regular expression to match against the decoded subject/body of each mail.
 
-          Specify a regular expression to match against the decoded
-          subject/body of each mail.
+          Use the `(?i)` directive for case-insensitive search.  For example, a pattern `(?i)alert` will match "alert", "Alert"or "ALERT".  You can also make only a part of a pattern to work case-insensitively: `Re: (?i:alert)` will match either "Re: Alert" or "Re: alert", but not "RE: alert".
 
-          Use the `(?i)` directive for case-insensitive search.  For
-          example, a pattern `(?i)alert` will match "alert", "Alert"
-          or "ALERT".  You can also make only a part of a pattern to
-          work case-insensitively: `Re: (?i:alert)` will match either
-          "Re: Alert" or "Re: alert", but not "RE: alert".
+          When a mail has multiple non-attachment text parts, they are prioritized according to the `mime_types` option (which see below) and the first part that matches a "body" pattern, if specified, will be chosen as the "body" value in a created event.
 
-          When a mail has multiple non-attachment text parts, they are
-          prioritized according to the `mime_types` option (which see
-          below) and the first part that matches a "body" pattern, if
-          specified, will be chosen as the "body" value in a created
-          event.
+          Named captures will appear in the "matches" hash in a created event.
 
-          Named captues will appear in the "matches" hash in a created
-          event.
-
-      - "from", "to", "cc"
-
-          Specify a shell glob pattern string that is matched against
-          mail addresses extracted from the corresponding header
-          values of each mail.
+      - `from`, `to`, `cc`
+          Specify a shell glob pattern string that is matched against mail addresses extracted from the corresponding header values of each mail.
 
           Patterns match addresses in case insensitive manner.
 
-          Multiple pattern strings can be specified in an array, in
-          which case a mail is selected if any of the patterns
-          matches. (i.e. patterns are OR'd)
+          Multiple pattern strings can be specified in an array, in which case a mail is selected if any of the patterns matches. (i.e. patterns are OR'd)
 
-      - "mime_types"
+      - `mime_types`
+          Specify an array of MIME types to tell which non-attachment part of a mail among its text/* parts should be used as mail body.  The default value is `['text/plain', 'text/enriched', 'text/html']`.
 
-          Specify an array of MIME types to tell which non-attachment
-          part of a mail among its text/* parts should be used as mail
-          body.  The default value is `['text/plain', 'text/enriched',
-          'text/html']`.
-
-      - "is_unread"
-
-          Setting this to true or false means only mails that is
-          marked as unread or read respectively, are selected.
+      - `is_unread`
+          Setting this to true or false means only mails that is marked as unread or read respectively, are selected.
 
           If this key is unspecified or set to null, it is ignored.
 
-      - "has_attachment"
-
-          Setting this to true or false means only mails that does or does
-          not have an attachment are selected.
+      - `has_attachment`
+      
+          Setting this to true or false means only mails that does or does not have an attachment are selected.
 
           If this key is unspecified or set to null, it is ignored.
 
       Set `mark_as_read` to true to mark found mails as read.
 
-      Each agent instance memorizes the highest UID of mails that are
-      found in the last run for each watched folder, so even if you
-      change a set of conditions so that it matches mails that are
-      missed previously, or if you alter the flag status of already
-      found mails, they will not show up as new events.
+      Each agent instance memorizes the highest UID of mails that are found in the last run for each watched folder, so even if you change a set of conditions so that it matches mails that are missed previously, or if you alter the flag status of already found mails, they will not show up as new events.
 
-      Also, in order to avoid duplicated notification it keeps a list
-      of Message-Id's of 100 most recent mails, so if multiple mails
-      of the same Message-Id are found, you will only see one event
-      out of them.
+      Also, in order to avoid duplicated notification it keeps a list of Message-Id's of 100 most recent mails, so if multiple mails of the same Message-Id are found, you will only see one event out of them.
     MD
 
     event_description <<-MD
@@ -263,7 +227,14 @@ module Agents
             }
           when 'from', 'to', 'cc'
             value.present? or next true
-            mail.header[key].addresses.any? { |address|
+            begin
+              # Mail::Field really needs to define respond_to_missing?
+              # so we could use try(:addresses) here.
+              addresses = mail.header[key].addresses
+            rescue NoMethodError
+              next false
+            end
+            addresses.any? { |address|
               Array(value).any? { |pattern|
                 glob_match?(pattern, address)
               }
@@ -311,7 +282,7 @@ module Agents
 
         if boolify(interpolated['mark_as_read'])
           log 'Marking as read'
-          mail.mark_as_read
+          mail.mark_as_read unless dry_run?
         end
       }
     end
@@ -322,7 +293,7 @@ module Agents
       port = (Integer(port) if port.present?)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
-      Client.open(host, port, ssl) { |imap|
+      Client.open(host, port: port, ssl: ssl) { |imap|
         log "Logging in as #{username}"
         imap.login(username, interpolated[:password])
 
@@ -437,8 +408,8 @@ module Agents
 
     class Client < ::Net::IMAP
       class << self
-        def open(host, port, ssl)
-          imap = new(host, port, ssl)
+        def open(host, *args)
+          imap = new(host, *args)
           yield imap
         ensure
           imap.disconnect unless imap.nil?
@@ -507,7 +478,7 @@ module Agents
       module Scrubbed
         def scrubbed(method)
           (@scrubbed ||= {})[method.to_sym] ||=
-            __send__(method).scrub { |bytes| "<#{bytes.unpack('H*')[0]}>" }
+            __send__(method).try(:scrub) { |bytes| "<#{bytes.unpack('H*')[0]}>" }
         end
       end
 
@@ -525,17 +496,19 @@ module Agents
 
       def has_attachment?
         @has_attachment ||=
-          begin
-            data = @client.uid_fetch(@uid, 'BODYSTRUCTURE').first
+          if data = @client.uid_fetch(@uid, 'BODYSTRUCTURE').first
             struct_has_attachment?(data.attr['BODYSTRUCTURE'])
+          else
+            false
           end
       end
 
       def fetch
         @parsed ||=
-          begin
-            data = @client.uid_fetch(@uid, 'BODY.PEEK[]').first
+          if data = @client.uid_fetch(@uid, 'BODY.PEEK[]').first
             Mail.read_from_string(data.attr['BODY[]'])
+          else
+            Mail.read_from_string('')
           end
       end
 

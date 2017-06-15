@@ -1,0 +1,55 @@
+# This needs at least compose 1.6.0
+version: '2'
+
+services:
+  mysqldata:
+    image: mysql:5.7
+    command: /bin/true
+
+  mysql:
+    image: mysql:5.7
+    volumes_from:
+      - mysqldata
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: myrootpassword
+      MYSQL_DATABASE: huginn
+      MYSQL_USER: huginn
+      MYSQL_PASSWORD: myhuginnpassword
+
+  huginn_web:
+    build:
+      context: ../../
+      dockerfile: docker/single-process/Dockerfile
+    restart: always
+    environment:
+      DATABASE_ADAPTER: mysql2
+      DATABASE_NAME: huginn
+      DATABASE_USERNAME: huginn
+      DATABASE_PASSWORD: myhuginnpassword
+      APP_SECRET_TOKEN: 3bd139f9186b31a85336bb89cd1a1337078921134b2f48e022fd09c234d764d3e19b018b2ab789c6e0e04a1ac9e3365116368049660234c2038dc9990513d49c
+      MYSQL_PORT_3306_TCP_ADDR: mysql
+      MYSQL_PORT_3306_TCP_PORT: 3306
+    ports:
+      - 3000:3000
+    links:
+      - mysql
+
+  huginn_threaded:
+    build:
+      context: ../../
+      dockerfile: docker/single-process/Dockerfile
+    restart: always
+    environment:
+      DATABASE_ADAPTER: mysql2
+      DATABASE_NAME: huginn
+      DATABASE_USERNAME: huginn
+      DATABASE_PASSWORD: myhuginnpassword
+      APP_SECRET_TOKEN: 3bd139f9186b31a85336bb89cd1a1337078921134b2f48e022fd09c234d764d3e19b018b2ab789c6e0e04a1ac9e3365116368049660234c2038dc9990513d49c
+      MYSQL_PORT_3306_TCP_ADDR: mysql
+      MYSQL_PORT_3306_TCP_PORT: 3306
+    links:
+      - mysql
+    command: /scripts/init bin/threaded.rb
+

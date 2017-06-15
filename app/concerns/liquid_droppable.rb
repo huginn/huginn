@@ -18,20 +18,58 @@ module LiquidDroppable
         yield [name, __send__(name)]
       }
     end
+
+    def as_json
+      return {} unless defined?(self.class::METHODS)
+      Hash[self.class::METHODS.map { |m| [m, send(m).as_json]}]
+    end
   end
 
   included do
-    const_set :Drop, Kernel.const_set("#{name}Drop", Class.new(Drop))
+    const_set :Drop,
+              if Kernel.const_defined?(drop_name = "#{name}Drop")
+                Kernel.const_get(drop_name)
+              else
+                Kernel.const_set(drop_name, Class.new(Drop))
+              end
   end
 
   def to_liquid
     self.class::Drop.new(self)
   end
 
+  class MatchDataDrop < Drop
+    METHODS = %w[pre_match post_match names size]
+
+    METHODS.each { |attr|
+      define_method(attr) {
+        @object.__send__(attr)
+      }
+    }
+
+    def to_s
+      @object[0]
+    end
+
+    def liquid_method_missing(method)
+      @object[method]
+    rescue IndexError
+      nil
+    end
+  end
+
+  class ::MatchData
+    def to_liquid
+      MatchDataDrop.new(self)
+    end
+  end
+
   require 'uri'
 
   class URIDrop < Drop
-    URI::Generic::COMPONENT.each { |attr|
+    METHODS = URI::Generic::COMPONENT
+
+    METHODS.each { |attr|
       define_method(attr) {
         @object.__send__(attr)
       }
@@ -41,6 +79,12 @@ module LiquidDroppable
   class ::URI::Generic
     def to_liquid
       URIDrop.new(self)
+    end
+  end
+
+  class ::ActiveRecord::Associations::CollectionProxy
+    def to_liquid
+      self.to_a.to_liquid
     end
   end
 end

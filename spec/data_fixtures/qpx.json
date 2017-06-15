@@ -1,0 +1,184 @@
+{
+  "kind": "qpxExpress#tripsSearch",
+  "trips": {
+    "kind": "qpxexpress#tripOptions",
+    "requestId": "a5KWNgUILMQXl0QjZ0O1Kj",
+    "data": {
+      "kind": "qpxexpress#data",
+      "airport": [
+        {
+          "kind": "qpxexpress#airportData",
+          "code": "BOS",
+          "city": "BOS",
+          "name": "Boston Logan International"
+        },
+        {
+          "kind": "qpxexpress#airportData",
+          "code": "SFO",
+          "city": "SFO",
+          "name": "San Francisco International"
+        }
+      ],
+      "city": [
+        {
+          "kind": "qpxexpress#cityData",
+          "code": "BOS",
+          "name": "Boston"
+        },
+        {
+          "kind": "qpxexpress#cityData",
+          "code": "SFO",
+          "name": "San Francisco"
+        }
+      ],
+      "aircraft": [
+        {
+          "kind": "qpxexpress#aircraftData",
+          "code": "320",
+          "name": "Airbus A320"
+        }
+      ],
+      "tax": [
+        {
+          "kind": "qpxexpress#taxData",
+          "id": "ZP",
+          "name": "US Flight Segment Tax"
+        },
+        {
+          "kind": "qpxexpress#taxData",
+          "id": "AY_001",
+          "name": "US September 11th Security Fee"
+        },
+        {
+          "kind": "qpxexpress#taxData",
+          "id": "US_001",
+          "name": "US Transportation Tax"
+        },
+        {
+          "kind": "qpxexpress#taxData",
+          "id": "XF",
+          "name": "US Passenger Facility Charge"
+        }
+      ],
+      "carrier": [
+        {
+          "kind": "qpxexpress#carrierData",
+          "code": "B6",
+          "name": "Jetblue Airways Corporation"
+        }
+      ]
+    },
+    "tripOption": [
+      {
+        "kind": "qpxexpress#tripOption",
+        "saleTotal": "USD244.10",
+        "id": "SD5atWDaIWFUAOehDmedl8001",
+        "slice": [
+          {
+            "kind": "qpxexpress#sliceInfo",
+            "duration": 404,
+            "segment": [
+              {
+                "kind": "qpxexpress#segmentInfo",
+                "duration": 404,
+                "flight": {
+                  "carrier": "B6",
+                  "number": "833"
+                },
+                "id": "Gv+0Syg7VaA8NyWp",
+                "cabin": "COACH",
+                "bookingCode": "Z",
+                "bookingCodeCount": 7,
+                "marriedSegmentGroup": "0",
+                "leg": [
+                  {
+                    "kind": "qpxexpress#legInfo",
+                    "id": "LXRlPXVU35MvdfE-",
+                    "aircraft": "320",
+                    "arrivalTime": "2016-04-11T23:10-07:00",
+                    "departureTime": "2016-04-11T19:26-04:00",
+                    "origin": "BOS",
+                    "destination": "SFO",
+                    "originTerminal": "C",
+                    "destinationTerminal": "I",
+                    "duration": 404,
+                    "onTimePerformance": 60,
+                    "mileage": 2697,
+                    "secure": true
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "pricing": [
+          {
+            "kind": "qpxexpress#pricingInfo",
+            "fare": [
+              {
+                "kind": "qpxexpress#fareInfo",
+                "id": "Aw9SUGx6XiV/Eeby73yJz5cu1avySnHVCBCW01QV6wk2",
+                "carrier": "B6",
+                "origin": "BOS",
+                "destination": "SFO",
+                "basisCode": "ZH4AUEN"
+              }
+            ],
+            "segmentPricing": [
+              {
+                "kind": "qpxexpress#segmentPricing",
+                "fareId": "Aw9SUGx6XiV/Eeby73yJz5cu1avySnHVCBCW01QV6wk2",
+                "segmentId": "Gv+0Syg7VaA8NyWp"
+              }
+            ],
+            "baseFareTotal": "USD213.95",
+            "saleFareTotal": "USD213.95",
+            "saleTaxTotal": "USD30.15",
+            "saleTotal": "USD244.10",
+            "passengers": {
+              "kind": "qpxexpress#passengerCounts",
+              "adultCount": 1
+            },
+            "tax": [
+              {
+                "kind": "qpxexpress#taxInfo",
+                "id": "US_001",
+                "chargeType": "GOVERNMENT",
+                "code": "US",
+                "country": "US",
+                "salePrice": "USD16.05"
+              },
+              {
+                "kind": "qpxexpress#taxInfo",
+                "id": "AY_001",
+                "chargeType": "GOVERNMENT",
+                "code": "AY",
+                "country": "US",
+                "salePrice": "USD5.60"
+              },
+              {
+                "kind": "qpxexpress#taxInfo",
+                "id": "XF",
+                "chargeType": "GOVERNMENT",
+                "code": "XF",
+                "country": "US",
+                "salePrice": "USD4.50"
+              },
+              {
+                "kind": "qpxexpress#taxInfo",
+                "id": "ZP",
+                "chargeType": "GOVERNMENT",
+                "code": "ZP",
+                "country": "US",
+                "salePrice": "USD4.00"
+              }
+            ],
+            "fareCalculation": "BOS B6 SFO 213.95ZH4AUEN USD 213.95 END ZP BOS XT 16.05US 4.00ZP 5.60AY 4.50XF BOS4.50",
+            "latestTicketingTime": "2016-03-24T23:59-04:00",
+            "ptc": "ADT"
+          }
+        ]
+      }
+    ]
+  }
+}

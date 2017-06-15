@@ -7,8 +7,11 @@ module Agents
     gem_dependency_check { defined?(HyPDF) }
 
     cannot_be_scheduled!
+    no_bulk_receive!
 
     description <<-MD
+      The PDF Info Agent returns the metadata contained within a given PDF file, using HyPDF.
+
       #{'## Include the `hypdf` gem in your `Gemfile` to use PDFInfo Agents.' if dependencies_missing?}
 
       In order for this agent to work, you need to have [HyPDF](https://devcenter.heroku.com/articles/hypdf) running and configured.
