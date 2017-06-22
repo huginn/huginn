@@ -39,6 +39,6 @@ module Huginn
     # like if you have constraints or database-specific column types
     # config.active_record.schema_format = :sql
 
-    config.active_job.queue_adapter = :delayed_job
+    config.active_job.queue_adapter = :sidekiq
   end
 end

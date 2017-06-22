@@ -124,6 +124,7 @@ gem 'rails', '~> 5.0.1'
 gem 'rufus-scheduler', '~> 3.3.2', require: false
 gem 'sass-rails',   '~> 5.0.6'
 gem 'select2-rails', '~> 3.5.4'
+gem 'sidekiq'
 gem 'spectrum-rails'
 gem 'therubyracer', '~> 0.12.2'
 gem 'typhoeus', '~> 0.6.3'
