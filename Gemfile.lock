@@ -160,7 +160,6 @@ GEM
     coffee-script-source (1.10.0)
     colorize (0.7.7)
     concurrent-ruby (1.0.3)
-    connection_pool (2.2.1)
     cookiejar (0.3.2)
     coveralls (0.7.12)
       multi_json (~> 1.10)
@@ -418,8 +417,6 @@ GEM
     rack (2.0.1)
     rack-livereload (0.3.16)
       rack
-    rack-protection (2.0.0)
-      rack
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (5.0.1)
@@ -456,7 +453,6 @@ GEM
       ffi (>= 0.5.0)
     rb-kqueue (0.2.4)
       ffi (>= 0.5.0)
-    redis (3.3.3)
     ref (2.0.0)
     responders (2.3.0)
       railties (>= 4.2.0, < 5.1)
@@ -514,11 +510,6 @@ GEM
     shellany (0.0.1)
     shoulda-matchers (3.0.0)
       activesupport (>= 4.0.0)
-    sidekiq (5.0.2)
-      concurrent-ruby (~> 1.0)
-      connection_pool (~> 2.2, >= 2.2.0)
-      rack-protection (>= 1.5.0)
-      redis (~> 3.3, >= 3.3.3)
     signet (0.6.0)
       addressable (~> 2.3)
       extlib (~> 0.9)
@@ -704,7 +695,6 @@ DEPENDENCIES
   sass-rails (~> 5.0.6)
   select2-rails (~> 3.5.4)
   shoulda-matchers
-  sidekiq
   slack-notifier (~> 1.0.0)
   spectrum-rails
   spring (~> 1.7.2)
@@ -728,7 +718,7 @@ DEPENDENCIES
   xmpp4r (~> 0.5.6)
 
 RUBY VERSION
-   ruby 2.3.1p112
+   ruby 2.3.3p222
 
 BUNDLED WITH
-   1.14.6
+   1.13.7
