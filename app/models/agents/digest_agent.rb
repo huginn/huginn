@@ -35,6 +35,10 @@ module Agents
     form_configurable :expected_receive_period_in_days
     form_configurable :clear_queue
 
+    def validate_options
+      errors.add(:base, 'clear_queue must be 0 to 999') unless options['clear_queue'].to_i >= 0 && options['clear_queue'].to_i < 1000
+    end
+
     def working?
       last_receive_at && last_receive_at > interpolated["expected_receive_period_in_days"].to_i.days.ago && !recent_error_logs?
     end
