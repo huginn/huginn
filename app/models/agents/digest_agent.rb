@@ -10,6 +10,8 @@ module Agents
       The resulting Event will have a payload message of `message`. You can use liquid templating in the `message`, have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
+
+      If `clear_queue` is set to 0, Events are automatically purged from the memory when an Event is emitted by this Agent. To maintain a fixed number of Events, set `clear_queue` to that number.
     MD
 
     event_description <<-MD
@@ -24,12 +26,14 @@ module Agents
     def default_options
       {
           "expected_receive_period_in_days" => "2",
-          "message" => "{{ events | map: 'message' | join: ',' }}"
+          "message" => "{{ events | map: 'message' | join: ',' }}",
+          "clear_queue" => "0"
       }
     end
 
     form_configurable :message, type: :text
     form_configurable :expected_receive_period_in_days
+    form_configurable :clear_queue
 
     def working?
       last_receive_at && last_receive_at > interpolated["expected_receive_period_in_days"].to_i.days.ago && !recent_error_logs?
@@ -40,6 +44,11 @@ module Agents
       incoming_events.each do |event|
         self.memory["queue"] << event.id
       end
+      if interpolated["clear_queue"].to_i > 0
+        while self.memory["queue"].length > interpolated["clear_queue"].to_i do
+          self.memory["queue"].shift
+        end
+      end
     end
 
     def check
@@ -48,7 +57,9 @@ module Agents
         payload = { "events" => events.map { |event| event.payload } }
         payload["message"] = interpolated(payload)["message"]
         create_event :payload => payload
-        self.memory["queue"] = []
+        if interpolated["clear_queue"].to_i == 0
+          self.memory["queue"] = []
+        end
       end
     end
   end
