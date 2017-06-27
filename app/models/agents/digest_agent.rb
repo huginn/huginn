@@ -48,10 +48,8 @@ module Agents
       incoming_events.each do |event|
         self.memory["queue"] << event.id
       end
-      if interpolated["clear_queue"].to_i > 0
-        while self.memory["queue"].length > interpolated["clear_queue"].to_i do
-          self.memory["queue"].shift
-        end
+      if interpolated["clear_queue"].to_i > 0 && memory["queue"].length > interpolated["clear_queue"].to_i
+        memory["queue"].shift(memory["queue"].length - interpolated["clear_queue"].to_i)
       end
     end
 
