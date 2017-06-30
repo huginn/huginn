@@ -1,20 +1,22 @@
 ---
 http_interactions:
 - request:
-    method: get
-    uri: https://www.googleapis.com/discovery/v1/apis/translate/v2/rest?key=some_api_key
+    method: post
+    uri: https://translation.googleapis.com/language/translate/v2?key=some_api_key
     body:
       encoding: UTF-8
-      string: ''
+      string: '{"q":["hey what are you doing"],"target":"sv","source":"en","format":"text"}'
     headers:
       User-Agent:
-      - |-
-        Huginn/0.0.1 google-api-ruby-client/0.7.1 Mac OS X/10.11.6
-         (gzip)
-      Accept-Encoding:
-      - gzip
+      - gcloud-ruby/1.0.0
+      Google-Cloud-Resource-Prefix:
+      - projects/
       Content-Type:
-      - ''
+      - application/json
+      X-Goog-Api-Client:
+      - gl-ruby/2.3.4 gccl/1.0.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
       - "*/*"
   response:
@@ -22,154 +24,53 @@ http_interactions:
       code: 200
       message: OK
     headers:
-      Expires:
-      - Tue, 25 Apr 2017 10:49:56 GMT
-      Date:
-      - Tue, 25 Apr 2017 10:44:56 GMT
-      Etag:
-      - '"YWOzh2SDasdU84ArJnpYek-OMdg/6s__cFeA5l1i01rONlu3TmUQEHs"'
-      Vary:
-      - Origin
-      - X-Origin
       Content-Type:
       - application/json; charset=UTF-8
-      Content-Encoding:
-      - gzip
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-Xss-Protection:
-      - 1; mode=block
-      Content-Length:
-      - '1870'
-      Server:
-      - GSE
-      Cache-Control:
-      - public, max-age=300, must-revalidate, no-transform
-      Age:
-      - '0'
-      Alt-Svc:
-      - quic=":443"; ma=2592000; v="37,36,35"
-    body:
-      encoding: ASCII-8BIT
-      string: !binary |-
-        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
-        ftEe3bRzPG9nVZiwDp4O/gfEQdY3CBwAAA==
-    http_version:
-  recorded_at: Tue, 25 Apr 2017 10:44:56 GMT
-- request:
-    method: get
-    uri: https://www.googleapis.com/language/translate/v2?format=text&key=some_api_key&q=hey%20what%20are%20you%20doing&source=en&target=sv
-    body:
-      encoding: UTF-8
-      string: ''
-    headers:
-      User-Agent:
-      - |-
-        Huginn/0.0.1 google-api-ruby-client/0.7.1 Mac OS X/10.11.6
-         (gzip)
-      Accept-Encoding:
-      - gzip
-      Content-Type:
-      - ''
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Expires:
-      - Tue, 25 Apr 2017 10:44:56 GMT
-      Date:
-      - Tue, 25 Apr 2017 10:44:56 GMT
-      Cache-Control:
-      - private, max-age=0, must-revalidate, no-transform
-      Etag:
-      - '"0Etagq2wejMpn1NuD3Ltqh3qHnw/XGWNxMh7tDHIjrW_w-Ffgk19QCg"'
       Vary:
       - Origin
+      - Referer
       - X-Origin
-      Content-Type:
-      - application/json; charset=UTF-8
-      Content-Encoding:
-      - gzip
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
+      Date:
+      - Fri, 30 Jun 2017 14:54:18 GMT
+      Server:
+      - ESF
+      Cache-Control:
+      - private
       X-Xss-Protection:
       - 1; mode=block
-      Server:
-      - GSE
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
       Alt-Svc:
-      - quic=":443"; ma=2592000; v="37,36,35"
+      - quic=":443"; ma=2592000; v="39,38,37,36,35"
       Transfer-Encoding:
       - chunked
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        H4sIAAAAAAAAAKvmUlBKSSxJVLJSqOZSUFAqKUrMK85JLMnMzysGikUDxcAS
-        SFKpKSGpFSVASSWP1CyFssQUhfTD24oUUkqVQOpqgUQsF5Cq5QIA9kBPzVwA
-        AAA=
-    http_version:
-  recorded_at: Tue, 25 Apr 2017 10:44:56 GMT
+        ewogICJkYXRhIjogewogICAgInRyYW5zbGF0aW9ucyI6IFsKICAgICAgewog
+        ICAgICAgICJ0cmFuc2xhdGVkVGV4dCI6ICJIZWogdmFkIGfDtnIgZHUiCiAg
+        ICAgIH0KICAgIF0KICB9Cn0K
+    http_version: 
+  recorded_at: Fri, 30 Jun 2017 14:54:18 GMT
 - request:
-    method: get
-    uri: https://www.googleapis.com/language/translate/v2?format=text&key=some_api_key&q=do%20tell%20more&source=en&target=sv
+    method: post
+    uri: https://translation.googleapis.com/language/translate/v2?key=some_api_key
     body:
       encoding: UTF-8
-      string: ''
+      string: '{"q":["do tell more"],"target":"sv","source":"en","format":"text"}'
     headers:
       User-Agent:
-      - |-
-        Huginn/0.0.1 google-api-ruby-client/0.7.1 Mac OS X/10.11.6
-         (gzip)
-      Accept-Encoding:
-      - gzip
+      - gcloud-ruby/1.0.0
+      Google-Cloud-Resource-Prefix:
+      - projects/
       Content-Type:
-      - ''
+      - application/json
+      X-Goog-Api-Client:
+      - gl-ruby/2.3.4 gccl/1.0.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
       - "*/*"
   response:
@@ -177,55 +78,53 @@ http_interactions:
       code: 200
       message: OK
     headers:
-      Expires:
-      - Tue, 25 Apr 2017 10:44:56 GMT
-      Date:
-      - Tue, 25 Apr 2017 10:44:56 GMT
-      Cache-Control:
-      - private, max-age=0, must-revalidate, no-transform
-      Etag:
-      - '"0Etagq2wejMpn1NuD3Ltqh3qHnw/ojPXc7YpC7RgGxSvk9qvHc7p0bM"'
-      Vary:
-      - Origin
-      - X-Origin
       Content-Type:
       - application/json; charset=UTF-8
-      Content-Encoding:
-      - gzip
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Fri, 30 Jun 2017 14:54:19 GMT
+      Server:
+      - ESF
+      Cache-Control:
+      - private
       X-Xss-Protection:
       - 1; mode=block
-      Server:
-      - GSE
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
       Alt-Svc:
-      - quic=":443"; ma=2592000; v="37,36,35"
+      - quic=":443"; ma=2592000; v="39,38,37,36,35"
       Transfer-Encoding:
       - chunked
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        H4sIAAAAAAAAAKvmUlBKSSxJVLJSqOZSUFAqKUrMK85JLMnMzysGikUDxcAS
-        SFKpKSGpFSVASaWk1KLDS0pKEhVyU4uUQIpqgUQsF5Cq5QIAoYw0jVkAAAA=
-    http_version:
-  recorded_at: Tue, 25 Apr 2017 10:44:56 GMT
+        ewogICJkYXRhIjogewogICAgInRyYW5zbGF0aW9ucyI6IFsKICAgICAgewog
+        ICAgICAgICJ0cmFuc2xhdGVkVGV4dCI6ICJCZXLDpHR0YSBtZXIiCiAgICAg
+        IH0KICAgIF0KICB9Cn0K
+    http_version: 
+  recorded_at: Fri, 30 Jun 2017 14:54:19 GMT
 - request:
-    method: get
-    uri: https://www.googleapis.com/language/translate/v2?format=text&key=some_api_key&q=value2&source=en&target=sv
+    method: post
+    uri: https://translation.googleapis.com/language/translate/v2?key=some_api_key
     body:
       encoding: UTF-8
-      string: ''
+      string: '{"q":["value2"],"target":"sv","source":"en","format":"text"}'
     headers:
       User-Agent:
-      - |-
-        Huginn/0.0.1 google-api-ruby-client/0.7.1 Mac OS X/10.11.6
-         (gzip)
-      Accept-Encoding:
-      - gzip
+      - gcloud-ruby/1.0.0
+      Google-Cloud-Resource-Prefix:
+      - projects/
       Content-Type:
-      - ''
+      - application/json
+      X-Goog-Api-Client:
+      - gl-ruby/2.3.4 gccl/1.0.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
       - "*/*"
   response:
@@ -233,55 +132,53 @@ http_interactions:
       code: 200
       message: OK
     headers:
-      Expires:
-      - Tue, 25 Apr 2017 10:44:56 GMT
-      Date:
-      - Tue, 25 Apr 2017 10:44:56 GMT
-      Cache-Control:
-      - private, max-age=0, must-revalidate, no-transform
-      Etag:
-      - '"0Etagq2wejMpn1NuD3Ltqh3qHnw/2iNW9phusbWGkf6jtxwOLwZpsUA"'
-      Vary:
-      - Origin
-      - X-Origin
       Content-Type:
       - application/json; charset=UTF-8
-      Content-Encoding:
-      - gzip
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Fri, 30 Jun 2017 14:54:19 GMT
+      Server:
+      - ESF
+      Cache-Control:
+      - private
       X-Xss-Protection:
       - 1; mode=block
-      Server:
-      - GSE
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
       Alt-Svc:
-      - quic=":443"; ma=2592000; v="37,36,35"
+      - quic=":443"; ma=2592000; v="39,38,37,36,35"
       Transfer-Encoding:
       - chunked
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        H4sIAAAAAAAAAKvmUlBKSSxJVLJSqOZSUFAqKUrMK85JLMnMzysGikUDxcAS
-        SFKpKSGpFSVASaWyw0uKUlKNlEDytUAilgtI1XIBACGegeVUAAAA
-    http_version:
-  recorded_at: Tue, 25 Apr 2017 10:44:56 GMT
+        ewogICJkYXRhIjogewogICAgInRyYW5zbGF0aW9ucyI6IFsKICAgICAgewog
+        ICAgICAgICJ0cmFuc2xhdGVkVGV4dCI6ICJ2w6RyZGUyIgogICAgICB9CiAg
+        ICBdCiAgfQp9Cg==
+    http_version: 
+  recorded_at: Fri, 30 Jun 2017 14:54:19 GMT
 - request:
-    method: get
-    uri: https://www.googleapis.com/language/translate/v2?format=text&key=some_api_key&q=value1&source=en&target=sv
+    method: post
+    uri: https://translation.googleapis.com/language/translate/v2?key=some_api_key
     body:
       encoding: UTF-8
-      string: ''
+      string: '{"q":["value1"],"target":"sv","source":"en","format":"text"}'
     headers:
       User-Agent:
-      - |-
-        Huginn/0.0.1 google-api-ruby-client/0.7.1 Mac OS X/10.11.6
-         (gzip)
-      Accept-Encoding:
-      - gzip
+      - gcloud-ruby/1.0.0
+      Google-Cloud-Resource-Prefix:
+      - projects/
       Content-Type:
-      - ''
+      - application/json
+      X-Goog-Api-Client:
+      - gl-ruby/2.3.4 gccl/1.0.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
       - "*/*"
   response:
@@ -289,38 +186,40 @@ http_interactions:
       code: 200
       message: OK
     headers:
-      Expires:
-      - Tue, 25 Apr 2017 10:44:56 GMT
-      Date:
-      - Tue, 25 Apr 2017 10:44:56 GMT
-      Cache-Control:
-      - private, max-age=0, must-revalidate, no-transform
-      Etag:
-      - '"0Etagq2wejMpn1NuD3Ltqh3qHnw/nFM5Az6_LFcl8SfedeFzG_gVr5Y"'
-      Vary:
-      - Origin
-      - X-Origin
       Content-Type:
       - application/json; charset=UTF-8
-      Content-Encoding:
-      - gzip
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Fri, 30 Jun 2017 14:54:19 GMT
+      Server:
+      - ESF
+      Cache-Control:
+      - private
       X-Xss-Protection:
       - 1; mode=block
-      Server:
-      - GSE
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
       Alt-Svc:
-      - quic=":443"; ma=2592000; v="37,36,35"
+      - quic=":443"; ma=2592000; v="39,38,37,36,35"
       Transfer-Encoding:
       - chunked
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        H4sIAAAAAAAAAKvmUlBKSSxJVLJSqOZSUFAqKUrMK85JLMnMzysGikUDxcAS
-        SFKpKSGpFSVASaWyxJzSVEMlkHQtkIjlAlK1XAC9QY+aUwAAAA==
-    http_version:
-  recorded_at: Tue, 25 Apr 2017 10:44:56 GMT
-recorded_with: VCR 2.9.2
+      string: |
+        {
+          "data": {
+            "translations": [
+              {
+                "translatedText": "value1"
+              }
+            ]
+          }
+        }
+    http_version: 
+  recorded_at: Fri, 30 Jun 2017 14:54:19 GMT
+recorded_with: VCR 3.0.3

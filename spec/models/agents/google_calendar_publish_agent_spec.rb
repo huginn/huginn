@@ -43,12 +43,13 @@ describe Agents::GoogleCalendarPublishAgent, :vcr do
         }
       }
     end
-    let(:response_body) do
+
+    let(:response_hash) do
       {"kind"=>"calendar#event",
         "etag"=>"\"2908684044040000\"",
         "id"=>"baz",
         "status"=>"confirmed",
-        "htmlLink"=>
+        "html_link"=>
           "https://calendar.google.com/calendar/event?eid=foobar",
         "created"=>"2016-02-01T15:53:41.000Z",
         "updated"=>"2016-02-01T15:53:42.020Z",
@@ -60,20 +61,20 @@ describe Agents::GoogleCalendarPublishAgent, :vcr do
             "blah-foobar@developer.gserviceaccount.com"},
         "organizer"=>
           {"email"=>calendar_id,
-            "displayName"=>"Huginn Location Log",
+            "display_name"=>"Huginn Location Log",
             "self"=>true},
-        "start"=>{"dateTime"=>"2014-10-03T00:30:00+09:30"},
-        "end"=>{"dateTime"=>"2014-10-03T01:30:00+09:30"},
-        "iCalUID"=>"blah@google.com",
+        "start"=>{"date_time"=>"2014-10-03T00:30:00+09:30"},
+        "end"=>{"date_time"=>"2014-10-03T01:30:00+09:30"},
+        "i_cal_uid"=>"blah@google.com",
         "sequence"=>0,
-        "reminders"=>{"useDefault"=>true}
-      }.to_json
+        "reminders"=>{"use_default"=>true}
+      }
     end
 
     def setup_mock!
       fake_interface = Object.new
       mock(GoogleCalendar).new(agent.interpolate_options(agent.options), Rails.logger) { fake_interface }
-      mock(fake_interface).publish_as(calendar_id, message) { stub!.response.stub!.body { response_body } }
+      mock(fake_interface).publish_as(calendar_id, message) { response_hash }
     end
 
     describe 'when the calendar_id is in the options' do
@@ -84,7 +85,7 @@ describe Agents::GoogleCalendarPublishAgent, :vcr do
           agent.receive([event])
         }.to change { agent.events.count }.by(1)
 
-        expect(agent.events.last.payload).to eq({ "success" => true, "published_calendar_event" => JSON.parse(response_body), "agent_id" => event.agent_id, "event_id" => event.id })
+        expect(agent.events.last.payload).to eq({ "success" => true, "published_calendar_event" => response_hash, "agent_id" => event.agent_id, "event_id" => event.id })
       end
     end
 
@@ -101,7 +102,7 @@ describe Agents::GoogleCalendarPublishAgent, :vcr do
         agent.receive([event])
 
         expect(agent.events.count).to eq(1)
-        expect(agent.events.last.payload).to eq({ "success" => true, "published_calendar_event" => JSON.parse(response_body), "agent_id" => event.agent_id, "event_id" => event.id })
+        expect(agent.events.last.payload).to eq({ "success" => true, "published_calendar_event" => response_hash, "agent_id" => event.agent_id, "event_id" => event.id })
       end
 
       it 'should allow Liquid in the key' do

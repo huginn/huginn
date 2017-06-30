@@ -1,11 +1,12 @@
 require 'json'
+require 'google/apis/calendar_v3'
 
 module Agents
   class GoogleCalendarPublishAgent < Agent
     cannot_be_scheduled!
     no_bulk_receive!
 
-    gem_dependency_check { defined?(Google) && defined?(Google::APIClient) }
+    gem_dependency_check { defined?(Google) && defined?(Google::Apis::CalendarV3) }
 
     description <<-MD
       The Google Calendar Publish Agent creates events on your Google Calendar.
@@ -23,6 +24,21 @@ module Agents
       5. Persist the generated private key to a path, ie: `/home/huginn/a822ccdefac89fac6330f95039c492dfa3ce6843.p12`
       6. Grant access via google calendar UI to the service account email address for each calendar you wish to manage. For a whole google apps domain, you can [delegate authority](https://developers.google.com/+/domains/authentication/delegation)
 
+      An earlier version of Huginn used PKCS12 key files to authenticate. This will no longer work, you should generate a new JSON format keyfile, that will look something like:
+      <pre><code>{
+        "type": "service_account",
+        "project_id": "huginn-123123",
+        "private_key_id": "6d6b476fc6ccdb31e0f171991e5528bb396ffbe4",
+        "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+        "client_email": "huginn-calendar@huginn-123123.iam.gserviceaccount.com",
+        "client_id": "123123...123123",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/huginn-calendar%40huginn-123123.iam.gserviceaccount.com"
+      }</code></pre>
+
+
 
       Agent Configuration:
 
@@ -32,10 +48,7 @@ module Agents
 
       `google` `service_account_email` - The authorised service account.
 
-      `google` `key_file` OR `google` `key` - The path to the key file or the key itself.  [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) formatting is supported if you want to use a Credential.  (E.g., `{% credential google_key %}`)
-
-      `google` `key_secret` - The secret for the key, typically 'notasecret'
-
+      `google` `key_file` OR `google` `key` - The path to the JSON key file above, or the key itself (the value of `private_key`).  [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) formatting is supported if you want to use a Credential.  (E.g., `{% credential google_key %}`)
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -50,10 +63,12 @@ module Agents
           "summary": "Awesome event",
           "description": "An example event with text. Pro tip: DateTimes are in RFC3339",
           "start": {
-            "dateTime": "2014-10-02T10:00:00-05:00"
+            "date_time": "2017-06-30T17:00:00-05:00",
+            "time_zone": "America/New_York"
           },
           "end": {
-            "dateTime": "2014-10-02T11:00:00-05:00"
+            "date_time": "2017-06-30T18:00:00-05:00",
+            "time_zone": "America/New_York"
           }
         }
       }</code></pre>
@@ -84,7 +99,7 @@ module Agents
         'calendar_id' => 'you@email.com',
         'google' => {
           'key_file' => '/path/to/private.key',
-          'key_secret' => 'notasecret',
+          'key' => '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n',
           'service_account_email' => ''
         }
       }
@@ -95,7 +110,10 @@ module Agents
       incoming_events.each do |event|
         calendar = GoogleCalendar.new(interpolate_options(options, event), Rails.logger)
 
-        calendar_event = JSON.parse(calendar.publish_as(interpolated(event)['calendar_id'], event.payload["message"]).response.body)
+        calendar_event = calendar.publish_as(
+              interpolated(event)['calendar_id'],
+              event.payload["message"]
+            )
 
         create_event :payload => {
           'success' => true,
