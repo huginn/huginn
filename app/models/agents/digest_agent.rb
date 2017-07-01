@@ -11,7 +11,9 @@ module Agents
 
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
 
-      If `clear_queue` is set to 0, Events are automatically purged from the memory when an Event is emitted by this Agent. To maintain a fixed number of Events, set `clear_queue` to that number.
+      If `retained_events` is set to 0 (the default), all received events are cleared after a digest is sent. Set `retained_events` to a value larger than 0 to keep a certain number of events around on a rolling basis to re-send in future digests.
+
+      For instance, say `retained_events` is set to 3 and the Agent has received Events `5`, `4`, and `3`. When a digest is sent, Events `5`, `4`, and `3` are retained for a future digest. After Event `6` is received, the next digest will contain Events `6`, `5`, and `4`.
     MD
 
     event_description <<-MD
@@ -27,16 +29,16 @@ module Agents
       {
           "expected_receive_period_in_days" => "2",
           "message" => "{{ events | map: 'message' | join: ',' }}",
-          "clear_queue" => "0"
+          "retained_events" => "0"
       }
     end
 
     form_configurable :message, type: :text
     form_configurable :expected_receive_period_in_days
-    form_configurable :clear_queue
+    form_configurable :retained_events
 
     def validate_options
-      errors.add(:base, 'clear_queue must be 0 to 999') unless options['clear_queue'].to_i >= 0 && options['clear_queue'].to_i < 1000
+      errors.add(:base, 'retained_events must be 0 to 999') unless options['retained_events'].to_i >= 0 && options['retained_events'].to_i < 1000
     end
 
     def working?
@@ -48,8 +50,8 @@ module Agents
       incoming_events.each do |event|
         self.memory["queue"] << event.id
       end
-      if interpolated["clear_queue"].to_i > 0 && memory["queue"].length > interpolated["clear_queue"].to_i
-        memory["queue"].shift(memory["queue"].length - interpolated["clear_queue"].to_i)
+      if interpolated["retained_events"].to_i > 0 && memory["queue"].length > interpolated["retained_events"].to_i
+        memory["queue"].shift(memory["queue"].length - interpolated["retained_events"].to_i)
       end
     end
 
@@ -59,7 +61,7 @@ module Agents
         payload = { "events" => events.map { |event| event.payload } }
         payload["message"] = interpolated(payload)["message"]
         create_event :payload => payload
-        if interpolated["clear_queue"].to_i == 0
+        if interpolated["retained_events"].to_i == 0
           self.memory["queue"] = []
         end
       end
