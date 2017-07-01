@@ -53,8 +53,14 @@ Install the required packages (needed to compile Ruby and native extensions to R
     sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz
 
 
-## 2. Ruby
+### Debian Stretch
 
+Since Debian Stretch, `runit` isn't started anymore automatically, but this gets handled by the init system. For a default installation use this package:
+
+     sudo apt-get install -y runit-systemd
+
+
+## 2. Ruby
 
 The use of Ruby version managers such as [RVM](http://rvm.io/), [rbenv](https://github.com/sstephenson/rbenv) or [chruby](https://github.com/postmodern/chruby) with Huginn in production frequently leads to hard-to-diagnose problems. Version managers are not supported and we strongly advise everyone to follow the instructions below to use a system Ruby.
 
@@ -90,7 +96,7 @@ Install the database packages
     # Pick a MySQL root password (can be anything), type it and press enter,
     # retype the MySQL root password and press enter
 
-Check the installed MySQL version (remeber if its >= 5.5.3 for the `.env` configuration done later):
+Check the installed MySQL version (remember if its >= 5.5.3 for the `.env` configuration done later):
 
     mysql --version
 
