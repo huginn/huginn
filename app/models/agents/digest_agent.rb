@@ -39,7 +39,7 @@ module Agents
 
     def validate_options
       errors.add(:base, 'retained_events must be 0 to 999') unless options['retained_events'].to_i >= 0 && options['retained_events'].to_i < 1000
-      errors.add(:base, 'retained_events must be an integer') unless (Integer(options['retained_events'])is_a? Integer rescue false)
+      errors.add(:base, 'retained_events must be an integer') unless (Integer(options['retained_events']).is_a? Integer rescue false)
     end
 
     def working?
