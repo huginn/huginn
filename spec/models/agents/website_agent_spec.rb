@@ -1312,15 +1312,9 @@ fire: hot
       @checker.user = users(:bob)
       @checker.save!
 
-      case @checker.faraday_backend
-      when :typhoeus
-        # Webmock's typhoeus adapter does not read the Authorization
-        # header: https://github.com/bblimke/webmock/pull/592
-        stub_request(:any, "www.example.com").
-          with(headers: { 'Authorization' => "Basic #{['user:pass'].pack('m0')}" })
-      else
-        stub_request(:any, "user:pass@www.example.com")
-      end.to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+      stub_request(:any, "www.example.com").
+        with(basic_auth: ['user', 'pass']).
+        to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
     end
 
     describe "#check" do

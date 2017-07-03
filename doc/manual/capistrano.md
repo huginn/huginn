@@ -31,7 +31,7 @@ You can now run Capistrano and update your server:
 
 If you want to deploy a different branch, pass it as environment variable:
 
-    cap production deploy BRANCH=awesome-feature
+    cap production deploy CAPISTRANO_DEPLOY_BRANCH=awesome-feature
 
 ### Changes to remote .env and Procfile
 

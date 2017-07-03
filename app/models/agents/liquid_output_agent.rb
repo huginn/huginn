@@ -23,14 +23,13 @@ module Agents
           * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
           * `content` - The content to display when someone requests this page.
           * `mime_type` - The mime type to use when someone requests this page.
+          * `response_headers` - An object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
           * `mode` - The behavior that determines what data is passed to the Liquid template.
           * `event_limit` - A limit applied to the events passed to a template when in "Last X events" mode. Can be a count like "1", or an amount of time like "1 day" or "5 minutes".
 
         # Liquid Templating
 
-        The content you provide will be run as a Liquid template. The data from the last event received will be used when processing the Liquid template.
-
-        To learn more about Liquid templates, go here: [http://liquidmarkup.org](http://liquidmarkup.org "Liquid Templating")
+        The content you provide will be run as a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template. The data from the last event received will be used when processing the Liquid template.
 
         # Modes
 
@@ -153,7 +152,7 @@ EOF
     end
 
     def receive_web_request(params, method, format)
-      valid_authentication?(params) ? [liquified_content, 200, mime_type]
+      valid_authentication?(params) ? [liquified_content, 200, mime_type, interpolated['response_headers'].presence]
                                     : [unauthorized_content(format), 401]
     end
 

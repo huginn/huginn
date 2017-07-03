@@ -19,7 +19,7 @@ module Agents
 
       * `configure`: Target Agents have their options updated with the contents of `configure_options`.
 
-      Here's a tip: you can use Liquid templating to dynamically determine the action type.  For example:
+      Here's a tip: you can use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating to dynamically determine the action type.  For example:
 
       - To create a CommanderAgent that receives an event from a WeatherAgent every morning to kick an agent flow that is only useful in a nice weather, try this: `{% if conditions contains 'Sunny' or conditions contains 'Cloudy' %}` `run{% endif %}`
 

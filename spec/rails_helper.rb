@@ -38,7 +38,7 @@ RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.
-  config.use_transactional_fixtures = ENV['RSPEC_TASK'] == 'spec:nofeatures'
+  config.use_transactional_fixtures = true
 
   # rspec-rails 3 will no longer automatically infer an example group's spec type
   # from the file location. You can explicitly opt-in to this feature using this

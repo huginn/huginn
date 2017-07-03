@@ -26,6 +26,7 @@ module Agents
           For example, "post,get" will enable POST and GET requests. Defaults
           to "post".
         * `response` - The response message to the request. Defaults to 'Event Created'.
+        * `response_headers` - An object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
         * `code` - The response code to the request. Defaults to '201'. If the code is '301' or '302' the request will automatically be redirected to the url defined in "response".
         * `recaptcha_secret` - Setting this to a reCAPTCHA "secret" key makes your agent verify incoming requests with reCAPTCHA.  Don't forget to embed a reCAPTCHA snippet including your "site" key in the originating form(s).
         * `recaptcha_send_remote_addr` - Set this to true if your server is properly configured to set REMOTE_ADDR to the IP address of each visitor (instead of that of a proxy server).
@@ -88,7 +89,11 @@ module Agents
         create_event(payload: payload)
       end
 
-      [interpolated(params)['response'] || 'Event Created', code]
+      if interpolated['response_headers'].presence
+        [interpolated(params)['response'] || 'Event Created', code, "text/plain", interpolated['response_headers'].presence]
+      else
+        [interpolated(params)['response'] || 'Event Created', code]
+      end
     end
 
     def working?

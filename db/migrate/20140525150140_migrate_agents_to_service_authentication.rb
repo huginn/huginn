@@ -1,4 +1,4 @@
-class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration
+class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration[4.2]
   def twitter_consumer_key(agent)
     agent.options['consumer_key'].presence || agent.credential('twitter_consumer_key')
   end

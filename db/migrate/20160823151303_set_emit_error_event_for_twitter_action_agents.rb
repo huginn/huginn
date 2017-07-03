@@ -1,4 +1,4 @@
-class SetEmitErrorEventForTwitterActionAgents < ActiveRecord::Migration
+class SetEmitErrorEventForTwitterActionAgents < ActiveRecord::Migration[4.2]
   def up
     Agents::TwitterActionAgent.find_each do |agent|
       agent.options['emit_error_events'] = 'true'

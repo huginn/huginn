@@ -1,4 +1,4 @@
-class SetEventsCountDefault < ActiveRecord::Migration
+class SetEventsCountDefault < ActiveRecord::Migration[4.2]
   def up
     change_column_default(:agents, :events_count, 0)
     change_column_null(:agents, :events_count, false, 0)

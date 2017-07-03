@@ -16,7 +16,7 @@ module Agents
       * `user`: the user or group key (not e-mail address).
       * `expected_receive_period_in_days`:  is maximum number of days that you would expect to pass between events being received by this agent.
 
-      The following options are all Liquid templates whose evaluated values will be posted to the Pushover API.  Only the `message` parameter is required, and if it is blank API call is omitted.
+      The following options are all [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templates whose evaluated values will be posted to the Pushover API.  Only the `message` parameter is required, and if it is blank API call is omitted.
 
       Pushover API has a `512` Character Limit including `title`.  `message` will be truncated.
 

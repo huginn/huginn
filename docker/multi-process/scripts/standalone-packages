@@ -1,4 +1,4 @@
-DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y python2.7 python-docutils mysql-server \
                    supervisor python-pip && \
