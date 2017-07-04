@@ -22,47 +22,133 @@ describe Agents::DigestAgent do
       expect(@checker.reload).not_to be_working # too much time has passed
     end
   end
+  
+  describe "validation" do
+    before do
+      expect(agent).to be_valid
+    end
+    
+    it "should validate retained_events" do
+      agent.options[:retained_events] = ""
+      expect(agent).not_to be_valid
+      agent.options[:retained_events] = "0"
+      expect(agent).to be_valid
+      agent.options[:retained_events] = "10"
+      expect(agent).to be_valid
+      agent.options[:retained_events] = "10000"
+      expect(agent).not_to be_valid
+      agent.options[:retained_events] = "-1"
+      expect(agent).not_to be_valid
+    end
 
-  describe "#receive" do
-    it "queues any payloads it receives" do
-      event1 = Event.new
-      event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = { :data => "event1" }
-      event1.save!
-
-      event2 = Event.new
-      event2.agent = agents(:bob_weather_agent)
-      event2.payload = { :data => "event2" }
-      event2.save!
-
-      Agents::DigestAgent.async_receive(@checker.id, [event1.id, event2.id])
-      expect(@checker.reload.memory[:queue]).to eq([event1.id, event2.id])
+    it "should not allow non-integer retained_events" do
+      agent.options[:retained_events] = "abc1234"
+      expect(agent).not_to be_valid
     end
   end
 
+  describe "#receive" do
+    
+    describe "and retained_events is 0" do
+      
+      before { agent.options['retained_events'] = 0 }
+      
+      it "queues any payloads it receives" do
+        event1 = Event.new
+        event1.agent = agents(:bob_rain_notifier_agent)
+        event1.payload = { :data => "event1" }
+        event1.save!
+
+        event2 = Event.new
+        event2.agent = agents(:bob_weather_agent)
+        event2.payload = { :data => "event2" }
+        event2.save!  
+    
+        Agents::DigestAgent.async_receive(@checker.id, [event1.id, event2.id])
+        expect(@checker.reload.memory[:queue]).to eq([event1.id, event2.id])
+      end
+    end
+      
+    describe "but retained_events is 1" do
+      
+      before { agent.options['retained_events'] = 1 }
+      
+      it "queues only 1 event at a time" do
+        event1 = Event.new
+        event1.agent = agents(:bob_rain_notifier_agent)
+        event1.payload = { :data => "event1" }
+        event1.save!
+
+        event2 = Event.new
+        event2.agent = agents(:bob_weather_agent)
+        event2.payload = { :data => "event2" }
+        event2.save!  
+    
+        Agents::DigestAgent.async_receive(@checker.id, [event1.id, event2.id])
+        expect(@checker.reload.memory[:queue]).to eq([event2.id])
+      end
+    end
+      
+  end
+
   describe "#check" do
-    it "should emit a event" do
-      expect { Agents::DigestAgent.async_check(@checker.id) }.not_to change { Event.count }
+    
+    describe "and retained_events is 0" do
+      
+      before { agent.options['retained_events'] = 0 }
+      
+      it "should emit a event" do
+        expect { Agents::DigestAgent.async_check(@checker.id) }.not_to change { Event.count }
 
-      event1 = Event.new
-      event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = { :data => "event" }
-      event1.save!
+        event1 = Event.new
+        event1.agent = agents(:bob_rain_notifier_agent)
+        event1.payload = { :data => "event" }
+        event1.save!
 
-      event2 = Event.new
-      event2.agent = agents(:bob_weather_agent)
-      event2.payload = { :data => "event" }
-      event2.save!
+        event2 = Event.new
+        event2.agent = agents(:bob_weather_agent)
+        event2.payload = { :data => "event" }
+        event2.save!
 
-      Agents::DigestAgent.async_receive(@checker.id, [event1.id, event2.id])
-      @checker.sources << agents(:bob_rain_notifier_agent) << agents(:bob_weather_agent)
-      @checker.save!
+        Agents::DigestAgent.async_receive(@checker.id, [event1.id, event2.id])
+        @checker.sources << agents(:bob_rain_notifier_agent) << agents(:bob_weather_agent)
+        @checker.save!
 
-      expect { Agents::DigestAgent.async_check(@checker.id) }.to change { Event.count }.by(1)
-      @checker.reload
-      expect(@checker.most_recent_event.payload["events"]).to eq([event1.payload, event2.payload])
-      expect(@checker.most_recent_event.payload["message"]).to eq("event;event")
-      expect(@checker.memory[:queue]).to be_empty
+        expect { Agents::DigestAgent.async_check(@checker.id) }.to change { Event.count }.by(1)
+        @checker.reload
+        expect(@checker.most_recent_event.payload["events"]).to eq([event1.payload, event2.payload])
+        expect(@checker.most_recent_event.payload["message"]).to eq("event;event")
+        expect(@checker.memory[:queue]).to be_empty
+      end
+    end
+    
+    describe "but retained_events is 1" do
+      
+      before { agent.options['retained_events'] = 1 }
+      
+      it "should emit a event" do
+        expect { Agents::DigestAgent.async_check(@checker.id) }.not_to change { Event.count }
+
+        event1 = Event.new
+        event1.agent = agents(:bob_rain_notifier_agent)
+        event1.payload = { :data => "event" }
+        event1.save!
+
+        event2 = Event.new
+        event2.agent = agents(:bob_weather_agent)
+        event2.payload = { :data => "event" }
+        event2.save!
+
+        Agents::DigestAgent.async_receive(@checker.id, [event1.id, event2.id])
+        @checker.sources << agents(:bob_rain_notifier_agent) << agents(:bob_weather_agent)
+        @checker.save!
+
+        expect { Agents::DigestAgent.async_check(@checker.id) }.to change { Event.count }.by(1)
+        @checker.reload
+        expect(@checker.most_recent_event.payload["events"]).to eq([event2.payload])
+        expect(@checker.most_recent_event.payload["message"]).to eq("event")
+        expect(@checker.memory[:queue].length).to eq(1)
+      end
     end
   end
 end
