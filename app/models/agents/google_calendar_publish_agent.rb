@@ -21,7 +21,7 @@ module Agents
       2. New project -> Huginn
       3. APIs & Auth -> Enable google calendar
       4. Credentials -> Create new Client ID -> Service Account
-      5. Persist the generated private key to a path, ie: `/home/huginn/a822ccdefac89fac6330f95039c492dfa3ce6843.p12`
+      5. Download the JSON keyfile and save it to a path, ie: `/home/huginn/Huginn-5d12345678cd.json`. Or open that file and copy the `private_key`.
       6. Grant access via google calendar UI to the service account email address for each calendar you wish to manage. For a whole google apps domain, you can [delegate authority](https://developers.google.com/+/domains/authentication/delegation)
 
       An earlier version of Huginn used PKCS12 key files to authenticate. This will no longer work, you should generate a new JSON format keyfile, that will look something like:
@@ -46,7 +46,7 @@ module Agents
 
       `google` A hash of configuration options for the agent.
 
-      `google` `service_account_email` - The authorised service account.
+      `google` `service_account_email` - The authorised service account email address.
 
       `google` `key_file` OR `google` `key` - The path to the JSON key file above, or the key itself (the value of `private_key`).  [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) formatting is supported if you want to use a Credential.  (E.g., `{% credential google_key %}`)
 
@@ -55,6 +55,8 @@ module Agents
       Use it with a trigger agent to shape your payload!
 
       A hash of event details. See the [Google Calendar API docs](https://developers.google.com/google-apps/calendar/v3/reference/events/insert)
+
+      The prior version Google's API expected keys like `dateTime` but in the latest version they expect snake case keys like `date_time`.
 
       Example payload for trigger agent:
       <pre><code>{
@@ -121,6 +123,8 @@ module Agents
           'agent_id' => event.agent_id,
           'event_id' => event.id
         }
+
+        calendar.cleanup!
       end
     end
   end

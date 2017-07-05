@@ -49,9 +49,7 @@ gem 'weibo_2', github: 'albertsun/weibo_2', branch: 'master'
 
 # GoogleCalendarPublishAgent and GoogleTranslateAgent
 gem 'google-api-client', '~> 0.13'
-# gem 'google-api-client', '~> 0.7.0' #, require: 'google/api_client'
 gem 'google-cloud-translate', '~> 1.0.0', require: 'google/cloud/translate'
-# gem 'google-cloud-bigquery', '~> 0.27.0', require: 'google/cloud/bigquery'
 
 # Twitter Agents
 gem 'twitter', github: 'sferik/twitter' # Must to be loaded before cantino-twitter-stream.

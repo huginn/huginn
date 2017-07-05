@@ -11,7 +11,7 @@ class GoogleCalendar
       ENV['GOOGLE_PRIVATE_KEY'] = @config['google']['key']
       ENV['GOOGLE_CLIENT_EMAIL'] = @config['google']['service_account_email']
       ENV['GOOGLE_ACCOUNT_TYPE'] = 'service_account'
-    else
+    elsif @config['google']['key_file'].present?
       ENV['GOOGLE_APPLICATION_CREDENTIALS'] = @config['google']['key_file']
     end
 
@@ -67,5 +67,12 @@ class GoogleCalendar
 
     @logger.debug ret.to_yaml
     ret.to_h  
+  end
+
+  def cleanup!
+    ENV.delete('GOOGLE_PRIVATE_KEY')
+    ENV.delete('GOOGLE_CLIENT_EMAIL')
+    ENV.delete('GOOGLE_ACCOUNT_TYPE')
+    ENV.delete('GOOGLE_APPLICATION_CREDENTIALS')
   end
 end
