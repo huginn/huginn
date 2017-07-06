@@ -41,10 +41,6 @@ describe Agents::DigestAgent do
       expect(agent).not_to be_valid
     end
 
-    it "should not allow non-integer retained_events" do
-      agent.options[:retained_events] = "abc1234"
-      expect(agent).not_to be_valid
-    end
   end
 
   describe "#receive" do
