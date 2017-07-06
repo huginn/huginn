@@ -55,9 +55,9 @@ Install the required packages (needed to compile Ruby and native extensions to R
 
 ### Debian Stretch
 
-Since Debian Stretch, `runit` isn't started anymore automatically, but this gets handled by the init system. For a default installation use this package:
+Since Debian Stretch, `runit` isn't started anymore automatically, but this gets handled by the init system. Additionally, Ruby requires the OpenSSL 1.0 development packages instead of 1.1. For a default installation use these packages:
 
-     sudo apt-get install -y runit-systemd
+     sudo apt-get install -y runit-systemd libssl1.0-dev
 
 
 ## 2. Ruby
