@@ -96,6 +96,8 @@ Install the database packages
     # Pick a MySQL root password (can be anything), type it and press enter,
     # retype the MySQL root password and press enter
 
+For Debian Stretch, replace `libmysqlclient-dev` with `default-libmysqlclient-dev`. See the [additional notes section](#additional-notes) for more information.
+
 Check the installed MySQL version (remember if its >= 5.5.3 for the `.env` configuration done later):
 
     mysql --version
@@ -413,3 +415,8 @@ When you want to monitor the background processes you can easily watch all the f
 ### Still having problems? :crying_cat_face:
 
 You probably found an error message or exception backtrace you could not resolve. Please create a new [issue](https://github.com/cantino/huginn/issues) and include as much information as you could gather about the problem your are experiencing.
+
+
+### Additional notes
+
+Debian Stretch switched from MySQL to [MariaDB](https://mariadb.org/). All packages with `mysql` in the name are just wrappers around the MariaDB ones, with some containing some compatibility symlinks. Huginn should also work fine with the MariaDB packages directly, although to keep the installation instructions more compact, they still use the MySQL packages.
