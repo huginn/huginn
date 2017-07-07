@@ -29,7 +29,7 @@ module Agents
         "type": "service_account",
         "project_id": "huginn-123123",
         "private_key_id": "6d6b476fc6ccdb31e0f171991e5528bb396ffbe4",
-        "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+        "private_key": "-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----\\n",
         "client_email": "huginn-calendar@huginn-123123.iam.gserviceaccount.com",
         "client_id": "123123...123123",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -37,7 +37,6 @@ module Agents
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
         "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/huginn-calendar%40huginn-123123.iam.gserviceaccount.com"
       }</code></pre>
-
 
 
       Agent Configuration:
@@ -65,12 +64,10 @@ module Agents
           "summary": "Awesome event",
           "description": "An example event with text. Pro tip: DateTimes are in RFC3339",
           "start": {
-            "date_time": "2017-06-30T17:00:00-05:00",
-            "time_zone": "America/New_York"
+            "date_time": "2017-06-30T17:00:00-05:00"
           },
           "end": {
-            "date_time": "2017-06-30T18:00:00-05:00",
-            "time_zone": "America/New_York"
+            "date_time": "2017-06-30T18:00:00-05:00"
           }
         }
       }</code></pre>
@@ -112,9 +109,17 @@ module Agents
       incoming_events.each do |event|
         calendar = GoogleCalendar.new(interpolate_options(options, event), Rails.logger)
 
+        cal_message = event.payload["message"]
+        if cal_message["start"].present? && cal_message["start"]["dateTime"].present? && !cal_message["start"]["date_time"].present?
+          cal_message["start"]["date_time"] = cal_message["start"].delete "dateTime"
+        end
+        if cal_message["end"].present? && cal_message["end"]["dateTime"].present? && !cal_message["end"]["date_time"].present?
+          cal_message["end"]["date_time"] = cal_message["end"].delete "dateTime"
+        end
+
         calendar_event = calendar.publish_as(
               interpolated(event)['calendar_id'],
-              event.payload["message"]
+              cal_message
             )
 
         create_event :payload => {
