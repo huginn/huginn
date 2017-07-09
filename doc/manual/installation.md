@@ -53,8 +53,14 @@ Install the required packages (needed to compile Ruby and native extensions to R
     sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz
 
 
-## 2. Ruby
+### Debian Stretch
 
+Since Debian Stretch, `runit` isn't started anymore automatically, but this gets handled by the init system. Additionally, Ruby requires the OpenSSL 1.0 development packages instead of 1.1. For a default installation use these packages:
+
+     sudo apt-get install -y runit-systemd libssl1.0-dev
+
+
+## 2. Ruby
 
 The use of Ruby version managers such as [RVM](http://rvm.io/), [rbenv](https://github.com/sstephenson/rbenv) or [chruby](https://github.com/postmodern/chruby) with Huginn in production frequently leads to hard-to-diagnose problems. Version managers are not supported and we strongly advise everyone to follow the instructions below to use a system Ruby.
 
@@ -90,7 +96,9 @@ Install the database packages
     # Pick a MySQL root password (can be anything), type it and press enter,
     # retype the MySQL root password and press enter
 
-Check the installed MySQL version (remeber if its >= 5.5.3 for the `.env` configuration done later):
+For Debian Stretch, replace `libmysqlclient-dev` with `default-libmysqlclient-dev`. See the [additional notes section](#additional-notes) for more information.
+
+Check the installed MySQL version (remember if its >= 5.5.3 for the `.env` configuration done later):
 
     mysql --version
 
@@ -407,3 +415,8 @@ When you want to monitor the background processes you can easily watch all the f
 ### Still having problems? :crying_cat_face:
 
 You probably found an error message or exception backtrace you could not resolve. Please create a new [issue](https://github.com/cantino/huginn/issues) and include as much information as you could gather about the problem your are experiencing.
+
+
+### Additional notes
+
+Debian Stretch switched from MySQL to [MariaDB](https://mariadb.org/). All packages with `mysql` in the name are just wrappers around the MariaDB ones, with some containing some compatibility symlinks. Huginn should also work fine with the MariaDB packages directly, although to keep the installation instructions more compact, they still use the MySQL packages.
