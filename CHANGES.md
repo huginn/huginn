@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Jul 10, 2017   | Update Google API Client. May break backwards compatibility for GoogleCalendarPublishAgent. [2047](https://github.com/huginn/huginn/pull/2047)   |
 | Oct 17, 2016   | Normalize URL in `to_uri` and `uri_expand` liquid filters.                                                   |
 | Oct 06, 2016   | `RssAgent` is reimplemented migrating its underlying feed parser from FeedNormalizer to Feedjira. [1564](https://github.com/cantino/huginn/pull/1564)     |
 | Oct 05, 2016   | Migrate to Rails 5. [1688](https://github.com/cantino/huginn/pull/1688)                                      |
