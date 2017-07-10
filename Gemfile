@@ -66,6 +66,9 @@ gem 'omniauth-dropbox'
 # UserLocationAgent
 gem 'haversine'
 
+# UsabillaAgent
+gem 'usabilla_api', github: 'chattermill/usabilla_api', branch: 'md-usability-improvements'
+
 # EvernoteAgent
 gem 'omniauth-evernote'
 gem 'evernote_oauth'

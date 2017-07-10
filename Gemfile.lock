@@ -19,6 +19,15 @@ GIT
       simple_oauth (~> 0.3.0)
 
 GIT
+  remote: https://github.com/chattermill/usabilla_api.git
+  revision: ab3b73156e6b8d7f7e38ee8eb1a061d517c57f2b
+  branch: md-usability-improvements
+  specs:
+    usabilla_api (2.0.0)
+      json (~> 1.7, >= 1.7.7)
+      rest-client (~> 1.7)
+
+GIT
   remote: https://github.com/dsander/delayed_job.git
   revision: ec16c569ff0af1a71272b87ab8e070f113653c2d
   branch: rails51
@@ -724,6 +733,7 @@ DEPENDENCIES
   tzinfo-data
   uglifier (~> 2.7.2)
   unicorn (~> 5.1.0)
+  usabilla_api!
   vcr
   web-console (>= 3.3.0)
   webmock (~> 2.3)
