@@ -189,6 +189,32 @@ module Agents
         ).items
     end
 
+    def retrieve_apps
+      ids = interpolated['apps_to_retrieve'] || '*'
+
+      usabilla_api
+        .apps_feedback
+        .retrieve(
+          id: ids,
+          access_key: interpolated['access_key'],
+          secret_key: interpolated['secret_key'],
+          days_ago: DEFAULT_DAYS_AGO
+        ).items
+    end
+
+    def retrieve_email
+      ids = interpolated['emails_to_retrieve'] || '*'
+
+      usabilla_api
+        .email_button
+        .retrieve(
+          id: ids,
+          access_key: interpolated['access_key'],
+          secret_key: interpolated['secret_key'],
+          days_ago: DEFAULT_DAYS_AGO
+        ).items
+    end
+
     def usabilla_response_to_event(r)
       {
         comment: r.comment,
