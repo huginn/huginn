@@ -38,8 +38,8 @@ module AgentControllerConcern
   end
 
   def control!
-    control_targets.each { |target|
-      interpolate_with('target' => target) {
+    control_targets.each do |target|
+      interpolate_with('target' => target) do
         begin
           case action = control_action
           when 'run'
@@ -72,14 +72,14 @@ module AgentControllerConcern
             target.update! options: target.options.deep_merge(interpolated['configure_options'])
             log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"
           when ''
-          # Do nothing
+            # Do nothing
           else
             error "Unsupported action '#{action}' ignored for '#{target.name}'"
           end
         rescue => e
           error "Failed to #{action} '#{target.name}': #{e.message}"
         end
-      }
-    }
+      end
+    end
   end
 end
