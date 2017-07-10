@@ -107,29 +107,31 @@ module Agents
     def receive(incoming_events)
       require 'google_calendar'
       incoming_events.each do |event|
-        calendar = GoogleCalendar.new(interpolate_options(options, event), Rails.logger)
+        begin
+          calendar = GoogleCalendar.new(interpolate_options(options, event), Rails.logger)
 
-        cal_message = event.payload["message"]
-        if cal_message["start"].present? && cal_message["start"]["dateTime"].present? && !cal_message["start"]["date_time"].present?
-          cal_message["start"]["date_time"] = cal_message["start"].delete "dateTime"
+          cal_message = event.payload["message"]
+          if cal_message["start"].present? && cal_message["start"]["dateTime"].present? && !cal_message["start"]["date_time"].present?
+            cal_message["start"]["date_time"] = cal_message["start"].delete "dateTime"
+          end
+          if cal_message["end"].present? && cal_message["end"]["dateTime"].present? && !cal_message["end"]["date_time"].present?
+            cal_message["end"]["date_time"] = cal_message["end"].delete "dateTime"
+          end
+
+          calendar_event = calendar.publish_as(
+                interpolated(event)['calendar_id'],
+                cal_message
+              )
+
+          create_event :payload => {
+            'success' => true,
+            'published_calendar_event' => calendar_event,
+            'agent_id' => event.agent_id,
+            'event_id' => event.id
+          }
+        ensure
+          calendar.cleanup!
         end
-        if cal_message["end"].present? && cal_message["end"]["dateTime"].present? && !cal_message["end"]["date_time"].present?
-          cal_message["end"]["date_time"] = cal_message["end"].delete "dateTime"
-        end
-
-        calendar_event = calendar.publish_as(
-              interpolated(event)['calendar_id'],
-              cal_message
-            )
-
-        create_event :payload => {
-          'success' => true,
-          'published_calendar_event' => calendar_event,
-          'agent_id' => event.agent_id,
-          'event_id' => event.id
-        }
-
-        calendar.cleanup!
       end
     end
   end
