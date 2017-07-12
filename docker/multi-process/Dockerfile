@@ -1,5 +1,4 @@
 FROM ubuntu:14.04
-MAINTAINER Andrew Cantino
 
 ADD docker/scripts/prepare /scripts/prepare
 RUN /scripts/prepare
@@ -18,7 +17,11 @@ RUN chown -R huginn:huginn /app && \
     sudo -u huginn -H LC_ALL=en_US.UTF-8 RAILS_ENV=production ON_HEROKU=true bundle install --without test development --path vendor/bundle -j 4
 COPY . /app
 
-ADD ["docker/scripts/setup", "docker/multi-process/scripts/init", "/scripts/"]
+ARG OUTDATED_DOCKER_IMAGE_NAMESPACE=false
+ENV OUTDATED_DOCKER_IMAGE_NAMESPACE ${OUTDATED_DOCKER_IMAGE_NAMESPACE}
+
+ADD ["docker/scripts/setup", "docker/scripts/setup_env", "docker/multi-process/scripts/init", "/scripts/"]
+
 RUN /scripts/setup
 
 VOLUME /var/lib/mysql

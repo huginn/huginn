@@ -32,6 +32,7 @@ class ApplicationController < ActionController::Base
     return unless current_user
     twitter_oauth_check
     basecamp_auth_check
+    outdated_docker_image_namespace_check
   end
 
   def filtered_agent_return_link(options = {})
@@ -65,15 +66,25 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def outdated_docker_image_namespace_check
+    @outdated_docker_image_namespace = ENV['OUTDATED_DOCKER_IMAGE_NAMESPACE'] == 'true'
+  end
+
   def agent_params
     return {} unless params[:agent]
     @agent_params ||= begin
-      options = params[:agent].delete(:options) if params[:agent][:options].present?
-      params[:agent].permit(:memory, :name, :type, :schedule, :disabled, :keep_events_for, :propagate_immediately, :drop_pending_events, :service_id,
-                            source_ids: [], receiver_ids: [], scenario_ids: [], controller_ids: [], control_target_ids: []).tap do |agent_params|
-        agent_params[:options] = options if options
-        agent_params[:options].permit! if agent_params[:options].respond_to?(:permit!)
-      end
+      params[:agent].permit([:memory, :name, :type, :schedule, :disabled, :keep_events_for, :propagate_immediately, :drop_pending_events, :service_id,
+                              source_ids: [], receiver_ids: [], scenario_ids: [], controller_ids: [], control_target_ids: []] + agent_params_options)
+    end
+  end
+
+  private
+
+  def agent_params_options
+    if params[:agent].fetch(:options, '').kind_of?(ActionController::Parameters)
+      [options: {}]
+    else
+      [:options]
     end
   end
 end

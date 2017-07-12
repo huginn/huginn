@@ -9,8 +9,10 @@ Notes for any Heroku plan:
 If you still wish to use the Heroku free plan (which won't work very well), please understand the following:
 
 * Heroku's [free plan](https://www.heroku.com/pricing) limits total runtime per day to 18 hours. This means that Huginn must sleep some of the time, and so recurring tasks will only run if their recurrence frequency fits within the free plan's awake time, which is 30 minutes. Therefore, we recommend that you only use the every 1 minute, every 2 minute, and every 5 minute Agent scheduling options.
-* If you're using the free plan, you need to signup for a free [uptimerobot](https://uptimerobot.com) account and have it ping your Huginn URL on Heroku once every 70 minutes.  If you still receive warnings from Heroku, try a longer interval.
+* If you're using the free plan, you need to signup for a free [uptimerobot](https://uptimerobot.com) account and have it ping your Huginn URL on Heroku once every 70 minutes.  If you still receive warnings from Heroku, try a longer interval. 
+* Another way if you're using the free plan, you can create a Http Status Agent on your Heroku Huginn instance itself and ping your own domain at huginn-example.herokuapp.com every 10 minutes.
 * Heroku's free Postgres plan limits the number of database rows that you can have to 10,000, so you should be sure to set a low event retention schedule for your agents and set `AGENT_LOG_LENGTH`, the number of log lines kept in the DB per Agent, to something small: `heroku config:set AGENT_LOG_LENGTH=20`.
+* 512MB of RAM may not be enough for Huginn and it may stop working as RAM usage increases over time.
 
 ## Instructions
 

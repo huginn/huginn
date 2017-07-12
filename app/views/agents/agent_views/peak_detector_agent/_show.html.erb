@@ -1,12 +1,12 @@
 <% content_for :head do %>
   <%= javascript_include_tag "graphing" %>
 <% end %>
-
 <% if @agent.memory[:data] && @agent.memory[:data].length > 0 %>
   <h3>Recent Trends</h3>
+  <% search_url = @agent.search_url %>
   <% @agent.memory[:data].each.with_index do |(group_name, data), index| %>
     <div class="filter-group counts">
-      <div class='filter'><%= link_to group_name.to_s, "https://twitter.com/search?q=#{CGI::escape group_name.to_s}", :target => "blank" %></div>
+      <div class='filter'><%= link_to group_name.to_s, search_url.expand(q: group_name.to_s).to_s, target: '_blank' %></div>
 
       <div class="chart-container group-<%= index.to_s %>">
         <div class="y-axis"></div>

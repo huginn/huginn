@@ -68,16 +68,11 @@ describe Utils do
     it "returns the value at a JSON path" do
       expect(Utils.value_at({ :foo => { :bar => :baz }}.to_json, "foo.bar")).to eq("baz")
       expect(Utils.value_at({ :foo => { :bar => { :bing => 2 } }}, "foo.bar.bing")).to eq(2)
+      expect(Utils.value_at({ :foo => { :bar => { :bing => 2 } }}, "foo.bar[?(@.bing == 2)].bing")).to eq(2)
     end
 
     it "returns nil when the path cannot be followed" do
       expect(Utils.value_at({ :foo => { :bar => :baz }}, "foo.bing")).to be_nil
-    end
-
-    it "does not eval" do
-      expect {
-        Utils.value_at({ :foo => 2 }, "foo[?(@ > 1)]")
-      }.to raise_error(RuntimeError, /Cannot use .*? eval/)
     end
   end
 

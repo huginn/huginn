@@ -563,7 +563,7 @@ describe Agent do
         agent.options = 5
         expect(agent.options["hi"]).to eq(2)
         expect(agent).to have(1).errors_on(:options)
-        expect(agent.errors_on(:options)).to include("cannot be set to an instance of Fixnum")
+        expect(agent.errors_on(:options)).to include("cannot be set to an instance of #{2.class}")  # Integer (ruby >=2.4) or Fixnum (ruby <2.4)
       end
 
       it "should not allow source agents owned by other people" do

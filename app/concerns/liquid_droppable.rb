@@ -51,7 +51,7 @@ module LiquidDroppable
       @object[0]
     end
 
-    def before_method(method)
+    def liquid_method_missing(method)
       @object[method]
     rescue IndexError
       nil

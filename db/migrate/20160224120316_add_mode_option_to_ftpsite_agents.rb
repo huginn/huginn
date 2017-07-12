@@ -1,4 +1,4 @@
-class AddModeOptionToFtpsiteAgents < ActiveRecord::Migration
+class AddModeOptionToFtpsiteAgents < ActiveRecord::Migration[4.2]
   def up
     Agents::FtpsiteAgent.find_each do |agent|
       agent.options['mode'] = 'read'

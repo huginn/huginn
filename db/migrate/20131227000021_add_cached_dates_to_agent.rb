@@ -1,4 +1,4 @@
-class AddCachedDatesToAgent < ActiveRecord::Migration
+class AddCachedDatesToAgent < ActiveRecord::Migration[4.2]
   def up
     add_column :agents, :last_event_at, :datetime
     execute "UPDATE agents SET last_event_at = (SELECT created_at FROM events WHERE events.agent_id = agents.id ORDER BY id DESC LIMIT 1)"

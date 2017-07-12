@@ -1,3 +1,0 @@
-#!/bin/bash
-
-echo "`date`: `cat $(dirname \"$0\")/chrono.dat`"

@@ -9,11 +9,13 @@
 # #receive_web_request is called. For example, one of your Agent's options could be :secret and you could compare this
 # value to params[:secret] whenever #receive_web_request is called on your Agent, rejecting invalid requests.
 #
-# Your Agent's #receive_web_request method should return an Array of json_or_string_response, status_code, and
-# optional mime type.  For example:
+# Your Agent's #receive_web_request method should return an Array of json_or_string_response, status_code, 
+# optional mime type, and optional hash of custom response headers.  For example:
 #   [{status: "success"}, 200]
 # or
 #   ["not found", 404, 'text/plain']
+# or
+#   ["<status>success</status>", 200, 'text/xml', {"Access-Control-Allow-Origin" => "*"}]
 
 class WebRequestsController < ApplicationController
   skip_before_action :verify_authenticity_token
@@ -24,7 +26,13 @@ class WebRequestsController < ApplicationController
     if user
       agent = user.agents.find_by_id(params[:agent_id])
       if agent
-        content, status, content_type = agent.trigger_web_request(request)
+        content, status, content_type, headers = agent.trigger_web_request(request)
+
+        if headers.present?
+          headers.each do |k,v|
+            response.headers[k] = v
+          end
+        end
 
         status = status || 200
 

@@ -1,7 +1,0 @@
-#
-#  Any script or job files listed in here (one entry per line) will NOT be
-#  executed (read as ignored by run-parts).
-#
-
-README
-

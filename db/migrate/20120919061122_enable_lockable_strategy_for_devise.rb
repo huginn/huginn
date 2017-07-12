@@ -1,4 +1,4 @@
-class EnableLockableStrategyForDevise < ActiveRecord::Migration
+class EnableLockableStrategyForDevise < ActiveRecord::Migration[4.2]
   def up
     add_column :users, :failed_attempts, :integer, :default => 0
     add_column :users, :unlock_token, :string

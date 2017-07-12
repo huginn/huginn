@@ -1,4 +1,4 @@
-class ChangeEventsOrderToEventsListOrder < ActiveRecord::Migration
+class ChangeEventsOrderToEventsListOrder < ActiveRecord::Migration[4.2]
   def up
     Agents::DataOutputAgent.find_each do |agent|
       if value = agent.options.delete('events_order')

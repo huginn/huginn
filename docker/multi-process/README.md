@@ -1,9 +1,9 @@
 Huginn for docker with multiple container linkage
 =================================================
 
-This image runs a linkable [Huginn](https://github.com/cantino/huginn) instance.
+This image runs a linkable [Huginn](https://github.com/huginn/huginn) instance.
 
-There is an automated build repository on docker hub for [cantino/huginn](https://hub.docker.com/r/cantino/huginn/builds/).
+There is an automated build repository on docker hub for [huginn/huginn](https://hub.docker.com/r/huginn/huginn/builds/).
 
 This was patterned after [sameersbn/gitlab](https://registry.hub.docker.com/u/sameersbn/gitlab) by [ianblenke/huginn](http://github.com/ianblenke/huginn), and imported here for official generation of a docker hub auto-build image.
 
@@ -33,6 +33,8 @@ Additionally, the database variables may be overridden from the above as per the
     DATABASE_HOST
     DATABASE_PORT
 
+When connecting to an external database and your user does not have the permission to create the Huginn database please make sure it exists and set the `DO_NOT_CREATE_DATABASE` environment variable.
+
 This script will run database migrations (rake db:migrate) which should be idempotent.
 
 It will also seed the database (rake db:seed) unless this is defined:
@@ -49,11 +51,11 @@ The CMD launches Huginn via the scripts/init script. This may become the ENTRYPO
 
 Simple stand-alone usage (use only for testing/evaluation as it can not be updated without losing data):
 
-    docker run -it -p 3000:3000 cantino/huginn
+    docker run -it -p 3000:3000 huginn/huginn
 
 Use a volume to export the data of the internal mysql server:
 
-    docker run -it -p 3000:3000 -v /home/huginn/mysql-data:/var/lib/mysql cantino/huginn
+    docker run -it -p 3000:3000 -v /home/huginn/mysql-data:/var/lib/mysql huginn/huginn
 
 To link to another mysql container, for example:
 
@@ -69,7 +71,7 @@ To link to another mysql container, for example:
         -e HUGINN_DATABASE_NAME=huginn \
         -e HUGINN_DATABASE_USERNAME=huginn \
         -e HUGINN_DATABASE_PASSWORD=somethingsecret \
-        cantino/huginn
+        huginn/huginn
 
 To link to another container named 'postgres':
 
@@ -82,7 +84,7 @@ To link to another container named 'postgres':
         -e HUGINN_DATABASE_USERNAME=huginn \
         -e HUGINN_DATABASE_PASSWORD=mysecretpassword \
         -e HUGINN_DATABASE_ADAPTER=postgresql \
-        cantino/huginn
+        huginn/huginn
 
 The `docker/multi-process` folder also has a `docker-compose.yml` that allows for a sample database formation with a data volume container:
 
@@ -90,19 +92,21 @@ The `docker/multi-process` folder also has a `docker-compose.yml` that allows fo
 
 ## Environment Variables
 
-Other Huginn 12factored environment variables of note, as generated and put into the .env file as per Huginn documentation. All variables of the [.env.example](https://github.com/cantino/huginn/blob/master/.env.example) can be used to override the defaults which a read from the current `.env.example`.
+Other Huginn [12factored](https://12factor.net/) environment variables of note are generated and put into the .env file as per Huginn documentation. All variables of the [.env.example](https://github.com/huginn/huginn/blob/master/.env.example) can be used to override the defaults which a read from the current `.env.example`.
 
 For variables in the .env.example that are commented out, the default is to not include that variable in the generated .env file.
 
+In newer versions of Docker you are able to pass your own .env file in to the container with the `--env-file` parameter.
+
 ## Building on your own
 
-You don't need to do this on your own, because there is an [automated build](https://registry.hub.docker.com/u/cantino/huginn/) for this repository, but if you really want run this command in the Huginn root directory:
+You don't need to do this on your own, because there is an [automated build](https://registry.hub.docker.com/u/huginn/huginn/) for this repository, but if you really want run this command in the Huginn root directory:
 
     docker build --rm=true --tag={yourname}/huginn -f docker/multi-process/Dockerfile .
 
 ## Source
 
-The source is [available on GitHub](https://github.com/cantino/huginn/docker/multi-process/).
+The source is [available on GitHub](https://github.com/huginn/huginn/docker/multi-process/).
 
 Please feel free to submit pull requests and/or fork at your leisure.
 

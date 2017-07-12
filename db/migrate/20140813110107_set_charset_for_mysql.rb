@@ -1,4 +1,4 @@
-class SetCharsetForMysql < ActiveRecord::Migration
+class SetCharsetForMysql < ActiveRecord::Migration[4.2]
   def all_models
     @all_models ||= [
       Agent,

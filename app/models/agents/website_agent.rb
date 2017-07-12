@@ -23,8 +23,8 @@ module Agents
 
       The WebsiteAgent can also scrape based on incoming events.
 
-      * Set the `url_from_event` option to a Liquid template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
-      * Alternatively, set `data_from_event` to a Liquid template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
+      * Set the `url_from_event` option to a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
+      * Alternatively, set `data_from_event` to a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
 
       # Supported Document Types
@@ -119,7 +119,7 @@ module Agents
       If a `template` option is given, its value must be a hash, whose key-value pairs are interpolated after extraction for each iteration and merged with the payload.  In the template, keys of extracted data can be interpolated, and some additional variables are also available as explained in the next section.  For example:
 
           "template": {
-            "url": "{{ url | to_uri: _request_.url }}",
+            "url": "{{ url | to_uri: _response_.url }}",
             "description": "{{ body_text }}",
             "last_modified": "{{ _response_.headers.Last-Modified | date: '%FT%T' }}"
           }
@@ -128,7 +128,7 @@ module Agents
 
       # Liquid Templating
 
-      In Liquid templating, the following variables are available:
+      In [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variables are available:
 
       * `_url_`: The URL specified to fetch the content from.  When parsing `data_from_event`, this is not set.
 
@@ -138,7 +138,7 @@ module Agents
 
           * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.  When parsing `data_from_event`, this is constructed from the value of the `headers` key in the incoming Event, if it is a hash.
 
-          * `url`: The final URL of the fetched page, following redirects.  When parsing `data_from_event`, this is set to the value of the `url` key in the incoming Event.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _request_.url }}` and `{{ content | rebase_hrefs: _request_.url }}`.
+          * `url`: The final URL of the fetched page, following redirects.  When parsing `data_from_event`, this is set to the value of the `url` key in the incoming Event.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _response_.url }}` and `{{ content | rebase_hrefs: _response_.url }}`.
 
       # Ordering Events
 
@@ -702,7 +702,7 @@ module Agents
 
     # Wraps Faraday::Utils::Headers
     class HeaderDrop < LiquidDroppable::Drop
-      def before_method(name)
+      def liquid_method_missing(name)
         @object[name.tr('_', '-')]
       end
     end

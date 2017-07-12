@@ -22,6 +22,8 @@ module Agents
 
       The resulting event will contain the `command` which was executed, the `path` it was executed under, the `exit_status` of the command, the `errors`, and the actual `output`. ShellCommandAgent will not log an error if the result implies that something went wrong.
 
+      If `unbundle` is set to true, the command is run in a clean environment, outside of Huginn's bundler context.
+
       If `suppress_on_failure` is set to true, no event is emitted when `exit_status` is not zero.
 
       If `suppress_on_empty_output` is set to true, no event is emitted when `output` is empty.
@@ -47,6 +49,7 @@ module Agents
       {
           'path' => "/",
           'command' => "pwd",
+          'unbundle' => false,
           'suppress_on_failure' => false,
           'suppress_on_empty_output' => false,
           'expected_update_period_in_days' => 1
@@ -95,7 +98,7 @@ module Agents
         path = opts['path']
         stdin = opts['stdin']
 
-        result, errors, exit_status = run_command(path, command, stdin)
+        result, errors, exit_status = run_command(path, command, stdin, interpolated.slice(:unbundle).symbolize_keys)
 
         payload = {
           'command' => command,
@@ -115,7 +118,13 @@ module Agents
       end
     end
 
-    def run_command(path, command, stdin)
+    def run_command(path, command, stdin, unbundle: false)
+      if unbundle
+        return Bundler.with_original_env {
+          run_command(path, command, stdin)
+        }
+      end
+
       begin
         rout, wout = IO.pipe
         rerr, werr = IO.pipe
