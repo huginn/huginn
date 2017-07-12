@@ -205,6 +205,8 @@ GEM
       safe_yaml (~> 1.0.0)
     daemons (1.1.9)
     debug_inspector (0.0.3)
+    delighted (1.5.1)
+      multi_json
     delorean (2.1.0)
       chronic
     devise (4.3.0)
@@ -651,6 +653,7 @@ DEPENDENCIES
   daemons (~> 1.1.9)
   delayed_job!
   delayed_job_active_record!
+  delighted
   delorean
   devise (~> 4.3.0)
   dotenv!
