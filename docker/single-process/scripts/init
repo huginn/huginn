@@ -40,5 +40,9 @@ fi
 if [ -z $1 ]; then
   exec sudo -u huginn -H -E bundle exec unicorn -c config/unicorn.rb
 else
-  exec sudo -u huginn -H -E bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
+  if [[ $1 == sidekiq* ]]; then
+    exec sudo -u huginn -H -E bundle exec "$@" RAILS_ENV=${RAILS_ENV}
+  else
+    exec sudo -u huginn -H -E bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
+  fi
 fi

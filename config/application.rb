@@ -42,6 +42,6 @@ module Huginn
     # like if you have constraints or database-specific column types
     # config.active_record.schema_format = :sql
 
-    config.active_job.queue_adapter = :delayed_job
+    config.active_job.queue_adapter = (ENV['BACKGROUND_JOB_PROCESSOR'].presence || :delayed_job).to_sym
   end
 end

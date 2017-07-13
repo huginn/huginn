@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DelayedJobWorker do
+describe DelayedJobWorker, processor: :delayed_job do
   before do
     @djw = DelayedJobWorker.new
   end

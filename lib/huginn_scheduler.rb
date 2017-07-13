@@ -183,6 +183,7 @@ class HuginnScheduler < LongRunnable::Worker
   end
 
   def cleanup_failed_jobs!
+    return if Rails.configuration.active_job.queue_adapter != :delayed_job
     num_to_keep = (ENV['FAILED_JOBS_TO_KEEP'].presence || FAILED_JOBS_TO_KEEP).to_i
     first_to_delete = Delayed::Job.where.not(failed_at: nil).order("failed_at DESC").offset(num_to_keep).limit(1).pluck(:failed_at).first
     Delayed::Job.where(["failed_at <= ?", first_to_delete]).delete_all if first_to_delete.present?

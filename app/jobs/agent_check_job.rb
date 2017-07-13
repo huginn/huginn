@@ -1,4 +1,5 @@
 class AgentCheckJob < ActiveJob::Base
+  queue_as :default
   # Given an Agent id, load the Agent, call #check on it, and then save it with an updated `last_check_at` timestamp.
   def perform(agent_id)
     agent = Agent.find(agent_id)

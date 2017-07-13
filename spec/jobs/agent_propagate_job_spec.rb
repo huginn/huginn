@@ -11,12 +11,12 @@ describe AgentPropagateJob do
       expect(AgentPropagateJob.can_enqueue?).to be_truthy
     end
 
-    it "is falsy when a progation job is queued" do
+    it "is falsy when a progation job is queued", processor: :delayed_job do
       Delayed::Job.create!(queue: 'propagation')
       expect(AgentPropagateJob.can_enqueue?).to be_falsy
     end
 
-    it "is truthy when a enqueued progation job failed" do
+    it "is truthy when a enqueued progation job failed", processor: :delayed_job do
       Delayed::Job.create!(queue: 'propagation', failed_at: Time.now - 1.minute)
       expect(AgentPropagateJob.can_enqueue?).to be_truthy
     end
