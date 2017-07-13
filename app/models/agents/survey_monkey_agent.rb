@@ -16,44 +16,31 @@ module Agents
 
     description do
       <<-MD
-        The Chattermill Response Agent receives events, build responses, and sends the results using the Chattermill API.
+        The Survey Monkey Agent pull surveys responses via [SurveyMonkey API](https://developer.surveymonkey.com/api/v3/#surveys-id-responses-bulk),
+        extract a `comment` and calculates a `score` based on available questions, then it sends the results as events.
 
-        A Chattermill Response Agent can receives events from other agents or run periodically,
-        it builds Chattermill Responses with the [Liquid-interpolated](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid)
-        contents of `options`, and sends the results as Authenticated POST requests to a specified API instance.
-        If the request fail, a notification to Slack will be sent.
-
-        If `emit_events` is set to `true`, the server response will be emitted as an Event and can be fed to a
-        WebsiteAgent for parsing (using its `data_from_event` and `type` options). No data processing
-        will be attempted by this Agent, so the Event's "body" value will always be raw text.
-        The Event will also have a "headers" hash and a "status" integer value.
-        Header names are capitalized; e.g. "Content-Type".
+        With `on_change` mode selected, changes are detected based on the resulted event payload after applying this option.
+        If you want to add some keys to each event but ignore any change in them, set `mode` to `all` and put a DeDuplicationAgent downstream.
+        If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
 
         Options:
 
-          * `organization_subdomain` - Specify the subdomain for the target organization (e.g `moo` or `hellofresh`).
-          * `comment` - Specify the Liquid interpolated expresion to build the Response comment.
-          * `score` - Specify the Liquid interpolated expresion to build the Response score.
-          * `kind` - Specify the Liquid interpolated expresion to build the Response kind.
-          * `stream` - Specify the Liquid interpolated expresion to build the Response stream.
-          * `created_at` - Specify the Liquid interpolated expresion to build the Response created_at date.
-          * `user_meta` - Specify the Liquid interpolated JSON to build the Response user metas.
-          * `segments` - Specify the Liquid interpolated JSON to build the Response segments.
-          * `extra_fields` - Specify the Liquid interpolated JSON to build additional fields for the Response, e.g: `{ approved: true }`.
-          * `emit_events` - Select `true` or `false`.
-          * `expected_receive_period_in_days` - Specify the period in days used to calculate if the agent is working.
+          * `api_token` - Specify the SurveyMonkey API token for authentication.
+          * `survey_ids` - Specify the list of survey IDs for which Huginn will retrieve responses.
+          * `mode` - Select the operation mode (`all`, `on_change`, `merge`).
+          * `expected_update_period_in_days` - Specify the period in days used to calculate if the agent is working.
       MD
     end
 
     event_description <<-MD
       Events look like this:
         {
-          "status": 201,
-          "headers": {
-            "Content-Type": "'application/json",
-            ...
-          },
-          "body": "{...}"
+          "score": 2,
+          "comment": "Sometimes the website is hanged, not so stable.",
+          "response_id": "783280986",
+          "survey_id": "10172078",
+          "created_at": "2009-04-30T01:45:11+00:00",
+          "language": "en"
         }
     MD
 
@@ -66,7 +53,7 @@ module Agents
     end
 
     def working?
-      last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
+      last_receive_at && last_receive_at > interpolated['expected_update_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
     def http_method
@@ -85,8 +72,8 @@ module Agents
         errors.add(:base, "The 'survey_ids' option is required.")
       end
 
-      if options['expected_receive_period_in_days'].blank?
-        errors.add(:base, "The 'expected_receive_period_in_days' option is required.")
+      if options['expected_update_period_in_days'].blank?
+        errors.add(:base, "The 'expected_update_period_in_days' option is required.")
       end
 
       if options['mode'].present?
@@ -113,7 +100,6 @@ module Agents
       { "Authorization" => "bearer #{interpolated['api_token']}" }
     end
 
-    # TODO: move to a concern?
     def previous_payloads(num_events)
       # Larger of UNIQUENESS_FACTOR * num_events and UNIQUENESS_LOOK_BACK
       look_back = UNIQUENESS_FACTOR * num_events
@@ -122,7 +108,6 @@ module Agents
       events.order('id desc').limit(look_back) if interpolated['mode'] == 'on_change'
     end
 
-    # TODO: move to a concern?
     # This method returns true if the result should be stored as a new event.
     # If mode is set to 'on_change', this method may return false and update an
     # existing event to expire further in the future.
@@ -159,7 +144,7 @@ module Agents
 
     def fetch_survey_responses(survey_id)
       log "Fetching survey ##{survey_id} responses"
-      url = "#{SURVEYS_URL_BASE}/#{survey_id}/responses/bulk"
+      url = "#{SURVEYS_URL_BASE}/#{survey_id}/responses/bulk?sort_by=date_modified&sort_order=DESC"
       fetch_survey_monkey_resource(url)
     end
 

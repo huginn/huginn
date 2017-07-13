@@ -1,4 +1,6 @@
 class SurveyMonkeyParser
+  attr_reader :survey, :responses
+  
   def initialize(data)
     @survey = Survey.new(data)
     @responses = data.dig('responses', 'data') || []
@@ -6,17 +8,8 @@ class SurveyMonkeyParser
 
   def parse_responses
     responses.map do |response|
-      parse_response(response)
+      ResponseParser.new(response, survey).parse
     end
-  end
-
-  private
-
-  attr_reader :survey, :responses
-
-  def parse_response(response_data)
-    response = ResponseParser.new(response_data, survey)
-    response.parse
   end
 
   class Survey
@@ -32,7 +25,7 @@ class SurveyMonkeyParser
       question['family'] == 'open_ended' && question['subtype'] == 'essay'
     end
 
-    def scorable_question?(question)
+    def qualifiable_question?(question)
       question['family'] == 'matrix' && question['subtype'] == 'rating'
     end
 
@@ -66,7 +59,7 @@ class SurveyMonkeyParser
     attr_reader :data, :survey
 
     def score
-      question = questions.find { |q| survey.scorable_question?(q['details']) }
+      question = questions.find { |q| survey.qualifiable_question?(q['details']) }
       return if question.nil?
 
       choices = question.dig('details', 'answers', 'choices')
