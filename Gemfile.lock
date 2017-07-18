@@ -357,7 +357,7 @@ GEM
       actionmailer (>= 3.2)
       letter_opener (~> 1.0)
       railties (>= 3.2)
-    libv8 (3.16.14.19)
+    libv8 (5.3.332.38.5)
     liquid (4.0.0)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -381,6 +381,8 @@ GEM
     mimemagic (0.3.2)
     mini_magick (4.8.0)
     mini_portile2 (2.2.0)
+    mini_racer (0.1.9)
+      libv8 (~> 5.3)
     minitest (5.10.2)
     mqtt (0.5.0)
     multi_json (1.12.1)
@@ -494,7 +496,6 @@ GEM
     rb-kqueue (0.2.5)
       ffi (>= 0.5.0)
     redis (3.3.3)
-    ref (2.0.0)
     responders (2.4.0)
       actionpack (>= 4.2.0, < 5.3)
       railties (>= 4.2.0, < 5.3)
@@ -597,9 +598,6 @@ GEM
     systemu (2.6.5)
     term-ansicolor (1.6.0)
       tins (~> 1.0)
-    therubyracer (0.12.3)
-      libv8 (~> 3.16.14.15)
-      ref
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.7)
@@ -705,6 +703,7 @@ DEPENDENCIES
   listen (~> 3.0.5)
   loofah (~> 2.0)
   mini_magick
+  mini_racer
   mqtt
   multi_xml
   mysql2 (~> 0.3.20)
@@ -743,7 +742,6 @@ DEPENDENCIES
   spring (~> 1.7.2)
   spring-commands-rspec (~> 1.0.4)
   spring-watcher-listen (~> 2.0.0)
-  therubyracer (~> 0.12.3)
   tumblr_client!
   twilio-ruby (~> 3.11.5)
   twitter!
