@@ -80,6 +80,25 @@ describe "Creating a new agent", js: true do
 
       expect(agent.control_targets).to eq([bob_weather_agent])
     end
+
+    it "creates an agent with a controller" do
+      visit "/"
+      page.find("a", text: "Agents").trigger(:mouseover)
+      click_on("New Agent")
+
+      select_agent_type("Weather Agent")
+      fill_in(:agent_name, with: "Test Weather Agent")
+
+      select2("Example Scheduler", from: 'Controllers')
+
+      click_on "Save"
+
+      expect(page).to have_text("Test Weather Agent")
+
+      agent = Agent.find_by(name: "Test Weather Agent")
+
+      expect(agent.controllers).to eq([bob_scheduler_agent])
+    end
   end
 
   it "creates an alert if a new agent with invalid json is submitted" do
