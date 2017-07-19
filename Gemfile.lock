@@ -170,6 +170,9 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
+    capybara-screenshot (1.0.17)
+      capybara (>= 1.0, < 3)
+      launchy
     capybara-select2 (1.0.1)
       capybara
       rspec
@@ -625,6 +628,7 @@ DEPENDENCIES
   capistrano-bundler (~> 1.1.4)
   capistrano-rails (~> 1.1)
   capybara (~> 2.13.0)
+  capybara-screenshot
   capybara-select2
   coffee-rails (~> 4.2)
   coveralls (~> 0.7.4)
