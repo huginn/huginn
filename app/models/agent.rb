@@ -294,7 +294,7 @@ class Agent < ActiveRecord::Base
   class << self
     def build_clone(original)
       new(original.slice(:type, :options, :service_id, :schedule, :controller_ids, :control_target_ids,
-                         :source_ids, :keep_events_for, :propagate_immediately, :scenario_ids)) { |clone|
+                         :source_ids, :receiver_ids, :keep_events_for, :propagate_immediately, :scenario_ids)) { |clone|
         # Give it a unique name
         2.step do |i|
           name = '%s (%d)' % [original.name, i]

@@ -149,6 +149,7 @@ group :development do
   group :test do
     gem 'coveralls', '~> 0.7.4', require: false
     gem 'capybara', '~> 2.13.0'
+    gem 'capybara-screenshot'
     gem 'capybara-select2', require: false
     gem 'delorean'
     gem 'poltergeist'
