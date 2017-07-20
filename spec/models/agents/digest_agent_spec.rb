@@ -116,7 +116,6 @@ describe Agents::DigestAgent do
         @checker.save!
 
         expect { @checker.check }.to change { Event.count }.by(1)
-        #@checker.reload
         expect(@checker.most_recent_event.payload["events"]).to eq([event1.payload, event2.payload])
         expect(@checker.most_recent_event.payload["message"]).to eq("event;event")
         expect(@checker.memory['queue']).to be_empty
@@ -146,7 +145,6 @@ describe Agents::DigestAgent do
         @checker.save!
 
         expect { @checker.check }.to change { Event.count }.by(1)
-        #@checker.reload
         expect(@checker.most_recent_event.payload["events"]).to eq([event2.payload])
         expect(@checker.most_recent_event.payload["message"]).to eq("event")
         expect(@checker.memory['queue'].length).to eq(1)
