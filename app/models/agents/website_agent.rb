@@ -53,12 +53,57 @@ module Agents
 
       # Scraping JSON
 
-      When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
+      When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.
+
+      Sample incoming event:
+
+          { "results": {
+              "data": [
+                {
+                  "title": "Lorem ipsum 1",
+                  "description": "Aliquam pharetra leo ipsum."
+                  "price": 8.95
+                },
+                {
+                  "title": "Lorem ipsum 2",
+                  "description": "Suspendisse a pulvinar lacus."
+                  "price": 12.99
+                },
+                {
+                  "title": "Lorem ipsum 3",
+                  "description": "Praesent ac arcu tellus."
+                  "price": 8.99
+                }
+              ]
+            }
+          }
+
+      Sample rule:
 
           "extract": {
             "title": { "path": "results.data[*].title" },
             "description": { "path": "results.data[*].description" }
           }
+
+      In this example the `*` wildcard character makes the parser to iterate through all items of the `data` array. Three events will be created as a result.
+
+      Sample outgoing events:
+
+          [
+            {
+              "title": "Lorem ipsum 1",
+              "description": "Aliquam pharetra leo ipsum."
+            },
+            {
+              "title": "Lorem ipsum 2",
+              "description": "Suspendisse a pulvinar lacus."
+            },
+            {
+              "title": "Lorem ipsum 3",
+              "description": "Praesent ac arcu tellus."
+            }
+          ]
+
 
       The `extract` option can be skipped for the JSON type, causing the full JSON response to be returned.
 
