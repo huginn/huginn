@@ -29,6 +29,13 @@ class GoogleCalendar
     @logger.debug @calendar.inspect
   end
 
+  def self.open(*args, &block)
+    instance = new(*args)
+    block.call(instance)
+  ensure
+    instance.cleanup!
+  end
+
   def auth_as
     @authorization.fetch_access_token!
     @calendar.authorization = @authorization

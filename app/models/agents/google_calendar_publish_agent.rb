@@ -107,8 +107,7 @@ module Agents
     def receive(incoming_events)
       require 'google_calendar'
       incoming_events.each do |event|
-        begin
-          calendar = GoogleCalendar.new(interpolate_options(options, event), Rails.logger)
+        GoogleCalendar.open(interpolate_options(options, event), Rails.logger) do |calendar|
 
           cal_message = event.payload["message"]
           if cal_message["start"].present? && cal_message["start"]["dateTime"].present? && !cal_message["start"]["date_time"].present?
@@ -129,8 +128,6 @@ module Agents
             'agent_id' => event.agent_id,
             'event_id' => event.id
           }
-        ensure
-          calendar.cleanup!
         end
       end
     end
