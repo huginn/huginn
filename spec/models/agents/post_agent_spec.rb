@@ -292,6 +292,20 @@ describe Agents::PostAgent do
           @checker.check
           expect(@checker.events.last.payload['headers']).to eq({ 'content_type' => 'text/html' })
         end
+
+        context "when output_mode is set to 'merge'" do
+          before do
+            @checker.options['output_mode'] = 'merge'
+            @checker.save!
+          end
+
+          it "emits the received event" do
+            @checker.receive([@event])
+            @checker.check
+            expect(@checker.events.last.payload['somekey']).to eq('somevalue')
+            expect(@checker.events.last.payload['someotherkey']).to eq({ 'somekey' => 'value' })
+          end
+        end
       end
     end
   end
@@ -428,6 +442,32 @@ describe Agents::PostAgent do
       expect(@checker).to be_valid
 
       @checker.options['emit_events'] = true
+      expect(@checker).to be_valid
+    end
+
+    it "requires output_mode to be 'clean' or 'merge', if present" do
+      @checker.options['output_mode'] = 'what?'
+      expect(@checker).not_to be_valid
+
+      @checker.options.delete('output_mode')
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = 'clean'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = 'merge'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = :clean
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = :merge
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = '{{somekey}}'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = "{% if key == 'foo' %}merge{% else %}clean{% endif %}"
       expect(@checker).to be_valid
     end
   end
