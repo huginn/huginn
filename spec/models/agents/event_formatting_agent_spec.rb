@@ -74,6 +74,12 @@ describe Agents::EventFormattingAgent do
       expect(Event.last.payload[:content]).not_to eq(nil)
     end
 
+    it "should handle Liquid templating in mode" do
+      @checker.options[:mode] = "{{'merge'}}"
+      @checker.receive([@event])
+      expect(Event.last.payload[:content]).not_to eq(nil)
+    end
+
     it "should handle Liquid templating in instructions" do
       @checker.receive([@event])
       expect(Event.last.payload[:message]).to eq("Received Some Lorem Ipsum from somevalue .")
