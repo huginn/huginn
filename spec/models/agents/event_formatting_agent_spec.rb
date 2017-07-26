@@ -188,5 +188,25 @@ describe Agents::EventFormattingAgent do
       @checker.options[:mode] = ""
       expect(@checker).not_to be_valid
     end
+
+    it "requires mode to be 'clean' or 'merge'" do
+      @checker.options['mode'] = 'what?'
+      expect(@checker).not_to be_valid
+
+      @checker.options['mode'] = 'clean'
+      expect(@checker).to be_valid
+
+      @checker.options['mode'] = 'merge'
+      expect(@checker).to be_valid
+
+      @checker.options['mode'] = :clean
+      expect(@checker).to be_valid
+
+      @checker.options['mode'] = :merge
+      expect(@checker).to be_valid
+
+      @checker.options['mode'] = '{{somekey}}'
+      expect(@checker).to be_valid
+    end
   end
 end
