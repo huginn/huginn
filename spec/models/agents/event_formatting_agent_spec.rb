@@ -74,6 +74,12 @@ describe Agents::EventFormattingAgent do
       expect(Event.last.payload[:content]).not_to eq(nil)
     end
 
+    it "should handle Liquid templating in mode" do
+      @checker.options[:mode] = "{{'merge'}}"
+      @checker.receive([@event])
+      expect(Event.last.payload[:content]).not_to eq(nil)
+    end
+
     it "should handle Liquid templating in instructions" do
       @checker.receive([@event])
       expect(Event.last.payload[:message]).to eq("Received Some Lorem Ipsum from somevalue .")
@@ -181,6 +187,26 @@ describe Agents::EventFormattingAgent do
     it "should validate presence of mode" do
       @checker.options[:mode] = ""
       expect(@checker).not_to be_valid
+    end
+
+    it "requires mode to be 'clean' or 'merge'" do
+      @checker.options['mode'] = 'what?'
+      expect(@checker).not_to be_valid
+
+      @checker.options['mode'] = 'clean'
+      expect(@checker).to be_valid
+
+      @checker.options['mode'] = 'merge'
+      expect(@checker).to be_valid
+
+      @checker.options['mode'] = :clean
+      expect(@checker).to be_valid
+
+      @checker.options['mode'] = :merge
+      expect(@checker).to be_valid
+
+      @checker.options['mode'] = '{{somekey}}'
+      expect(@checker).to be_valid
     end
   end
 end

@@ -84,7 +84,7 @@ module Agents
     event_description do
       "Events will have the following fields%s:\n\n    %s" % [
         case options['mode'].to_s
-        when 'merged'
+        when 'merge'
           ', merged with the original contents'
         when /\{/
           ', conditionally merged with the original contents'
@@ -97,6 +97,10 @@ module Agents
 
     def validate_options
       errors.add(:base, "instructions and mode need to be present.") unless options['instructions'].present? && options['mode'].present?
+
+      if options['mode'].present? && !options['mode'].to_s.include?('{{') && !%[clean merge].include?(options['mode'].to_s)
+        errors.add(:base, "mode must be 'clean' or 'merge'")
+      end
 
       validate_matchers
     end
