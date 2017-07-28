@@ -61,16 +61,8 @@ module Agents
       options['events'] == 'single'
     end
 
-    def interval
-      options['interval']
-    end
-
     def last_modified
       options['last_modified']
-    end
-
-    def date_since
-      interval.to_i.seconds.ago.iso8601
     end
 
     def base_url
