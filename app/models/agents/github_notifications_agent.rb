@@ -86,7 +86,7 @@ module Agents
 
     def query_parameters
       {
-        access_token: options['access_token']
+        access_token: interpolated['access_token']
       }
     end
   end
