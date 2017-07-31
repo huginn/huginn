@@ -5,7 +5,7 @@ describe Agents::GithubNotificationsAgent do
     @valid_params = {
       name: "somename",
       options: {
-        access_token: 'sometoken',
+        access_token: "{% credential github_access_token %}",
         events: "multiple",
         last_modified: true
       }
@@ -17,6 +17,7 @@ describe Agents::GithubNotificationsAgent do
       :headers => {"Content-Type" => "text/json", "Last-Modified" => 'Thu, 25 Oct 2012 15:16:27 GMT'}
     )
 
+    users(:jane).user_credentials.create! credential_name: 'github_access_token', credential_value: 'something'
     @checker = Agents::GithubNotificationsAgent.new(@valid_params)
     @checker.user = users(:jane)
     @checker.save!
@@ -24,10 +25,22 @@ describe Agents::GithubNotificationsAgent do
   end
 
   describe "#check" do
-    it "checks if it can handle multiple events" do
+    it "emits a single event with options['events'] = single" do
+      @checker.options[:events] = 'single'
+      expect {
+        @checker.check()
+      }.to change { Event.count }.by(1)
+    end
+
+    it "emits multiple events with options['events'] = multiple" do
       expect {
         @checker.check()
       }.to change { Event.count }.by(2)
+    end
+
+    it "creates an Events with the received data" do
+      @checker.check()
+      expect(Event.last.payload['url']).to eq "https://api.github.com/notifications/threads/1"
     end
   end
 
@@ -35,7 +48,7 @@ describe Agents::GithubNotificationsAgent do
     it "should generate a correct request options hash on the first run" do
       expect(@checker.send(:request_options)).to eq({
         headers: {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"},
-        query: {access_token: @checker.options['access_token']}
+        query: {access_token: users(:jane).user_credentials.last.credential_value}
       })
     end
 
@@ -45,7 +58,7 @@ describe Agents::GithubNotificationsAgent do
       @checker.save
       expect(@checker.reload.send(:request_options)).to eq({
         headers: {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "If-Modified-Since" => time},
-        query: {access_token: @checker.options['access_token']}
+        query: {access_token: users(:jane).user_credentials.last.credential_value}
       })
     end
 
@@ -55,10 +68,9 @@ describe Agents::GithubNotificationsAgent do
       @checker.save
       expect(@checker.reload.send(:request_options)).to eq({
         headers: {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"},
-        query: {access_token: @checker.options['access_token']}
+        query: {access_token: users(:jane).user_credentials.last.credential_value}
       })
     end
-
   end
 
   describe "validation" do
@@ -73,16 +85,6 @@ describe Agents::GithubNotificationsAgent do
 
     it "should validate last_modified is boolean" do
       @checker.options[:last_modified] = 'test'
-      expect(@checker).not_to be_valid
-    end
-
-    it "should validate interval is positive integer, if present" do
-      @checker.options[:interval] = "asdf"
-      expect(@checker).not_to be_valid
-    end
-
-    it "should validate interval is positive integer, if present" do
-      @checker.options[:interval] = "-1"
       expect(@checker).not_to be_valid
     end
   end

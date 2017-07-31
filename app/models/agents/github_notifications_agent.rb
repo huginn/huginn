@@ -29,10 +29,7 @@ module Agents
 
     def validate_options
       errors.add(:base, "access_token is required ") unless options['access_token'].present?
-      errors.add(:base, "interval needs to be a positive integer") if options['interval'].present? &&  options['interval'].to_i <= 0
-      if last_modified.present? && boolify(last_modified).nil?
-        errors.add(:base, "last_modified must be a boolean value")
-      end
+      errors.add(:base, "last_modified must be a boolean value") if last_modified.present? && boolify(last_modified).nil?
     end
 
     def working?
@@ -65,6 +62,10 @@ module Agents
       options['last_modified']
     end
 
+    def use_last_modified?
+      memory[:last_modified].present? && boolify(last_modified)
+    end
+
     def base_url
       "https://api.github.com/notifications"
     end
@@ -81,7 +82,7 @@ module Agents
     end
 
     def extra_headers
-      (memory[:last_modified].present? && boolify(last_modified)) ? {'If-Modified-Since' => memory[:last_modified]} : {}
+      use_last_modified? ? {'If-Modified-Since' => memory[:last_modified]} : {}
     end
 
     def query_parameters
