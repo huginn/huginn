@@ -72,7 +72,7 @@ class ApplicationController < ActionController::Base
   end
 
   def outdated_google_auth_check
-    @outdated_google_cal_agents = current_user.agents.where("type like 'Agents::GoogleCalendarPublishAgent'").select do |agent|
+    @outdated_google_cal_agents = current_user.agents.of_type('Agents::GoogleCalendarPublishAgent').select do |agent|
       agent.options['google']['key_secret'].present?
     end
   end
