@@ -134,6 +134,7 @@ gem 'multi_xml'
 gem 'nokogiri'
 gem 'omniauth', '~> 1.3.1'
 gem 'rails', '= 5.1.1'
+gem 'rollbar'
 gem 'rufus-scheduler', '~> 3.3.2', require: false
 gem 'sass-rails', '~> 5.0'
 gem 'select2-rails', '~> 3.5.4'

@@ -1,4 +1,4 @@
-class AgentReceiveJob < ActiveJob::Base
+class AgentReceiveJob < ApplicationJob
   queue_as :default
   # Given an Agent id and an array of Event ids, load the Agent, call #receive on it with the Event objects, and then
   # save it with an updated `last_receive_at` timestamp.

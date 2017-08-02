@@ -490,6 +490,8 @@ GEM
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     retriable (1.4.1)
+    rollbar (2.13.3)
+      multi_json
     rr (1.1.2)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
@@ -708,6 +710,7 @@ DEPENDENCIES
   rails (= 5.1.1)
   rails-controller-testing
   rb-kqueue (>= 0.2)
+  rollbar
   rr
   rspec (~> 3.5)
   rspec-collection_matchers (~> 1.1.0)

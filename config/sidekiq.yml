@@ -3,6 +3,7 @@
 :queues:
   - propagation
   - default
+  - rollbar
 
 production:
   :concurrency: <%= (ENV['SIDEKIQ_CONCURRENCY'] || 20).to_i %>

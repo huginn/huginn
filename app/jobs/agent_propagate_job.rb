@@ -1,4 +1,4 @@
-class AgentPropagateJob < ActiveJob::Base
+class AgentPropagateJob < ApplicationJob
   queue_as :propagation
 
   def perform
