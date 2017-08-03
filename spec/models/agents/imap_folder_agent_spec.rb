@@ -61,6 +61,7 @@ describe Agents::ImapFolderAgent do
     let(:expected_payloads) {
       [
         {
+          'message_id' => 'foo.123@mail.example.jp',
           'folder' => 'INBOX',
           'from' => 'nanashi.gombeh@example.jp',
           'to' => ['jane.doe@example.com', 'john.doe@example.com'],
@@ -73,6 +74,7 @@ describe Agents::ImapFolderAgent do
           'mime_type' => 'text/plain',
         },
         {
+          'message_id' => 'bar.456@mail.example.com',
           'folder' => 'INBOX',
           'from' => 'john.doe@example.com',
           'to' => ['jane.doe@example.com', 'nanashi.gombeh@example.jp'],

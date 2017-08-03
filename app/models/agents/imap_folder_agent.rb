@@ -63,6 +63,7 @@ module Agents
       Events look like this:
 
           {
+            "message_id": "...(Message-Id without angle brackets)...",
             "folder": "INBOX",
             "subject": "...",
             "from": "Nanashi <nanashi.gombeh@example.jp>",
@@ -265,6 +266,7 @@ module Agents
           log 'Emitting an event for mail: %s' % message_id
 
           create_event :payload => {
+            'message_id' => message_id,
             'folder' => mail.folder,
             'subject' => mail.scrubbed(:subject),
             'from' => mail.from_addrs.first,
