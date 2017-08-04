@@ -230,7 +230,7 @@ module Agents
         url: feed.url,
         links: feed.links,
         title: feed.title,
-        description: feed.description,
+        description: feed.try(:description),
         copyright: feed.copyright,
         generator: feed.generator,
         icon: feed.icon,
