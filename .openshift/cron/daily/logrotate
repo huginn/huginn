@@ -1,0 +1,11 @@
+#!/bin/bash
+
+pushd $OPENSHIFT_REPO_DIR
+
+/usr/sbin/logrotate -s log/logrotate.status .openshift/logrotate
+
+EXITVALUE=$?
+if [ $EXITVALUE != 0 ]; then
+    echo "ALERT exited abnormally with [$EXITVALUE]" | /usr/bin/logshifter -tag logrotate
+fi
+exit 0

@@ -1,0 +1,10 @@
+"log/*.log" {
+  compress
+  copytruncate
+  create
+  dateext
+  maxage 30
+  missingok
+  rotate 4
+  size 2
+}
