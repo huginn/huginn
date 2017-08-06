@@ -239,7 +239,7 @@ GEM
     execjs (2.6.0)
     faraday (0.12.1)
       multipart-post (>= 1.2, < 3)
-    feedjira (2.1.0)
+    feedjira (2.1.2)
       faraday (>= 0.9)
       faraday_middleware (>= 0.9)
       loofah (>= 2.0)
