@@ -295,6 +295,8 @@ module FeedjiraExtension
               _itunes_owners.reject(&:empty?)
             end
           end
+        else
+          element :subtitle, as: :description unless method_defined?(:description)
         end
 
         sax_config.collection_elements.each_value do |collection_elements|
