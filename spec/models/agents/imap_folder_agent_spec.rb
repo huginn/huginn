@@ -47,13 +47,13 @@ describe Agents::ImapFolderAgent do
         Mail.read(Rails.root.join('spec/data_fixtures/imap1.eml')).tap { |mail|
           mail.extend(MessageMixin)
           stub(mail).uid.returns(1)
-          stub(mail).rfc822.returns(mail.encoded)
+          stub(mail).raw_mail.returns(mail.encoded)
         },
         Mail.read(Rails.root.join('spec/data_fixtures/imap2.eml')).tap { |mail|
           mail.extend(MessageMixin)
           stub(mail).uid.returns(2)
           stub(mail).has_attachment?.returns(true)
-          stub(mail).rfc822.returns(mail.encoded)
+          stub(mail).raw_mail.returns(mail.encoded)
         },
       ]
     }
@@ -292,6 +292,27 @@ describe Agents::ImapFolderAgent do
           expect {
             expect { @checker.check }.not_to change { Event.count }
           }.not_to raise_exception
+        end
+      end
+
+      describe 'with include_raw_mail' do
+        before do
+          @checker.options['include_raw_mail'] = true
+          @checker.save!
+        end
+
+        it 'should check for mails and emit events with raw_mail' do
+          expect { @checker.check }.to change { Event.count }.by(2)
+          expect(@checker.notified.sort).to eq(mails.map(&:message_id).sort)
+          expect(@checker.lastseen).to eq(mails.each_with_object(@checker.make_seen) { |mail, seen|
+              seen[mail.uidvalidity] = mail.uid
+            })
+
+          expect(Event.last(2).map(&:payload)).to eq expected_payloads.map.with_index { |payload, i|
+            payload.merge('raw_mail' => mails[i].encoded)
+          }
+
+          expect { @checker.check }.not_to change { Event.count }
         end
       end
     end
