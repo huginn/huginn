@@ -108,6 +108,7 @@ module Agents
     def send_notification(post_params)
       response = HTTParty.post(API_URL, query: post_params)
       puts response
+      log "Sent notification with message \"#{post_params['message']}\" to \"#{post_params['user']}\""
     end
   end
 end
