@@ -146,18 +146,6 @@ module FeedjiraExtension
         def authors
           _authors.reject(&:empty?)
         end
-
-        def alternate_link
-          links.find { |link|
-            link.is_a?(AtomLink) &&
-              link.rel == 'alternate' &&
-              (link.type == 'text/html'|| link.type.nil?)
-          }
-        end
-
-        def url
-          @url ||= (alternate_link || links.first).try!(:href)
-        end
       end
     end
   end
