@@ -1,6 +1,6 @@
 class SurveyMonkeyParser
   attr_reader :survey, :responses
-  
+
   def initialize(data)
     @survey = Survey.new(data)
     @responses = data.dig('responses', 'data') || []
@@ -43,7 +43,7 @@ class SurveyMonkeyParser
   end
 
   class ResponseParser
-    ATTRIBUTES = %w[score comment response_id survey_id created_at language].freeze
+    ATTRIBUTES = %w(score comment response_id survey_id created_at collector_id custom_variables url language).freeze
 
     def initialize(data, survey)
       @data = data
@@ -51,7 +51,7 @@ class SurveyMonkeyParser
     end
 
     def parse
-      ATTRIBUTES.inject({}) { |a, e| a.merge(e => send(e)) }
+      ATTRIBUTES.inject({}) { |acc, elem| acc.merge(elem => send(elem)) }
     end
 
     private
@@ -88,6 +88,18 @@ class SurveyMonkeyParser
 
     def created_at
       data['date_created']
+    end
+
+    def collector_id
+      data['collector_id']
+    end
+
+    def custom_variables
+      data['custom_variables']
+    end
+
+    def url
+      data['analyze_url']
     end
 
     def language
