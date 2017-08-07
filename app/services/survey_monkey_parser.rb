@@ -65,7 +65,7 @@ class SurveyMonkeyParser
       choices = question.dig('details', 'answers', 'choices')
       values = question['answers'].map do |answer|
         choice = choices.find { |c| c['id'] == answer['choice_id'] }
-        choice['text'].to_i
+        choice['text'].gsub(/[^0-9]/, '')
       end
 
       (values.sum / values.size.to_f).round
