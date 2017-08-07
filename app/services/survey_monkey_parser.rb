@@ -43,10 +43,10 @@ class SurveyMonkeyParser
   end
 
   class ResponseParser
-    ATTRIBUTES = %w(score comment response_id survey_id created_at collector_id custom_variables url language).freeze
+    ATTRIBUTES = %w(score comment id survey_id date_created collector_id custom_variables analyze_url language).freeze
 
     def initialize(data, survey)
-      @data = data
+      @data = OpenStruct.new(data)
       @survey = survey
     end
 
@@ -56,54 +56,17 @@ class SurveyMonkeyParser
 
     private
 
-    attr_reader :data, :survey
+    attr_reader :survey, :data
+
+    delegate :id, :date_created, :survey_id, :collector_id, :custom_variables, :analyze_url, to: :data
+    delegate :language, to: :survey
 
     def score
-      question = questions.find { |q| survey.qualifiable_question?(q['details']) }
-      return if question.nil?
-
-      choices = question.dig('details', 'answers', 'choices')
-      values = question['answers'].map do |answer|
-        choice = choices.find { |c| c['id'] == answer['choice_id'] }
-        choice['text'].gsub(/[^0-9]/, '').to_i
-      end
-
-      (values.sum / values.size.to_f).round
+      return parsed_score_answer unless score_question.nil?
     end
 
     def comment
-      question = questions.find { |q| survey.commentable_question?(q['details']) }
-      return if question.nil?
-
-      question['answers'].first['text']
-    end
-
-    def response_id
-      data['id']
-    end
-
-    def survey_id
-      data['survey_id']
-    end
-
-    def created_at
-      data['date_created']
-    end
-
-    def collector_id
-      data['collector_id']
-    end
-
-    def custom_variables
-      data['custom_variables']
-    end
-
-    def url
-      data['analyze_url']
-    end
-
-    def language
-      survey.language
+      return parsed_comment_answer unless comment_question.nil?
     end
 
     def questions
@@ -111,6 +74,34 @@ class SurveyMonkeyParser
                      .map { |page| page['questions'] }
                      .flatten
                      .map { |q| q.merge('details' => survey.find_question(q['id'])) }
+    end
+
+    def score_question
+      questions.find { |q| survey.qualifiable_question?(q['details']) }
+    end
+
+    def score_options
+      score_question.dig('details', 'answers', 'choices')
+    end
+
+    def score_answer_given
+      score_question['answers'].first['choice_id']
+    end
+
+    def parsed_score_answer
+      score_options.find { |c| c['id'] == score_answer_given }['text'].gsub(/[^0-9]/, '').to_i
+    end
+
+    def comment_question
+      questions.find { |q| survey.commentable_question?(q['details']) }
+    end
+
+    def comment_answer_given
+      comment_question['answers'].first
+    end
+
+    def parsed_comment_answer
+      comment_answer_given['text']
     end
   end
 end
