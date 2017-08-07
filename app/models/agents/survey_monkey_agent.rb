@@ -144,7 +144,7 @@ module Agents
 
     def fetch_survey_responses(survey_id)
       log "Fetching survey ##{survey_id} responses"
-      url = "#{SURVEYS_URL_BASE}/#{survey_id}/responses/bulk?sort_by=date_modified&sort_order=DESC"
+      url = "#{SURVEYS_URL_BASE}/#{survey_id}/responses/bulk?sort_by=date_modified&sort_order=DESC&status=completed"
       fetch_survey_monkey_resource(url)
     end
 

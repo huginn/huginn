@@ -1,0 +1,69 @@
+AllCops:
+  TargetRubyVersion: 2.3
+  Exclude:
+    - "db/**/*"
+    - "tmp/**/*"
+    - "vendor/**/*"
+    - "bin/**/*"
+    - "log/**/*"
+    - "app/controllers/blazer/*"
+    - "spec/models/regression/*"
+
+# Keep these options sorted :)
+
+AccessModifierIndentation:
+  Enabled: false
+
+AlignHash:
+  EnforcedColonStyle: key
+
+AlignParameters:
+  Enabled: false
+
+AndOr:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+GuardClause:
+  Enabled: false
+
+LineLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Max: 5
+
+Metrics/AbcSize:
+  Max: 20
+
+Metrics/MethodLength:
+  Max: 20
+
+NumericLiterals:
+  MinDigits: 7
+
+SignalException:
+  Enabled: false
+
+SpaceBeforeBlockBraces:
+  Enabled: false
+
+SpaceInsideBlockBraces:
+  EnforcedStyle: space
+
+StringLiterals:
+  Enabled: false
+
+WordArray:
+  Enabled: false
+
+ActionFilter:
+  Enabled: false
+BlockLength:
+  Enabled: false
+Rails/SkipsModelValidations:
+  Enabled: false
+AmbiguousBlockAssociation:
+  Enabled: false
