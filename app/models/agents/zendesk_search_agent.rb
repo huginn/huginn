@@ -7,6 +7,7 @@ module Agents
     API_ENDPOINTS = {
       "users" => "/api/v2/users",
       "tickets" => "/api/v2/tickets",
+      "groups" => "/api/v2/groups",
       "organizations" => "/api/v2/organizations"
     }
     DOMAIN = "zendesk.com"
@@ -21,7 +22,7 @@ module Agents
       <<-MD
         The Zendesk Search Agent receives events, find Zendesk resources and emit an event with the result.
 
-        A Zendesk Search Agent can receives events from other agents, search resources by `id` (Users, Tickets and Organizations)
+        A Zendesk Search Agent can receives events from other agents, search resources by `id` (Users, Tickets, Groups and Organizations)
         and emit the result as an `event` with the data merged to the original payload if `merge` option is `true`.
 
         When `merge` is `true` search data is added to the event payload under the key `zendesk_search`.
@@ -31,7 +32,7 @@ module Agents
           * `subdomain` - Specify the subdomain of the Zendesk client (e.g `moo` or `hellofresh`).
           * `account_email` - Specify email to be used for Basic authentication.
           * `api_token` - Specify the token (or password) to be used for Basic authentication.
-          * `resource` - Select the resource type to find (`users`, `tickets`, `organizations`).
+          * `resource` - Select the resource type to find (`users`, `tickets`, 'groups' or `organizations`).
           * `id` - Specify the Liquid interpolated expresion to get the `id` of the Zendesk user to find.
           * `merge` - Select `true` or `false`.
           * `expected_receive_period_in_days` - Specify the period in days used to calculate if the agent is working.
