@@ -69,6 +69,9 @@ gem 'haversine'
 # UsabillaAgent
 gem 'usabilla_api', github: 'chattermill/usabilla_api', branch: 'md-usability-improvements'
 
+# TypeformAgent
+gem 'typeform'
+
 # EvernoteAgent
 gem 'omniauth-evernote'
 gem 'evernote_oauth'
