@@ -76,6 +76,7 @@ module Agents
     form_configurable :mode, type: :array, values: %w(all on_change merge)
     form_configurable :retrieve_assignee, type: :array, values: %w(true false)
     form_configurable :retrieve_ticket, type: :array, values: %w(true false)
+    form_configurable :retrieve_group, type: :array, values: %w(true false)
     form_configurable :expected_update_period_in_days
 
     def default_options
