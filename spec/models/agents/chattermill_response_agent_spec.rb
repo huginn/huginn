@@ -169,7 +169,7 @@ describe Agents::ChattermillResponseAgent do
 
       it "sends a slack notification" do
         slack = mock
-        mock(slack).ping(/There is a problem/, hash_including({ icon_emoji: ':fire:', channel: '#mychannel' })) { true }
+        mock(slack).ping('', hash_including({ icon_emoji: ':fire:', channel: '#mychannel' })) { true }
         mock(Slack::Notifier).new('http://slack.webhook/abc', { username: 'Huginn' }) { slack }
         @checker.check
       end

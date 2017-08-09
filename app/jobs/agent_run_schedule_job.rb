@@ -1,4 +1,4 @@
-class AgentRunScheduleJob < ActiveJob::Base
+class AgentRunScheduleJob < ApplicationJob
   queue_as :default
 
   def perform(time)

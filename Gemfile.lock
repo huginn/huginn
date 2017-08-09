@@ -57,10 +57,10 @@ GIT
 
 GIT
   remote: https://github.com/lostisland/faraday_middleware.git
-  revision: e754e2700b5104e8b5572c3ba68aad11a4082a31
+  revision: d72ba5ea88ed117140f38bbc852c10ff67948393
   branch: master
   specs:
-    faraday_middleware (0.11.0.1)
+    faraday_middleware (0.12.2)
       faraday (>= 0.7.4, < 1.0)
 
 GIT
@@ -103,40 +103,40 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    ace-rails-ap (4.1.2)
-    actioncable (5.1.2)
-      actionpack (= 5.1.2)
+    ace-rails-ap (4.1.3)
+    actioncable (5.1.1)
+      actionpack (= 5.1.1)
       nio4r (~> 2.0)
       websocket-driver (~> 0.6.1)
-    actionmailer (5.1.2)
-      actionpack (= 5.1.2)
-      actionview (= 5.1.2)
-      activejob (= 5.1.2)
+    actionmailer (5.1.1)
+      actionpack (= 5.1.1)
+      actionview (= 5.1.1)
+      activejob (= 5.1.1)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 2.0)
-    actionpack (5.1.2)
-      actionview (= 5.1.2)
-      activesupport (= 5.1.2)
+    actionpack (5.1.1)
+      actionview (= 5.1.1)
+      activesupport (= 5.1.1)
       rack (~> 2.0)
       rack-test (~> 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (5.1.2)
-      activesupport (= 5.1.2)
+    actionview (5.1.1)
+      activesupport (= 5.1.1)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    activejob (5.1.2)
-      activesupport (= 5.1.2)
+    activejob (5.1.1)
+      activesupport (= 5.1.1)
       globalid (>= 0.3.6)
-    activemodel (5.1.2)
-      activesupport (= 5.1.2)
-    activerecord (5.1.2)
-      activemodel (= 5.1.2)
-      activesupport (= 5.1.2)
+    activemodel (5.1.1)
+      activesupport (= 5.1.1)
+    activerecord (5.1.1)
+      activemodel (= 5.1.1)
+      activesupport (= 5.1.1)
       arel (~> 8.0)
-    activesupport (5.1.2)
+    activesupport (5.1.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (~> 0.7)
       minitest (~> 5.1)
@@ -194,6 +194,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     concurrent-ruby (1.0.5)
+    connection_pool (2.2.1)
     cookiejar (0.3.3)
     coveralls (0.7.12)
       multi_json (~> 1.10)
@@ -205,6 +206,8 @@ GEM
       safe_yaml (~> 1.0.0)
     daemons (1.1.9)
     debug_inspector (0.0.3)
+    delighted (1.5.1)
+      multi_json
     delorean (2.1.0)
       chronic
     devise (4.3.0)
@@ -217,10 +220,10 @@ GEM
     docile (1.1.5)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
-    dropbox-api (0.4.7)
-      hashie (~> 3.4.0)
-      multi_json (~> 1.10)
-      oauth (~> 0.4.7)
+    dropbox-api (0.4.2)
+      hashie
+      multi_json
+      oauth
     em-http-request (1.1.5)
       addressable (>= 2.3.4)
       cookiejar (!= 0.3.1)
@@ -309,8 +312,8 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    hashdiff (0.3.4)
-    hashie (3.4.6)
+    hashdiff (0.3.5)
+    hashie (3.0.0)
     haversine (0.3.2)
     hipchat (1.2.0)
       httparty
@@ -327,21 +330,21 @@ GEM
       domain_name (~> 0.5)
     http-form_data (1.0.3)
     http_parser.rb (0.6.0)
-    httparty (0.15.5)
+    httparty (0.15.6)
       multi_xml (>= 0.5.2)
     huginn_agent (0.4.3)
       thor
     hypdf (1.0.14)
       httmultiparty (~> 0.3)
       httparty (~> 0.13)
-    i18n (0.8.4)
+    i18n (0.8.6)
     jmespath (1.3.1)
     jquery-rails (4.2.2)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (1.8.6)
-    jsonpath (0.8.5)
+    jsonpath (0.8.6)
       multi_json
     jwt (1.5.6)
     kgio (2.11.0)
@@ -354,7 +357,7 @@ GEM
       actionmailer (>= 3.2)
       letter_opener (~> 1.0)
       railties (>= 3.2)
-    libv8 (3.16.14.19)
+    libv8 (5.9.211.38.1)
     liquid (4.0.0)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -376,9 +379,11 @@ GEM
     method_source (0.8.2)
     mime-types (2.99.3)
     mimemagic (0.3.2)
-    mini_magick (4.7.2)
+    mini_magick (4.8.0)
     mini_portile2 (2.2.0)
-    minitest (5.10.2)
+    mini_racer (0.1.12)
+      libv8 (~> 5.9)
+    minitest (5.10.3)
     mqtt (0.5.0)
     multi_json (1.12.1)
     multi_xml (0.6.0)
@@ -397,7 +402,7 @@ GEM
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    oauth (0.4.7)
+    oauth (0.5.3)
     oauth2 (1.4.0)
       faraday (>= 0.8, < 0.13)
       jwt (~> 1.0)
@@ -434,7 +439,7 @@ GEM
     orm_adapter (0.5.0)
     os (0.9.6)
     pg (0.18.4)
-    poltergeist (1.15.0)
+    poltergeist (1.16.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
@@ -452,19 +457,21 @@ GEM
     rack (2.0.3)
     rack-livereload (0.3.16)
       rack
+    rack-protection (2.0.0)
+      rack
     rack-test (0.6.3)
       rack (>= 1.0)
-    rails (5.1.2)
-      actioncable (= 5.1.2)
-      actionmailer (= 5.1.2)
-      actionpack (= 5.1.2)
-      actionview (= 5.1.2)
-      activejob (= 5.1.2)
-      activemodel (= 5.1.2)
-      activerecord (= 5.1.2)
-      activesupport (= 5.1.2)
+    rails (5.1.1)
+      actioncable (= 5.1.1)
+      actionmailer (= 5.1.1)
+      actionpack (= 5.1.1)
+      actionview (= 5.1.1)
+      activejob (= 5.1.1)
+      activemodel (= 5.1.1)
+      activerecord (= 5.1.1)
+      activesupport (= 5.1.1)
       bundler (>= 1.3.0, < 2.0)
-      railties (= 5.1.2)
+      railties (= 5.1.1)
       sprockets-rails (>= 2.0.0)
     rails-controller-testing (1.0.2)
       actionpack (~> 5.x, >= 5.0.1)
@@ -475,9 +482,9 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.0.3)
       loofah (~> 2.0)
-    railties (5.1.2)
-      actionpack (= 5.1.2)
-      activesupport (= 5.1.2)
+    railties (5.1.1)
+      actionpack (= 5.1.1)
+      activesupport (= 5.1.1)
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
@@ -488,7 +495,7 @@ GEM
       ffi (>= 0.5.0, < 2)
     rb-kqueue (0.2.5)
       ffi (>= 0.5.0)
-    ref (2.0.0)
+    redis (3.3.3)
     responders (2.4.0)
       actionpack (>= 4.2.0, < 5.3)
       railties (>= 4.2.0, < 5.3)
@@ -497,7 +504,9 @@ GEM
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     retriable (1.4.1)
-    rr (1.2.0)
+    rollbar (2.15.0)
+      multi_json
+    rr (1.2.1)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
       rspec-expectations (~> 3.5.0)
@@ -533,7 +542,11 @@ GEM
     rufus-scheduler (3.3.4)
       tzinfo
     safe_yaml (1.0.4)
-    sass (3.4.24)
+    sass (3.5.1)
+      sass-listen (~> 4.0.0)
+    sass-listen (4.0.0)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
     sass-rails (5.0.6)
       railties (>= 4.0.0, < 6)
       sass (~> 3.1)
@@ -544,8 +557,15 @@ GEM
     select2-rails (3.5.10)
       thor (~> 0.14)
     shellany (0.0.1)
-    shoulda-matchers (3.1.1)
+    shoulda-matchers (3.1.2)
       activesupport (>= 4.0.0)
+    sidekiq (4.2.10)
+      concurrent-ruby (~> 1.0)
+      connection_pool (~> 2.2, >= 2.2.0)
+      rack-protection (>= 1.5.0)
+      redis (~> 3.2, >= 3.2.1)
+    sidekiq-failures (0.4.5)
+      sidekiq (>= 2.16.0)
     signet (0.7.3)
       addressable (~> 2.3)
       faraday (~> 0.9)
@@ -580,12 +600,9 @@ GEM
     systemu (2.6.5)
     term-ansicolor (1.6.0)
       tins (~> 1.0)
-    therubyracer (0.12.3)
-      libv8 (~> 3.16.14.15)
-      ref
     thor (0.19.4)
     thread_safe (0.3.6)
-    tilt (2.0.7)
+    tilt (2.0.8)
     tins (1.15.0)
     treetop (1.6.8)
       polyglot (~> 0.3)
@@ -593,6 +610,10 @@ GEM
       builder (>= 2.1.2)
       jwt (>= 0.1.2)
       multi_json (>= 1.3.0)
+    typeform (0.0.2)
+      hashie (~> 3.0.0)
+      httparty
+      json
     typhoeus (0.6.9)
       ethon (>= 0.7.1)
     tzinfo (1.2.3)
@@ -651,6 +672,7 @@ DEPENDENCIES
   daemons (~> 1.1.9)
   delayed_job!
   delayed_job_active_record!
+  delighted
   delorean
   devise (~> 4.3.0)
   dotenv!
@@ -687,6 +709,7 @@ DEPENDENCIES
   listen (~> 3.0.5)
   loofah (~> 2.0)
   mini_magick
+  mini_racer
   mqtt
   multi_xml
   mysql2 (~> 0.3.20)
@@ -704,9 +727,10 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   rack-livereload (~> 0.3.16)
-  rails (~> 5.1.1)
+  rails (= 5.1.1)
   rails-controller-testing
   rb-kqueue (>= 0.2)
+  rollbar
   rr
   rspec (~> 3.5)
   rspec-collection_matchers (~> 1.1.0)
@@ -718,16 +742,18 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   select2-rails (~> 3.5.4)
   shoulda-matchers
+  sidekiq (~> 4.2.3)
+  sidekiq-failures (~> 0.4.5)
   slack-notifier (~> 1.0.0)
   spectrum-rails
   spring (~> 1.7.2)
   spring-commands-rspec (~> 1.0.4)
   spring-watcher-listen (~> 2.0.0)
-  therubyracer (~> 0.12.3)
   tumblr_client!
   twilio-ruby (~> 3.11.5)
   twitter!
   twitter-stream!
+  typeform
   typhoeus (~> 0.6.3)
   tzinfo (>= 1.2.0)
   tzinfo-data
@@ -745,4 +771,4 @@ RUBY VERSION
    ruby 2.3.3p222
 
 BUNDLED WITH
-   1.13.6
+   1.15.3

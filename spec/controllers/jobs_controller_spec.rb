@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe JobsController do
+describe JobsController, processor: :delayed_job do
   describe "GET index" do
     before do
       async_handler_yaml =

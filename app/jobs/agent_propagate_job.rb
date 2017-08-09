@@ -1,4 +1,4 @@
-class AgentPropagateJob < ActiveJob::Base
+class AgentPropagateJob < ApplicationJob
   queue_as :propagation
 
   def perform
@@ -12,6 +12,9 @@ class AgentPropagateJob < ActiveJob::Base
     when 'ActiveJob::QueueAdapters::ResqueAdapter'
       return Resque.size('propagation') == 0 &&
              Resque.workers.select { |w| w.job && w.job['queue'] && w.job['queue']['propagation'] }.count == 0
+    when 'ActiveJob::QueueAdapters::SidekiqAdapter'
+      return Sidekiq::Queue.new('propagation').size == 0 &&
+             Sidekiq::Workers.new.select { |_, _, msg| msg['queue'] == 'propagation' }.count == 0
     else
       raise NotImplementedError, "unsupported adapter: #{queue_adapter}"
     end

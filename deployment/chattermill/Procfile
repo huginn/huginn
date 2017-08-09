@@ -1,0 +1,20 @@
+# This setup uses an unicorn config similar to default one but suitable for use with Dokku,
+# it can be found at deployment/chattermill/unicorn.rb
+
+# Also, this setup uses the old Procfile structure with separate processes
+# so we can use Sidekiq and keep DelayedJob for schedule.
+web: bundle exec unicorn -p $PORT -c ./deployment/chattermill/unicorn.rb
+jobs: bundle exec rails runner bin/threaded.rb
+
+###################
+# Sidekiq workers #
+###################
+# WARNING: Using Sidekiq with Huginn has not been heavily tested yet and is very beta.
+# Only use this when you know how to setup redis and want to help us test this feature.
+#
+# Steps:
+# 1. Disable all "dj" workers processes
+# 2. Configure BACKGROUND_JOB_PROCESSOR=sidekiq in your .env file
+# 3. If your redis server is not running locally configure REDIS_URL
+# 4. Uncomment this line:
+sidekiq: bundle exec sidekiq -C config/sidekiq.yml

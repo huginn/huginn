@@ -1,3 +1,5 @@
+require 'worker_status'
+
 class ApplicationController < ActionController::Base
   protect_from_forgery
 

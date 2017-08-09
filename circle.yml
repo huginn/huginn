@@ -1,0 +1,30 @@
+machine:
+  environment:
+    # Add the Postgres 9.6 binaries to the path.
+    PATH: /usr/lib/postgresql/9.6/bin/:$PATH
+    DATABASE_URL: postgres://ubuntu:ubuntu@127.0.0.1:5433/test
+    DATABASE_ADAPTER: postgresql
+    BACKGROUND_JOB_PROCESSOR: sidekiq
+
+  services:
+    - redis
+  ruby:
+    version: 2.3.1
+
+  pre:
+    # Start Postgres 9.6 since the default is 9.5.
+    - sudo service postgresql stop
+    - sudo mv /usr/lib/postgresql-9.6/9.6 /usr/lib/postgresql/9.6
+    - sudo mv /etc/postgresql-9.6/9.6 /etc/postgresql/9.6
+    - sudo service postgresql start 9.6
+
+    # Add a password to the `ubuntu` user, since Postgres is configured to
+    # always ask for a password, and without out it will fail.
+    - sudo -u postgres psql -p 5433 -c "create user ubuntu with password 'ubuntu';"
+    - sudo -u postgres psql -p 5433 -c "alter user ubuntu with superuser;"
+
+    # Create a new test database.
+    - sudo -u postgres psql -p 5433 -c "create database test;"
+dependencies:
+  pre:
+    - bundle config github.https true

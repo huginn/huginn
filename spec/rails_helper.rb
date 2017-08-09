@@ -15,6 +15,11 @@ require 'webmock/rspec'
 
 WebMock.disable_net_connect!(allow_localhost: true)
 
+if Rails.configuration.active_job.queue_adapter == :sidekiq
+  require 'sidekiq/testing'
+  Sidekiq::Testing.inline!
+end
+
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
@@ -69,6 +74,12 @@ RSpec.configure do |config|
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include SpecHelpers
   config.include Delorean
+
+  if Rails.configuration.active_job.queue_adapter == :delayed_job
+    config.filter_run_excluding processor: :sidekiq
+  else
+    config.filter_run_excluding processor: :delayed_job
+  end
 end
 
 if ENV['RSPEC_TASK'] != 'spec:nofeatures'

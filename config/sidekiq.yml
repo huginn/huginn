@@ -1,0 +1,11 @@
+# This configuration file is only used by sidekiq, per default Huginn uses delayed_job and this file is ignored
+---
+:queues:
+  - propagation
+  - default
+  - rollbar
+
+production:
+  :concurrency: <%= (ENV['SIDEKIQ_CONCURRENCY'] || 20).to_i %>
+development:
+  :concurrency: <%= (ENV['SIDEKIQ_CONCURRENCY'] || 25).to_i %>

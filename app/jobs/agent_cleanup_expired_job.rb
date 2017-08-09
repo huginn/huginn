@@ -1,4 +1,4 @@
-class AgentCleanupExpiredJob < ActiveJob::Base
+class AgentCleanupExpiredJob < ApplicationJob
   queue_as :default
 
   def perform
