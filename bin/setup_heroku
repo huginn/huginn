@@ -17,6 +17,22 @@ def set_env(key, value)
   capture("heroku config:set #{key}=#{value}")
 end
 
+def get_local_timezone_str
+  # Yes, this is actually a shell script…
+  olsontz = `if [ -f /etc/timezone ]; then
+    cat /etc/timezone
+  elif [ -h /etc/localtime ]; then
+    readlink /etc/localtime | sed "s/\\/usr\\/share\\/zoneinfo\\///"
+  else
+    checksum=\`md5sum /etc/localtime | cut -d' ' -f1\`
+    find /usr/share/zoneinfo/ -type f -exec md5sum {} \\; | grep "^$checksum" | sed "s/.*\\/usr\\/share\\/zoneinfo\\///" | head -n 1
+  fi`.chomp
+
+  # …and it almost certainly won't work with Windows or weird *nixes
+  throw "Olson time zone could not be determined" if olsontz.nil? || olsontz.empty?
+  return olsontz
+end
+
 def check_login!
   unless File.exists?(File.expand_path("~/.netrc")) && File.read(File.expand_path("~/.netrc")) =~ /heroku/
     puts "It looks like you need to log in to Heroku.  Please run 'heroku auth:login' before continuing."
@@ -84,6 +100,7 @@ end
 set_value 'BUILDPACK_URL', "https://github.com/heroku/heroku-buildpack-multi.git"
 set_value 'PROCFILE_PATH', "deployment/heroku/Procfile.heroku", force: false
 set_value 'ON_HEROKU', "true"
+set_value 'TZ', get_local_timezone_str()
 
 unless $config['DATABASE_URL']
   puts "Setting up the postgres addon"
