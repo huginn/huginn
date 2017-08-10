@@ -14,6 +14,7 @@ describe Agents::RssAgent do
     stub_request(:any, /bad.onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")).gsub(/(?<=<link>)[^<]*/, ''), status: 200)
     stub_request(:any, /iso-8859-1/).to_return(body: File.binread(Rails.root.join("spec/data_fixtures/iso-8859-1.rss")), headers: { 'Content-Type' => 'application/rss+xml; charset=ISO-8859-1' }, status: 200)
     stub_request(:any, /podcast/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/podcast.rss")), status: 200)
+    stub_request(:any, /youtube/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/youtube.xml")), status: 200)
   end
 
   let(:agent) do
@@ -483,6 +484,54 @@ describe Agents::RssAgent do
             "itunes_summary" => "This week we talk about <a href=\"https://itunes/apple.com/us/book/antique-trader-salt-pepper/id429691295?mt=11\">salt and pepper shakers</a>, comparing and contrasting pour rates, construction materials, and overall aesthetics. Come and join the party!"
           }
         ])
+      end
+    end
+
+    context 'of YouTube' do
+      before do
+        @valid_options['url'] = 'http://example.com/youtube.xml'
+        @valid_options['include_feed_info'] = true
+      end
+
+      it "is parsed correctly" do
+        expect {
+          agent.check
+        }.to change { agent.events.count }.by(15)
+
+        expect(agent.events.first.payload).to match({
+          "feed" => {
+            "id" => "yt:channel:UCoTLdfNePDQzvdEgIToLIUg",
+            "type" => "atom",
+            "url" => "https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg",
+            "links" => [
+              { "href" => "http://www.youtube.com/feeds/videos.xml?channel_id=UCoTLdfNePDQzvdEgIToLIUg", "rel" => "self" },
+              { "href" => "https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg", "rel" => "alternate" }
+            ],
+            "title" => "SecDSM",
+            "description" => nil,
+            "copyright" => nil,
+            "generator" => nil,
+            "icon" => nil,
+            "authors" => ["SecDSM (https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg)"],
+            "date_published" => "2016-07-28T18:46:21+00:00",
+            "last_updated" => "2016-07-28T18:46:21+00:00"
+          },
+          "id" => "yt:video:OCs1E0vP7Oc",
+          "authors" => ["SecDSM (https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg)"],
+          "categories" => [],
+          "content" => nil,
+          "date_published" => "2017-06-15T02:36:17+00:00",
+          "description" => nil,
+          "enclosure" => nil,
+          "image" => nil,
+          "last_updated" => "2017-06-15T02:36:17+00:00",
+          "links" => [
+            { "href"=>"https://www.youtube.com/watch?v=OCs1E0vP7Oc", "rel"=>"alternate" }
+          ],
+          "title" => "SecDSM 2017 March - Talk 01",
+          "url" => "https://www.youtube.com/watch?v=OCs1E0vP7Oc",
+          "urls" => ["https://www.youtube.com/watch?v=OCs1E0vP7Oc"]
+        })
       end
     end
   end
