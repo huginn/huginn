@@ -116,6 +116,17 @@ describe Agents::CsvAgent do
           expect(Event.last.payload).to eq(@checker.options['data_key'] => {'one' => '2', 'two' => '3'})
         end
       end
+
+      context "encoding" do
+        it "handles encodings" do
+          event = event_with_contents("\xE9\xE0,\xE7a,12\n\xE0@\x80,\xE7\xEF,13")
+          @checker.options['encoding'] = 'windows-1252:utf-8'
+          @checker.options['with_header'] = 'false'
+
+          expect { @checker.receive([event]) }.to change(Event, :count).by(2)
+          expect(Event.last.payload).to eq(@checker.options['data_key'] => ["à@€", "çï", "13"])
+        end
+      end
     end
 
     context "handling different CSV formats" do
