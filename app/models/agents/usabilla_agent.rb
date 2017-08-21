@@ -218,16 +218,31 @@ module Agents
 
     def usabilla_response_to_event(r)
       {
-        comment: r.comment,
-        score: r.rating,
+        comment: extract_comment(r),
+        score: extract_score(r),
         location: r.location,
         id: r.id,
         custom: r.custom,
-        public_url: r.public_url,
-        button_id: r.button_id,
+        public_url: extract_if_present(:public_url, r),
+        button_id: extract_if_present(:button_id, r),
         created_at: r.date,
-        email: r.email
+        email: extract_if_present(:email, r),
+        data: extract_if_present(:data, r)
       }
+    end
+
+    def extract_comment(response)
+      return response.comment if response.respond_to?(:comment)
+      response.data[:comment] if response.respond_to?(:data)
+    end
+
+    def extract_score(response)
+      return response.rating if response.respond_to?(:rating)
+      response.data[:mood] || response.data[:nps] if response.respond_to?(:data)
+    end
+
+    def extract_if_present(attr_name, response)
+      response.send(attr_name) if response.respond_to?(attr_name)
     end
 
     def usabilla_api
