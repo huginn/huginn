@@ -174,8 +174,7 @@ module Agents
       protocol = Rails.env.production? ? 'https' : 'http'
       domain = DOMAINS[Rails.env.to_sym]
       host = "#{event_options['organization_subdomain']}.#{domain}"
-      url = "#{protocol}://#{host}#{API_ENDPOINT}"
-      has_id?(event) ? "#{url}/#{event.payload['data']['id']}" : url
+     "#{protocol}://#{host}#{API_ENDPOINT}/#{event.payload.dig('data', 'id')}"
     end
 
     def has_id?(event)

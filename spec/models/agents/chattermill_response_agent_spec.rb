@@ -72,7 +72,7 @@ describe Agents::ChattermillResponseAgent do
     it "uses the correct URI" do
       @checker.check
       uri = @sent_requests[:post].first.uri.to_s
-      expect(uri).to eq("http://foo.localhost:3000/webhooks/responses")
+      expect(uri).to eq("http://foo.localhost:3000/webhooks/responses/")
     end
 
     it "generates the authorization header" do
