@@ -30,7 +30,7 @@ GIT
 
 GIT
   remote: https://github.com/chattermill/usabilla_api.git
-  revision: edd2616ea6df368c6d1a42cb460769ff0b25aabf
+  revision: 817e45b5bc930e0da27c82920c300d23998f40ec
   branch: md-usability-improvements
   specs:
     usabilla_api (2.0.0)
