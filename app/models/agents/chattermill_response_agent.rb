@@ -3,7 +3,6 @@ module Agents
     include WebRequestConcern
     include FormConfigurable
 
-    HTTP_METHOD = "post"
     API_ENDPOINT = "/webhooks/responses"
     BASIC_OPTIONS = %w(comment score kind stream created_at user_meta segments)
     DOMAINS = {
@@ -84,8 +83,8 @@ module Agents
       last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
-    def http_method
-      HTTP_METHOD
+    def http_method(event)
+      has_id?(event) ? :put : :post
     end
 
     form_configurable :organization_subdomain
@@ -170,13 +169,17 @@ module Agents
       }
     end
 
-    def post_url(event = Event.new)
+    def request_url(event = Event.new)
       event_options = interpolated(event.payload)
       protocol = Rails.env.production? ? 'https' : 'http'
       domain = DOMAINS[Rails.env.to_sym]
       host = "#{event_options['organization_subdomain']}.#{domain}"
+      url = "#{protocol}://#{host}#{API_ENDPOINT}"
+      has_id?(event) ? "#{url}/#{event.payload['data']['id']}" : url
+    end
 
-      "#{protocol}://#{host}#{API_ENDPOINT}"
+    def has_id?(event)
+      event.payload['data'] && event.payload['data']['id']
     end
 
     def auth_header
@@ -184,10 +187,11 @@ module Agents
     end
 
     def handle(data, event = Event.new, headers)
-      url = post_url(event)
+      url = request_url(event)
       headers['Content-Type'] = 'application/json; charset=utf-8'
       body = data.to_json
-      response = faraday.run_request(http_method.to_sym, url, body, headers)
+      method = http_method(event)
+      response = faraday.run_request(method, url, body, headers)
       send_slack_notification(response, event) unless response.status == 201
 
       return unless boolify(interpolated['emit_events'])

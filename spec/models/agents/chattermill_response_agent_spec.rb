@@ -83,6 +83,24 @@ describe Agents::ChattermillResponseAgent do
   end
 
   describe "#receive" do
+    it "can handle events with id" do
+      event1 = Event.new
+      event1.agent = agents(:bob_weather_agent)
+      event1.payload = {
+        'xyz' => 'value1',
+        'data' => {
+          'segment' => 'My Segment',
+          'id' => 'id'
+        }
+      }
+
+      expect {
+        @checker.receive([@event, event1])
+      }.to change { @sent_requests[:put].length }.by(1)
+      uri = @sent_requests[:put].first.uri.to_s
+      expect(uri).to eq("http://foo.localhost:3000/webhooks/responses/id")
+    end
+
     it "can handle multiple events" do
       event1 = Event.new
       event1.agent = agents(:bob_weather_agent)
