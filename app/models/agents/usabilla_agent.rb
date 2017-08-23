@@ -227,7 +227,7 @@ module Agents
         button_id: extract_if_present(:button_id, r),
         created_at: r.date,
         email: extract_if_present(:email, r),
-        data: extract_if_present(:data, r)
+        raw_data: r.raw_data
       }
     end
 
