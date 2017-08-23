@@ -96,8 +96,8 @@ describe Agents::ChattermillResponseAgent do
 
       expect {
         @checker.receive([@event, event1])
-      }.to change { @sent_requests[:put].length }.by(1)
-      uri = @sent_requests[:put].first.uri.to_s
+      }.to change { @sent_requests[:patch].length }.by(1)
+      uri = @sent_requests[:patch].first.uri.to_s
       expect(uri).to eq("http://foo.localhost:3000/webhooks/responses/id")
     end
 
@@ -123,7 +123,6 @@ describe Agents::ChattermillResponseAgent do
       expect(@sent_requests[:post][0].data).to eq(expected)
 
       expected = {
-        'comment' => '',
         'segments' => { 'segment_id' => { 'type' => 'text', 'name' => 'Segment Id', 'value' => 'My Segment' } },
         'user_meta' => user_meta
       }
@@ -138,7 +137,6 @@ describe Agents::ChattermillResponseAgent do
       }.to change { @sent_requests[:post].length }.by(1)
 
       expected = {
-        'comment' => '',
         'segments' => { 'segment_id' => { 'type' => 'text', 'name' => 'Segment Id', 'value' => '' } },
         'user_meta' => user_meta
       }
