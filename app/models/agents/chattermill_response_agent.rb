@@ -191,7 +191,7 @@ module Agents
       body = data.to_json
       method = http_method(event)
       response = faraday.run_request(method, url, body, headers)
-      send_slack_notification(response, event) unless response.status == 201
+      send_slack_notification(response, event) unless [200, 201].include?(response.status)
 
       return unless boolify(interpolated['emit_events'])
       create_event(payload: { body: response.body,
