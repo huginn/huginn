@@ -72,7 +72,7 @@ describe Agents::ChattermillResponseAgent do
     it "uses the correct URI" do
       @checker.check
       uri = @sent_requests[:post].first.uri.to_s
-      expect(uri).to eq("http://foo.localhost:3000/webhooks/responses")
+      expect(uri).to eq("http://foo.localhost:3000/webhooks/responses/")
     end
 
     it "generates the authorization header" do
@@ -83,6 +83,24 @@ describe Agents::ChattermillResponseAgent do
   end
 
   describe "#receive" do
+    it "can handle events with id" do
+      event1 = Event.new
+      event1.agent = agents(:bob_weather_agent)
+      event1.payload = {
+        'xyz' => 'value1',
+        'data' => {
+          'segment' => 'My Segment',
+          'id' => 'id'
+        }
+      }
+
+      expect {
+        @checker.receive([@event, event1])
+      }.to change { @sent_requests[:patch].length }.by(1)
+      uri = @sent_requests[:patch].first.uri.to_s
+      expect(uri).to eq("http://foo.localhost:3000/webhooks/responses/id")
+    end
+
     it "can handle multiple events" do
       event1 = Event.new
       event1.agent = agents(:bob_weather_agent)
@@ -105,7 +123,6 @@ describe Agents::ChattermillResponseAgent do
       expect(@sent_requests[:post][0].data).to eq(expected)
 
       expected = {
-        'comment' => '',
         'segments' => { 'segment_id' => { 'type' => 'text', 'name' => 'Segment Id', 'value' => 'My Segment' } },
         'user_meta' => user_meta
       }
@@ -120,7 +137,6 @@ describe Agents::ChattermillResponseAgent do
       }.to change { @sent_requests[:post].length }.by(1)
 
       expected = {
-        'comment' => '',
         'segments' => { 'segment_id' => { 'type' => 'text', 'name' => 'Segment Id', 'value' => '' } },
         'user_meta' => user_meta
       }
