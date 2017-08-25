@@ -4,10 +4,13 @@ module Agents
 
     def index
       @events = if params[:agent_id]
-                  current_user.agents.find_by(id: params[:agent_id]).received_events.limit(5)
+                  current_user.agents
+                              .find_by(id: params[:agent_id])
+                              .received_events
+                              .reorder("events.id DESC NULLS LAST").limit(5)
                 elsif params[:source_ids]
                   Event.where(agent_id: current_user.agents.where(id: params[:source_ids]).pluck(:id))
-                       .order("id DESC").limit(5)
+                       .reorder("id DESC NULLS LAST").limit(5)
                 else
                   []
                 end
