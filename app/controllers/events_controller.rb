@@ -4,10 +4,12 @@ class EventsController < ApplicationController
   def index
     if params[:agent_id]
       @agent = current_user.agents.find(params[:agent_id])
-      @events = @agent.events.page(params[:page])
+      @events = @agent.events
     else
-      @events = current_user.events.preload(:agent).page(params[:page])
+      @events = current_user.events.preload(:agent)
     end
+
+    @events = @events.page(params[:page]).reorder("events.id DESC NULLS LAST")
 
     respond_to do |format|
       format.html
