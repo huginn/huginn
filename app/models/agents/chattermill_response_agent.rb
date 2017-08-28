@@ -83,11 +83,12 @@ module Agents
       last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
     end
 
-    def http_method(event)
-      has_id?(event) ? :patch : :post
+    def http_method
+      has_id? ? :patch : :post
     end
 
     form_configurable :organization_subdomain
+    form_configurable :id
     form_configurable :comment
     form_configurable :score
     form_configurable :kind
@@ -96,7 +97,7 @@ module Agents
     form_configurable :user_meta, type: :json, ace: { mode: 'json' }
     form_configurable :segments, type: :json, ace: { mode: 'json' }
     form_configurable :extra_fields, type: :json, ace: { mode: 'json' }
-    form_configurable :emit_events, type: :array, values: %w(true false)
+    form_configurable :emit_events, type: :boolean
     form_configurable :expected_receive_period_in_days
 
     def validate_options
@@ -170,27 +171,27 @@ module Agents
     end
 
     def request_url(event = Event.new)
-      event_options = interpolated(event.payload)
       protocol = Rails.env.production? ? 'https' : 'http'
       domain = DOMAINS[Rails.env.to_sym]
-      host = "#{event_options['organization_subdomain']}.#{domain}"
-      "#{protocol}://#{host}#{API_ENDPOINT}/#{event.payload.dig('data', 'id')}"
+      "#{protocol}://#{domain}#{API_ENDPOINT}/#{interpolated['id']}"
     end
 
-    def has_id?(event)
-      event.payload['data'] && event.payload['data']['id']
+    def has_id?
+      interpolated['id'].present?
     end
 
     def auth_header
-      { "Authorization" => "Bearer #{ENV['CHATTERMILL_AUTH_TOKEN']}" }
+      {
+        "Authorization" => "Bearer #{ENV['CHATTERMILL_AUTH_TOKEN']}",
+        "Organization" => interpolated['organization_subdomain']
+      }
     end
 
     def handle(data, event = Event.new, headers)
       url = request_url(event)
       headers['Content-Type'] = 'application/json; charset=utf-8'
       body = data.to_json
-      method = http_method(event)
-      response = faraday.run_request(method, url, body, headers)
+      response = faraday.run_request(http_method, url, body, headers)
       send_slack_notification(response, event) unless [200, 201].include?(response.status)
 
       return unless boolify(interpolated['emit_events'])
