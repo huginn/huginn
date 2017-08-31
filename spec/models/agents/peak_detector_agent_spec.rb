@@ -78,6 +78,13 @@ describe Agents::PeakDetectorAgent do
                                   :pattern => { 'filter' => "something" })
       expect(@agent.memory['peaks']['something'].length).to eq(1)
     end
+
+    it 'raised an exception if the extracted data can not be casted to a float' do
+      event = Event.new(payload: {count: ["not working"]})
+      expect {
+        @agent.receive([event])
+      }.to raise_error(NoMethodError, /undefined method `to_f'/)
+    end
   end
 
   describe "validation" do
