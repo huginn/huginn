@@ -138,7 +138,7 @@ module Agents
     def remember(group, event)
       memory['data'] ||= {}
       memory['data'][group] ||= []
-      memory['data'][group] << [ Utils.value_at(event.payload, interpolated['value_path']), event.created_at.to_i ]
+      memory['data'][group] << [ Utils.value_at(event.payload, interpolated['value_path']).to_f, event.created_at.to_i ]
       cleanup group
     end
 
