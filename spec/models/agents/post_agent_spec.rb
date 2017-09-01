@@ -161,7 +161,7 @@ describe Agents::PostAgent do
         with(headers: {
                'Accept-Encoding' => 'gzip,deflate',
                'Content-Type' => /\Amultipart\/form-data; boundary=/,
-               'User-Agent' => 'Huginn - https://github.com/cantino/huginn'
+               'User-Agent' => 'Huginn - https://github.com/huginn/huginn'
         }) { |request|
         qboundary = Regexp.quote(request.headers['Content-Type'][/ boundary=(.+)/, 1])
         /\A--#{qboundary}\r\nContent-Disposition: form-data; name="default"\r\n\r\nvalue\r\n--#{qboundary}\r\nContent-Disposition: form-data; name="file"; filename="local.path"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n--#{qboundary}--\r\n\r\n\z/ === request.body

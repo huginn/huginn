@@ -19,7 +19,7 @@ describe "Dry running an Agent", js: true do
   context 'successful dry runs' do
     before do
       stub_request(:get, "http://xkcd.com/").
-        with(:headers => {'Accept-Encoding'=>'gzip,deflate', 'User-Agent'=>'Huginn - https://github.com/cantino/huginn'}).
+        with(:headers => {'Accept-Encoding'=>'gzip,deflate', 'User-Agent'=>'Huginn - https://github.com/huginn/huginn'}).
         to_return(:status => 200, :body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :headers => {})
     end
 
@@ -65,7 +65,7 @@ describe "Dry running an Agent", js: true do
 
   it 'shows the dry run pop up without previous events and selects the log tab when no event was created' do
     stub_request(:get, "http://xkcd.com/").
-      with(:headers => {'Accept-Encoding'=>'gzip,deflate', 'User-Agent'=>'Huginn - https://github.com/cantino/huginn'}).
+      with(:headers => {'Accept-Encoding'=>'gzip,deflate', 'User-Agent'=>'Huginn - https://github.com/huginn/huginn'}).
       to_return(:status => 200, :body => "", :headers => {})
 
     open_dry_run_modal(agent)

@@ -19,7 +19,7 @@ module Agents
 
       [Sign up](https://dashboard.phantomjscloud.com/dash.html#/signup) to get an api key, and add it in Huginn credentials.
 
-      Please see the [Huginn Wiki for more info](https://github.com/cantino/huginn/wiki/Browser-Emulation-Using-PhantomJS-Cloud).
+      Please see the [Huginn Wiki for more info](https://github.com/huginn/huginn/wiki/Browser-Emulation-Using-PhantomJS-Cloud).
 
       Options:
 
@@ -34,7 +34,7 @@ module Agents
       This is useful in case there are any AJAX requests or animations that need to finish up.
       This can safely be set to 0 if you know there are no AJAX or animations you need to wait for (default: `1000`ms)
 
-      As this agent only provides a limited subset of the most commonly used options, you can follow [this guide](https://github.com/cantino/huginn/wiki/Browser-Emulation-Using-PhantomJS-Cloud) to make full use of additional options PhantomJsCloud provides.
+      As this agent only provides a limited subset of the most commonly used options, you can follow [this guide](https://github.com/huginn/huginn/wiki/Browser-Emulation-Using-PhantomJS-Cloud) to make full use of additional options PhantomJsCloud provides.
     MD
 
     event_description <<-MD

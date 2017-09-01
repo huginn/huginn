@@ -47,7 +47,7 @@ module Agents
 
       `google` `service_account_email` - The authorised service account email address.
 
-      `google` `key_file` OR `google` `key` - The path to the JSON key file above, or the key itself (the value of `private_key`).  [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) formatting is supported if you want to use a Credential.  (E.g., `{% credential google_key %}`)
+      `google` `key_file` OR `google` `key` - The path to the JSON key file above, or the key itself (the value of `private_key`).  [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) formatting is supported if you want to use a Credential.  (E.g., `{% credential google_key %}`)
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 

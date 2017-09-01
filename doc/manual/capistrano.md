@@ -20,7 +20,7 @@ Add Capistrano configuration to you local `.env`:
 
     CAPISTRANO_DEPLOY_SERVER=<IP or FQDN of your server>
     CAPISTRANO_DEPLOY_USER=huginn
-    CAPISTRANO_DEPLOY_REPO_URL=https://github.com/cantino/huginn.git
+    CAPISTRANO_DEPLOY_REPO_URL=https://github.com/huginn/huginn.git
 
 
 ### 3. Run Capistrano

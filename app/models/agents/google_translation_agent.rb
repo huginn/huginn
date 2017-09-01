@@ -18,7 +18,7 @@ module Agents
 
       `from` is the language translated from. If it's not specified, the API will attempt to detect the source language automatically and return it within the response.
 
-      Specify what you would like to translate in `content` field, you can use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) specify which part of the payload you want to translate.
+      Specify what you would like to translate in `content` field, you can use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) specify which part of the payload you want to translate.
 
       `expected_receive_period_in_days` is the maximum number of days you would allow to pass between events.
     MD

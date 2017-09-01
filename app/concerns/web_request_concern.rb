@@ -165,7 +165,7 @@ module WebRequestConcern
 
   module ClassMethods
     def default_user_agent
-      ENV.fetch('DEFAULT_HTTP_USER_AGENT', "Huginn - https://github.com/cantino/huginn")
+      ENV.fetch('DEFAULT_HTTP_USER_AGENT', "Huginn - https://github.com/huginn/huginn")
     end
   end
 end

@@ -29,7 +29,7 @@ module Agents
 
         # Liquid Templating
 
-        The content you provide will be run as a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template. The data from the last event received will be used when processing the Liquid template.
+        The content you provide will be run as a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template. The data from the last event received will be used when processing the Liquid template.
 
         # Modes
 

@@ -2,7 +2,7 @@ require 'utils'
 
 # Agent is the core class in Huginn, representing a configurable, schedulable, reactive system with memory that can
 # be sub-classed for many different purposes.  Agents can emit Events, as well as receive them and react in many different ways.
-# The basic Agent API is detailed on the Huginn wiki: https://github.com/cantino/huginn/wiki/Creating-a-new-agent
+# The basic Agent API is detailed on the Huginn wiki: https://github.com/huginn/huginn/wiki/Creating-a-new-agent
 class Agent < ActiveRecord::Base
   include AssignableTypes
   include MarkdownClassAttributes

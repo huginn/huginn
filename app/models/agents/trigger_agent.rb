@@ -17,7 +17,7 @@ module Agents
       By default, all rules must match for the Agent to trigger. You can switch this so that only one rule must match by
       setting `must_match` to `1`.
 
-      The resulting Event will have a payload message of `message`.  You can use liquid templating in the `message, have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) for details.
+      The resulting Event will have a payload message of `message`.  You can use liquid templating in the `message, have a look at the [Wiki](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
       Set `keep_event` to `true` if you'd like to re-emit the incoming event, optionally merged with 'message' when provided.
 
