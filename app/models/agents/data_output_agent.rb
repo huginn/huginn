@@ -287,9 +287,7 @@ module Agents
             XML
           }.join
 
-          items = simplify_item_for_xml(items)
-                  .to_xml(skip_types: true, root: "items", skip_instruct: true, indent: 1)
-                  .gsub(%r{^</?items>\n}, '')
+          items = items_to_xml(items)
 
           return [<<-XML, 200, rss_content_type, interpolated['response_headers'].presence]
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -387,6 +385,22 @@ module Agents
       else
         item
       end
+    end
+
+    def items_to_xml(items)
+      simplify_item_for_xml(items)
+        .to_xml(skip_types: true, root: "items", skip_instruct: true, indent: 1)
+        .gsub(%r{
+          (?<indent> ^\ + ) < (?<tagname> [^> ]+ ) > \n
+          (?<children>
+            (?: \k<indent> \  < \k<tagname> (?:\ [^>]*)? > [^<>]*? </ \k<tagname> > \n )+
+          )
+          \k<indent> </ \k<tagname> > \n
+        }mx) { $~[:children].gsub(/^ /, '') } # delete redundant nesting of array elements
+        .gsub(%r{
+          (?<indent> ^\ + ) < [^> ]+ /> \n
+        }mx, '') # delete empty elements
+        .gsub(%r{^</?items>\n}, '')
     end
 
     def push_to_hub(hub, url)
