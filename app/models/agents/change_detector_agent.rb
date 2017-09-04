@@ -5,7 +5,7 @@ module Agents
     description <<-MD
       The Change Detector Agent receives a stream of events and emits a new event when a property of the received event changes.
 
-      `property` specifies a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template that expands to the property to be watched, where you can use a variable `last_property` for the last property value.  If you want to detect a new lowest price, try this: `{% assign drop = last_property | minus: price %}{% if last_property == blank or drop > 0 %}{{ price | default: last_property }}{% else %}{{ last_property }}{% endif %}`
+      `property` specifies a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template that expands to the property to be watched, where you can use a variable `last_property` for the last property value.  If you want to detect a new lowest price, try this: `{% assign drop = last_property | minus: price %}{% if last_property == blank or drop > 0 %}{{ price | default: last_property }}{% else %}{{ last_property }}{% endif %}`
 
       `expected_update_period_in_days` is used to determine if the Agent is working.
 

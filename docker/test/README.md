@@ -1,7 +1,7 @@
 Docker image for Huginn testing
 =================================================
 
-This image allows the [Huginn](https://github.com/cantino/huginn) test suite to be run in a container, against multiple databases.
+This image allows the [Huginn](https://github.com/huginn/huginn) test suite to be run in a container, against multiple databases.
 
 It was inspired by the [official docker container for huginn](https://registry.hub.docker.com/u/cantino/huginn)
 

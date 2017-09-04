@@ -18,7 +18,7 @@ module Agents
 
       # Example
 
-      If created with an event, all HIT fields can contain interpolated values via [liquid templating](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid).
+      If created with an event, all HIT fields can contain interpolated values via [liquid templating](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid).
       For example, if the incoming event was a Twitter event, you could make a HITT to rate its sentiment like this:
 
           {

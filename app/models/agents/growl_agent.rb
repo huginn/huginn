@@ -21,7 +21,7 @@ module Agents
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between
       Events being received by this Agent.
 
-      Have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to learn
+      Have a look at the [Wiki](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to learn
       more about liquid templating.
     MD
 

@@ -35,7 +35,7 @@ module Agents
       * link: `title`, `body`, and `url`
       * address: `name`, and `address`
 
-      In every value of the options hash you can use the liquid templating, learn more about it at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid).
+      In every value of the options hash you can use the liquid templating, learn more about it at the [Wiki](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid).
     MD
 
     def default_options

@@ -2,6 +2,7 @@ module Agents
   class WunderlistAgent < Agent
     include FormConfigurable
     include Oauthable
+    include WebRequestConcern
     valid_oauth_providers :wunderlist
 
     cannot_be_scheduled!
@@ -72,7 +73,7 @@ module Agents
 
     def request_options
       {:headers => {'Content-Type' => 'application/json',
-                    'User-Agent' => 'Huginn (https://github.com/cantino/huginn)',
+                    'User-Agent' => user_agent,
                     'X-Access-Token' => service.token,
                     'X-Client-ID' => ENV["WUNDERLIST_OAUTH_KEY"] }}
     end
