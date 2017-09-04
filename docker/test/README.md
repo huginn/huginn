@@ -3,7 +3,7 @@ Docker image for Huginn testing
 
 This image allows the [Huginn](https://github.com/huginn/huginn) test suite to be run in a container, against multiple databases.
 
-It was inspired by the [official docker container for huginn](https://registry.hub.docker.com/u/cantino/huginn)
+It was inspired by the [official docker container for huginn](https://hub.docker.com/r/huginn/huginn)
 
 In Development Mode, the source code of the current project directory is mounted as a volume overlaying the packaged `/app` directory.
 
