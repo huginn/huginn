@@ -5,7 +5,7 @@ Dotenv.load
 lock '3.4.0'
 
 set :application, 'huginn'
-set :repo_url, ENV['CAPISTRANO_DEPLOY_REPO_URL'] || 'https://github.com/cantino/huginn.git'
+set :repo_url, ENV['CAPISTRANO_DEPLOY_REPO_URL'] || 'https://github.com/huginn/huginn.git'
 
 # Default branch is :master
 set :branch, ENV['CAPISTRANO_DEPLOY_BRANCH'] || ENV['BRANCH'] || 'master'

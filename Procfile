@@ -18,7 +18,7 @@ jobs: bundle exec rails runner bin/threaded.rb
 
 # You need to copy or link config/unicorn.rb.example to config/unicorn.rb for both production versions.
 # Have a look at the deployment guides, if you want to set up huginn on your server:
-# https://github.com/cantino/huginn/doc
+# https://github.com/huginn/huginn/doc
 
 # Using the threaded worker (consumes less RAM but can run slower)
 # web: bundle exec unicorn -c config/unicorn.rb
