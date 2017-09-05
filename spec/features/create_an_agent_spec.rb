@@ -128,7 +128,7 @@ describe "Creating a new agent", js: true do
     end
 
     it "does not show the target select2 field when the agent can not create events" do
-      select_agent_type("Growl Agent")
+      select_agent_type("Email Agent")
       expect(page).to have_content('This type of Agent cannot create events.')
     end
   end
