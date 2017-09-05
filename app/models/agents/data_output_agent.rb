@@ -296,6 +296,7 @@ module Agents
  <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
  <atom:icon>#{feed_icon.encode(xml: :text)}</atom:icon>
 #{hub_links}
+ <itunes:image href=#{feed_icon.encode(xml: :attr)} />
  <title>#{feed_title.encode(xml: :text)}</title>
  <description>#{feed_description.encode(xml: :text)}</description>
  <link>#{feed_link.encode(xml: :text)}</link>
