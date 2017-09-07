@@ -466,10 +466,11 @@ describe Agents::DataOutputAgent do
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
-
+          
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
           expect(namespaces).not_to include("xmlns:itunes")
+          expect(doc.at("/rss/channel/*[local-name()='itunes:image']")).to be_nil
         end
       end
 
@@ -484,12 +485,13 @@ describe Agents::DataOutputAgent do
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
-
+          
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
           expect(namespaces).to include(
             "xmlns:itunes" => 'http://www.itunes.com/dtds/podcast-1.0.dtd'
           )
+          expect(doc.at('/rss/channel/itunes:image').attr('href')).to eq('https://yoursite.com/favicon.ico')          
         end
       end
 
