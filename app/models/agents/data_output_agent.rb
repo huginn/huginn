@@ -163,6 +163,12 @@ module Agents
       interpolated['template']['icon'].presence || feed_link + '/favicon.ico'
     end
 
+    def itunes_icon
+      if(boolify(interpolated['ns_itunes']))
+        "<itunes:image href=#{feed_icon.encode(xml: :attr)} />"
+      end  
+    end
+
     def feed_description
       interpolated['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
     end
@@ -295,8 +301,8 @@ module Agents
 <channel>
  <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
  <atom:icon>#{feed_icon.encode(xml: :text)}</atom:icon>
+ #{itunes_icon}
 #{hub_links}
- <itunes:image href=#{feed_icon.encode(xml: :attr)} />
  <title>#{feed_title.encode(xml: :text)}</title>
  <description>#{feed_description.encode(xml: :text)}</description>
  <link>#{feed_link.encode(xml: :text)}</link>
