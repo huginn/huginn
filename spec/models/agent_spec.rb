@@ -1033,6 +1033,14 @@ describe AgentDrop do
     expect(interpolate(t, @wsa1)).to eq('0: ')
     expect(interpolate(t, @wsa2)).to eq('0: ')
     expect(interpolate(t, @efa)).to eq('2: XKCD, Dilbert')
+
+    t = '{{agent.sources.first.name}}..{{agent.sources.last.name}}'
+    expect(interpolate(t, @wsa1)).to eq('..')
+    expect(interpolate(t, @wsa2)).to eq('..')
+    expect(interpolate(t, @efa)).to eq('XKCD..Dilbert')
+
+    t = '{{agent.sources[1].name}}'
+    expect(interpolate(t, @efa)).to eq('Dilbert')
   end
 
   it 'should have .receivers' do
