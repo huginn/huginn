@@ -466,4 +466,12 @@ class AgentDrop
       @object.__send__(attr)
     } unless method_defined?(attr)
   }
+
+  def working
+    @object.working?
+  end
+
+  def url
+    Rails.application.routes.url_helpers.agent_url(@object, Rails.application.config.action_mailer.default_url_options)
+  end
 end
