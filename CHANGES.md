@@ -2,7 +2,41 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Sep 09, 2017   | Agent objects in Liquid templating now have new properties `working` and `url`. [2118](https://github.com/huginn/huginn/pull/2118) |
+| Sep 06, 2017   | `DataOutputAgent` includes an icon in a podcast feed. [2114](https://github.com/huginn/huginn/pull/2114) |
+| Sep 05, 2017   | `DataOutputAgent` can properly output an RSS feed with items containing  multiple categories, enclosures, etc. [2110](https://github.com/huginn/huginn/pull/2110) |
+| Aug 07, 2017   | `ImapFolderAgent` can now include a `Message-ID` and optionally a raw mail blob in each created event. [2076](https://github.com/huginn/huginn/pull/2076) |
+| Aug 01, 2017   | `GrowlAgent` supports new API parameters `sticky`, `priority` and `callback_url`. [2074](https://github.com/huginn/huginn/pull/2074) |
+| Jul 31, 2017   | `PostAgent` now has a `merge` mode that can be enabled via the `output_mode` new option. [2069](https://github.com/huginn/huginn/pull/2069) |
+| Jul 20, 2017   | Agent editor has a selectable `contollers` field. [2063](https://github.com/huginn/huginn/pull/2063) |
+| Jul 20, 2017   | Receivers are now inherited when cloning an agent. [2063](https://github.com/huginn/huginn/pull/2063)|
+| Jul 18, 2017   | `DigestAgent` gets a new option `retained_events`. [2041](https://github.com/huginn/huginn/pull/2041) |
+| Jul 10, 2017   | `CommanderAgent` can now refer to `target` to determine what to do for each target agent. [2053](https://github.com/huginn/huginn/pull/2053)   |
 | Jul 10, 2017   | Update Google API Client. May break backwards compatibility for GoogleCalendarPublishAgent. [2047](https://github.com/huginn/huginn/pull/2047)   |
+| Jun 06, 2017   | Addressed the problem with MySQL resetting auto_increment after events get emptied and the server reboots. [1974](https://github.com/huginn/huginn/pull/1974), [2014](https://github.com/huginn/huginn/pull/2014) |
+| May 30, 2017   | Support Ruby 2.4. [1876](https://github.com/huginn/huginn/pull/1876) |
+| May 25, 2017   | PeakDetectorAgent now has a configurable `search_url`. [2013](https://github.com/huginn/huginn/pull/2013) |
+| May 19, 2017   | Upgrade Rails to 5.1. [1912](https://github.com/huginn/huginn/pull/1912) |
+| May 18, 2017   | `ShellCommandAgent` gets a new option `unbundle`. [1990](https://github.com/huginn/huginn/pull/1990) |
+| May 11, 2017   | `PeakDetectorAgent` gets a new option `min_events`. [1924](https://github.com/huginn/huginn/pull/1924) |
+| May 11, 2017   | Switch back to the much improved `jsonpath` gem after `jsonpathv2` gets merged to mainline. [1996](https://github.com/huginn/huginn/pull/1996), [1997](https://github.com/huginn/huginn/pull/1997), [2017](https://github.com/huginn/huginn/pull/2017) |
+| Apr 27, 2017   | Add custom response header support to DataOutputAgent, WebhookAgent and LiquidOutputAgent. [1977](https://github.com/huginn/huginn/pull/1977) |
+| Apr 27, 2017   | Upgrade Liquid to 4.0. [1982](https://github.com/huginn/huginn/pull/1982) |
+| Apr 26, 2017   | Add `GoogleTranslationAgent`. [1978](https://github.com/huginn/huginn/pull/1978) |
+| Apr 19, 2017   | `DataOutputAgent` now serves RSS output as `application/rss+xml` by default. (existing agents are automatically configured to use `text/xml`) [1973](https://github.com/huginn/huginn/pull/1973) |
+| Apr 08, 2017   | Add `TumblrLikesAgent`. [1923](https://github.com/huginn/huginn/pull/1923) |
+| Mar 31, 2017   | `ChangeDetectorAgent` can now refer to `last_property`. [1950](https://github.com/huginn/huginn/pull/1950) |
+| Feb 01, 2017   | `GoogleFlightsAgent` supports choice of carrier and alliance. [1878](https://github.com/huginn/huginn/pull/1878) |
+| Jan 29, 2017   | `WebhookAgent` can redirect to any URL after successful submission. [1923](https://github.com/huginn/huginn/pull/1923) |
+| Jan 06, 2017   | Agent's id of each incoming event is accessible from Liquid and JavaScriptAgent. [1860](https://github.com/huginn/huginn/pull/1860) |
+| Jan 06, 2017   | "Every X" schedules now run on fixed times. [1844](https://github.com/huginn/huginn/pull/1844) |
+| Jan 03, 2017   | Twitter agents support "extended" tweets that are longer than 140 characters. [1847](https://github.com/huginn/huginn/pull/1847) |
+| Jan 01, 2017   | A new `include_sort_info` Agent option is added to help sort out an Nth event of a series of events created in a run. [1772](https://github.com/huginn/huginn/pull/1772) |
+| Nov 30, 2016   | `RssAgent` includes podcast tag values in events created from a podcast feed. [1782](https://github.com/huginn/huginn/pull/1782) |
+| Nov 28, 2016   | Remove `BeeperAgent` after Beeper.io shuts down. [1808](https://github.com/huginn/huginn/pull/1808) |
+| Nov 27, 2016   | `WebsiteAgent` can interpolate via the `template` option after extraction. [1743](https://github.com/huginn/huginn/pull/1743), [1816](https://github.com/huginn/huginn/pull/1816) |
+| Nov 20, 2016   | `WebsiteAgent` provides a new extractor option `repeat`. [1769](https://github.com/huginn/huginn/pull/1769) |
+| Oct 27, 2016   | `WebsiteAgent` now has improved encoding detection for HTML/XML documents. [1751](https://github.com/huginn/huginn/pull/1751) |
 | Oct 17, 2016   | Normalize URL in `to_uri` and `uri_expand` liquid filters.                                                   |
 | Oct 06, 2016   | `RssAgent` is reimplemented migrating its underlying feed parser from FeedNormalizer to Feedjira. [1564](https://github.com/huginn/huginn/pull/1564)     |
 | Oct 05, 2016   | Migrate to Rails 5. [1688](https://github.com/huginn/huginn/pull/1688)                                      |
@@ -67,7 +101,7 @@
 | Apr 04, 2016   | `PostAgent` allow sending arbitrary string data. [1402](https://github.com/huginn/huginn/pull/1402) |
 | Mar 31, 2016   | Add `TelegramAgent`. [1381](https://github.com/huginn/huginn/pull/1381) |
 | Mar 30, 2016   | Add Agent actions menu to Agent show and Agent Events page. [1374](https://github.com/huginn/huginn/pull/1374) |
-| Mar 30, 2016   | Add round trip option to `GoogleFlightAgent`. [1384](https://github.com/huginn/huginn/pull/1384) |
+| Mar 30, 2016   | Add round trip option to `GoogleFlightsAgent`. [1384](https://github.com/huginn/huginn/pull/1384) |
 | Mar 30, 2016   | Ensure cloned Agents stay in the same Scenario. [1377](https://github.com/huginn/huginn/pull/1377) |
 | Mar 27, 2016   | Allow usage of HTML table tags/attributes in E-Mail Agents. [1380](https://github.com/huginn/huginn/pull/1380) |
 | Mar 27, 2016   | Add tabs to Dry Run result modal. [1371](https://github.com/huginn/huginn/pull/1371) |
