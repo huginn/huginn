@@ -33,7 +33,7 @@
       "disabled": false,
       "guid": "505c9bba65507c40e5786afff36f688c",
       "options": {
-        "url": "http://xkcd.com",
+        "url": "https://xkcd.com",
         "mode": "on_change",
         "expected_update_period_in_days": 5,
         "extract": {
@@ -97,7 +97,7 @@
       "disabled": false,
       "guid": "e9afa65457d0a736b9ec20a8dd452fc8",
       "options": {
-        "url": "http://trailers.apple.com/trailers/home/rss/newtrailers.rss",
+        "url": "https://trailers.apple.com/trailers/home/rss/newtrailers.rss",
         "mode": "on_change",
         "type": "xml",
         "expected_update_period_in_days": 5,
