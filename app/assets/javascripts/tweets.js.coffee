@@ -1,6 +1,7 @@
 $ ->
   $('.tweet-body').each ->
     $(this).click ->
+      $(this).off('click')
       twttr.widgets.createTweet(
         this.dataset.tweetId
         this
