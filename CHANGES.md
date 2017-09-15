@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Sep 15, 2017   | Tweets view of `TwitterStreamAgent` has been enhanced. [2122](https://github.com/huginn/huginn/pull/2122) |
 | Sep 09, 2017   | Agent objects in Liquid templating now have new properties `working` and `url`. [2118](https://github.com/huginn/huginn/pull/2118) |
 | Sep 06, 2017   | `DataOutputAgent` includes an icon in a podcast feed. [2114](https://github.com/huginn/huginn/pull/2114) |
 | Sep 05, 2017   | `DataOutputAgent` can properly output an RSS feed with items containing  multiple categories, enclosures, etc. [2110](https://github.com/huginn/huginn/pull/2110) |
