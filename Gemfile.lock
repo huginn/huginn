@@ -1,4 +1,29 @@
 GIT
+  remote: https://github.com/albertsun/tumblr_client.git
+  revision: e046fe6e39291c173add0a49081630c7b60a36c7
+  ref: e046fe6e39291c173add0a49081630c7b60a36c7
+  branch: master
+  specs:
+    tumblr_client (0.8.5)
+      faraday (<= 1.0.0)
+      faraday_middleware (<= 1.0.0)
+      json
+      mime-types
+      oauth
+      simple_oauth
+
+GIT
+  remote: https://github.com/albertsun/weibo_2.git
+  revision: ac38d04434747c4b88e86c5337cd436d00c34349
+  branch: master
+  specs:
+    weibo_2 (0.1.7)
+      hashie (~> 3)
+      multi_json (~> 1)
+      oauth2 (~> 1)
+      rest-client (>= 2.0)
+
+GIT
   remote: https://github.com/amatsuda/kaminari.git
   revision: abbf93d557208ee1d0b612c612cd079f86ed54f4
   ref: abbf93d557208ee1d0b612c612cd079f86ed54f4
@@ -36,17 +61,6 @@ GIT
       delayed_job (>= 3.0, < 5)
 
 GIT
-  remote: https://github.com/dsander/weibo_2.git
-  revision: e5b77f21a7e9a666b582c48e16b1e96fca198cf8
-  branch: master
-  specs:
-    weibo_2 (0.1.7)
-      hashie (~> 3)
-      multi_json (~> 1)
-      oauth2 (~> 1)
-      rest-client (~> 1.8)
-
-GIT
   remote: https://github.com/lostisland/faraday_middleware.git
   revision: 59088da02940d0ee2010b2e3156343346767c31e
   branch: master
@@ -55,18 +69,20 @@ GIT
       faraday (>= 0.7.4, < 1.0)
 
 GIT
-  remote: https://github.com/tumblr/tumblr_client.git
-  revision: 0c59b04e49f2a8c89860613b18cf4e8f978d8dc7
-  ref: 0c59b04e49f2a8c89860613b18cf4e8f978d8dc7
-  branch: master
+  remote: https://github.com/sferik/twitter.git
+  revision: d11707edf4abd13f7ada0eef57fc1eaa1062d75b
   specs:
-    tumblr_client (0.8.5)
-      faraday (~> 0.9.0)
-      faraday_middleware (~> 0.9)
-      json
-      mime-types
-      oauth
-      simple_oauth
+    twitter (5.15.0)
+      addressable (~> 2.3)
+      buftok (~> 0.2.0)
+      equalizer (~> 0.0.11)
+      http (~> 2.0)
+      http-form_data (~> 1.0)
+      http_parser.rb (~> 0.6.0)
+      memoizable (~> 0.4.0)
+      multipart-post (~> 2.0)
+      naught (~> 1.0)
+      simple_oauth (~> 0.3.0)
 
 PATH
   remote: vendor/gems/dotenv-2.0.1
@@ -119,10 +135,6 @@ GEM
     addressable (2.5.1)
       public_suffix (~> 2.0, >= 2.0.2)
     arel (8.0.0)
-    autoparse (0.3.3)
-      addressable (>= 2.3.1)
-      extlib (>= 0.9.15)
-      multi_json (>= 1.0.0)
     aws-sdk-core (2.2.15)
       jmespath (~> 1.0)
     bcrypt (3.1.11)
@@ -154,6 +166,9 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
+    capybara-screenshot (1.0.17)
+      capybara (>= 1.0, < 3)
+      launchy
     capybara-select2 (1.0.1)
       capybara
       rspec
@@ -170,16 +185,18 @@ GEM
     colorize (0.7.7)
     concurrent-ruby (1.0.5)
     cookiejar (0.3.2)
-    coveralls (0.7.12)
-      multi_json (~> 1.10)
-      rest-client (>= 1.6.8, < 2)
-      simplecov (~> 0.9.1)
+    coveralls (0.8.21)
+      json (>= 1.8, < 3)
+      simplecov (~> 0.14.1)
       term-ansicolor (~> 1.3)
-      thor (~> 0.19.1)
-    crack (0.4.2)
+      thor (~> 0.19.4)
+      tins (~> 1.6)
+    crack (0.4.3)
       safe_yaml (~> 1.0.0)
     daemons (1.1.9)
     debug_inspector (0.0.2)
+    declarative (0.0.9)
+    declarative-option (0.1.0)
     delorean (2.1.0)
       chronic
     devise (4.3.0)
@@ -190,7 +207,7 @@ GEM
       warden (~> 1.2.3)
     diff-lcs (1.3)
     docile (1.1.5)
-    domain_name (0.5.24)
+    domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
     dropbox-api (0.4.2)
       hashie
@@ -220,10 +237,9 @@ GEM
       evernote-thrift
       oauth (>= 0.4.1)
     execjs (2.6.0)
-    extlib (0.9.16)
-    faraday (0.9.2)
+    faraday (0.12.1)
       multipart-post (>= 1.2, < 3)
-    feedjira (2.1.0)
+    feedjira (2.1.2)
       faraday (>= 0.9)
       faraday_middleware (>= 0.9)
       loofah (>= 2.0)
@@ -246,17 +262,29 @@ GEM
       rails (>= 3.0)
     globalid (0.4.0)
       activesupport (>= 4.2.0)
-    google-api-client (0.7.1)
-      addressable (>= 2.3.2)
-      autoparse (>= 0.3.3)
-      extlib (>= 0.9.15)
-      faraday (>= 0.9.0)
-      jwt (>= 0.1.5)
-      launchy (>= 2.1.1)
-      multi_json (>= 1.0.0)
-      retriable (>= 1.4)
-      signet (>= 0.5.0)
-      uuidtools (>= 2.1.0)
+    google-api-client (0.13.0)
+      addressable (~> 2.5, >= 2.5.1)
+      googleauth (~> 0.5)
+      httpclient (>= 2.8.1, < 3.0)
+      mime-types (~> 3.0)
+      representable (~> 3.0)
+      retriable (>= 2.0, < 4.0)
+    google-cloud-core (1.0.0)
+      google-cloud-env (~> 1.0)
+      googleauth (~> 0.5.1)
+    google-cloud-env (1.0.0)
+      faraday (~> 0.11)
+    google-cloud-translate (1.0.0)
+      google-cloud-core (~> 1.0)
+      googleauth (~> 0.5.1)
+    googleauth (0.5.1)
+      faraday (~> 0.9)
+      jwt (~> 1.4)
+      logging (~> 2.0)
+      memoist (~> 0.12)
+      multi_json (~> 1.11)
+      os (~> 0.9)
+      signet (~> 0.7)
     guard (2.13.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, <= 4.0)
@@ -276,7 +304,8 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    hashie (3.4.6)
+    hashdiff (0.3.2)
+    hashie (3.5.6)
     haversine (0.3.0)
     hipchat (1.2.0)
       httparty
@@ -284,14 +313,18 @@ GEM
       httparty (>= 0.7.3)
       mimemagic
       multipart-post
-    http (0.6.4)
+    http (2.1.0)
+      addressable (~> 2.3)
+      http-cookie (~> 1.0)
+      http-form_data (~> 1.0.1)
       http_parser.rb (~> 0.6.0)
-    http-cookie (1.0.2)
+    http-cookie (1.0.3)
       domain_name (~> 0.5)
+    http-form_data (1.0.1)
     http_parser.rb (0.6.0)
-    httparty (0.13.7)
-      json (~> 1.8)
+    httparty (0.14.0)
       multi_xml (>= 0.5.2)
+    httpclient (2.8.3)
     huginn_agent (0.4.0)
       thor
     hypdf (1.0.10)
@@ -303,25 +336,29 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (1.8.3)
-    jsonpath (0.7.2)
+    json (1.8.6)
+    jsonpath (0.8.3)
       multi_json
-    jwt (1.4.1)
+    jwt (1.5.6)
     kgio (2.10.0)
     kramdown (1.3.3)
     launchy (2.4.2)
       addressable (~> 2.3)
     letter_opener (1.4.1)
       launchy (~> 2.2)
-    letter_opener_web (1.3.0)
+    letter_opener_web (1.3.1)
       actionmailer (>= 3.2)
       letter_opener (~> 1.0)
       railties (>= 3.2)
-    libv8 (3.16.14.15)
+    libv8 (3.16.14.19)
     liquid (4.0.0)
     listen (3.0.5)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
+    little-plugger (1.1.4)
+    logging (2.2.2)
+      little-plugger (~> 1.1)
+      multi_json (~> 1.10)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.10)
@@ -329,26 +366,29 @@ GEM
       systemu (~> 2.6.2)
     mail (2.6.5)
       mime-types (>= 1.16, < 4)
+    memoist (0.16.0)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
     method_source (0.8.2)
-    mime-types (2.99.3)
+    mime-types (3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2016.0521)
     mimemagic (0.3.1)
     mini_magick (4.2.3)
     mini_portile2 (2.1.0)
     minitest (5.10.2)
     mqtt (0.3.1)
     multi_json (1.12.1)
-    multi_xml (0.5.5)
+    multi_xml (0.6.0)
     multipart-post (2.0.0)
-    mysql2 (0.3.20)
-    naught (1.0.0)
+    mysql2 (0.4.8)
+    naught (1.1.0)
     nenv (0.2.0)
     net-ftp-list (3.2.8)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (3.0.2)
-    netrc (0.10.3)
+    netrc (0.11.0)
     nio4r (2.0.0)
     nokogiri (1.7.2)
       mini_portile2 (~> 2.1.0)
@@ -356,15 +396,15 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     oauth (0.4.7)
-    oauth2 (1.2.0)
-      faraday (>= 0.8, < 0.10)
+    oauth2 (1.4.0)
+      faraday (>= 0.8, < 0.13)
       jwt (~> 1.0)
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
-    omniauth (1.3.1)
-      hashie (>= 1.2, < 4)
-      rack (>= 1.0, < 3)
+    omniauth (1.6.1)
+      hashie (>= 3.4.6, < 3.6.0)
+      rack (>= 1.6.2, < 3)
     omniauth-37signals (1.0.5)
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.0)
@@ -383,13 +423,14 @@ GEM
     omniauth-tumblr (1.2)
       multi_json
       omniauth-oauth (~> 1.0)
-    omniauth-twitter (1.2.1)
-      json (~> 1.3)
+    omniauth-twitter (1.3.0)
       omniauth-oauth (~> 1.1)
+      rack
     omniauth-wunderlist (0.0.2)
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.1)
     orm_adapter (0.5.0)
+    os (0.9.6)
     pg (0.18.3)
     poltergeist (1.8.1)
       capybara (~> 2.1)
@@ -407,7 +448,7 @@ GEM
     pry-rails (0.3.4)
       pry (>= 0.9.10)
     public_suffix (2.0.5)
-    rack (2.0.2)
+    rack (2.0.3)
     rack-livereload (0.3.16)
       rack
     rack-test (0.6.3)
@@ -447,14 +488,18 @@ GEM
     rb-kqueue (0.2.4)
       ffi (>= 0.5.0)
     ref (2.0.0)
+    representable (3.0.4)
+      declarative (< 0.1.0)
+      declarative-option (< 0.2.0)
+      uber (< 0.2.0)
     responders (2.4.0)
       actionpack (>= 4.2.0, < 5.3)
       railties (>= 4.2.0, < 5.3)
-    rest-client (1.8.0)
+    rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 3.0)
-      netrc (~> 0.7)
-    retriable (2.0.2)
+      mime-types (>= 1.16, < 4.0)
+      netrc (~> 0.8)
+    retriable (3.0.2)
     rr (1.1.2)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
@@ -504,17 +549,17 @@ GEM
     shellany (0.0.1)
     shoulda-matchers (3.0.0)
       activesupport (>= 4.0.0)
-    signet (0.5.1)
-      addressable (>= 2.2.3)
-      faraday (>= 0.9.0.rc5)
-      jwt (>= 0.1.5)
-      multi_json (>= 1.0.0)
+    signet (0.7.3)
+      addressable (~> 2.3)
+      faraday (~> 0.9)
+      jwt (~> 1.5)
+      multi_json (~> 1.10)
     simple_oauth (0.3.1)
-    simplecov (0.9.2)
+    simplecov (0.14.1)
       docile (~> 1.1.0)
-      multi_json (~> 1.0)
-      simplecov-html (~> 0.9.0)
-    simplecov-html (0.9.0)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.1)
     slack-notifier (1.0.0)
     slop (3.6.0)
     spectrum-rails (1.3.4)
@@ -537,49 +582,38 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     systemu (2.6.4)
-    term-ansicolor (1.3.2)
+    term-ansicolor (1.6.0)
       tins (~> 1.0)
-    therubyracer (0.12.2)
-      libv8 (~> 3.16.14.0)
+    therubyracer (0.12.3)
+      libv8 (~> 3.16.14.15)
       ref
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.7)
-    tins (1.10.1)
+    tins (1.15.0)
     treetop (1.5.3)
       polyglot (~> 0.3)
     twilio-ruby (3.11.6)
       builder (>= 2.1.2)
       jwt (>= 0.1.2)
       multi_json (>= 1.3.0)
-    twitter (5.14.0)
-      addressable (~> 2.3)
-      buftok (~> 0.2.0)
-      equalizer (~> 0.0.9)
-      faraday (~> 0.9.0)
-      http (~> 0.6.0)
-      http_parser.rb (~> 0.6.0)
-      json (~> 1.8)
-      memoizable (~> 0.4.0)
-      naught (~> 1.0)
-      simple_oauth (~> 0.3.0)
     typhoeus (0.6.9)
       ethon (>= 0.7.1)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
+    uber (0.1.0)
     uglifier (2.7.2)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.3)
+    unf_ext (0.0.7.4)
     unicorn (5.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
     uuid (2.3.7)
       macaddr (~> 1.0)
-    uuidtools (2.1.5)
-    vcr (2.9.2)
+    vcr (3.0.3)
     warden (1.2.7)
       rack (>= 1.0)
     web-console (3.3.1)
@@ -587,9 +621,10 @@ GEM
       activemodel (>= 5.0)
       debug_inspector
       railties (>= 5.0)
-    webmock (1.17.4)
-      addressable (>= 2.2.7)
+    webmock (2.3.2)
+      addressable (>= 2.3.6)
       crack (>= 0.3.2)
+      hashdiff
     websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
@@ -615,9 +650,10 @@ DEPENDENCIES
   capistrano-bundler (~> 1.1.4)
   capistrano-rails (~> 1.1)
   capybara (~> 2.13.0)
+  capybara-screenshot
   capybara-select2
   coffee-rails (~> 4.2)
-  coveralls (~> 0.7.4)
+  coveralls (~> 0.8.12)
   daemons (~> 1.1.9)
   delayed_job!
   delayed_job_active_record!
@@ -637,7 +673,8 @@ DEPENDENCIES
   foreman (~> 0.63.0)
   geokit (~> 1.8.4)
   geokit-rails (~> 2.2.0)
-  google-api-client (~> 0.7.1)
+  google-api-client (~> 0.13)
+  google-cloud-translate (~> 1.0.0)
   guard (~> 2.13.0)
   guard-livereload (~> 2.5.1)
   guard-rspec (~> 4.6.4)
@@ -649,25 +686,25 @@ DEPENDENCIES
   hypdf (~> 1.0.10)
   jquery-rails (~> 4.2.1)
   json (~> 1.8.1)
-  jsonpath (~> 0.7.2)
+  jsonpath (~> 0.8.3)
   kaminari!
   kramdown (~> 1.3.3)
-  letter_opener_web (~> 1.3.0)
+  letter_opener_web (~> 1.3.1)
   liquid (~> 4.0)
   listen (~> 3.0.5)
   loofah (~> 2.0)
   mini_magick
   mqtt
   multi_xml
-  mysql2 (~> 0.3.20)
+  mysql2 (>= 0.3.18, < 0.5)
   net-ftp-list (~> 3.2.8)
   nokogiri
-  omniauth (~> 1.3.1)
+  omniauth (~> 1.6.1)
   omniauth-37signals
   omniauth-dropbox
   omniauth-evernote
   omniauth-tumblr (~> 1.2)
-  omniauth-twitter (~> 1.2.1)
+  omniauth-twitter (~> 1.3.0)
   omniauth-wunderlist
   pg (~> 0.18.3)
   poltergeist
@@ -693,10 +730,10 @@ DEPENDENCIES
   spring (~> 1.7.2)
   spring-commands-rspec (~> 1.0.4)
   spring-watcher-listen (~> 2.0.0)
-  therubyracer (~> 0.12.2)
+  therubyracer (~> 0.12.3)
   tumblr_client!
   twilio-ruby (~> 3.11.5)
-  twitter (~> 5.14.0)
+  twitter!
   twitter-stream!
   typhoeus (~> 0.6.3)
   tzinfo (>= 1.2.0)
@@ -705,13 +742,13 @@ DEPENDENCIES
   unicorn (~> 5.1.0)
   vcr
   web-console (>= 3.3.0)
-  webmock (~> 1.17.4)
+  webmock (~> 2.3)
   weibo_2!
   wunderground (~> 1.2.0)
   xmpp4r (~> 0.5.6)
 
 RUBY VERSION
-   ruby 2.3.3p222
+   ruby 2.3.4p301
 
 BUNDLED WITH
    1.14.6

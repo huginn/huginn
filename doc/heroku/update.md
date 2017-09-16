@@ -1,6 +1,6 @@
 ## Update an existing Heroku deployment
 
-Once you've run `bin/setup_heroku`, you should have 'cantino/huginn' as a remote in git.  (Check with `git remote -v`.)  Now, you can update your Heroku installation with the following commands:
+Once you've run `bin/setup_heroku`, you should have 'huginn/huginn' as a remote in git.  (Check with `git remote -v`.)  Now, you can update your Heroku installation with the following commands:
 
 ```sh
 git fetch origin

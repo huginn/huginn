@@ -158,9 +158,14 @@ describe Agents::PostAgent do
     it 'makes a multipart request when receiving a file_pointer' do
       WebMock.reset!
       stub_request(:post, "http://www.example.com/").
-        with(:body => "-------------RubyMultipartPost\r\nContent-Disposition: form-data; name=\"default\"\r\n\r\nvalue\r\n-------------RubyMultipartPost\r\nContent-Disposition: form-data; name=\"file\"; filename=\"local.path\"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n-------------RubyMultipartPost--\r\n\r\n",
-             :headers => {'Accept-Encoding'=>'gzip,deflate', 'Content-Length'=>'307', 'Content-Type'=>'multipart/form-data; boundary=-----------RubyMultipartPost', 'User-Agent'=>'Huginn - https://github.com/cantino/huginn'}).
-        to_return(:status => 200, :body => "", :headers => {})
+        with(headers: {
+               'Accept-Encoding' => 'gzip,deflate',
+               'Content-Type' => /\Amultipart\/form-data; boundary=/,
+               'User-Agent' => 'Huginn - https://github.com/huginn/huginn'
+        }) { |request|
+        qboundary = Regexp.quote(request.headers['Content-Type'][/ boundary=(.+)/, 1])
+        /\A--#{qboundary}\r\nContent-Disposition: form-data; name="default"\r\n\r\nvalue\r\n--#{qboundary}\r\nContent-Disposition: form-data; name="file"; filename="local.path"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n--#{qboundary}--\r\n\r\n\z/ === request.body
+      }.to_return(status: 200, body: "", headers: {})
       event = Event.new(payload: {file_pointer: {agent_id: 111, file: 'test'}})
       io_mock = mock()
       mock(@checker).get_io(event) { StringIO.new("testdata") }
@@ -286,6 +291,20 @@ describe Agents::PostAgent do
           @checker.options['event_headers_style'] = 'snakecased'
           @checker.check
           expect(@checker.events.last.payload['headers']).to eq({ 'content_type' => 'text/html' })
+        end
+
+        context "when output_mode is set to 'merge'" do
+          before do
+            @checker.options['output_mode'] = 'merge'
+            @checker.save!
+          end
+
+          it "emits the received event" do
+            @checker.receive([@event])
+            @checker.check
+            expect(@checker.events.last.payload['somekey']).to eq('somevalue')
+            expect(@checker.events.last.payload['someotherkey']).to eq({ 'somekey' => 'value' })
+          end
         end
       end
     end
@@ -423,6 +442,32 @@ describe Agents::PostAgent do
       expect(@checker).to be_valid
 
       @checker.options['emit_events'] = true
+      expect(@checker).to be_valid
+    end
+
+    it "requires output_mode to be 'clean' or 'merge', if present" do
+      @checker.options['output_mode'] = 'what?'
+      expect(@checker).not_to be_valid
+
+      @checker.options.delete('output_mode')
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = 'clean'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = 'merge'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = :clean
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = :merge
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = '{{somekey}}'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = "{% if key == 'foo' %}merge{% else %}clean{% endif %}"
       expect(@checker).to be_valid
     end
   end

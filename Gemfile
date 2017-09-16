@@ -44,19 +44,21 @@ gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
 gem 'hypdf', '~> 1.0.10'          # PDFInfoAgent
 
 # Weibo Agents
-# FIXME needs to loosen omniauth dependency
-gem 'weibo_2', github: 'dsander/weibo_2', branch: 'master'
+# FIXME needs to loosen omniauth dependency, add rest-client
+gem 'weibo_2', github: 'albertsun/weibo_2', branch: 'master'
 
 # GoogleCalendarPublishAgent and GoogleTranslateAgent
-gem 'google-api-client', '~> 0.7.1', require: 'google/api_client'
+gem 'google-api-client', '~> 0.13'
+gem 'google-cloud-translate', '~> 1.0.0', require: 'google/cloud/translate'
 
 # Twitter Agents
-gem 'twitter', '~> 5.14.0' # Must to be loaded before cantino-twitter-stream.
+gem 'twitter', github: 'sferik/twitter' # Must to be loaded before cantino-twitter-stream.
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
-gem 'omniauth-twitter', '~> 1.2.1'
+gem 'omniauth-twitter', '~> 1.3.0'
 
 # Tumblr Agents
-gem 'tumblr_client', github: 'tumblr/tumblr_client', branch: 'master', ref: '0c59b04e49f2a8c89860613b18cf4e8f978d8dc7'  # '>= 0.8.5'
+# until merge of https://github.com/tumblr/tumblr_client/pull/61
+gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master', ref: 'e046fe6e39291c173add0a49081630c7b60a36c7' 
 gem 'omniauth-tumblr', '~> 1.2'
 
 # Dropbox Agents
@@ -108,7 +110,7 @@ gem 'httmultiparty', '~> 0.3.16'
 gem 'jquery-rails', '~> 4.2.1'
 gem 'huginn_agent', '~> 0.4.0'
 gem 'json', '~> 1.8.1'
-gem 'jsonpath', '~> 0.7.2'
+gem 'jsonpath', '~> 0.8.3'
 gem 'kaminari', github: "amatsuda/kaminari", branch: '0-17-stable', ref: 'abbf93d557208ee1d0b612c612cd079f86ed54f4'
 gem 'kramdown', '~> 1.3.3'
 gem 'liquid', '~> 4.0'
@@ -116,13 +118,13 @@ gem 'loofah', '~> 2.0'
 gem 'mini_magick'
 gem 'multi_xml'
 gem 'nokogiri'
-gem 'omniauth', '~> 1.3.1'
+gem 'omniauth', '~> 1.6.1'
 gem 'rails', '~> 5.1.1'
 gem 'rufus-scheduler', '~> 3.3.2', require: false
 gem 'sass-rails', '~> 5.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
-gem 'therubyracer', '~> 0.12.2'
+gem 'therubyracer', '~> 0.12.3'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '~> 2.7.2'
 
@@ -133,7 +135,7 @@ group :development do
   gem 'guard-livereload', '~> 2.5.1'
   gem 'guard-rspec', '~> 4.6.4'
   gem 'rack-livereload', '~> 0.3.16'
-  gem 'letter_opener_web', '~> 1.3.0'
+  gem 'letter_opener_web', '~> 1.3.1'
   gem 'web-console', '>= 3.3.0'
 
   gem 'capistrano', '~> 3.4.0'
@@ -147,8 +149,9 @@ group :development do
   end
 
   group :test do
-    gem 'coveralls', '~> 0.7.4', require: false
+    gem 'coveralls', '~> 0.8.12', require: false
     gem 'capybara', '~> 2.13.0'
+    gem 'capybara-screenshot'
     gem 'capybara-select2', require: false
     gem 'delorean'
     gem 'poltergeist'
@@ -162,7 +165,7 @@ group :development do
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'
     gem 'vcr'
-    gem 'webmock', '~> 1.17.4', require: false
+    gem 'webmock', '~> 2.3'
   end
 end
 
@@ -197,7 +200,7 @@ if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
-  gem 'mysql2', '~> 0.3.20'
+  gem 'mysql2', ">= 0.3.18", "< 0.5"
 end
 
 GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|

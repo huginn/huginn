@@ -20,7 +20,7 @@ module Agents
 
       When `connect_to_receiver` is set to true, the JabberAgent will emit an event for every message it receives.
 
-      Have a look at the [Wiki](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to learn more about liquid templating.
+      Have a look at the [Wiki](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to learn more about liquid templating.
     MD
 
     event_description <<-MD

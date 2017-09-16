@@ -1,6 +1,7 @@
 require 'rails_helper'
 require 'capybara/rails'
 require 'capybara/poltergeist'
+require 'capybara-screenshot/rspec'
 require 'capybara-select2'
 
 CAPYBARA_TIMEOUT = ENV['CI'] == 'true' ? 60 : 5
@@ -11,6 +12,8 @@ end
 
 Capybara.javascript_driver = :poltergeist
 Capybara.default_max_wait_time = CAPYBARA_TIMEOUT
+
+Capybara::Screenshot.prune_strategy = { keep: 3 }
 
 RSpec.configure do |config|
   config.include Warden::Test::Helpers

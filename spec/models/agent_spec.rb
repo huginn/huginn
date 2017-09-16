@@ -563,7 +563,7 @@ describe Agent do
         agent.options = 5
         expect(agent.options["hi"]).to eq(2)
         expect(agent).to have(1).errors_on(:options)
-        expect(agent.errors_on(:options)).to include("cannot be set to an instance of Fixnum")
+        expect(agent.errors_on(:options)).to include("cannot be set to an instance of #{2.class}")  # Integer (ruby >=2.4) or Fixnum (ruby <2.4)
       end
 
       it "should not allow source agents owned by other people" do
@@ -1033,6 +1033,14 @@ describe AgentDrop do
     expect(interpolate(t, @wsa1)).to eq('0: ')
     expect(interpolate(t, @wsa2)).to eq('0: ')
     expect(interpolate(t, @efa)).to eq('2: XKCD, Dilbert')
+
+    t = '{{agent.sources.first.name}}..{{agent.sources.last.name}}'
+    expect(interpolate(t, @wsa1)).to eq('..')
+    expect(interpolate(t, @wsa2)).to eq('..')
+    expect(interpolate(t, @efa)).to eq('XKCD..Dilbert')
+
+    t = '{{agent.sources[1].name}}'
+    expect(interpolate(t, @efa)).to eq('Dilbert')
   end
 
   it 'should have .receivers' do
@@ -1040,5 +1048,23 @@ describe AgentDrop do
     expect(interpolate(t, @wsa1)).to eq('1: Formatter')
     expect(interpolate(t, @wsa2)).to eq('1: Formatter')
     expect(interpolate(t, @efa)).to eq('0: ')
+  end
+
+  it 'should have .working' do
+    stub(@wsa1).working? { false }
+    stub(@wsa2).working? { true }
+    stub(@efa).working? { false }
+
+    t = '{% if agent.working %}healthy{% else %}unhealthy{% endif %}'
+    expect(interpolate(t, @wsa1)).to eq('unhealthy')
+    expect(interpolate(t, @wsa2)).to eq('healthy')
+    expect(interpolate(t, @efa)).to eq('unhealthy')
+  end
+
+  it 'should have .url' do
+    t = '{{ agent.url }}'
+    expect(interpolate(t, @wsa1)).to eq("http://localhost/agents/#{@wsa1.id}")
+    expect(interpolate(t, @wsa2)).to eq("http://localhost/agents/#{@wsa2.id}")
+    expect(interpolate(t, @efa)).to  eq("http://localhost/agents/#{@efa.id}")
   end
 end

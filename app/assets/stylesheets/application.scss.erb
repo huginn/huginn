@@ -66,10 +66,6 @@ img.odin {
   display: none;
 }
 
-.controller-region[data-has-controllers=false] {
-  display: none;
-}
-
 .spinner {
   display: none;
   vertical-align: bottom;
@@ -329,4 +325,16 @@ $service-colors: (
   -ms-transform: scaleX(-1);
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1);
+}
+
+.tweet-body {
+  .tweet-plain {
+    cursor: help;
+  }
+
+  .twitter-tweet-rendered {
+    display: inline !important;
+    margin: 0 !important;
+    vertical-align: bottom !important;
+  }
 }

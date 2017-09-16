@@ -17,6 +17,90 @@ describe "Creating a new agent", js: true do
     expect(page).to have_text("Test Trigger Agent")
   end
 
+  context "with associated agents" do
+    let!(:bob_scheduler_agent) {
+      Agents::SchedulerAgent.create!(
+        user: users(:bob),
+        name: 'Example Scheduler',
+        options: {
+          'action' => 'run',
+          'schedule' => '0 * * * *'
+        },
+      )
+    }
+
+    let!(:bob_weather_agent) {
+      agents(:bob_weather_agent)
+    }
+
+    let!(:bob_formatting_agent) {
+      agents(:bob_formatting_agent).tap { |agent|
+        # Make this valid
+        agent.options['instructions']['foo'] = 'bar'
+        agent.save!
+      }
+    }
+
+    it "creates an agent with a source and a receiver" do
+      visit "/"
+      page.find("a", text: "Agents").trigger(:mouseover)
+      click_on("New Agent")
+
+      select_agent_type("Trigger Agent")
+      fill_in(:agent_name, with: "Test Trigger Agent")
+
+      select2("SF Weather", from: 'Sources')
+      select2("Formatting Agent", from: 'Receivers')
+
+      click_on "Save"
+
+      expect(page).to have_text("Test Trigger Agent")
+
+      agent = Agent.find_by(name: "Test Trigger Agent")
+
+      expect(agent.sources).to eq([bob_weather_agent])
+      expect(agent.receivers).to eq([bob_formatting_agent])
+    end
+
+    it "creates an agent with a control target" do
+      visit "/"
+      page.find("a", text: "Agents").trigger(:mouseover)
+      click_on("New Agent")
+
+      select_agent_type("Scheduler Agent")
+      fill_in(:agent_name, with: "Test Scheduler Agent")
+
+      select2("SF Weather", from: 'Control targets')
+
+      click_on "Save"
+
+      expect(page).to have_text("Test Scheduler Agent")
+
+      agent = Agent.find_by(name: "Test Scheduler Agent")
+
+      expect(agent.control_targets).to eq([bob_weather_agent])
+    end
+
+    it "creates an agent with a controller" do
+      visit "/"
+      page.find("a", text: "Agents").trigger(:mouseover)
+      click_on("New Agent")
+
+      select_agent_type("Weather Agent")
+      fill_in(:agent_name, with: "Test Weather Agent")
+
+      select2("Example Scheduler", from: 'Controllers')
+
+      click_on "Save"
+
+      expect(page).to have_text("Test Weather Agent")
+
+      agent = Agent.find_by(name: "Test Weather Agent")
+
+      expect(agent.controllers).to eq([bob_scheduler_agent])
+    end
+  end
+
   it "creates an alert if a new agent with invalid json is submitted" do
     visit "/"
     page.find("a", text: "Agents").trigger(:mouseover)
@@ -44,7 +128,7 @@ describe "Creating a new agent", js: true do
     end
 
     it "does not show the target select2 field when the agent can not create events" do
-      select_agent_type("Growl Agent")
+      select_agent_type("Email Agent")
       expect(page).to have_content('This type of Agent cannot create events.')
     end
   end

@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
     twitter_oauth_check
     basecamp_auth_check
     outdated_docker_image_namespace_check
+    outdated_google_auth_check
   end
 
   def filtered_agent_return_link(options = {})
@@ -68,6 +69,12 @@ class ApplicationController < ActionController::Base
 
   def outdated_docker_image_namespace_check
     @outdated_docker_image_namespace = ENV['OUTDATED_DOCKER_IMAGE_NAMESPACE'] == 'true'
+  end
+
+  def outdated_google_auth_check
+    @outdated_google_cal_agents = current_user.agents.of_type('Agents::GoogleCalendarPublishAgent').select do |agent|
+      agent.options['google']['key_secret'].present?
+    end
   end
 
   def agent_params

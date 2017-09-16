@@ -22,7 +22,7 @@ module Agents
 
           * `secrets` - An array of tokens that the requestor must provide for light-weight authentication.
           * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
-          * `template` - A JSON object representing a mapping between item output keys and incoming event values.  Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values.  Values of the `link`, `title`, `description` and `icon` keys will be put into the \\<channel\\> section of RSS output.  Value of the `self` key will be used as URL for this feed itself, which is useful when you serve it via reverse proxy.  The `item` key will be repeated for every Event.  The `pubDate` key for each item will have the creation time of the Event unless given.
+          * `template` - A JSON object representing a mapping between item output keys and incoming event values.  Use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to format the values.  Values of the `link`, `title`, `description` and `icon` keys will be put into the \\<channel\\> section of RSS output.  Value of the `self` key will be used as URL for this feed itself, which is useful when you serve it via reverse proxy.  The `item` key will be repeated for every Event.  The `pubDate` key for each item will have the creation time of the Event unless given.
           * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
           * `ttl` - A value for the \\<ttl\\> element in RSS output. (default: `60`)
           * `ns_media` - Add [yahoo media namespace](https://en.wikipedia.org/wiki/Media_RSS) in output xml
@@ -59,7 +59,7 @@ module Agents
 
         # Liquid Templating
 
-        In [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variable is available:
+        In [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variable is available:
 
         * `events`: An array of events being output, sorted in the given order, up to `events_to_show` in number.  For example, if source events contain a site title in the `site_title` key, you can refer to it in `template.title` by putting `{{events.first.site_title}}`.
 
@@ -161,6 +161,12 @@ module Agents
 
     def feed_icon
       interpolated['template']['icon'].presence || feed_link + '/favicon.ico'
+    end
+
+    def itunes_icon
+      if(boolify(interpolated['ns_itunes']))
+        "<itunes:image href=#{feed_icon.encode(xml: :attr)} />"
+      end  
     end
 
     def feed_description
@@ -287,9 +293,7 @@ module Agents
             XML
           }.join
 
-          items = simplify_item_for_xml(items)
-                  .to_xml(skip_types: true, root: "items", skip_instruct: true, indent: 1)
-                  .gsub(%r{^</?items>\n}, '')
+          items = items_to_xml(items)
 
           return [<<-XML, 200, rss_content_type, interpolated['response_headers'].presence]
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -297,6 +301,7 @@ module Agents
 <channel>
  <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
  <atom:icon>#{feed_icon.encode(xml: :text)}</atom:icon>
+ #{itunes_icon}
 #{hub_links}
  <title>#{feed_title.encode(xml: :text)}</title>
  <description>#{feed_description.encode(xml: :text)}</description>
@@ -387,6 +392,22 @@ module Agents
       else
         item
       end
+    end
+
+    def items_to_xml(items)
+      simplify_item_for_xml(items)
+        .to_xml(skip_types: true, root: "items", skip_instruct: true, indent: 1)
+        .gsub(%r{
+          (?<indent> ^\ + ) < (?<tagname> [^> ]+ ) > \n
+          (?<children>
+            (?: \k<indent> \  < \k<tagname> (?:\ [^>]*)? > [^<>]*? </ \k<tagname> > \n )+
+          )
+          \k<indent> </ \k<tagname> > \n
+        }mx) { $~[:children].gsub(/^ /, '') } # delete redundant nesting of array elements
+        .gsub(%r{
+          (?<indent> ^\ + ) < [^> ]+ /> \n
+        }mx, '') # delete empty elements
+        .gsub(%r{^</?items>\n}, '')
     end
 
     def push_to_hub(hub, url)

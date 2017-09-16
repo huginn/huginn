@@ -17,7 +17,7 @@ COPY . /app
 ARG OUTDATED_DOCKER_IMAGE_NAMESPACE=false
 ENV OUTDATED_DOCKER_IMAGE_NAMESPACE ${OUTDATED_DOCKER_IMAGE_NAMESPACE}
 
-ADD ["docker/scripts/setup", "docker/single-process/scripts/init", "/scripts/"]
+ADD ["docker/scripts/setup", "docker/scripts/setup_env", "docker/single-process/scripts/init", "/scripts/"]
 
 RUN /scripts/setup
 

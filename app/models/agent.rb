@@ -2,7 +2,7 @@ require 'utils'
 
 # Agent is the core class in Huginn, representing a configurable, schedulable, reactive system with memory that can
 # be sub-classed for many different purposes.  Agents can emit Events, as well as receive them and react in many different ways.
-# The basic Agent API is detailed on the Huginn wiki: https://github.com/cantino/huginn/wiki/Creating-a-new-agent
+# The basic Agent API is detailed on the Huginn wiki: https://github.com/huginn/huginn/wiki/Creating-a-new-agent
 class Agent < ActiveRecord::Base
   include AssignableTypes
   include MarkdownClassAttributes
@@ -294,7 +294,7 @@ class Agent < ActiveRecord::Base
   class << self
     def build_clone(original)
       new(original.slice(:type, :options, :service_id, :schedule, :controller_ids, :control_target_ids,
-                         :source_ids, :keep_events_for, :propagate_immediately, :scenario_ids)) { |clone|
+                         :source_ids, :receiver_ids, :keep_events_for, :propagate_immediately, :scenario_ids)) { |clone|
         # Give it a unique name
         2.step do |i|
           name = '%s (%d)' % [original.name, i]
@@ -383,7 +383,14 @@ class Agent < ActiveRecord::Base
 
         agents_to_events = {}
         Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_type, receiver_agent_type, event_id|
-          next unless const_defined?(source_agent_type) && const_defined?(receiver_agent_type)
+
+          begin
+            Object.const_get(source_agent_type)
+            Object.const_get(receiver_agent_type)
+          rescue NameError
+            next
+          end
+
           agents_to_events[receiver_agent_id.to_i] ||= []
           agents_to_events[receiver_agent_id.to_i] << event_id
         end
@@ -466,4 +473,12 @@ class AgentDrop
       @object.__send__(attr)
     } unless method_defined?(attr)
   }
+
+  def working
+    @object.working?
+  end
+
+  def url
+    Rails.application.routes.url_helpers.agent_url(@object, Rails.application.config.action_mailer.default_url_options)
+  end
 end

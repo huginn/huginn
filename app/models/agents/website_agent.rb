@@ -23,8 +23,8 @@ module Agents
 
       The WebsiteAgent can also scrape based on incoming events.
 
-      * Set the `url_from_event` option to a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
-      * Alternatively, set `data_from_event` to a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
+      * Set the `url_from_event` option to a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
+      * Alternatively, set `data_from_event` to a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
 
       # Supported Document Types
@@ -58,12 +58,57 @@ module Agents
 
       # Scraping JSON
 
-      When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
+      When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.
+
+      Sample incoming event:
+
+          { "results": {
+              "data": [
+                {
+                  "title": "Lorem ipsum 1",
+                  "description": "Aliquam pharetra leo ipsum."
+                  "price": 8.95
+                },
+                {
+                  "title": "Lorem ipsum 2",
+                  "description": "Suspendisse a pulvinar lacus."
+                  "price": 12.99
+                },
+                {
+                  "title": "Lorem ipsum 3",
+                  "description": "Praesent ac arcu tellus."
+                  "price": 8.99
+                }
+              ]
+            }
+          }
+
+      Sample rule:
 
           "extract": {
             "title": { "path": "results.data[*].title" },
             "description": { "path": "results.data[*].description" }
           }
+
+      In this example the `*` wildcard character makes the parser to iterate through all items of the `data` array. Three events will be created as a result.
+
+      Sample outgoing events:
+
+          [
+            {
+              "title": "Lorem ipsum 1",
+              "description": "Aliquam pharetra leo ipsum."
+            },
+            {
+              "title": "Lorem ipsum 2",
+              "description": "Suspendisse a pulvinar lacus."
+            },
+            {
+              "title": "Lorem ipsum 3",
+              "description": "Praesent ac arcu tellus."
+            }
+          ]
+
 
       The `extract` option can be skipped for the JSON type, causing the full JSON response to be returned.
 
@@ -128,7 +173,7 @@ module Agents
 
       # Liquid Templating
 
-      In [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variables are available:
+      In [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variables are available:
 
       * `_url_`: The URL specified to fetch the content from.  When parsing `data_from_event`, this is not set.
 

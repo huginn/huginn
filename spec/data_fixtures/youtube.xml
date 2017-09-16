@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=UCoTLdfNePDQzvdEgIToLIUg"/>
+ <id>yt:channel:UCoTLdfNePDQzvdEgIToLIUg</id>
+ <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+ <title>SecDSM</title>
+ <link rel="alternate" href="https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg"/>
+ <author>
+  <name>SecDSM</name>
+  <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+ </author>
+ <published>2016-07-28T18:46:21+00:00</published>
+ <entry>
+  <id>yt:video:OCs1E0vP7Oc</id>
+  <yt:videoId>OCs1E0vP7Oc</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>SecDSM 2017 March - Talk 01</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=OCs1E0vP7Oc"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-06-15T02:36:17+00:00</published>
+  <updated>2017-06-15T02:36:17+00:00</updated>
+  <media:group>
+   <media:title>SecDSM 2017 March - Talk 01</media:title>
+   <media:content url="https://www.youtube.com/v/OCs1E0vP7Oc?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/OCs1E0vP7Oc/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="36"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:Qky7RDF5Yk8</id>
+  <yt:videoId>Qky7RDF5Yk8</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>SecDSM 2017 March - Talk 02</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=Qky7RDF5Yk8"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-06-15T02:36:09+00:00</published>
+  <updated>2017-06-15T02:36:09+00:00</updated>
+  <media:group>
+   <media:title>SecDSM 2017 March - Talk 02</media:title>
+   <media:content url="https://www.youtube.com/v/Qky7RDF5Yk8?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/Qky7RDF5Yk8/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="14"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:4b6GtFgQYuY</id>
+  <yt:videoId>4b6GtFgQYuY</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>SecDSM March 2017 - Announcements</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=4b6GtFgQYuY"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-05-11T03:29:47+00:00</published>
+  <updated>2017-05-11T03:29:47+00:00</updated>
+  <media:group>
+   <media:title>SecDSM March 2017 - Announcements</media:title>
+   <media:content url="https://www.youtube.com/v/4b6GtFgQYuY?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/4b6GtFgQYuY/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="13"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:CrkSsvl3HRg</id>
+  <yt:videoId>CrkSsvl3HRg</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>SecDSM 2017 April - Principal CTF</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=CrkSsvl3HRg"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-05-01T21:24:37+00:00</published>
+  <updated>2017-05-04T07:08:10+00:00</updated>
+  <media:group>
+   <media:title>SecDSM 2017 April - Principal CTF</media:title>
+   <media:content url="https://www.youtube.com/v/CrkSsvl3HRg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/CrkSsvl3HRg/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="66"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:Pin_Mq06fWE</id>
+  <yt:videoId>Pin_Mq06fWE</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>Tom Pohl - SecDSM, 1 year later</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=Pin_Mq06fWE"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-03-12T04:17:12+00:00</published>
+  <updated>2017-03-12T04:17:12+00:00</updated>
+  <media:group>
+   <media:title>Tom Pohl - SecDSM, 1 year later</media:title>
+   <media:content url="https://www.youtube.com/v/Pin_Mq06fWE?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/Pin_Mq06fWE/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="28"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:vsPFzzvFdkQ</id>
+  <yt:videoId>vsPFzzvFdkQ</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>Jared Brees - Password Cracking</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=vsPFzzvFdkQ"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-03-12T04:16:57+00:00</published>
+  <updated>2017-03-12T04:16:57+00:00</updated>
+  <media:group>
+   <media:title>Jared Brees - Password Cracking</media:title>
+   <media:content url="https://www.youtube.com/v/vsPFzzvFdkQ?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/vsPFzzvFdkQ/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="20"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:WvdoRVZsVDA</id>
+  <yt:videoId>WvdoRVZsVDA</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>Nicholas Starke - SQLMap</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=WvdoRVZsVDA"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-03-12T04:16:37+00:00</published>
+  <updated>2017-03-12T04:16:37+00:00</updated>
+  <media:group>
+   <media:title>Nicholas Starke - SQLMap</media:title>
+   <media:content url="https://www.youtube.com/v/WvdoRVZsVDA?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/WvdoRVZsVDA/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="7"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:vI6uX5DBx6Q</id>
+  <yt:videoId>vI6uX5DBx6Q</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>Ben Schmitt - dnscat2</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=vI6uX5DBx6Q"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-01-22T22:05:17+00:00</published>
+  <updated>2017-01-24T05:09:50+00:00</updated>
+  <media:group>
+   <media:title>Ben Schmitt - dnscat2</media:title>
+   <media:content url="https://www.youtube.com/v/vI6uX5DBx6Q?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/vI6uX5DBx6Q/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="1" average="5.00" min="1" max="5"/>
+    <media:statistics views="133"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:zN2WijXEY9k</id>
+  <yt:videoId>zN2WijXEY9k</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>Nicholas Starke &amp; Tom Pohl - WeevBot - Browser Based DNS Exfiltration</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=zN2WijXEY9k"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-01-22T22:04:46+00:00</published>
+  <updated>2017-03-30T01:27:17+00:00</updated>
+  <media:group>
+   <media:title>Nicholas Starke &amp; Tom Pohl - WeevBot - Browser Based DNS Exfiltration</media:title>
+   <media:content url="https://www.youtube.com/v/zN2WijXEY9k?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/zN2WijXEY9k/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="2" average="5.00" min="1" max="5"/>
+    <media:statistics views="122"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:wR_O3485-Gw</id>
+  <yt:videoId>wR_O3485-Gw</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>Aaron Tekippe - Finding a needle in a haystack: Utilizing DNS to detect threats</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=wR_O3485-Gw"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-01-22T21:49:32+00:00</published>
+  <updated>2017-01-22T21:49:32+00:00</updated>
+  <media:group>
+   <media:title>Aaron Tekippe - Finding a needle in a haystack: Utilizing DNS to detect threats</media:title>
+   <media:content url="https://www.youtube.com/v/wR_O3485-Gw?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/wR_O3485-Gw/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="33"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:hvhde2F6Jms</id>
+  <yt:videoId>hvhde2F6Jms</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>Sean Flattery - Sudoers and Auditd!</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=hvhde2F6Jms"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2017-01-20T22:41:07+00:00</published>
+  <updated>2017-04-21T01:49:33+00:00</updated>
+  <media:group>
+   <media:title>Sean Flattery - Sudoers and Auditd!</media:title>
+   <media:content url="https://www.youtube.com/v/hvhde2F6Jms?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/hvhde2F6Jms/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="1" average="5.00" min="1" max="5"/>
+    <media:statistics views="43"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:6YIlFnvlMjU</id>
+  <yt:videoId>6YIlFnvlMjU</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>2016 Defcon Recap</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=6YIlFnvlMjU"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2016-11-28T16:21:11+00:00</published>
+  <updated>2016-11-29T01:58:27+00:00</updated>
+  <media:group>
+   <media:title>2016 Defcon Recap</media:title>
+   <media:content url="https://www.youtube.com/v/6YIlFnvlMjU?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/6YIlFnvlMjU/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="22"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:0GVO3ouyudE</id>
+  <yt:videoId>0GVO3ouyudE</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>James Stumme - Updating the SecDSM Website</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=0GVO3ouyudE"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2016-11-28T16:21:10+00:00</published>
+  <updated>2016-11-28T16:54:15+00:00</updated>
+  <media:group>
+   <media:title>James Stumme - Updating the SecDSM Website</media:title>
+   <media:content url="https://www.youtube.com/v/0GVO3ouyudE?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/0GVO3ouyudE/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="14"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:x0z1_crrigI</id>
+  <yt:videoId>x0z1_crrigI</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>Michael Jackson - NextGen Vendor Risk Management: How to Raise the Bar on aaS Providers.</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=x0z1_crrigI"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2016-11-28T16:21:10+00:00</published>
+  <updated>2016-11-28T16:54:50+00:00</updated>
+  <media:group>
+   <media:title>Michael Jackson - NextGen Vendor Risk Management: How to Raise the Bar on aaS Providers.</media:title>
+   <media:content url="https://www.youtube.com/v/x0z1_crrigI?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/x0z1_crrigI/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="9"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:nSM2vTYyACQ</id>
+  <yt:videoId>nSM2vTYyACQ</yt:videoId>
+  <yt:channelId>UCoTLdfNePDQzvdEgIToLIUg</yt:channelId>
+  <title>Nicholas Starke - BinaryNinja</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=nSM2vTYyACQ"/>
+  <author>
+   <name>SecDSM</name>
+   <uri>https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg</uri>
+  </author>
+  <published>2016-11-28T16:21:10+00:00</published>
+  <updated>2017-02-03T09:11:35+00:00</updated>
+  <media:group>
+   <media:title>Nicholas Starke - BinaryNinja</media:title>
+   <media:content url="https://www.youtube.com/v/nSM2vTYyACQ?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/nSM2vTYyACQ/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="2" average="5.00" min="1" max="5"/>
+    <media:statistics views="46"/>
+   </media:community>
+  </media:group>
+ </entry>
+</feed>

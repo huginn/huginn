@@ -118,6 +118,20 @@ describe Event do
       Event.cleanup_expired!
       expect(Event.find_by_id(event.id)).not_to be_nil
     end
+
+    it "always keeps the latest Event regardless of its expires_at value only if the database is MySQL" do
+      Event.delete_all
+      event1 = agents(:jane_weather_agent).create_event expires_at: 1.minute.ago
+      event2 = agents(:bob_weather_agent).create_event expires_at: 1.minute.ago
+
+      Event.cleanup_expired!
+      case ActiveRecord::Base.connection.adapter_name
+      when /\Amysql/i
+        expect(Event.all.pluck(:id)).to eq([event2.id])
+      else
+        expect(Event.all.pluck(:id)).to be_empty
+      end
+    end
   end
 
   describe "after destroy" do

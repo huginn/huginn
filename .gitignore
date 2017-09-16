@@ -27,3 +27,4 @@ deployment/cookbooks
 manifest.yml
 config/unicorn.rb
 db/schema.rb
+.local/

@@ -54,6 +54,8 @@ module Agents
 
       Set `mark_as_read` to true to mark found mails as read.
 
+      Set `include_raw_mail` to true to add to each created event a raw unencoded mail text, in the so-called "RFC822" format defined in the [IMAP4 standard](https://tools.ietf.org/html/rfc3501).
+
       Each agent instance memorizes the highest UID of mails that are found in the last run for each watched folder, so even if you change a set of conditions so that it matches mails that are missed previously, or if you alter the flag status of already found mails, they will not show up as new events.
 
       Also, in order to avoid duplicated notification it keeps a list of Message-Id's of 100 most recent mails, so if multiple mails of the same Message-Id are found, you will only see one event out of them.
@@ -63,6 +65,7 @@ module Agents
       Events look like this:
 
           {
+            "message_id": "...(Message-Id without angle brackets)...",
             "folder": "INBOX",
             "subject": "...",
             "from": "Nanashi <nanashi.gombeh@example.jp>",
@@ -74,6 +77,8 @@ module Agents
             "matches": {
             }
           }
+
+      Additionally, "raw_mail" will be included if the `include_raw_mail` option is set.
     MD
 
     IDCACHE_SIZE = 100
@@ -112,7 +117,7 @@ module Agents
         errors.add(:base, "port must be a positive integer") unless is_positive_integer?(options['port'])
       end
 
-      %w[ssl mark_as_read].each { |key|
+      %w[ssl mark_as_read include_raw_mail].each { |key|
         if options[key].present?
           if boolify(options[key]).nil?
             errors.add(:base, '%s must be a boolean value' % key)
@@ -264,7 +269,8 @@ module Agents
 
           log 'Emitting an event for mail: %s' % message_id
 
-          create_event :payload => {
+          payload = {
+            'message_id' => message_id,
             'folder' => mail.folder,
             'subject' => mail.scrubbed(:subject),
             'from' => mail.from_addrs.first,
@@ -276,6 +282,12 @@ module Agents
             'matches' => matches,
             'has_attachment' => mail.has_attachment?,
           }
+
+          if boolify(interpolated['include_raw_mail'])
+            payload['raw_mail'] = mail.raw_mail
+          end
+
+          create_event payload: payload
 
           notified << mail.message_id if mail.message_id
         end
@@ -503,13 +515,17 @@ module Agents
           end
       end
 
-      def fetch
-        @parsed ||=
+      def raw_mail
+        @raw_mail ||=
           if data = @client.uid_fetch(@uid, 'BODY.PEEK[]').first
-            Mail.read_from_string(data.attr['BODY[]'])
+            data.attr['BODY[]']
           else
-            Mail.read_from_string('')
+            ''
           end
+      end
+
+      def fetch
+        @parsed ||= Mail.read_from_string(raw_mail)
       end
 
       def body_parts(mime_types = DEFAULT_BODY_MIME_TYPES)
