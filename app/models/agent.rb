@@ -383,7 +383,14 @@ class Agent < ActiveRecord::Base
 
         agents_to_events = {}
         Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_type, receiver_agent_type, event_id|
-          next unless const_defined?(source_agent_type) && const_defined?(receiver_agent_type)
+
+          begin
+            Object.const_get(source_agent_type)
+            Object.const_get(receiver_agent_type)
+          rescue NameError
+            next
+          end
+
           agents_to_events[receiver_agent_id.to_i] ||= []
           agents_to_events[receiver_agent_id.to_i] << event_id
         end
