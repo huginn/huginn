@@ -220,7 +220,7 @@ class @AgentEditPage
   invokeDryRun: (e) =>
     e.preventDefault()
     @updateFromEditors()
-    Utils.handleDryRunButton(e.target)
+    Utils.handleDryRunButton(e.currentTarget)
 
   formatAgentForSelect = (agent) ->
     originalOption = agent.element

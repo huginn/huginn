@@ -23,6 +23,12 @@ describe "Dry running an Agent", js: true do
         to_return(:status => 200, :body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :headers => {})
     end
 
+    it 'opens the dry run modal even when clicking on the refresh icon' do
+      visit edit_agent_path(agent)
+      find('.agent-dry-run-button span.glyphicon').click
+      expect(page).to have_text('Event to send (Optional)')
+    end
+
     it 'shows the dry run pop up without previous events and selects the events tab when a event was created' do
       open_dry_run_modal(agent)
       click_on("Dry Run")
