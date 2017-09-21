@@ -1063,8 +1063,8 @@ describe AgentDrop do
 
   it 'should have .url' do
     t = '{{ agent.url }}'
-    expect(interpolate(t, @wsa1)).to eq("http://localhost/agents/#{@wsa1.id}")
-    expect(interpolate(t, @wsa2)).to eq("http://localhost/agents/#{@wsa2.id}")
-    expect(interpolate(t, @efa)).to  eq("http://localhost/agents/#{@efa.id}")
+    expect(interpolate(t, @wsa1)).to match(/http:\/\/localhost(?::\d+)?\/agents\/#{@wsa1.id}/)
+    expect(interpolate(t, @wsa2)).to match(/http:\/\/localhost(?::\d+)?\/agents\/#{@wsa2.id}/)
+    expect(interpolate(t, @efa)).to  match(/http:\/\/localhost(?::\d+)?\/agents\/#{@efa.id}/)
   end
 end
