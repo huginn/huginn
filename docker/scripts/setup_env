@@ -89,5 +89,6 @@ cp -a config/unicorn.rb.example config/unicorn.rb
 sed -ri 's/^listen .*$/listen ENV["PORT"]/' config/unicorn.rb
 sed -ri 's/^stderr_path.*$//' config/unicorn.rb
 sed -ri 's/^stdout_path.*$//' config/unicorn.rb
+sed -ri 's/^pid.*$//' config/unicorn.rb
 
 mkdir -p tmp/pids tmp/cache tmp/sockets log
