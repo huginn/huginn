@@ -4,9 +4,12 @@ require 'tempfile'
 
 module Agents
   class TelegramAgent < Agent
+    include FormConfigurable
+
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!
+    can_dry_run!
 
     description <<-MD
       The Telegram Agent receives and collects events and sends them via [Telegram](https://telegram.org/).
@@ -18,16 +21,15 @@ module Agents
 
       **Setup**
 
-      1. Obtain an `auth_token` by [creating a new bot](https://telegram.me/botfather).
-      2a. If you would like to send messages to a public channel:
-        1. Add your bot to the channel as an administrator
-        2. Set `chat_id` to the name of your channel - e.g. `@YourHugginChannel`
-      2b. If you would like to send messages to a group:
-        1. Add the bot to the group
-        2. Obtain your group `chat_id` from the recently started conversation by visiting https://api.telegram.org/bot`<auth_token>`/getUpdates
-      2c. If you would like to send messages privately to yourself:
-        1. Send a private message to your bot by visiting https://telegram.me/YourHuginnBot
-        2. Obtain your private `chat_id` from the recently started conversation by visiting https://api.telegram.org/bot`<auth_token>`/getUpdates
+      * Obtain an `auth_token` by [creating a new bot](https://telegram.me/botfather).
+      * If you would like to send messages to a public channel:
+        * Add your bot to the channel as an administrator
+      * If you would like to send messages to a group:
+        * Add the bot to the group
+      * If you would like to send messages privately to yourself:
+        * Open a conservation with the bot by visiting https://telegram.me/YourHuginnBot
+      * Send a message to the bot, group or channel.
+      * Select the `chat_id` from the dropdown.
     MD
 
     def default_options
@@ -35,6 +37,20 @@ module Agents
         auth_token: 'xxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         chat_id: 'xxxxxxxx'
       }
+    end
+
+    form_configurable :auth_token, roles: :validatable
+    form_configurable :chat_id, roles: :completable
+    form_configurable :parse_mode, type: :array, values: ['', 'html', 'markdown']
+
+    def validate_auth_token
+      HTTMultiParty.post(telegram_bot_uri('getMe'))['ok'] == true
+    end
+
+    def complete_chat_id
+      response = HTTMultiParty.post(telegram_bot_uri('getUpdates'))
+      return [] unless response['ok']
+      response['result'].map { |update| update_to_complete(update) }.uniq
     end
 
     def validate_options
@@ -68,18 +84,23 @@ module Agents
     end
 
     def receive_event(event)
-      TELEGRAM_ACTIONS.each do |field, method|
+      messages_send = TELEGRAM_ACTIONS.count do |field, method|
         payload = load_field event, field
         next unless payload
         send_telegram_message method, field => payload
         unlink_file payload if payload.is_a? Tempfile
+        true
       end
+      error("No valid key found in event #{event.payload.inspect}") if messages_send.zero?
     end
 
     def send_telegram_message(method, params)
       params[:chat_id] = interpolated['chat_id']
       params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
-      HTTMultiParty.post telegram_bot_uri(method), query: params
+      response = HTTMultiParty.post telegram_bot_uri(method), query: params
+      if response['ok'] == false
+        error(response)
+      end
     end
 
     def load_field(event, field)
@@ -100,6 +121,13 @@ module Agents
     def unlink_file(file)
       file.close
       file.unlink
+    end
+
+    private
+
+    def update_to_complete(update)
+      chat = (update['message'] || update.fetch('channel_post', {})).fetch('chat', {})
+      {id: chat['id'], text: chat['title'] || "#{chat['first_name']} #{chat['last_name']}"}
     end
   end
 end
