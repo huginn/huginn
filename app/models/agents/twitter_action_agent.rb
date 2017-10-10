@@ -63,14 +63,21 @@ module Agents
         twitter.favorite(tweets) if favorite?
         twitter.retweet(tweets) if retweet?
       rescue Twitter::Error => e
-        raise e unless emit_error_events?
-        create_event :payload => {
-          'success' => false,
-          'error' => e.message,
-          'tweets' => Hash[tweets.map { |t| [t.id, t.text] }],
-          'agent_ids' => incoming_events.map(&:agent_id),
-          'event_ids' => incoming_events.map(&:id)
-        }
+        case e
+        when Twitter::Error::AlreadyRetweeted, Twitter::Error::AlreadyFavorited
+          error e.message
+        else
+          raise e unless emit_error_events?
+        end
+        if emit_error_events?
+          create_event payload: {
+            'success' => false,
+            'error' => e.message,
+            'tweets' => Hash[tweets.map { |t| [t.id, t.text] }],
+            'agent_ids' => incoming_events.map(&:agent_id),
+            'event_ids' => incoming_events.map(&:id)
+          }
+        end
       end
     end
 
