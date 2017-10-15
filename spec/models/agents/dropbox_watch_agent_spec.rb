@@ -50,7 +50,7 @@ describe Agents::DropboxWatchAgent do
 
   describe '#check' do
 
-    let(:first_result) { [{ 'path' => '1.json', 'rev' => '1', 'modified' => '01-01-01' }] }
+    let(:first_result) { Dropbox::API::Object.convert([{ 'path_display' => '1.json', 'rev' => '1', 'server_modified' => '01-01-01' }], nil) }
 
     before(:each) do
       stub.proxy(Dropbox::API::Client).new do |api|
@@ -60,7 +60,7 @@ describe Agents::DropboxWatchAgent do
 
     it 'saves the directory listing in its memory' do
       @agent.check
-      expect(@agent.memory).to eq 'contents' => first_result
+      expect(@agent.memory).to eq({"contents"=>[{"path"=>"1.json", "rev"=>"1", "modified"=>"01-01-01"}]})
     end
 
     context 'first time' do
@@ -75,7 +75,7 @@ describe Agents::DropboxWatchAgent do
 
     context 'subsequent calls' do
 
-      let(:second_result) { [{ 'path' => '2.json', 'rev' => '1', 'modified' => '02-02-02' }] }
+      let(:second_result) { Dropbox::API::Object.convert([{ 'path_display' => '2.json', 'rev' => '1', 'server_modified' => '02-02-02' }], nil) }
 
       before(:each) do
         @agent.memory = { 'contents' => 'not_empty' }
@@ -87,7 +87,7 @@ describe Agents::DropboxWatchAgent do
 
       it 'sends an event upon a different directory listing' do
         payload = { 'diff' => 'object as hash' }
-        stub.proxy(Agents::DropboxWatchAgent::DropboxDirDiff).new(@agent.memory['contents'], second_result) do |diff|
+        stub.proxy(Agents::DropboxWatchAgent::DropboxDirDiff).new(@agent.memory['contents'], [{"path"=>"2.json", "rev"=>"1", "modified"=>"02-02-02"}]) do |diff|
           stub(diff).empty? { false }
           stub(diff).to_hash { payload }
         end
@@ -96,7 +96,7 @@ describe Agents::DropboxWatchAgent do
       end
 
       it 'does not sent any events when there is no difference on the directory listing' do
-        stub.proxy(Agents::DropboxWatchAgent::DropboxDirDiff).new(@agent.memory['contents'], second_result) do |diff|
+        stub.proxy(Agents::DropboxWatchAgent::DropboxDirDiff).new(@agent.memory['contents'], [{"path"=>"2.json", "rev"=>"1", "modified"=>"02-02-02"}]) do |diff|
           stub(diff).empty? { true }
         end
 
