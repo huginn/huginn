@@ -131,9 +131,9 @@ gem 'uglifier', '~> 2.7.2'
 group :development do
   gem 'better_errors', '~> 1.1'
   gem 'binding_of_caller'
-  gem 'guard', '~> 2.13.0'
+  gem 'guard', '~> 2.14.1'
   gem 'guard-livereload', '~> 2.5.1'
-  gem 'guard-rspec', '~> 4.6.4'
+  gem 'guard-rspec', '~> 4.7.3'
   gem 'rack-livereload', '~> 0.3.16'
   gem 'letter_opener_web', '~> 1.3.1'
   gem 'web-console', '>= 3.3.0'
@@ -144,8 +144,8 @@ group :development do
 
   if_true(ENV['SPRING']) do
     gem 'spring-commands-rspec', '~> 1.0.4'
-    gem 'spring', '~> 1.7.2'
-    gem 'spring-watcher-listen', '~> 2.0.0'
+    gem 'spring', '~> 2.0.2'
+    gem 'spring-watcher-listen', '~> 2.0.1'
   end
 
   group :test do
