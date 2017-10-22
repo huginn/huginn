@@ -3,7 +3,7 @@ Docker image for Huginn using the production environment and separate container 
 
 This image runs a linkable [Huginn](https://github.com/huginn/huginn) instance.
 
-It was inspired by the [official docker container for huginn](https://registry.hub.docker.com/u/huginn/huginn)
+It was inspired by the [official docker container for huginn](https://hub.docker.com/r/huginn/huginn)
 
 The scripts/init script generates a .env file containing the variables as passed as per normal Huginn documentation.
 The same environment variables that would be used for Heroku PaaS deployment are used by this script.
@@ -60,7 +60,7 @@ Manual startup and linking to a MySQL container:
         -e MYSQL_ROOT_PASSWORD=somethingevenmoresecret \
         mysql
 
-    docker run --name huginn_web \
+    docker run --rm --name huginn_web \
         --link huginn_mysql:mysql \
         -p 3000:3000 \
         -e DATABASE_NAME=huginn \
@@ -68,12 +68,22 @@ Manual startup and linking to a MySQL container:
         -e DATABASE_PASSWORD=somethingsecret \
         huginn/huginn-single-process
 
-    docker run --name huginn_threaded \
+    docker run --rm --name huginn_threaded \
         --link huginn_mysql:mysql \
         -e DATABASE_NAME=huginn \
         -e DATABASE_USERNAME=huginn \
         -e DATABASE_PASSWORD=somethingsecret \
         huginn/huginn-single-process /scripts/init bin/threaded.rb
+
+or alternatively:
+
+    docker run --rm --name huginn_threaded \
+        --link huginn_mysql:mysql \
+        -e DATABASE_NAME=huginn \
+        -e DATABASE_USERNAME=huginn \
+        -e DATABASE_PASSWORD=somethingsecret \
+        -e WORKER_CMD='bin/threaded.rb' \
+        huginn/huginn-single-process
 
 ## Environment Variables
 
@@ -87,12 +97,10 @@ In newer versions of Docker you are able to pass your own .env file in to the co
 
 You don't need to do this on your own, but if you really want run this command in the Huginn root directory:
 
-    docker build --rm=true --tag={yourname}/huginn -f docker/single-process/Dockerfile .
+    bin/docker_wrapper build --rm=true --tag={yourname}/huginn -f docker/single-process/Dockerfile .
 
 ## Source
 
-The source is [available on GitHub](https://github.com/huginn/huginn/docker/single-process/).
+The source is [available on GitHub](https://github.com/huginn/huginn/tree/master/docker/single-process).
 
 Please feel free to submit pull requests and/or fork at your leisure.
-
-

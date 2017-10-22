@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+chmod -R g=u . && docker "$@"
