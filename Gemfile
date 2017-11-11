@@ -62,8 +62,8 @@ gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master', ref: '
 gem 'omniauth-tumblr', '~> 1.2'
 
 # Dropbox Agents
-gem 'dropbox-api'
-gem 'omniauth-dropbox'
+gem 'dropbox-api', github: 'dsander/dropbox-api', ref: '86cb7b5a1254dc5b054de7263835713c4c1018c7'
+gem 'omniauth-dropbox-oauth2', github: 'bamorim/omniauth-dropbox-oauth2', ref: '35046706fb781ed3b57dfb9c3cd44ed0f3d3f8ea'
 
 # UserLocationAgent
 gem 'haversine'
