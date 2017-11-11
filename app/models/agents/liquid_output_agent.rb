@@ -176,8 +176,7 @@ EOF
     end
 
     def liquified_content
-      template = Liquid::Template.parse(options['content'] || "")
-      template.render(data_for_liquid_template)
+      interpolated(data_for_liquid_template)['content']
     end
 
     def data_for_liquid_template
