@@ -62,7 +62,11 @@ module WebRequestConcern
     if options['user_agent'].present?
       errors.add(:base, "user_agent must be a string") unless options['user_agent'].is_a?(String)
     end
-
+    
+    if options['proxy'].present?
+      errors.add(:base, "proxy must be a string") unless options['proxy'].is_a?(String)
+    end
+    
     if options['disable_ssl_verification'].present? && boolify(options['disable_ssl_verification']).nil?
       errors.add(:base, "if provided, disable_ssl_verification must be true or false")
     end
@@ -114,6 +118,8 @@ module WebRequestConcern
       builder.headers = headers if headers.length > 0
 
       builder.headers[:user_agent] = user_agent
+      
+      builder.proxy interpolated['proxy'].presence
 
       unless boolify(interpolated['disable_redirect_follow'])
         builder.use FaradayMiddleware::FollowRedirects
