@@ -13,7 +13,7 @@ module Agents
 
     description do
       <<-MD
-        A Post Agent receives events from other agents (or runs periodically), merges those events with the [Liquid-interpolated](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) contents of `payload`, and sends the results as POST (or GET) requests to a specified url.  To skip merging in the incoming event, but still send the interpolated payload, set `no_merge` to `true`.
+        A Post Agent receives events from other agents (or runs periodically), merges those events with the [Liquid-interpolated](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) contents of `payload`, and sends the results as POST (or GET) requests to a specified url.  To skip merging in the incoming event, but still send the interpolated payload, set `no_merge` to `true`.
 
         The `post_url` field must specify where you would like to send requests. Please include the URI scheme (`http` or `https`).
 
@@ -30,6 +30,9 @@ module Agents
         If `emit_events` is set to `true`, the server response will be emitted as an Event and can be fed to a WebsiteAgent for parsing (using its `data_from_event` and `type` options). No data processing
         will be attempted by this Agent, so the Event's "body" value will always be raw text.
         The Event will also have a "headers" hash and a "status" integer value.
+
+        If `output_mode` is set to `merge`, the emitted Event will be merged into the original contents of the received Event.
+
         Set `event_headers_style` to one of the following values to normalize the keys of "headers" for downstream agents' convenience:
 
           * `capitalized` (default) - Header names are capitalized; e.g. "Content-Type"
@@ -60,6 +63,8 @@ module Agents
           },
           "body": "<html>Some data...</html>"
         }
+
+      Original event contents will be merged when `output_mode` is set to `merge`.
     MD
 
     def default_options
@@ -74,7 +79,8 @@ module Agents
         },
         'headers' => {},
         'emit_events' => 'false',
-        'no_merge' => 'false'
+        'no_merge' => 'false',
+        'output_mode' => 'clean'
       }
     end
 
@@ -120,6 +126,10 @@ module Agents
 
       if options['no_merge'].present? && !%[true false].include?(options['no_merge'].to_s)
         errors.add(:base, "if provided, no_merge must be 'true' or 'false'")
+      end
+
+      if options['output_mode'].present? && !options['output_mode'].to_s.include?('{') && !%[clean merge].include?(options['output_mode'].to_s)
+        errors.add(:base, "if provided, output_mode must be 'clean' or 'merge'")
       end
 
       unless headers.is_a?(Hash)
@@ -210,11 +220,12 @@ module Agents
       }
 
       if boolify(interpolated['emit_events'])
-        create_event payload: {
+        new_event = interpolated['output_mode'].to_s == 'merge' ? event.payload.dup : {}
+        create_event payload: new_event.merge(
           body: response.body,
           headers: normalize_response_headers(response.headers),
           status: response.status
-        }
+        )
       end
     end
   end

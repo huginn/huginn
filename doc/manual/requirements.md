@@ -44,7 +44,7 @@ We love [JRuby](http://jruby.org/) and [Rubinius](http://rubini.us/) but Huginn 
 You need at least 0.5GB of physical and 0.5GB of addressable memory (swap) to install and use Huginn with the default configuration!
 With less memory you need to manually adjust the `Gemfile` and Huginn can respond with internal server errors when accessing the web interface.
 
-- 256MB RAM + 0.5GB of swap is the absolute minimum but we strongly **advise against** this amount of memory. See the Wiki page about running Huginn on [systems with low memory](https://github.com/cantino/huginn/wiki/Running-Huginn-on-minimal-systems-with-low-RAM-&-CPU-e.g.-Raspberry-Pi)
+- 256MB RAM + 0.5GB of swap is the absolute minimum but we strongly **advise against** this amount of memory. See the Wiki page about running Huginn on [systems with low memory](https://github.com/huginn/huginn/wiki/Running-Huginn-on-minimal-systems-with-low-RAM-&-CPU-e.g.-Raspberry-Pi)
 - 0.5GB RAM + 0.5GB swap will work relatively well with SSD drives, but can feel a bit slow due to swapping
 - 1GB RAM + 1GB swap will work with two unicorn workers and the threaded background worker
 - **2GB RAM** is the **recommended** memory size, it will support 2 unicorn workers and both the threaded and the old separate workers

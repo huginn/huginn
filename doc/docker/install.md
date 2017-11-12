@@ -38,7 +38,7 @@ Follow the [instructions on the docker hub registry](https://registry.hub.docker
 
 ## Running each Huginn process in a seperate container
 
-With the `cantino/huginn-single-process` image you can easily run each process needed for Huginn in a separate container and scale them individually when needed. Have a look at the [Docker hub](https://hub.docker.com/r/huginn/huginn-single-process/) and the [documentation for the container](https://github.com/cantino/huginn/tree/master/docker/single-process)
+With the `cantino/huginn-single-process` image you can easily run each process needed for Huginn in a separate container and scale them individually when needed. Have a look at the [Docker hub](https://hub.docker.com/r/huginn/huginn-single-process/) and the [documentation for the container](https://github.com/huginn/huginn/tree/master/docker/single-process)
 
 ### Other options:
 

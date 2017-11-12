@@ -54,3 +54,7 @@ module TwitterConcern
     end
   end
 end
+
+Twitter::Error::FORBIDDEN_MESSAGES = Twitter::Error.send(:remove_const, :FORBIDDEN_MESSAGES).merge(
+  'You have already retweeted this tweet.' => Twitter::Error::AlreadyRetweeted
+).freeze

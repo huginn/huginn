@@ -146,18 +146,6 @@ module FeedjiraExtension
         def authors
           _authors.reject(&:empty?)
         end
-
-        def alternate_link
-          links.find { |link|
-            link.is_a?(AtomLink) &&
-              link.rel == 'alternate' &&
-              (link.type == 'text/html'|| link.type.nil?)
-          }
-        end
-
-        def url
-          @url ||= (alternate_link || links.first).try!(:href)
-        end
       end
     end
   end
@@ -307,6 +295,8 @@ module FeedjiraExtension
               _itunes_owners.reject(&:empty?)
             end
           end
+        else
+          element :subtitle, as: :description unless method_defined?(:description)
         end
 
         sax_config.collection_elements.each_value do |collection_elements|

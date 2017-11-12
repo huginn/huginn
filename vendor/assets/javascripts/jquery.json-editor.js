@@ -544,6 +544,9 @@
         bq.append($('<div class="bracers">}</div>'));
         node.append(bq);
       } else {
+        if (json === null) {
+          json = '';
+        }
         elem = this.editable(json.toString(), key, parent, root, 'value').wrap('<span class="val"></span>').parent();
         node.append(elem);
         node.prepend(this.braceUI(key, parent));

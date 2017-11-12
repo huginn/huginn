@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Include this mix-in to make a class droppable to Liquid, and adjust
 # its behavior in Liquid by implementing its dedicated Drop class
 # named with a "Drop" suffix.
@@ -82,9 +84,49 @@ module LiquidDroppable
     end
   end
 
+  class ActiveRecordCollectionDrop < Drop
+    include Enumerable
+
+    def each(&block)
+      @object.each(&block)
+    end
+
+    # required for variable indexing as array
+    def [](i)
+      case i
+      when Integer
+        @object[i]
+      when 'size', 'first', 'last'
+        __send__(i)
+      end
+    end
+
+    # required for variable indexing as array
+    def fetch(i, &block)
+      @object.fetch(i, &block)
+    end
+
+    # compatibility with array; also required by the `size` filter
+    def size
+      @object.count
+    end
+
+    # compatibility with array
+    def first
+      @object.first
+    end
+
+    # compatibility with array
+    def last
+      @object.last
+    end
+
+    # This drop currently does not support the `slice` filter.
+  end
+
   class ::ActiveRecord::Associations::CollectionProxy
     def to_liquid
-      self.to_a.to_liquid
+      ActiveRecordCollectionDrop.new(self)
     end
   end
 end

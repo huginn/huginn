@@ -98,7 +98,7 @@ shared_examples_for WebRequestConcern do
     end
 
     it "should have the default value of Huginn" do
-      expect(agent.user_agent).to eq('Huginn - https://github.com/cantino/huginn')
+      expect(agent.user_agent).to eq('Huginn - https://github.com/huginn/huginn')
     end
 
     it "should be overridden by the environment variable if present" do

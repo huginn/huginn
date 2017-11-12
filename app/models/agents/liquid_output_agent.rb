@@ -29,7 +29,7 @@ module Agents
 
         # Liquid Templating
 
-        The content you provide will be run as a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template. The data from the last event received will be used when processing the Liquid template.
+        The content you provide will be run as a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template. The data from the last event received will be used when processing the Liquid template.
 
         # Modes
 
@@ -176,8 +176,7 @@ EOF
     end
 
     def liquified_content
-      template = Liquid::Template.parse(options['content'] || "")
-      template.render(data_for_liquid_template)
+      interpolated(data_for_liquid_template)['content']
     end
 
     def data_for_liquid_template

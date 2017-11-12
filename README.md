@@ -71,8 +71,8 @@ If you just want to play around, you can simply fork this repository, then perfo
 * Read the [wiki][wiki] for usage examples and to get started making new Agents.
 * Periodically run `git fetch upstream` and then `git checkout master && git merge upstream/master` to merge in the newest version of Huginn.
 
-Note: By default, emails are intercepted in the `development` Rails environment, which is what you just setup.  You can view 
-them at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener). If you'd like to send real emails via SMTP when playing 
+Note: By default, emails are intercepted in the `development` Rails environment, which is what you just setup.  You can view
+them at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener). If you'd like to send real emails via SMTP when playing
 with Huginn locally, set `SEND_EMAIL_IN_DEVELOPMENT` to `true` in your `.env` file.
 
 If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
@@ -83,13 +83,13 @@ If you need more detailed instructions, see the [Novice setup guide][novice-setu
 
 ### Develop
 
-All agents have specs! And there's also acceptance tests that simulate running Huginn in a headless browser. 
+All agents have specs! And there's also acceptance tests that simulate running Huginn in a headless browser.
 
-* Install PhantomJS 2.1.1 or greater: 
-  * Using [Node Package Manager](https://www.npmjs.com/): `npm install phantomjs` 
+* Install PhantomJS 2.1.1 or greater:
+  * Using [Node Package Manager](https://www.npmjs.com/): `npm install phantomjs`
   * Using [Homebrew](http://brew.sh/) on OSX `brew install phantomjs`
 * Run all specs with `bundle exec rspec`
-* Run a specific spec with `bundle exec rspec path/to/specific/test_spec.rb`. 
+* Run a specific spec with `bundle exec rspec path/to/specific/test_spec.rb`.
 * Read more about rspec for rails [here](https://github.com/rspec/rspec-rails).
 
 ## Using Huginn Agent gems
@@ -102,13 +102,19 @@ Our general intention is to encourage complex and specific Agents to be written 
 
 ## Deployment
 
+Please see [the Huginn Wiki](https://github.com/huginn/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
+
 ### Heroku
 
 Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup. Read the [documentation](https://github.com/huginn/huginn/blob/master/doc/heroku/install.md) while you are waiting and be sure to click 'View it' after launch!)
 
 Huginn launches on the free version of Heroku [with significant limitations](https://github.com/huginn/huginn/blob/master/doc/heroku/install.md). For non-experimental use, we strongly recommend Heroku's 1GB paid plan or our Docker container.
 
-Please see [the Huginn Wiki](https://github.com/huginn/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
+### OpenShift Online (v3)
+
+Try Huginn on OpenShift Online (v3): `oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-mysql.json` or `oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-postgresql.json`. You can also use the web console to import either json file by going to "Add to Project" -> "Import YAML/JSON".
+
+If you are on the Starter plan, make sure to follow the [guide](https://docs.openshift.com/online/getting_started/beyond_the_basics.html#btb-creating-a-new-application-from-source-code) to remove any existing application.
 
 ### Manual installation on any server
 
@@ -135,4 +141,3 @@ Huginn is provided under the MIT License.
 Huginn was originally created by [@cantino](https://github.com/cantino) in 2013. Since then, many people's dedicated contributions have made it what it is today.
 
 [![Build Status](https://travis-ci.org/huginn/huginn.svg)](https://travis-ci.org/huginn/huginn) [![Coverage Status](https://coveralls.io/repos/cantino/huginn/badge.svg)](https://coveralls.io/r/cantino/huginn) [![Dependency Status](https://gemnasium.com/huginn/huginn.svg)](https://gemnasium.com/huginn/huginn) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=282580)](https://www.bountysource.com/trackers/282580-huginn?utm_source=282580&utm_medium=shield&utm_campaign=TRACKER_BADGE)
-

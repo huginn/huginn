@@ -33,16 +33,12 @@ update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 gem install --no-ri --no-rdoc bundler
 
 apt-get purge -y python3* rsyslog rsync manpages
+apt-get -y clean
 rm -rf /var/lib/apt/lists/*
 rm -rf /usr/share/doc/
 rm -rf /usr/share/man/
 rm -rf /usr/share/locale/
 rm -rf /var/log/*
 
-# add a huginn group and user
-adduser --group huginn
-adduser --disabled-login --ingroup huginn --gecos 'Huginn' --no-create-home --home /app huginn
-passwd -d huginn
-
-mkdir -p /app/lib/
-mkdir -p /app/vendor/gems
+mkdir -p /app
+chmod -R g=u /etc/passwd /app

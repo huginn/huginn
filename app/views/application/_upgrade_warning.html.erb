@@ -19,10 +19,31 @@ TWITTER_OAUTH_SECRET=<%= @twitter_oauth_secret %>
     <% if @basecamp_agent %>
       <p>
         Your <b>Basecamp</b> agents could not be migrated automatically. You need to manually register an application with 37signals and authenticate Huginn to use it.<br/>
-        Have a look at the <%= link_to 'Wiki', 'https://github.com/cantino/huginn/wiki/Configuring-OAuth-applications', target: '_blank' %> if you need help.
+        Have a look at the <%= link_to 'Wiki', 'https://github.com/huginn/huginn/wiki/Configuring-OAuth-applications', target: '_blank' %> if you need help.
       </p>
     <% end %>
   </div>
+<% end -%>
+<% if @outdated_google_cal_agents && @outdated_google_cal_agents.length > 0 %>
+  <dir class="container">
+    <div class="alert alert-danger" role="alert">
+      <p>
+        <b>Warning!</b> Your <b>Google Calendar Publish Agents</b> are using an outdated version of Google Auth. You need to update the agent configuration, possibly with a new keyfile from Google for it to continue to work.
+      <br/>
+        PKCS12 key files (`.p12`) are no longer supported. Instead use RSA private keys. Edit the agents to see the updated instructions. The `google.key_secret` option is no longer needed, please remove it.
+      <br/>
+        The format of parameters in events passed to the agent have also changed. Parameters now are expected in underscore_case instead of camelCase (to match Ruby convention). Please update upstream agents that send events to the calendar agent.
+      </p>
+      <p>
+        Outdated agents:
+        <ul>
+        <% @outdated_google_cal_agents.each do |agent| -%>
+          <li><%= link_to(agent.name, edit_agent_path(agent)) %></li>
+        <% end -%>
+        </ul>
+      </p>
+    </div>
+  </dir>
 <% end -%>
 <% if @outdated_docker_image_namespace %>
   <dir class="container">

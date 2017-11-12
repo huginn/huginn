@@ -21,7 +21,7 @@ If you still wish to use the Heroku free plan (which won't work very well), plea
 * Now, run the magic setup wizard: `bin/setup_heroku`
 * That's it!
 * If you make changes, you can re-run `bin/setup_heroku`, or just do `git push heroku master`.
-* Follow [these instructions](https://github.com/cantino/huginn/blob/master/doc/heroku/update.md) when you want to update your Huginn installation.
+* Follow [these instructions](https://github.com/huginn/huginn/blob/master/doc/heroku/update.md) when you want to update your Huginn installation.
 
 ### Using your own mail server
 

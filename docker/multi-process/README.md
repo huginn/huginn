@@ -3,9 +3,9 @@ Huginn for docker with multiple container linkage
 
 This image runs a linkable [Huginn](https://github.com/huginn/huginn) instance.
 
-There is an automated build repository on docker hub for [huginn/huginn](https://hub.docker.com/r/huginn/huginn/builds/).
+There is an automated build repository on docker hub for [huginn/huginn](https://hub.docker.com/r/huginn/huginn).
 
-This was patterned after [sameersbn/gitlab](https://registry.hub.docker.com/u/sameersbn/gitlab) by [ianblenke/huginn](http://github.com/ianblenke/huginn), and imported here for official generation of a docker hub auto-build image.
+This was patterned after [sameersbn/gitlab](https://hub.docker.com/r/sameersbn/gitlab) by [ianblenke/huginn](http://github.com/ianblenke/huginn), and imported here for official generation of a docker hub auto-build image.
 
 The scripts/init script generates a .env file containing the variables as passed as per normal Huginn documentation.
 The same environment variables that would be used for Heroku PaaS deployment are used by this script.
@@ -55,16 +55,17 @@ Simple stand-alone usage (use only for testing/evaluation as it can not be updat
 
 Use a volume to export the data of the internal mysql server:
 
-    docker run -it -p 3000:3000 -v /home/huginn/mysql-data:/var/lib/mysql huginn/huginn
+    docker run --rm -it -p 3000:3000 -v /home/huginn/mysql-data:/var/lib/mysql huginn/huginn
 
 To link to another mysql container, for example:
 
-    docker run --rm --name huginn_mysql \
+    docker run --name huginn_mysql \
         -e MYSQL_DATABASE=huginn \
         -e MYSQL_USER=huginn \
         -e MYSQL_PASSWORD=somethingsecret \
         -e MYSQL_ROOT_PASSWORD=somethingevenmoresecret \
         mysql
+
     docker run --rm --name huginn \
         --link huginn_mysql:mysql \
         -p 3000:3000 \
@@ -78,6 +79,7 @@ To link to another container named 'postgres':
     docker run --name huginn_postgres \
         -e POSTGRES_PASSWORD=mysecretpassword \
         -e POSTGRES_USER=huginn -d postgres
+
     docker run --rm --name huginn \
         --link huginn_postgres:postgres \
         -p 3000:3000 \
@@ -88,7 +90,8 @@ To link to another container named 'postgres':
 
 The `docker/multi-process` folder also has a `docker-compose.yml` that allows for a sample database formation with a data volume container:
 
-    cd docker/multi-process ; docker-compose up
+    cd docker/multi-process
+    docker-compose up
 
 ## Environment Variables
 
@@ -100,14 +103,12 @@ In newer versions of Docker you are able to pass your own .env file in to the co
 
 ## Building on your own
 
-You don't need to do this on your own, because there is an [automated build](https://registry.hub.docker.com/u/huginn/huginn/) for this repository, but if you really want run this command in the Huginn root directory:
+You don't need to do this on your own, because there is an [automated build](https://hub.docker.com/r/huginn/huginn/) for this repository, but if you really want run this command in the Huginn root directory:
 
-    docker build --rm=true --tag={yourname}/huginn -f docker/multi-process/Dockerfile .
+    bin/docker_wrapper build --rm=true --tag={yourname}/huginn -f docker/multi-process/Dockerfile .
 
 ## Source
 
-The source is [available on GitHub](https://github.com/huginn/huginn/docker/multi-process/).
+The source is [available on GitHub](https://github.com/huginn/huginn/tree/master/docker/multi-process).
 
 Please feel free to submit pull requests and/or fork at your leisure.
-
-

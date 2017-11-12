@@ -1,69 +1,22 @@
 #!/bin/bash
 set -e
 
-export LC_ALL=en_US.UTF-8
-
 cd /app
-
-# Do we have a Rails secret yet?
-# If not, generate one, but persist it for the container's lifetime.
-if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW .env.example; then
-  echo 'Generating random APP_SECRET_TOKEN.'
-  secret=$(dd if=/dev/urandom bs=36 count=1 | openssl base64)
-  sed -i.orig "s:REPLACE_ME_NOW:$secret:" .env.example
-fi
 
 # Cleanup any leftover pid file
 if [ -f /app/tmp/pids/server.pid ]; then
   rm /app/tmp/pids/server.pid
 fi
 
-# is a mysql or postgresql database linked?
-# requires that the mysql or postgresql containers have exposed
-# port 3306 and 5432 respectively.
-if [[ -n "${MYSQL_PORT_3306_TCP_ADDR}" || ("${DATABASE_ADAPTER}" == "mysql2" && -n "${DATABASE_HOST}") ]]; then
-  DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
-  DATABASE_HOST=${DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
-  DATABASE_PORT=${DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT}}
-  DATABASE_ENCODING=${DATABASE_ENCODING:-utf8mb4}
-elif [[ -n "${POSTGRES_PORT_5432_TCP_ADDR}" || "${DATABASE_ADAPTER}" == "postgresql" ]]; then
-  DATABASE_ADAPTER=${DATABASE_ADAPTER:-postgresql}
-  DATABASE_HOST=${DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
-  DATABASE_PORT=${DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT}}
-  DATABASE_ENCODING=utf8
-else
-  START_MYSQL=${START_MYSQL:-true}
+source /scripts/setup_env
+
+# Fixup the Procfile and prepare the PORT
+if [ -n "${DO_NOT_RUN_JOBS}" ]; then
+  sed -i -e 's/^jobs:/#jobs:/' /app/Procfile
 fi
 
-USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
-DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
-DATABASE_PORT=${HUGINN_DATABASE_PORT:-${DATABASE_PORT}}
-DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
-DATABASE_PASSWORD=${HUGINN_DATABASE_PASSWORD:-${DATABASE_PASSWORD:-password}}
-DATABASE_NAME=${HUGINN_DATABASE_NAME:-${DATABASE_NAME:-huginn_production}}
-RAILS_ENV=${HUGINN_RAILS_ENV:-${RAILS_ENV:-production}}
-
-IFS="="
-grep = /app/.env.example | sed -e 's/^#\([^ ]\)/\1/' | grep -v -e '^#' | \
-  while read var value ; do
-    eval "echo \"$var=\${$var:-\${HUGINN_$var-\$value}}\""
-  done | grep -v -e ^= > /app/.env
-
-eval "echo RAILS_ENV=${RAILS_ENV}" >> .env
-eval "echo START_MYSQL=${START_MYSQL}" >> .env
-echo "RAILS_LOG_TO_STDOUT=true" >> .env
-echo "RAILS_SERVE_STATIC_FILES=true" >> .env
-
-chmod ugo+r /app/.env
-source /app/.env
-sudo -u huginn -H -E bundle install --without test development --path vendor/bundle
-
-# use default port number if it is still not set
-case "${DATABASE_ADAPTER}" in
-  mysql2) DATABASE_PORT=${DATABASE_PORT:-3306} ;;
-  postgresql) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
-  *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
-esac
+IP="${IP:-0.0.0.0}"
+sed -i -e "s/\${IP-0.0.0.0}/$IP/" -e "s/\${PORT-3000}/$PORT/" /app/Procfile
 
 # initialize supervisord config
 cat > /etc/supervisor/supervisord.conf <<EOF
@@ -73,10 +26,9 @@ chmod=0700                       ; sockef file mode (default 0700)
 
 [supervisord]
 nodaemon = true
-user = root
 stdout_logfile = AUTO
 logfile=/var/log/supervisor/supervisord.log ; (main log file;default $CWD/supervisord.log)
-pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
+pidfile=/app/tmp/pids/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
 childlogdir=/var/log/supervisor            ; ('AUTO' child log dir, default $TEMP)
 
 ; the below section must remain in the config file for RPC
@@ -114,7 +66,7 @@ echo DATABASE_HOST=\${DATABASE_HOST}
 
 # start mysql server if \${DATABASE_HOST} is the .env.example default
 if [ "\${START_MYSQL}" = "true" ]; then
-  echo "DATABASE_SOCKET=/var/run/mysqld/mysqld.sock" >> .env
+  echo "DATABASE_SOCKET=/app/tmp/sockets/mysqld.sock" >> .env
   if [ "\${DATABASE_ADAPTER}" = "postgresql" ]; then
     echo "DATABASE_ADAPTER 'postgresql' is not supported internally. Please provide DATABASE_HOST."
     exit 1
@@ -126,7 +78,6 @@ if [ "\${START_MYSQL}" = "true" ]; then
 priority=20
 directory=/tmp
 command=/usr/bin/mysqld_safe
-user=root
 autostart=false
 autorestart=true
 stdout_events_enabled=true
@@ -135,13 +86,10 @@ EOF
   supervisorctl reread
   supervisorctl add mysqld
 
-  # fix permissions and ownership of /var/lib/mysql
-  chown -R mysql:mysql /var/lib/mysql
-  chmod 700 /var/lib/mysql
-
   # initialize MySQL data directory
   if [ ! -d /var/lib/mysql/mysql ]; then
-    mysql_install_db --user=mysql
+    mysql_install_db --user=\$(whoami) --datadir=/tmp/mysql
+    mv -f /tmp/mysql/* /var/lib/mysql/
   fi
 
   echo "Starting mysql server..."
@@ -207,28 +155,20 @@ fi
 
 # We may need to try and create a database
 if [ -z "\${DO_NOT_CREATE_DATABASE}" ]; then
-  sudo -u huginn -EH bundle exec rake db:create
+  bundle exec rake db:create
 fi
 
 # Assuming we have a created database, run the migrations and seed it idempotently.
 if [ -z "\${DO_NOT_MIGRATE}" ]; then
- sudo -u huginn -EH bundle exec rake db:migrate
+ bundle exec rake db:migrate
 fi
 
 if [ -z "\${DO_NOT_SEED}" ]; then
-  sudo -u huginn -EH bash -xc 'bundle exec rake db:seed &'
+  bash -xc 'bundle exec rake db:seed &'
 fi
-
-# Fixup the Procfile and prepare the PORT
-if [ -n "\${DO_NOT_RUN_JOBS}" ]; then
-  perl -pi -e 's/^jobs:/#jobs:/' /app/Procfile
-fi
-
-perl -pi -e 's/rails server -b0.0.0.0\$/rails server -b 0.0.0.0 -p \\\$PORT/' /app/Procfile
-export PORT="\${PORT:-3000}"
 
 # Start huginn
-exec sudo -u huginn -EH bash -xc 'exec bundle exec foreman start'
+exec bundle exec foreman start
 FOREMAN
 
 chmod 755 /tmp/foreman.sh

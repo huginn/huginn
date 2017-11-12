@@ -23,8 +23,8 @@ module Agents
 
       The WebsiteAgent can also scrape based on incoming events.
 
-      * Set the `url_from_event` option to a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
-      * Alternatively, set `data_from_event` to a [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
+      * Set the `url_from_event` option to a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
+      * Alternatively, set `data_from_event` to a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
 
       # Supported Document Types
@@ -173,7 +173,7 @@ module Agents
 
       # Liquid Templating
 
-      In [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variables are available:
+      In [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variables are available:
 
       * `_url_`: The URL specified to fetch the content from.  When parsing `data_from_event`, this is not set.
 

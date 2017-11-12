@@ -251,10 +251,10 @@ Devise.setup do |config|
     config.omniauth :'37signals', key, secret
   end
 
-  if defined?(OmniAuth::Strategies::Dropbox) &&
+  if defined?(OmniAuth::Strategies::DropboxOauth2) &&
      (key = ENV["DROPBOX_OAUTH_KEY"]).present? &&
      (secret = ENV["DROPBOX_OAUTH_SECRET"]).present?
-    config.omniauth :dropbox, key, secret
+    config.omniauth :dropbox, key, secret, strategy_class: OmniAuth::Strategies::DropboxOauth2, request_path: '/auth/dropbox', callback_path: '/auth/dropbox/callback'
   end
 
   if defined?(OmniAuth::Strategies::Wunderlist) &&

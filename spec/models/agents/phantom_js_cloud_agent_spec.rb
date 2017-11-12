@@ -41,7 +41,7 @@ describe Agents::PhantomJsCloudAgent do
       }.to change { @checker.events.count }.by(1)
 
       item,* = @checker.events.last(1)
-      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fcantino%2Fhuginn%22%7D%7D")
+      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%7D%7D")
     end
 
     it "should set render type as plain text" do
@@ -52,7 +52,7 @@ describe Agents::PhantomJsCloudAgent do
       }.to change { @checker.events.count }.by(1)
 
       item,* = @checker.events.last(1)
-      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22plainText%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fcantino%2Fhuginn%22%7D%7D")
+      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22plainText%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%7D%7D")
     end
 
     it "should set output as json" do
@@ -63,7 +63,7 @@ describe Agents::PhantomJsCloudAgent do
       }.to change { @checker.events.count }.by(1)
 
       item,* = @checker.events.last(1)
-      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22outputAsJson%22%3Atrue%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fcantino%2Fhuginn%22%7D%7D")
+      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22outputAsJson%22%3Atrue%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%7D%7D")
     end
 
     it "should not set ignore images" do
@@ -74,7 +74,7 @@ describe Agents::PhantomJsCloudAgent do
       }.to change { @checker.events.count }.by(1)
 
       item,* = @checker.events.last(1)
-      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fcantino%2Fhuginn%22%7D%7D")
+      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%7D%7D")
     end
 
     it "should set ignore images" do
@@ -85,7 +85,7 @@ describe Agents::PhantomJsCloudAgent do
       }.to change { @checker.events.count }.by(1)
 
       item,* = @checker.events.last(1)
-      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22ignoreImages%22%3Atrue%2C%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fcantino%2Fhuginn%22%7D%7D")
+      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22ignoreImages%22%3Atrue%2C%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%7D%7D")
     end
 
     it "should set wait interval to zero" do
@@ -96,7 +96,7 @@ describe Agents::PhantomJsCloudAgent do
       }.to change { @checker.events.count }.by(1)
 
       item,* = @checker.events.last(1)
-      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fcantino%2Fhuginn%22%2C%22wait_interval%22%3A%220%22%7D%7D")
+      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%2C%22wait_interval%22%3A%220%22%7D%7D")
     end
 
     it "should set user agent to BlackBerry" do

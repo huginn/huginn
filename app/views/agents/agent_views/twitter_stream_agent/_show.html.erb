@@ -1,20 +1,22 @@
 <% content_for :head do %>
   <%= javascript_include_tag "graphing" %>
+  <%= javascript_include_tag "tweets" %>
+  <%= javascript_include_tag "//platform.twitter.com/widgets.js", charset: "utf-8", async: "async" %>
 <% end %>
 
 <% grouped_events = @agent.events.order("id desc").limit(2000).group_by {|e| e.payload[:filter] || e.payload[:match] }%>
 <% if grouped_events.length > 0 %>
   <% if @agent.options[:generate] == "events" %>
-
     <h3>Recent Tweets</h3>
-      <% grouped_events.each do |filter, group|  %>
+    <% grouped_events.each do |filter, group| %>
       <div class="filter-group tweets">
         <div class='filter'><%= filter %></div>
         <% group.each do |event| %>
-          <% next unless event.payload[:text].present? %>
-          <div class='tweet'>
-            <%= event.payload[:text] %> - <%= link_to event.payload[:user][:screen_name], "http://twitter.com/#{event.payload[:user][:screen_name]}" %>
-          </div>
+          <% tweet = event.payload %>
+          <% text = tweet.dig(:extended_tweet, :full_text) %>
+          <% next unless text.present? %>
+          <% screen_name = tweet.dig(:user, :screen_name) %>
+          <div class='tweet'><span class="tweet-body" data-tweet-id='<%= tweet[:id_str] %>'><span class="tweet-plain" title="Click to expand"><%= link_to "@#{screen_name}", "https://twitter.com/#{URI.encode(screen_name)}" %>: <%= text %> - <%= link_to l(Time.zone.parse(tweet[:created_at]), format: :long), "https://twitter.com/#{URI.encode(screen_name)}/status/#{URI.encode(tweet[:id_str])}" %></span></span> (<%= link_to 'event', event_path(id: event.id) %>)</div>
         <% end %>
       </div>
     <% end %>
