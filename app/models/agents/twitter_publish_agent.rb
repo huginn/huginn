@@ -37,9 +37,11 @@ module Agents
         incoming_events = incoming_events.first(20)
       end
       incoming_events.each do |event|
-        tweet_text = interpolated(event)['message']
+        result = interpolated(event)
+        tweet_text = result['message']
+        tweet_media = result['media_url']
         begin
-          tweet = publish_tweet tweet_text
+          tweet = publish_tweet tweet_text, tweet_media
           create_event :payload => {
             'success' => true,
             'published_tweet' => tweet_text,
@@ -59,7 +61,8 @@ module Agents
       end
     end
 
-    def publish_tweet(text)
+    def publish_tweet(text, media)
+      return twitter.update_with_media(text, media) unless media.blank?
       twitter.update(text)
     end
   end
