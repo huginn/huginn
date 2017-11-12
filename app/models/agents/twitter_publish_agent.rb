@@ -62,7 +62,7 @@ module Agents
     end
 
     def publish_tweet(text, media)
-      return twitter.update_with_media(text, media) unless media.blank?
+      return twitter.update_with_media(text, File.new(open(media))) unless media.blank?
       twitter.update(text)
     end
   end
