@@ -30,6 +30,15 @@ module Agents
         * Open a conservation with the bot by visiting https://telegram.me/YourHuginnBot
       * Send a message to the bot, group or channel.
       * Select the `chat_id` from the dropdown.
+
+      **Options**
+
+      * `caption`: caption for a media content, 0-200 characters
+      * `disable_notification`: send a message silently in a channel
+      * `disable_web_page_preview`: disable link previews for links in a text message
+      * `parse_mode`: parse policy of a text message
+
+      See the official [Telegram Bot API documentation](https://core.telegram.org/bots/api#available-methods) for detailed info.
     MD
 
     def default_options
@@ -41,6 +50,9 @@ module Agents
 
     form_configurable :auth_token, roles: :validatable
     form_configurable :chat_id, roles: :completable
+    form_configurable :caption
+    form_configurable :disable_notification, type: :array, values: ['', 'true', 'false']
+    form_configurable :disable_web_page_preview, type: :array, values: ['', 'true', 'false']
     form_configurable :parse_mode, type: :array, values: ['', 'html', 'markdown']
 
     def validate_auth_token
@@ -56,7 +68,10 @@ module Agents
     def validate_options
       errors.add(:base, 'auth_token is required') unless options['auth_token'].present?
       errors.add(:base, 'chat_id is required') unless options['chat_id'].present?
-      errors.add(:base, 'parse_mode has invalid value: should be html or markdown') if interpolated['parse_mode'].present? and !['html', 'markdown'].include? interpolated['parse_mode']
+      errors.add(:base, 'caption should be 200 characters or less') if interpolated['caption'].present? and interpolated['caption'].length > 200
+      errors.add(:base, "disable_notification has invalid value: should be 'true' or 'false'") if interpolated['disable_notification'].present? and !%w(true false).include?(interpolated['disable_notification'])
+      errors.add(:base, "disable_web_page_preview has invalid value: should be 'true' or 'false'") if interpolated['disable_web_page_preview'].present? and !%w(true false).include?(interpolated['disable_web_page_preview'])
+      errors.add(:base, "parse_mode has invalid value: should be 'html' or 'markdown'") if interpolated['parse_mode'].present? and !%w(html markdown).include?(interpolated['parse_mode'])
     end
 
     def working?
@@ -84,19 +99,20 @@ module Agents
     end
 
     def receive_event(event)
-      messages_send = TELEGRAM_ACTIONS.count do |field, method|
-        payload = load_field event, field
-        next unless payload
-        send_telegram_message method, field => payload
-        unlink_file payload if payload.is_a? Tempfile
-        true
+      interpolate_with event do
+        messages_send = TELEGRAM_ACTIONS.count do |field, method|
+          payload = load_field event, field
+          next unless payload
+          send_telegram_message method, configure_params(field => payload)
+          unlink_file payload if payload.is_a? Tempfile
+          true
+        end
+        error("No valid key found in event #{event.payload.inspect}") if messages_send.zero?
       end
-      error("No valid key found in event #{event.payload.inspect}") if messages_send.zero?
     end
 
     def send_telegram_message(method, params)
       params[:chat_id] = interpolated['chat_id']
-      params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
       response = HTTMultiParty.post telegram_bot_uri(method), query: params
       if response['ok'] == false
         error(response)
@@ -124,6 +140,18 @@ module Agents
     end
 
     private
+
+    def configure_params(params)
+      params[:disable_notification] = interpolated['disable_notification'] if interpolated['disable_notification'].present?
+      if params.has_key?(:text)
+        params[:disable_web_page_preview] = interpolated['disable_web_page_preview'] if interpolated['disable_web_page_preview'].present?
+        params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
+      else
+        params[:caption] = interpolated['caption'][0..199] if interpolated['caption'].present?
+      end
+
+      params
+    end
 
     def update_to_complete(update)
       chat = (update['message'] || update.fetch('channel_post', {})).fetch('chat', {})
