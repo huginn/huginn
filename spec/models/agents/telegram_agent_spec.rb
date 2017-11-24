@@ -4,29 +4,16 @@ describe Agents::TelegramAgent do
   before do
     default_options = {
       auth_token: 'xxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      chat_id: 'xxxxxxxx'
-    }
-    photo_options = {
-      auth_token: 'xxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
       chat_id: 'xxxxxxxx',
-      caption: '{{ caption }}'
-    }
-    text_options = {
-      auth_token: 'xxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      chat_id: 'xxxxxxxx',
-      disable_web_page_preview: 'true',
+      caption: '{{ caption }}',
+      disable_web_page_preview: '{{ disable_web_page_preview }}',
+      disable_notification: '{{ silent }}',
       parse_mode: 'html'
     }
 
-    @checker = Agents::TelegramAgent.new name: 'Telegram Main Tester', options: default_options
+    @checker = Agents::TelegramAgent.new name: 'Telegram Tester', options: default_options
     @checker.user = users(:bob)
     @checker.save!
-    @photo = Agents::TelegramAgent.new name: 'Telegram Photo Tester', options: photo_options
-    @photo.user = users(:bob)
-    @photo.save!
-    @text = Agents::TelegramAgent.new name: 'Telegram Text Tester', options: text_options
-    @text.user = users(:bob)
-    @text.save!
   end
 
   def event_with_payload(payload)
@@ -90,27 +77,19 @@ describe Agents::TelegramAgent do
     end
 
     it 'processes multiple events properly' do
-      event_0 = event_with_payload text: 'Looks like its going to rain'
-      event_1 = event_with_payload text: 'Another text message'
+      event_0 = event_with_payload silent: 'true', text: 'Looks like it is going to rain'
+      event_1 = event_with_payload disable_web_page_preview: 'true', text: 'Another text message'
       @checker.receive [event_0, event_1]
 
       expect(@sent_messages).to eq([
-                                    { sendMessage: { text: 'Looks like its going to rain' } },
-                                    { sendMessage: { text: 'Another text message' } }
+                                    { sendMessage: { disable_notification: 'true', parse_mode: 'html', text: 'Looks like it is going to rain' } },
+                                    { sendMessage: { disable_web_page_preview: 'true', parse_mode: 'html', text: 'Another text message' } }
                                    ])
-    end
-
-    it 'sends text with options properly' do
-      text = '<a href="https://example.com/link.html">Test link</a>'
-      event = event_with_payload text: text
-      @text.receive [event]
-
-      expect(@sent_messages).to eq([{ sendMessage: { disable_web_page_preview: 'true', parse_mode: 'html', text: text } }])
     end
 
     it 'accepts photo key and uses :send_photo to send the file with correct caption' do
       event = event_with_payload caption: 'a' * 250, photo: 'https://example.com/image.png'
-      @photo.receive [event]
+      @checker.receive [event]
 
       expect(@sent_messages).to eq([{ sendPhoto: { caption: 'a'* 200, photo: :stubbed_file } }])
     end
