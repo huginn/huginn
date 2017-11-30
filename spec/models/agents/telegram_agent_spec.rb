@@ -4,21 +4,16 @@ describe Agents::TelegramAgent do
   before do
     default_options = {
       auth_token: 'xxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      chat_id: 'xxxxxxxx'
+      chat_id: 'xxxxxxxx',
+      caption: '{{ caption }}',
+      disable_web_page_preview: '{{ disable_web_page_preview }}',
+      disable_notification: '{{ silent }}',
+      parse_mode: 'html'
     }
+
     @checker = Agents::TelegramAgent.new name: 'Telegram Tester', options: default_options
     @checker.user = users(:bob)
     @checker.save!
-  end
-
-  def stub_methods
-    stub.any_instance_of(Agents::TelegramAgent).send_telegram_message do |method, params|
-      @sent_messages << { method => params }
-    end
-
-    stub.any_instance_of(Agents::TelegramAgent).load_file do |_url|
-      :stubbed_file
-    end
   end
 
   def event_with_payload(payload)
@@ -29,44 +24,74 @@ describe Agents::TelegramAgent do
     event
   end
 
+  def stub_methods
+    stub.any_instance_of(Agents::TelegramAgent).load_file do |_url|
+      :stubbed_file
+    end
+
+    stub.any_instance_of(Agents::TelegramAgent).send_telegram_message do |method, params|
+      @sent_messages << { method => params }
+    end
+  end
+
   describe 'validation' do
     before do
       expect(@checker).to be_valid
     end
 
-    it 'should validate presence of of auth_token' do
+    it 'should validate presence of auth_token' do
       @checker.options[:auth_token] = ''
       expect(@checker).not_to be_valid
     end
 
-    it 'should validate presence of of chat_id' do
+    it 'should validate presence of chat_id' do
       @checker.options[:chat_id] = ''
+      expect(@checker).not_to be_valid
+    end
+
+    it 'should validate value of caption' do
+      @checker.options[:caption] = 'a' * 250
+      expect(@checker).not_to be_valid
+    end
+
+    it 'should validate value of disable_web_page_preview' do
+      @checker.options[:disable_web_page_preview] = 'invalid'
+      expect(@checker).not_to be_valid
+    end
+
+    it 'should validate value of disable_notification' do
+      @checker.options[:disable_notification] = 'invalid'
+      expect(@checker).not_to be_valid
+    end
+
+    it 'should validate value of parse_mode' do
+      @checker.options[:parse_mode] = 'invalid'
       expect(@checker).not_to be_valid
     end
   end
 
   describe '#receive' do
     before do
-      @sent_messages = []
       stub_methods
+      @sent_messages = []
     end
 
     it 'processes multiple events properly' do
-      event_0 = event_with_payload text: 'Looks like its going to rain'
-      event_1 = event_with_payload text: 'Another text message'
+      event_0 = event_with_payload silent: 'true', text: 'Looks like it is going to rain'
+      event_1 = event_with_payload disable_web_page_preview: 'true', text: 'Another text message'
       @checker.receive [event_0, event_1]
 
       expect(@sent_messages).to eq([
-        { sendMessage: { text: 'Looks like its going to rain' } },
-        { sendMessage: { text: 'Another text message' } }
-      ])
+                                    { sendMessage: { disable_notification: 'true', parse_mode: 'html', text: 'Looks like it is going to rain' } },
+                                    { sendMessage: { disable_web_page_preview: 'true', parse_mode: 'html', text: 'Another text message' } }
+                                   ])
     end
 
-    it 'accepts photo key and uses :send_photo to send the file' do
-      event = event_with_payload photo: 'https://example.com/image.png'
+    it 'accepts photo key and uses :send_photo to send the file with correct caption' do
+      event = event_with_payload caption: 'a' * 250, photo: 'https://example.com/image.png'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ sendPhoto: { photo: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ sendPhoto: { caption: 'a'* 200, photo: :stubbed_file } }])
     end
 
     it 'accepts audio key and uses :send_audio to send the file' do
