@@ -56,7 +56,7 @@ module Agents
     form_configurable :parse_mode, type: :array, values: ['', 'html', 'markdown']
 
     def validate_auth_token
-      HTTMultiParty.post(telegram_bot_uri('getMe'))['ok'] == true
+      HTTMultiParty.post(telegram_bot_uri('getMe'))['ok']
     end
 
     def complete_chat_id
@@ -94,8 +94,31 @@ module Agents
       video:    :sendVideo
     }.freeze
 
-    def telegram_bot_uri(method)
-      "https://api.telegram.org/bot#{interpolated['auth_token']}/#{method}"
+    def configure_params(params)
+      params[:disable_notification] = interpolated['disable_notification'] if interpolated['disable_notification'].present?
+      if params.has_key?(:text)
+        params[:disable_web_page_preview] = interpolated['disable_web_page_preview'] if interpolated['disable_web_page_preview'].present?
+        params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
+      else
+        params[:caption] = interpolated['caption'][0..199] if interpolated['caption'].present?
+      end
+
+      params
+    end
+
+    def load_field(event, field)
+      payload = event.payload[field]
+      return false unless payload.present?
+      return payload if field == :text
+      load_file payload
+    end
+
+    def load_file(url)
+      file = Tempfile.new [File.basename(url), File.extname(url)]
+      file.binmode
+      file.write open(url).read
+      file.rewind
+      file
     end
 
     def receive_event(event)
@@ -114,43 +137,18 @@ module Agents
     def send_telegram_message(method, params)
       params[:chat_id] = interpolated['chat_id']
       response = HTTMultiParty.post telegram_bot_uri(method), query: params
-      if response['ok'] == false
+      unless response['ok']
         error(response)
       end
     end
 
-    def load_field(event, field)
-      payload = event.payload[field]
-      return false unless payload.present?
-      return payload if field == :text
-      load_file payload
-    end
-
-    def load_file(url)
-      file = Tempfile.new [File.basename(url), File.extname(url)]
-      file.binmode
-      file.write open(url).read
-      file.rewind
-      file
+    def telegram_bot_uri(method)
+      "https://api.telegram.org/bot#{interpolated['auth_token']}/#{method}"
     end
 
     def unlink_file(file)
       file.close
       file.unlink
-    end
-
-    private
-
-    def configure_params(params)
-      params[:disable_notification] = interpolated['disable_notification'] if interpolated['disable_notification'].present?
-      if params.has_key?(:text)
-        params[:disable_web_page_preview] = interpolated['disable_web_page_preview'] if interpolated['disable_web_page_preview'].present?
-        params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
-      else
-        params[:caption] = interpolated['caption'][0..199] if interpolated['caption'].present?
-      end
-
-      params
     end
 
     def update_to_complete(update)
