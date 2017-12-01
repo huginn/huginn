@@ -56,6 +56,8 @@ module Agents
 
       Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions, all namespaces are stripped from the document unless the top-level option `use_namespaces` is set to `true`.
 
+      For extraction with `array` set to true, all matches will be extracted into an array. This is useful when extracting list elements or multiple parts of a website that can only be matched with the same selector.
+
       # Scraping JSON
 
       When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.
@@ -614,15 +616,20 @@ module Agents
         log "Extracting #{extraction_type} at #{xpath || css}"
         case nodes
         when Nokogiri::XML::NodeSet
-          nodes.each { |node|
+          stringified_nodes  = nodes.map do |node|
             case value = node.xpath(extraction_details['value'] || '.')
             when Float
               # Node#xpath() returns any numeric value as float;
               # convert it to integer as appropriate.
               value = value.to_i if value.to_i == value
             end
-            values << value.to_s
-          }
+            value.to_s
+          end
+          if boolify(extraction_details['array'])
+            values << stringified_nodes
+          else
+            stringified_nodes.each { |n| values << n }
+          end
         else
           raise "The result of HTML/XML extraction was not a NodeSet"
         end

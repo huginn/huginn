@@ -1167,6 +1167,16 @@ fire: hot
           last_payload = Event.last.payload
           expect(last_payload['link']).to eq('Random')
         end
+
+        it 'returns an array of found nodes when the array extract_option is true' do
+          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+
+          @checker.options['extract']['nav_links'] = {'css' => '#topLeft li', 'value' => 'normalize-space(.)', 'array' => 'true'}
+          expect {
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+          expect(Event.last.payload['nav_links']).to eq(["Archive", "What If?", "Blag", "Store", "About"])
+        end
       end
 
       describe "with a data_from_event" do
