@@ -36,6 +36,7 @@ module Agents
       * `caption`: caption for a media content, 0-200 characters
       * `disable_notification`: send a message silently in a channel
       * `disable_web_page_preview`: disable link previews for links in a text message
+      * `long_message`: split or truncate long text messages or captions
       * `parse_mode`: parse policy of a text message
 
       See the official [Telegram Bot API documentation](https://core.telegram.org/bots/api#available-methods) for detailed info.
@@ -53,6 +54,7 @@ module Agents
     form_configurable :caption
     form_configurable :disable_notification, type: :array, values: ['', 'true', 'false']
     form_configurable :disable_web_page_preview, type: :array, values: ['', 'true', 'false']
+    form_configurable :long_message, type: :array, values: ['', 'split', 'truncate']
     form_configurable :parse_mode, type: :array, values: ['', 'html', 'markdown']
 
     def validate_auth_token
@@ -68,10 +70,11 @@ module Agents
     def validate_options
       errors.add(:base, 'auth_token is required') unless options['auth_token'].present?
       errors.add(:base, 'chat_id is required') unless options['chat_id'].present?
-      errors.add(:base, 'caption should be 200 characters or less') if interpolated['caption'].present? and interpolated['caption'].length > 200
-      errors.add(:base, "disable_notification has invalid value: should be 'true' or 'false'") if interpolated['disable_notification'].present? and !%w(true false).include?(interpolated['disable_notification'])
-      errors.add(:base, "disable_web_page_preview has invalid value: should be 'true' or 'false'") if interpolated['disable_web_page_preview'].present? and !%w(true false).include?(interpolated['disable_web_page_preview'])
-      errors.add(:base, "parse_mode has invalid value: should be 'html' or 'markdown'") if interpolated['parse_mode'].present? and !%w(html markdown).include?(interpolated['parse_mode'])
+      errors.add(:base, 'caption should be 200 characters ol less') if interpolated['caption'].present? && interpolated['caption'].length > 200 && (!interpolated['long_message'].present? || interpolated['long_message'] != 'split')
+      errors.add(:base, "disable_notification has invalid value: should be 'true' or 'false'") if interpolated['disable_notification'].present? && !%w(true false).include?(interpolated['disable_notification'])
+      errors.add(:base, "disable_web_page_preview has invalid value: should be 'true' or 'false'") if interpolated['disable_web_page_preview'].present? && !%w(true false).include?(interpolated['disable_web_page_preview'])
+      errors.add(:base, "long_message has invalid value: should be 'split' or 'truncate'") if interpolated['long_message'].present? && !%w(split truncate).include?(interpolated['long_message'])
+      errors.add(:base, "parse_mode has invalid value: should be 'html' or 'markdown'") if interpolated['parse_mode'].present? && !%w(html markdown).include?(interpolated['parse_mode'])
     end
 
     def working?
@@ -95,12 +98,13 @@ module Agents
     }.freeze
 
     def configure_params(params)
+      params[:chat_id] = interpolated['chat_id']
       params[:disable_notification] = interpolated['disable_notification'] if interpolated['disable_notification'].present?
       if params.has_key?(:text)
         params[:disable_web_page_preview] = interpolated['disable_web_page_preview'] if interpolated['disable_web_page_preview'].present?
         params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
       else
-        params[:caption] = interpolated['caption'][0..199] if interpolated['caption'].present?
+        params[:caption] = interpolated['caption'] if interpolated['caption'].present?
       end
 
       params
@@ -123,10 +127,10 @@ module Agents
 
     def receive_event(event)
       interpolate_with event do
-        messages_send = TELEGRAM_ACTIONS.count do |field, method|
+        messages_send = TELEGRAM_ACTIONS.count do |field, _method|
           payload = load_field event, field
           next unless payload
-          send_telegram_message method, configure_params(field => payload)
+          send_telegram_messages field, configure_params(field => payload)
           unlink_file payload if payload.is_a? Tempfile
           true
         end
@@ -134,11 +138,29 @@ module Agents
       end
     end
 
-    def send_telegram_message(method, params)
-      params[:chat_id] = interpolated['chat_id']
-      response = HTTMultiParty.post telegram_bot_uri(method), query: params
+    def send_message(field, params)
+      response = HTTMultiParty.post telegram_bot_uri(TELEGRAM_ACTIONS[field]), query: params
       unless response['ok']
         error(response)
+      end
+    end
+
+    def send_telegram_messages(field, params)
+      if !interpolated['long_message'].present? || interpolated['long_message'] != 'split'
+        params[:caption] = params[:caption][0..199] if params[:caption]
+        params[:text] = params[:text][0..4095] if params[:text]
+        send_message field, params
+      elsif field == :text
+        params[:text].scan(/\G(?:\w{4096}|.{1,4096}(?<=\s)|.{1,4096}(?=\b|\z))/m) do |message|
+          send_message field, configure_params(field => message.strip) unless message.strip.blank?
+        end
+      else
+        caption_array = params[:caption].scan(/\G(?:\w{200}|.{1,200}(?<=\s)|.{1,200}(?=\b|\z))/m)
+        params[:caption] = caption_array.first.strip
+        send_message field, params
+        caption_array.drop(1).each do |caption|
+          send_message(:text, configure_params(text: caption.strip)) unless caption.strip.blank?
+        end
       end
     end
 
