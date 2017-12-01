@@ -33,10 +33,10 @@ module Agents
 
       **Options**
 
-      * `caption`: caption for a media content, 0-200 characters
+      * `caption`: caption for a media content (0-200 characters)
       * `disable_notification`: send a message silently in a channel
       * `disable_web_page_preview`: disable link previews for links in a text message
-      * `long_message`: split or truncate long text messages or captions
+      * `long_message`: split or truncate text messages or captions that exceeds Telegram API limits
       * `parse_mode`: parse policy of a text message
 
       See the official [Telegram Bot API documentation](https://core.telegram.org/bots/api#available-methods) for detailed info.
