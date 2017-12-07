@@ -319,7 +319,7 @@ module Agents
         interpolated['folders'].each { |folder|
           log "Selecting the folder: %s" % folder
 
-          imap.select(folder)
+          imap.select(Net::IMAP.encode_utf7(folder))
           uidvalidity = imap.uidvalidity
 
           lastseenuid = lastseen[uidvalidity]
