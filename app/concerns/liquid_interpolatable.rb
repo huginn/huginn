@@ -66,6 +66,14 @@ module LiquidInterpolatable
     end
   end
 
+  def interpolate_with_each(array)
+    array.each do |object|
+      interpolate_with(object) do
+        yield object
+      end
+    end
+  end
+
   def interpolate_options(options, self_object = nil)
     interpolate_with(self_object) do
       case options
