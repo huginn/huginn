@@ -6,7 +6,7 @@ describe Agents::TwilioAgent do
                                        :options => { :account_sid => 'x',
                                                      :auth_token => 'x',
                                                      :sender_cell => 'x',
-                                                     :receiver_cell => 'x',
+                                                     :receiver_cell => '{{to}}',
                                                      :server_url    => 'http://somename.com:3000',
                                                      :receive_text  => 'true',
                                                      :receive_call  => 'true',
@@ -16,11 +16,11 @@ describe Agents::TwilioAgent do
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :message => 'Looks like its going to rain' }
+    @event.payload = {message: 'Looks like its going to rain', to: 54321}
     @event.save!
 
-    @sent_messages = []
-    stub.any_instance_of(Twilio::REST::Messages).create { |message| @sent_messages << message[:body]}
+    @message_calls = []
+    stub.any_instance_of(Twilio::REST::Messages).create { |message| @message_calls << message }
     stub.any_instance_of(Twilio::REST::Calls).create
   end
 
@@ -28,22 +28,24 @@ describe Agents::TwilioAgent do
     it 'should make sure multiple events are being received' do
       event1 = Event.new
       event1.agent = agents(:bob_rain_notifier_agent)
-      event1.payload = { :message => 'Some message' }
+      event1.payload = {message: 'Some message', to: 12345}
       event1.save!
 
       event2 = Event.new
       event2.agent = agents(:bob_weather_agent)
-      event2.payload = { :message => 'Some other message' }
+      event2.payload = {message: 'Some other message', to: 987654}
       event2.save!
 
       @checker.receive([@event,event1,event2])
-      expect(@sent_messages).to eq(['Looks like its going to rain','Some message','Some other message'])
+      expect(@message_calls).to eq([{from: "x", to: "54321", body: "Looks like its going to rain"},
+                                    {from: "x", to: "12345", body: "Some message"},
+                                    {from: "x", to: "987654", body: "Some other message"}])
     end
 
     it 'should check if receive_text is working fine' do
       @checker.options[:receive_text] = 'false'
       @checker.receive([@event])
-      expect(@sent_messages).to be_empty
+      expect(@message_calls).to be_empty
     end
 
     it 'should check if receive_call is working fine' do
