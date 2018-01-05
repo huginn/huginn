@@ -15,6 +15,8 @@ module LiquidInterpolatable
 
   def validate_interpolation
     interpolated
+  rescue Liquid::ZeroDivisionError => e
+    # Ignore error (likely due to possibly missing variables on "divided_by")
   rescue Liquid::Error => e
     errors.add(:options, "has an error with Liquid templating: #{e.message}")
   rescue
