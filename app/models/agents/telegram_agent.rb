@@ -151,11 +151,11 @@ module Agents
         params[:text] = params[:text][0..4095] if params[:text]
         send_message field, params
       elsif field == :text
-        params[:text].scan(/\G(?:\w{4096}|.{1,4096}(?<=\s)|.{1,4096}(?=\b|\z))/m) do |message|
+        params[:text].scan(/\G(?:\w{4096}|.{1,4096}(?=\b|\z))/m) do |message|
           send_message field, configure_params(field => message.strip) unless message.strip.blank?
         end
       else
-        caption_array = params[:caption].scan(/\G(?:\w{200}|.{1,200}(?<=\s)|.{1,200}(?=\b|\z))/m)
+        caption_array = params[:caption].scan(/\G(?:\w{200}|.{1,200}(?=\b|\z))/m)
         params[:caption] = caption_array.first.strip
         send_message field, params
         caption_array.drop(1).each do |caption|
