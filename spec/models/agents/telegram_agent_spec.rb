@@ -8,6 +8,7 @@ describe Agents::TelegramAgent do
       caption: '{{ caption }}',
       disable_web_page_preview: '{{ disable_web_page_preview }}',
       disable_notification: '{{ silent }}',
+      long_message: '{{ long }}',
       parse_mode: 'html'
     }
 
@@ -29,7 +30,7 @@ describe Agents::TelegramAgent do
       :stubbed_file
     end
 
-    stub.any_instance_of(Agents::TelegramAgent).send_telegram_message do |method, params|
+    stub.any_instance_of(Agents::TelegramAgent).send_message do |method, params|
       @sent_messages << { method => params }
     end
   end
@@ -64,6 +65,11 @@ describe Agents::TelegramAgent do
       expect(@checker).not_to be_valid
     end
 
+    it 'should validate value of long_message' do
+      @checker.options[:long_message] = 'invalid'
+      expect(@checker).not_to be_valid
+    end
+
     it 'should validate value of parse_mode' do
       @checker.options[:parse_mode] = 'invalid'
       expect(@checker).not_to be_valid
@@ -78,41 +84,45 @@ describe Agents::TelegramAgent do
 
     it 'processes multiple events properly' do
       event_0 = event_with_payload silent: 'true', text: 'Looks like it is going to rain'
-      event_1 = event_with_payload disable_web_page_preview: 'true', text: 'Another text message'
+      event_1 = event_with_payload disable_web_page_preview: 'true', long: 'split', text: "#{'a' * 4095} #{'b' * 6}"
       @checker.receive [event_0, event_1]
 
       expect(@sent_messages).to eq([
-                                    { sendMessage: { disable_notification: 'true', parse_mode: 'html', text: 'Looks like it is going to rain' } },
-                                    { sendMessage: { disable_web_page_preview: 'true', parse_mode: 'html', text: 'Another text message' } }
+                                    { text: { chat_id: 'xxxxxxxx', disable_notification: 'true', parse_mode: 'html', text: 'Looks like it is going to rain' } },
+                                    { text: { chat_id: 'xxxxxxxx', disable_web_page_preview: 'true', parse_mode: 'html', text: 'a' * 4095 } },
+                                    { text: { chat_id: 'xxxxxxxx', disable_web_page_preview: 'true', parse_mode: 'html', text: 'b' * 6 } }
                                    ])
     end
 
-    it 'accepts audio key and uses :send_audio to send the file' do
-      event = event_with_payload audio: 'https://example.com/sound.mp3'
+    it 'accepts audio key and uses :send_audio to send the file with truncated caption' do
+      event = event_with_payload audio: 'https://example.com/sound.mp3', caption: 'a' * 250
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ sendAudio: { audio: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ audio: { audio: :stubbed_file, caption: 'a'* 200, chat_id: 'xxxxxxxx' } }])
     end
 
-    it 'accepts document key and uses :send_document to send the file' do
-      event = event_with_payload document: 'https://example.com/document.pdf'
+    it 'accepts document key and uses :send_document to send the file and the full caption' do
+      event = event_with_payload caption: "#{'a' * 199}  #{'b' * 6}", document: 'https://example.com/document.pdf', long: 'split'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ sendDocument: { document: :stubbed_file } }])
+      expect(@sent_messages).to eq([
+                                    { document: { caption: 'a' * 199, chat_id: 'xxxxxxxx', document: :stubbed_file } },
+                                    { text: { chat_id: 'xxxxxxxx', parse_mode: 'html', text: 'b' * 6 } }
+                                   ])
     end
 
-    it 'accepts photo key and uses :send_photo to send the file with correct caption' do
-      event = event_with_payload caption: 'a' * 250, photo: 'https://example.com/image.png'
+    it 'accepts photo key and uses :send_photo to send the file' do
+      event = event_with_payload photo: 'https://example.com/image.png'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ sendPhoto: { caption: 'a'* 200, photo: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ photo: { chat_id: 'xxxxxxxx', photo: :stubbed_file } }])
     end
 
     it 'accepts video key and uses :send_video to send the file' do
       event = event_with_payload video: 'https://example.com/video.avi'
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ sendVideo: { video: :stubbed_file } }])
+      expect(@sent_messages).to eq([{ video: { chat_id: 'xxxxxxxx', video: :stubbed_file } }])
     end
 
     it 'creates a log entry when no key of the received event was useable' do
