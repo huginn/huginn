@@ -87,13 +87,6 @@ describe Agents::TelegramAgent do
                                    ])
     end
 
-    it 'accepts photo key and uses :send_photo to send the file with correct caption' do
-      event = event_with_payload caption: 'a' * 250, photo: 'https://example.com/image.png'
-      @checker.receive [event]
-
-      expect(@sent_messages).to eq([{ sendPhoto: { caption: 'a'* 200, photo: :stubbed_file } }])
-    end
-
     it 'accepts audio key and uses :send_audio to send the file' do
       event = event_with_payload audio: 'https://example.com/sound.mp3'
       @checker.receive [event]
@@ -106,6 +99,13 @@ describe Agents::TelegramAgent do
       @checker.receive [event]
 
       expect(@sent_messages).to eq([{ sendDocument: { document: :stubbed_file } }])
+    end
+
+    it 'accepts photo key and uses :send_photo to send the file with correct caption' do
+      event = event_with_payload caption: 'a' * 250, photo: 'https://example.com/image.png'
+      @checker.receive [event]
+
+      expect(@sent_messages).to eq([{ sendPhoto: { caption: 'a'* 200, photo: :stubbed_file } }])
     end
 
     it 'accepts video key and uses :send_video to send the file' do
