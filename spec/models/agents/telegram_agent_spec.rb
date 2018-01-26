@@ -85,12 +85,18 @@ describe Agents::TelegramAgent do
     it 'processes multiple events properly' do
       event_0 = event_with_payload silent: 'true', text: 'Looks like it is going to rain'
       event_1 = event_with_payload disable_web_page_preview: 'true', long: 'split', text: "#{'a' * 4095} #{'b' * 6}"
-      @checker.receive [event_0, event_1]
+      event_2 = event_with_payload disable_web_page_preview: 'true', long: 'split', text: "#{'a' * 4096}#{'b' * 6}"
+      event_3 = event_with_payload long: 'split', text: "#{'a' * 2142} #{'b' * 2142}"
+      @checker.receive [event_0, event_1, event_2, event_3]
 
       expect(@sent_messages).to eq([
                                     { text: { chat_id: 'xxxxxxxx', disable_notification: 'true', parse_mode: 'html', text: 'Looks like it is going to rain' } },
                                     { text: { chat_id: 'xxxxxxxx', disable_web_page_preview: 'true', parse_mode: 'html', text: 'a' * 4095 } },
-                                    { text: { chat_id: 'xxxxxxxx', disable_web_page_preview: 'true', parse_mode: 'html', text: 'b' * 6 } }
+                                    { text: { chat_id: 'xxxxxxxx', disable_web_page_preview: 'true', parse_mode: 'html', text: 'b' * 6 } },
+                                    { text: { chat_id: 'xxxxxxxx', disable_web_page_preview: 'true', parse_mode: 'html', text: 'a' * 4096 } },
+                                    { text: { chat_id: 'xxxxxxxx', disable_web_page_preview: 'true', parse_mode: 'html', text: 'b' * 6 } },
+                                    { text: { chat_id: 'xxxxxxxx', parse_mode: 'html', text: 'a' * 2142 } },
+                                    { text: { chat_id: 'xxxxxxxx', parse_mode: 'html', text: 'b' * 2142 } }
                                    ])
     end
 
