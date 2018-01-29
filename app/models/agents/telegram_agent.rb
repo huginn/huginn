@@ -36,7 +36,7 @@ module Agents
       * `caption`: caption for a media content (0-200 characters)
       * `disable_notification`: send a message silently in a channel
       * `disable_web_page_preview`: disable link previews for links in a text message
-      * `long_message`: split or truncate text messages or captions that exceeds Telegram API limits
+      * `long_message`: truncate (default) or split text messages and captions that exceed Telegram API limits. Markdown and HTML tags can't span across messages and, if not opened or closed properly, will render as plain text.
       * `parse_mode`: parse policy of a text message
 
       See the official [Telegram Bot API documentation](https://core.telegram.org/bots/api#available-methods) for detailed info.
@@ -146,21 +146,23 @@ module Agents
     end
 
     def send_telegram_messages(field, params)
-      if !interpolated['long_message'].present? || interpolated['long_message'] != 'split'
+      if interpolated['long_message'] == 'split'
+        if field == :text
+          params[:text].scan(/\G(?:\w{4096}|.{1,4096}(?=\b|\z))/m) do |message|
+            send_message field, configure_params(field => message.strip) unless message.strip.blank?
+          end
+        else
+          caption_array = params[:caption].scan(/\G(?:\w{200}|.{1,200}(?=\b|\z))/m)
+          params[:caption] = caption_array.first.strip
+          send_message field, params
+          caption_array.drop(1).each do |caption|
+            send_message(:text, configure_params(text: caption.strip)) unless caption.strip.blank?
+            end
+        end
+      else
         params[:caption] = params[:caption][0..199] if params[:caption]
         params[:text] = params[:text][0..4095] if params[:text]
         send_message field, params
-      elsif field == :text
-        params[:text].scan(/\G(?:\w{4096}|.{1,4096}(?=\b|\z))/m) do |message|
-          send_message field, configure_params(field => message.strip) unless message.strip.blank?
-        end
-      else
-        caption_array = params[:caption].scan(/\G(?:\w{200}|.{1,200}(?=\b|\z))/m)
-        params[:caption] = caption_array.first.strip
-        send_message field, params
-        caption_array.drop(1).each do |caption|
-          send_message(:text, configure_params(text: caption.strip)) unless caption.strip.blank?
-        end
       end
     end
 
