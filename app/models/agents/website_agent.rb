@@ -119,21 +119,21 @@ module Agents
       When parsing text, each sub-hash should contain a `regexp` and `index`.  Output text is matched against the regular expression repeatedly from the beginning through to the end, collecting a captured group specified by `index` in each match.  Each index should be either an integer or a string name which corresponds to <code>(?&lt;<em>name</em>&gt;...)</code>.  For example, to parse lines of <code><em>word</em>: <em>definition</em></code>, the following should work:
 
           "extract": {
-            "word": { "regexp": "^(.+?): (.+)$", index: 1 },
-            "definition": { "regexp": "^(.+?): (.+)$", index: 2 }
+            "word": { "regexp": "^(.+?): (.+)$", "index": 1 },
+            "definition": { "regexp": "^(.+?): (.+)$", "index": 2 }
           }
 
       Or if you prefer names to numbers for index:
 
           "extract": {
-            "word": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'word' },
-            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'definition' }
+            "word": { "regexp": "^(?<word>.+?): (?<definition>.+)$", "index": "word" },
+            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", "index": "definition" }
           }
 
       To extract the whole content as one event:
 
           "extract": {
-            "content": { "regexp": "\A(?m:.)*\z", index: 0 }
+            "content": { "regexp": "\A(?m:.)*\z", "index": 0 }
           }
 
       Beware that `.` does not match the newline character (LF) unless the `m` flag is in effect, and `^`/`$` basically match every line beginning/end.  See [this document](http://ruby-doc.org/core-#{RUBY_VERSION}/doc/regexp_rdoc.html) to learn the regular expression variant used in this service.
