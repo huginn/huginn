@@ -133,7 +133,7 @@ module Agents
       To extract the whole content as one event:
 
           "extract": {
-            "content": { "regexp": "\A(?m:.)*\z", "index": 0 }
+            "content": { "regexp": "\\A(?m:.)*\\z", "index": 0 }
           }
 
       Beware that `.` does not match the newline character (LF) unless the `m` flag is in effect, and `^`/`$` basically match every line beginning/end.  See [this document](http://ruby-doc.org/core-#{RUBY_VERSION}/doc/regexp_rdoc.html) to learn the regular expression variant used in this service.
