@@ -24,16 +24,6 @@ GIT
       rest-client (>= 2.0)
 
 GIT
-  remote: https://github.com/amatsuda/kaminari.git
-  revision: abbf93d557208ee1d0b612c612cd079f86ed54f4
-  ref: abbf93d557208ee1d0b612c612cd079f86ed54f4
-  branch: 0-17-stable
-  specs:
-    kaminari (0.17.0)
-      actionpack (>= 3.0.0)
-      activesupport (>= 3.0.0)
-
-GIT
   remote: https://github.com/bamorim/omniauth-dropbox-oauth2.git
   revision: 35046706fb781ed3b57dfb9c3cd44ed0f3d3f8ea
   ref: 35046706fb781ed3b57dfb9c3cd44ed0f3d3f8ea
@@ -77,14 +67,6 @@ GIT
   specs:
     erector (0.10.0)
       treetop (>= 1.2.3)
-
-GIT
-  remote: https://github.com/lostisland/faraday_middleware.git
-  revision: 59088da02940d0ee2010b2e3156343346767c31e
-  branch: master
-  specs:
-    faraday_middleware (0.10.0)
-      faraday (>= 0.7.4, < 1.0)
 
 GIT
   remote: https://github.com/sferik/twitter.git
@@ -255,6 +237,8 @@ GEM
     execjs (2.6.0)
     faraday (0.12.1)
       multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.12.2)
+      faraday (>= 0.7.4, < 1.0)
     feedjira (2.1.2)
       faraday (>= 0.9)
       faraday_middleware (>= 0.9)
@@ -356,6 +340,18 @@ GEM
     jsonpath (0.8.3)
       multi_json
     jwt (1.5.6)
+    kaminari (1.1.1)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.1.1)
+      kaminari-activerecord (= 1.1.1)
+      kaminari-core (= 1.1.1)
+    kaminari-actionview (1.1.1)
+      actionview
+      kaminari-core (= 1.1.1)
+    kaminari-activerecord (1.1.1)
+      activerecord
+      kaminari-core (= 1.1.1)
+    kaminari-core (1.1.1)
     kgio (2.10.0)
     kramdown (1.3.3)
     launchy (2.4.2)
@@ -679,7 +675,7 @@ DEPENDENCIES
   erector!
   evernote_oauth
   faraday (~> 0.9)
-  faraday_middleware!
+  faraday_middleware (~> 0.12.2)
   feedjira (~> 2.1)
   ffi (>= 1.9.4)
   font-awesome-sass (~> 4.7.0)
@@ -701,7 +697,7 @@ DEPENDENCIES
   jquery-rails (~> 4.2.1)
   json (~> 1.8.1)
   jsonpath (~> 0.8.3)
-  kaminari!
+  kaminari (~> 1.1.1)
   kramdown (~> 1.3.3)
   letter_opener_web (~> 1.3.1)
   liquid (~> 4.0)
