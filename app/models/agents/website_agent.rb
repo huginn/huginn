@@ -49,8 +49,14 @@ module Agents
             "body_text": { "css": "div.main", "value": "string(.)" },
             "page_title": { "css": "title", "value": "string(.)", "repeat": true }
           }
+      or
+          "extract": {
+            "url": { "xpath": "//*[@class="blog-item"]/a/@href", "value": "."
+            "title": { "xpath": "//*[@class="blog-item"]/a", "value": "normalize-space(.)" },
+            "description": { "xpath": "//*[@class="blog-item"]/div[0]", "value": "string(.)" }
+          }
 
-      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and `string(.)` gives a string with all the enclosed text nodes concatenated without entity escaping (such as `&amp;`). To extract the innerHTML, use `./node()`; and to extract the outer HTML, use `.`.
+      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node (such as "@href" from a hyperlink), and `string(.)` gives a string with all the enclosed text nodes concatenated without entity escaping (such as `&amp;`). To extract the innerHTML, use `./node()`; and to extract the outer HTML, use `.`.
 
       You can also use [XPath functions](https://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove commas from formatted numbers, etc.  Instead of passing `string(.)` to these functions, you can just pass `.` like `normalize-space(.)` and `translate(., ',', '')`.
 
@@ -119,21 +125,21 @@ module Agents
       When parsing text, each sub-hash should contain a `regexp` and `index`.  Output text is matched against the regular expression repeatedly from the beginning through to the end, collecting a captured group specified by `index` in each match.  Each index should be either an integer or a string name which corresponds to <code>(?&lt;<em>name</em>&gt;...)</code>.  For example, to parse lines of <code><em>word</em>: <em>definition</em></code>, the following should work:
 
           "extract": {
-            "word": { "regexp": "^(.+?): (.+)$", index: 1 },
-            "definition": { "regexp": "^(.+?): (.+)$", index: 2 }
+            "word": { "regexp": "^(.+?): (.+)$", "index": 1 },
+            "definition": { "regexp": "^(.+?): (.+)$", "index": 2 }
           }
 
       Or if you prefer names to numbers for index:
 
           "extract": {
-            "word": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'word' },
-            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'definition' }
+            "word": { "regexp": "^(?<word>.+?): (?<definition>.+)$", "index": "word" },
+            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", "index": "definition" }
           }
 
       To extract the whole content as one event:
 
           "extract": {
-            "content": { "regexp": "\A(?m:.)*\z", index: 0 }
+            "content": { "regexp": "\\A(?m:.)*\\z", "index": 0 }
           }
 
       Beware that `.` does not match the newline character (LF) unless the `m` flag is in effect, and `^`/`$` basically match every line beginning/end.  See [this document](http://ruby-doc.org/core-#{RUBY_VERSION}/doc/regexp_rdoc.html) to learn the regular expression variant used in this service.
