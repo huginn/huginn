@@ -96,6 +96,7 @@ module Agents
       unless options['post_url'].present? && options['expected_receive_period_in_days'].present?
         errors.add(:base, "post_url and expected_receive_period_in_days are required fields")
       end
+
       if options['payload'].present? && %w[get delete].include?(method) && (!options['payload'].is_a?(Hash)  || !options['payload'].is_a?(array))
         errors.add(:base, "if provided, payload must be a hash or an array")
       end
@@ -103,11 +104,11 @@ module Agents
       if options['payload'].present? && %w[post put patch].include?(method)
         if (!options['payload'].is_a?(Hash) || !options['payload'].is_a?(array)) && options['content_type'] !~ MIME_RE
           errors.add(:base, "if provided, payload must be a hash or an array")
+        end
       end
 
-        if options['content_type'] =~ MIME_RE && options['payload'].is_a?(String) && boolify(options['no_merge']) != true
-          errors.add(:base, "when the payload is a string, `no_merge` has to be set to `true`")
-        end
+      if options['content_type'] =~ MIME_RE && options['payload'].is_a?(String) && boolify(options['no_merge']) != true
+        errors.add(:base, "when the payload is a string, `no_merge` has to be set to `true`")
       end
 
       if options.has_key?('emit_events') && boolify(options['emit_events']).nil?
