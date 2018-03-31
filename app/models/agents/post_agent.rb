@@ -97,12 +97,12 @@ module Agents
         errors.add(:base, "post_url and expected_receive_period_in_days are required fields")
       end
 
-      if options['payload'].present? && %w[get delete].include?(method) && (!options['payload'].is_a?(Hash)  || !options['payload'].is_a?(Array))
+      if options['payload'].present? && %w[get delete].include?(method) && !(options['payload'].is_a?(Hash) || options['payload'].is_a?(Array))
         errors.add(:base, "if provided, payload must be a hash or an array")
       end
 
       if options['payload'].present? && %w[post put patch].include?(method)
-        if (!options['payload'].is_a?(Hash) || !options['payload'].is_a?(Array)) && options['content_type'] !~ MIME_RE
+        if !(options['payload'].is_a?(Hash) || options['payload'].is_a?(Array)) && options['content_type'] !~ MIME_RE
           errors.add(:base, "if provided, payload must be a hash or an array")
         end
       end
