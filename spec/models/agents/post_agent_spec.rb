@@ -382,17 +382,17 @@ describe Agents::PostAgent do
       @checker.options['payload'] = ""
       expect(@checker).to be_valid
 
-      @checker.options['payload'] = "hello"
-      expect(@checker).not_to be_valid
-
       @checker.options['payload'] = ["foo", "bar"]
+      expect(@checker).to be_valid
+
+      @checker.options['payload'] = "hello"
       expect(@checker).not_to be_valid
 
       @checker.options['payload'] = { 'this' => 'that' }
       expect(@checker).to be_valid
     end
 
-    it "should not validate payload as a hash if content_type includes a MIME type and method is not get or delete" do
+    it "should not validate payload as a hash or an array if content_type includes a MIME type and method is not get or delete" do
       @checker.options['no_merge'] = 'true'
       @checker.options['content_type'] = 'text/xml'
       @checker.options['payload'] = "test"
