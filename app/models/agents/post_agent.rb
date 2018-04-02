@@ -111,6 +111,10 @@ module Agents
         errors.add(:base, "when the payload is a string, `no_merge` has to be set to `true`")
       end
 
+      if options['content_type'] == 'form' && options['payload'].present? && options['payload'].is_a?(Array)
+        errors.add(:base, "when content_type is a form, if provided, payload must be a hash")
+      end
+
       if options.has_key?('emit_events') && boolify(options['emit_events']).nil?
         errors.add(:base, "if provided, emit_events must be true or false")
       end
