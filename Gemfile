@@ -37,6 +37,7 @@ gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
 gem 'wunderground', '~> 1.2.0'    # WeatherAgent
 gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
+gem 'erector', github: 'dsander/erector', branch: 'fix-fixnum-warning'
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
@@ -94,12 +95,12 @@ gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
 gem 'coffee-rails', '~> 4.2'
 gem 'daemons', '~> 1.1.9'
-gem 'delayed_job', github: 'dsander/delayed_job', branch: 'rails51'
+gem 'delayed_job', '~> 4.1.4'
 gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails5'
-gem 'devise', '~> 4.3.0'
+gem 'devise', '~> 4.4.1'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9'
-gem 'faraday_middleware', github: 'lostisland/faraday_middleware', branch: 'master'  # '>= 0.10.1'
+gem 'faraday_middleware', '~> 0.12.2'
 gem 'feedjira', '~> 2.1'
 gem 'font-awesome-sass', '~> 4.7.0'
 gem 'foreman', '~> 0.63.0'
@@ -111,7 +112,7 @@ gem 'jquery-rails', '~> 4.2.1'
 gem 'huginn_agent', '~> 0.4.0'
 gem 'json', '~> 1.8.1'
 gem 'jsonpath', '~> 0.8.3'
-gem 'kaminari', github: "amatsuda/kaminari", branch: '0-17-stable', ref: 'abbf93d557208ee1d0b612c612cd079f86ed54f4'
+gem 'kaminari', '~> 1.1.1'
 gem 'kramdown', '~> 1.3.3'
 gem 'liquid', '~> 4.0'
 gem 'loofah', '~> 2.0'
@@ -120,7 +121,7 @@ gem 'multi_xml'
 gem 'nokogiri'
 gem 'omniauth', '~> 1.6.1'
 gem 'rails', '~> 5.1.1'
-gem 'rufus-scheduler', '~> 3.3.2', require: false
+gem 'rufus-scheduler', '~> 3.4.2', require: false
 gem 'sass-rails', '~> 5.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'

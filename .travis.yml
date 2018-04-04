@@ -29,26 +29,31 @@ matrix:
     - env: DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
     - env: RSPEC_TASK=spec:features
   include:
-    - rvm: 2.4.2
+    - rvm: 2.4.3
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - rvm: 2.4.2
+    - rvm: 2.4.3
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
-    - rvm: 2.4.2
+    - rvm: 2.4.3
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - rvm: 2.4.2
+    - rvm: 2.4.3
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
-    - rvm: 2.4.2
+    - rvm: 2.5.0
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
-    - rvm: 2.4.2
+    - rvm: 2.5.0
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
-    - rvm: 2.3.5
+    - rvm: 2.4.3
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
-    - rvm: 2.3.5
+    - rvm: 2.4.3
+      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
+    - rvm: 2.3.6
+      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
+    - rvm: 2.3.6
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
 rvm:
-- 2.2.8
-- 2.3.5
-- 2.4.2
+- 2.2.9
+- 2.3.6
+- 2.4.3
+- 2.5.0
 cache: bundler
 bundler_args: --without development production
 script:
