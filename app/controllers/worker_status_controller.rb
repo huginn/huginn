@@ -8,7 +8,7 @@ class WorkerStatusController < ApplicationController
       events = events.where('id > ?', since_id)
     end
 
-    result = events.select('COUNT(id) AS count', 'MIN(id) AS min_id', 'MAX(id) AS max_id').reorder('min(created_at)').first
+    result = events.select('COUNT(id) AS count', 'MIN(id) AS min_id', 'MAX(id) AS max_id').reorder(Arel.sql('min(created_at)')).first
     count, min_id, max_id = result.count, result.min_id, result.max_id
 
     case max_id

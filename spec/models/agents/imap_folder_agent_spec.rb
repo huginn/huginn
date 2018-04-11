@@ -215,7 +215,7 @@ describe Agents::ImapFolderAgent do
         })
 
         expect(Event.last.payload).to eq(expected_payloads.last.update(
-          'body' => "<div dir=\"ltr\">Some HTML reply<br></div>\n",
+          'body' => "<div dir=\"ltr\">Some HTML reply<br></div>\r\n",
           'matches' => { 'a' => 'some subject', 'b' => 'HTML' },
           'mime_type' => 'text/html',
         ))

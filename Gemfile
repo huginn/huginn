@@ -152,7 +152,7 @@ group :development do
 
   group :test do
     gem 'coveralls', '~> 0.8.12', require: false
-    gem 'capybara', '~> 2.13.0'
+    gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
     gem 'capybara-select2', require: false
     gem 'delorean'
@@ -160,9 +160,9 @@ group :development do
     gem 'pry-rails'
     gem 'pry-byebug'
     gem 'rr'
-    gem 'rspec', '~> 3.5'
+    gem 'rspec', '~> 3.7'
     gem 'rspec-collection_matchers', '~> 1.1.0'
-    gem 'rspec-rails', '~> 3.5.2'
+    gem 'rspec-rails', '~> 3.7'
     gem 'rspec-html-matchers', '~> 0.8'
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'
