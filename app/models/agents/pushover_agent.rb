@@ -86,7 +86,6 @@ module Agents
             sound
             retry
             expire
-            html
           ].each do |key|
             if value = String.try_convert(interpolated[key].presence)
               case key
@@ -94,16 +93,19 @@ module Agents
                 value.slice!(512..-1)
               when 'url_title'
                 value.slice!(100..-1)
-              when 'html'
-                case value
-                when 'true', '1'
-                  value = '1'
-                else
-                  value = '0'
-                end
               end
               post_params[key] = value
             end
+          end
+          # html is special because String.try_convert(true) gives nil (not even "nil", just nil)
+          if value = interpolated['html'].presence
+            post_params['html'] =
+              case value.to_s
+              when 'true', '1'
+                '1'
+              else
+                '0'
+              end
           end
 
           send_notification(post_params)
