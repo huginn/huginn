@@ -30,7 +30,7 @@ module Agents
       * `sound` - the name of one of the sounds supported by device clients to override the user's default sound choice. [See PushOver docs for sound options.](https://pushover.net/api#sounds)
       * `retry` - Required for emergency priority - Specifies how often (in seconds) the Pushover servers will send the same notification to the user. Minimum value: `30`
       * `expire` - Required for emergency priority - Specifies how many seconds your notification will continue to be retried for (every retry seconds). Maximum value: `86400`
-      * `html` - set to `1` to have Pushover's apps display the `message` content as HTML
+      * `html` - set to `true` to have Pushover's apps display the `message` content as HTML
 
     MD
 
@@ -48,7 +48,7 @@ module Agents
         'sound' => '{{ sound }}',
         'retry' => '{{ retry }}',
         'expire' => '{{ expire }}',
-        'html' => '0',
+        'html' => 'false',
         'expected_receive_period_in_days' => '1'
       }
     end
@@ -94,6 +94,13 @@ module Agents
                 value.slice!(512..-1)
               when 'url_title'
                 value.slice!(100..-1)
+              when 'html'
+                case value
+                when 'true', '1'
+                  value = '1'
+                else
+                  value = '0'
+                end
               end
               post_params[key] = value
             end
