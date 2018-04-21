@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Ruby 2.2.2 is the minimum requirement
-ruby ['2.2.2', RUBY_VERSION].max
+ruby [Gem::Version.new('2.2.2'), Gem::Version.new(RUBY_VERSION)].max
 
 # Ensure github repositories are fetched using HTTPS
 git_source(:github) do |repo_name|
