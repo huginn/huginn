@@ -43,7 +43,7 @@ GIT
 
 GIT
   remote: https://github.com/dsander/delayed_job_active_record.git
-  revision: 0b433cc38cec67b911f3f07dab8caa61b3202990
+  revision: 8efc7b10a3e899a75515430b2216556f4e6c3de0
   branch: rails52
   specs:
     delayed_job_active_record (4.1.3)
