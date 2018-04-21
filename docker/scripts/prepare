@@ -15,6 +15,9 @@ EOF
 
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
+
+CLEAR_DOCKER_CACHE=2018-08-07
+
 minimal_apt_get_install='apt-get install -y --no-install-recommends'
 
 apt-get update
