@@ -132,7 +132,7 @@ gem 'uglifier', '~> 2.7.2'
 
 group :development do
   gem 'better_errors', '~> 1.1'
-  gem 'binding_of_caller'
+  gem 'binding_of_caller', '~> 0.8.0'
   gem 'guard', '~> 2.14.1'
   gem 'guard-livereload', '~> 2.5.1'
   gem 'guard-rspec', '~> 4.7.3'
