@@ -1,6 +1,5 @@
 require 'httmultiparty'
 require 'open-uri'
-require 'tempfile'
 
 module Agents
   class TelegramAgent < Agent
@@ -110,17 +109,11 @@ module Agents
       params
     end
 
-    def load_field(event, field)
-      payload = event.payload[field]
-      return false unless payload.present?
-      payload
-    end
-
     def receive_event(event)
       interpolate_with event do
         messages_send = TELEGRAM_ACTIONS.count do |field, _method|
-          payload = load_field event, field
-          next unless payload
+          payload = event.payload[field]
+          next unless payload.present?
           send_telegram_messages field, configure_params(field => payload)
           true
         end
