@@ -1,5 +1,4 @@
 require 'httmultiparty'
-require 'open-uri'
 
 module Agents
   class TelegramAgent < Agent
