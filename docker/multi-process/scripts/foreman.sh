@@ -1,5 +1,5 @@
 #!/bin/bash -e
-source /app/.env
+source /tmp/.env
 
 # The database may need to start up for a bit first
 if [ -n "${INTENTIONALLY_SLEEP}" ]; then

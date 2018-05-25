@@ -14,23 +14,17 @@ services:
       - mysqldata
 
   web:
-    image: huginn/huginn-single-process
+    build:
+      context: ../../
+      dockerfile: docker/multi-process/Dockerfile
     restart: always
     ports:
       - "3000:3000"
+    environment:
+      # - DATABASE_INITIAL_CONNECT_MAX_RETRIES=5
+      - INTENTIONALLY_SLEEP=10
     env_file:
       - ../mysql.env
       - ../secrets.env
     depends_on:
       - mysql
-
-  threaded:
-    image: huginn/huginn-single-process
-    command: /scripts/init bin/threaded.rb
-    restart: always
-    env_file:
-      - ../mysql.env
-      - ../secrets.env
-    depends_on:
-      - mysql
-      - web
