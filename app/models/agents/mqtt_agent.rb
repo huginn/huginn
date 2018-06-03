@@ -77,7 +77,7 @@ module Agents
     end
 
     def working?
-      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
+      (event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?) || received_event_without_error?
     end
 
     def default_options
