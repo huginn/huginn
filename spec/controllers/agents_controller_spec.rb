@@ -258,7 +258,7 @@ describe AgentsController do
       post :update, params: {:id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:name => "New name")}, :format => :json
       expect(agents(:bob_website_agent).reload.name).to eq("New name")
       expect(JSON.parse(response.body)['name']).to eq("New name")
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "will not accept Agent sources owned by other users" do

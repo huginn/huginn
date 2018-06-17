@@ -28,3 +28,4 @@ manifest.yml
 config/unicorn.rb
 db/schema.rb
 .local/
+spec/examples.txt

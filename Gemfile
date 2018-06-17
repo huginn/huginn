@@ -95,9 +95,9 @@ gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
 gem 'coffee-rails', '~> 4.2'
 gem 'daemons', '~> 1.1.9'
-gem 'delayed_job', '~> 4.1.4'
-gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails5'
-gem 'devise', '~> 4.4.1'
+gem 'delayed_job', '~> 4.1.5'
+gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails52'
+gem 'devise', '~> 4.4.3'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9'
 gem 'faraday_middleware', '~> 0.12.2'
@@ -120,7 +120,7 @@ gem 'mini_magick'
 gem 'multi_xml'
 gem 'nokogiri'
 gem 'omniauth', '~> 1.6.1'
-gem 'rails', '~> 5.1.1'
+gem 'rails', '~> 5.2.0'
 gem 'rails-html-sanitizer', '~> 1.0.4'
 gem 'rufus-scheduler', '~> 3.4.2', require: false
 gem 'sass-rails', '~> 5.0'
@@ -129,6 +129,7 @@ gem 'spectrum-rails'
 gem 'therubyracer', '~> 0.12.3'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '~> 2.7.2'
+gem 'bootsnap', '>= 1.1.0', require: false
 
 group :development do
   gem 'better_errors', '~> 1.1'
@@ -152,7 +153,7 @@ group :development do
 
   group :test do
     gem 'coveralls', '~> 0.8.12', require: false
-    gem 'capybara', '~> 2.13.0'
+    gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
     gem 'capybara-select2', require: false
     gem 'delorean'
@@ -160,9 +161,9 @@ group :development do
     gem 'pry-rails'
     gem 'pry-byebug'
     gem 'rr'
-    gem 'rspec', '~> 3.5'
+    gem 'rspec', '~> 3.7'
     gem 'rspec-collection_matchers', '~> 1.1.0'
-    gem 'rspec-rails', '~> 3.5.2'
+    gem 'rspec-rails', '~> 3.7'
     gem 'rspec-html-matchers', '~> 0.8'
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'

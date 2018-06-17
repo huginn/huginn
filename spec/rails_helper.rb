@@ -66,6 +66,8 @@ RSpec.configure do |config|
 
   config.render_views
 
+  config.example_status_persistence_file_path = "./spec/examples.txt"
+
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include SpecHelpers
   config.include Delorean
