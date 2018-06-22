@@ -470,7 +470,7 @@ GEM
     pry-rails (0.3.4)
       pry (>= 0.9.10)
     public_suffix (3.0.2)
-    rack (2.0.4)
+    rack (2.0.5)
     rack-livereload (0.3.16)
       rack
     rack-test (1.0.0)
@@ -593,7 +593,7 @@ GEM
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
       spring (>= 1.2, < 3.0)
-    sprockets (3.7.1)
+    sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
     sprockets-rails (3.2.1)
@@ -756,6 +756,7 @@ DEPENDENCIES
   spring (~> 2.0.2)
   spring-commands-rspec (~> 1.0.4)
   spring-watcher-listen (~> 2.0.1)
+  sprockets (~> 3.7.2)
   therubyracer (~> 0.12.3)
   tumblr_client!
   twilio-ruby (~> 3.11.5)
@@ -777,4 +778,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   1.16.1
+   1.16.2
