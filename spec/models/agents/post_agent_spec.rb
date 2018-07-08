@@ -311,8 +311,20 @@ describe Agents::PostAgent do
   end
 
   describe "#working?" do
+    it "checks if there was an error" do
+      log('Error!')
+      expect(AgentLog.count).to eq(1)
+      expect(@checker.reload).not_to be_working
+    end
+
+    it "checks if no event has been received" do
+      expect(AgentLog.count).to eq(0)
+      expect(@checker.last_received_at).to be_nil
+      expect(@checker.reload).to be_working
+    end
+
     it "checks if events have been received within expected receive period" do
-      expect(@checker).not_to be_working
+      expect(AgentLog.count).to eq(0)
       @checker.last_received_at = Time.zone.now
       Agents::PostAgent.async_receive @checker.id, [@event.id]
       expect(@checker.reload).to be_working
