@@ -313,6 +313,7 @@ describe Agents::PostAgent do
   describe "#working?" do
     it "checks if events have been received within expected receive period" do
       expect(@checker).not_to be_working
+      @checker.last_received_at = Time.zone.now
       Agents::PostAgent.async_receive @checker.id, [@event.id]
       expect(@checker.reload).to be_working
       two_days_from_now = 2.days.from_now
