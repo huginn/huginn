@@ -319,13 +319,13 @@ describe Agents::PostAgent do
 
     it "checks if no event has been received" do
       expect(@checker.logs.count).to eq(0)
-      expect(@checker.last_received_at).to be_nil
+      expect(@checker.last_receive_at).to be_nil
       expect(@checker.reload).to be_working
     end
 
     it "checks if events have been received within expected receive period" do
       expect(@checker.logs.count).to eq(0)
-      @checker.last_received_at = Time.zone.now
+      @checker.last_receive_at = Time.zone.now
       Agents::PostAgent.async_receive @checker.id, [@event.id]
       expect(@checker.reload).to be_working
       two_days_from_now = 2.days.from_now
