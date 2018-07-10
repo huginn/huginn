@@ -320,7 +320,7 @@ describe Agents::PostAgent do
     it "checks if no event has been received" do
       expect(@checker.logs.count).to eq(0)
       expect(@checker.last_receive_at).to be_nil
-      expect(@checker.reload).to be_working
+      expect(@checker.reload).not_to be_working
     end
 
     it "checks if events have been received within expected receive period" do
