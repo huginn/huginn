@@ -85,11 +85,13 @@ module Agents
     end
 
     def working?
-      if last_receive_at
-        last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
-      else
-        !recent_error_logs?
+      return false if recent_error_logs?
+      
+      if interpolated['expected_receive_period_in_days'].present?
+        return false unless last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago
       end
+
+      true
     end
 
     def method
