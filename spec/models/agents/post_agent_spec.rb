@@ -325,9 +325,11 @@ describe Agents::PostAgent do
 
     it "checks if events have been received within expected receive period" do
       expect(@checker.logs.count).to eq(0)
+      # last event within limit
       @checker.last_receive_at = Time.zone.now
       Agents::PostAgent.async_receive @checker.id, [@event.id]
       expect(@checker.reload).to be_working
+      # last event too long ago
       two_days_from_now = 2.days.from_now
       stub(Time).now { two_days_from_now }
       expect(@checker.reload).not_to be_working
