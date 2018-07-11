@@ -317,7 +317,7 @@ describe Agents::PostAgent do
       expect(@checker.reload).not_to be_working
     end
 
-    it "checks if 'expected_receive_period_in_days' was not set"
+    it "checks if 'expected_receive_period_in_days' was not set" do
       expect(@checker.logs.count).to eq(0)
       @checker.options.delete('expected_receive_period_in_days')
       expect(@checker).to be_working
