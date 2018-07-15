@@ -99,8 +99,8 @@ module Agents
     end
 
     def validate_options
-      unless options['post_url'].present? && options['expected_receive_period_in_days'].present?
-        errors.add(:base, "post_url and expected_receive_period_in_days are required fields")
+      unless options['post_url'].present?
+        errors.add(:base, "post_url is a required field")
       end
 
       if options['payload'].present? && %w[get delete].include?(method) && !(options['payload'].is_a?(Hash) || options['payload'].is_a?(Array))
