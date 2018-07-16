@@ -349,9 +349,9 @@ describe Agents::PostAgent do
       expect(@checker).not_to be_valid
     end
 
-    it "should validate presence of expected_receive_period_in_days" do
+    it "should validate absence of expected_receive_period_in_days is allowed" do
       @checker.options['expected_receive_period_in_days'] = ""
-      expect(@checker).not_to be_valid
+      expect(@checker).to be_valid
     end
 
     it "should validate method as post, get, put, patch, or delete, defaulting to post" do
