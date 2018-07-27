@@ -8,14 +8,6 @@ describe UserCredential do
     it { should validate_presence_of(:user_id) }
   end
 
-  describe "mass assignment" do
-    it { should allow_mass_assignment_of :credential_name }
-
-    it { should allow_mass_assignment_of :credential_value }
-
-    it { should_not allow_mass_assignment_of :user_id }
-  end
-
   describe "cleaning fields" do
     it "should trim whitespace" do
       user_credential = user_credentials(:bob_aws_key)

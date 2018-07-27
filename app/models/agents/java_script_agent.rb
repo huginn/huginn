@@ -21,6 +21,8 @@ module Agents
       * `this.memory()`
       * `this.memory(key)`
       * `this.memory(keyToSet, valueToSet)`
+      * `this.setMemory(object)` (replaces the Agent's memory with the provided object)
+      * `this.deleteKey(key)` (deletes a key from memory and returns the value)
       * `this.credential(name)`
       * `this.credential(name, valueToSet)`
       * `this.options()`
@@ -113,13 +115,14 @@ module Agents
       context["getOptions"] = lambda { |a, x| interpolated.to_json }
       context["doLog"] = lambda { |a, x| log x }
       context["doError"] = lambda { |a, x| error x }
-      context["getMemory"] = lambda do |a, x, y|
-        if x && y
-          memory[x] = clean_nans(y)
-        else
-          memory.to_json
-        end
+      context["getMemory"] = lambda { |a| memory.to_json }
+      context["setMemoryKey"] = lambda do |a, x, y|
+        memory[x] = clean_nans(y)
       end
+      context["setMemory"] = lambda do |a, x|
+        memory.replace(clean_nans(x))
+      end
+      context["deleteKey"] = lambda { |a, x| memory.delete(x).to_json }
       context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
       context["unescapeHtml"] = lambda { |a, x| CGI.unescapeHTML(x) }
       context['getCredential'] = lambda { |a, k| credential(k); }
@@ -166,12 +169,16 @@ module Agents
 
         Agent.memory = function(key, value) {
           if (typeof(key) !== "undefined" && typeof(value) !== "undefined") {
-            getMemory(key, value);
+            setMemoryKey(key, value);
           } else if (typeof(key) !== "undefined") {
             return JSON.parse(getMemory())[key];
           } else {
             return JSON.parse(getMemory());
           }
+        }
+
+        Agent.setMemory = function(obj) {
+          setMemory(obj);
         }
 
         Agent.credential = function(name, value) {
@@ -198,6 +205,10 @@ module Agents
           doError(message);
         }
 
+        Agent.deleteKey = function(key) {
+          return JSON.parse(deleteKey(key));
+        }
+
         Agent.escapeHtml = function(html) {
           return escapeHtml(html);
         }
@@ -220,9 +231,9 @@ module Agents
     end
 
     def clean_nans(input)
-      if input.is_a?(Array)
+      if input.is_a?(V8::Array)
         input.map {|v| clean_nans(v) }
-      elsif input.is_a?(Hash)
+      elsif input.is_a?(V8::Object)
         input.inject({}) { |m, (k, v)| m[k] = clean_nans(v); m }
       elsif input.is_a?(Float) && input.nan?
         'NaN'

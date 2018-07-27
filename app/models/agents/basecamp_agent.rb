@@ -2,6 +2,7 @@ module Agents
   class BasecampAgent < Agent
     include FormConfigurable
     include Oauthable
+    include WebRequestConcern
     valid_oauth_providers :'37signals'
 
     cannot_receive_events!
@@ -87,7 +88,7 @@ module Agents
     end
 
     def request_options
-      {:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "Authorization" => "Bearer \"#{service.token}\""}}
+      {headers: {"User-Agent" => user_agent, "Authorization" => "Bearer \"#{service.token}\""}}
     end
 
     def query_parameters

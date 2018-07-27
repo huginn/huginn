@@ -24,8 +24,16 @@ module JobsHelper
   #
   # Can return nil, or an instance of Agent.
   def agent_from_job(job)
-    if data = YAML.load(job.handler).try(:job_data)
+    data = YAML.load(job.handler.to_s).try(:job_data)
+    case data['job_class']
+    when 'AgentCheckJob', 'AgentReceiveJob'
       Agent.find_by_id(data['arguments'][0])
+    when 'AgentRunScheduleJob'
+      "Run Agent schedule '#{data['arguments'][0]}'"
+    when 'AgentCleanupExpiredJob'
+      'Run Event cleanup'
+    when 'AgentPropagateJob'
+      'Run Event propagation'
     else
       false
     end

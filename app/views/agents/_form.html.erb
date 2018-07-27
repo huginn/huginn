@@ -25,7 +25,7 @@
           <% if @agent.new_record? %>
             <div class="form-group type-select">
               <%= f.label :type %>
-              <%= f.select :type, options_for_select([['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [type.name.gsub(/^.*::/, '').underscore.humanize.titleize, type, {title: h(Agent.build_for_type(type.name,current_user,{}).html_description.lines.first.strip)}] }, @agent.type), {}, :class => 'form-control' %>
+              <%= f.select :type, options_for_select(agent_type_select_options, @agent.type), {}, class: 'form-control', autofocus: true %>
             </div>
           <% end %>
         </div>
@@ -45,19 +45,20 @@
               <%= f.label :schedule, :class => 'control-label' %>
               <div class="schedule-region" data-can-be-scheduled="<%= @agent.can_be_scheduled? %>">
                 <div class="can-be-scheduled">
-                  <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [s.humanize.titleize, s] }, @agent.schedule), {}, :class => 'form-control' %>
+                  <%= f.select :schedule, options_for_select(Agent::SCHEDULES.map {|s| [builtin_schedule_name(s), s] }, @agent.schedule), {}, :class => 'form-control' %>
                 </div>
                 <span class='cannot-be-scheduled text-info'>This type of Agent cannot be scheduled.</span>
               </div>
             </div>
 
-            <div class="controller-region" data-has-controllers="<%= !@agent.controllers.empty? %>">
+            <div class="controller-region">
               <div class="form-group">
                 <%= f.label :controllers %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run or controlled by these user-defined Agents."></span>
-                <div class="controller-list">
-                  <%= agent_controllers(@agent) || 'None' %>
-                </div>
+                <%= f.select(:controller_ids,
+                             options_for_select(current_user.agents.select(&:can_control_other_agents?).pluck(:name, :id),
+                                                @agent.controller_ids),
+                             {}, { multiple: true, size: 5, class: 'select2-linked-tags form-control', data: {url_prefix: '/agents'}}) %>
               </div>
             </div>
 
@@ -68,7 +69,7 @@
                   <%= f.select(:control_target_ids,
                                options_for_select(current_user.agents.map {|s| [s.name, s.id] },
                                                   @agent.control_target_ids),
-                               {}, { multiple: true, size: 5, class: 'select2 form-control' }) %>
+                               {}, { multiple: true, size: 5, class: 'select2-linked-tags form-control', data: {url_prefix: '/agents'}}) %>
                 </div>
               </div>
             </div>
@@ -83,12 +84,13 @@
 
             <div class="form-group">
               <%= f.label :sources %>
+              <span class="glyphicon glyphicon-question-sign hover-help" data-content="This Agent will receive events from the selected Agents."></span>
               <div class="link-region" data-can-receive-events="<%= @agent.can_receive_events? %>">
                 <% eventSources = (current_user.agents - [@agent]).find_all { |a| a.can_create_events? } %>
                 <%= f.select(:source_ids,
                              options_for_select(eventSources.map {|s| [s.name, s.id] },
                                                 @agent.source_ids),
-                             {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
+                             {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/agents'} }) %>
                 <span class='cannot-receive-events text-info'>This type of Agent cannot receive events.</span>
                 <%= f.label :propagate_immediately, :class => 'propagate-immediately' do %>Propagate immediately
                   <%= f.check_box :propagate_immediately %>
@@ -98,13 +100,26 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <%= f.label :receivers %>
+              <span class="glyphicon glyphicon-question-sign hover-help" data-content="Events created by this Agent will be sent to the selected Agents."></span>
+              <div class="event-related-region">
+                <% eventTargets = (current_user.agents - [@agent]).find_all { |a| a.can_receive_events? } %>
+                <%= f.select(:receiver_ids,
+                             options_for_select(eventTargets.pluck(:name, :id),
+                                                @agent.receiver_ids),
+                             {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/agents'} }) %>
+                <span class='cannot-create-events text-info'>This type of Agent cannot create events.</span>
+              </div>
+            </div>
+
             <% if current_user.scenario_count > 0 %>
               <div class="form-group">
                 <%= f.label :scenarios %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="Use Scenarios to group sets of Agents, both for organization, and to make them easy to export and share."></span>
                 <%= f.select(:scenario_ids,
                              options_for_select(current_user.scenarios.pluck(:name, :id), @agent.scenario_ids),
-                             {}, { :multiple => true, :size => 5, :class => 'select2 form-control' }) %>
+                             {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/scenarios'} }) %>
               </div>
             <% end %>
 

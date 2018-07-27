@@ -1,6 +1,4 @@
 class Service < ActiveRecord::Base
-  attr_accessible :provider, :name, :token, :secret, :refresh_token, :expires_at, :global, :options, :uid
-
   serialize :options, Hash
 
   belongs_to :user, :inverse_of => :services
@@ -57,17 +55,8 @@ class Service < ActiveRecord::Base
     (config = Devise.omniauth_configs[provider.to_sym]) && config.args[1]
   end
 
-  def self.provider_specific_options(omniauth)
-    case omniauth['provider'].to_sym
-      when :'37signals'
-        { user_id: omniauth['extra']['accounts'][0]['id'], name: omniauth['info']['name'] }
-      else
-        { name: omniauth['info']['nickname'] || omniauth['info']['name'] }
-    end
-  end
-
   def self.initialize_or_update_via_omniauth(omniauth)
-    options = provider_specific_options(omniauth)
+    options = get_options(omniauth)
 
     find_or_initialize_by(provider: omniauth['provider'], uid: omniauth['uid'].to_s).tap do |service|
       service.assign_attributes token: omniauth['credentials']['token'],
@@ -77,5 +66,25 @@ class Service < ActiveRecord::Base
                                 expires_at: omniauth['credentials']['expires_at'] && Time.at(omniauth['credentials']['expires_at']),
                                 options: options
     end
+  end
+
+  def self.register_options_provider(provider_name, &block)
+    option_providers[provider_name] = block
+  end
+
+  def self.get_options(omniauth)
+    option_providers.fetch(omniauth['provider'], option_providers['default']).call(omniauth)
+  end
+
+  private
+  @@option_providers = HashWithIndifferentAccess.new
+  cattr_reader :option_providers
+
+  register_options_provider('default') do |omniauth|
+    {name: omniauth['info']['nickname'] || omniauth['info']['name']}
+  end
+
+  register_options_provider('37signals') do |omniauth|
+    {user_id: omniauth['extra']['accounts'][0]['id'], name: omniauth['info']['name']}
   end
 end

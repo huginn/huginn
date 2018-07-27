@@ -1,4 +1,4 @@
-# encoding: utf-8 
+# encoding: utf-8
 require 'rails_helper'
 
 describe Agents::WeiboPublishAgent do
@@ -9,7 +9,8 @@ describe Agents::WeiboPublishAgent do
       :app_key => "---",
       :app_secret => "---",
       :access_token => "---",
-      :message_path => "text"
+      :message_path => "text",
+      :pic_path => "pic"
     }
 
     @checker = Agents::WeiboPublishAgent.new(:name => "Weibo Publisher", :options => @opts)
@@ -22,7 +23,9 @@ describe Agents::WeiboPublishAgent do
     @event.save!
 
     @sent_messages = []
+    @sent_pictures = []
     stub.any_instance_of(Agents::WeiboPublishAgent).publish_tweet { |message| @sent_messages << message}
+    stub.any_instance_of(Agents::WeiboPublishAgent).publish_tweet_with_pic { |message, picture| @sent_pictures << picture}
   end
 
   describe '#receive' do
@@ -52,8 +55,40 @@ describe Agents::WeiboPublishAgent do
 
       Agents::WeiboPublishAgent.async_receive(@checker.id, [event.id])
       expect(@sent_messages.count).to eq(1)
+      expect(@sent_pictures.count).to eq(0)
       expect(@checker.events.count).to eq(1)
       expect(@sent_messages.first.include?("t.co")).not_to be_truthy
+    end
+  end
+
+  describe '#receive payload with picture url' do
+    before do
+      stub_request(:head, 'http://valid.image').to_return(status: 200, headers: {"Content-Type" => "image/jpeg"})
+      stub_request(:head, 'http://invalid.image').to_return(status: 200, headers: {"Content-Type" => "text/html"})
+    end
+
+    it 'should publish a tweet without a picture if image url is not valid' do
+      event = Event.new
+      event.agent = agents(:bob_weather_agent)
+      event.payload = {:text => 'whatever', :pic => 'http://invalid.image'}
+      event.save!
+
+      Agents::WeiboPublishAgent.async_receive(@checker.id, [event.id])
+      expect(@sent_messages.count).to eq(1)
+      expect(@sent_pictures.count).to eq(0)
+      expect(@checker.events.count).to eq(1)
+    end
+
+    it 'should publish a tweet along with a picture if image url is valid' do
+      event = Event.new
+      event.agent = agents(:bob_weather_agent)
+      event.payload = {:text => 'whatever', :pic => 'http://valid.image'}
+      event.save!
+
+      Agents::WeiboPublishAgent.async_receive(@checker.id, [event.id])
+      expect(@sent_messages.count).to eq(0)
+      expect(@sent_pictures.count).to eq(1)
+      expect(@checker.events.count).to eq(1)
     end
   end
 

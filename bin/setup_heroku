@@ -49,9 +49,9 @@ end
 
 if (root_id = `git rev-list --max-parents=0 HEAD`.chomp) != '620acffa5a302c6a27165d3214cf3da6be6c1d0d'
   if (`git remote`.split - %w[heroku]).empty?
-    puts "You don't seem to have cantino/huginn set up as upstream repository."
+    puts "You don't seem to have huginn/huginn set up as upstream repository."
     if yes?("Would you like me to set this working tree up for you?", default: :yes)
-      if system('git remote add origin https://github.com/cantino/huginn.git') &&
+      if system('git remote add origin https://github.com/huginn/huginn.git') &&
         system('git remote update origin')
         rebase_command = "git rebase #{root_id} --onto origin/master"
         if system(rebase_command)
@@ -160,7 +160,7 @@ if first_time
   puts
   puts "\t#{$config['INVITATION_CODE']}"
   puts
-  puts "We strongly recommend that you read https://github.com/cantino/huginn/blob/master/doc/heroku/install.md thoroughly!"
+  puts "We strongly recommend that you read https://github.com/huginn/huginn/blob/master/doc/heroku/install.md thoroughly!"
 end
 
 puts

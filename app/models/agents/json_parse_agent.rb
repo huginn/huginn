@@ -7,7 +7,7 @@ module Agents
     description <<-MD
       The JSON Parse Agent parses a JSON string and emits the data in a new event
 
-      `data` is the JSON to parse. Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating to specify the JSON string.
+      `data` is the JSON to parse. Use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templating to specify the JSON string.
 
       `data_key` sets the key which contains the parsed JSON data in emitted events
     MD

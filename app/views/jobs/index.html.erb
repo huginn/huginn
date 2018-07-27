@@ -1,3 +1,5 @@
+<% content_for :title, "Jobs" -%>
+
 <div class='container'>
   <div class='row'>
     <div class='col-md-12'>
@@ -11,7 +13,7 @@
         <table class='table table-striped events'>
           <tr>
             <th>Status</th>
-            <th>Agent</th>
+            <th>Agent / Job</th>
             <th>Created</th>
             <th>Next Run</th>
             <th>Attempts</th>
@@ -25,6 +27,8 @@
             <td><% case agent = agent_from_job(job)
                    when Agent
                    %><%= link_to(agent.name, agent_path(agent)) %><%
+                   when String
+                   %><%= agent %><%
                    when false
                    %>(system)<%
                    when nil
@@ -78,6 +82,10 @@
       <div class="btn-group">
         <%= link_to destroy_failed_jobs_path, class: "btn btn-default", method: :delete do %>
           <span class="glyphicon glyphicon-trash"></span> Remove failed jobs
+        <% end %>
+
+        <%= link_to retry_queued_jobs_path, class: "btn btn-default", method: :post do %>
+          <span class="glyphicon glyphicon-refresh"></span> Retry queued jobs
         <% end %>
 
         <%= link_to destroy_all_jobs_path, class: "btn btn-default", method: :delete, data: { confirm: "Are you sure you want to delete ALL pending jobs for all Huginn users?" } do %>

@@ -1,16 +1,24 @@
+<% content_for :title, (@agent ? @agent.name + "'s " : "") + "Events" -%>
+
 <div class='container'>
   <div class='row'>
     <div class='col-md-12'>
       <div class="page-header">
         <h2>
-          Your Events <%= @agent && "from #{@agent.name}" %>
+          Your Events
+          <% if @agent %>
+            from <%= @agent.name %>
+            <%= render 'agents/mini_action_menu', agent: @agent, return_to: request.path %>
+          <% end %>
         </h2>
       </div>
 
       <div class='table-responsive'>
         <table class='table table-striped events'>
           <tr>
-            <th>Source</th>
+            <% unless @agent %>
+              <th>Source</th>
+            <% end %>
             <th>Created</th>
             <th>Payload</th>
             <th></th>
@@ -19,12 +27,14 @@
         <% @events.each do |event| %>
           <% next unless event.agent %>
           <%= content_tag :tr, class: (highlighted?(event.id) ? 'hl' : nil) do %>
-            <td><%= link_to event.agent.name, agent_path(event.agent, return: request.fullpath) %></td>
+            <% unless @agent %>
+              <td><%= link_to event.agent.name, agent_path(event.agent, return: request.fullpath) %></td>
+            <% end %>
             <td title='<%= event.created_at %>'><%= time_ago_in_words event.created_at %> ago</td>
             <td class='payload'><%= truncate event.payload.to_json, :length => 90, :omission => "" %></td>
             <td>
               <div class="btn-group btn-group-xs">
-                <%= link_to 'Show', event_path(event), class: "btn btn-default" %>
+                <%= link_to 'Show', event_path(event, return: request.fullpath), class: "btn btn-default" %>
                 <%= link_to 'Re-emit', reemit_event_path(event), method: :post, data: { confirm: 'Are you sure you want to duplicate this event and emit the new one now?' }, class: "btn btn-default" %>
                 <%= link_to 'Delete', event_path(event), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default" %>
               </div>
@@ -34,7 +44,7 @@
         </table>
       </div>
 
-      <%= paginate @events, params: params.slice(:hl), theme: 'twitter-bootstrap-3' %>
+      <%= paginate @events, params: params.to_unsafe_h.slice(:hl), theme: 'twitter-bootstrap-3' %>
 
       <br />
 

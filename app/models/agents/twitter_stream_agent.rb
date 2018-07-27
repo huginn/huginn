@@ -125,7 +125,7 @@ module Agents
     end
 
     def self.setup_worker
-      Agents::TwitterStreamAgent.active.group_by { |agent| agent.twitter_oauth_token }.map do |oauth_token, agents|
+      Agents::TwitterStreamAgent.active.order(:id).group_by { |agent| agent.twitter_oauth_token }.map do |oauth_token, agents|
         if Agents::TwitterStreamAgent.dependencies_missing?
           STDERR.puts Agents::TwitterStreamAgent.twitter_dependencies_missing
           STDERR.flush
@@ -182,7 +182,7 @@ module Agents
         filters = filters.map(&:downcase).uniq
 
         stream = Twitter::JSONStream.connect(
-          :path    => "/1/statuses/#{(filters && filters.length > 0) ? 'filter' : 'sample'}.json#{"?track=#{filters.map {|f| CGI::escape(f) }.join(",")}" if filters && filters.length > 0}",
+          :path    => "/1.1/statuses/#{(filters && filters.length > 0) ? 'filter' : 'sample'}.json#{"?track=#{filters.map {|f| CGI::escape(f) }.join(",")}" if filters && filters.length > 0}",
           :ssl     => true,
           :oauth   => {
             :consumer_key    => agent.twitter_consumer_key,

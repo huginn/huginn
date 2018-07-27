@@ -9,14 +9,15 @@ module Agents
     description <<-MD
       The Email Agent sends any events it receives via email immediately.
 
-      You can specify the email's subject line by providing a `subject` option, which can contain Liquid formatting.  E.g.,
+      You can specify the email's subject line by providing a `subject` option, which can contain [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) formatting.  E.g.,
       you could provide `"Huginn email"` to set a simple subject, or `{{subject}}` to use the `subject` key from the incoming Event.
 
       By default, the email body will contain an optional `headline`, followed by a listing of the Events' keys.
 
       You can customize the email body by including the optional `body` param.  Like the `subject`, the `body` can be a simple message
       or a Liquid template.  You could send only the Event's `some_text` field with a `body` set to `{{ some_text }}`.
-      The body can contain simple HTML and will be sanitized.
+      The body can contain simple HTML and will be sanitized. Note that when using `body`, it will be wrapped with `<html>` and `<body>` tags,
+      so you do not need to add these yourself.
 
       You can specify one or more `recipients` for the email, or skip the option in order to send the email to your
       account's default email address.

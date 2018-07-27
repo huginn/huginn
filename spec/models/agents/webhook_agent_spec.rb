@@ -49,12 +49,44 @@ describe Agents::WebhookAgent do
       expect(out).to eq(['', 201])
     end
 
+    it 'should respond with interpolated response message if configured with `response` option' do
+      agent.options['response'] = '{{some_key.people[1].name}}'
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['jon', 201])
+    end
+
+    it 'should respond with custom response header if configured with `response_headers` option' do
+      agent.options['response_headers'] = {"X-My-Custom-Header" => 'hello'}
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201, "text/plain", {"X-My-Custom-Header" => 'hello'}])
+    end
+
     it 'should respond with `Event Created` if the response option is nil or missing' do
       agent.options['response'] = nil
       out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
       expect(out).to eq(['Event Created', 201])
 
       agent.options.delete('response')
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201])
+    end
+
+    it 'should respond with customized response code if configured with `code` option' do
+      agent.options['code'] = '200'
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 200])
+    end
+
+    it 'should respond with `201` if the code option is empty, nil or missing' do
+      agent.options['code'] = ''
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201])
+      
+      agent.options['code'] = nil
+      out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
+      expect(out).to eq(['Event Created', 201])
+
+      agent.options.delete('code')
       out = agent.receive_web_request({ 'secret' => 'foobar', 'some_key' => payload }, "post", "text/html")
       expect(out).to eq(['Event Created', 201])
     end

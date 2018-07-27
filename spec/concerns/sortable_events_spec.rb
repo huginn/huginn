@@ -210,9 +210,9 @@ describe SortableEvents do
         end
       end
 
-      def new_agent(events_order = nil)
+      let :new_agent do
         options = {}
-        options['events_order'] = events_order if events_order
+        options['events_order'] = @events_order
         Agents::EventOrderableAgent.new(name: 'test', options: options) { |agent|
           agent.user = users(:bob)
           agent.payloads_to_emit = payloads
@@ -229,25 +229,30 @@ describe SortableEvents do
       }
 
       it 'should keep the order of created events unless events_order is specified' do
-        [[], [nil], [[]]].each do |args|
-          agent = new_agent(*args)
+        [nil, []].each do |events_order|
+          @events_order = events_order
+          agent = new_agent
           agent.save!
           expect { agent.check }.to change { Event.count }.by(4)
           events = agent.events.last(4).sort_by(&:id)
+          expect(events.map(&:payload)).to match_array(payloads)
           expect(events.map { |event| event.payload['title'] }).to eq(%w[TitleA TitleB TitleD TitleC])
         end
       end
 
       it 'should sort events created in check() in the order specified in events_order' do
-        agent = new_agent([['{{score}}', 'number'], ['{{title}}', 'string', true]])
+        @events_order = [['{{score}}', 'number'], ['{{title}}', 'string', true]]
+        agent = new_agent
         agent.save!
         expect { agent.check }.to change { Event.count }.by(4)
         events = agent.events.last(4).sort_by(&:id)
+        expect(events.map(&:payload)).to match_array(payloads)
         expect(events.map { |event| event.payload['title'] }).to eq(%w[TitleB TitleA TitleD TitleC])
       end
 
       it 'should sort events created in receive() in the order specified in events_order' do
-        agent = new_agent([['{{score}}', 'number'], ['{{title}}', 'string', true]])
+        @events_order = [['{{score}}', 'number'], ['{{title}}', 'string', true]]
+        agent = new_agent
         agent.save!
         expect {
           agent.receive([Event.new(payload: { 'title_suffix' => ' [new]' }),
@@ -258,6 +263,49 @@ describe SortableEvents do
           'TitleB [new]',     'TitleA [new]',     'TitleD [new]',     'TitleC [new]',
           'TitleB [popular]', 'TitleA [popular]', 'TitleD [popular]', 'TitleC [popular]',
         ])
+      end
+
+      describe 'with the include_sort_info option enabled' do
+        let :new_agent do
+          agent = super()
+          agent.options['include_sort_info'] = true
+          agent
+        end
+
+        it 'should add sort_info to events created in check() when events_order is not specified' do
+          agent = new_agent
+          agent.save!
+          expect { agent.check }.to change { Event.count }.by(4)
+          events = agent.events.last(4).sort_by(&:id)
+          expect(events.map { |event| event.payload['title'] }).to eq(%w[TitleA TitleB TitleD TitleC])
+          expect(events.map { |event| event.payload['sort_info'] }).to eq((1..4).map{ |pos| { 'position' => pos, 'count' => 4 } })
+        end
+
+        it 'should add sort_info to events created in check() when events_order is specified' do
+          @events_order = [['{{score}}', 'number'], ['{{title}}', 'string', true]]
+          agent = new_agent
+          agent.save!
+          expect { agent.check }.to change { Event.count }.by(4)
+          events = agent.events.last(4).sort_by(&:id)
+          expect(events.map { |event| event.payload['title'] }).to eq(%w[TitleB TitleA TitleD TitleC])
+          expect(events.map { |event| event.payload['sort_info'] }).to eq((1..4).map{ |pos| { 'position' => pos, 'count' => 4 } })
+        end
+
+        it 'should add sort_info to events created in receive() when events_order is specified' do
+          @events_order = [['{{score}}', 'number'], ['{{title}}', 'string', true]]
+          agent = new_agent
+          agent.save!
+          expect {
+            agent.receive([Event.new(payload: { 'title_suffix' => ' [new]' }),
+                           Event.new(payload: { 'title_suffix' => ' [popular]' })])
+          }.to change { Event.count }.by(8)
+          events = agent.events.last(8).sort_by(&:id)
+          expect(events.map { |event| event.payload['title'] }).to eq([
+            'TitleB [new]',     'TitleA [new]',     'TitleD [new]',     'TitleC [new]',
+            'TitleB [popular]', 'TitleA [popular]', 'TitleD [popular]', 'TitleC [popular]',
+          ])
+          expect(events.map { |event| event.payload['sort_info'] }).to eq((1..4).map{ |pos| { 'position' => pos, 'count' => 4 } } * 2)
+        end
       end
     end
   end

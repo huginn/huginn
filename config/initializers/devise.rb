@@ -161,7 +161,7 @@ Devise.setup do |config|
   config.lock_strategy = Utils.if_present(ENV['LOCK_STRATEGY'], :to_sym) || :failed_attempts
 
   # Defines which key will be used when locking and unlocking an account
-  config.unlock_keys = [ :email ]
+  config.unlock_keys = [ :login ]
 
   # Defines which strategy will be used to unlock an account.
   # :email = Sends an unlock link to the user email
@@ -251,10 +251,10 @@ Devise.setup do |config|
     config.omniauth :'37signals', key, secret
   end
 
-  if defined?(OmniAuth::Strategies::Dropbox) &&
+  if defined?(OmniAuth::Strategies::DropboxOauth2) &&
      (key = ENV["DROPBOX_OAUTH_KEY"]).present? &&
      (secret = ENV["DROPBOX_OAUTH_SECRET"]).present?
-    config.omniauth :dropbox, key, secret
+    config.omniauth :dropbox, key, secret, strategy_class: OmniAuth::Strategies::DropboxOauth2, request_path: '/auth/dropbox', callback_path: '/auth/dropbox/callback'
   end
 
   if defined?(OmniAuth::Strategies::Wunderlist) &&

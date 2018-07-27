@@ -46,6 +46,8 @@ module WebRequestConcern
             # Never try to transcode a binary content
             next
           end
+          # Return body as binary if default_encoding is nil
+          next if encoding.nil?
         end
         body.encode!(Encoding::UTF_8, encoding)
       end
@@ -60,7 +62,11 @@ module WebRequestConcern
     if options['user_agent'].present?
       errors.add(:base, "user_agent must be a string") unless options['user_agent'].is_a?(String)
     end
-
+    
+    if options['proxy'].present?
+      errors.add(:base, "proxy must be a string") unless options['proxy'].is_a?(String)
+    end
+    
     if options['disable_ssl_verification'].present? && boolify(options['disable_ssl_verification']).nil?
       errors.add(:base, "if provided, disable_ssl_verification must be true or false")
     end
@@ -89,6 +95,9 @@ module WebRequestConcern
     end
   end
 
+  # The default encoding for a text content with no `charset`
+  # specified in the Content-Type header.  Override this and make it
+  # return nil if you want to detect the encoding on your own.
   def default_encoding
     Encoding::UTF_8
   end
@@ -109,10 +118,13 @@ module WebRequestConcern
       builder.headers = headers if headers.length > 0
 
       builder.headers[:user_agent] = user_agent
+      
+      builder.proxy interpolated['proxy'].presence
 
       unless boolify(interpolated['disable_redirect_follow'])
         builder.use FaradayMiddleware::FollowRedirects
       end
+      builder.request :multipart
       builder.request :url_encoded
 
       if boolify(interpolated['disable_url_encoding'])
@@ -159,7 +171,7 @@ module WebRequestConcern
 
   module ClassMethods
     def default_user_agent
-      ENV.fetch('DEFAULT_HTTP_USER_AGENT', "Huginn - https://github.com/cantino/huginn")
+      ENV.fetch('DEFAULT_HTTP_USER_AGENT', "Huginn - https://github.com/huginn/huginn")
     end
   end
 end

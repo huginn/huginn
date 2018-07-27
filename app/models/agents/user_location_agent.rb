@@ -14,6 +14,8 @@ module Agents
       If you want to only keep more precise locations, set `max_accuracy` to the upper bound, in meters. The default name for this field is `accuracy`, but you can change this by setting a value for `accuracy_field`.
 
       If you want to require a certain distance traveled, set `min_distance` to the minimum distance, in meters. Note that GPS readings and the measurement itself aren't exact, so don't rely on this for precision filtering.
+
+      To view the locations on a map, set `api_key` to your [Google Maps JavaScript API key](https://developers.google.com/maps/documentation/javascript/get-api-key#key).
     MD
     end
 
@@ -42,6 +44,7 @@ module Agents
         'secret' => SecureRandom.hex(7),
         'max_accuracy' => '',
         'min_distance' => '',
+        'api_key' => '',
       }
     end
 

@@ -37,11 +37,11 @@ describe JobsController do
     end
 
     it "destroy a job which is not running" do
-      expect { delete :destroy, id: @not_running.id }.to change(Delayed::Job, :count).by(-1)
+      expect { delete :destroy, params: {id: @not_running.id} }.to change(Delayed::Job, :count).by(-1)
     end
 
     it "does not destroy a running job" do
-      expect { delete :destroy, id: @running.id }.to change(Delayed::Job, :count).by(0)
+      expect { delete :destroy, params: {id: @running.id} }.to change(Delayed::Job, :count).by(0)
     end
   end
 
@@ -54,15 +54,15 @@ describe JobsController do
     end
 
     it "queue a job which is not running" do
-      expect { put :run, id: @not_running.id }.to change { @not_running.reload.run_at }
+      expect { put :run, params: {id: @not_running.id} }.to change { @not_running.reload.run_at }
     end
 
     it "queue a job that failed" do
-      expect { put :run, id: @failed.id }.to change { @failed.reload.run_at }
+      expect { put :run, params: {id: @failed.id} }.to change { @failed.reload.run_at }
     end
 
     it "not queue a running job" do
-      expect { put :run, id: @running.id }.not_to change { @not_running.reload.run_at }
+      expect { put :run, params: {id: @running.id} }.not_to change { @not_running.reload.run_at }
     end
   end
 
@@ -90,6 +90,20 @@ describe JobsController do
     it "destroys all jobs" do
       expect { delete :destroy_all }.to change(Delayed::Job, :count).by(-2)
       expect(Delayed::Job.find(@running.id)).to be
+    end
+  end
+
+  describe "POST retry_queued" do
+    before do
+      @not_running = Delayed::Job.create(run_at: Time.zone.now - 1.hour)
+      @not_running.update_attribute(:attempts, 1)
+      sign_in users(:jane)
+    end
+
+    it "run the queued job" do
+      expect(Delayed::Job.last.run_at.to_i).not_to be_within(2).of(Time.zone.now.to_i)
+      post :retry_queued
+      expect(Delayed::Job.last.run_at.to_i).to be_within(2).of(Time.zone.now.to_i)
     end
   end
 end

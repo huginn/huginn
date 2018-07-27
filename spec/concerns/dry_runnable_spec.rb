@@ -70,7 +70,7 @@ describe DryRunnable do
       [@agent.memory, counts]
     }
 
-    expect(results[:log]).to match(/\AE, .+ ERROR -- : Exception during dry-run. SandboxedAgent does not support dry-run: /)
+    expect(results[:log]).to match(/\A\[\d\d:\d\d:\d\d\] INFO -- : Dry Run failed\n\[\d\d:\d\d:\d\d\] ERROR -- : Exception during dry-run. SandboxedAgent does not support dry-run: /)
     expect(results[:events]).to eq([])
     expect(results[:memory]).to eq({})
   end
@@ -86,7 +86,7 @@ describe DryRunnable do
         [@agent.memory, counts]
       }
 
-      expect(results[:log]).to match(/\AI, .+ INFO -- : Logging\nE, .+ ERROR -- : Recording error\n/)
+      expect(results[:log]).to match(/\A\[\d\d:\d\d:\d\d\] INFO -- : Dry Run started\n\[\d\d:\d\d:\d\d\] INFO -- : Logging\n\[\d\d:\d\d:\d\d\] ERROR -- : Recording error\n/)
       expect(results[:events]).to eq([{ 'test' => 'foo' }, { 'test' => 'bar' }])
       expect(results[:memory]).to eq({ 'last_status' => 'ok', 'dry_run' => true })
     end
@@ -101,7 +101,7 @@ describe DryRunnable do
         [@agent.memory, counts]
       }
 
-      expect(results[:log]).to match(/\AI, .+ INFO -- : Logging\nE, .+ ERROR -- : Recording error\n/)
+      expect(results[:log]).to match(/\A\[\d\d:\d\d:\d\d\] INFO -- : Dry Run started\n\[\d\d:\d\d:\d\d\] INFO -- : Logging\n\[\d\d:\d\d:\d\d\] ERROR -- : Recording error\n/)
       expect(results[:events]).to eq([{ 'test' => 'superfoo' }, { 'test' => 'superbar' }])
       expect(results[:memory]).to eq({ 'last_status' => 'ok', 'dry_run' => true })
     end

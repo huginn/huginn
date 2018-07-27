@@ -1,4 +1,4 @@
-require 'capybara_helper'
+require 'rails_helper'
 
 describe Admin::UsersController do
   it "requires to be signed in as an admin" do
@@ -22,7 +22,7 @@ describe Admin::UsersController do
       visit admin_users_path
       find(:css, "a[href='/admin/users/#{users(:bob).id}']").click
       expect(page).to have_text("User 'bob' was deleted.")
-      expect(page).not_to have_text('bob@example.com')
+      expect(page).to have_no_text('bob@example.com')
     end
 
     context "creating new users" do
@@ -82,23 +82,23 @@ describe Admin::UsersController do
     context "(de)activating users" do
       it "does not show deactivation buttons for the current user" do
         visit admin_users_path
-        expect(page).not_to have_css("a[href='/admin/users/#{users(:jane).id}/deactivate']")
+        expect(page).to have_no_css("a[href='/admin/users/#{users(:jane).id}/deactivate']")
       end
 
       it "deactivates an existing user" do
         visit admin_users_path
-        expect(page).not_to have_text('inactive')
+        expect(page).to have_no_text('inactive')
         find(:css, "a[href='/admin/users/#{users(:bob).id}/deactivate']").click
         expect(page).to have_text('inactive')
         users(:bob).reload
         expect(users(:bob)).not_to be_active
       end
 
-      it "deactivates an existing user" do
+      it "activates an existing user" do
         users(:bob).deactivate!
         visit admin_users_path
         find(:css, "a[href='/admin/users/#{users(:bob).id}/activate']").click
-        expect(page).not_to have_text('inactive')
+        expect(page).to have_no_text('inactive')
         users(:bob).reload
         expect(users(:bob)).to be_active
       end

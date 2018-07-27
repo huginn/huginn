@@ -8,10 +8,24 @@ class AgentsController < ApplicationController
 
     @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
+    if show_only_enabled_agents?
+      @agents = @agents.where(disabled: false)
+    end
+
     respond_to do |format|
       format.html
       format.json { render json: @agents }
     end
+  end
+
+  def toggle_visibility
+    if show_only_enabled_agents?
+      mark_all_agents_viewable
+    else
+      set_only_enabled_agents_as_viewable
+    end
+
+    redirect_to agents_path
   end
 
   def handle_details_post
@@ -31,47 +45,6 @@ class AgentsController < ApplicationController
     respond_to do |format|
       format.html { redirect_back "Agent run queued for '#{@agent.name}'" }
       format.json { head :ok }
-    end
-  end
-
-  def dry_run
-    attrs = params[:agent] || {}
-    if agent = current_user.agents.find_by(id: params[:id])
-      # POST /agents/:id/dry_run
-      if attrs.present?
-        type = agent.type
-        agent = Agent.build_for_type(type, current_user, attrs)
-      end
-    else
-      # POST /agents/dry_run
-      type = attrs.delete(:type)
-      agent = Agent.build_for_type(type, current_user, attrs)
-    end
-    agent.name ||= '(Untitled)'
-
-    if agent.valid?
-      if event_payload = params[:event]
-        dummy_agent = Agent.build_for_type('ManualEventAgent', current_user, name: 'Dry-Runner')
-        dummy_agent.readonly!
-        event = dummy_agent.events.build(user: current_user, payload: event_payload)
-      end
-
-      results = agent.dry_run!(event)
-
-      render json: {
-        log: results[:log],
-        events: Utils.pretty_print(results[:events], false),
-        memory: Utils.pretty_print(results[:memory] || {}, false),
-      }
-    else
-      render json: {
-        log: [
-          "#{pluralize(agent.errors.count, "error")} prohibited this Agent from being saved:",
-          *agent.errors.full_messages
-        ].join("\n- "),
-        events: '',
-        memory: '',
-      }
     end
   end
 
@@ -113,11 +86,15 @@ class AgentsController < ApplicationController
   end
 
   def propagate
-    details = Agent.receive! # Eventually this should probably be scoped to the current_user.
-
     respond_to do |format|
-      format.html { redirect_back "Queued propagation calls for #{details[:event_count]} event(s) on #{details[:agent_count]} agent(s)" }
-      format.json { head :ok }
+      if AgentPropagateJob.can_enqueue?
+        details = Agent.receive! # Eventually this should probably be scoped to the current_user.
+        format.html { redirect_back "Queued propagation calls for #{details[:event_count]} event(s) on #{details[:agent_count]} agent(s)" }
+        format.json { head :ok }
+      else
+        format.html { redirect_back "Event propagation is already scheduled to run." }
+        format.json { head :locked }
+      end
     end
   end
 
@@ -183,7 +160,7 @@ class AgentsController < ApplicationController
     @agent = current_user.agents.find(params[:id])
 
     respond_to do |format|
-      if @agent.update_attributes(params[:agent])
+      if @agent.update_attributes(agent_params)
         format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
@@ -219,9 +196,9 @@ class AgentsController < ApplicationController
     build_agent
 
     if @agent.validate_option(params[:attribute])
-      render text: 'ok'
+      render plain: 'ok'
     else
-      render text: 'error', status: 403
+      render plain: 'error', status: 403
     end
   end
 
@@ -229,6 +206,12 @@ class AgentsController < ApplicationController
     build_agent
 
     render json: @agent.complete_option(params[:attribute])
+  end
+
+  def destroy_undefined
+    current_user.undefined_agents.destroy_all
+
+    redirect_back "All undefined Agents have been deleted."
   end
 
   protected
@@ -243,14 +226,30 @@ class AgentsController < ApplicationController
   end
 
   def build_agent
-    @agent = Agent.build_for_type(params[:agent].delete(:type),
+    @agent = Agent.build_for_type(agent_params[:type],
                                   current_user,
-                                  params[:agent])
+                                  agent_params.except(:type))
   end
 
   def initialize_presenter
     if @agent.present? && @agent.is_form_configurable?
       @agent = FormConfigurableAgentPresenter.new(@agent, view_context)
     end
+  end
+
+  private
+  def show_only_enabled_agents?
+    !!cookies[:huginn_view_only_enabled_agents]
+  end
+
+  def set_only_enabled_agents_as_viewable
+    cookies[:huginn_view_only_enabled_agents] = {
+      value: "true",
+      expires: 1.year.from_now
+    }
+  end
+
+  def mark_all_agents_viewable
+    cookies.delete(:huginn_view_only_enabled_agents)
   end
 end

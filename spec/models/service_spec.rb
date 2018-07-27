@@ -98,6 +98,7 @@ describe Service do
       expect(service.token).to eq('a1b2c3d4...')
       expect(service.secret).to eq('abcdef1234')
     end
+
     it "should work with 37signals services" do
       signals = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/37signals.json')))
       expect {
@@ -113,6 +114,7 @@ describe Service do
       expect(service.options[:user_id]).to eq(12345)
       service.expires_at = Time.at(1401554352)
     end
+
     it "should work with github services" do
       signals = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/github.json')))
       expect {
@@ -124,6 +126,29 @@ describe Service do
       expect(service.name).to eq('dsander')
       expect(service.uid).to eq('12345')
       expect(service.token).to eq('agithubtoken')
+    end
+  end
+
+  describe 'omniauth options provider registry for non-conforming omniauth responses' do
+    describe '.register_options_provider' do
+      before do
+        Service.register_options_provider('test-omniauth-provider') do |omniauth|
+          { name: omniauth['special_field'] }
+        end
+      end
+
+      after do
+        Service.option_providers.delete('test-omniauth-provider')
+      end
+
+      it 'allows gem developers to add their own options provider to the registry' do
+        actual_options = Service.get_options({
+          'provider' => 'test-omniauth-provider',
+          'special_field' => 'A Great Name'
+        })
+
+        expect(actual_options[:name]).to eq('A Great Name')
+      end
     end
   end
 end

@@ -36,7 +36,7 @@ module TwitterConcern
   end
 
   def twitter
-    Twitter::REST::Client.new do |config|
+    @twitter ||= Twitter::REST::Client.new do |config|
       config.consumer_key = twitter_consumer_key
       config.consumer_secret = twitter_consumer_secret
       config.access_token = twitter_oauth_token
@@ -54,3 +54,7 @@ module TwitterConcern
     end
   end
 end
+
+Twitter::Error::FORBIDDEN_MESSAGES = Twitter::Error.send(:remove_const, :FORBIDDEN_MESSAGES).merge(
+  'You have already retweeted this tweet.' => Twitter::Error::AlreadyRetweeted
+).freeze

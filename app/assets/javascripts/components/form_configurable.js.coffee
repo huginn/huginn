@@ -53,10 +53,13 @@ $ ->
     updateDropdownData = (form_data, element, data) ->
       returnedResults[form_data.attribute] = {text: 'Options', children: data}
       $(element).trigger('change')
+      $("input[role~=completable]").off 'select2-opening', select2OpeningCallback
       $(element).select2('open')
+      $("input[role~=completable]").on 'select2-opening', select2OpeningCallback
 
-    $("input[role~=completable]").on 'select2-open', (e) ->
+    select2OpeningCallback = (e) ->
       form_data = getFormData(e.currentTarget)
+      delete returnedResults[form_data.attribute] if returnedResults[form_data.attribute] && !$(e.currentTarget).data('cacheResponse')
       return if returnedResults[form_data.attribute]
 
       $.ajax '/agents/complete',
@@ -66,6 +69,8 @@ $ ->
           updateDropdownData(form_data, e.currentTarget, data)
         error: (data) ->
           updateDropdownData(form_data, e.currentTarget, [{id: undefined, text: 'Error loading data.'}])
+
+    $("input[role~=completable]").on 'select2-opening', select2OpeningCallback
 
     $("input[type=radio][role~=form-configurable]").change (e) ->
       input = $(e.currentTarget).parents().siblings("input[data-attribute=#{$(e.currentTarget).data('attribute')}]")

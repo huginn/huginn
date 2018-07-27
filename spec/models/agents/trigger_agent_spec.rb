@@ -270,6 +270,28 @@ describe Agents::TriggerAgent do
       }.to change { Event.count }.by(1)
     end
 
+    it "handles array of `not in` comparisons" do
+      @event.payload['foo']['bar']['baz'] = "hello world"
+      @checker.options['rules'].first['type'] = "not in"
+      @checker.options['rules'].first['value'] = ["hello world", "hello world"]
+
+      expect {
+        @checker.receive([@event])
+      }.not_to change { Event.count }
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello world"]
+
+      expect {
+        @checker.receive([@event])
+      }.not_to change { Event.count }
+
+      @checker.options['rules'].first['value'] = ["hello there", "hello here"]
+
+      expect {
+        @checker.receive([@event])
+      }.to change { Event.count }.by(1)
+    end
+
     it "does fine without dots in the path" do
       @event.payload = { 'hello' => "world" }
       @checker.options['rules'].first['type'] = "field==value"

@@ -15,6 +15,8 @@ module LiquidInterpolatable
 
   def validate_interpolation
     interpolated
+  rescue Liquid::ZeroDivisionError => e
+    # Ignore error (likely due to possibly missing variables on "divided_by")
   rescue Liquid::Error => e
     errors.add(:options, "has an error with Liquid templating: #{e.message}")
   rescue
@@ -66,6 +68,14 @@ module LiquidInterpolatable
     end
   end
 
+  def interpolate_with_each(array)
+    array.each do |object|
+      interpolate_with(object) do
+        yield object
+      end
+    end
+  end
+
   def interpolate_options(options, self_object = nil)
     interpolate_with(self_object) do
       case options
@@ -92,7 +102,9 @@ module LiquidInterpolatable
 
   def interpolate_string(string, self_object = nil)
     interpolate_with(self_object) do
-      Liquid::Template.parse(string).render!(interpolation_context)
+      catch :as_object do
+        Liquid::Template.parse(string).render!(interpolation_context)
+      end
     end
   end
 
@@ -127,10 +139,11 @@ module LiquidInterpolatable
     # userinfo, host, port, registry, path, opaque, query, and
     # fragment.
     def to_uri(uri, base_uri = nil)
-      if base_uri
-        URI(base_uri) + uri.to_s
+      case base_uri
+      when nil, ''
+        Utils.normalize_uri(uri.to_s)
       else
-        URI(uri.to_s)
+        Utils.normalize_uri(base_uri) + Utils.normalize_uri(uri.to_s)
       end
     rescue URI::Error
       nil
@@ -149,7 +162,7 @@ module LiquidInterpolatable
       else
         url = url.to_s
         begin
-          uri = URI(url)
+          uri = Utils.normalize_uri(url)
         rescue URI::Error
           return url
         end
@@ -170,7 +183,7 @@ module LiquidInterpolatable
             case response.status
             when 301, 302, 303, 307
               if location = response['location']
-                uri += location
+                uri += Utils.normalize_uri(location)
                 next
               end
             end
@@ -185,6 +198,11 @@ module LiquidInterpolatable
       logger.error "Too many rediretions in #{__method__}(#{url.inspect}) [uri=#{uri.to_s.inspect}]"
 
       url
+    end
+
+    # Rebase URIs contained in attributes in a given HTML fragment
+    def rebase_hrefs(input, base_uri)
+      Utils.rebase_hrefs(input, base_uri) rescue input
     end
 
     # Unescape (basic) HTML entities in a string
@@ -223,6 +241,25 @@ module LiquidInterpolatable
     # Serializes data as JSON
     def json(input)
       JSON.dump(input)
+    end
+
+    # Returns a Ruby object
+    #
+    # It can be used as a JSONPath replacement for Agents that only support Liquid:
+    #
+    # Event:   {"something": {"nested": {"data": 1}}}
+    # Liquid:  {{something.nested | as_object}}
+    # Returns: {"data": 1}
+    #
+    # Splitting up a string with Liquid filters and return the Array:
+    #
+    # Event:   {"data": "A,B,C"}}
+    # Liquid:  {{data | split: ',' | as_object}}
+    # Returns: ['A', 'B', 'C']
+    #
+    # as_object ALWAYS has be the last filter in a Liquid expression!
+    def as_object(object)
+      throw :as_object, object.as_json
     end
 
     private
@@ -359,21 +396,28 @@ module LiquidInterpolatable
         else
           raise Liquid::SyntaxError, 'Syntax Error in regex_replace tag - Valid syntax: regex_replace pattern in'
         end
-        @nodelist = @in_block = []
+        @in_block = Liquid::BlockBody.new
         @with_block = nil
       end
 
+      def parse(tokens)
+        if more = parse_body(@in_block, tokens)
+          @with_block = Liquid::BlockBody.new
+          parse_body(@with_block, tokens)
+       end
+     end
+
       def nodelist
         if @with_block
-          @in_block + @with_block
+          [@in_block, @with_block]
         else
-          @in_block
+          [@in_block]
         end
       end
 
       def unknown_tag(tag, markup, tokens)
         return super unless tag == 'with'.freeze
-        @nodelist = @with_block = []
+        @with_block = Liquid::BlockBody.new
       end
 
       def render(context)
@@ -383,7 +427,7 @@ module LiquidInterpolatable
           raise Liquid::SyntaxError, "Syntax Error in regex_replace tag - #{e.message}"
         end
 
-        subject = render_all(@in_block, context)
+        subject = @in_block.render(context)
 
         subject.send(first? ? :sub : :gsub, regexp) {
           next '' unless @with_block
@@ -393,7 +437,7 @@ module LiquidInterpolatable
               context[name] = m[name]
             end
             context['match'.freeze] = m
-            render_all(@with_block, context)
+            @with_block.render(context)
           end
         }
       end

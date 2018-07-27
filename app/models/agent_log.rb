@@ -2,13 +2,11 @@
 # in Agents' detail pages.  AgentLogs with a `level` of 4 or greater are considered "errors" and automatically update
 # Agents' `last_error_log_at` column.  These are often used to determine if an Agent is `working?`.
 class AgentLog < ActiveRecord::Base
-  attr_accessible :agent, :inbound_event, :level, :message, :outbound_event
-
   belongs_to :agent
-  belongs_to :inbound_event, :class_name => "Event"
-  belongs_to :outbound_event, :class_name => "Event"
+  belongs_to :inbound_event, :class_name => "Event", optional: true
+  belongs_to :outbound_event, :class_name => "Event", optional: true
 
-  validates_presence_of :agent, :message
+  validates_presence_of :message
   validates_numericality_of :level, :only_integer => true, :greater_than_or_equal_to => 0, :less_than => 5
 
   before_validation :scrub_message

@@ -3,7 +3,7 @@ module DropboxConcern
 
   included do
     include Oauthable
-    valid_oauth_providers :dropbox
+    valid_oauth_providers :dropbox_oauth2
     gem_dependency_check { defined?(Dropbox) && Devise.omniauth_providers.include?(:dropbox) }
   end
 
@@ -17,11 +17,11 @@ module DropboxConcern
   private
 
   def consumer_key
-    (config = Devise.omniauth_configs[:dropbox]) && config.strategy.consumer_key
+    (config = Devise.omniauth_configs[:dropbox]) && config.strategy.client_id
   end
 
   def consumer_secret
-    (config = Devise.omniauth_configs[:dropbox]) && config.strategy.consumer_secret
+    (config = Devise.omniauth_configs[:dropbox]) && config.strategy.client_secret
   end
 
   def oauth_token

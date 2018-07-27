@@ -9,11 +9,13 @@
 # #receive_web_request is called. For example, one of your Agent's options could be :secret and you could compare this
 # value to params[:secret] whenever #receive_web_request is called on your Agent, rejecting invalid requests.
 #
-# Your Agent's #receive_web_request method should return an Array of json_or_string_response, status_code, and
-# optional mime type.  For example:
+# Your Agent's #receive_web_request method should return an Array of json_or_string_response, status_code, 
+# optional mime type, and optional hash of custom response headers.  For example:
 #   [{status: "success"}, 200]
 # or
 #   ["not found", 404, 'text/plain']
+# or
+#   ["<status>success</status>", 200, 'text/xml', {"Access-Control-Allow-Origin" => "*"}]
 
 class WebRequestsController < ApplicationController
   skip_before_action :verify_authenticity_token
@@ -24,19 +26,30 @@ class WebRequestsController < ApplicationController
     if user
       agent = user.agents.find_by_id(params[:agent_id])
       if agent
-        content, status, content_type = agent.trigger_web_request(params.except(:action, :controller, :agent_id, :user_id, :format), request.method_symbol.to_s, request.format.to_s)
-        if content.is_a?(String)
-          render :text => content, :status => status || 200, :content_type => content_type || 'text/plain'
+        content, status, content_type, headers = agent.trigger_web_request(request)
+
+        if headers.present?
+          headers.each do |k,v|
+            response.headers[k] = v
+          end
+        end
+
+        status = status || 200
+
+        if status.to_s.in?(["301", "302"])
+          redirect_to content, status: status
+        elsif content.is_a?(String)
+          render plain: content, :status => status, :content_type => content_type || 'text/plain'
         elsif content.is_a?(Hash)
-          render :json => content, :status => status || 200
+          render :json => content, :status => status
         else
-          head(status || 200)
+          head(status)
         end
       else
-        render :text => "agent not found", :status => 404
+        render plain: "agent not found", :status => 404
       end
     else
-      render :text => "user not found", :status => 404
+      render plain: "user not found", :status => 404
     end
   end
 
@@ -46,12 +59,12 @@ class WebRequestsController < ApplicationController
       secret = params[:secret]
       user.agents.of_type(Agents::UserLocationAgent).each { |agent|
         if agent.options[:secret] == secret
-          agent.trigger_web_request(params.except(:action, :controller, :user_id, :format), request.method_symbol.to_s, request.format.to_s)
+          agent.trigger_web_request(request)
         end
       }
-      render :text => "ok"
+      render plain: "ok"
     else
-      render :text => "user not found", :status => :not_found
+      render plain: "user not found", :status => :not_found
     end
   end
 end

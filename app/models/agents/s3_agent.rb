@@ -36,7 +36,7 @@ module Agents
 
         Specify the filename to use in `filename`, Liquid interpolation is possible to change the name per event.
 
-        Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating in `data` to specify which part of the received event should be written.
+        Use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templating in `data` to specify which part of the received event should be written.
       MD
     end
 

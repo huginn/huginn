@@ -1,0 +1,94 @@
+#!/bin/bash
+set -e
+
+export LC_ALL=en_US.UTF-8
+
+cd /app
+
+export HOME=/app
+if ! whoami &> /dev/null; then
+    if [ -w /etc/passwd ]; then
+        echo "${USER_NAME:-default}:x:$(id -u):0:${USER_NAME:-default} user:${HOME}:/sbin/nologin" >> /etc/passwd
+    fi
+fi
+
+# Do we have a Rails secret yet?
+# If not, generate one, but persist it for the container's lifetime.
+if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW .env.example; then
+    echo 'Generating random APP_SECRET_TOKEN.'
+    secret=$(dd if=/dev/urandom bs=36 count=1 | openssl base64)
+    sed -i "s:REPLACE_ME_NOW!:$secret:" .env.example
+fi
+
+# is a mysql or postgresql database linked?
+# requires that the mysql or postgresql containers have exposed
+# port 3306 and 5432 respectively.
+if [[ -n "${MYSQL_PORT_3306_TCP_ADDR}" || ("${DATABASE_ADAPTER}" == "mysql2" && -n "${DATABASE_HOST}") ]]; then
+    DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
+    DATABASE_HOST=${DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
+    DATABASE_PORT=${DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT:-3306}}
+    DATABASE_ENCODING=${DATABASE_ENCODING:-utf8mb4}
+elif [[ -n "${POSTGRES_PORT_5432_TCP_ADDR}" || ("${DATABASE_ADAPTER}" == "postgresql" && -n "${DATABASE_HOST}") ]]; then
+    DATABASE_ADAPTER=${DATABASE_ADAPTER:-postgresql}
+    DATABASE_HOST=${DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
+    DATABASE_PORT=${DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT:-5432}}
+    DATABASE_ENCODING=utf8
+else
+    START_MYSQL=${START_MYSQL:-true}
+fi
+
+USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
+DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
+DATABASE_PORT=${HUGINN_DATABASE_PORT:-${DATABASE_PORT}}
+DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
+DATABASE_PASSWORD=${HUGINN_DATABASE_PASSWORD:-${DATABASE_PASSWORD:-password}}
+DATABASE_NAME=${HUGINN_DATABASE_NAME:-${DATABASE_NAME:-huginn_production}}
+RAILS_ENV=${HUGINN_RAILS_ENV:-${RAILS_ENV:-production}}
+
+# Add ENV variables to .env.example which are not present in it but usable
+cat >> /app/.env.example <<EOF
+ASSET_HOST=
+DEFAULT_SCENARIO_FILE=
+RAILS_SERVE_STATIC_FILES=
+SEED_EMAIL=
+SEED_PASSWORD=
+SEED_USERNAME=
+SMTP_OPENSSL_CA_FILE=
+SMTP_OPENSSL_CA_PATH=
+SMTP_OPENSSL_VERIFY_MODE=
+EOF
+
+# Default to the environment variable values set in .env.example
+IFS="="
+sed -n -r -e 's/^#?([A-Za-z0-9_]+ *=.*)/\1/p' /app/.env.example | \
+  while read var value ; do
+    eval "echo \"$var=\${HUGINN_$var:-\${$var:-\$value}}\""
+  done > /app/.env
+
+PORT=${HUGINN_PORT:-${PORT:-3000}}
+echo "PORT=$(echo $PORT|awk -F ':' '{print $NF}')" >> .env
+echo "RAILS_ENV=${RAILS_ENV}" >> .env
+echo "RAILS_LOG_TO_STDOUT=true" >> .env
+echo "RAILS_SERVE_STATIC_FILES=true" >> .env
+echo "START_MYSQL=${START_MYSQL}" >> .env
+
+chmod ugo+r /app/.env
+source /app/.env
+
+# use default port number if it is still not set
+case "${DATABASE_ADAPTER}" in
+  mysql2) DATABASE_PORT=${DATABASE_PORT:-3306} ;;
+  postgresql) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
+  *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
+esac
+
+bundle install --without test development --path vendor/bundle
+
+# Configure the unicorn server
+cp -a config/unicorn.rb.example config/unicorn.rb
+sed -ri 's/^listen .*$/listen ENV["PORT"]/' config/unicorn.rb
+sed -ri 's/^stderr_path.*$//' config/unicorn.rb
+sed -ri 's/^stdout_path.*$//' config/unicorn.rb
+sed -ri 's/^pid.*$//' config/unicorn.rb
+
+mkdir -p tmp/pids tmp/cache tmp/sockets log

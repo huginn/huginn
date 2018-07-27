@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+/scripts/setup_env
+source /app/.env
+
+export RAILS_ENV=test
+unset no_proxy
+
+bundle install --with test development --path vendor/bundle -j 4
+bundle exec rake db:create db:migrate
+bundle exec "$@"

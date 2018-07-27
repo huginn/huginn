@@ -1,0 +1,68 @@
+# This needs at least compose 1.6.0
+version: '2'
+
+services:
+  mysqldata:
+    image: mysql:5.7
+    command: /bin/true
+
+  mysql:
+    image: mysql:5.7
+    volumes_from:
+      - mysqldata
+    environment:
+      MYSQL_ROOT_PASSWORD: myrootpassword
+      MYSQL_DATABASE: huginn
+      MYSQL_USER: huginn
+      MYSQL_PASSWORD: myhuginnpassword
+
+  postgresdata:
+    image: postgres:9.5
+    command: /bin/true
+
+  postgres:
+    image: postgres:9.5
+    volumes_from:
+      - postgresdata
+    environment:
+      POSTGRES_PASSWORD: myhuginnpassword
+      POSTGRES_USER: huginn
+
+  huginn_test_mysql:
+    build:
+      context: ../../
+      dockerfile: docker/test/Dockerfile
+    restart: 'no'
+    environment:
+      DATABASE_ADAPTER: mysql2
+      DATABASE_NAME: huginn
+      TEST_DATABASE_NAME: huginn
+      DATABASE_USERNAME: huginn
+      DATABASE_PASSWORD: myhuginnpassword
+      MYSQL_PORT_3306_TCP_ADDR: mysql
+      MYSQL_PORT_3306_TCP_PORT: 3306
+    links:
+      - mysql
+    volumes:
+      - ../../:/app
+      - /app/vendor/bundle
+
+  huginn_test_postgres:
+    build:
+      context: ../../
+      dockerfile: docker/test/Dockerfile
+    restart: 'no'
+    environment:
+      DATABASE_ADAPTER: postgresql
+      TEST_DATABASE_NAME: huginn
+      DATABASE_NAME: huginn
+      DATABASE_USERNAME: huginn
+      DATABASE_PASSWORD: myhuginnpassword
+      DATABASE_SOCKET:
+      POSTGRES_PORT_5432_TCP_ADDR: postgres
+      POSTGRES_PORT_5432_TCP_PORT: 5432
+    links:
+      - postgres
+    volumes:
+      - ../../:/app
+      - /app/vendor/bundle

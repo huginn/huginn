@@ -12,19 +12,22 @@ module Agents
 
       #{'## Include `forecast_io` and `wunderground` in your Gemfile to use this Agent!' if dependencies_missing?}
 
-      You also must select `which_day` you would like to get the weather for where the number 0 is for today and 1 is for tomorrow and so on. Weather is only returned for 1 week at a time.
+      You also must select when you would like to get the weather forecast for using the `which_day` option, where the number 1 represents today, 2 represents tomorrow and so on. Weather forecast inforation is only returned for at most one week at a time.
 
-      The weather can be provided by either Wunderground or ForecastIO. To choose which `service` to use, enter either `forecastio` or `wunderground`.
+      The weather forecast information can be provided by either Wunderground or Dark Sky. To choose which `service` to use, enter either `darksky` or `wunderground`.
 
-      The `location` can be a US zipcode, or any location that Wunderground supports. To find one, search [wunderground.com](http://wunderground.com) and copy the location part of the URL.  For example, a result for San Francisco gives `http://www.wunderground.com/US/CA/San_Francisco.html` and London, England gives `http://www.wunderground.com/q/zmw:00000.1.03772`.  The locations in each are `US/CA/San_Francisco` and `zmw:00000.1.03772`, respectively.
+      The `location` should be:
 
-      If you plan on using ForecastIO, the `location` must be a comma-separated string of co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
+      * For Wunderground: A US zipcode, or any location that Wunderground supports. To find one, search [wunderground.com](https://wunderground.com) and copy the location part of the URL.  For example, a result for San Francisco gives `https://www.wunderground.com/US/CA/San_Francisco.html` and London, England gives `https://www.wunderground.com/q/zmw:00000.1.03772`.  The locations in each are `US/CA/San_Francisco` and `zmw:00000.1.03772`, respectively.
+      * For Dark Sky: `location` must be a comma-separated string of map co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
 
-      You must setup an [API key for Wunderground](http://www.wunderground.com/weather/api/) in order to use this Agent with Wunderground.
+      You must set up an [API key for Wunderground](https://www.wunderground.com/weather/api/) in order to use this Agent with Wunderground.
 
-      You must setup an [API key for Forecast](https://developer.forecast.io/) in order to use this Agent with ForecastIO.
+      You must set up an [API key for Dark Sky](https://darksky.net/dev/) in order to use this Agent with Dark Sky.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+
+      If you want to see the returned texts in your language, set the `language` parameter in ISO 639-1 format.
     MD
 
     event_description <<-MD
@@ -46,7 +49,7 @@ module Agents
             },
             "conditions": "Rain Showers",
             "icon": "rain",
-            "icon_url": "http://icons-ak.wxug.com/i/c/k/rain.gif",
+            "icon_url": "https://icons-ak.wxug.com/i/c/k/rain.gif",
             "skyicon": "mostlycloudy",
             ...
           }
@@ -55,11 +58,11 @@ module Agents
     default_schedule "8pm"
 
     def working?
-      event_created_within?((interpolated['expected_update_period_in_days'].presence || 2).to_i) && !recent_error_logs?
+      event_created_within?((interpolated['expected_update_period_in_days'].presence || 2).to_i) && !recent_error_logs? && key_setup?
     end
 
     def key_setup?
-      interpolated['api_key'].present? && interpolated['api_key'] != "your-key"
+      interpolated['api_key'].present? && interpolated['api_key'] != "your-key" && interpolated['api_key'] != "put-your-key-here"
     end
 
     def default_options
@@ -68,10 +71,11 @@ module Agents
         'api_key' => 'your-key',
         'location' => '94103',
         'which_day' => '1',
+        'language' => 'EN',
         'expected_update_period_in_days' => '2'
       }
     end
-    
+
     def check
       if key_setup?
         create_event :payload => model(weather_provider, which_day).merge('location' => location)
@@ -79,7 +83,7 @@ module Agents
     end
 
     private
-    
+
     def weather_provider
       interpolated["service"].presence || "wunderground"
     end
@@ -92,30 +96,40 @@ module Agents
       interpolated["location"].presence || interpolated["zipcode"]
     end
 
+    def language
+      interpolated['language'].presence || 'EN'
+    end
+
     def validate_options
-      errors.add(:base, "service must be set to 'forecastio' or 'wunderground'") unless ["forecastio", "wunderground"].include?(weather_provider)
+      errors.add(:base, "service must be set to 'darksky' or 'wunderground'") unless %w[darksky forecastio wunderground].include?(weather_provider)
       errors.add(:base, "location is required") unless location.present?
-      errors.add(:base, "api_key is required") unless key_setup?
+      errors.add(:base, "api_key is required") unless interpolated['api_key'].present?
       errors.add(:base, "which_day selection is required") unless which_day.present?
     end
 
     def wunderground
-      Wunderground.new(interpolated['api_key']).forecast_for(location)['forecast']['simpleforecast']['forecastday'] if key_setup?
+      if key_setup?
+        forecast = Wunderground.new(interpolated['api_key'], language: language.upcase).forecast_for(location)
+        merged = {}
+        forecast['forecast']['simpleforecast']['forecastday'].each { |daily| merged[daily['period']] = daily }
+        forecast['forecast']['txt_forecast']['forecastday'].each { |daily| (merged[daily['period']] || {}).merge!(daily) }
+        merged
+      end
     end
 
-    def forecastio
+    def dark_sky
       if key_setup?
         ForecastIO.api_key = interpolated['api_key']
         lat, lng = location.split(',')
-        ForecastIO.forecast(lat,lng)['daily']['data']
+        ForecastIO.forecast(lat, lng, params: {lang: language.downcase})['daily']['data']
       end
     end
 
     def model(weather_provider,which_day)
       if weather_provider == "wunderground"
         wunderground[which_day]
-      elsif weather_provider == "forecastio"
-        forecastio.each do |value|
+      elsif weather_provider == "darksky" || weather_provider == "forecastio"
+        dark_sky.each do |value|
           timestamp = Time.at(value.time)
           if (timestamp.to_date - Time.now.to_date).to_i == which_day
             day = {

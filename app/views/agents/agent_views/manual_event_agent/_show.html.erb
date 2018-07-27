@@ -30,6 +30,13 @@
       e.preventDefault();
       var $form = $("#create-event-form");
       var $status = $("#event-creation-status");
+      try{
+        JSON.parse($form.find("textarea").val());
+      }
+      catch(err){
+        alert ('Sorry, there appears to be an error in your JSON input. Please fix it before continuing.');
+        return false;
+      }
       $.ajax({
         url: $form.attr('action'),
         method: "post",

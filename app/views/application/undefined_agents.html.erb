@@ -1,0 +1,44 @@
+<div class="container">
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h3>
+          <div class="alert alert-danger" role="alert">
+            Error: Agent(s) are 'missing in action'
+          </div>
+        </h3>
+      </div>
+      <blockquote>
+        <p>
+          You have one or more Agents registered in the database for which no corresponding definition is available in the source code:
+        </p>
+        <ul>
+          <% @undefined_agent_types.each do |type| %>
+            <li><%= agent_type_to_human(type) %></li>
+          <% end %>
+        </ul>
+        <br/>
+        <p>
+          This issue probably occurred for one or more of the following reasons:
+        </p>
+        <ul>
+          <li>If the respective Agent is distributed as part of the Huginn application codebase, it may have been removed or moved to an Agent gem. Please see <a href="https://github.com/huginn/huginn/wiki/Dealing-with-Deleted-Agent-Types" target="_blank">this wiki page for more information</a>.</li>
+          <li>If the respective Agent is distributed as a Ruby gem, it might have been removed from the <code>ADDITIONAL_GEMS</code> environment setting.</li>
+        </ul>
+        <br/>
+        <p>
+          You can fix this issue by:
+        </p>
+        <ul>
+          <li>deleting the respective Agent(s) from the database using the button below.</li>
+          <li>adding the respective Agent(s) to the the <code>ADDITIONAL_GEMS</code> environment setting. Please see <a href="https://github.com/huginn/huginn_agent" target="_blank">https://github.com/huginn/huginn_agent</a> for documentation on how to properly set it.</li>
+          <li>adding the respective Agent(s) code to the Huginn application codebase (in case it was deleted accidentally).</li>
+        </ul>
+        <br/>
+        <div class="btn-group">
+          <%= link_to icon_tag('glyphicon-trash') + ' Delete Missing Agents', undefined_agents_path, class: "btn btn-danger", method: :DELETE, data: { confirm: 'Are you sure all missing Agents should be deleted from the database?'} %>
+        </div>
+      </blockquote>
+    </div>
+  </div>
+</div>

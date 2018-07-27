@@ -15,12 +15,12 @@ describe EventsController do
 
     it "can filter by Agent" do
       sign_in users(:bob)
-      get :index, :agent_id => agents(:bob_website_agent)
+      get :index, params: {:agent_id => agents(:bob_website_agent)}
       expect(assigns(:events).length).to eq(agents(:bob_website_agent).events.length)
       expect(assigns(:events).all? {|i| expect(i.agent).to eq(agents(:bob_website_agent)) }).to be_truthy
 
       expect {
-        get :index, :agent_id => agents(:jane_website_agent)
+        get :index, params: {:agent_id => agents(:jane_website_agent)}
       }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
@@ -28,11 +28,11 @@ describe EventsController do
   describe "GET show" do
     it "only shows Events for the current user" do
       sign_in users(:bob)
-      get :show, :id => events(:bob_website_agent_event).to_param
+      get :show, params: {:id => events(:bob_website_agent_event).to_param}
       expect(assigns(:event)).to eq(events(:bob_website_agent_event))
 
       expect {
-        get :show, :id => events(:jane_website_agent_event).to_param
+        get :show, params: {:id => events(:jane_website_agent_event).to_param}
       }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
@@ -45,7 +45,7 @@ describe EventsController do
 
     it "clones and re-emits events" do
       expect {
-        post :reemit, :id => events(:bob_website_agent_event).to_param
+        post :reemit, params: {:id => events(:bob_website_agent_event).to_param}
       }.to change { Event.count }.by(1)
       expect(Event.last.payload).to eq(events(:bob_website_agent_event).payload)
       expect(Event.last.agent).to eq(events(:bob_website_agent_event).agent)
@@ -54,7 +54,7 @@ describe EventsController do
 
     it "can only re-emit Events for the current user" do
       expect {
-        post :reemit, :id => events(:jane_website_agent_event).to_param
+        post :reemit, params: {:id => events(:jane_website_agent_event).to_param}
       }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
@@ -63,11 +63,11 @@ describe EventsController do
     it "only deletes events for the current user" do
       sign_in users(:bob)
       expect {
-        delete :destroy, :id => events(:bob_website_agent_event).to_param
+        delete :destroy, params: {:id => events(:bob_website_agent_event).to_param}
       }.to change { Event.count }.by(-1)
 
       expect {
-        delete :destroy, :id => events(:jane_website_agent_event).to_param
+        delete :destroy, params: {:id => events(:jane_website_agent_event).to_param}
       }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end

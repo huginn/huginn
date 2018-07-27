@@ -7,7 +7,7 @@ describe Agents::MqttAgent do
   before :each do
     @error_log = StringIO.new
 
-    @server = MQTT::FakeServer.new(41234, '127.0.0.1')
+    @server = MQTT::FakeServer.new('127.0.0.1')
     @server.logger = Logger.new(@error_log)
     @server.logger.level = Logger::DEBUG
     @server.start

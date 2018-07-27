@@ -15,6 +15,7 @@ describe Agents::GoogleFlightsAgent do
       'origin' => 'BOS',
       'destination' => 'SFO',
       'date' => '2016-04-11',
+      'preferredCabin' => 'COACH',
       'childCount' => 0,
       'infantInSeatCount' => 0,
       'infantInLapCount'=> 0,
@@ -85,6 +86,12 @@ describe Agents::GoogleFlightsAgent do
 
     it "should require Solutions" do 
       @checker.options['solutions'] = nil
+      expect(@checker).not_to be_valid
+    end
+
+    it "should require Return Date" do
+      @checker.options['roundtrip'] = true
+      @checker.options['return_date'] = nil
       expect(@checker).not_to be_valid
     end
   end

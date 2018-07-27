@@ -7,7 +7,7 @@ This guide is long because it covers many cases and includes all commands you ne
 
 This installation guide was created for and tested on **Debian/Ubuntu** operating systems. Please read [doc/install/requirements.md](./requirements.md) for hardware and operating system requirements.
 
-This is the official installation guide to set up a production server. To set up a **development installation** or for many other installation options please see [the getting started section of the readme](https://github.com/cantino/huginn#getting-started).
+This is the official installation guide to set up a production server. To set up a **development installation** or for many other installation options please see [the getting started section of the readme](https://github.com/huginn/huginn#getting-started).
 
 The following steps have been known to work. Please **use caution when you deviate** from this guide. Make sure you don't violate any assumptions Huginn makes about its environment. For example many people run into permission problems because they change the location of directories or run services as the wrong user.
 
@@ -53,8 +53,14 @@ Install the required packages (needed to compile Ruby and native extensions to R
     sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz
 
 
-## 2. Ruby
+### Debian Stretch
 
+Since Debian Stretch, `runit` isn't started anymore automatically, but this gets handled by the init system. Additionally, Ruby requires the OpenSSL 1.0 development packages instead of 1.1. For a default installation use these packages:
+
+     sudo apt-get install -y runit-systemd libssl1.0-dev
+
+
+## 2. Ruby
 
 The use of Ruby version managers such as [RVM](http://rvm.io/), [rbenv](https://github.com/sstephenson/rbenv) or [chruby](https://github.com/postmodern/chruby) with Huginn in production frequently leads to hard-to-diagnose problems. Version managers are not supported and we strongly advise everyone to follow the instructions below to use a system Ruby.
 
@@ -65,8 +71,8 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress http://cache.ruby-lang.org/pub/ruby/2.3/ruby-2.3.0.tar.bz2 | tar xj
-    cd ruby-2.3.0
+    curl -L --progress https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.0.tar.bz2 | tar xj
+    cd ruby-2.5.0
     ./configure --disable-install-rdoc
     make -j`nproc`
     sudo make install
@@ -90,7 +96,9 @@ Install the database packages
     # Pick a MySQL root password (can be anything), type it and press enter,
     # retype the MySQL root password and press enter
 
-Check the installed MySQL version (remeber if its >= 5.5.3 for the `.env` configuration done later):
+For Debian Stretch, replace `libmysqlclient-dev` with `default-libmysqlclient-dev`. See the [additional notes section](#additional-notes) for more information.
+
+Check the installed MySQL version (remember if its >= 5.5.3 for the `.env` configuration done later):
 
     mysql --version
 
@@ -110,7 +118,7 @@ Create a user for Huginn do not type the `mysql>`, this is part of the prompt. C
 
 Ensure you can use the InnoDB engine which is necessary to support long indexes
 
-    mysql> SET storage_engine=INNODB;
+    mysql> SET default_storage_engine=INNODB;
 
     # If this fails, check your MySQL config files (e.g. `/etc/mysql/*.cnf`, `/etc/mysql/conf.d/*`)
     # for the setting "innodb = off"
@@ -134,7 +142,7 @@ You should now see `ERROR 1049 (42000): Unknown database 'huginn_production'` wh
 You are done installing the database and can go back to the rest of the installation.
 
 
-## 6. Huginn
+## 5. Huginn
 
 ### Clone the Source
 
@@ -142,7 +150,7 @@ You are done installing the database and can go back to the rest of the installa
     cd /home/huginn
 
     # Clone Huginn repository
-    sudo -u huginn -H git clone https://github.com/cantino/huginn.git -b master huginn
+    sudo -u huginn -H git clone https://github.com/huginn/huginn.git -b master huginn
 
     # Go to Huginn installation folder
     cd /home/huginn/huginn
@@ -204,6 +212,8 @@ Change the Unicorn config if needed, the [requirements.md](./requirements.md#uni
 
 **Note:** If you want to use HTTPS, which is what we recommend, see [Using HTTPS](#using-https) for the additional steps.
 
+**Note:** For configuration changes after finishing the initial installation you have to re-export (see [Install Init Script](https://github.com/huginn/huginn/blob/master/doc/manual/installation.md#install-init-script)) the init script every time you change `.env`, `unicorn.rb` or your `Procfile`!
+
 ### Install Gems
 
 **Note:** As of bundler 1.5.2, you can invoke `bundle install -jN` (where `N` the number of your processor cores) and enjoy parallel gem installation with measurable difference in completion time (~60% faster). Check the number of your cores with `nproc`. For more information check this [post](http://robots.thoughtbot.com/parallel-gem-installing-using-bundler). First make sure you have bundler >= 1.5.2 (run `bundle -v`) as it addresses some [issues](https://devcenter.heroku.com/changelog-items/411) that were [fixed](https://github.com/bundler/bundler/pull/2817) in 1.5.2.
@@ -221,7 +231,7 @@ Change the Unicorn config if needed, the [requirements.md](./requirements.md#uni
     # Create admin user and example agents using the default admin/password login
     sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=admin SEED_PASSWORD=password
 
-When done you see `See the Huginn Wiki for more Agent examples!  https://github.com/cantino/huginn/wiki`
+When done you see `See the Huginn Wiki for more Agent examples!  https://github.com/huginn/huginn/wiki`
 
 **Note:** This will create an initial user, you can change the username and password by supplying it in environmental variables `SEED_USERNAME` and `SEED_PASSWORD` as seen above. If you don't change the password (and it is set to the default one) please wait with exposing Huginn to the public internet until the installation is done and you've logged into the server and changed your password.
 
@@ -233,16 +243,16 @@ When done you see `See the Huginn Wiki for more Agent examples!  https://github.
 
 Huginn uses [foreman](http://ddollar.github.io/foreman/) to generate the init scripts based on a `Procfile`
 
-Edit the [`Procfile`](https://github.com/cantino/huginn/blob/master/Procfile) and choose one of the suggested versions for production
+Edit the [`Procfile`](https://github.com/huginn/huginn/blob/master/Procfile) and choose one of the suggested versions for production
 
     sudo -u huginn -H editor Procfile
 
-Comment out (disable) [these two lines](https://github.com/cantino/huginn/blob/master/Procfile#L6-L7)
+Comment out (disable) [these two lines](https://github.com/huginn/huginn/blob/master/Procfile#L6-L7)
 
     web: bundle exec rails server -p ${PORT-3000} -b ${IP-0.0.0.0}
     jobs: bundle exec rails runner bin/threaded.rb
 
-Enable (remove the comment) [from these lines](https://github.com/cantino/huginn/blob/master/Procfile#L24-L25) or [those](https://github.com/cantino/huginn/blob/master/Procfile#L28-L31)
+Enable (remove the comment) [from these lines](https://github.com/huginn/huginn/blob/master/Procfile#L24-L25) or [those](https://github.com/huginn/huginn/blob/master/Procfile#L28-L31)
 
     # web: bundle exec unicorn -c config/unicorn.rb
     # jobs: bundle exec rails runner bin/threaded.rb
@@ -262,9 +272,9 @@ Export the init scripts:
 
     sudo bundle exec rake production:status
 
-## 7. Nginx
+## 6. Nginx
 
-**Note:** Nginx is the officially supported web server for Huginn. If you cannot or do not want to use Nginx as your web server, the wiki has a page on how to configure [apache](https://github.com/cantino/huginn/wiki/Apache-Huginn-configuration).
+**Note:** Nginx is the officially supported web server for Huginn. If you cannot or do not want to use Nginx as your web server, the wiki has a page on how to configure [apache](https://github.com/huginn/huginn/wiki/Apache-Huginn-configuration).
 
 ### Installation
 
@@ -404,4 +414,9 @@ When you want to monitor the background processes you can easily watch all the f
 
 ### Still having problems? :crying_cat_face:
 
-You probably found an error message or exception backtrace you could not resolve. Please create a new [issue](https://github.com/cantino/huginn/issues) and include as much information as you could gather about the problem your are experiencing.
+You probably found an error message or exception backtrace you could not resolve. Please create a new [issue](https://github.com/huginn/huginn/issues) and include as much information as you could gather about the problem your are experiencing.
+
+
+### Additional notes
+
+Debian Stretch switched from MySQL to [MariaDB](https://mariadb.org/). All packages with `mysql` in the name are just wrappers around the MariaDB ones, with some containing some compatibility symlinks. Huginn should also work fine with the MariaDB packages directly, although to keep the installation instructions more compact, they still use the MySQL packages.

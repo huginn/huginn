@@ -31,7 +31,7 @@ module Agents
       Example configuration:
 
       <pre><code>{
-        'uri' => 'mqtts://user:pass@locahost:8883'
+        'uri' => 'mqtts://user:pass@localhost:8883'
         'ssl' => :TLSv1,
         'ca_file' => './ca.pem',
         'cert_file' => './client.crt',
@@ -77,12 +77,12 @@ module Agents
     end
 
     def working?
-      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
+      (event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?) || received_event_without_error?
     end
 
     def default_options
       {
-        'uri' => 'mqtts://user:pass@locahost:8883',
+        'uri' => 'mqtts://user:pass@localhost:8883',
         'ssl' => :TLSv1,
         'ca_file'  => './ca.pem',
         'cert_file' => './client.crt',
@@ -109,7 +109,7 @@ module Agents
     def receive(incoming_events)
       mqtt_client.connect do |c|
         incoming_events.each do |event|
-          c.publish(interpolated(event)['topic'], event)
+          c.publish(interpolated(event)['topic'], event.payload['message'])
         end
       end
     end
