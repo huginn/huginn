@@ -27,7 +27,7 @@ module Agents
           * `ttl` - A value for the \\<ttl\\> element in RSS output. (default: `60`)
           * `ns_media` - Add [yahoo media namespace](https://en.wikipedia.org/wiki/Media_RSS) in output xml
           * `ns_itunes` - Add [itunes compatible namespace](http://lists.apple.com/archives/syndication-dev/2005/Nov/msg00002.html) in output xml
-          * `rss_content_type` - Content-Type for RSS output (default: `application/rss+xml`)
+          * `rss_content_type` - Content-Type for RSS output (default: `application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4`)
           * `response_headers` - An object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
           * `push_hubs` - Set to a list of PubSubHubbub endpoints you want to publish an update to every time this agent receives an event. (default: none)  Popular hubs include [Superfeedr](https://pubsubhubbub.superfeedr.com/) and [Google](https://pubsubhubbub.appspot.com/).  Note that publishing updates will make your feed URL known to the public, so if you want to keep it secret, set up a reverse proxy to serve your feed via a safe URL and specify it in `template.self`.
 
@@ -174,7 +174,7 @@ module Agents
     end
 
     def rss_content_type
-      interpolated['rss_content_type'].presence || 'application/rss+xml'
+      interpolated['rss_content_type'].presence || 'application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4'
     end
 
     def xml_namespace
