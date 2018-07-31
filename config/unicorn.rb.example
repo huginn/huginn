@@ -2,7 +2,7 @@ wd = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 app_path = wd
 
-worker_processes 2
+worker_processes Integer(ENV["WEB_CONCURRENCY"] || 2)
 preload_app true
 timeout 180
 listen "#{wd}/tmp/sockets/unicorn.socket"
