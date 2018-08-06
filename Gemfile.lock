@@ -33,11 +33,11 @@ GIT
 
 GIT
   remote: https://github.com/cantino/twitter-stream.git
-  revision: f7e7edb0bae013bffabf3598e7147773d9fd370f
+  revision: a80822d579509802124d4e219bb771eb663efdb7
   branch: huginn
   specs:
     twitter-stream (0.1.15)
-      eventmachine (~> 1.0.7)
+      eventmachine (>= 1.0.7)
       http_parser.rb (~> 0.6.0)
       simple_oauth (~> 0.3.0)
 
@@ -236,7 +236,7 @@ GEM
       tzinfo
     ethon (0.7.1)
       ffi (>= 1.3.0)
-    eventmachine (1.0.7)
+    eventmachine (1.2.7)
     evernote-thrift (1.25.1)
     evernote_oauth (0.2.3)
       evernote-thrift
@@ -778,4 +778,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   1.16.2
+   1.16.3
