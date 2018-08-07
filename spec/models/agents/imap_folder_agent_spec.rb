@@ -308,8 +308,10 @@ describe Agents::ImapFolderAgent do
               seen[mail.uidvalidity] = mail.uid
             })
 
-          expect(Event.last(2).map(&:payload)).to eq expected_payloads.map.with_index { |payload, i|
-            payload.merge('raw_mail' => mails[i].encoded)
+          expect(Event.last(2).map(&:payload)).to match expected_payloads.map.with_index { |payload, i|
+            payload.merge(
+              'raw_mail' => satisfy { |d| Base64.decode64(d) == mails[i].encoded }
+            )
           }
 
           expect { @checker.check }.not_to change { Event.count }
