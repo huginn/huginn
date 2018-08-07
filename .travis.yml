@@ -5,6 +5,9 @@ services:
   - docker
   - mysql
   - postgresql
+before_install:
+  - gem update --system
+  - gem install bundler
 env:
   global:
     - APP_SECRET_TOKEN=b2724973fd81c2f4ac0f92ac48eb3f0152c4a11824c122bcf783419a4c51d8b9bba81c8ba6a66c7de599677c7f486242cf819775c433908e77c739c5c8ae118d
@@ -29,31 +32,31 @@ matrix:
     - env: DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
     - env: RSPEC_TASK=spec:features
   include:
-    - rvm: 2.4.3
+    - rvm: 2.4.4
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - rvm: 2.4.3
+    - rvm: 2.4.4
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
-    - rvm: 2.4.3
+    - rvm: 2.4.4
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - rvm: 2.4.3
+    - rvm: 2.4.4
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
-    - rvm: 2.5.0
+    - rvm: 2.5.1
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
-    - rvm: 2.5.0
+    - rvm: 2.5.1
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
-    - rvm: 2.4.3
+    - rvm: 2.4.4
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
-    - rvm: 2.4.3
+    - rvm: 2.4.4
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
-    - rvm: 2.3.6
+    - rvm: 2.3.7
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
-    - rvm: 2.3.6
+    - rvm: 2.3.7
       env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
 rvm:
-- 2.2.9
-- 2.3.6
-- 2.4.3
-- 2.5.0
+- 2.2.10
+- 2.3.7
+- 2.4.4
+- 2.5.1
 cache: bundler
 bundler_args: --without development production
 script:
