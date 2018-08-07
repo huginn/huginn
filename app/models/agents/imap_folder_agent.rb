@@ -55,7 +55,7 @@ module Agents
 
       Set `mark_as_read` to true to mark found mails as read.
 
-      Set `include_raw_mail` to true to add a `raw_mail` value to each created event, which contains a *Base64-encoded* "RFC822" blob defined in [the IMAP4 standard](https://tools.ietf.org/html/rfc3501).  Note that while the result of Base64 encoding will be LF-terminated, its raw content will often be CRLF-terminated because of the nature of the e-mail protocols and formats.  Its primary use case is to pass to a Shell Command Agent with a command like `openssl enc -d -base64 | tr -d '\r' | procmail -Yf-`.
+      Set `include_raw_mail` to true to add a `raw_mail` value to each created event, which contains a *Base64-encoded* blob in the "RFC822" format defined in [the IMAP4 standard](https://tools.ietf.org/html/rfc3501).  Note that while the result of Base64 encoding will be LF-terminated, its raw content will often be CRLF-terminated because of the nature of the e-mail protocols and formats.  The primary use case for a raw mail blob is to pass to a Shell Command Agent with a command like `openssl enc -d -base64 | tr -d '\r' | procmail -Yf-`.
 
       Each agent instance memorizes the highest UID of mails that are found in the last run for each watched folder, so even if you change a set of conditions so that it matches mails that are missed previously, or if you alter the flag status of already found mails, they will not show up as new events.
 
