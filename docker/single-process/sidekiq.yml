@@ -3,11 +3,11 @@ version: '2'
 
 services:
   postgresdata:
-    image: postgres:9.5
+    image: postgres:10
     command: /bin/true
 
   postgres:
-    image: postgres:9.5
+    image: postgres:10
     volumes_from:
       - postgresdata
     environment:
@@ -15,16 +15,16 @@ services:
       POSTGRES_USER: huginn
 
   redisdata:
-    image: redis:3.2-alpine
+    image: redis:4-alpine
     command: /bin/true
 
   redis:
     volumes_from:
       - redisdata
-    image: redis:3.2-alpine
+    image: redis:4-alpine
 
   huginn_web:
-    image: cantino/huginn-single-process
+    image: huginn/huginn-single-process
     restart: always
     extends:
       file: environment.yml
@@ -42,7 +42,7 @@ services:
       - redis
 
   huginn_threaded:
-    image: cantino/huginn-single-process
+    image: huginn/huginn-single-process
     restart: always
     extends:
       file: environment.yml
@@ -59,7 +59,7 @@ services:
     command: /scripts/init bin/threaded.rb
 
   huginn_sidekiq:
-    image: cantino/huginn-single-process
+    image: huginn/huginn-single-process
     extends:
       file: environment.yml
       service: huginn_base
