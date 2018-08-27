@@ -17,16 +17,16 @@ Build a docker image that contains huginn, as well as huginn test dependencies u
 Run all specs against a MySQL database using `docker-compose`:
 
     cd docker/test
-    docker-compose -f develop.yml run huginn_test_mysql
+    docker-compose -f develop.yml run test_mysql
     docker-compose -f develop.yml down
 
 Run all specs against a Postgres database using `docker-compose`:
 
     cd docker/test
-    docker-compose -f develop.yml run huginn_test_postgres
+    docker-compose -f develop.yml run test_postgres
     docker-compose -f develop.yml down
 
 Run a specific spec using `docker-compose`:
 
-    docker-compose -f develop.yml run huginn_test_postgres rspec ./spec/helpers/dot_helper_spec.rb:82
+    docker-compose -f develop.yml run test_postgres rspec ./spec/helpers/dot_helper_spec.rb:82
     docker-compose -f develop.yml down

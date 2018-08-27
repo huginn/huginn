@@ -28,7 +28,14 @@ RUN umask 002 && \
 
 EXPOSE 3000
 
-COPY ["docker/scripts/setup_env", "docker/multi-process/scripts/init", "/scripts/"]
+COPY docker/multi-process/scripts/supervisord.conf /etc/supervisor/
+COPY ["docker/multi-process/scripts/bootstrap.conf", \
+      "docker/multi-process/scripts/foreman.conf", \
+      "docker/multi-process/scripts/mysqld.conf", "/etc/supervisor/conf.d/"]
+COPY ["docker/multi-process/scripts/bootstrap.sh", \
+      "docker/multi-process/scripts/foreman.sh", \
+      "docker/multi-process/scripts/init", \
+      "docker/scripts/setup_env", "/scripts/"]
 CMD ["/scripts/init"]
 
 USER 1001
