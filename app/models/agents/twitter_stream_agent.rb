@@ -64,10 +64,6 @@ module Agents
         errors.add(:base, "expected_update_period_in_days, generate, and filters are required fields")
       end
 
-      unless options[:include_retweets].present?
-        errors.add(:base, "include_retweets is a required fields")
-      end
-
       if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
         errors.add(:base, "include_retweets must be a boolean value string (true/false)")
       end
