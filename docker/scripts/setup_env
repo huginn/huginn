@@ -5,6 +5,10 @@ export LC_ALL=en_US.UTF-8
 
 cd /app
 
+if [ -f /app/tmp/pids/delayed_job.pid ]; then
+  rm /app/tmp/pids/delayed_job.pid
+fi
+
 export HOME=/app
 if ! whoami &> /dev/null; then
     if [ -w /etc/passwd ]; then
