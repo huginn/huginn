@@ -200,11 +200,11 @@ ENV['DATABASE_ADAPTER'] ||=
   end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
-  gem 'pg', '~> 0.18.3'
+  gem 'pg', '~> 1.1.3'
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
-  gem 'mysql2', ">= 0.3.18", "< 0.5"
+  gem 'mysql2' , "~> 0.5.2"
 end
 
 GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|
