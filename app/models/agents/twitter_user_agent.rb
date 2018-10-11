@@ -28,7 +28,7 @@ module Agents
       Events are the raw JSON provided by the [Twitter API](https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline). Should look something like:
           {
              ... every Tweet field, including ...
-            "text": "something",
+            "full_text": "something",
             "user": {
               "name": "Mr. Someone",
               "screen_name": "Someone",
