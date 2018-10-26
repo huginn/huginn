@@ -660,12 +660,6 @@ module Agents
       end
     end
 
-    def is_positive_integer?(value)
-      Integer(value) >= 0
-    rescue
-      false
-    end
-
     class UnevenSizeError < ArgumentError
     end
 

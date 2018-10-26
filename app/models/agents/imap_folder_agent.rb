@@ -405,12 +405,6 @@ module Agents
 
     private
 
-    def is_positive_integer?(value)
-      Integer(value) >= 0
-    rescue
-      false
-    end
-
     def glob_match?(pattern, value)
       File.fnmatch?(pattern, value, FNM_FLAGS)
     end
