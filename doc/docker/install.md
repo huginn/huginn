@@ -10,7 +10,7 @@ Getting Huginn up and running using docker is quick and painless once you have d
 
 #### OSX GUI using Kitematic
 
-1. Download and install [Kitematic](https://www.docker.com/docker-kitematic)
+1. Download and install [Kitematic](https://kitematic.com/)
 * Start Kitematic and search for `huginn/huginn`
 * Click `create` and wait for the container to be downloaded and booted
 * Click on the link icon next to 'WEB PREVIEW'
