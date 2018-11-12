@@ -106,7 +106,7 @@ module Agents
       interpolated["location"].presence || interpolated["zipcode"]
     end
 
-    def dark_sky_location
+    def coordinates
       location.split(',').map { |e| e.to_f }
     end
 
@@ -120,7 +120,7 @@ module Agents
       errors.add(:base, "location is required") unless location.present?
       return if wunderground?
       if location.match? VALID_COORDS_REGEX
-        lat, lon = dark_sky_location
+        lat, lon = coordinates
         errors.add :base, "too low of a latitude" unless lat > -90
         errors.add :base, "too big of a latitude" unless lat < 90
         errors.add :base, "too low of a longitude" unless lon > -180
@@ -154,7 +154,7 @@ module Agents
     def dark_sky
       if key_setup?
         ForecastIO.api_key = interpolated['api_key']
-        lat, lng = dark_sky_location
+        lat, lng = coordinates
         ForecastIO.forecast(lat, lng, params: {lang: language.downcase})['daily']['data']
       end
     end
