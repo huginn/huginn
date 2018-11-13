@@ -68,10 +68,10 @@ describe Agents::WeatherAgent do
       expect(dark_sky_agent).to be_valid
     end
     it "fails cases that pass the first test but are invalid" do
-        dark_sky_agent.options["location"] = "137.779329, -122.41915" # too high latitude
-        expect(dark_sky_agent).to_not be_valid
-        dark_sky_agent.options["location"] = "37.779329, -522.41915" # too low longitude
-        expect(dark_sky_agent).to_not be_valid
+      dark_sky_agent.options["location"] = "137.779329, -122.41915" # too high latitude
+      expect(dark_sky_agent).to_not be_valid
+      dark_sky_agent.options["location"] = "37.779329, -522.41915" # too low longitude
+      expect(dark_sky_agent).to_not be_valid
     end
   end
 
