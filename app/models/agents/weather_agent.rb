@@ -88,6 +88,16 @@ module Agents
       interpolated["service"].presence || "wunderground"
     end
 
+    # a check to see if the weather provider is wunderground.
+    def wunderground?
+      weather_provider.downcase == "wunderground"
+    end
+
+    # a check to see if the weather provider is one of the valid aliases for Dark Sky.
+    def dark_sky?
+      ["dark_sky", "darksky", "forecast_io", "forecastio"].include? weather_provider.downcase
+    end
+
     def which_day
       (interpolated["which_day"].presence || 1).to_i
     end
@@ -96,13 +106,37 @@ module Agents
       interpolated["location"].presence || interpolated["zipcode"]
     end
 
+    def coordinates
+      location.split(',').map { |e| e.to_f }
+    end
+
     def language
       interpolated['language'].presence || 'EN'
     end
 
-    def validate_options
-      errors.add(:base, "service must be set to 'darksky' or 'wunderground'") unless %w[darksky forecastio wunderground].include?(weather_provider)
+    VALID_COORDS_REGEX = /^\s*-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*$/
+
+    def validate_location
       errors.add(:base, "location is required") unless location.present?
+      return if wunderground?
+      if location.match? VALID_COORDS_REGEX
+        lat, lon = coordinates
+        errors.add :base, "too low of a latitude" unless lat > -90
+        errors.add :base, "too big of a latitude" unless lat < 90
+        errors.add :base, "too low of a longitude" unless lon > -180
+        errors.add :base, "too high of a longitude" unless lon < 180
+      else
+        errors.add(
+          :base,
+          "Location #{location} is malformed. Location for " +
+          'Dark Sky must be in the format "-00.000,-00.00000". The ' +
+          "number of decimal places does not matter.")
+      end
+    end
+
+    def validate_options
+      errors.add(:base, "service must be set to 'darksky' or 'wunderground'") unless wunderground? || dark_sky?
+      validate_location
       errors.add(:base, "api_key is required") unless interpolated['api_key'].present?
       errors.add(:base, "which_day selection is required") unless which_day.present?
     end
@@ -120,15 +154,15 @@ module Agents
     def dark_sky
       if key_setup?
         ForecastIO.api_key = interpolated['api_key']
-        lat, lng = location.split(',')
+        lat, lng = coordinates
         ForecastIO.forecast(lat, lng, params: {lang: language.downcase})['daily']['data']
       end
     end
 
     def model(weather_provider,which_day)
-      if weather_provider == "wunderground"
+      if wunderground?
         wunderground[which_day]
-      elsif weather_provider == "darksky" || weather_provider == "forecastio"
+      elsif dark_sky?
         dark_sky.each do |value|
           timestamp = Time.at(value.time)
           if (timestamp.to_date - Time.now.to_date).to_i == which_day
