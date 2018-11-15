@@ -80,19 +80,18 @@ EOF
 [ -e '/app/.env' ] && cat /app/.env >> /tmp/.env.example
 
 quote_if_necessary() {
-  if grep -q -E -e '^".*" *$' -e "^'.*' *$" <<<"$1"; then
+  if grep -q -E -e '^".*" *$' -e "^'.*' *$" <<<"$*"; then
     # preserve single or double quotes if they are provided
-    echo "$1";
+    echo "$*";
   else
     # otherwise double quote the string after escaping \, $, `
-    echo "\"$(sed -e 's/\\/\\\\/g' -e 's/\$/\\\$/g' -e 's/`/\\`/g' <<<"$1")\""
+    echo "\"$(sed -e 's/\\/\\\\/g' -e 's/\$/\\\$/g' -e 's/`/\\`/g' <<<"$*")\""
   fi
 }
 
 # Default to the environment variable values set in .env.example
-IFS="="
 sed -n -r -e 's/^#?([A-Za-z0-9_]+=.*)/\1/p' /tmp/.env.example | \
-  while read var value ; do
+  while IFS='=' read var value ; do
     huginn_var="HUGINN_$var"
     val="${!huginn_var:-${!var:-$value}}"
     echo "$var=$(quote_if_necessary $val)"
