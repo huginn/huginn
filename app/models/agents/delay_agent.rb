@@ -43,6 +43,12 @@ module Agents
       unless interpolated['max_events'].present? && interpolated['max_events'].to_i > 0
         errors.add(:base, "The 'max_events' option is required and must be an integer greater than 0")
       end
+
+      if interpolated['max_emitted_events'].present?
+        unless interpolated['max_emitted_events'].to_i > 0
+          errors.add(:base, "The 'max_emitted_events' option is optional and should be an integer greater than 0")
+        end
+      end
     end
 
     def working?
