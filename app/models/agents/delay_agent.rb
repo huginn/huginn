@@ -1,5 +1,7 @@
 module Agents
   class DelayAgent < Agent
+    include FormConfigurable
+
     default_schedule 'every_12h'
 
     description <<-MD
@@ -23,6 +25,11 @@ module Agents
         'max_emitted_events' => ''
       }
     end
+
+    form_configurable :expected_receive_period_in_days, type: :string
+    form_configurable :max_events, type: :string
+    form_configurable :keep, type: :array, values: %w[newest oldest]
+    form_configurable :max_emitted_events, type: :string
 
     def validate_options
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
