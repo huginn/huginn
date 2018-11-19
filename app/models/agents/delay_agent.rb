@@ -67,8 +67,8 @@ module Agents
       if memory['event_ids'] && memory['event_ids'].length > 0
         events = received_events.where(id: memory['event_ids']).reorder('events.id asc')
 
-        if options['max_emitted_events'].present?
-          events = events.limit(options['max_emitted_events'].to_i)
+        if interpolated['max_emitted_events'].present?
+          events = events.limit(interpolated['max_emitted_events'].to_i)
         end
 
         events.each do |event|
