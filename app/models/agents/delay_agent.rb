@@ -40,7 +40,7 @@ module Agents
         errors.add(:base, "The 'keep' option is required and must be set to 'oldest' or 'newest'")
       end
 
-      unless options['max_events'].present? && options['max_events'].to_i > 0
+      unless interpolated['max_events'].present? && interpolated['max_events'].to_i > 0
         errors.add(:base, "The 'max_events' option is required and must be an integer greater than 0")
       end
     end
