@@ -1,6 +1,6 @@
 module Agents
   class DelayAgent < Agent
-    default_schedule "every_12h"
+    default_schedule 'every_12h'
 
     description <<-MD
       The DelayAgent stores received Events and emits copies of them on a schedule. Use this as a buffer or queue of Events.
@@ -17,9 +17,10 @@ module Agents
 
     def default_options
       {
-        'expected_receive_period_in_days' => "10",
-        'max_events' => "100",
-        'keep' => 'newest'
+        'expected_receive_period_in_days' => '10',
+        'max_events' => '100',
+        'keep' => 'newest',
+        'max_emitted_events' => ''
       }
     end
 
