@@ -54,7 +54,7 @@ module Agents
         memory['event_ids'] ||= []
         memory['event_ids'] << event.id
         if memory['event_ids'].length > interpolated['max_events'].to_i
-          if interpolated['keep'] == 'newest'
+          if options['keep'] == 'newest'
             memory['event_ids'].shift
           else
             memory['event_ids'].pop
