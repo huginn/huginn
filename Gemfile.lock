@@ -416,7 +416,7 @@ GEM
     net-ssh (3.0.2)
     netrc (0.11.0)
     nio4r (2.3.0)
-    nokogiri (1.8.2)
+    nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
     notiffany (0.1.1)
       nenv (~> 0.1)
@@ -471,7 +471,7 @@ GEM
     pry-rails (0.3.4)
       pry (>= 0.9.10)
     public_suffix (3.0.2)
-    rack (2.0.5)
+    rack (2.0.6)
     rack-livereload (0.3.16)
       rack
     rack-test (1.0.0)
