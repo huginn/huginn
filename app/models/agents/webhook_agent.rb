@@ -1,12 +1,12 @@
 module Agents
-  class Webhook2Agent < Agent
+  class WebhookAgent < Agent
     include WebRequestConcern
 
     cannot_be_scheduled!
     cannot_receive_events!
 
     description do <<-MD
-      The Webhook2 Agent will create events by receiving webhooks from any source. In order to create events with this agent, make a POST request to:
+      The Webhook Agent will create events by receiving webhooks from any source. In order to create events with this agent, make a POST request to:
 
       ```
          https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || ':id'}/#{options['secret'] || ':secret'}
