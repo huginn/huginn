@@ -1,12 +1,12 @@
 module Agents
-  class WebhookAgent < Agent
+  class Webhook2Agent < Agent
     include WebRequestConcern
 
     cannot_be_scheduled!
     cannot_receive_events!
 
     description do <<-MD
-      The Webhook Agent will create events by receiving webhooks from any source. In order to create events with this agent, make a POST request to:
+      The Webhook2 Agent will create events by receiving webhooks from any source. In order to create events with this agent, make a POST request to:
 
       ```
          https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || ':id'}/#{options['secret'] || ':secret'}
@@ -22,6 +22,8 @@ module Agents
         * `payload_path` - JSONPath of the attribute in the POST body to be
           used as the Event payload.  Set to `.` to return the entire message.
           If `payload_path` points to an array, Events will be created for each element.
+        * `header_path` - JSONPath of the headers you want passed as the Event Payload. Set to `.` to return all headers
+        * `header_key` - The key to use to store all the headers recieved
         * `verbs` - Comma-separated list of http verbs your agent will accept.
           For example, "post,get" will enable POST and GET requests. Defaults
           to "post".
@@ -43,11 +45,17 @@ module Agents
     def default_options
       { "secret" => "supersecretstring",
         "expected_receive_period_in_days" => 1,
-        "payload_path" => "some_key"
+        "payload_path" => "some_key",
+        "header_path" => ".",
+        "header_key" => "X-HTTP-HEADERS"
       }
     end
 
-    def receive_web_request(params, method, format)
+    def receive_web_request(request)
+      params = request.params.except(:action, :controller, :agent_id, :user_id, :format)
+      method = request.method_symbol.to_s
+      headers = request.headers.select {|k,v| k.to_s[/^HTTP_/]}.to_h
+
       # check the secret
       secret = params.delete('secret')
       return ["Not Authorized", 401] unless secret == interpolated['secret']
@@ -84,7 +92,8 @@ module Agents
         JSON.parse(response.body)['success'] or
           return ["Not Authorized", 401]
       end
-
+      params[interpolated['header_key']] = header_for(headers)
+      
       [payload_for(params)].flatten.each do |payload|
         create_event(payload: payload)
       end
@@ -116,6 +125,10 @@ module Agents
 
     def payload_for(params)
       Utils.value_at(params, interpolated['payload_path']) || {}
+    end
+
+    def header_for(headers)
+      Utils.value_at(headers, interpolated['header_path']) || {}
     end
   end
 end
