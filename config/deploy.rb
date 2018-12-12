@@ -2,7 +2,7 @@ require 'dotenv'
 Dotenv.load
 
 # config valid only for current version of Capistrano
-lock '3.4.0'
+lock '3.11.0'
 
 set :application, 'huginn'
 set :repo_url, ENV['CAPISTRANO_DEPLOY_REPO_URL'] || 'https://github.com/huginn/huginn.git'
