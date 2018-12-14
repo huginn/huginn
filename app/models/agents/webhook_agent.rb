@@ -22,7 +22,7 @@ module Agents
         * `payload_path` - JSONPath of the attribute in the POST body to be
           used as the Event payload.  Set to `.` to return the entire message.
           If `payload_path` points to an array, Events will be created for each element.
-        * `header_path` - JSONPath of the headers you want passed as the Event Payload. Set to `.` to return all headers
+        * `headers` - Comma-separated list of HTTP headers your agent will include in the payload.
         * `header_key` - The key to use to store all the headers recieved
         * `verbs` - Comma-separated list of http verbs your agent will accept.
           For example, "post,get" will enable POST and GET requests. Defaults
@@ -46,7 +46,7 @@ module Agents
       { "secret" => "supersecretstring",
         "expected_receive_period_in_days" => 1,
         "payload_path" => "some_key",
-        "header_path" => ".",
+        "headers" => "",
         "header_key" => "X-HTTP-HEADERS"
       }
     end
@@ -71,12 +71,10 @@ module Agents
       if recaptcha_secret = interpolated['recaptcha_secret'].presence
         recaptcha_response = params.delete('g-recaptcha-response') or
           return ["Not Authorized", 401]
-
         parameters = {
           secret: recaptcha_secret,
           response: recaptcha_response,
         }
-
         if boolify(interpolated['recaptcha_send_remote_addr'])
           parameters[:remoteip] = request.env['REMOTE_ADDR']
         end
@@ -88,16 +86,20 @@ module Agents
           error "Verification failed: #{e.message}"
           return ["Not Authorized", 401]
         end
-
+          
         JSON.parse(response.body)['success'] or
           return ["Not Authorized", 401]
       end
-      params[interpolated['header_key']] = header_for(headers)
-      
+        
+
       [payload_for(params)].flatten.each do |payload|
+        if interpolated['header_key'].presence 
+          acceptedheaders = (interpolated['headers']).split(/,/).map { |x| x.strip }.select
+          payload[interpolated['header_key']] = headers.slice(*acceptedheaders)
+        end
         create_event(payload: payload)
       end
-
+      
       if interpolated['response_headers'].presence
         [interpolated(params)['response'] || 'Event Created', code, "text/plain", interpolated['response_headers'].presence]
       else
@@ -125,10 +127,6 @@ module Agents
 
     def payload_for(params)
       Utils.value_at(params, interpolated['payload_path']) || {}
-    end
-
-    def header_for(headers)
-      Utils.value_at(headers, interpolated['header_path']) || {}
     end
   end
 end
