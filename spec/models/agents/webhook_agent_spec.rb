@@ -548,7 +548,7 @@ describe Agents::WebhookAgent do
         expect(out).to eq(['Event Created', 201])
         expect(Event.last.payload).to eq(payload)
       end
-      it "should not pass selected headers specified in Header_Key" do
+      it "should pass selected headers specified in Header_Key" do
         webpayload = ActionDispatch::Request.new({
             'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
             'REQUEST_METHOD' => "POST",
@@ -567,7 +567,7 @@ describe Agents::WebhookAgent do
         expect(Event.last.payload).to eq({"people"=>[{"name"=>"bob"}, {"name"=>"jon"}], "X-HTTP-HEADERS"=>{"HTTP_X_HELLO_WORLD"=>"Hello Huginn"}})
       end
       
-      it "should not pass empty header_key if none of the headers exist" do
+      it "should pass empty header_key if none of the headers exist" do
         webpayload = ActionDispatch::Request.new({
             'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
             'REQUEST_METHOD' => "POST",
@@ -586,7 +586,7 @@ describe Agents::WebhookAgent do
         expect(Event.last.payload).to eq({"people"=>[{"name"=>"bob"}, {"name"=>"jon"}], "X-HTTP-HEADERS"=>{}})
       end
 
-      it "should not pass empty header_key if headers is empty" do
+      it "should pass empty header_key if headers is empty" do
         webpayload = ActionDispatch::Request.new({
             'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
             'REQUEST_METHOD' => "POST",
