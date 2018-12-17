@@ -90,16 +90,15 @@ module Agents
         JSON.parse(response.body)['success'] or
           return ["Not Authorized", 401]
       end
-        
 
       [payload_for(params)].flatten.each do |payload|
-        if interpolated['header_key'].presence 
-          acceptedheaders = (interpolated['headers']).split(/,/).map { |x| x.strip }.select
+        if interpolated['header_key'].present?
+          acceptedheaders = interpolated['headers'].split(/,/).map { |x| x.strip }
           payload[interpolated['header_key']] = headers.slice(*acceptedheaders)
         end
         create_event(payload: payload)
       end
-      
+
       if interpolated['response_headers'].presence
         [interpolated(params)['response'] || 'Event Created', code, "text/plain", interpolated['response_headers'].presence]
       else

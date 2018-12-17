@@ -24,7 +24,7 @@ describe Agents::WebhookAgent do
         out = agent.receive_web_request(webpayload)
       }.to change { Event.count }.by(1)
       expect(out).to eq(['Event Created', 201])
-      expect(Event.last.payload).to eq(payload)
+      expect(Event.last.payload).to eq( {"people"=>[{"name"=>"bob"}, {"name"=>"jon"}], "X-HTTP-HEADERS"=>{"HTTP_ACCEPT"=>"application/xml", "HTTP_X_HELLO_WORLD"=>"Hello Huginn"}})
     end
 
     it 'should be able to create multiple events when given an array' do
@@ -40,7 +40,7 @@ describe Agents::WebhookAgent do
         out = agent.receive_web_request(webpayload)
       }.to change { Event.count }.by(2)
       expect(out).to eq(['Event Created', 201])
-      expect(Event.last.payload).to eq({ 'name' => 'jon' })
+      expect(Event.last.payload).to eq({"name"=>"jon", "X-HTTP-HEADERS"=>{"HTTP_ACCEPT"=>"application/xml", "HTTP_X_HELLO_WORLD"=>"Hello Huginn"}})
     end
 
     it 'should not create event if secrets do not match' do
@@ -490,9 +490,8 @@ describe Agents::WebhookAgent do
           out = nil
 
           stub_request(:any, /verify/).to_return { |request|
-            puts gotrequest
             checked = true
-           { status: 200, body: '{"success":false}' }
+            { status: 200, body: '{"success":false}' }
           }
          expect {
             out = agent.receive_web_request(webpayload)
@@ -543,7 +542,7 @@ describe Agents::WebhookAgent do
         out = nil
 
         expect {
-          out= agent.receive_web_request(webpayload)
+          out = agent.receive_web_request(webpayload)
         }.to change { Event.count }.by(1)
         expect(out).to eq(['Event Created', 201])
         expect(Event.last.payload).to eq(payload)
