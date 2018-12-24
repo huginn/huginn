@@ -58,7 +58,7 @@ gem 'omniauth-twitter', '~> 1.3.0'
 
 # Tumblr Agents
 # until merge of https://github.com/tumblr/tumblr_client/pull/61
-gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master', ref: 'e046fe6e39291c173add0a49081630c7b60a36c7' 
+gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master', ref: 'e046fe6e39291c173add0a49081630c7b60a36c7'
 gem 'omniauth-tumblr', '~> 1.2'
 
 # Dropbox Agents
@@ -141,7 +141,7 @@ group :development do
   gem 'letter_opener_web', '~> 1.3.1'
   gem 'web-console', '>= 3.3.0'
 
-  gem 'capistrano', '~> 3.4.0'
+  gem 'capistrano', '~> 3.11.0'
   gem 'capistrano-rails', '~> 1.1'
   gem 'capistrano-bundler', '~> 1.1.4'
 

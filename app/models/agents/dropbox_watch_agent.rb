@@ -51,12 +51,6 @@ module Agents
 
     private
 
-    def is_positive_integer?(value)
-      Integer(value) >= 0
-    rescue
-      false
-    end
-
     def ls(dir_to_watch)
       dropbox.ls(dir_to_watch).map { |file| { 'path' => file.path, 'rev' => file.rev, 'modified' => file.server_modified } }
     end

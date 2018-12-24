@@ -86,12 +86,35 @@ module Agents
       interpolated["location"].presence || interpolated["zipcode"]
     end
 
+    def coordinates
+      location.split(',').map { |e| e.to_f }
+    end
+
     def language
       interpolated['language'].presence || 'EN'
     end
 
-    def validate_options
+    VALID_COORDS_REGEX = /^\s*-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*$/
+
+    def validate_location
       errors.add(:base, "location is required") unless location.present?
+      if location.match? VALID_COORDS_REGEX
+        lat, lon = coordinates
+        errors.add :base, "too low of a latitude" unless lat > -90
+        errors.add :base, "too big of a latitude" unless lat < 90
+        errors.add :base, "too low of a longitude" unless lon > -180
+        errors.add :base, "too high of a longitude" unless lon < 180
+      else
+        errors.add(
+          :base,
+          "Location #{location} is malformed. Location for " +
+          'Dark Sky must be in the format "-00.000,-00.00000". The ' +
+          "number of decimal places does not matter.")
+      end
+    end
+
+    def validate_options
+      validate_location
       errors.add(:base, "api_key is required") unless interpolated['api_key'].present?
       errors.add(:base, "which_day selection is required") unless which_day.present?
     end
@@ -99,7 +122,7 @@ module Agents
     def dark_sky
       if key_setup?
         ForecastIO.api_key = interpolated['api_key']
-        lat, lng = location.split(',')
+        lat, lng = coordinates
         ForecastIO.forecast(lat, lng, params: {lang: language.downcase})['daily']['data']
       end
     end
