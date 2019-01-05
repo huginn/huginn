@@ -3,11 +3,7 @@ set -ev
 
 docker pull $DOCKER_IMAGE
 
-if [[ $DOCKER_IMAGE =~ "cantino" ]]; then
-  bin/docker_wrapper build --build-arg OUTDATED_DOCKER_IMAGE_NAMESPACE='true' -t $DOCKER_IMAGE -f $DOCKERFILE .
-else
-  bin/docker_wrapper build -t $DOCKER_IMAGE -f $DOCKERFILE .
-fi
+bin/docker_wrapper build -t $DOCKER_IMAGE -f $DOCKERFILE .
 
 if [[ -n "${DOCKER_USER}" && "${TRAVIS_PULL_REQUEST}" = 'false' && "${TRAVIS_BRANCH}" = "master" ]]; then
   docker login -u $DOCKER_USER -p $DOCKER_PASS
