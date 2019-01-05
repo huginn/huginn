@@ -3,7 +3,7 @@ ENV["RAILS_ENV"] ||= 'test'
 if ENV['COVERAGE']
   require 'simplecov'
   SimpleCov.start 'rails'
-else
+elsif ENV['CI'] == 'true'
   require 'coveralls'
   Coveralls.wear!('rails')
 end
