@@ -1,4 +1,11 @@
 GIT
+  remote: https://github.com/Hirurg103/capybara_select2.git
+  revision: 89423820e8a7f31c1dad9d12ea85c2b07a13b187
+  ref: 89423820e8a7f31c1dad9d12ea85c2b07a13b187
+  specs:
+    capybara-select-2 (0.3.2)
+
+GIT
   remote: https://github.com/albertsun/tumblr_client.git
   revision: e046fe6e39291c173add0a49081630c7b60a36c7
   ref: e046fe6e39291c173add0a49081630c7b60a36c7
@@ -178,9 +185,6 @@ GEM
     capybara-screenshot (1.0.17)
       capybara (>= 1.0, < 3)
       launchy
-    capybara-select2 (1.0.1)
-      capybara
-      rspec
     cliver (0.3.2)
     coderay (1.1.2)
     coffee-rails (4.2.2)
@@ -675,7 +679,7 @@ DEPENDENCIES
   capistrano-rails (~> 1.1)
   capybara (~> 2.18)
   capybara-screenshot
-  capybara-select2
+  capybara-select-2!
   coffee-rails (~> 4.2)
   coveralls (~> 0.8.12)
   daemons (~> 1.1.9)

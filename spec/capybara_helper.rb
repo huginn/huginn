@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'capybara/rails'
 require 'capybara/poltergeist'
 require 'capybara-screenshot/rspec'
-require 'capybara-select2'
+require 'capybara-select-2'
 
 CAPYBARA_TIMEOUT = ENV['CI'] == 'true' ? 60 : 5
 
