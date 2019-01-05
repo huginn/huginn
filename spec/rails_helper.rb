@@ -70,7 +70,7 @@ RSpec.configure do |config|
 
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include SpecHelpers
-  config.include Delorean
+  config.include ActiveSupport::Testing::TimeHelpers
 end
 
 if ENV['RSPEC_TASK'] != 'spec:nofeatures'

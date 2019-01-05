@@ -157,7 +157,6 @@ group :development do
     gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
     gem 'capybara-select2', require: false
-    gem 'delorean'
     gem 'poltergeist'
     gem 'pry-rails'
     gem 'pry-byebug'

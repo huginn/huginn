@@ -126,9 +126,10 @@ describe Agents::WebsiteAgent do
 
     describe "#check" do
       it "should check for changes (and update Event.expires_at)" do
-        expect { @checker.check }.to change { Event.count }.by(1)
+        travel(-2.seconds) do
+          expect { @checker.check }.to change { Event.count }.by(1)
+        end
         event = Event.last
-        sleep 2
         expect { @checker.check }.not_to change { Event.count }
         update_event = Event.last
         expect(update_event.expires_at).not_to eq(event.expires_at)

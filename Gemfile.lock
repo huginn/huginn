@@ -181,7 +181,6 @@ GEM
     capybara-select2 (1.0.1)
       capybara
       rspec
-    chronic (0.10.2)
     cliver (0.3.2)
     coderay (1.1.2)
     coffee-rails (4.2.2)
@@ -208,8 +207,6 @@ GEM
     declarative-option (0.1.0)
     delayed_job (4.1.5)
       activesupport (>= 3.0, < 5.3)
-    delorean (2.1.0)
-      chronic
     devise (4.4.3)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -684,7 +681,6 @@ DEPENDENCIES
   daemons (~> 1.1.9)
   delayed_job (~> 4.1.5)
   delayed_job_active_record!
-  delorean
   devise (~> 4.4.3)
   dotenv!
   dotenv-rails!
