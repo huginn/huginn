@@ -94,16 +94,16 @@ module Agents
     end
 
     def mqtt_client
-      @client ||= MQTT::Client.new(interpolated['uri'])
-
-      if interpolated['ssl']
-        @client.ssl = interpolated['ssl'].to_sym
-        @client.ca_file = interpolated['ca_file']
-        @client.cert_file = interpolated['cert_file']
-        @client.key_file = interpolated['key_file']
+      @client ||= begin
+        MQTT::Client.new(interpolated['uri']).tap do |c|
+          if interpolated['ssl']
+            c.ssl = interpolated['ssl'].to_sym
+            c.ca_file = interpolated['ca_file']
+            c.cert_file = interpolated['cert_file']
+            c.key_file = interpolated['key_file']
+          end
+        end
       end
-
-      @client
     end
 
     def receive(incoming_events)
@@ -117,34 +117,35 @@ module Agents
 
     def check
       last_message = memory['last_message']
+      mqtt_client.connect
 
-      mqtt_client.connect do |c|
-        begin
-          Timeout.timeout((interpolated['max_read_time'].presence || 15).to_i) {
-            c.get_packet(interpolated['topic']) do |packet|
-              topic, payload = message = [packet.topic, packet.payload]
+      poll_thread = Thread.new do
+        mqtt_client.get_packet(interpolated['topic']) do |packet|
+          topic, payload = message = [packet.topic, packet.payload]
 
-              # Ignore a message if it is previously received
-              next if (packet.retain || packet.duplicate) && message == last_message
+          # Ignore a message if it is previously received
+          next if (packet.retain || packet.duplicate) && message == last_message
 
-              last_message = message
+          last_message = message
 
-              # A lot of services generate JSON, so try that.
-              begin
-                payload = JSON.parse(payload)
-              rescue
-              end
+          # A lot of services generate JSON, so try that.
+          begin
+            payload = JSON.parse(payload)
+          rescue
+          end
 
-              create_event payload: {
-                'topic' => topic,
-                'message' => payload,
-                'time' => Time.now.to_i
-              }
-            end
+          create_event payload: {
+            'topic' => topic,
+            'message' => payload,
+            'time' => Time.now.to_i
           }
-        rescue Timeout::Error
         end
       end
+
+      sleep (interpolated['max_read_time'].presence || 15).to_f
+
+      mqtt_client.disconnect
+      poll_thread.kill
 
       # Remember the last original (non-retain, non-duplicate) message
       self.memory['last_message'] = last_message
