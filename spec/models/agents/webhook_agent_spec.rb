@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Agents::WebhookAgent do
   let(:agent) do
     _agent = Agents::WebhookAgent.new(:name => 'webhook',
-                                      :options => { 'secret' => 'foobar', 'payload_path' => 'some_key', 'headers' => 'HTTP_ACCEPT, HTTP_X_HELLO_WORLD', 'header_key' => 'X-HTTP-HEADERS' })
+                                      :options => { 'secret' => 'foobar', 'payload_path' => 'some_key' })
     _agent.user = users(:bob)
     _agent.save!
     _agent
@@ -20,11 +20,13 @@ describe Agents::WebhookAgent do
         })
 
       out = nil
+      agent.options['event_headers'] = 'Accept,X-Hello-World'
+      agent.options['event_headers_key'] = 'X-HTTP-HEADERS'
       expect {
         out = agent.receive_web_request(webpayload)
       }.to change { Event.count }.by(1)
       expect(out).to eq(['Event Created', 201])
-      expect(Event.last.payload).to eq( {"people"=>[{"name"=>"bob"}, {"name"=>"jon"}], "X-HTTP-HEADERS"=>{"HTTP_ACCEPT"=>"application/xml", "HTTP_X_HELLO_WORLD"=>"Hello Huginn"}})
+      expect(Event.last.payload).to eq( {"people"=>[{"name"=>"bob"}, {"name"=>"jon"}], "X-HTTP-HEADERS"=>{"Accept"=>"application/xml", "X-Hello-World"=>"Hello Huginn"}})
     end
 
     it 'should be able to create multiple events when given an array' do
@@ -36,11 +38,13 @@ describe Agents::WebhookAgent do
         })
       out = nil
       agent.options['payload_path'] = 'some_key.people'
+      agent.options['event_headers'] = 'Accept,X-Hello-World'
+      agent.options['event_headers_key'] = 'X-HTTP-HEADERS'
       expect {
         out = agent.receive_web_request(webpayload)
       }.to change { Event.count }.by(2)
       expect(out).to eq(['Event Created', 201])
-      expect(Event.last.payload).to eq({"name"=>"jon", "X-HTTP-HEADERS"=>{"HTTP_ACCEPT"=>"application/xml", "HTTP_X_HELLO_WORLD"=>"Hello Huginn"}})
+      expect(Event.last.payload).to eq({"name"=>"jon", "X-HTTP-HEADERS"=>{"Accept"=>"application/xml", "X-Hello-World"=>"Hello Huginn"}})
     end
 
     it 'should not create event if secrets do not match' do
@@ -52,6 +56,8 @@ describe Agents::WebhookAgent do
         })
 
       out = nil
+      agent.options['event_headers'] = 'Accept,X-Hello-World'
+      agent.options['event_headers_key'] = 'X-HTTP-HEADERS'
       expect {
         out = agent.receive_web_request(webpayload)
       }.to change { Event.count }.by(0)
@@ -527,8 +533,8 @@ describe Agents::WebhookAgent do
         end
       end
     end
-    context "with Headers" do
-      it "should not pass any headers if Header_Key is not set" do
+    context "with headers" do
+      it "should not pass any headers if event_headers_key is not set" do
         webpayload = ActionDispatch::Request.new({
             'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
             'REQUEST_METHOD' => "POST",
@@ -536,7 +542,8 @@ describe Agents::WebhookAgent do
             'HTTP_X_HELLO_WORLD' => "Hello Huginn"
           })
 
-        agent.options['header_key'] = ''
+        agent.options['event_headers'] = 'Accept,X-Hello-World'
+        agent.options['event_headers_key'] = ''
 
         out = nil
 
@@ -546,7 +553,8 @@ describe Agents::WebhookAgent do
         expect(out).to eq(['Event Created', 201])
         expect(Event.last.payload).to eq(payload)
       end
-      it "should pass selected headers specified in Header_Key" do
+
+      it "should pass selected headers specified in event_headers_key" do
         webpayload = ActionDispatch::Request.new({
             'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
             'REQUEST_METHOD' => "POST",
@@ -554,7 +562,8 @@ describe Agents::WebhookAgent do
             'HTTP_X_HELLO_WORLD' => "Hello Huginn"
           })
 
-        agent.options['headers'] = 'HTTP_X_HELLO_WORLD'
+        agent.options['event_headers'] = 'X-Hello-World'
+        agent.options['event_headers_key'] = 'X-HTTP-HEADERS'
 
         out = nil
 
@@ -562,10 +571,10 @@ describe Agents::WebhookAgent do
           out= agent.receive_web_request(webpayload)
         }.to change { Event.count }.by(1)
         expect(out).to eq(['Event Created', 201])
-        expect(Event.last.payload).to eq({"people"=>[{"name"=>"bob"}, {"name"=>"jon"}], "X-HTTP-HEADERS"=>{"HTTP_X_HELLO_WORLD"=>"Hello Huginn"}})
+        expect(Event.last.payload).to eq({"people"=>[{"name"=>"bob"}, {"name"=>"jon"}], "X-HTTP-HEADERS"=>{"X-Hello-World"=>"Hello Huginn"}})
       end
 
-      it "should pass empty header_key if none of the headers exist" do
+      it "should pass empty event_headers_key if none of the headers exist" do
         webpayload = ActionDispatch::Request.new({
             'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
             'REQUEST_METHOD' => "POST",
@@ -573,7 +582,8 @@ describe Agents::WebhookAgent do
             'HTTP_X_HELLO_WORLD' => "Hello Huginn"
           })
 
-        agent.options['headers'] = 'HTTP_X_HELLO_WORLD1'
+        agent.options['event_headers'] = 'x-hello-world1'
+        agent.options['event_headers_key'] = 'X-HTTP-HEADERS'
 
         out = nil
 
@@ -584,7 +594,7 @@ describe Agents::WebhookAgent do
         expect(Event.last.payload).to eq({"people"=>[{"name"=>"bob"}, {"name"=>"jon"}], "X-HTTP-HEADERS"=>{}})
       end
 
-      it "should pass empty header_key if headers is empty" do
+      it "should pass empty event_headers_key if event_headers is empty" do
         webpayload = ActionDispatch::Request.new({
             'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
             'REQUEST_METHOD' => "POST",
@@ -592,7 +602,8 @@ describe Agents::WebhookAgent do
             'HTTP_X_HELLO_WORLD' => "Hello Huginn"
           })
 
-        agent.options['headers'] = ''
+        agent.options['event_headers'] = ''
+        agent.options['event_headers_key'] = 'X-HTTP-HEADERS'
 
         out = nil
 

@@ -1,6 +1,7 @@
 module Agents
   class WebhookAgent < Agent
-    include WebRequestConcern
+    include EventHeadersConcern
+    include WebRequestConcern  # to make reCAPTCHA verification requests
 
     cannot_be_scheduled!
     cannot_receive_events!
@@ -22,8 +23,8 @@ module Agents
         * `payload_path` - JSONPath of the attribute in the POST body to be
           used as the Event payload.  Set to `.` to return the entire message.
           If `payload_path` points to an array, Events will be created for each element.
-        * `headers` - Comma-separated list of HTTP headers your agent will include in the payload.
-        * `header_key` - The key to use to store all the headers recieved
+        * `event_headers` - Comma-separated list of HTTP headers your agent will include in the payload.
+        * `event_headers_key` - The key to use to store all the headers received
         * `verbs` - Comma-separated list of http verbs your agent will accept.
           For example, "post,get" will enable POST and GET requests. Defaults
           to "post".
@@ -46,15 +47,20 @@ module Agents
       { "secret" => "supersecretstring",
         "expected_receive_period_in_days" => 1,
         "payload_path" => "some_key",
-        "headers" => "",
-        "header_key" => "X-HTTP-HEADERS"
+        "event_headers" => "",
+        "event_headers_key" => "headers"
       }
     end
 
     def receive_web_request(request)
       params = request.params.except(:action, :controller, :agent_id, :user_id, :format)
       method = request.method_symbol.to_s
-      headers = request.headers.select {|k,v| k.to_s[/^HTTP_/]}.to_h
+      headers = request.headers.each_with_object({}) { |(name, value), hash|
+        case name
+        when /\AHTTP_([A-Z0-9_]+)\z/
+          hash[$1.tr('_', '-').gsub(/[^-]+/, &:capitalize)] = value
+        end
+      }
 
       # check the secret
       secret = params.delete('secret')
@@ -94,11 +100,7 @@ module Agents
       end
 
       [payload_for(params)].flatten.each do |payload|
-        if interpolated['header_key'].present?
-          acceptedheaders = interpolated['headers'].split(/,/).map { |x| x.strip }
-          payload[interpolated['header_key']] = headers.slice(*acceptedheaders)
-        end
-        create_event(payload: payload)
+        create_event(payload: payload.merge(event_headers_payload(headers)))
       end
 
       if interpolated['response_headers'].presence
@@ -124,6 +126,8 @@ module Agents
       if options['code'].to_s.in?(['301', '302']) && !options['response'].present?
         errors.add(:base, "Must specify a url for request redirect")
       end
+
+      validate_event_headers_options!
     end
 
     def payload_for(params)
