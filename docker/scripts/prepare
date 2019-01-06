@@ -33,7 +33,7 @@ $minimal_apt_get_install build-essential checkinstall git-core \
   ruby2.5 ruby2.5-dev
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
-gem install --no-ri --no-rdoc bundler
+gem install --no-document bundler
 
 apt-get purge -y python3* rsyslog rsync manpages
 apt-get -y clean

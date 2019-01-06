@@ -79,7 +79,7 @@ Download Ruby and compile it:
 
 Install the bundler and foreman gems:
 
-    sudo gem install rake bundler foreman --no-ri --no-rdoc
+    sudo gem install rake bundler foreman --no-document
 
 ## 3. System Users
 
