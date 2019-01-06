@@ -52,7 +52,7 @@ describe Agents::PostAgent do
           raise "unexpected Content-Type: #{content_type}"
         end
       end
-      { status: 200, body: "<html>a webpage!</html>", headers: { 'Content-type' => 'text/html' } }
+      { status: 200, body: "<html>a webpage!</html>", headers: { 'Content-type' => 'text/html', 'X-Foo-Bar' => 'baz' } }
     }
   end
 
@@ -272,23 +272,30 @@ describe Agents::PostAgent do
 
         it "emits the response headers capitalized by default" do
           @checker.check
-          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html', 'X-Foo-Bar' => 'baz' })
         end
 
         it "emits the response headers capitalized" do
           @checker.options['event_headers_style'] = 'capitalized'
           @checker.check
-          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html', 'X-Foo-Bar' => 'baz' })
         end
 
         it "emits the response headers downcased" do
           @checker.options['event_headers_style'] = 'downcased'
           @checker.check
-          expect(@checker.events.last.payload['headers']).to eq({ 'content-type' => 'text/html' })
+          expect(@checker.events.last.payload['headers']).to eq({ 'content-type' => 'text/html', 'x-foo-bar' => 'baz' })
         end
 
         it "emits the response headers snakecased" do
           @checker.options['event_headers_style'] = 'snakecased'
+          @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'content_type' => 'text/html', 'x_foo_bar' => 'baz' })
+        end
+
+        it "emits the response headers only including those specified by event_headers" do
+          @checker.options['event_headers_style'] = 'snakecased'
+          @checker.options['event_headers'] = 'content-type'
           @checker.check
           expect(@checker.events.last.payload['headers']).to eq({ 'content_type' => 'text/html' })
         end
