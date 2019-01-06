@@ -4,9 +4,8 @@ ruby '>=2.3.0'
 
 # Ensure github repositories are fetched using HTTPS
 git_source(:github) do |repo_name|
-  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
   "https://github.com/#{repo_name}.git"
-end if Gem::Version.new(Bundler::VERSION) < Gem::Version.new('2')
+end
 
 # Load vendored dotenv gem and .env file
 require File.join(File.dirname(__FILE__), 'lib/gemfile_helper.rb')
