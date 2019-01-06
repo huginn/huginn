@@ -254,7 +254,7 @@ GEM
       faraday_middleware (>= 0.9)
       loofah (>= 2.0)
       sax-machine (>= 1.0)
-    ffi (1.9.18)
+    ffi (1.9.25)
     font-awesome-sass (4.7.0)
       sass (>= 3.2)
     forecast_io (2.0.1)
