@@ -45,6 +45,7 @@ RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES:-true}
 IP="${IP:-0.0.0.0}"
 PORT=${HUGINN_PORT:-${PORT:-3000}}
 PORT="$(echo $PORT|awk -F ':' '{print $NF}')"
+HUGINN_PORT=${PORT}
 
 cp -a /app/.env.example /tmp/
 
