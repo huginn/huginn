@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/Hirurg103/capybara_select2.git
-  revision: 89423820e8a7f31c1dad9d12ea85c2b07a13b187
-  ref: 89423820e8a7f31c1dad9d12ea85c2b07a13b187
+  revision: fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76
+  ref: fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76
   specs:
     capybara-select-2 (0.3.2)
 
@@ -778,7 +778,7 @@ DEPENDENCIES
   xmpp4r (~> 0.5.6)
 
 RUBY VERSION
-   ruby 2.5.3p105
+   ruby 2.6.0p0
 
 BUNDLED WITH
    1.17.2

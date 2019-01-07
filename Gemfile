@@ -156,7 +156,7 @@ group :development do
     gem 'coveralls', '~> 0.8.12', require: false
     gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
-    gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', ref: '89423820e8a7f31c1dad9d12ea85c2b07a13b187', require: false
+    gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76', require: false
     gem 'poltergeist'
     gem 'pry-rails'
     gem 'pry-byebug'
