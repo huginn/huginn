@@ -3,8 +3,8 @@ require 'rails_helper'
 describe Location do
   let(:location) {
     Location.new(
-      lat: BigDecimal.new('2.0'),
-      lng: BigDecimal.new('3.0'),
+      lat: BigDecimal('2.0'),
+      lng: BigDecimal('3.0'),
       radius: 300,
       speed: 2,
       course: 30)

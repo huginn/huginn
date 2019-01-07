@@ -653,7 +653,7 @@ describe Agent do
     describe "cleaning up now-expired events" do
       before do
         @time = "2014-01-01 01:00:00 +00:00"
-        time_travel_to @time do
+        travel_to @time do
           @agent = Agents::SomethingSource.new(:name => "something")
           @agent.keep_events_for = 5.days
           @agent.user = users(:bob)
@@ -678,7 +678,7 @@ describe Agent do
 
       describe "when keep_events_for is changed" do
         it "updates events' expires_at" do
-          time_travel_to @time do
+          travel_to @time do
             expect {
                 @agent.options[:foo] = "bar1"
                 @agent.keep_events_for = 3.days

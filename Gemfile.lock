@@ -1,4 +1,11 @@
 GIT
+  remote: https://github.com/Hirurg103/capybara_select2.git
+  revision: fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76
+  ref: fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76
+  specs:
+    capybara-select-2 (0.3.2)
+
+GIT
   remote: https://github.com/albertsun/tumblr_client.git
   revision: e046fe6e39291c173add0a49081630c7b60a36c7
   ref: e046fe6e39291c173add0a49081630c7b60a36c7
@@ -178,10 +185,6 @@ GEM
     capybara-screenshot (1.0.17)
       capybara (>= 1.0, < 3)
       launchy
-    capybara-select2 (1.0.1)
-      capybara
-      rspec
-    chronic (0.10.2)
     cliver (0.3.2)
     coderay (1.1.2)
     coffee-rails (4.2.2)
@@ -208,8 +211,6 @@ GEM
     declarative-option (0.1.0)
     delayed_job (4.1.5)
       activesupport (>= 3.0, < 5.3)
-    delorean (2.1.0)
-      chronic
     devise (4.4.3)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -253,7 +254,7 @@ GEM
       faraday_middleware (>= 0.9)
       loofah (>= 2.0)
       sax-machine (>= 1.0)
-    ffi (1.9.18)
+    ffi (1.9.25)
     font-awesome-sass (4.7.0)
       sass (>= 3.2)
     forecast_io (2.0.1)
@@ -313,7 +314,7 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    hashdiff (0.3.2)
+    hashdiff (0.3.8)
     hashie (3.5.6)
     haversine (0.3.0)
     hipchat (1.2.0)
@@ -647,7 +648,7 @@ GEM
       activemodel (>= 5.0)
       debug_inspector
       railties (>= 5.0)
-    webmock (2.3.2)
+    webmock (3.5.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
@@ -678,13 +679,12 @@ DEPENDENCIES
   capistrano-rails (~> 1.1)
   capybara (~> 2.18)
   capybara-screenshot
-  capybara-select2
+  capybara-select-2!
   coffee-rails (~> 4.2)
   coveralls (~> 0.8.12)
   daemons (~> 1.1.9)
   delayed_job (~> 4.1.5)
   delayed_job_active_record!
-  delorean
   devise (~> 4.4.3)
   dotenv!
   dotenv-rails!
@@ -772,13 +772,13 @@ DEPENDENCIES
   unicorn (~> 5.1.0)
   vcr
   web-console (>= 3.3.0)
-  webmock (~> 2.3)
+  webmock (~> 3.5.1)
   weibo_2!
   wunderground (~> 1.2.0)
   xmpp4r (~> 0.5.6)
 
 RUBY VERSION
-   ruby 2.5.1p57
+   ruby 2.6.0p0
 
 BUNDLED WITH
-   1.16.3
+   1.17.2

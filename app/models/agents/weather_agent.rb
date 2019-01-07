@@ -119,7 +119,7 @@ module Agents
     def validate_location
       errors.add(:base, "location is required") unless location.present?
       return if wunderground?
-      if location.match? VALID_COORDS_REGEX
+      if location =~ VALID_COORDS_REGEX
         lat, lon = coordinates
         errors.add :base, "too low of a latitude" unless lat > -90
         errors.add :base, "too big of a latitude" unless lat < 90

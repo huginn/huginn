@@ -7,6 +7,11 @@ describe Seeder do
   end
 
   describe '.seed' do
+    before(:each) do
+      User.delete_all
+      expect(User.count).to eq(0)
+    end
+
     it 'imports a default scenario' do
       expect { Seeder.seed }.to change(Agent, :count).by(7)
     end
@@ -18,7 +23,8 @@ describe Seeder do
 
     it 'can be run multiple times and exit normally' do
       Seeder.seed
-      expect { Seeder.seed }.to raise_error(SystemExit)
+      mock(Seeder).exit
+      Seeder.seed
     end
   end
 

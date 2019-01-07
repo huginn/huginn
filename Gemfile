@@ -156,8 +156,7 @@ group :development do
     gem 'coveralls', '~> 0.8.12', require: false
     gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
-    gem 'capybara-select2', require: false
-    gem 'delorean'
+    gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76', require: false
     gem 'poltergeist'
     gem 'pry-rails'
     gem 'pry-byebug'
@@ -169,7 +168,7 @@ group :development do
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'
     gem 'vcr'
-    gem 'webmock', '~> 2.3'
+    gem 'webmock', '~> 3.5.1'
   end
 end
 

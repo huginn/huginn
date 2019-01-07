@@ -68,7 +68,7 @@ describe Agents::DeDuplicationAgent do
     it "isnt when event created outside :expected_update_period_in_days" do
       @checker.options[:expected_update_period_in_days] = 2
 
-      time_travel_to 2.days.from_now do
+      travel 49.hours do
           expect(@checker).not_to be_working
       end
     end
