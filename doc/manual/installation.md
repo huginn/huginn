@@ -193,7 +193,7 @@ If you are using a local MySQL server the database configuration should look lik
     DATABASE_RECONNECT=true
     DATABASE_NAME=huginn_production
     DATABASE_POOL=20
-    DATABASE_USERNAME=huginn
+    DATABASE_USERNAME=root
     DATABASE_PASSWORD='$password'
     #DATABASE_HOST=your-domain-here.com
     #DATABASE_PORT=3306
