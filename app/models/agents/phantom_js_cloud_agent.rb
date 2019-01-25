@@ -26,7 +26,7 @@ module Agents
       * `Api key` - PhantomJs Cloud API Key credential stored in Huginn
       * `Url` - The url to render
       * `Mode` - Create a new `clean` event or `merge` old payload with new values (default: `clean`)
-      * `Render type` - Render as html or plain text without html tags (default: `html`)
+      * `Render type` - Render as html, plain text without html tags, or jpg as screenshot of the page (default: `html`)
       * `Output as json` - Return the page conents and metadata as a JSON object (default: `false`)
       * `Ignore images` - Skip loading of inlined images (default: `false`)
       * `Url agent` - A custom User-Agent name (default: `#{default_user_agent}`)
@@ -59,7 +59,7 @@ module Agents
     form_configurable :mode, type: :array, values: ['clean', 'merge']
     form_configurable :api_key, roles: :completable
     form_configurable :url
-    form_configurable :render_type, type: :array, values: ['html', 'plainText']
+    form_configurable :render_type, type: :array, values: ['html', 'plainText', 'jpg']
     form_configurable :output_as_json, type: :boolean
     form_configurable :ignore_images, type: :boolean
     form_configurable :user_agent, type: :text

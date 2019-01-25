@@ -55,6 +55,17 @@ describe Agents::PhantomJsCloudAgent do
       expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22plainText%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%7D%7D")
     end
 
+    it "should set render type as jpg" do
+      @checker.options['render_type'] = 'jpg'
+
+      expect {
+        @checker.check
+      }.to change { @checker.events.count }.by(1)
+
+      item,* = @checker.events.last(1)
+      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22jpg%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%7D%7D")
+    end
+
     it "should set output as json" do
       @checker.options['output_as_json'] = true
 
