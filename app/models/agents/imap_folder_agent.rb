@@ -5,6 +5,8 @@ require 'mail'
 
 module Agents
   class ImapFolderAgent < Agent
+    include EventHeadersConcern
+
     cannot_receive_events!
 
     can_dry_run!
@@ -55,6 +57,14 @@ module Agents
 
       Set `mark_as_read` to true to mark found mails as read.
 
+      Set `event_headers` to a list of header names you want to include in a `headers` hash in each created event, either in an array of string or in a comma-separated string.
+
+      Set `event_headers_style` to one of the following values to normalize the keys of "headers" for downstream agents' convenience:
+
+        * `capitalized` (default) - Header names are capitalized; e.g. "Content-Type"
+        * `downcased` - Header names are downcased; e.g. "content-type"
+        * `snakecased` - Header names are snakecased; e.g. "content_type"
+
       Set `include_raw_mail` to true to add a `raw_mail` value to each created event, which contains a *Base64-encoded* blob in the "RFC822" format defined in [the IMAP4 standard](https://tools.ietf.org/html/rfc3501).  Note that while the result of Base64 encoding will be LF-terminated, its raw content will often be CRLF-terminated because of the nature of the e-mail protocols and formats.  The primary use case for a raw mail blob is to pass to a Shell Command Agent with a command like `openssl enc -d -base64 | tr -d '\r' | procmail -Yf-`.
 
       Each agent instance memorizes the highest UID of mails that are found in the last run for each watched folder, so even if you change a set of conditions so that it matches mails that are missed previously, or if you alter the flag status of already found mails, they will not show up as new events.
@@ -79,7 +89,7 @@ module Agents
             }
           }
 
-      Additionally, "raw_mail" will be included if the `include_raw_mail` option is set.
+      Additionally, "headers" will be included if the `event_headers` option is set, and "raw_mail" if the `include_raw_mail` option is set.
     MD
 
     IDCACHE_SIZE = 100
@@ -288,6 +298,14 @@ module Agents
             payload['raw_mail'] = Base64.encode64(mail.raw_mail)
           end
 
+          if interpolated['event_headers'].present?
+            headers = mail.header.each_with_object({}) { |field, hash|
+              name = field.name
+              hash[name] = (v = hash[name]) ? "#{v}\n#{field.value.to_s}" : field.value.to_s
+            }
+            payload.update(event_headers_payload(headers))
+          end
+
           create_event payload: payload
 
           notified << mail.message_id if mail.message_id
@@ -411,6 +429,10 @@ module Agents
 
     def pluralize(count, noun)
       "%d %s" % [count, noun.pluralize(count)]
+    end
+
+    def event_headers_key
+      super || 'headers'
     end
 
     class Client < ::Net::IMAP
