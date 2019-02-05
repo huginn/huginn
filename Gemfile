@@ -1,13 +1,11 @@
 source 'https://rubygems.org'
 
-# Ruby 2.2.2 is the minimum requirement
-ruby [Gem::Version.new('2.2.2'), Gem::Version.new(RUBY_VERSION)].max
+ruby '>=2.3.0'
 
 # Ensure github repositories are fetched using HTTPS
 git_source(:github) do |repo_name|
-  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
   "https://github.com/#{repo_name}.git"
-end if Gem::Version.new(Bundler::VERSION) < Gem::Version.new('2')
+end
 
 # Load vendored dotenv gem and .env file
 require File.join(File.dirname(__FILE__), 'lib/gemfile_helper.rb')
@@ -155,8 +153,7 @@ group :development do
     gem 'coveralls', '~> 0.8.12', require: false
     gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
-    gem 'capybara-select2', require: false
-    gem 'delorean'
+    gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76', require: false
     gem 'poltergeist'
     gem 'pry-rails'
     gem 'pry-byebug'
@@ -168,7 +165,7 @@ group :development do
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'
     gem 'vcr'
-    gem 'webmock', '~> 2.3'
+    gem 'webmock', '~> 3.5.1'
   end
 end
 

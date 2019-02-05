@@ -3,7 +3,7 @@ ENV["RAILS_ENV"] ||= 'test'
 if ENV['COVERAGE']
   require 'simplecov'
   SimpleCov.start 'rails'
-else
+elsif ENV['CI'] == 'true'
   require 'coveralls'
   Coveralls.wear!('rails')
 end
@@ -70,7 +70,7 @@ RSpec.configure do |config|
 
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include SpecHelpers
-  config.include Delorean
+  config.include ActiveSupport::Testing::TimeHelpers
 end
 
 if ENV['RSPEC_TASK'] != 'spec:nofeatures'

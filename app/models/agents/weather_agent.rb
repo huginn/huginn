@@ -98,7 +98,7 @@ module Agents
 
     def validate_location
       errors.add(:base, "location is required") unless location.present?
-      if location.match? VALID_COORDS_REGEX
+      if location =~ VALID_COORDS_REGEX
         lat, lon = coordinates
         errors.add :base, "too low of a latitude" unless lat > -90
         errors.add :base, "too big of a latitude" unless lat < 90
@@ -128,69 +128,68 @@ module Agents
     end
 
     def model(which_day)
-      dark_sky.each do |value|
+      value = dark_sky[which_day - 1]
+      if value
         timestamp = Time.at(value.time)
-        if (timestamp.to_date - Time.now.to_date).to_i == which_day
-          day = {
-            'date' => {
-              'epoch' => value.time.to_s,
-              'pretty' => timestamp.strftime("%l:%M %p %Z on %B %d, %Y"),
-              'day' => timestamp.day,
-              'month' => timestamp.month,
-              'year' => timestamp.year,
-              'yday' => timestamp.yday,
-              'hour' => timestamp.hour,
-              'min' => timestamp.strftime("%M"),
-              'sec' => timestamp.sec,
-              'isdst' => timestamp.isdst ? 1 : 0 ,
-              'monthname' => timestamp.strftime("%B"),
-              'monthname_short' => timestamp.strftime("%b"),
-              'weekday_short' => timestamp.strftime("%a"),
-              'weekday' => timestamp.strftime("%A"),
-              'ampm' => timestamp.strftime("%p"),
-              'tz_short' => timestamp.zone
-            },
-            'period' => which_day.to_i,
-            'high' => {
-              'fahrenheit' => value.temperatureMax.round().to_s,
-              'epoch' => value.temperatureMaxTime.to_s,
-              'fahrenheit_apparent' => value.apparentTemperatureMax.round().to_s,
-              'epoch_apparent' => value.apparentTemperatureMaxTime.to_s,
-              'celsius' => ((5*(Float(value.temperatureMax) - 32))/9).round().to_s
-            },
-            'low' => {
-              'fahrenheit' => value.temperatureMin.round().to_s,
-              'epoch' => value.temperatureMinTime.to_s,
-              'fahrenheit_apparent' => value.apparentTemperatureMin.round().to_s,
-              'epoch_apparent' => value.apparentTemperatureMinTime.to_s,
-              'celsius' => ((5*(Float(value.temperatureMin) - 32))/9).round().to_s
-            },
-            'conditions' => value.summary,
-            'icon' => value.icon,
-            'avehumidity' => (value.humidity * 100).to_i,
-            'sunriseTime' => value.sunriseTime.to_s,
-            'sunsetTime' => value.sunsetTime.to_s,
-            'moonPhase' => value.moonPhase.to_s,
-            'precip' => {
-              'intensity' => value.precipIntensity.to_s,
-              'intensity_max' => value.precipIntensityMax.to_s,
-              'intensity_max_epoch' => value.precipIntensityMaxTime.to_s,
-              'probability' => value.precipProbability.to_s,
-              'type' => value.precipType
-            },
-            'dewPoint' => value.dewPoint.to_s,
-            'avewind' => {
-              'mph' => value.windSpeed.round().to_s,
-              'kph' =>  (Float(value.windSpeed) * 1.609344).round().to_s,
-              'degrees' => value.windBearing.to_s
-            },
-            'visibility' => value.visibility.to_s,
-            'cloudCover' => value.cloudCover.to_s,
-            'pressure' => value.pressure.to_s,
-            'ozone' => value.ozone.to_s
-          }
-          return day
-        end
+        day = {
+          'date' => {
+            'epoch' => value.time.to_s,
+            'pretty' => timestamp.strftime("%l:%M %p %Z on %B %d, %Y"),
+            'day' => timestamp.day,
+            'month' => timestamp.month,
+            'year' => timestamp.year,
+            'yday' => timestamp.yday,
+            'hour' => timestamp.hour,
+            'min' => timestamp.strftime("%M"),
+            'sec' => timestamp.sec,
+            'isdst' => timestamp.isdst ? 1 : 0 ,
+            'monthname' => timestamp.strftime("%B"),
+            'monthname_short' => timestamp.strftime("%b"),
+            'weekday_short' => timestamp.strftime("%a"),
+            'weekday' => timestamp.strftime("%A"),
+            'ampm' => timestamp.strftime("%p"),
+            'tz_short' => timestamp.zone
+          },
+          'period' => which_day.to_i,
+          'high' => {
+            'fahrenheit' => value.temperatureMax.round().to_s,
+            'epoch' => value.temperatureMaxTime.to_s,
+            'fahrenheit_apparent' => value.apparentTemperatureMax.round().to_s,
+            'epoch_apparent' => value.apparentTemperatureMaxTime.to_s,
+            'celsius' => ((5*(Float(value.temperatureMax) - 32))/9).round().to_s
+          },
+          'low' => {
+            'fahrenheit' => value.temperatureMin.round().to_s,
+            'epoch' => value.temperatureMinTime.to_s,
+            'fahrenheit_apparent' => value.apparentTemperatureMin.round().to_s,
+            'epoch_apparent' => value.apparentTemperatureMinTime.to_s,
+            'celsius' => ((5*(Float(value.temperatureMin) - 32))/9).round().to_s
+          },
+          'conditions' => value.summary,
+          'icon' => value.icon,
+          'avehumidity' => (value.humidity * 100).to_i,
+          'sunriseTime' => value.sunriseTime.to_s,
+          'sunsetTime' => value.sunsetTime.to_s,
+          'moonPhase' => value.moonPhase.to_s,
+          'precip' => {
+            'intensity' => value.precipIntensity.to_s,
+            'intensity_max' => value.precipIntensityMax.to_s,
+            'intensity_max_epoch' => value.precipIntensityMaxTime.to_s,
+            'probability' => value.precipProbability.to_s,
+            'type' => value.precipType
+          },
+          'dewPoint' => value.dewPoint.to_s,
+          'avewind' => {
+            'mph' => value.windSpeed.round().to_s,
+            'kph' =>  (Float(value.windSpeed) * 1.609344).round().to_s,
+            'degrees' => value.windBearing.to_s
+          },
+          'visibility' => value.visibility.to_s,
+          'cloudCover' => value.cloudCover.to_s,
+          'pressure' => value.pressure.to_s,
+          'ozone' => value.ozone.to_s
+        }
+        return day
       end
     end
   end

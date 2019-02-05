@@ -5,7 +5,7 @@ describe Agents::WeatherAgent do
     Agents::WeatherAgent.create(
       name: 'weather',
       options: {
-        :location => 94103,
+          :location => "37.77550,-122.41292",
         :api_key => 'test',
         :which_day => 1,
       }
@@ -44,17 +44,6 @@ describe Agents::WeatherAgent do
     expect(agent.working?).to be_falsey
   end
 
-  context "wunderground" do
-    it "validates the location properly" do
-      expect(agent.options["location"]).to eq 94103
-      agent.options["location"] = "meh, really whatever, this is on the way to deprecation anyway"
-      expect(agent).to be_valid
-      agent.options["location"] = nil
-      expect(agent).to_not be_valid
-      agent.options["location"] = 94103
-    end
-  end
-
   context "dark sky" do
     it "validates the location properly" do
       expect(dark_sky_agent.options["location"]).to eq "37.779329,-122.41915"
@@ -84,7 +73,7 @@ describe Agents::WeatherAgent do
   describe "Agents::WeatherAgent::VALID_COORDS_REGEX" do
     it "matches 37.779329,-122.41915" do
       expect(
-        "37.779329,-122.41915".match? Agents::WeatherAgent::VALID_COORDS_REGEX
+        "37.779329,-122.41915" =~ Agents::WeatherAgent::VALID_COORDS_REGEX
       ).to be_truthy
     end
     it "matches a dozen random valid values" do
@@ -92,8 +81,8 @@ describe Agents::WeatherAgent do
       valid_latitude_range = -90.0..90.0
       12.times do
         expect(
-          "#{rand valid_latitude_range},#{rand valid_longitude_range}".match? Agents::WeatherAgent::VALID_COORDS_REGEX
-        ).to be true
+          "#{rand valid_latitude_range},#{rand valid_longitude_range}" =~ Agents::WeatherAgent::VALID_COORDS_REGEX
+        ).not_to be_nil
       end
     end
   end

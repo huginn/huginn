@@ -11,7 +11,6 @@ before_install:
 env:
   global:
     - APP_SECRET_TOKEN=b2724973fd81c2f4ac0f92ac48eb3f0152c4a11824c122bcf783419a4c51d8b9bba81c8ba6a66c7de599677c7f486242cf819775c433908e77c739c5c8ae118d
-    - RSPEC_TASK=spec:nofeatures
     - COVERALLS_PARALLEL=true
     - secure: fzmSI7PQz6CJiIJNAtLAuy3TMmYCrK4bUil3uufh8JkHfpSGWOZt2i6fZ8yZ7pzwG5Aw7eZDgdFsNcEPJlgUDJhlwjg+QxCJslhotTQ9qI3Ieo85peWlU9dZFTOZcrCu0net/hY2FE4ZpTRb5r8A/DRv9ukA8P8tShhePCjckgg=
     - secure: YjW07LpRSiC9xB6PhLQ4LVv2VphvF3IacV43PLfvzdagjy14yAwKXTUlSadgRaMbndB2dlCTe3YcY11a/xtX/2HDrF14NHPXQdL7e2dJUS3CDLSKZK26x1SOiaaDIrl1jO1xr5kOUd+564MAcNUzDTJQR4CrWl/5t6EwW4iYQVc=
@@ -19,49 +18,27 @@ env:
   matrix:
     - DATABASE_ADAPTER=mysql2
     - DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
-    - DOCKER_IMAGE=cantino/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
     - DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
     - DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
-    - RSPEC_TASK=spec:features
 matrix:
   exclude:
-    - env: DOCKER_IMAGE=cantino/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - env: DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
     - env: DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
     - env: DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
-    - env: RSPEC_TASK=spec:features
   include:
-    - rvm: 2.4.4
-      env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - rvm: 2.4.4
-      env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=cantino/huginn DOCKERFILE=docker/multi-process/Dockerfile
-    - rvm: 2.4.4
+    - rvm: 2.6.0
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - rvm: 2.4.4
+    - rvm: 2.6.0
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
-    - rvm: 2.5.1
-      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
-    - rvm: 2.5.1
-      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
-    - rvm: 2.4.4
-      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
-    - rvm: 2.4.4
-      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
-    - rvm: 2.3.7
-      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=mysql2
-    - rvm: 2.3.7
-      env: RSPEC_TASK=spec:features DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
 rvm:
-- 2.2.10
-- 2.3.7
-- 2.4.4
-- 2.5.1
+- 2.3.8
+- 2.4.5
+- 2.5.3
+- 2.6.0
 cache: bundler
 bundler_args: --without development production
 script:
   - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec rake db:create db:migrate; else true; fi
-  - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec rake $RSPEC_TASK; else ./build_docker_image.sh; fi
+  - if [ -z "${DOCKER_IMAGE}" ]; then bundle exec rake; else ./build_docker_image.sh; fi
 notifications:
   irc:
     channels:
