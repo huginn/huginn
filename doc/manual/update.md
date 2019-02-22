@@ -15,6 +15,13 @@ sudo bundle exec rake production:check
 sudo bundle exec rake production:stop
 ```
 
+When the process is stuck you can use 
+
+```
+sudo bundle exec rake production:force_stop
+```
+to forcefully kill the process.
+
 ### 2. Store the current version
 
 ```
@@ -44,6 +51,15 @@ sudo -u huginn -H cp Procfile.bak Procfile
 ```
 
 ### 4. Install gems, migrate and precompile assets
+
+Ensure you have rubygems 2.7.0+ installed:
+
+```
+gem -v
+
+# Update rubygems if the version is too old
+sudo gem update --system --no-document
+```
 
 ```
 cd /home/huginn/huginn

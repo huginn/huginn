@@ -6,6 +6,8 @@ require 'date'
 
 module Agents
   class JiraAgent < Agent
+    include WebRequestConcern
+
     cannot_receive_events!
 
     description <<-MD
@@ -86,7 +88,7 @@ module Agents
     end
 
     def request_options
-      ropts = {:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)"}}
+      ropts = { headers: {"User-Agent" => user_agent} }
 
       if !interpolated[:username].empty?
         ropts = ropts.merge({:basic_auth => {:username =>interpolated[:username], :password=>interpolated[:password]}})

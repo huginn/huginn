@@ -106,7 +106,7 @@ end
 class LocationDrop
   KEYS = Location.members.map(&:to_s).concat(%w[latitude longitude latlng])
 
-  def before_method(key)
+  def liquid_method_missing(key)
     if KEYS.include?(key)
       @object.__send__(key)
     end

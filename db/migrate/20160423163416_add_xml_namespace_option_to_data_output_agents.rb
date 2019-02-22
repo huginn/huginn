@@ -1,4 +1,4 @@
-class AddXmlNamespaceOptionToDataOutputAgents < ActiveRecord::Migration
+class AddXmlNamespaceOptionToDataOutputAgents < ActiveRecord::Migration[4.2]
   def up
     Agents::DataOutputAgent.find_each do |agent|
       agent.options['ns_media'] = 'true'

@@ -1,4 +1,4 @@
-class WebsiteAgentDoesNotUseEventUrl < ActiveRecord::Migration
+class WebsiteAgentDoesNotUseEventUrl < ActiveRecord::Migration[4.2]
   def up
     # Until this migration, if a WebsiteAgent received Events and did not have a `url_from_event` option set,
     # it would use the `url` from the Event's payload.  If the Event did not have a `url` in its payload, the

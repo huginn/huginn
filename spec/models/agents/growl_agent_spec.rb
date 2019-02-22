@@ -7,11 +7,13 @@ describe Agents::GrowlAgent do
                                                     :growl_app_name => 'HuginnGrowlApp',
                                                     :growl_password => 'mypassword',
                                                     :growl_notification_name => 'Notification',
-                                                    :expected_receive_period_in_days => '1' })
+                                                    expected_receive_period_in_days: '1' ,
+                                                    message: '{{message}}',
+                                                    subject: '{{subject}}'})
     @checker.user = users(:bob)
     @checker.save!
-    
-    stub.any_instance_of(Growl).notify
+
+    stub.any_instance_of(Growl::GNTP).notify
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
@@ -45,7 +47,7 @@ describe Agents::GrowlAgent do
       expect(@checker).not_to be_valid
     end
   end
-  
+
   describe "register_growl" do
     it "should set the password for the Growl connection from the agent options" do
       @checker.register_growl
@@ -54,34 +56,34 @@ describe Agents::GrowlAgent do
 
     it "should add a notification to the Growl connection" do
       called = false
-      any_instance_of(Growl) do |obj|
+      any_instance_of(Growl::GNTP) do |obj|
         called = true
         mock(obj).add_notification(@checker.options[:growl_notification_name])
       end
-      
+
       @checker.register_growl
       expect(called).to be_truthy
     end
   end
-  
+
   describe "notify_growl" do
     before do
       @checker.register_growl
     end
-    
+
     it "should call Growl.notify with the correct notification name, subject, and message" do
       message = "message"
       subject = "subject"
       called = false
-      any_instance_of(Growl) do |obj|
+      any_instance_of(Growl::GNTP) do |obj|
         called = true
-        mock(obj).notify(@checker.options[:growl_notification_name],subject,message)
+        mock(obj).notify(@checker.options[:growl_notification_name], subject, message, 0, false, nil, '')
       end
-      @checker.notify_growl(subject,message)
+      @checker.notify_growl(subject: subject, message: message, sticky: false, priority: 0, callback_url: '')
       expect(called).to be_truthy
     end
   end
-  
+
   describe "receive" do
     def generate_events_array
       events = []
@@ -90,31 +92,32 @@ describe Agents::GrowlAgent do
       end
       return events
     end
-    
-    it "should call register_growl once regardless of number of events received" do
-      mock.proxy(@checker).register_growl.once
-      @checker.receive(generate_events_array)
+
+    it "should call register_growl once per received event" do
+      events = generate_events_array
+      mock.proxy(@checker).register_growl.times(events.length)
+      @checker.receive(events)
     end
-    
+
     it "should call notify_growl one time for each event received" do
       events = generate_events_array
       events.each do |event|
-        mock.proxy(@checker).notify_growl(event.payload['subject'], event.payload['message'])
+        mock.proxy(@checker).notify_growl(subject: event.payload['subject'], message: event.payload['message'], priority: 0, sticky: false, callback_url: nil)
       end
       @checker.receive(events)
     end
-    
+
     it "should not call notify_growl if message or subject are missing" do
       event_without_a_subject = Event.new
       event_without_a_subject.agent = agents(:bob_weather_agent)
       event_without_a_subject.payload = { :message => 'Looks like its going to rain' }
       event_without_a_subject.save!
-      
+
       event_without_a_message = Event.new
       event_without_a_message.agent = agents(:bob_weather_agent)
       event_without_a_message.payload = { :subject => 'Weather Alert YO!' }
       event_without_a_message.save!
-      
+
       mock.proxy(@checker).notify_growl.never
       @checker.receive([event_without_a_subject,event_without_a_message])
     end

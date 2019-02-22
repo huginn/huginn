@@ -5,6 +5,6 @@ describe "form configuring agents", js: true do
     login_as(users(:bob))
     visit edit_agent_path(agents(:bob_csv_agent))
     check('Propagate immediately')
-    select2("serialize", from: "Mode")
+    select2("serialize", from: "Mode", match: :first)
   end
 end

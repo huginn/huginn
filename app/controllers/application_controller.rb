@@ -1,6 +1,4 @@
 class ApplicationController < ActionController::Base
-  protect_from_forgery
-
   before_action :authenticate_user!
   before_action :configure_permitted_parameters, if: :devise_controller?
 
@@ -32,6 +30,7 @@ class ApplicationController < ActionController::Base
     return unless current_user
     twitter_oauth_check
     basecamp_auth_check
+    outdated_google_auth_check
   end
 
   def filtered_agent_return_link(options = {})
@@ -65,15 +64,27 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def outdated_google_auth_check
+    @outdated_google_cal_agents = current_user.agents.of_type('Agents::GoogleCalendarPublishAgent').select do |agent|
+      agent.options['google']['key_secret'].present?
+    end
+  end
+
   def agent_params
     return {} unless params[:agent]
     @agent_params ||= begin
-      options = params[:agent].delete(:options) if params[:agent][:options].present?
-      params[:agent].permit(:memory, :name, :type, :schedule, :disabled, :keep_events_for, :propagate_immediately, :drop_pending_events, :service_id,
-                            source_ids: [], receiver_ids: [], scenario_ids: [], controller_ids: [], control_target_ids: []).tap do |agent_params|
-        agent_params[:options] = options if options
-        agent_params[:options].permit! if agent_params[:options].respond_to?(:permit!)
-      end
+      params[:agent].permit([:memory, :name, :type, :schedule, :disabled, :keep_events_for, :propagate_immediately, :drop_pending_events, :service_id,
+                              source_ids: [], receiver_ids: [], scenario_ids: [], controller_ids: [], control_target_ids: []] + agent_params_options)
+    end
+  end
+
+  private
+
+  def agent_params_options
+    if params[:agent].fetch(:options, '').kind_of?(ActionController::Parameters)
+      [options: {}]
+    else
+      [:options]
     end
   end
 end

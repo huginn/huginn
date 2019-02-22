@@ -1,18 +1,25 @@
-<div class='row'>
-  <div class='col-md-8 col-md-offset-2'>
-    <div class='well'>
+<% content_for :title, "Resend confirmation" -%>
 
+<div class='row'>
+  <div class='col-md-6 col-md-offset-3'>
+    <div class='well'>
       <h2>Resend confirmation instructions</h2>
 
       <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, class: 'form-horizontal' }) do |f| %>
         <%= devise_error_messages! %>
 
         <div class="form-group">
-          <%= f.label :email %>
-          <%= f.email_field :email, autofocus: true, class: 'form-control' %>
+          <%= f.label :login, class: 'col-md-2 col-md-offset-2 control-label' %>
+          <div class="col-md-6">
+            <%= f.text_field :login, autofocus: true, class: 'form-control' %>
+          </div>
         </div>
 
-        <%= f.submit "Resend confirmation instructions", class: "btn btn-primary" %>
+        <div class="form-group">
+          <div class="col-md-offset-4 col-md-10">
+            <%= f.submit "Resend confirmation instructions", class: "btn btn-primary" %>
+          </div>
+        </div>
       <% end %>
 
       <%= render "devise/shared/links" %>

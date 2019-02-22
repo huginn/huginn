@@ -1,0 +1,225 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://translation.googleapis.com/language/translate/v2?key=some_api_key
+    body:
+      encoding: UTF-8
+      string: '{"q":["hey what are you doing"],"target":"sv","source":"en","format":"text"}'
+    headers:
+      User-Agent:
+      - gcloud-ruby/1.0.0
+      Google-Cloud-Resource-Prefix:
+      - projects/
+      Content-Type:
+      - application/json
+      X-Goog-Api-Client:
+      - gl-ruby/2.3.4 gccl/1.0.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Fri, 30 Jun 2017 14:54:18 GMT
+      Server:
+      - ESF
+      Cache-Control:
+      - private
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="39,38,37,36,35"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJkYXRhIjogewogICAgInRyYW5zbGF0aW9ucyI6IFsKICAgICAgewog
+        ICAgICAgICJ0cmFuc2xhdGVkVGV4dCI6ICJIZWogdmFkIGfDtnIgZHUiCiAg
+        ICAgIH0KICAgIF0KICB9Cn0K
+    http_version: 
+  recorded_at: Fri, 30 Jun 2017 14:54:18 GMT
+- request:
+    method: post
+    uri: https://translation.googleapis.com/language/translate/v2?key=some_api_key
+    body:
+      encoding: UTF-8
+      string: '{"q":["do tell more"],"target":"sv","source":"en","format":"text"}'
+    headers:
+      User-Agent:
+      - gcloud-ruby/1.0.0
+      Google-Cloud-Resource-Prefix:
+      - projects/
+      Content-Type:
+      - application/json
+      X-Goog-Api-Client:
+      - gl-ruby/2.3.4 gccl/1.0.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Fri, 30 Jun 2017 14:54:19 GMT
+      Server:
+      - ESF
+      Cache-Control:
+      - private
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="39,38,37,36,35"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJkYXRhIjogewogICAgInRyYW5zbGF0aW9ucyI6IFsKICAgICAgewog
+        ICAgICAgICJ0cmFuc2xhdGVkVGV4dCI6ICJCZXLDpHR0YSBtZXIiCiAgICAg
+        IH0KICAgIF0KICB9Cn0K
+    http_version: 
+  recorded_at: Fri, 30 Jun 2017 14:54:19 GMT
+- request:
+    method: post
+    uri: https://translation.googleapis.com/language/translate/v2?key=some_api_key
+    body:
+      encoding: UTF-8
+      string: '{"q":["value2"],"target":"sv","source":"en","format":"text"}'
+    headers:
+      User-Agent:
+      - gcloud-ruby/1.0.0
+      Google-Cloud-Resource-Prefix:
+      - projects/
+      Content-Type:
+      - application/json
+      X-Goog-Api-Client:
+      - gl-ruby/2.3.4 gccl/1.0.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Fri, 30 Jun 2017 14:54:19 GMT
+      Server:
+      - ESF
+      Cache-Control:
+      - private
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="39,38,37,36,35"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJkYXRhIjogewogICAgInRyYW5zbGF0aW9ucyI6IFsKICAgICAgewog
+        ICAgICAgICJ0cmFuc2xhdGVkVGV4dCI6ICJ2w6RyZGUyIgogICAgICB9CiAg
+        ICBdCiAgfQp9Cg==
+    http_version: 
+  recorded_at: Fri, 30 Jun 2017 14:54:19 GMT
+- request:
+    method: post
+    uri: https://translation.googleapis.com/language/translate/v2?key=some_api_key
+    body:
+      encoding: UTF-8
+      string: '{"q":["value1"],"target":"sv","source":"en","format":"text"}'
+    headers:
+      User-Agent:
+      - gcloud-ruby/1.0.0
+      Google-Cloud-Resource-Prefix:
+      - projects/
+      Content-Type:
+      - application/json
+      X-Goog-Api-Client:
+      - gl-ruby/2.3.4 gccl/1.0.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Fri, 30 Jun 2017 14:54:19 GMT
+      Server:
+      - ESF
+      Cache-Control:
+      - private
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="39,38,37,36,35"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "data": {
+            "translations": [
+              {
+                "translatedText": "value1"
+              }
+            ]
+          }
+        }
+    http_version: 
+  recorded_at: Fri, 30 Jun 2017 14:54:19 GMT
+recorded_with: VCR 3.0.3

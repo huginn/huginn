@@ -76,7 +76,7 @@ module Agents
     end
 
     def check
-      opts = {:count => interpolated['number']}
+      opts = {:count => interpolated['number'], tweet_mode: 'extended'}
       tweets = twitter.favorites(interpolated['username'], opts)
       memory[:last_seen] ||= []
 

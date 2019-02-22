@@ -1,3 +1,5 @@
+<% content_for :title, "Users" -%>
+
 <div class='container'>
   <div class='row'>
     <div class='col-md-12'>
@@ -30,8 +32,8 @@
               <td>
                 <div class="btn-group btn-group-xs">
                   <% if user != current_user %>
-                    <%= link_to 'Become User', switch_to_user_admin_user_path(user), class: "btn btn-default", data: { confirm: 'This will log you in as another user. Would you like to continue?' } %>
                     <% if user.active? %>
+                      <%= link_to 'Become User', switch_to_user_admin_user_path(user), class: "btn btn-default", data: { confirm: 'This will log you in as another user. Would you like to continue?' } %>
                       <%= link_to 'Deactivate', deactivate_admin_user_path(user), method: :put, class: "btn btn-default" %>
                     <% else %>
                       <%= link_to 'Activate', activate_admin_user_path(user), method: :put, class: "btn btn-default" %>

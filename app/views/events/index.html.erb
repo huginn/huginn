@@ -1,3 +1,5 @@
+<% content_for :title, (@agent ? @agent.name + "'s " : "") + "Events" -%>
+
 <div class='container'>
   <div class='row'>
     <div class='col-md-12'>
@@ -42,7 +44,7 @@
         </table>
       </div>
 
-      <%= paginate @events, params: params.slice(:hl), theme: 'twitter-bootstrap-3' %>
+      <%= paginate @events, params: params.to_unsafe_h.slice(:hl), theme: 'twitter-bootstrap-3' %>
 
       <br />
 

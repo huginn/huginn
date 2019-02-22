@@ -224,6 +224,18 @@ describe Agents::LiquidOutputAgent do
       agents(:bob_website_agent).events.destroy_all
     end
 
+    it 'should respond with custom response header if configured with `response_headers` option' do
+      agent.options['response_headers'] = {"X-My-Custom-Header" => 'hello'}
+      result = agent.receive_web_request params, method, format
+      expect(result).to eq(["The key is #{value}.", 200, mime_type, {"X-My-Custom-Header" => "hello"}])
+    end
+
+    it 'should allow the usage custom liquid tags' do
+      agent.options['content'] = "{% credential aws_secret %}"
+      result = agent.receive_web_request params, method, format
+      expect(result).to eq(["1111111111-bob", 200, mime_type, nil])
+    end
+
     describe "and the mode is last event in" do
 
       before { agent.options['mode'] = 'Last event in' }

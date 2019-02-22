@@ -1,4 +1,4 @@
-class AddConfirmableAttributesToUsers < ActiveRecord::Migration
+class AddConfirmableAttributesToUsers < ActiveRecord::Migration[4.2]
   def change
     change_table(:users) do |t|
       ## Confirmable
@@ -11,7 +11,7 @@ class AddConfirmableAttributesToUsers < ActiveRecord::Migration
     add_index :users, :confirmation_token,   unique: true
 
     if ENV['REQUIRE_CONFIRMED_EMAIL'] != 'true' && ActiveRecord::Base.connection.column_exists?(:users, :confirmed_at)
-      User.update_all('confirmed_at = NOW()')
+      User.update_all(confirmed_at: Time.zone.now)
     end
   end
 end

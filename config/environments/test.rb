@@ -15,7 +15,7 @@ Huginn::Application.configure do
   # Configure static asset server for tests with Cache-Control for performance
   config.public_file_server.enabled = true
   config.public_file_server.headers = {
-    'Cache-Control' => 'public, max-age=3600'
+    'Cache-Control' => "public, max-age=#{1.hour.to_i}"
   }
 
   # Show full error reports and disable caching
@@ -42,6 +42,6 @@ Huginn::Application.configure do
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
 
-  config.action_mailer.default_url_options = { :host => ENV['DOMAIN'] }
+  config.action_mailer.default_url_options = { host: ENV['DOMAIN'] || 'localhost' }
   config.action_mailer.perform_deliveries = true
 end

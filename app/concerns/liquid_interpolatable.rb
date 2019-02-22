@@ -15,6 +15,8 @@ module LiquidInterpolatable
 
   def validate_interpolation
     interpolated
+  rescue Liquid::ZeroDivisionError => e
+    # Ignore error (likely due to possibly missing variables on "divided_by")
   rescue Liquid::Error => e
     errors.add(:options, "has an error with Liquid templating: #{e.message}")
   rescue
@@ -62,6 +64,14 @@ module LiquidInterpolatable
         yield
       ensure
         context.environments.shift
+      end
+    end
+  end
+
+  def interpolate_with_each(array)
+    array.each do |object|
+      interpolate_with(object) do
+        yield object
       end
     end
   end
@@ -129,10 +139,11 @@ module LiquidInterpolatable
     # userinfo, host, port, registry, path, opaque, query, and
     # fragment.
     def to_uri(uri, base_uri = nil)
-      if base_uri
-        Utils.normalize_uri(base_uri) + Utils.normalize_uri(uri.to_s)
-      else
+      case base_uri
+      when nil, ''
         Utils.normalize_uri(uri.to_s)
+      else
+        Utils.normalize_uri(base_uri) + Utils.normalize_uri(uri.to_s)
       end
     rescue URI::Error
       nil
@@ -385,21 +396,28 @@ module LiquidInterpolatable
         else
           raise Liquid::SyntaxError, 'Syntax Error in regex_replace tag - Valid syntax: regex_replace pattern in'
         end
-        @nodelist = @in_block = []
+        @in_block = Liquid::BlockBody.new
         @with_block = nil
       end
 
+      def parse(tokens)
+        if more = parse_body(@in_block, tokens)
+          @with_block = Liquid::BlockBody.new
+          parse_body(@with_block, tokens)
+       end
+     end
+
       def nodelist
         if @with_block
-          @in_block + @with_block
+          [@in_block, @with_block]
         else
-          @in_block
+          [@in_block]
         end
       end
 
       def unknown_tag(tag, markup, tokens)
         return super unless tag == 'with'.freeze
-        @nodelist = @with_block = []
+        @with_block = Liquid::BlockBody.new
       end
 
       def render(context)
@@ -409,7 +427,7 @@ module LiquidInterpolatable
           raise Liquid::SyntaxError, "Syntax Error in regex_replace tag - #{e.message}"
         end
 
-        subject = render_all(@in_block, context)
+        subject = @in_block.render(context)
 
         subject.send(first? ? :sub : :gsub, regexp) {
           next '' unless @with_block
@@ -419,7 +437,7 @@ module LiquidInterpolatable
               context[name] = m[name]
             end
             context['match'.freeze] = m
-            render_all(@with_block, context)
+            @with_block.render(context)
           end
         }
       end

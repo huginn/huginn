@@ -11,7 +11,7 @@ $ ->
       if !(navigationData instanceof Object) || !navigationData.method || navigationData.method == 'GET'
         window.location = navigationData.url || navigationData
       else
-        $("<a href='#{navigationData.url}' data-method='#{navigationData.method}'></a>").appendTo($("body")).click()
+        $.rails.handleMethod.apply $("<a href='#{navigationData.url}' data-method='#{navigationData.method}'></a>").appendTo($("body")).get(0)
 
   # substring matcher for typeahead
   substringMatcher = (strings) ->

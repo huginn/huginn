@@ -35,7 +35,7 @@ module Agents
       {
         'account_sid' => 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         'auth_token' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        'server_url'    => "https://#{ENV['DOMAIN'].presence || example.com}",
+        'server_url'    => "https://#{ENV['DOMAIN'].presence || 'example.com'}",
         'reply_text'    => '',
         "expected_receive_period_in_days" => 1
       }
@@ -63,7 +63,7 @@ module Agents
       params = request.params.except(:action, :controller, :agent_id, :user_id, :format)
       method = request.method_symbol.to_s
       headers = request.headers
-      
+
       # check the last url param: 'secret'
       secret = params.delete('secret')
       return ["Not Authorized", 401] unless secret == "sms-endpoint"

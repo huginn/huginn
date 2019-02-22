@@ -60,7 +60,7 @@ describe Agents::ShellCommandAgent do
 
   describe "#working?" do
     it "generating events as scheduled" do
-      stub(@checker).run_command(@valid_path, 'pwd', nil) { ["fake pwd output", "", 0] }
+      stub(@checker).run_command(@valid_path, 'pwd', nil, {}) { ["fake pwd output", "", 0] }
 
       expect(@checker).not_to be_working
       @checker.check
@@ -73,9 +73,14 @@ describe Agents::ShellCommandAgent do
 
   describe "#check" do
     before do
-      stub(@checker).run_command(@valid_path, 'pwd', nil) { ["fake pwd output", "", 0] }
-      stub(@checker).run_command(@valid_path, 'empty_output', nil) { ["", "", 0] }
-      stub(@checker).run_command(@valid_path, 'failure', nil) { ["failed", "error message", 1] }
+      orig_run_command = @checker.method(:run_command)
+      stub(@checker).run_command(@valid_path, 'pwd', nil, {}) { ["fake pwd output", "", 0] }
+      stub(@checker).run_command(@valid_path, 'empty_output', nil, {}) { ["", "", 0] }
+      stub(@checker).run_command(@valid_path, 'failure', nil, {}) { ["failed", "error message", 1] }
+      stub(@checker).run_command(@valid_path, 'echo $BUNDLE_GEMFILE', nil, unbundle: true) { orig_run_command.(@valid_path, 'echo $BUNDLE_GEMFILE', nil, unbundle: true) }
+      [[], [{}], [{ unbundle: false }]].each do |rest|
+        stub(@checker).run_command(@valid_path, 'echo $BUNDLE_GEMFILE', nil, *rest) { [ENV['BUNDLE_GEMFILE'].to_s, "", 0] }
+      end
     end
 
     it "should create an event when checking" do
@@ -125,11 +130,49 @@ describe Agents::ShellCommandAgent do
       stub(Agents::ShellCommandAgent).should_run? { false }
       expect { @checker.check }.not_to change { Event.count }
     end
+
+    describe "with unbundle" do
+      before do
+        @checker.options[:command] = 'echo $BUNDLE_GEMFILE'
+        if ENV['TRAVIS'] == 'true'
+          stub.proxy(Bundler).original_env { |env| env.except('BUNDLE_GEMFILE') }
+        end
+      end
+
+      context "unspecified" do
+        it "should be run inside of our bundler context" do
+          expect { @checker.check }.to change { Event.count }.by(1)
+          expect(Event.last.payload[:output].strip).to eq(ENV['BUNDLE_GEMFILE'])
+        end
+      end
+
+      context "explicitly set to false" do
+        before do
+          @checker.options[:unbundle] = false
+        end
+
+        it "should be run inside of our bundler context" do
+          expect { @checker.check }.to change { Event.count }.by(1)
+          expect(Event.last.payload[:output].strip).to eq(ENV['BUNDLE_GEMFILE'])
+        end
+      end
+
+      context "set to true" do
+        before do
+          @checker.options[:unbundle] = true
+        end
+
+        it "should be run outside of our bundler context" do
+          expect { @checker.check }.to change { Event.count }.by(1)
+          expect(Event.last.payload[:output].strip).to eq('') # not_to eq(ENV['BUNDLE_GEMFILE']
+        end
+      end
+    end
   end
 
   describe "#receive" do
     before do
-      stub(@checker).run_command(@valid_path, @event.payload[:cmd], nil) { ["fake ls output", "", 0] }
+      stub(@checker).run_command(@valid_path, @event.payload[:cmd], nil, {}) { ["fake ls output", "", 0] }
     end
 
     it "creates events" do

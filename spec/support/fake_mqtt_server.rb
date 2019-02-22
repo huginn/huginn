@@ -66,11 +66,11 @@ class MQTT::FakeServer
   # Stop the thread and close the socket
   def stop
     logger.info "Stopping fake MQTT server"
-    @socket.close unless @socket.nil?
-    @socket = nil
-
     @thread.kill if @thread and @thread.alive?
     @thread = nil
+
+    @socket.close unless @socket.nil?
+    @socket = nil
   end
 
   # Start the server thread and wait for it to finish (possibly never)

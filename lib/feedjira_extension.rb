@@ -57,6 +57,13 @@ module FeedjiraExtension
     value :content
   end
 
+  class ITunesRssOwner < Author
+    include SAXMachine
+
+    element :'itunes:name', as: :name
+    element :'itunes:email', as: :email
+  end
+
   class Enclosure
     include SAXMachine
 
@@ -138,18 +145,6 @@ module FeedjiraExtension
 
         def authors
           _authors.reject(&:empty?)
-        end
-
-        def alternate_link
-          links.find { |link|
-            link.is_a?(AtomLink) &&
-              link.rel == 'alternate' &&
-              (link.type == 'text/html'|| link.type.nil?)
-          }
-        end
-
-        def url
-          @url ||= (alternate_link || links.first).try!(:href)
         end
       end
     end
@@ -290,6 +285,18 @@ module FeedjiraExtension
           def copyright
             @copyright || super
           end
+
+          if /ITunes/ === name
+            sax_config.collection_elements['itunes:owner'].clear
+            elements :"itunes:owner", as: :_itunes_owners, class: ITunesRssOwner
+            private :_itunes_owners
+
+            def itunes_owners
+              _itunes_owners.reject(&:empty?)
+            end
+          end
+        else
+          element :subtitle, as: :description unless method_defined?(:description)
         end
 
         sax_config.collection_elements.each_value do |collection_elements|

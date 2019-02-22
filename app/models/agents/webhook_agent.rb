@@ -1,6 +1,7 @@
 module Agents
   class WebhookAgent < Agent
-    include WebRequestConcern
+    include EventHeadersConcern
+    include WebRequestConcern  # to make reCAPTCHA verification requests
 
     cannot_be_scheduled!
     cannot_receive_events!
@@ -22,11 +23,14 @@ module Agents
         * `payload_path` - JSONPath of the attribute in the POST body to be
           used as the Event payload.  Set to `.` to return the entire message.
           If `payload_path` points to an array, Events will be created for each element.
+        * `event_headers` - Comma-separated list of HTTP headers your agent will include in the payload.
+        * `event_headers_key` - The key to use to store all the headers received
         * `verbs` - Comma-separated list of http verbs your agent will accept.
           For example, "post,get" will enable POST and GET requests. Defaults
           to "post".
         * `response` - The response message to the request. Defaults to 'Event Created'.
-        * `code` - The response code to the request. Defaults to '201'.
+        * `response_headers` - An object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
+        * `code` - The response code to the request. Defaults to '201'. If the code is '301' or '302' the request will automatically be redirected to the url defined in "response".
         * `recaptcha_secret` - Setting this to a reCAPTCHA "secret" key makes your agent verify incoming requests with reCAPTCHA.  Don't forget to embed a reCAPTCHA snippet including your "site" key in the originating form(s).
         * `recaptcha_send_remote_addr` - Set this to true if your server is properly configured to set REMOTE_ADDR to the IP address of each visitor (instead of that of a proxy server).
       MD
@@ -42,11 +46,22 @@ module Agents
     def default_options
       { "secret" => "supersecretstring",
         "expected_receive_period_in_days" => 1,
-        "payload_path" => "some_key"
+        "payload_path" => "some_key",
+        "event_headers" => "",
+        "event_headers_key" => "headers"
       }
     end
 
-    def receive_web_request(params, method, format)
+    def receive_web_request(request)
+      params = request.params.except(:action, :controller, :agent_id, :user_id, :format)
+      method = request.method_symbol.to_s
+      headers = request.headers.each_with_object({}) { |(name, value), hash|
+        case name
+        when /\AHTTP_([A-Z0-9_]+)\z/
+          hash[$1.tr('_', '-').gsub(/[^-]+/, &:capitalize)] = value
+        end
+      }
+
       # check the secret
       secret = params.delete('secret')
       return ["Not Authorized", 401] unless secret == interpolated['secret']
@@ -54,7 +69,7 @@ module Agents
       # check the verbs
       verbs = (interpolated['verbs'] || 'post').split(/,/).map { |x| x.strip.downcase }.select { |x| x.present? }
       return ["Please use #{verbs.join('/').upcase} requests only", 401] unless verbs.include?(method)
-      
+
       # check the code
       code = (interpolated['code'].presence || 201).to_i
 
@@ -85,10 +100,14 @@ module Agents
       end
 
       [payload_for(params)].flatten.each do |payload|
-        create_event(payload: payload)
+        create_event(payload: payload.merge(event_headers_payload(headers)))
       end
 
-      [interpolated(params)['response'] || 'Event Created', code]
+      if interpolated['response_headers'].presence
+        [interpolated(params)['response'] || 'Event Created', code, "text/plain", interpolated['response_headers'].presence]
+      else
+        [interpolated(params)['response'] || 'Event Created', code]
+      end
     end
 
     def working?
@@ -103,6 +122,12 @@ module Agents
       if options['code'].present? && options['code'].to_s !~ /\A\s*(\d+|\{.*)\s*\z/
         errors.add(:base, "Must specify a code for request responses")
       end
+
+      if options['code'].to_s.in?(['301', '302']) && !options['response'].present?
+        errors.add(:base, "Must specify a url for request redirect")
+      end
+
+      validate_event_headers_options!
     end
 
     def payload_for(params)

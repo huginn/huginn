@@ -35,7 +35,7 @@ module Agents
         if event_payload = params[:event]
           dummy_agent = Agent.build_for_type('ManualEventAgent', current_user, name: 'Dry-Runner')
           dummy_agent.readonly!
-          event = dummy_agent.events.build(user: current_user, payload: event_payload)
+          event = dummy_agent.events.build(user: current_user, payload: event_payload, created_at: Time.now)
         end
 
         @results = agent.dry_run!(event)

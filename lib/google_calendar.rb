@@ -1,33 +1,44 @@
+require 'googleauth'
+require 'google/apis/calendar_v3'
+
 class GoogleCalendar
   def initialize(config, logger)
     @config = config
 
     if @config['google']['key'].present?
-      @key = OpenSSL::PKCS12.new(@config['google']['key'], @config['google']['key_secret']).key
-    else
-      @key = Google::APIClient::PKCS12.load_key(@config['google']['key_file'], @config['google']['key_secret'])
+      # https://github.com/google/google-auth-library-ruby/issues/65
+      # https://github.com/google/google-api-ruby-client/issues/370
+      ENV['GOOGLE_PRIVATE_KEY'] = @config['google']['key']
+      ENV['GOOGLE_CLIENT_EMAIL'] = @config['google']['service_account_email']
+      ENV['GOOGLE_ACCOUNT_TYPE'] = 'service_account'
+    elsif @config['google']['key_file'].present?
+      ENV['GOOGLE_APPLICATION_CREDENTIALS'] = @config['google']['key_file']
     end
 
-    @client = Google::APIClient.new(application_name: "Huginn", application_version: "0.0.1")
-    @client.retries = 2
     @logger ||= logger
 
-    @calendar = @client.discovered_api('calendar','v3')
+    # https://github.com/google/google-api-ruby-client/blob/master/MIGRATING.md
+    @calendar = Google::Apis::CalendarV3::CalendarService.new
+
+    # https://developers.google.com/api-client-library/ruby/auth/service-accounts
+    # https://developers.google.com/identity/protocols/application-default-credentials
+    scopes = [Google::Apis::CalendarV3::AUTH_CALENDAR]
+    @authorization = Google::Auth.get_application_default(scopes)
 
     @logger.info("Setup")
     @logger.debug @calendar.inspect
   end
 
-  def auth_as
-    @client.authorization = Signet::OAuth2::Client.new({
-      token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
-      audience:             'https://accounts.google.com/o/oauth2/token',
-      scope:                'https://www.googleapis.com/auth/calendar',
-      issuer:               @config['google']['service_account_email'],
-      signing_key:          @key
-    });
+  def self.open(*args, &block)
+    instance = new(*args)
+    block.call(instance)
+  ensure
+    instance.cleanup!
+  end
 
-    @client.authorization.fetch_access_token!
+  def auth_as
+    @authorization.fetch_access_token!
+    @calendar.authorization = @authorization
   end
 
   # who - String: email of user to add event
@@ -38,14 +49,15 @@ class GoogleCalendar
     @logger.info("Attempting to create event for " + who)
     @logger.debug details.to_yaml
 
-    ret = @client.execute(
-      api_method: @calendar.events.insert,
-      parameters: {'calendarId' => who, 'sendNotifications' => true},
-      body: details.to_json,
-      headers: {'Content-Type' => 'application/json'}
-    )
+    event = Google::Apis::CalendarV3::Event.new(details.deep_symbolize_keys)
+    ret = @calendar.insert_event(
+        who,
+        event,
+        send_notifications: true
+      )
+
     @logger.debug ret.to_yaml
-    ret
+    ret.to_h
   end
 
   def events_as(who, date)
@@ -56,14 +68,18 @@ class GoogleCalendar
     @logger.info("Attempting to receive events for "+who)
     @logger.debug details.to_yaml
 
-    ret = @client.execute(
-      api_method: @calendar.events.list,
-      parameters: {'calendarId' => who, 'sendNotifications' => true},
-      body: details.to_json,
-      headers: {'Content-Type' => 'application/json'}
-    )
+    ret = @calendar.list_events(
+        who
+      )
 
     @logger.debug ret.to_yaml
-    ret    
+    ret.to_h  
+  end
+
+  def cleanup!
+    ENV.delete('GOOGLE_PRIVATE_KEY')
+    ENV.delete('GOOGLE_CLIENT_EMAIL')
+    ENV.delete('GOOGLE_ACCOUNT_TYPE')
+    ENV.delete('GOOGLE_APPLICATION_CREDENTIALS')
   end
 end

@@ -54,3 +54,23 @@ module TwitterConcern
     end
   end
 end
+
+class Twitter::Error
+  remove_const :FORBIDDEN_MESSAGES
+
+  FORBIDDEN_MESSAGES = proc do |message|
+    case message
+    when /(?=.*status).*duplicate/i
+      # - "Status is a duplicate."
+      Twitter::Error::DuplicateStatus
+    when /already favorited/i
+      # - "You have already favorited this status."
+      Twitter::Error::AlreadyFavorited
+    when /already retweeted|Share validations failed/i
+      # - "You have already retweeted this Tweet." (Nov 2017-)
+      # - "You have already retweeted this tweet." (?-Nov 2017)
+      # - "sharing is not permissible for this status (Share validations failed)" (-? 2017)
+      Twitter::Error::AlreadyRetweeted
+    end
+  end
+end

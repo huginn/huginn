@@ -1,4 +1,4 @@
-class RenameDigestEmailToEmailDigest < ActiveRecord::Migration
+class RenameDigestEmailToEmailDigest < ActiveRecord::Migration[4.2]
   def up
     sql = <<-SQL
       UPDATE #{ActiveRecord::Base.connection.quote_table_name('agents')}

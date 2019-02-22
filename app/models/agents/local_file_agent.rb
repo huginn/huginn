@@ -32,7 +32,7 @@ module Agents
 
         When `append` is true the received data will be appended to the file.
 
-        Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) templating in `data` to specify which part of the received event should be written.
+        Use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templating in `data` to specify which part of the received event should be written.
 
         *Warning*: This type of Agent can read and write any file the user that runs the Huginn server has access to, and is #{Agents::LocalFileAgent.should_run? ? "**currently enabled**" : "**currently disabled**"}.
         Only enable this Agent if you trust everyone using your Huginn installation.

@@ -1,4 +1,3 @@
-# This needs at least compose 1.6.0
 version: '2'
 
 services:
@@ -8,38 +7,30 @@ services:
 
   mysql:
     image: mysql:5.7
+    restart: always
+    env_file:
+      - ../mysql.env
     volumes_from:
       - mysqldata
-    environment:
-      MYSQL_ROOT_PASSWORD: myrootpassword
-      MYSQL_DATABASE: huginn
-      MYSQL_USER: huginn
-      MYSQL_PASSWORD: myhuginnpassword
 
-  huginn_web:
-    image: cantino/huginn-single-process
+  web:
+    image: huginn/huginn-single-process
     restart: always
-    extends:
-      file: environment.yml
-      service: huginn_base
     ports:
-      - 3000:3000
-    links:
+      - "3000:3000"
+    env_file:
+      - ../mysql.env
+      - ../secrets.env
+    depends_on:
       - mysql
-    environment:
-      MYSQL_PORT_3306_TCP_ADDR: mysql
-      MYSQL_PORT_3306_TCP_PORT: 3306
 
-  huginn_threaded:
-    image: cantino/huginn-single-process
-    restart: always
-    extends:
-      file: environment.yml
-      service: huginn_base
-    links:
-      - mysql
+  threaded:
+    image: huginn/huginn-single-process
     command: /scripts/init bin/threaded.rb
-    environment:
-      MYSQL_PORT_3306_TCP_ADDR: mysql
-      MYSQL_PORT_3306_TCP_PORT: 3306
-
+    restart: always
+    env_file:
+      - ../mysql.env
+      - ../secrets.env
+    depends_on:
+      - mysql
+      - web

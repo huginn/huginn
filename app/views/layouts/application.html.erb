@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= content_for?(:title) ? yield(:title) : "Huginn" %></title>
+    <title><%= content_for?(:title) ? yield(:title) + " - Huginn" : "Huginn" %></title>
     <meta name="description" content="">
     <meta name="author" content="">
     <%= stylesheet_link_tag    "application", :media => "all" %>
@@ -52,7 +52,7 @@
       window.agentPaths = {};
       window.agentNames = [];
       <% if current_user.present? -%>
-        var myAgents = <%= Utils.jsonify(current_user.agents.pluck(:name, :id).inject({}) {|m, a| m[a.first] = agent_path(a.last); m }) %>;
+        var myAgents = <%= Utils.jsonify(current_user.agents.pluck(:name, :id).inject({}) {|m, a| next if a.last.nil?; m[a.first] = agent_path(a.last); m }) %>;
         var myScenarios = <%= Utils.jsonify(current_user.scenarios.pluck(:name, :id).inject({}) {|m, s| m[s.first + " Scenario"] = scenario_path(s.last); m }) %>;
         $.extend(window.agentPaths, myAgents);
         $.extend(window.agentPaths, myScenarios);

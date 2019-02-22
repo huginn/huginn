@@ -16,7 +16,7 @@ module Agents
       * `user`: the user or group key (not e-mail address).
       * `expected_receive_period_in_days`:  is maximum number of days that you would expect to pass between events being received by this agent.
 
-      The following options are all Liquid templates whose evaluated values will be posted to the Pushover API.  Only the `message` parameter is required, and if it is blank API call is omitted.
+      The following options are all [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templates whose evaluated values will be posted to the Pushover API.  Only the `message` parameter is required, and if it is blank API call is omitted.
 
       Pushover API has a `512` Character Limit including `title`.  `message` will be truncated.
 
@@ -30,6 +30,7 @@ module Agents
       * `sound` - the name of one of the sounds supported by device clients to override the user's default sound choice. [See PushOver docs for sound options.](https://pushover.net/api#sounds)
       * `retry` - Required for emergency priority - Specifies how often (in seconds) the Pushover servers will send the same notification to the user. Minimum value: `30`
       * `expire` - Required for emergency priority - Specifies how many seconds your notification will continue to be retried for (every retry seconds). Maximum value: `86400`
+      * `html` - set to `true` to have Pushover's apps display the `message` content as HTML
 
     MD
 
@@ -47,6 +48,7 @@ module Agents
         'sound' => '{{ sound }}',
         'retry' => '{{ retry }}',
         'expire' => '{{ expire }}',
+        'html' => 'false',
         'expected_receive_period_in_days' => '1'
       }
     end
@@ -95,6 +97,16 @@ module Agents
               post_params[key] = value
             end
           end
+          # html is special because String.try_convert(true) gives nil (not even "nil", just nil)
+          if value = interpolated['html'].presence
+            post_params['html'] =
+              case value.to_s
+              when 'true', '1'
+                '1'
+              else
+                '0'
+              end
+          end
 
           send_notification(post_params)
         end
@@ -108,6 +120,7 @@ module Agents
     def send_notification(post_params)
       response = HTTParty.post(API_URL, query: post_params)
       puts response
+      log "Sent the following notification: \"#{post_params.except('token').inspect}\""
     end
   end
 end

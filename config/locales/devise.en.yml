@@ -32,6 +32,7 @@ en:
       github: "GitHub"
       37signals: "37Signals (Basecamp)"
       dropbox: "Dropbox"
+      dropbox_oauth2: "Dropbox"
       wunderlist: 'Wunderlist'
       evernote: "Evernote"
     passwords:

@@ -28,7 +28,7 @@ module Agents
       Events are the raw JSON provided by the [Twitter API](https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline). Should look something like:
           {
              ... every Tweet field, including ...
-            "text": "something",
+            "full_text": "something",
             "user": {
               "name": "Mr. Someone",
               "screen_name": "Someone",
@@ -98,7 +98,7 @@ module Agents
 
     def check
       since_id = memory['since_id'] || nil
-      opts = {:count => 200, :include_rts => include_retweets?, :exclude_replies => exclude_replies?, :include_entities => true, :contributor_details => true}
+      opts = {:count => 200, :include_rts => include_retweets?, :exclude_replies => exclude_replies?, :include_entities => true, :contributor_details => true, tweet_mode: 'extended'}
       opts.merge! :since_id => since_id unless since_id.nil?
 
       if choose_home_time_line?

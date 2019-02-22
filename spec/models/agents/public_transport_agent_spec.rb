@@ -26,7 +26,7 @@ describe Agents::PublicTransportAgent do
     end
 
     it "should add 4 items to memory" do
-      time_travel_to Time.parse("2014-01-14 20:21:30 +0500") do
+      travel_to Time.parse("2014-01-14 20:21:30 +0500") do
         expect(@agent.memory).to eq({})
         @agent.check
         @agent.save
@@ -46,10 +46,10 @@ describe Agents::PublicTransportAgent do
     end
 
     it "should reset memory after 2 hours" do
-      time_travel_to Time.parse("2014-01-14 20:21:30 +0500") do
+      travel_to Time.parse("2014-01-14 20:21:30 +0500") do
         expect { @agent.check }.to change {@agent.events.count}.by(4)
       end
-      time_travel_to "2014-01-14 23:21:30 +0500".to_time do
+      travel_to "2014-01-14 23:21:30 +0500".to_time do
         @agent.cleanup_old_memory
         expect { @agent.check }.to change {@agent.events.count}.by(4)
       end

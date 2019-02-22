@@ -125,7 +125,7 @@ module Agents
     end
 
     def self.setup_worker
-      Agents::TwitterStreamAgent.active.group_by { |agent| agent.twitter_oauth_token }.map do |oauth_token, agents|
+      Agents::TwitterStreamAgent.active.order(:id).group_by { |agent| agent.twitter_oauth_token }.map do |oauth_token, agents|
         if Agents::TwitterStreamAgent.dependencies_missing?
           STDERR.puts Agents::TwitterStreamAgent.twitter_dependencies_missing
           STDERR.flush

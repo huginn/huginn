@@ -52,7 +52,7 @@ describe Agents::PostAgent do
           raise "unexpected Content-Type: #{content_type}"
         end
       end
-      { status: 200, body: "<html>a webpage!</html>", headers: { 'Content-type' => 'text/html' } }
+      { status: 200, body: "<html>a webpage!</html>", headers: { 'Content-type' => 'text/html', 'X-Foo-Bar' => 'baz' } }
     }
   end
 
@@ -158,9 +158,14 @@ describe Agents::PostAgent do
     it 'makes a multipart request when receiving a file_pointer' do
       WebMock.reset!
       stub_request(:post, "http://www.example.com/").
-        with(:body => "-------------RubyMultipartPost\r\nContent-Disposition: form-data; name=\"default\"\r\n\r\nvalue\r\n-------------RubyMultipartPost\r\nContent-Disposition: form-data; name=\"file\"; filename=\"local.path\"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n-------------RubyMultipartPost--\r\n\r\n",
-             :headers => {'Accept-Encoding'=>'gzip,deflate', 'Content-Length'=>'307', 'Content-Type'=>'multipart/form-data; boundary=-----------RubyMultipartPost', 'User-Agent'=>'Huginn - https://github.com/cantino/huginn'}).
-        to_return(:status => 200, :body => "", :headers => {})
+        with(headers: {
+               'Accept-Encoding' => 'gzip,deflate',
+               'Content-Type' => /\Amultipart\/form-data; boundary=/,
+               'User-Agent' => 'Huginn - https://github.com/huginn/huginn'
+        }) { |request|
+        qboundary = Regexp.quote(request.headers['Content-Type'][/ boundary=(.+)/, 1])
+        /\A--#{qboundary}\r\nContent-Disposition: form-data; name="default"\r\n\r\nvalue\r\n--#{qboundary}\r\nContent-Disposition: form-data; name="file"; filename="local.path"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n--#{qboundary}--\r\n\r\n\z/ === request.body
+      }.to_return(status: 200, body: "", headers: {})
       event = Event.new(payload: {file_pointer: {agent_id: 111, file: 'test'}})
       io_mock = mock()
       mock(@checker).get_io(event) { StringIO.new("testdata") }
@@ -267,31 +272,70 @@ describe Agents::PostAgent do
 
         it "emits the response headers capitalized by default" do
           @checker.check
-          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html', 'X-Foo-Bar' => 'baz' })
         end
 
         it "emits the response headers capitalized" do
           @checker.options['event_headers_style'] = 'capitalized'
           @checker.check
-          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html' })
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html', 'X-Foo-Bar' => 'baz' })
         end
 
         it "emits the response headers downcased" do
           @checker.options['event_headers_style'] = 'downcased'
           @checker.check
-          expect(@checker.events.last.payload['headers']).to eq({ 'content-type' => 'text/html' })
+          expect(@checker.events.last.payload['headers']).to eq({ 'content-type' => 'text/html', 'x-foo-bar' => 'baz' })
         end
 
         it "emits the response headers snakecased" do
           @checker.options['event_headers_style'] = 'snakecased'
           @checker.check
+          expect(@checker.events.last.payload['headers']).to eq({ 'content_type' => 'text/html', 'x_foo_bar' => 'baz' })
+        end
+
+        it "emits the response headers only including those specified by event_headers" do
+          @checker.options['event_headers_style'] = 'snakecased'
+          @checker.options['event_headers'] = 'content-type'
+          @checker.check
           expect(@checker.events.last.payload['headers']).to eq({ 'content_type' => 'text/html' })
+        end
+
+        context "when output_mode is set to 'merge'" do
+          before do
+            @checker.options['output_mode'] = 'merge'
+            @checker.save!
+          end
+
+          it "emits the received event" do
+            @checker.receive([@event])
+            @checker.check
+            expect(@checker.events.last.payload['somekey']).to eq('somevalue')
+            expect(@checker.events.last.payload['someotherkey']).to eq({ 'somekey' => 'value' })
+          end
         end
       end
     end
   end
 
   describe "#working?" do
+    it "checks if there was an error" do
+      @checker.error("error")
+      expect(@checker.logs.count).to eq(1)
+      expect(@checker.reload).not_to be_working
+    end
+
+    it "checks if 'expected_receive_period_in_days' was not set" do
+      expect(@checker.logs.count).to eq(0)
+      @checker.options.delete('expected_receive_period_in_days')
+      expect(@checker).to be_working
+    end
+
+    it "checks if no event has been received" do
+      expect(@checker.logs.count).to eq(0)
+      expect(@checker.last_receive_at).to be_nil
+      expect(@checker.reload).not_to be_working
+    end
+
     it "checks if events have been received within expected receive period" do
       expect(@checker).not_to be_working
       Agents::PostAgent.async_receive @checker.id, [@event.id]
@@ -312,9 +356,9 @@ describe Agents::PostAgent do
       expect(@checker).not_to be_valid
     end
 
-    it "should validate presence of expected_receive_period_in_days" do
+    it "should validate absence of expected_receive_period_in_days is allowed" do
       @checker.options['expected_receive_period_in_days'] = ""
-      expect(@checker).not_to be_valid
+      expect(@checker).to be_valid
     end
 
     it "should validate method as post, get, put, patch, or delete, defaulting to post" do
@@ -363,17 +407,17 @@ describe Agents::PostAgent do
       @checker.options['payload'] = ""
       expect(@checker).to be_valid
 
-      @checker.options['payload'] = "hello"
-      expect(@checker).not_to be_valid
-
       @checker.options['payload'] = ["foo", "bar"]
+      expect(@checker).to be_valid
+
+      @checker.options['payload'] = "hello"
       expect(@checker).not_to be_valid
 
       @checker.options['payload'] = { 'this' => 'that' }
       expect(@checker).to be_valid
     end
 
-    it "should not validate payload as a hash if content_type includes a MIME type and method is not get or delete" do
+    it "should not validate payload as a hash or an array if content_type includes a MIME type and method is not get or delete" do
       @checker.options['no_merge'] = 'true'
       @checker.options['content_type'] = 'text/xml'
       @checker.options['payload'] = "test"
@@ -423,6 +467,32 @@ describe Agents::PostAgent do
       expect(@checker).to be_valid
 
       @checker.options['emit_events'] = true
+      expect(@checker).to be_valid
+    end
+
+    it "requires output_mode to be 'clean' or 'merge', if present" do
+      @checker.options['output_mode'] = 'what?'
+      expect(@checker).not_to be_valid
+
+      @checker.options.delete('output_mode')
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = 'clean'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = 'merge'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = :clean
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = :merge
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = '{{somekey}}'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = "{% if key == 'foo' %}merge{% else %}clean{% endif %}"
       expect(@checker).to be_valid
     end
   end

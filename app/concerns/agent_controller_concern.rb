@@ -38,46 +38,48 @@ module AgentControllerConcern
   end
 
   def control!
-    control_targets.each { |target|
-      begin
-        case control_action
-        when 'run'
-          case
-          when target.cannot_be_scheduled?
-            error "'#{target.name}' cannot run without an incoming event"
-          when target.disabled?
-            log "Agent run ignored for disabled Agent '#{target.name}'"
+    control_targets.each do |target|
+      interpolate_with('target' => target) do
+        begin
+          case action = control_action
+          when 'run'
+            case
+            when target.cannot_be_scheduled?
+              error "'#{target.name}' cannot run without an incoming event"
+            when target.disabled?
+              log "Agent run ignored for disabled Agent '#{target.name}'"
+            else
+              Agent.async_check(target.id)
+              log "Agent run queued for '#{target.name}'"
+            end
+          when 'enable'
+            case
+            when target.disabled?
+              target.update!(disabled: false)
+              log "Agent '#{target.name}' is enabled"
+            else
+              log "Agent '#{target.name}' is already enabled"
+            end
+          when 'disable'
+            case
+            when target.disabled?
+              log "Agent '#{target.name}' is alread disabled"
+            else
+              target.update!(disabled: true)
+              log "Agent '#{target.name}' is disabled"
+            end
+          when 'configure'
+            target.update! options: target.options.deep_merge(interpolated['configure_options'])
+            log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"
+          when ''
+            # Do nothing
           else
-            Agent.async_check(target.id)
-            log "Agent run queued for '#{target.name}'"
+            error "Unsupported action '#{action}' ignored for '#{target.name}'"
           end
-        when 'enable'
-          case
-          when target.disabled?
-            target.update!(disabled: false)
-            log "Agent '#{target.name}' is enabled"
-          else
-            log "Agent '#{target.name}' is already enabled"
-          end
-        when 'disable'
-          case
-          when target.disabled?
-            log "Agent '#{target.name}' is alread disabled"
-          else
-            target.update!(disabled: true)
-            log "Agent '#{target.name}' is disabled"
-          end
-        when 'configure'
-          target.update! options: target.options.deep_merge(interpolated['configure_options'])
-          log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"
-        when ''
-          # Do nothing
-        else
-          error "Unsupported action '#{control_action}' ignored for '#{target.name}'"
+        rescue => e
+          error "Failed to #{action} '#{target.name}': #{e.message}"
         end
-      rescue => e
-        error "Failed to #{control_action} '#{target.name}': #{e.message}"
       end
-    }
+    end
   end
 end

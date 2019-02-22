@@ -3,7 +3,10 @@ require 'rails_helper'
 describe Agents::TwitterSearchAgent do
   before do
     # intercept the twitter API request
-    stub_request(:any, /freebandnames/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/search_tweets.json")), status: 200)
+    stub_request(:any, /freebandnames.*[?&]tweet_mode=extended/).
+      to_return(body: File.read(Rails.root.join("spec/data_fixtures/search_tweets.json")),
+                headers: { 'Content-Type': 'application/json;charset=utf-8' },
+                status: 200)
 
     @opts = {
       search: "freebandnames",

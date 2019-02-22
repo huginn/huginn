@@ -22,11 +22,13 @@ module Agents
 
           * `secrets` - An array of tokens that the requestor must provide for light-weight authentication.
           * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
-          * `template` - A JSON object representing a mapping between item output keys and incoming event values.  Use [Liquid](https://github.com/cantino/huginn/wiki/Formatting-Events-using-Liquid) to format the values.  Values of the `link`, `title`, `description` and `icon` keys will be put into the \\<channel\\> section of RSS output.  Value of the `self` key will be used as URL for this feed itself, which is useful when you serve it via reverse proxy.  The `item` key will be repeated for every Event.  The `pubDate` key for each item will have the creation time of the Event unless given.
+          * `template` - A JSON object representing a mapping between item output keys and incoming event values.  Use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to format the values.  Values of the `link`, `title`, `description` and `icon` keys will be put into the \\<channel\\> section of RSS output.  Value of the `self` key will be used as URL for this feed itself, which is useful when you serve it via reverse proxy.  The `item` key will be repeated for every Event.  The `pubDate` key for each item will have the creation time of the Event unless given.
           * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
           * `ttl` - A value for the \\<ttl\\> element in RSS output. (default: `60`)
           * `ns_media` - Add [yahoo media namespace](https://en.wikipedia.org/wiki/Media_RSS) in output xml
           * `ns_itunes` - Add [itunes compatible namespace](http://lists.apple.com/archives/syndication-dev/2005/Nov/msg00002.html) in output xml
+          * `rss_content_type` - Content-Type for RSS output (default: `application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4`)
+          * `response_headers` - An object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
           * `push_hubs` - Set to a list of PubSubHubbub endpoints you want to publish an update to every time this agent receives an event. (default: none)  Popular hubs include [Superfeedr](https://pubsubhubbub.superfeedr.com/) and [Google](https://pubsubhubbub.appspot.com/).  Note that publishing updates will make your feed URL known to the public, so if you want to keep it secret, set up a reverse proxy to serve your feed via a safe URL and specify it in `template.self`.
 
         If you'd like to output RSS tags with attributes, such as `enclosure`, use something like the following in your `template`:
@@ -57,7 +59,7 @@ module Agents
 
         # Liquid Templating
 
-        In Liquid templating, the following variable is available:
+        In [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variable is available:
 
         * `events`: An array of events being output, sorted in the given order, up to `events_to_show` in number.  For example, if source events contain a site title in the `site_title` key, you can refer to it in `template.title` by putting `{{events.first.site_title}}`.
 
@@ -161,8 +163,18 @@ module Agents
       interpolated['template']['icon'].presence || feed_link + '/favicon.ico'
     end
 
+    def itunes_icon
+      if(boolify(interpolated['ns_itunes']))
+        "<itunes:image href=#{feed_icon.encode(xml: :attr)} />"
+      end  
+    end
+
     def feed_description
       interpolated['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
+    end
+
+    def rss_content_type
+      interpolated['rss_content_type'].presence || 'application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4'
     end
 
     def xml_namespace
@@ -246,9 +258,7 @@ module Agents
 
       source_events = sort_events(latest_events(), 'events_list_order')
 
-      interpolation_context.stack do
-        interpolation_context['events'] = source_events
-
+      interpolate_with('events' => source_events) do
         items = source_events.map do |event|
           interpolated = interpolate_options(options['template']['item'], event)
           interpolated['guid'] = {'_attributes' => {'isPermaLink' => 'false'},
@@ -275,7 +285,7 @@ module Agents
             'items' => simplify_item_for_json(items)
           }
 
-          return [content, 200]
+          return [content, 200, "application/json", interpolated['response_headers'].presence]
         else
           hub_links = push_hubs.map { |hub|
             <<-XML
@@ -283,16 +293,15 @@ module Agents
             XML
           }.join
 
-          items = simplify_item_for_xml(items)
-                  .to_xml(skip_types: true, root: "items", skip_instruct: true, indent: 1)
-                  .gsub(%r{^</?items>\n}, '')
+          items = items_to_xml(items)
 
-          return [<<-XML, 200, 'text/xml']
+          return [<<-XML, 200, rss_content_type, interpolated['response_headers'].presence]
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" #{xml_namespace}>
 <channel>
  <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
  <atom:icon>#{feed_icon.encode(xml: :text)}</atom:icon>
+ #{itunes_icon}
 #{hub_links}
  <title>#{feed_title.encode(xml: :text)}</title>
  <description>#{feed_description.encode(xml: :text)}</description>
@@ -383,6 +392,22 @@ module Agents
       else
         item
       end
+    end
+
+    def items_to_xml(items)
+      simplify_item_for_xml(items)
+        .to_xml(skip_types: true, root: "items", skip_instruct: true, indent: 1)
+        .gsub(%r{
+          (?<indent> ^\ + ) < (?<tagname> [^> ]+ ) > \n
+          (?<children>
+            (?: \k<indent> \  < \k<tagname> (?:\ [^>]*)? > [^<>]*? </ \k<tagname> > \n )+
+          )
+          \k<indent> </ \k<tagname> > \n
+        }mx) { $~[:children].gsub(/^ /, '') } # delete redundant nesting of array elements
+        .gsub(%r{
+          (?<indent> ^\ + ) < [^> ]+ /> \n
+        }mx, '') # delete empty elements
+        .gsub(%r{^</?items>\n}, '')
     end
 
     def push_to_hub(hub, url)

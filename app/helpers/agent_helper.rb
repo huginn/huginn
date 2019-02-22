@@ -32,10 +32,18 @@ module AgentHelper
       agent_controllers(agent, delimiter) || 'Never'
     else
       [
-        agent.schedule.humanize.titleize,
+        builtin_schedule_name(agent.schedule),
         *(agent_controllers(agent, delimiter))
       ].join(delimiter).html_safe
     end
+  end
+
+  def builtin_schedule_name(schedule)
+    AgentHelper.builtin_schedule_name(schedule)
+  end
+
+  def self.builtin_schedule_name(schedule)
+    schedule == 'every_7d' ? 'Every Monday' : schedule.humanize.titleize
   end
 
   def agent_controllers(agent, delimiter = ', ')
@@ -82,6 +90,12 @@ module AgentHelper
     end
   end
 
+  def agent_type_select_options
+    Rails.cache.fetch('agent_type_select_options') do
+      [['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name, User.new(id: 0), {}).html_description.lines.first.strip)}] }
+    end
+  end
+
   private
 
   def links_counter_cache(agents)
@@ -90,13 +104,13 @@ module AgentHelper
       agent_ids = agents.map(&:id)
       cache[:links_as_receiver] = Hash[Link.where(receiver_id: agent_ids)
                                            .group(:receiver_id)
-                                           .pluck('receiver_id', 'count(receiver_id) as id')]
+                                           .pluck(:receiver_id, Arel.sql('count(receiver_id) as id'))]
       cache[:links_as_source]   = Hash[Link.where(source_id: agent_ids)
                                            .group(:source_id)
-                                           .pluck('source_id', 'count(source_id) as id')]
+                                           .pluck(:source_id, Arel.sql('count(source_id) as id'))]
       cache[:control_links_as_controller] = Hash[ControlLink.where(controller_id: agent_ids)
                                                             .group(:controller_id)
-                                                            .pluck('controller_id', 'count(controller_id) as id')]
+                                                            .pluck(:controller_id, Arel.sql('count(controller_id) as id'))]
     end
   end
 end

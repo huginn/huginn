@@ -109,15 +109,30 @@ describe Agents::TwitterActionAgent do
     end
 
     context 'with emit_error_events set to false' do
-      it 'does re-raises the exception on failure' do
-        agent = build_agent
+      let(:agent) { build_agent.tap(&:save!) }
 
+      it 're-raises the exception on failure' do
         stub(agent.twitter).retweet(anything) {
           raise Twitter::Error.new('uh oh')
         }
 
-       expect { agent.receive([@event1]) }.to raise_error(StandardError, /uh oh/)
+        expect { agent.receive([@event1]) }.to raise_error(StandardError, /uh oh/)
+      end
 
+      it 'does not re-raise the exception on "already retweeted" error' do
+        stub(agent.twitter).retweet(anything) {
+          raise Twitter::Error::AlreadyRetweeted.new('You have already retweeted this tweet.')
+        }
+
+        expect { agent.receive([@event1]) }.not_to raise_error
+      end
+
+      it 'does not re-raise the exception on "already favorited" error' do
+        stub(agent.twitter).retweet(anything) {
+          raise Twitter::Error::AlreadyFavorited.new('You have already favorited this status.')
+        }
+
+        expect { agent.receive([@event1]) }.not_to raise_error
       end
     end
   end

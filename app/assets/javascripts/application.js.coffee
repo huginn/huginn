@@ -1,5 +1,5 @@
 #= require jquery
-#= require jquery_ujs
+#= require rails-ujs
 #= require typeahead.bundle
 #= require bootstrap
 #= require select2

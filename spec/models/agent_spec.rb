@@ -74,6 +74,13 @@ describe Agent do
       Agent.run_schedule("midnight")
     end
 
+    it "ignores unknown types" do
+      Agent.where(id: agents(:bob_weather_agent).id).update_all type: 'UnknownTypeAgent'
+      mock(Agents::WeatherAgent).bulk_check("midnight").once
+      mock(Agents::WebsiteAgent).bulk_check("midnight").once
+      Agent.run_schedule("midnight")
+    end
+
     it "only runs agents with the given schedule" do
       do_not_allow(Agents::WebsiteAgent).async_check
       Agent.run_schedule("blah")
@@ -283,10 +290,34 @@ describe Agent do
         Agent.receive!
       end
 
-      it "should not propogate to disabled Agents" do
+      it "should not propagate to disabled Agents" do
         Agent.async_check(agents(:bob_weather_agent).id)
         agents(:bob_rain_notifier_agent).update_attribute :disabled, true
         mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
+        Agent.receive!
+      end
+
+      it "should not propagate to Agents with unknown types" do
+        Agent.async_check(agents(:jane_weather_agent).id)
+        Agent.async_check(agents(:bob_weather_agent).id)
+
+        Agent.where(id: agents(:bob_rain_notifier_agent).id).update_all type: 'UnknownTypeAgent'
+
+        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
+        mock(Agent).async_receive(agents(:jane_rain_notifier_agent).id, anything).times(1)
+
+        Agent.receive!
+      end
+
+      it "should not propagate from Agents with unknown types" do
+        Agent.async_check(agents(:jane_weather_agent).id)
+        Agent.async_check(agents(:bob_weather_agent).id)
+
+        Agent.where(id: agents(:bob_weather_agent).id).update_all type: 'UnknownTypeAgent'
+
+        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
+        mock(Agent).async_receive(agents(:jane_rain_notifier_agent).id, anything).times(1)
+
         Agent.receive!
       end
 
@@ -532,7 +563,7 @@ describe Agent do
         agent.options = 5
         expect(agent.options["hi"]).to eq(2)
         expect(agent).to have(1).errors_on(:options)
-        expect(agent.errors_on(:options)).to include("cannot be set to an instance of Fixnum")
+        expect(agent.errors_on(:options)).to include("cannot be set to an instance of #{2.class}")  # Integer (ruby >=2.4) or Fixnum (ruby <2.4)
       end
 
       it "should not allow source agents owned by other people" do
@@ -622,7 +653,7 @@ describe Agent do
     describe "cleaning up now-expired events" do
       before do
         @time = "2014-01-01 01:00:00 +00:00"
-        time_travel_to @time do
+        travel_to @time do
           @agent = Agents::SomethingSource.new(:name => "something")
           @agent.keep_events_for = 5.days
           @agent.user = users(:bob)
@@ -647,7 +678,7 @@ describe Agent do
 
       describe "when keep_events_for is changed" do
         it "updates events' expires_at" do
-          time_travel_to @time do
+          travel_to @time do
             expect {
                 @agent.options[:foo] = "bar1"
                 @agent.keep_events_for = 3.days
@@ -982,11 +1013,11 @@ describe AgentDrop do
     expect(@efa.to_liquid.class).to be(AgentDrop)
   end
 
-  it 'should have .type and .name' do
-    t = '{{agent.type}}: {{agent.name}}'
-    expect(interpolate(t, @wsa1)).to eq('WebsiteAgent: XKCD')
-    expect(interpolate(t, @wsa2)).to eq('WebsiteAgent: Dilbert')
-    expect(interpolate(t, @efa)).to eq('EventFormattingAgent: Formatter')
+  it 'should have .id, .type and .name' do
+    t = '[{{agent.id}}]{{agent.type}}: {{agent.name}}'
+    expect(interpolate(t, @wsa1)).to eq("[#{@wsa1.id}]WebsiteAgent: XKCD")
+    expect(interpolate(t, @wsa2)).to eq("[#{@wsa2.id}]WebsiteAgent: Dilbert")
+    expect(interpolate(t, @efa)).to eq("[#{@efa.id}]EventFormattingAgent: Formatter")
   end
 
   it 'should have .options' do
@@ -1002,6 +1033,14 @@ describe AgentDrop do
     expect(interpolate(t, @wsa1)).to eq('0: ')
     expect(interpolate(t, @wsa2)).to eq('0: ')
     expect(interpolate(t, @efa)).to eq('2: XKCD, Dilbert')
+
+    t = '{{agent.sources.first.name}}..{{agent.sources.last.name}}'
+    expect(interpolate(t, @wsa1)).to eq('..')
+    expect(interpolate(t, @wsa2)).to eq('..')
+    expect(interpolate(t, @efa)).to eq('XKCD..Dilbert')
+
+    t = '{{agent.sources[1].name}}'
+    expect(interpolate(t, @efa)).to eq('Dilbert')
   end
 
   it 'should have .receivers' do
@@ -1009,5 +1048,23 @@ describe AgentDrop do
     expect(interpolate(t, @wsa1)).to eq('1: Formatter')
     expect(interpolate(t, @wsa2)).to eq('1: Formatter')
     expect(interpolate(t, @efa)).to eq('0: ')
+  end
+
+  it 'should have .working' do
+    stub(@wsa1).working? { false }
+    stub(@wsa2).working? { true }
+    stub(@efa).working? { false }
+
+    t = '{% if agent.working %}healthy{% else %}unhealthy{% endif %}'
+    expect(interpolate(t, @wsa1)).to eq('unhealthy')
+    expect(interpolate(t, @wsa2)).to eq('healthy')
+    expect(interpolate(t, @efa)).to eq('unhealthy')
+  end
+
+  it 'should have .url' do
+    t = '{{ agent.url }}'
+    expect(interpolate(t, @wsa1)).to match(/http:\/\/localhost(?::\d+)?\/agents\/#{@wsa1.id}/)
+    expect(interpolate(t, @wsa2)).to match(/http:\/\/localhost(?::\d+)?\/agents\/#{@wsa2.id}/)
+    expect(interpolate(t, @efa)).to  match(/http:\/\/localhost(?::\d+)?\/agents\/#{@efa.id}/)
   end
 end

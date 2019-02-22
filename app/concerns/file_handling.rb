@@ -22,12 +22,12 @@ module FileHandling
 
   def emitting_file_handling_agent_description
     @emitting_file_handling_agent_description ||=
-      "This agent only emits a 'file pointer', not the data inside the files, the following agents can consume the created events: `#{receiving_file_handling_agents.join('`, `')}`. Read more about the concept in the [wiki](https://github.com/cantino/huginn/wiki/How-Huginn-works-with-files)."
+      "This agent only emits a 'file pointer', not the data inside the files, the following agents can consume the created events: `#{receiving_file_handling_agents.join('`, `')}`. Read more about the concept in the [wiki](https://github.com/huginn/huginn/wiki/How-Huginn-works-with-files)."
   end
 
   def receiving_file_handling_agent_description
     @receiving_file_handling_agent_description ||=
-      "This agent can consume a 'file pointer' event from the following agents with no additional configuration: `#{emitting_file_handling_agents.join('`, `')}`. Read more about the concept in the [wiki](https://github.com/cantino/huginn/wiki/How-Huginn-works-with-files)."
+      "This agent can consume a 'file pointer' event from the following agents with no additional configuration: `#{emitting_file_handling_agents.join('`, `')}`. Read more about the concept in the [wiki](https://github.com/huginn/huginn/wiki/How-Huginn-works-with-files)."
   end
 
   private
