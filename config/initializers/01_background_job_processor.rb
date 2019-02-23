@@ -28,19 +28,21 @@ if Rails.configuration.active_job.queue_adapter == :delayed_job
   end
 elsif Rails.configuration.active_job.queue_adapter == :sidekiq
   require 'sidekiq'
-  require 'sidekiq-failures'
   require 'sidekiq/web'
 
   Sidekiq::Web.set :sessions, false
 
   Sidekiq.configure_server do |config|
     config.redis = { url: ENV['REDIS_URL'].presence || 'redis://localhost:6379/1' }
-    config.failures_max_count = (ENV['FAILED_JOBS_TO_KEEP'].presence || 100).to_i
-    config.failures_default_mode = :exhausted
   end
+
+  Sidekiq.default_worker_options = {
+    backtrace: 30,
+    queue: 'default',
+    retry: 5
+  }
 
   Sidekiq.configure_client do |config|
     config.redis = { url: ENV['REDIS_URL'].presence || 'redis://localhost:6379/1' }
-    config.default_worker_options = {queue: 'default', retry: 5}
   end
 end

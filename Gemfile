@@ -101,8 +101,7 @@ if_true(!ENV['BACKGROUND_JOB_PROCESSOR'] || ENV['BACKGROUND_JOB_PROCESSOR'] == '
 end
 
 if_true(ENV['BACKGROUND_JOB_PROCESSOR'] == 'sidekiq') do
-  gem 'sidekiq', '~> 5.2.1', require: false
-  gem 'sidekiq-failures', '~> 1.0', require: false
+  gem 'sidekiq', '~> 5.2.5', require: false
 end
 
 gem 'em-http-request', '~> 1.1.2'
