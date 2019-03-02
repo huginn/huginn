@@ -154,7 +154,7 @@ describe Agents::DataOutputAgent do
         stub(agent).feed_link { "https://yoursite.com" }
         content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         expect(status).to eq(200)
-        expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+        expect(content_type).to eq('application/rss+xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
           <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
@@ -218,7 +218,7 @@ describe Agents::DataOutputAgent do
         agent.options[:push_hubs] = %w[https://pubsubhubbub.superfeedr.com/ https://pubsubhubbub.appspot.com/]
         content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         expect(status).to eq(200)
-        expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+        expect(content_type).to eq('application/rss+xml')
         xml = Nokogiri::XML(content)
         expect(xml.xpath('/rss/channel/atom:link[@rel="hub"]/@href').map(&:text).sort).to eq agent.options[:push_hubs].sort
       end
@@ -350,7 +350,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+          expect(content_type).to eq('application/rss+xml')
           expect(Nokogiri(content).at('/rss/channel/title/text()').text).to eq('XKCD comics as a feed (XKCD)')
         end
 
@@ -394,7 +394,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+          expect(content_type).to eq('application/rss+xml')
           expect(Nokogiri(content).at('/rss/channel/atom:icon/text()').text).to eq('https://somesite.com/icon.png')
         end
       end
@@ -409,7 +409,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+          expect(content_type).to eq('application/rss+xml')
 
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -427,7 +427,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+          expect(content_type).to eq('application/rss+xml')
 
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -447,7 +447,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+          expect(content_type).to eq('application/rss+xml')
 
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -465,7 +465,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+          expect(content_type).to eq('application/rss+xml')
           
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -484,7 +484,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+          expect(content_type).to eq('application/rss+xml')
           
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -505,7 +505,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+          expect(content_type).to eq('application/rss+xml')
 
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -609,7 +609,7 @@ describe Agents::DataOutputAgent do
         stub(agent).feed_link { "https://yoursite.com" }
         content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         expect(status).to eq(200)
-        expect(content_type).to eq('application/rss+xml, application/rdf+xml;q=0.8, application/atom+xml;q=0.6, application/xml;q=0.4, text/xml;q=0.4')
+        expect(content_type).to eq('application/rss+xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
           <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" >
