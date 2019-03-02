@@ -5,6 +5,7 @@ services:
   - docker
   - mysql
   - postgresql
+  - redis-server
 before_install:
   - gem update --system
   - gem install bundler
@@ -20,15 +21,21 @@ env:
     - DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
     - DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
     - DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
+    - BACKGROUND_JOB_PROCESSOR=sidekiq
 matrix:
   exclude:
     - env: DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
     - env: DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
+    - env: BACKGROUND_JOB_PROCESSOR=sidekiq
   include:
     - rvm: 2.6.0
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
     - rvm: 2.6.0
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
+    - rvm: 2.6.0
+      env: BACKGROUND_JOB_PROCESSOR=sidekiq DATABASE_ADAPTER=mysql2
+    - rvm: 2.6.0
+      env: BACKGROUND_JOB_PROCESSOR=sidekiq DATABASE_ADAPTER=postgresql DATABASE_USERNAME=postgres
 rvm:
 - 2.3.8
 - 2.4.5

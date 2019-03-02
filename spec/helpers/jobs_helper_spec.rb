@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe JobsHelper do
+describe JobsHelper, processor: :delayed_job do
   let(:job) { Delayed::Job.new }
 
   describe '#status' do

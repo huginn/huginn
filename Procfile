@@ -48,3 +48,16 @@ jobs: bundle exec rails runner bin/threaded.rb
 #dj8: bundle exec script/delayed_job -i 8 run
 #dj9: bundle exec script/delayed_job -i 9 run
 #dj10: bundle exec script/delayed_job -i 10 run
+
+###################
+# Sidekiq workers #
+###################
+# WARNING: Using Sidekiq with Huginn has not been heavily tested yet and is very beta.
+# Only use this when you know how to setup redis and want to help us test this feature.
+#
+# Steps:
+# 1. Disable all "dj" workers processes
+# 2. Configure BACKGROUND_JOB_PROCESSOR=sidekiq in your .env file
+# 3. If your redis server is not running locally configure REDIS_URL
+# 4. Uncomment this line:
+#sidekiq: bundle exec sidekiq
