@@ -22,7 +22,6 @@ module Agents
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
-      If you want to see the returned texts in your language, set the `language` parameter in ISO 639-1 format.
     MD
 
     event_description <<-MD
@@ -65,7 +64,6 @@ module Agents
         'api_key' => 'your-key',
         'location' => '37.779329,-122.41915',
         'which_day' => '1',
-        'language' => 'EN',
         'expected_update_period_in_days' => '2'
       }
     end
@@ -88,10 +86,6 @@ module Agents
 
     def coordinates
       location.split(',').map { |e| e.to_f }
-    end
-
-    def language
-      interpolated['language'].presence || 'EN'
     end
 
     VALID_COORDS_REGEX = /^\s*-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*$/
@@ -123,7 +117,7 @@ module Agents
       if key_setup?
         ForecastIO.api_key = interpolated['api_key']
         lat, lng = coordinates
-        ForecastIO.forecast(lat, lng, params: {lang: language.downcase})['daily']['data']
+        ForecastIO.forecast(lat, lng)['daily']['data']
       end
     end
 
