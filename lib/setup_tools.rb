@@ -74,7 +74,29 @@ module SetupTools
   def ask(question, opts = {})
     print question + " "
     STDOUT.flush
-    (opts[:noecho] ? STDIN.noecho(&:gets) : gets).strip
+    if opts[:noecho] && is_noecho_unsupported
+      ask_without_echo.strip
+    else
+      (opts[:noecho] ? STDIN.noecho(&:gets) : gets).strip
+    end
+  end
+
+  def is_noecho_unsupported
+    return RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw32/
+  end
+
+  def ask_without_echo
+      # Due to MinTTY and Cygwin not supporting the no-echo TTY mode
+      # workaround is needed
+
+      # 8m is the control code to hide characters
+      print "\e[0;8m"
+      STDOUT.flush
+      input = gets
+      # 0m is the control code to reset formatting attributes
+      print "\e[0m"
+      STDOUT.flush
+      return input
   end
 
   def nag(question, opts = {})
