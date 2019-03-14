@@ -18,13 +18,20 @@ def set_env(key, value)
 end
 
 def check_login!
-  unless File.exists?(File.expand_path("~/.netrc")) && File.read(File.expand_path("~/.netrc")) =~ /heroku/
+  netrc = get_expanded_netrc_path
+  unless File.exists?(netrc) && File.read(netrc) =~ /heroku/
     puts "It looks like you need to log in to Heroku.  Please run 'heroku auth:login' before continuing."
     exit 1
   end
 
   puts "Welcome #{`heroku auth:whoami`.strip}!  It looks like you're logged into Heroku."
   puts
+end
+
+def get_expanded_netrc_path
+  is_windows = (ENV['OS'] == 'Windows_NT')
+  netrc_path = is_windows ? "~/_netrc" : "~/.netrc"
+  File.expand_path(netrc_path);
 end
 
 check_login!
