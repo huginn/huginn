@@ -87,6 +87,14 @@ describe Agents::TriggerAgent do
       @checker.options['rules'].last.delete('value')
       expect(@checker).not_to be_valid
     end
+
+    it "should validate non-hash rules" do
+      @checker.options['rules'] << "{% if status == 'ok' %}true{% endif %}"
+      expect(@checker).to be_valid
+
+      @checker.options['rules'] << []
+      expect(@checker).not_to be_valid
+    end
   end
 
   describe "#working?" do
