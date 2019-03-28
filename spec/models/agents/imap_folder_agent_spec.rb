@@ -277,6 +277,14 @@ describe Agents::ImapFolderAgent do
         expect { @checker.check }.to change { Event.count }.by(1)
       end
 
+      it 'should delete mails if delete is true' do
+        @checker.options['delete'] = true
+        mails.each { |mail|
+          stub(mail).delete.once
+        }
+        expect { @checker.check }.to change { Event.count }.by(2)
+      end
+
       describe 'processing mails with a broken From header value' do
         before do
           # "from" patterns work against mail addresses and not
