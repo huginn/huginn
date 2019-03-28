@@ -8,7 +8,13 @@ module Agents
     description <<-MD
       The Trigger Agent will watch for a specific value in an Event payload.
 
-      The `rules` array contains hashes of `path`, `value`, and `type`.  The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax. For simple events, this is usually just the name of the field you want, like 'text' for the text key of the event.
+      The `rules` array contains a mixture of strings and hashes.
+
+      A string rule is a Liquid template and counts as a match when it expands to `true`.
+
+      A hash rule consists of the following keys: `path`, `value`, and `type`.
+
+      The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax. For simple events, this is usually just the name of the field you want, like 'text' for the text key of the event.
 
       The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.  Note that regex patterns are matched case insensitively.  If you want case sensitive matching, prefix your pattern with `(?-i)`.
 
@@ -32,9 +38,22 @@ module Agents
           { "message": "Your message" }
     MD
 
+    private def valid_rule?(rule)
+      case rule
+      when String
+        true
+      when Hash
+        rule.values_at('type', 'value', 'path').all?(&:present?) &&
+          VALID_COMPARISON_TYPES.include?(rule['type'])
+      else
+        false
+      end
+    end
+
     def validate_options
-      unless options['expected_receive_period_in_days'].present? && options['rules'].present? &&
-             options['rules'].all? { |rule| rule['type'].present? && VALID_COMPARISON_TYPES.include?(rule['type']) && rule['value'].present? && rule['path'].present? }
+      unless options['expected_receive_period_in_days'].present? &&
+             options['rules'].present? &&
+             options['rules'].all? { |rule| valid_rule?(rule) }
         errors.add(:base, "expected_receive_period_in_days, message, and rules, with a type, value, and path for every rule, are required")
       end
 
@@ -74,6 +93,10 @@ module Agents
         opts = interpolated(event)
 
         match_results = opts['rules'].map do |rule|
+          if rule.is_a?(String)
+            next boolify(rule)
+          end
+
           value_at_path = Utils.value_at(event['payload'], rule['path'])
           rule_values = rule['value']
           rule_values = [rule_values] unless rule_values.is_a?(Array)
