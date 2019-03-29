@@ -370,4 +370,28 @@ HTML
       expect(agent.interpolated['template']).to eq(replaced_fragment)
     end
   end
+
+  describe 'digest filters' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'computes digest values from string input' do
+      agent.interpolation_context['value'] = 'Huginn'
+      agent.interpolation_context['key'] = 'Muninn'
+
+      agent.options['template'] = "{{ value | md5 }}"
+      expect(agent.interpolated['template']).to eq('5fca9fe120027bc87fa9923cc926f8fe')
+
+      agent.options['template'] = "{{ value | sha1 }}"
+      expect(agent.interpolated['template']).to eq('647d81f6dae6ff474cdcef3e9b74f038206af680')
+
+      agent.options['template'] = "{{ value | sha256 }}"
+      expect(agent.interpolated['template']).to eq('62c6099ec14502176974aadf0991525f50332ba552500556fea583ffdf0ba076')
+
+      agent.options['template'] = "{{ value | hmac_sha1: key }}"
+      expect(agent.interpolated['template']).to eq('9bd7cdebac134e06ba87258c28d2deea431407ac')
+
+      agent.options['template'] = "{{ value | hmac_sha256: key }}"
+      expect(agent.interpolated['template']).to eq('38b98bc2625a8cac33369f6204e784482be5e172b242699406270856a841d1ec')
+    end
+  end
 end
