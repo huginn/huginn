@@ -56,6 +56,7 @@ module Agents
           If this key is unspecified or set to null, it is ignored.
 
       Set `mark_as_read` to true to mark found mails as read.
+      Set `delete` to true to delete found mails.
 
       Set `event_headers` to a list of header names you want to include in a `headers` hash in each created event, either in an array of string or in a comma-separated string.
 
@@ -128,7 +129,7 @@ module Agents
         errors.add(:base, "port must be a positive integer") unless is_positive_integer?(options['port'])
       end
 
-      %w[ssl mark_as_read include_raw_mail].each { |key|
+      %w[ssl mark_as_read delete include_raw_mail].each { |key|
         if options[key].present?
           if boolify(options[key]).nil?
             errors.add(:base, '%s must be a boolean value' % key)
@@ -314,6 +315,11 @@ module Agents
         if boolify(interpolated['mark_as_read'])
           log 'Marking as read'
           mail.mark_as_read unless dry_run?
+        end
+
+        if boolify(interpolated['delete'])
+          log 'Deleting'
+          mail.delete unless dry_run?
         end
       }
     end
@@ -566,6 +572,11 @@ module Agents
 
       def mark_as_read
         @client.uid_store(@uid, '+FLAGS', [:Seen])
+      end
+
+      def delete
+        @client.uid_store(@uid, '+FLAGS', [:Deleted])
+        @client.expunge
       end
 
       private
