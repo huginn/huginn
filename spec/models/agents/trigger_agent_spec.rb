@@ -87,6 +87,14 @@ describe Agents::TriggerAgent do
       @checker.options['rules'].last.delete('value')
       expect(@checker).not_to be_valid
     end
+
+    it "should validate non-hash rules" do
+      @checker.options['rules'] << "{% if status == 'ok' %}true{% endif %}"
+      expect(@checker).to be_valid
+
+      @checker.options['rules'] << []
+      expect(@checker).not_to be_valid
+    end
   end
 
   describe "#working?" do
@@ -324,6 +332,28 @@ describe Agents::TriggerAgent do
       expect {
         @checker.receive([@event, event2, event3])
       }.to change { Event.count }.by(2)
+    end
+
+    it "handles Liquid rules" do
+      event1 = Event.create!(
+        agent: agents(:bob_rain_notifier_agent),
+        payload: { 'hello' => 'world1', 'created_at' => '2019-03-27T08:54:12+09:00' }
+      )
+      event2 = Event.create!(
+        agent: agents(:bob_rain_notifier_agent),
+        payload: { 'hello' => 'world2', 'created_at' => '2019-03-27T09:17:01+09:00' }
+      )
+      @checker.options['message'] = '{{hello}}'
+      @checker.options['rules'] = [
+        "{% assign value = created_at | date: '%s' | plus: 0 %}{% assign threshold = 'now' | date: '%s' | minus: 86400 %}{% if value > threshold %}true{% endif %}"
+      ]
+      expect {
+        travel_to(Time.parse('2019-03-28T00:00:00+00:00')) {
+          @checker.receive([event1, event2])
+        }
+      }.to change { Event.count }.by(1)
+
+      expect(Event.last.payload['message']).to eq("world2")
     end
 
     describe "with multiple rules" do
