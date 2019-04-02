@@ -30,7 +30,7 @@ module Agents
           * `rss_content_type` - Content-Type for RSS output (default: `application/rss+xml`)
           * `response_headers` - An object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
           * `push_hubs` - Set to a list of PubSubHubbub endpoints you want to publish an update to every time this agent receives an event. (default: none)  Popular hubs include [Superfeedr](https://pubsubhubbub.superfeedr.com/) and [Google](https://pubsubhubbub.appspot.com/).  Note that publishing updates will make your feed URL known to the public, so if you want to keep it secret, set up a reverse proxy to serve your feed via a safe URL and specify it in `template.self`.
-          * `template.item.category` (optional), use with `category_filter` URL parameter. When `category_filter` is set to "example", then only events where the interpolated value of category results in "example" will be included in the output.
+          * `template.item.category` (optional), use with `category_filter` URL parameter. When `category_filter` URL query parameter is set, for example "https://huginn.example.com/?category_filter=example", then only events where the interpolated value of `template.item.category` results in "example" will be included in the output.
 
 
 
