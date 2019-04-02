@@ -243,6 +243,26 @@ module LiquidInterpolatable
       JSON.dump(input)
     end
 
+    def md5(input)
+      Digest::MD5.hexdigest(input.to_s)
+    end
+
+    def sha1(input)
+      Digest::SHA1.hexdigest(input.to_s)
+    end
+
+    def sha256(input)
+      Digest::SHA256.hexdigest(input.to_s)
+    end
+
+    def hmac_sha1(input, key)
+      OpenSSL::HMAC.hexdigest('sha1', key.to_s, input.to_s)
+    end
+
+    def hmac_sha256(input, key)
+      OpenSSL::HMAC.hexdigest('sha256', key.to_s, input.to_s)
+    end
+
     # Returns a Ruby object
     #
     # It can be used as a JSONPath replacement for Agents that only support Liquid:
