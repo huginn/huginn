@@ -221,7 +221,7 @@ module Agents
     def log_errors
       begin
         yield
-      rescue MiniRacer::EvalError, MiniRacer::SnapshotError, MiniRacer::PlatformAlreadyInitialized => e
+      rescue MiniRacer::Error => e
         error "JavaScript error: #{e.message}"
       end
     end
