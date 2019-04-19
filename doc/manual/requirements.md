@@ -5,7 +5,7 @@
 ### Supported Unix distributions by this guide
 
 - Ubuntu (18.04, 16.04 and 14.04)
-- Debian (Jessie and Wheezy)
+- Debian (Stretch and Jessie)
 
 ### Unsupported Unix distributions
 
