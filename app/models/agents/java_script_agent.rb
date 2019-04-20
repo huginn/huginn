@@ -107,26 +107,22 @@ module Agents
 
     def execute_js(js_function, incoming_events = [])
       js_function = js_function == "check" ? "check" : "receive"
-      context = V8::Context.new
+      context = MiniRacer::Context.new
       context.eval(setup_javascript)
 
-      context["doCreateEvent"] = lambda { |a, y| create_event(payload: clean_nans(JSON.parse(y))).payload.to_json }
-      context["getIncomingEvents"] = lambda { |a| incoming_events.to_json }
-      context["getOptions"] = lambda { |a, x| interpolated.to_json }
-      context["doLog"] = lambda { |a, x| log x }
-      context["doError"] = lambda { |a, x| error x }
-      context["getMemory"] = lambda { |a| memory.to_json }
-      context["setMemoryKey"] = lambda do |a, x, y|
-        memory[x] = clean_nans(y)
-      end
-      context["setMemory"] = lambda do |a, x|
-        memory.replace(clean_nans(x))
-      end
-      context["deleteKey"] = lambda { |a, x| memory.delete(x).to_json }
-      context["escapeHtml"] = lambda { |a, x| CGI.escapeHTML(x) }
-      context["unescapeHtml"] = lambda { |a, x| CGI.unescapeHTML(x) }
-      context['getCredential'] = lambda { |a, k| credential(k); }
-      context['setCredential'] = lambda { |a, k, v| set_credential(k, v) }
+      context.attach("doCreateEvent", -> (y) { create_event(payload: clean_nans(JSON.parse(y))).payload.to_json })
+      context.attach("getIncomingEvents", -> { incoming_events.to_json })
+      context.attach("getOptions", -> { interpolated.to_json })
+      context.attach("doLog", -> (x) { log x })
+      context.attach("doError", -> (x) { error x })
+      context.attach("getMemory", -> { memory.to_json })
+      context.attach("setMemoryKey", -> (x, y) { memory[x] = clean_nans(y) })
+      context.attach("setMemory", -> (x) { memory.replace(clean_nans(x)) })
+      context.attach("deleteKey", -> (x) { memory.delete(x).to_json })
+      context.attach("escapeHtml", -> (x) { CGI.escapeHTML(x) })
+      context.attach("unescapeHtml", -> (x) { CGI.unescapeHTML(x) })
+      context.attach('getCredential', -> (k) { credential(k); })
+      context.attach('setCredential', -> (k, v) { set_credential(k, v) })
 
       if (options['language'] || '').downcase == 'coffeescript'
         context.eval(CoffeeScript.compile code)
@@ -225,15 +221,15 @@ module Agents
     def log_errors
       begin
         yield
-      rescue V8::Error => e
+      rescue MiniRacer::Error => e
         error "JavaScript error: #{e.message}"
       end
     end
 
     def clean_nans(input)
-      if input.is_a?(V8::Array)
+      if input.is_a?(Array)
         input.map {|v| clean_nans(v) }
-      elsif input.is_a?(V8::Object)
+      elsif input.is_a?(Hash)
         input.inject({}) { |m, (k, v)| m[k] = clean_nans(v); m }
       elsif input.is_a?(Float) && input.nan?
         'NaN'
