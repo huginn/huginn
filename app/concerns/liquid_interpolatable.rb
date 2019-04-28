@@ -71,6 +71,7 @@ module LiquidInterpolatable
   def interpolate_with_each(array)
     array.each do |object|
       interpolate_with(object) do
+        self.current_event = object
         yield object
       end
     end

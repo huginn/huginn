@@ -462,26 +462,24 @@ module Agents
     end
 
     def receive(incoming_events)
-      incoming_events.each do |event|
-        interpolate_with(event) do
-          existing_payload = interpolated['mode'].to_s == "merge" ? event.payload : {}
+      interpolate_with_each(incoming_events) do |event|
+        existing_payload = interpolated['mode'].to_s == "merge" ? event.payload : {}
 
-          if data_from_event = options['data_from_event'].presence
-            data = interpolate_options(data_from_event)
-            if data.present?
-              handle_event_data(data, event, existing_payload)
-            else
-              error "No data was found in the Event payload using the template #{data_from_event}", inbound_event: event
-            end
+        if data_from_event = options['data_from_event'].presence
+          data = interpolate_options(data_from_event)
+          if data.present?
+            handle_event_data(data, event, existing_payload)
           else
-            url_to_scrape =
-              if url_template = options['url_from_event'].presence
-                interpolate_options(url_template)
-              else
-                interpolated['url']
-              end
-            check_urls(url_to_scrape, existing_payload)
+            error "No data was found in the Event payload using the template #{data_from_event}", inbound_event: event
           end
+        else
+          url_to_scrape =
+            if url_template = options['url_from_event'].presence
+              interpolate_options(url_template)
+            else
+              interpolated['url']
+            end
+          check_urls(url_to_scrape, existing_payload)
         end
       end
     end
@@ -500,7 +498,7 @@ module Agents
         handle_data(data, event.payload['url'].presence, existing_payload)
       }
     rescue => e
-      error "Error when handling event data: #{e.message}\n#{e.backtrace.join("\n")}", inbound_event: event
+      error "Error when handling event data: #{e.message}\n#{e.backtrace.join("\n")}"
     end
 
     # This method returns true if the result should be stored as a new event.

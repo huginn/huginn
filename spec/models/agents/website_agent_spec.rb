@@ -1075,6 +1075,7 @@ fire: hot
             'url' => 'http://foo.com',
             'link' => 'Random'
           }
+          @event.save!
         end
 
         it "should use url_from_event as the url to scrape" do
@@ -1177,6 +1178,19 @@ fire: hot
             @checker.receive([@event])
           }.to change { Event.count }.by(1)
           expect(Event.last.payload['nav_links']).to eq(["Archive", "What If?", "Blag", "Store", "About"])
+        end
+
+        it "should set the inbound_event when logging errors" do
+          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+           @valid_options['extract'] = {
+            'url' => { 'css' => "div", 'value' => "@src" },
+            'title' => { 'css' => "#comic img", 'value' => "@alt" },
+          }
+          @checker.options = @valid_options
+          @checker.receive([@event])
+          log = @checker.logs.first
+          expect(log.message).to match(/Got an uneven number of matches/)
+          expect(log.inbound_event).to eq(@event)
         end
       end
 

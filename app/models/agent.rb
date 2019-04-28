@@ -222,7 +222,7 @@ class Agent < ActiveRecord::Base
   end
 
   def log(message, options = {})
-    AgentLog.log_for_agent(self, message, options)
+    AgentLog.log_for_agent(self, message, options.merge(inbound_event: current_event))
   end
 
   def error(message, options = {})
@@ -265,7 +265,9 @@ class Agent < ActiveRecord::Base
   #Validation Methods
   
   private
-  
+
+  attr_accessor :current_event
+
   def validate_schedule
     unless cannot_be_scheduled?
       errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
