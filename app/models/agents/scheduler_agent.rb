@@ -24,6 +24,7 @@ module Agents
       * `disable`: Target Agents are disabled (if not) at intervals.
 
       * `enable`: Target Agents are enabled (if not) at intervals.
+        * If the option `drop_pending_events` is set to `true`, pending events will be cleared before the agent is enabled.
 
       # Targets
 
