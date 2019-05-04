@@ -99,16 +99,16 @@ shared_examples_for AgentControllerConcern do
       expect(control_target_ids).to eq [agent.control_targets.last.id]
     end
 
-    it "should enable targets" do
+    it "should disable targets" do
       agent.options['action'] = 'disable'
       agent.save!
-      agent.control_targets.first.update!(disabled: true)
+      agent.control_targets.first.update!(disabled: false)
 
       agent.control!
       expect(agent.control_targets.reload).to all(be_disabled)
     end
 
-    it "should disable targets" do
+    it "should enable targets" do
       agent.options['action'] = 'enable'
       agent.save!
       agent.control_targets.first.update!(disabled: true)
