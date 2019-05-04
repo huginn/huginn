@@ -55,7 +55,7 @@ module AgentControllerConcern
           when 'enable'
             case
             when target.disabled?
-              if options['drop_pending_events']
+              if boolify(interpolated['drop_pending_events'])
                 target.drop_pending_events = true
               end
               target.update!(disabled: false)
