@@ -59,6 +59,11 @@ Since Debian Stretch, `runit` isn't started anymore automatically, but this gets
 
      sudo apt-get install -y runit-systemd libssl1.0-dev
 
+### Ubuntu 18.04 Bionic
+
+To start `runit` automatically on Ubuntu Bionic, we need to install `runit-systemd`:
+
+    sudo apt-get install -y runit-systemd
 
 ## 2. Ruby
 
@@ -79,7 +84,11 @@ Download Ruby and compile it:
 
 Install the bundler and foreman gems:
 
-    sudo gem install rake bundler foreman --no-ri --no-rdoc
+    sudo gem install rake bundler foreman --no-document
+
+Update rubygems:
+
+    sudo gem update --system --no-document
 
 ## 3. System Users
 

@@ -1,13 +1,11 @@
 source 'https://rubygems.org'
 
-# Ruby 2.2.2 is the minimum requirement
-ruby [Gem::Version.new('2.2.2'), Gem::Version.new(RUBY_VERSION)].max
+ruby '>=2.3.0'
 
 # Ensure github repositories are fetched using HTTPS
 git_source(:github) do |repo_name|
-  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
   "https://github.com/#{repo_name}.git"
-end if Gem::Version.new(Bundler::VERSION) < Gem::Version.new('2')
+end
 
 # Load vendored dotenv gem and .env file
 require File.join(File.dirname(__FILE__), 'lib/gemfile_helper.rb')
@@ -59,7 +57,7 @@ gem 'omniauth-twitter', '~> 1.3.0'
 
 # Tumblr Agents
 # until merge of https://github.com/tumblr/tumblr_client/pull/61
-gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master', ref: 'e046fe6e39291c173add0a49081630c7b60a36c7' 
+gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master', ref: 'e046fe6e39291c173add0a49081630c7b60a36c7'
 gem 'omniauth-tumblr', '~> 1.2'
 
 # Dropbox Agents
@@ -97,7 +95,7 @@ gem 'coffee-rails', '~> 4.2'
 gem 'daemons', '~> 1.1.9'
 gem 'delayed_job', '~> 4.1.5'
 gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails52'
-gem 'devise', '~> 4.4.3'
+gem 'devise', '~> 4.6.2'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9'
 gem 'faraday_middleware', '~> 0.12.2'
@@ -111,7 +109,7 @@ gem 'httmultiparty', '~> 0.3.16'
 gem 'jquery-rails', '~> 4.2.1'
 gem 'huginn_agent', '~> 0.4.0'
 gem 'json', '~> 1.8.1'
-gem 'jsonpath', '~> 0.8.3'
+gem 'jsonpath', '~> 1.0.1'
 gem 'kaminari', '~> 1.1.1'
 gem 'kramdown', '~> 1.3.3'
 gem 'liquid', '~> 4.0'
@@ -127,7 +125,8 @@ gem 'rufus-scheduler', '~> 3.4.2', require: false
 gem 'sass-rails', '~> 5.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
-gem 'therubyracer', '~> 0.12.3'
+gem 'mini_racer', '~> 0.2.4'
+gem 'execjs', '~> 2.7.0'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '~> 2.7.2'
 gem 'bootsnap', '>= 1.1.0', require: false
@@ -142,7 +141,7 @@ group :development do
   gem 'letter_opener_web', '~> 1.3.1'
   gem 'web-console', '>= 3.3.0'
 
-  gem 'capistrano', '~> 3.4.0'
+  gem 'capistrano', '~> 3.11.0'
   gem 'capistrano-rails', '~> 1.1'
   gem 'capistrano-bundler', '~> 1.1.4'
 
@@ -156,8 +155,7 @@ group :development do
     gem 'coveralls', '~> 0.8.12', require: false
     gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
-    gem 'capybara-select2', require: false
-    gem 'delorean'
+    gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76', require: false
     gem 'poltergeist'
     gem 'pry-rails'
     gem 'pry-byebug'
@@ -169,7 +167,7 @@ group :development do
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'
     gem 'vcr'
-    gem 'webmock', '~> 2.3'
+    gem 'webmock', '~> 3.5.1'
   end
 end
 
@@ -200,11 +198,11 @@ ENV['DATABASE_ADAPTER'] ||=
   end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
-  gem 'pg', '~> 0.18.3'
+  gem 'pg', '~> 1.1.3'
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
-  gem 'mysql2', ">= 0.3.18", "< 0.5"
+  gem 'mysql2' , "~> 0.5.2"
 end
 
 GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|

@@ -4,6 +4,8 @@ Message-ID: <bar.456@mail.example.com>
 Subject: Re: some subject
 To: Jane <jane.doe@example.com>, Nanashi <nanashi.gombeh@example.jp>
 MIME-Version: 1.0
+X-Foo: test2-1
+X-Foo: test2-2
 Content-Type: multipart/alternative; boundary=d8c92622e09101e4bc833685557b
 
 --d8c92622e09101e4bc833685557b

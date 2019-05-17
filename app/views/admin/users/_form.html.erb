@@ -1,5 +1,5 @@
 <%= form_for([:admin, @user], html: { class: 'form-horizontal' }) do |f| %>
-  <%= devise_error_messages! %>
+  <%= render "devise/shared/error_messages", resource: resource %>
   <%= render partial: '/devise/registrations/common_registration_fields', locals: { f: f } %>
 
   <div class="form-group">

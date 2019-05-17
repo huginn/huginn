@@ -4,8 +4,8 @@
 
 ### Supported Unix distributions by this guide
 
-- Ubuntu (16.04, 14.04 and 12.04)
-- Debian (Jessie and Wheezy)
+- Ubuntu (18.04, 16.04 and 14.04)
+- Debian (Stretch and Jessie)
 
 ### Unsupported Unix distributions
 

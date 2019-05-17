@@ -7,7 +7,7 @@
         <h2>Change your password</h2>
 
         <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: 'form-horizontal' }) do |f| %>
-          <%= devise_error_messages! %>
+          <%= render "devise/shared/error_messages", resource: resource %>
           <%= f.hidden_field :reset_password_token %>
 
           <div class="control-group">

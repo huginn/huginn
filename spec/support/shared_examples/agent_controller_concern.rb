@@ -99,21 +99,39 @@ shared_examples_for AgentControllerConcern do
       expect(control_target_ids).to eq [agent.control_targets.last.id]
     end
 
-    it "should enable targets" do
+    it "should disable targets" do
       agent.options['action'] = 'disable'
       agent.save!
-      agent.control_targets.first.update!(disabled: true)
+      agent.control_targets.first.update!(disabled: false)
 
       agent.control!
       expect(agent.control_targets.reload).to all(be_disabled)
     end
 
-    it "should disable targets" do
+    it "should enable targets" do
       agent.options['action'] = 'enable'
       agent.save!
       agent.control_targets.first.update!(disabled: true)
 
       agent.control!
+      expect(agent.control_targets.reload).to all(satisfy { |a| !a.disabled? })
+    end
+
+    it "should enable targets and drop pending events", focus: true do
+      agent.options['action'] = 'enable'
+      agent.options['drop_pending_events'] = 'true'
+      agent.save!
+      agent.control_targets.first.update!(disabled: true)
+
+      agent.control!
+
+      # Find the maximum Event ID, which is what our control_targets should be set to when drop_pending_events is called.
+      maximum_event_id = Event.maximum(:id)
+      # Only test Agents which can_receive_events? because those are the only ones who will have had pending events dropped.
+      agents_that_can_recieve_events = agent.control_targets.to_a.keep_if(&:can_receive_events?)
+      expect(agents_that_can_recieve_events.collect(&:last_checked_event_id)).to all(eq(maximum_event_id))
+
+      # Ensure that the control_targets are not disabled.
       expect(agent.control_targets.reload).to all(satisfy { |a| !a.disabled? })
     end
 

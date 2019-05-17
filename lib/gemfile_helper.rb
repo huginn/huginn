@@ -13,7 +13,7 @@ class GemfileHelper
     def load_dotenv
       dotenv_dir = Dir[File.join(File.dirname(__FILE__), '../vendor/gems/dotenv-[0-9]*')].sort.last
 
-      yield dotenv_dir
+      yield dotenv_dir if block_given?
 
       return if ENV['ON_HEROKU'] == 'true'
 

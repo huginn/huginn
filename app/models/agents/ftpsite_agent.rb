@@ -257,12 +257,6 @@ module Agents
 
     private
 
-    def is_positive_integer?(value)
-      Integer(value) >= 0
-    rescue
-      false
-    end
-
     def uri_path_escape(string)
       str = string.b
       str.gsub!(/([^A-Za-z0-9\-._~!$&()*+,=@]+)/) { |m|

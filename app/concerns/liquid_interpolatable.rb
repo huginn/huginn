@@ -71,6 +71,7 @@ module LiquidInterpolatable
   def interpolate_with_each(array)
     array.each do |object|
       interpolate_with(object) do
+        self.current_event = object
         yield object
       end
     end
@@ -241,6 +242,26 @@ module LiquidInterpolatable
     # Serializes data as JSON
     def json(input)
       JSON.dump(input)
+    end
+
+    def md5(input)
+      Digest::MD5.hexdigest(input.to_s)
+    end
+
+    def sha1(input)
+      Digest::SHA1.hexdigest(input.to_s)
+    end
+
+    def sha256(input)
+      Digest::SHA256.hexdigest(input.to_s)
+    end
+
+    def hmac_sha1(input, key)
+      OpenSSL::HMAC.hexdigest('sha1', key.to_s, input.to_s)
+    end
+
+    def hmac_sha256(input, key)
+      OpenSSL::HMAC.hexdigest('sha256', key.to_s, input.to_s)
     end
 
     # Returns a Ruby object

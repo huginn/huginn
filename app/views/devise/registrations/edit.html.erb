@@ -8,7 +8,7 @@
         <h2>Edit <%= resource_name.to_s.humanize %></h2>
 
         <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: 'form-horizontal' }) do |f| %>
-          <%= devise_error_messages! %>
+          <%= render "devise/shared/error_messages", resource: resource %>
 
           <div class="form-group">
             <%= f.label :email, class: 'col-md-4 control-label' %>
@@ -45,7 +45,7 @@
 
         <h3>Change password</h3>
         <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: 'form-horizontal' }) do |f| %>
-          <%= devise_error_messages! %>
+          <%= render "devise/shared/error_messages", resource: resource %>
           <div class="form-group">
             <%= f.label :current_password, class: 'col-md-4 control-label' %>
             <div class="col-md-6">
