@@ -10,6 +10,10 @@ This was patterned after [sameersbn/gitlab](https://hub.docker.com/r/sameersbn/g
 The scripts/init script generates a .env file containing the variables as passed as per normal Huginn documentation.
 The same environment variables that would be used for Heroku PaaS deployment are used by this script.
 
+It is possible to use a separate mysql/mariadb/postgres container for the database. If you do not use a separate database container, a built-in mysql database will be started. There is an exported docker volume of `/var/lib/mysql` to allow persistence of that mysql database. Please be aware that to improve security, newer versions of this docker image do not run the processes as root. If the permissions of the mounted volume are not correct (777 / chown 1001), mysql can not be started. There are no permission environment variables (GUID/PUID) for this image.
+
+__NOTE:__ If you do not export the volume, or use a separate database container, you cannot update Huginn without losing your data.
+
 The scripts/init script is aware of mysql and postgres linked containers through the environment variables:
 
     MYSQL_PORT_3306_TCP_ADDR
@@ -20,12 +24,7 @@ and
     POSTGRES_PORT_5432_TCP_ADDR
     POSTGRES_PORT_5432_TCP_PORT
 
-Its recommended to use an image that allows you to create a database via environmental variables at docker run, like `paintedfox / postgresql` or `centurylink / mysql`, so the db is populated when this script runs.
-
-If you do not link a database container, a built-in mysql database will be started.
-There is an exported docker volume of `/var/lib/mysql` to allow persistence of that mysql database.
-
-__NOTE:__ If you do not export the volme, or use a linked database container, you cannot update Huginn without losing your data.
+It is recommended to use an image that allows you to create a database via environmental variables at docker run, so the db is populated when this script runs. The offical images of the mentioned databases all support this.
 
 Additionally, the database variables may be overridden from the above as per the standard Huginn documentation:
 
@@ -86,6 +85,17 @@ To link to another container named 'postgres':
         -e HUGINN_DATABASE_USERNAME=huginn \
         -e HUGINN_DATABASE_PASSWORD=mysecretpassword \
         -e HUGINN_DATABASE_ADAPTER=postgresql \
+        huginn/huginn
+
+To use a separate, non-linked mysql container:
+
+    docker run --rm --name huginn \
+        -p 3000:3000 \
+        -e HUGINN_DATABASE_NAME=huginn \
+        -e HUGINN_DATABASE_USERNAME=huginn \
+        -e HUGINN_DATABASE_PASSWORD=mysecretpassword \
+        -e HUGINN_DATABASE_HOST=myname.mydomain \
+        -e HUGINN_DATABASE_PORT=3306
         huginn/huginn
 
 The `docker/multi-process` folder also has a `docker-compose.yml` that allows for a sample database formation with a data volume container:
