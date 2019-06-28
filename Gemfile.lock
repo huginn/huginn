@@ -40,11 +40,11 @@ GIT
 
 GIT
   remote: https://github.com/cantino/twitter-stream.git
-  revision: a80822d579509802124d4e219bb771eb663efdb7
-  branch: huginn
+  revision: cbc40c38c46276f4230873c63dfebad307dd7c62
+  branch: attempt-could-not-parse-fix
   specs:
     twitter-stream (0.1.15)
-      eventmachine (>= 1.0.7)
+      eventmachine (~> 1.0.7)
       http_parser.rb (~> 0.6.0)
       simple_oauth (~> 0.3.0)
 
@@ -239,7 +239,7 @@ GEM
       tzinfo
     ethon (0.7.1)
       ffi (>= 1.3.0)
-    eventmachine (1.2.7)
+    eventmachine (1.0.9.1)
     evernote-thrift (1.25.1)
     evernote_oauth (0.2.3)
       evernote-thrift
