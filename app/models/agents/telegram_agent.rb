@@ -31,7 +31,7 @@ module Agents
 
       **Options**
 
-      * `caption`: caption for a media content (0-200 characters)
+      * `caption`: caption for a media content (0-1024 characters)
       * `disable_notification`: send a message silently in a channel
       * `disable_web_page_preview`: disable link previews for links in a text message
       * `long_message`: truncate (default) or split text messages and captions that exceed Telegram API limits. Markdown and HTML tags can't span across messages and, if not opened or closed properly, will render as plain text.
@@ -68,7 +68,7 @@ module Agents
     def validate_options
       errors.add(:base, 'auth_token is required') unless options['auth_token'].present?
       errors.add(:base, 'chat_id is required') unless options['chat_id'].present?
-      errors.add(:base, 'caption should be 200 characters ol less') if interpolated['caption'].present? && interpolated['caption'].length > 200 && (!interpolated['long_message'].present? || interpolated['long_message'] != 'split')
+      errors.add(:base, 'caption should be 1024 characters or less') if interpolated['caption'].present? && interpolated['caption'].length > 1024 && (!interpolated['long_message'].present? || interpolated['long_message'] != 'split')
       errors.add(:base, "disable_notification has invalid value: should be 'true' or 'false'") if interpolated['disable_notification'].present? && !%w(true false).include?(interpolated['disable_notification'])
       errors.add(:base, "disable_web_page_preview has invalid value: should be 'true' or 'false'") if interpolated['disable_web_page_preview'].present? && !%w(true false).include?(interpolated['disable_web_page_preview'])
       errors.add(:base, "long_message has invalid value: should be 'split' or 'truncate'") if interpolated['long_message'].present? && !%w(split truncate).include?(interpolated['long_message'])
@@ -134,7 +134,7 @@ module Agents
             send_message field, configure_params(field => message.strip) unless message.strip.blank?
           end
         else
-          caption_array = params[:caption].scan(/\G(?:\w{200}|.{1,200}(?=\b|\z))/m)
+          caption_array = params[:caption].scan(/\G(?:\w{1024}|.{1,1024}(?=\b|\z))/m)
           params[:caption] = caption_array.first.strip
           send_message field, params
           caption_array.drop(1).each do |caption|
@@ -142,7 +142,7 @@ module Agents
             end
         end
       else
-        params[:caption] = params[:caption][0..199] if params[:caption]
+        params[:caption] = params[:caption][0..1023] if params[:caption]
         params[:text] = params[:text][0..4095] if params[:text]
         send_message field, params
       end
