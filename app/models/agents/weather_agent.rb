@@ -88,6 +88,10 @@ module Agents
       location.split(',').map { |e| e.to_f }
     end
 
+    def wunderground? 
+        interpolated["service"].presence && interpolated["service"].presence.downcase == "wunderground"
+    end
+
     VALID_COORDS_REGEX = /^\s*-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*$/
 
     def validate_location
@@ -108,6 +112,7 @@ module Agents
     end
 
     def validate_options
+      errors.add(:base, "The Weather Underground API has been disables since Jan 1st 2018, please switch to DarkSky") if wunderground?
       validate_location
       errors.add(:base, "api_key is required") unless interpolated['api_key'].present?
       errors.add(:base, "which_day selection is required") unless which_day.present?
