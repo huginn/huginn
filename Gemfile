@@ -114,7 +114,7 @@ gem 'kaminari', '~> 1.1.1'
 gem 'kramdown', '~> 1.3.3'
 gem 'liquid', '~> 4.0.3'
 gem 'loofah', '~> 2.0'
-gem 'mini_magick'
+gem 'mini_magick', ">= 4.9.4"
 gem 'multi_xml'
 gem 'nokogiri'
 gem 'omniauth', '~> 1.6.1'
