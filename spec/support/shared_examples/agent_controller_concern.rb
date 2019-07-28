@@ -117,7 +117,7 @@ shared_examples_for AgentControllerConcern do
       expect(agent.control_targets.reload).to all(satisfy { |a| !a.disabled? })
     end
 
-    it "should enable targets and drop pending events", focus: true do
+    it "should enable targets and drop pending events" do
       agent.options['action'] = 'enable'
       agent.options['drop_pending_events'] = 'true'
       agent.save!
