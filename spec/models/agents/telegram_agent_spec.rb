@@ -47,7 +47,7 @@ describe Agents::TelegramAgent do
     end
 
     it 'should validate value of caption' do
-      @checker.options[:caption] = 'a' * 250
+      @checker.options[:caption] = 'a' * 1025
       expect(@checker).not_to be_valid
     end
 
@@ -97,18 +97,18 @@ describe Agents::TelegramAgent do
     end
 
     it 'accepts audio key and uses :send_audio to send the file with truncated caption' do
-      event = event_with_payload audio: 'https://example.com/sound.mp3', caption: 'a' * 250
+      event = event_with_payload audio: 'https://example.com/sound.mp3', caption: 'a' * 1025
       @checker.receive [event]
 
-      expect(@sent_messages).to eq([{ audio: { audio: 'https://example.com/sound.mp3', caption: 'a'* 200, chat_id: 'xxxxxxxx' } }])
+      expect(@sent_messages).to eq([{ audio: { audio: 'https://example.com/sound.mp3', caption: 'a'* 1024, chat_id: 'xxxxxxxx' } }])
     end
 
     it 'accepts document key and uses :send_document to send the file and the full caption' do
-      event = event_with_payload caption: "#{'a' * 199}  #{'b' * 6}", document: 'https://example.com/document.pdf', long: 'split'
+      event = event_with_payload caption: "#{'a' * 1023}  #{'b' * 6}", document: 'https://example.com/document.pdf', long: 'split'
       @checker.receive [event]
 
       expect(@sent_messages).to eq([
-                                    { document: { caption: 'a' * 199, chat_id: 'xxxxxxxx', document: 'https://example.com/document.pdf' } },
+                                    { document: { caption: 'a' * 1023, chat_id: 'xxxxxxxx', document: 'https://example.com/document.pdf' } },
                                     { text: { chat_id: 'xxxxxxxx', parse_mode: 'html', text: 'b' * 6 } }
                                    ])
     end
