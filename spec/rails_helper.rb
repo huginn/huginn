@@ -54,7 +54,9 @@ RSpec.configure do |config|
   # to individual examples or groups you care about by tagging them with
   # `:focus` metadata. When nothing is tagged with `:focus`, all examples
   # get run.
-  config.filter_run :focus
+  if ENV['CI'] != 'true'
+    config.filter_run :focus
+  end
   config.run_all_when_everything_filtered = true
 
   # Run specs in random order to surface order dependencies. If you find an
