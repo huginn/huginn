@@ -75,6 +75,19 @@ class AgentsController < ApplicationController
     render :json => { :description_html => html }
   end
 
+  def reemit_events
+    @agent = current_user.agents.find(params[:id])
+
+    @agent.events.find_each do |event|
+      event.reemit!
+    end
+
+    respond_to do |format|
+      format.html { redirect_back "All events reemitted for '#{@agent.name}'" }
+      format.json { head :ok }
+    end
+  end
+
   def remove_events
     @agent = current_user.agents.find(params[:id])
     @agent.events.delete_all
