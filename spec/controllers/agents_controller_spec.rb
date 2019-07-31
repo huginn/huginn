@@ -58,20 +58,11 @@ describe AgentsController do
   end
 
   describe "POST reemit_events" do
-    it "reemits all events created by the given Agent" do
+    it "enqueues an AgentReemitJob" do
+      agent = agents(:bob_website_agent)
+      mock(AgentReemitJob).perform_later(agent, agent.most_recent_event.id)
       sign_in users(:bob)
-      agent_event = events(:bob_website_agent_event)
-
-      2.times { agent_event.dup.save! }
-
-      expect {
-        post :reemit_events, params: {:id => agents(:bob_website_agent).to_param}
-      }.to change(Event, :count).by(3)
-
-      last_event = Event.last
-      expect(last_event.user).to eq(agent_event.user)
-      expect(last_event.agent).to eq(agent_event.agent)
-      expect(last_event.payload).to eq(agent_event.payload)
+      post :reemit_events, params: {:id => agent.to_param}
     end
 
     it "can only be accessed by the Agent's owner" do

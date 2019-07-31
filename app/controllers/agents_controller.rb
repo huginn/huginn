@@ -78,13 +78,10 @@ class AgentsController < ApplicationController
   def reemit_events
     @agent = current_user.agents.find(params[:id])
 
-    # `find_each` orders by PK, so events get re-created in the same order
-    @agent.events.find_each do |event|
-      event.reemit!
-    end
+    AgentReemitJob.perform_later(@agent, @agent.most_recent_event.id)
 
     respond_to do |format|
-      format.html { redirect_back "All events reemitted for '#{@agent.name}'" }
+      format.html { redirect_back "Enqueued job to re-emit all events for '#{@agent.name}'" }
       format.json { head :ok }
     end
   end
