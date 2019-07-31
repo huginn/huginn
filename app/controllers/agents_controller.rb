@@ -78,6 +78,7 @@ class AgentsController < ApplicationController
   def reemit_events
     @agent = current_user.agents.find(params[:id])
 
+    # `find_each` orders by PK, so events get re-created in the same order
     @agent.events.find_each do |event|
       event.reemit!
     end
