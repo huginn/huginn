@@ -296,10 +296,8 @@ module LiquidInterpolatable
     # {% endfor %}
     def group_by(input, property)
       if input.respond_to?(:group_by)
-        [].tap do |grouped|
-          input.group_by { |item| item[property] }.each do |value, items|
-            grouped << { 'name' => value, 'items' => items }
-          end
+        input.group_by { |item| item[property] }.map do |value, items|
+          { 'name' => value, 'items' => items }
         end
       else
         input
