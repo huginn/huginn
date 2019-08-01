@@ -283,6 +283,27 @@ module LiquidInterpolatable
       throw :as_object, object.as_json
     end
 
+    # Group an array of items by a property
+    #
+    # Example usage:
+    #
+    # {% assign posts_by_author = site.posts | group_by: "author" %}
+    # {% for author in posts_by_author %}
+    #   <dt>{{author.name}}</dt>
+    #   {% for post in author.items %}
+    #   <dd><a href="{{post.url}}">{{post.title}}</a></dd>
+    #   {% endfor %}
+    # {% endfor %}
+    def group_by(input, property)
+      if input.respond_to?(:group_by)
+        input.group_by { |item| item[property] }.map do |value, items|
+          { 'name' => value, 'items' => items }
+        end
+      else
+        input
+      end
+    end
+
     private
 
     def logger

@@ -86,11 +86,11 @@ describe LiquidInterpolatable::Filters do
       @agent.interpolation_context['s'] = 'http://example.com/dir/1?q=test'
     end
 
-    it 'should parse an abosule URI' do
+    it 'should parse an absolute URI' do
       expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
-    it 'should parse an abosule URI with a base URI specified' do
+    it 'should parse an absolute URI with a base URI specified' do
       expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
@@ -98,7 +98,7 @@ describe LiquidInterpolatable::Filters do
       expect(@filter.to_uri('foo/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.com/dir/foo/index.html'))
     end
 
-    it 'should parse an abosule URI with a base URI specified' do
+    it 'should parse an absolute URI with a base URI specified' do
       expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
@@ -392,6 +392,42 @@ HTML
 
       agent.options['template'] = "{{ value | hmac_sha256: key }}"
       expect(agent.interpolated['template']).to eq('38b98bc2625a8cac33369f6204e784482be5e172b242699406270856a841d1ec')
+    end
+  end
+
+  describe 'group_by' do
+    let(:events) do
+      [
+        { "date" => "2019-07-30", "type" => "Snap" },
+        { "date" => "2019-07-30", "type" => "Crackle" },
+        { "date" => "2019-07-29", "type" => "Pop" },
+        { "date" => "2019-07-29", "type" => "Bam" },
+        { "date" => "2019-07-29", "type" => "Pow" },
+      ]
+    end
+
+    it "should group an enumerable by the given attribute" do
+      expect(@filter.group_by(events, "date")).to eq(
+        [
+          {
+            "name" => "2019-07-30", "items" => [
+              { "date" => "2019-07-30", "type" => "Snap" },
+              { "date" => "2019-07-30", "type" => "Crackle" }
+            ]
+          },
+          {
+            "name" => "2019-07-29", "items" => [
+              { "date" => "2019-07-29", "type" => "Pop" },
+              { "date" => "2019-07-29", "type" => "Bam" },
+              { "date" => "2019-07-29", "type" => "Pow" }
+            ]
+          }
+        ]
+      )
+    end
+
+    it "should leave non-groupables alone" do
+      expect(@filter.group_by("some string", "anything")).to eq("some string")
     end
   end
 end
