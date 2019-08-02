@@ -64,7 +64,8 @@ module Agents
         'api_key' => 'your-key',
         'location' => '37.779329,-122.41915',
         'which_day' => '1',
-        'expected_update_period_in_days' => '2'
+        'expected_update_period_in_days' => '2',
+        'language' => 'en'
       }
     end
 
@@ -86,6 +87,10 @@ module Agents
 
     def coordinates
       location.split(',').map { |e| e.to_f }
+    end
+
+    def language
+        interpolated["language"].presence || "en"
     end
 
     def wunderground? 
@@ -122,7 +127,7 @@ module Agents
       if key_setup?
         ForecastIO.api_key = interpolated['api_key']
         lat, lng = coordinates
-        ForecastIO.forecast(lat, lng)['daily']['data']
+        ForecastIO.forecast(lat, lng, params: {lang: language.downcase})['daily']['data']
       end
     end
 
