@@ -115,7 +115,6 @@
               <span class="glyphicon glyphicon-question-sign hover-help" data-content="If this is checked, the original copies of the events will be deleted once they are re-emitted."></span>
             </div>
           <% end %>
-          <%= f.hidden_field :disabled, value: (!agent.disabled).to_s %>
           <%= f.button 'Cancel', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
           <%= f.submit 'Re-emit all events', class: 'btn btn-primary' %>
         <% end %>
