@@ -90,11 +90,11 @@ module Agents
     end
 
     def language
-        interpolated["language"].presence || "en"
+      interpolated["language"].presence || "en"
     end
 
     def wunderground? 
-        interpolated["service"].presence && interpolated["service"].presence.downcase == "wunderground"
+      interpolated["service"].presence && interpolated["service"].presence.downcase == "wunderground"
     end
 
     VALID_COORDS_REGEX = /^\s*-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*$/
