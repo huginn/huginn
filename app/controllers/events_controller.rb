@@ -3,7 +3,11 @@ class EventsController < ApplicationController
 
   def index
     if params[:agent_id]
-      @agent = current_user.agents.find(params[:agent_id])
+      if current_user.admin?
+        @agent = Agent.find(params[:agent_id])
+      else
+        @agent = current_user.agents.find(params[:agent_id])
+      end
       @events = @agent.events.page(params[:page])
     else
       @events = current_user.events.preload(:agent).page(params[:page])
@@ -41,6 +45,10 @@ class EventsController < ApplicationController
   private
 
   def load_event
-    @event = current_user.events.find(params[:id])
+    if current_user.admin?
+      @event = Event.find(params[:id])
+    else
+      @event = current_user.events.find(params[:id])
+    end
   end
 end

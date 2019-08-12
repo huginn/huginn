@@ -17,6 +17,11 @@
         <%= link_to icon_tag('glyphicon-random') + ' View diagram', diagram_path, class: "btn btn-default" %>
         <%= link_to icon_tag('glyphicon-adjust') + toggle_disabled_text, toggle_visibility_agents_path, method: :put, class: "btn btn-default visibility-enabler" %>
       </div>
+      <% if current_user.admin? %>
+      <div class="btn-group">
+        <%= link_to 'All Agents', all_agents_path, class: "btn btn-default" %>
+      </div>
+      <% end %>
     </div>
   </div>
 </div>

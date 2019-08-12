@@ -14,9 +14,12 @@
     <ul class='nav navbar-nav'>
       <%= nav_link "Agents", agents_path do %>
         <ul class='dropdown-menu' role='menu'>
-          <%= nav_link icon_tag('glyphicon-plus') + " New Agent", new_agent_path %>
-          <%= nav_link icon_tag('glyphicon-refresh') + " Run event propagation", propagate_agents_path, method: 'post' %>
-          <%= nav_link icon_tag('glyphicon-random') + " View Diagram", diagram_path %>
+          <%= nav_link icon_tag('glyphicon-plus') + " New Agent", new_agent_path(user: nil) %>
+          <%= nav_link icon_tag('glyphicon-refresh') + " Run event propagation", propagate_agents_path(user: nil), method: 'post' %>
+          <%= nav_link icon_tag('glyphicon-random') + " View Diagram", diagram_path(user: nil) %>
+          <% if current_user.admin? %>
+            <%= nav_link "Admin: " + " All Agents", all_agents_path %>
+          <% end %>
         </ul>
       <% end %>
       <%= nav_link "Scenarios", scenarios_path %>

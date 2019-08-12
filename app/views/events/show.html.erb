@@ -6,7 +6,9 @@
       <div class="page-header">
         <h2>
           Event from <%= @event.agent.name %>
+          <% if @event.agent.user == current_user %>
           <%= render 'agents/mini_action_menu', agent: @event.agent, return_to: event_path(@event) %>
+          <% end %>
         </h2>
       </div>
 
