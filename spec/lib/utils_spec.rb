@@ -196,4 +196,12 @@ describe Utils do
       expect(Utils.if_present(argument, :to_i)).to eq(1)
     end
   end
+
+  describe ".normalize_uri" do
+    it 'should accept a URI with an IDN hostname, malformed path, query, and fragment parts' do
+      uri = Utils.normalize_uri("http://\u{3042}/\u{3042}?a[]=%2F&b=\u{3042}#100%")
+      expect(uri).to be_a(URI::HTTP)
+      expect(uri.to_s).to eq "http://xn--l8j/%E3%81%82?a[]=%2F&b=%E3%81%82#100%25"
+    end
+  end
 end
