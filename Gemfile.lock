@@ -653,10 +653,6 @@ GEM
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
-    wunderground (1.2.0)
-      addressable
-      httparty (> 0.6.0)
-      json (> 1.4.0)
     xmpp4r (0.5.6)
     xpath (3.0.0)
       nokogiri (~> 1.8)
@@ -773,7 +769,6 @@ DEPENDENCIES
   web-console (>= 3.3.0)
   webmock (~> 3.5.1)
   weibo_2!
-  wunderground (~> 1.2.0)
   xmpp4r (~> 0.5.6)
 
 RUBY VERSION

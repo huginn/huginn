@@ -280,7 +280,7 @@ describe Agent do
 
     describe ".receive!" do
       before do
-        stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
+        stub_request(:any, /darksky/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
         stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       end
 
@@ -910,8 +910,7 @@ describe Agent do
 
   describe ".drop_pending_events" do
     before do
-      stub_request(:any, /wunderground/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
-      stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
+      stub_request(:any, /darksky/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
     end
 
     it "should drop pending events while the agent was disabled when set to true" do
@@ -923,7 +922,7 @@ describe Agent do
           Agent.async_check(agent1.id)
           Agent.receive!
         }.to change { agent1.events.count }.by(1)
-      }.to change { agent2.events.count }.by(1)
+      }.to change { agent2.events.count }.by(0)
 
       agent2.disabled = true
       agent2.save!
