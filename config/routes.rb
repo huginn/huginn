@@ -4,6 +4,7 @@ Huginn::Application.routes.draw do
       post :run
       post :handle_details_post
       put :leave_scenario
+      post :reemit_events
       delete :remove_events
       delete :memory, action: :destroy_memory
     end
@@ -100,12 +101,12 @@ Huginn::Application.routes.draw do
   post  "/users/:user_id/update_location/:secret" => "web_requests#update_location" # legacy
 
   devise_for :users,
-             controllers: { 
+             controllers: {
                omniauth_callbacks: 'omniauth_callbacks',
                registrations: 'users/registrations'
              },
              sign_out_via: [:post, :delete]
-  
+
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end

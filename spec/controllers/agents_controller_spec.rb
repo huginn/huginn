@@ -57,6 +57,32 @@ describe AgentsController do
     end
   end
 
+  describe "POST reemit_events" do
+    let(:agent) { agents(:bob_website_agent) }
+    let(:params) { { :id => agent.to_param } }
+
+    it "enqueues an AgentReemitJob" do
+      mock(AgentReemitJob).perform_later(agent, agent.most_recent_event.id, false)
+      sign_in users(:bob)
+      post :reemit_events, params: params
+    end
+
+    context "when delete_old_events passed" do
+      it "enqueues an AgentReemitJob with delete_old_events set to true" do
+        mock(AgentReemitJob).perform_later(agent, agent.most_recent_event.id, true)
+        sign_in users(:bob)
+        post :reemit_events, params: params.merge('delete_old_events' => '1')
+      end
+    end
+
+    it "can only be accessed by the Agent's owner" do
+      sign_in users(:jane)
+      expect {
+        post :reemit_events, params: {:id => agents(:bob_website_agent).to_param}
+      }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
   describe "POST remove_events" do
     it "deletes all events created by the given Agent" do
       sign_in users(:bob)

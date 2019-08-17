@@ -4,10 +4,10 @@
   <div class='row'>
     <div class='col-md-12'>
       <div class="page-header">
-        <h2>
+        <span class='h2'>
           Event from <%= @event.agent.name %>
-          <%= render 'agents/mini_action_menu', agent: @event.agent, return_to: event_path(@event) %>
-        </h2>
+        </span>
+        <%= render 'agents/mini_action_menu', agent: @event.agent, return_to: event_path(@event) %>
       </div>
 
       <p>

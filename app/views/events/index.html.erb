@@ -4,13 +4,15 @@
   <div class='row'>
     <div class='col-md-12'>
       <div class="page-header">
-        <h2>
+        <span class='h2'>
           Your Events
           <% if @agent %>
             from <%= @agent.name %>
-            <%= render 'agents/mini_action_menu', agent: @agent, return_to: request.path %>
           <% end %>
-        </h2>
+        </span>
+        <% if @agent %>
+          <%= render 'agents/mini_action_menu', agent: @agent, return_to: request.path %>
+        <% end %>
       </div>
 
       <div class='table-responsive'>
