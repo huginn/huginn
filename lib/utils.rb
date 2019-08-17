@@ -1,5 +1,6 @@
 require 'jsonpath'
 require 'cgi'
+require 'uri'
 require 'addressable/uri'
 
 module Utils
@@ -22,33 +23,38 @@ module Utils
     end
   end
 
-  def self.normalize_uri(uri)
-    begin
-      URI(uri)
-    rescue URI::Error
+  class << self
+    def normalize_uri(uri)
+      URI.parse(uri)
+    rescue URI::Error => e
       begin
-        URI(uri.to_s.gsub(/[^\-_.!~*'()a-zA-Z\d;\/?:@&=+$,\[\]]+/) { |unsafe|
-              unsafe.bytes.each_with_object(String.new) { |uc, s|
-                s << sprintf('%%%02X', uc)
-              }
-            }.force_encoding(Encoding::US_ASCII))
-      rescue URI::Error => e
-        begin
-          auri = Addressable::URI.parse(uri.to_s)
-        rescue
-          # Do not leak Addressable::URI::InvalidURIError which
-          # callers might not expect.
-          raise e
-        else
-          # Addressable::URI#normalize! modifies the query and
-          # fragment components beyond escaping unsafe characters, so
-          # avoid using it.  Otherwise `?a[]=%2F` would be normalized
-          # as `?a%5B%5D=/`, for example.
-          auri.site = auri.normalized_site
-          auri.path = auri.normalized_path
-          URI(auri.to_s)
-        end
+        auri = Addressable::URI.parse(uri.to_s)
+      rescue StandardError
+        # Do not leak Addressable::URI::InvalidURIError which
+        # callers might not expect.
+        raise e
+      else
+        # Addressable::URI#normalize! modifies the query and
+        # fragment components beyond escaping unsafe characters, so
+        # avoid using it.  Otherwise `?a[]=%2F` would be normalized
+        # as `?a%5B%5D=/`, for example.
+        auri.site = auri.normalized_site
+        auri.path = auri.normalized_path
+        auri.query &&= escape_uri_unsafe_characters(auri.query)
+        auri.fragment &&= escape_uri_unsafe_characters(auri.fragment)
+
+        URI.parse(auri.to_s)
       end
+    end
+
+    private
+
+    def escape_uri_unsafe_characters(string)
+      string.gsub(/(?!%[\h\H]{2})[^\-_.!~*'()a-zA-Z\d;\/?:@&=+$,\[\]]+/) { |unsafe|
+        unsafe.bytes.each_with_object(String.new) { |uc, s|
+          s << '%%%02X' % uc
+        }
+      }.force_encoding(Encoding::US_ASCII)
     end
   end
 
