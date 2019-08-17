@@ -71,7 +71,11 @@ module Agents
     end
 
     def deliver(text)
-      client.send Jabber::Message::new(interpolated['jabber_receiver'], text).set_type(:chat)
+      client.tap do |c|
+        c.send Jabber::Message::new(interpolated['jabber_receiver'], text).set_type(:chat)
+        c.close
+        c.stop
+      end
     end
 
     def start_worker?
