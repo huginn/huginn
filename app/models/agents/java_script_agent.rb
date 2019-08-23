@@ -9,8 +9,12 @@ module Agents
 
     default_schedule "never"
 
+    gem_dependency_check { defined?(MiniRacer) }
+
     description <<-MD
       The JavaScript Agent allows you to write code in JavaScript that can create and receive events.  If other Agents aren't meeting your needs, try this one!
+
+      #{'## Include `mini_racer` in your Gemfile to use this Agent!' if dependencies_missing?}
 
       You can put code in the `code` option, or put your code in a Credential and reference it from `code` with `credential:<name>` (recommended).
 
