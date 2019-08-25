@@ -36,6 +36,7 @@ gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'erector', github: 'dsander/erector', branch: 'fix-fixnum-warning'
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
+gem 'mini_racer', '~> 0.2.4'      # JavaScriptAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
@@ -124,7 +125,6 @@ gem 'rufus-scheduler', '~> 3.4.2', require: false
 gem 'sass-rails', '~> 5.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
-gem 'mini_racer', '~> 0.2.4'
 gem 'execjs', '~> 2.7.0'
 gem 'typhoeus', '~> 0.6.3'
 gem 'uglifier', '~> 2.7.2'
