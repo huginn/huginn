@@ -79,7 +79,7 @@ describe Agents::EmailAgent do
 
       event = Event.new
       event.agent = agents(:bob_rain_notifier_agent)
-      event.payload = { :foo => { :subject => "Something you should know about" }, :some_html => "<strong>rain!</strong>" }
+      event.payload = { :foo => { :subject => "Something you should know about" }, :some_html => "<script>console.log('hello, world.')</script><strong>rain!</strong>" }
       event.save!
 
       Agents::EmailAgent.async_receive(@checker.id, [event.id])
@@ -87,8 +87,8 @@ describe Agents::EmailAgent do
       expect(ActionMailer::Base.deliveries.count).to eq(1)
       expect(ActionMailer::Base.deliveries.last.to).to eq(["bob@example.com"])
       expect(ActionMailer::Base.deliveries.last.subject).to eq("Something you should know about")
-      expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to match(/\A\s*<strong>rain\!<\/strong>\s*\z/)
-      expect(get_message_part(ActionMailer::Base.deliveries.last, /html/).strip).to match(/<body>\s*<strong>rain\!<\/strong>\s*<\/body>/)
+      expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to match(/\A\s*#{Regexp.escape("<script>console.log('hello, world.')</script><strong>rain!</strong>")}\s*\z/)
+      expect(get_message_part(ActionMailer::Base.deliveries.last, /html/).strip).to match(/<body>\s*#{Regexp.escape("console.log('hello, world.')<strong>rain!</strong>")}\s*<\/body>/)
     end
 
     it "can take content type option to set content type of email sent" do
