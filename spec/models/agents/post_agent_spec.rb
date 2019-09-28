@@ -164,10 +164,9 @@ describe Agents::PostAgent do
                'User-Agent' => 'Huginn - https://github.com/huginn/huginn'
         }) { |request|
         qboundary = Regexp.quote(request.headers['Content-Type'][/ boundary=(.+)/, 1])
-        /\A--#{qboundary}\r\nContent-Disposition: form-data; name="default"\r\n\r\nvalue\r\n--#{qboundary}\r\nContent-Disposition: form-data; name="file"; filename="local.path"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n--#{qboundary}--\r\n\r\n\z/ === request.body
+        /\A--#{qboundary}\r\nContent-Disposition: form-data; name="default"\r\n\r\nvalue\r\n--#{qboundary}\r\nContent-Disposition: form-data; name="file"; filename="local.path"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n--#{qboundary}--\r\n\z/ === request.body
       }.to_return(status: 200, body: "", headers: {})
       event = Event.new(payload: {file_pointer: {agent_id: 111, file: 'test'}})
-      io_mock = mock()
       mock(@checker).get_io(event) { StringIO.new("testdata") }
       @checker.options['no_merge'] = true
       @checker.receive([event])
