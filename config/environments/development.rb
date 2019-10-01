@@ -1,6 +1,6 @@
 $stdout.sync = true
 
-Huginn::Application.configure do
+Rails.application.configure do
   config.middleware.insert_after ActionDispatch::Static, Rack::LiveReload
 
   # Settings specified here will take precedence over those in config/application.rb
@@ -10,10 +10,7 @@ Huginn::Application.configure do
   # since you don't have to restart the web server when you make code changes.
   config.cache_classes = false
 
-  # Eager load code on boot. This eager loads most of Rails and
-  # your application in memory, allowing both threaded web servers
-  # and those relying on copy on write to perform better.
-  # Rake tasks automatically ignore this option for performance.
+  # Do not eager load code on boot.
   config.eager_load = false
 
   # Show full error reports.
@@ -23,6 +20,7 @@ Huginn::Application.configure do
   # Run rails dev:cache to toggle caching.
   if Rails.root.join('tmp', 'caching-dev.txt').exist?
     config.action_controller.perform_caching = true
+    config.action_controller.enable_fragment_cache_logging = true
 
     config.cache_store = :memory_store
     config.public_file_server.headers = {
