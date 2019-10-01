@@ -12,9 +12,11 @@ if [ "${START_MYSQL}" = "true" ]; then
 
   # initialize MySQL data directory
   if [ ! -d /var/lib/mysql/mysql ]; then
-    mysql_install_db --user=$(whoami) --datadir=/tmp/mysql
+    mysql_install_db --admin-auth-plugin=mysql_native_password --insecure --user=$(whoami) --datadir=/tmp/mysql
     mv -f /tmp/mysql/* /var/lib/mysql/
   fi
+
+  echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DATABASE_PASSWORD}';" > /app/tmp/mysql_init.sql
 
   echo "Starting mysql server..."
   supervisorctl start mysqld >/dev/null
@@ -31,9 +33,6 @@ if [ "${START_MYSQL}" = "true" ]; then
     echo -n .
     sleep 1
   done
-
-  if ! echo "USE ${DATABASE_NAME}" | mysql -u${DATABASE_USERNAME:-root} "${DATABASE_PASSWORD:+-p$DATABASE_PASSWORD}" >/dev/null 2>&1; then
-    echo "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${DATABASE_PASSWORD}');" | mysql -u root
-  fi
 fi
+
 supervisorctl start foreman >/dev/null

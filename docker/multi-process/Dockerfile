@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:18.04
 
 COPY docker/scripts/prepare /scripts/
 RUN /scripts/prepare
