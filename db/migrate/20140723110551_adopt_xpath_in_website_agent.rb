@@ -1,6 +1,6 @@
 class AdoptXpathInWebsiteAgent < ActiveRecord::Migration[4.2]
   class Agent < ActiveRecord::Base
-    include JSONSerializedField
+    include JsonSerializedField
     json_serialize :options
   end
 
