@@ -237,7 +237,7 @@ GEM
     erubis (2.7.0)
     et-orbi (1.0.9)
       tzinfo
-    ethon (0.7.1)
+    ethon (0.12.0)
       ffi (>= 1.3.0)
     eventmachine (1.2.7)
     evernote-thrift (1.25.1)
@@ -622,8 +622,8 @@ GEM
       builder (>= 2.1.2)
       jwt (>= 0.1.2)
       multi_json (>= 1.3.0)
-    typhoeus (0.6.9)
-      ethon (>= 0.7.1)
+    typhoeus (1.3.1)
+      ethon (>= 0.9.0)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
     uber (0.1.0)
@@ -760,7 +760,7 @@ DEPENDENCIES
   twilio-ruby (~> 3.11.5)
   twitter!
   twitter-stream!
-  typhoeus (~> 0.6.3)
+  typhoeus (~> 1.3.1)
   tzinfo (>= 1.2.0)
   tzinfo-data
   uglifier (~> 2.7.2)
