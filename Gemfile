@@ -34,7 +34,7 @@ gem 'ruby-growl', '~> 4.1.0'      # GrowlAgent
 gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
 gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'erector', github: 'dsander/erector', branch: 'fix-fixnum-warning'
+gem 'erector', github: 'dsander/erector', branch: 'rails6'
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'mini_racer', '~> 0.2.4'      # JavaScriptAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
@@ -159,9 +159,9 @@ group :development do
     gem 'pry-rails'
     gem 'pry-byebug'
     gem 'rr'
-    gem 'rspec', '~> 3.7'
+    gem 'rspec', '~> 3.8'
+    gem 'rspec-rails'
     gem 'rspec-collection_matchers', '~> 1.1.0'
-    gem 'rspec-rails', '~> 3.7'
     gem 'rspec-html-matchers', '~> 0.8'
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'
