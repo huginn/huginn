@@ -50,8 +50,8 @@ GIT
 
 GIT
   remote: https://github.com/dsander/delayed_job_active_record.git
-  revision: 8fab2befe898005388dc4e5d02a054093c2844b0
-  branch: rails6
+  revision: ac2dfef97be39ae0fee2de8006158878ed65a719
+  branch: rails6-zeitwerk
   specs:
     delayed_job_active_record (4.1.4)
       activerecord (>= 3.0, < 6.1)

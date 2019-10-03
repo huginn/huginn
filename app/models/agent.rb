@@ -6,8 +6,8 @@ require 'utils'
 class Agent < ActiveRecord::Base
   include AssignableTypes
   include MarkdownClassAttributes
-  include JSONSerializedField
-  include RDBMSFunctions
+  include JsonSerializedField
+  include RdbmsFunctions
   include WorkingHelpers
   include LiquidInterpolatable
   include HasGuid

@@ -4,7 +4,7 @@ require 'location'
 # Agents.  They contain a serialized `payload` of arbitrary JSON data, as well as optional `lat`, `lng`, and `expires_at`
 # fields.
 class Event < ActiveRecord::Base
-  include JSONSerializedField
+  include JsonSerializedField
   include LiquidDroppable
 
   acts_as_mappable
