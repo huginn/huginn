@@ -2,54 +2,265 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Oct 03, 2019   | Upgrade typhoeus to fix obscure error SSL validation error [2602](https://github.com/huginn/huginn/pull/2602) |
+| Sep 14, 2019   | Do not sanitize `@body` in a text part in EmailAgent [2595](https://github.com/huginn/huginn/pull/2595) |
+| Aug 25, 2019   | Make JavaScript Agent optional [2590](https://github.com/huginn/huginn/pull/2590) |
+| Aug 17, 2019   | Remove support for the Weather Underground API [2396](https://github.com/huginn/huginn/pull/2396) |
+| Aug 17, 2019   | Add ability to reemit all of an Agent's events from the UI [2573](https://github.com/huginn/huginn/pull/2573) |
+| Aug 17, 2019   | Improve Utils.normalize_uri() [2585](https://github.com/huginn/huginn/pull/2585) |
+| Aug 12, 2019   | Upgrade `nokogiri` to 1.10.4 for CVE-2019-5477 [2582](https://github.com/huginn/huginn/pull/2582) |
+| Aug 01, 2019   | Add `group_by` liquid filter [2572](https://github.com/huginn/huginn/pull/2572) |
+| Jul 29, 2019   | Upgrade `mini_magic`, fix focus rspec filter limiting test suit on CI [2568](https://github.com/huginn/huginn/pull/2568) |
+| Jul 28, 2019   | Fix description of `EmailDigestAgent` [2567](https://github.com/huginn/huginn/pull/2567) |
+| Jul 27, 2019   | Increase `TelegramAgent` Caption Length [2560](https://github.com/huginn/huginn/pull/2560) |
+| Jun 30, 2019   | Install Node 10 instead of Node 0.12 in the install guide [2551](https://github.com/huginn/huginn/pull/2551) |
+| Jun 10, 2019   | Improve Docker README.md [2546](https://github.com/huginn/huginn/pull/2546) |
+| May 19, 2019   | Update `liquid` to the latest version 4.0.3 [2536](https://github.com/huginn/huginn/pull/2536) |
+| May 07, 2019   | Add `drop_pending_events` option to `AgentControllerConcern` [2532](https://github.com/huginn/huginn/pull/2532) |
+| Apr 30, 2019   | Update `nokogiri` for CVEs [2531](https://github.com/huginn/huginn/pull/2531) |
+| Apr 28, 2019   | Set `inbound_event` when creating `AgentLog` entries [2530](https://github.com/huginn/huginn/pull/2530) |
 | Apr 18, 2019   | Replace rubyracer with mini_racer, dropped support for Debian 7 aka Wheezy [1961](https://github.com/huginn/huginn/pull/1961) |
+| Apr 16, 2019   | Force SNI support in Net modules for IMAP/POP3/SMTP [2523](https://github.com/huginn/huginn/pull/2523) |
+| Apr 15, 2019   | Upgrade `devise` to fix CVE [2525](https://github.com/huginn/huginn/pull/2525) |
+| Apr 14, 2019   | Set Heroku stack to `heroku-18` in app.json [2524](https://github.com/huginn/huginn/pull/2524) |
+| Mar 29, 2019   | Add digest filters to our Liquid engine [2516](https://github.com/huginn/huginn/pull/2516) |
+| Mar 29, 2019   | Add Liquid based rule support to `TriggerAgent` [2514](https://github.com/huginn/huginn/pull/2514) |
+| Mar 29, 2019   | Add a `delete` option to `ImapFolderAgent` [2515](https://github.com/huginn/huginn/pull/2515) |
+| Mar 17, 2019   | Update `rails` for CVEs [2508](https://github.com/huginn/huginn/pull/2508) |
+| Mar 02, 2019   | Revert "Update DataOutputAgent accept header for browser compatibilit… [2499](https://github.com/huginn/huginn/pull/2499) |
+| Feb 14, 2019   | Improve description of `TriggerAgent` [2489](https://github.com/huginn/huginn/pull/2489) |
+| Jan 29, 2019   | Add `event_headers` support to `ImapFolderAgent` [2476](https://github.com/huginn/huginn/pull/2476) |
+| Jan 26, 2019   | Make the `mail` gem use real-world encoders for some Japanese charsets [2477](https://github.com/huginn/huginn/pull/2477) |
+| Jan 25, 2019   | Update `jsonpath` gem [2474](https://github.com/huginn/huginn/pull/2474) |
+| Jan 25, 2019   | Ddd jpg as renderType to phantomjscloud setting [2470](https://github.com/huginn/huginn/pull/2470) |
+| Jan 09, 2019   | Update manual installation instructions [2461](https://github.com/huginn/huginn/pull/2461) |
+| Jan 08, 2019   | Improve #2434 (Add HTTP Headers to Webhook Agent) [2454](https://github.com/huginn/huginn/pull/2454) |
+| Jan 08, 2019   | Fix for Bundler 2 [2455](https://github.com/huginn/huginn/pull/2455) |
+| Jan 07, 2019   | Winter cleaning [2452](https://github.com/huginn/huginn/pull/2452) |
+| Jan 07, 2019   | Persist override of HUGINN_PORT [2448](https://github.com/huginn/huginn/pull/2448) |
+| Dec 15, 2018   | Bump `capistrano` to latest version to avoid OpenSSL error [2437](https://github.com/huginn/huginn/pull/2437) |
+| Dec 02, 2018   | Update `rails` to 5.2.1.1 for CVE-2018-16476 [2428](https://github.com/huginn/huginn/pull/2428) |
+| Nov 22, 2018   | Bump `rack and` `nokogiri` [2425](https://github.com/huginn/huginn/pull/2425) |
+| Nov 21, 2018   | Improve usability of `DelayAgent` [2422](https://github.com/huginn/huginn/pull/2422) |
+| Nov 15, 2018   | Bug fix: restrict IFS to only the read builtin [2413](https://github.com/huginn/huginn/pull/2413) |
+| Nov 14, 2018   | Added better validations for the `WatherAgent`. [2414](https://github.com/huginn/huginn/pull/2414) |
+| Nov 03, 2018   | Updated link to Kitematic [2406](https://github.com/huginn/huginn/pull/2406) |
+| Oct 29, 2018   | Move method `is_positive_integer?` to "agent.rb" [2402](https://github.com/huginn/huginn/pull/2402) |
+| Oct 12, 2018   | Do not seed databnase when a user exists [2386](https://github.com/huginn/huginn/pull/2386) |
+| Oct 12, 2018   | Fix name of Twitter event field in `TwitterUserAgent` [2388](https://github.com/huginn/huginn/pull/2388) |
+| Oct 03, 2018   | Delete stale delayed_job pid file when starting docker containers [2385](https://github.com/huginn/huginn/pull/2385) |
+| Oct 03, 2018   | Update `jsonpath` to 0.9.4 [2383](https://github.com/huginn/huginn/pull/2383) |
 | Oct 03, 2018   | Added support for MySQL 8 and MariaDB 10.3. Dropped support for MySQL < 5.5 and PostgreSQL < 9.2 [2384](https://github.com/huginn/huginn/pull/2384) |
+| Aug 30, 2018   | Support merge mode in `JsonParseAgent`  [2353](https://github.com/huginn/huginn/pull/2353) |
+| Aug 27, 2018   | Docker: extract heredocs from multi-process init and update docker-compose files [2298](https://github.com/huginn/huginn/pull/2298) |
+| Aug 18, 2018   | Remove `GoogleFlightsAgent` [2351](https://github.com/huginn/huginn/pull/2351) |
+| Aug 07, 2018   | Fix IMAP encoding issues [2346](https://github.com/huginn/huginn/pull/2346) |
+| Aug 07, 2018   | Upgrade rubies to their latest patch release [2267](https://github.com/huginn/huginn/pull/2267) |
+| Aug 07, 2018   | Fix "already retweeted" error detection [2174](https://github.com/huginn/huginn/pull/2174) |
+| Aug 07, 2018   | Update twitter-stream and its dependency, eventmachine [2345](https://github.com/huginn/huginn/pull/2345) |
+| Aug 01, 2018   | Respect WEB_CONCURRENCY env in unicorn.rb.example [2342](https://github.com/huginn/huginn/pull/2342) |
+| Jul 31, 2018   | Update DataOutputAgent accept header for browser compatibility [2338](https://github.com/huginn/huginn/pull/2338) |
+| Jul 16, 2018   | Make 'expected_receive_period_in_days' optional [2333](https://github.com/huginn/huginn/pull/2333) |
+| Jul 14, 2018   | Fix "working?" of PostAgent [2329](https://github.com/huginn/huginn/pull/2329) |
+| Jun 22, 2018   | Bump sprockets version [2321](https://github.com/huginn/huginn/pull/2321) |
+| Jun 17, 2018   | Upgrade to Rails 5.2 [2266](https://github.com/huginn/huginn/pull/2266) |
+| Jun 17, 2018   | Add link for darksky api key since wunderground no longer free [2313](https://github.com/huginn/huginn/pull/2313) |
+| Jun 08, 2018   | Update google_translation_agent.rb [2309](https://github.com/huginn/huginn/pull/2309) |
+| Jun 04, 2018   | Improve logic of "working?" in MqttAgent [2307](https://github.com/huginn/huginn/pull/2307) |
+| May 18, 2018   | Pass URLs to Telegram API directly [2285](https://github.com/huginn/huginn/pull/2285) |
+| May 02, 2018   | Bump binding of caller to fix incompatibility with ruby 2.5 [2276](https://github.com/huginn/huginn/pull/2276) |
+| Apr 30, 2018   | Bump rails-html-sanitizer to 1.0.4 to address CVE [2274](https://github.com/huginn/huginn/pull/2274) |
+| Apr 28, 2018   | Add ssl support for mail config [2270](https://github.com/huginn/huginn/pull/2270) |
+| Apr 21, 2018   | PushoverAgent: HTML message support [2264](https://github.com/huginn/huginn/pull/2264) |
+| Apr 04, 2018   | Allow to run on ruby 2.5 and fix warnings [2216](https://github.com/huginn/huginn/pull/2216) |
+| Apr 04, 2018   | [#2248] Allow the `PostAgent` to consume arrays [2249](https://github.com/huginn/huginn/pull/2249) |
+| Mar 21, 2018   | Update loofah due to CVE-2018-8048 [2243](https://github.com/huginn/huginn/pull/2243) |
+| Feb 13, 2018   | Clarify xpath usage with example [2217](https://github.com/huginn/huginn/pull/2217) |
+| Feb 03, 2018   | Fix syntax error in Website Agent description [2207](https://github.com/huginn/huginn/pull/2207) |
+| Jan 31, 2018   | Upgrade nokogiri to 1.8.2 to address vulnerabilities found in libxml2 [2205](https://github.com/huginn/huginn/pull/2205) |
+| Jan 29, 2018   | Split long Telegram messages [2171](https://github.com/huginn/huginn/pull/2171) |
+| Jan 08, 2018   | Rescue ZeroDivisionError on validation [2189](https://github.com/huginn/huginn/pull/2189) |
+| Jan 05, 2018   | Fix Liquid interpolation in TwilioAgent helper methods [2187](https://github.com/huginn/huginn/pull/2187) |
+| Jan 02, 2018   | Fix Docker testing README for better GitHub readability [2183](https://github.com/huginn/huginn/pull/2183) |
+| Dec 01, 2017   | Add `array` extraction option to WebsiteAgent in HTML/XML mode [2170](https://github.com/huginn/huginn/pull/2170) |
+| Nov 30, 2017   | Add options to Telegram Agent [2168](https://github.com/huginn/huginn/pull/2168) |
+| Nov 11, 2017   | Upgrade Dropbox Agents to new v2 API [2146](https://github.com/huginn/huginn/pull/2146) |
+| Nov 11, 2017   | Add proxy support for WebRequestConcern [2157](https://github.com/huginn/huginn/pull/2157) |
+| Nov 11, 2017   | Allow usage of custom Liquid tags in LiquidOutputAgent [2160](https://github.com/huginn/huginn/pull/2160) |
+| Oct 30, 2017   | Add a workaround for broken AlreadyRetweeted error detection [2155](https://github.com/huginn/huginn/pull/2155) |
+| Oct 27, 2017   | Clarifying no authentication scenario [2153](https://github.com/huginn/huginn/pull/2153) |
+| Oct 22, 2017   | Make Docker image runnable as non-root user [2112](https://github.com/huginn/huginn/pull/2112) |
+| Oct 16, 2017   | Fix running specs with guard and spring [2145](https://github.com/huginn/huginn/pull/2145) |
+| Oct 11, 2017   | Do not treat already retweeted/favorited error as failure [2140](https://github.com/huginn/huginn/pull/2140) |
+| Oct 03, 2017   | Make TelegramAgent FormConfigurable, DryRunable and add logging [2138](https://github.com/huginn/huginn/pull/2138) |
+| Sep 21, 2017   | Fix Run Event Propagation search action [2124](https://github.com/huginn/huginn/pull/2124) |
+| Sep 21, 2017   | Update to nokogiri 1.8.1 [2132](https://github.com/huginn/huginn/pull/2132) |
+| Sep 20, 2017   | Update rubies: 2017-09 [2129](https://github.com/huginn/huginn/pull/2129) |
+| Sep 19, 2017   | Fix default scenario links [2123](https://github.com/huginn/huginn/pull/2123) |
+| Sep 19, 2017   | Upgrade jquery.jsoneditor to handle null values [2127](https://github.com/huginn/huginn/pull/2127) |
+| Sep 16, 2017   | Update Ruby version in instructions [2015](https://github.com/huginn/huginn/pull/2015) |
+| Sep 16, 2017   | Handle lazy loading of Agents in gems during Agent.receive! [2125](https://github.com/huginn/huginn/pull/2125) |
+| Sep 16, 2017   | Fix dry-run modal when clicking on icon in 'Dry Run' button [2126](https://github.com/huginn/huginn/pull/2126) |
+| Sep 16, 2017   | OpenShift v3 quickstart [2108](https://github.com/huginn/huginn/pull/2108) |
 | Sep 15, 2017   | Tweets view of `TwitterStreamAgent` has been enhanced. [2122](https://github.com/huginn/huginn/pull/2122) |
+| Sep 11, 2017   | Do not instantiate all records when liquidizing a record collection [2119](https://github.com/huginn/huginn/pull/2119) |
 | Sep 09, 2017   | Agent objects in Liquid templating now have new properties `working` and `url`. [2118](https://github.com/huginn/huginn/pull/2118) |
 | Sep 06, 2017   | `DataOutputAgent` includes an icon in a podcast feed. [2114](https://github.com/huginn/huginn/pull/2114) |
+| Sep 06, 2017   | Add documentation for `force_stop` rake task [2115](https://github.com/huginn/huginn/pull/2115) |
+| Sep 05, 2017   | Fix flaky spec [2113](https://github.com/huginn/huginn/pull/2113) |
 | Sep 05, 2017   | `DataOutputAgent` can properly output an RSS feed with items containing  multiple categories, enclosures, etc. [2110](https://github.com/huginn/huginn/pull/2110) |
+| Sep 04, 2017   | Replace references to https://github.com/cantino/huginn with huginn/huginn [2106](https://github.com/huginn/huginn/pull/2106) |
+| Sep 01, 2017   | Switch back to the upstream heroku-buildpack-graphviz [2105](https://github.com/huginn/huginn/pull/2105) |
+| Aug 31, 2017   | Prevent PeakDetectorAgent from storing invalid data in it's memory [2103](https://github.com/huginn/huginn/pull/2103) |
+| Aug 10, 2017   | Upgrade omniauth to prevent Hashie warning [2084](https://github.com/huginn/huginn/pull/2084) |
+| Aug 10, 2017   | Load .env.test instead of .env.development when running rspec [2083](https://github.com/huginn/huginn/pull/2083) |
+| Aug 08, 2017   | Add logging output for pushover agent [2081](https://github.com/huginn/huginn/pull/2081) |
 | Aug 07, 2017   | `ImapFolderAgent` can now include a `Message-ID` and optionally a raw mail blob in each created event. [2076](https://github.com/huginn/huginn/pull/2076) |
+| Aug 06, 2017   | Increase upper user name limit to 190 [2078](https://github.com/huginn/huginn/pull/2078) |
 | Aug 01, 2017   | `GrowlAgent` supports new API parameters `sticky`, `priority` and `callback_url`. [2074](https://github.com/huginn/huginn/pull/2074) |
 | Jul 31, 2017   | `PostAgent` now has a `merge` mode that can be enabled via the `output_mode` new option. [2069](https://github.com/huginn/huginn/pull/2069) |
+| Jul 27, 2017   | Add validations for `mode` values in EventFormattingAgent [2070](https://github.com/huginn/huginn/pull/2070) |
+| Jul 25, 2017   | Improve documentation of Website Agent [2066](https://github.com/huginn/huginn/pull/2066) |
+| Jul 21, 2017   | Upgrade mysql2 gem to 0.4.8 [2065](https://github.com/huginn/huginn/pull/2065) |
 | Jul 20, 2017   | Agent editor has a selectable `contollers` field. [2063](https://github.com/huginn/huginn/pull/2063) |
 | Jul 20, 2017   | Receivers are now inherited when cloning an agent. [2063](https://github.com/huginn/huginn/pull/2063)|
+| Jul 19, 2017   | Replace references of `cantino/huginn` with `huginn/huginn` [2062](https://github.com/huginn/huginn/pull/2062) |
 | Jul 18, 2017   | `DigestAgent` gets a new option `retained_events`. [2041](https://github.com/huginn/huginn/pull/2041) |
 | Jul 10, 2017   | `CommanderAgent` can now refer to `target` to determine what to do for each target agent. [2053](https://github.com/huginn/huginn/pull/2053)   |
 | Jul 10, 2017   | Update Google API Client. May break backwards compatibility for GoogleCalendarPublishAgent. [2047](https://github.com/huginn/huginn/pull/2047)   |
+| Jul 09, 2017   | Add runit-information for Debian Stretch [2048](https://github.com/huginn/huginn/pull/2048) |
+| Jul 01, 2017   | Improve Capistrano configuration [2045](https://github.com/huginn/huginn/pull/2045) |
 | Jun 06, 2017   | Addressed the problem with MySQL resetting auto_increment after events get emptied and the server reboots. [1974](https://github.com/huginn/huginn/pull/1974), [2014](https://github.com/huginn/huginn/pull/2014) |
+| Jun 01, 2017   | Upgrade letter_opener_web version to 1.3.1 to support Rails 5. [2026](https://github.com/huginn/huginn/pull/2026) |
+| May 31, 2017   | Downgrade ruby in Gemfile.lock to Heroku supported version [2024](https://github.com/huginn/huginn/pull/2024) |
+| May 31, 2017   | Build and publish huginn/huginn-test [2016](https://github.com/huginn/huginn/pull/2016) |
 | May 30, 2017   | Support Ruby 2.4. [1876](https://github.com/huginn/huginn/pull/1876) |
 | May 25, 2017   | PeakDetectorAgent now has a configurable `search_url`. [2013](https://github.com/huginn/huginn/pull/2013) |
+| May 24, 2017   | Add test docker image [2002](https://github.com/huginn/huginn/pull/2002) |
+| May 19, 2017   | Improve docker environment variable documentation [2007](https://github.com/huginn/huginn/pull/2007) |
 | May 19, 2017   | Upgrade Rails to 5.1. [1912](https://github.com/huginn/huginn/pull/1912) |
 | May 18, 2017   | `ShellCommandAgent` gets a new option `unbundle`. [1990](https://github.com/huginn/huginn/pull/1990) |
+| May 17, 2017   | Change docker image namespace [2004](https://github.com/huginn/huginn/pull/2004) |
+| May 11, 2017   | Switch graphviz heroku buildpack to a fork to support new heroku stack [1998](https://github.com/huginn/huginn/pull/1998) |
+| May 11, 2017   | Update Nokogiri to 1.7.2 [2000](https://github.com/huginn/huginn/pull/2000) |
 | May 11, 2017   | `PeakDetectorAgent` gets a new option `min_events`. [1924](https://github.com/huginn/huginn/pull/1924) |
 | May 11, 2017   | Switch back to the much improved `jsonpath` gem after `jsonpathv2` gets merged to mainline. [1996](https://github.com/huginn/huginn/pull/1996), [1997](https://github.com/huginn/huginn/pull/1997), [2017](https://github.com/huginn/huginn/pull/2017) |
+| May 01, 2017   | Revert "Protect the latest event from automatic deletion when using MySQL" [1993](https://github.com/huginn/huginn/pull/1993) |
 | Apr 27, 2017   | Add custom response header support to DataOutputAgent, WebhookAgent and LiquidOutputAgent. [1977](https://github.com/huginn/huginn/pull/1977) |
 | Apr 27, 2017   | Upgrade Liquid to 4.0. [1982](https://github.com/huginn/huginn/pull/1982) |
 | Apr 26, 2017   | Add `GoogleTranslationAgent`. [1978](https://github.com/huginn/huginn/pull/1978) |
+| Apr 23, 2017   | Rss agent dynamic cleanup [1733](https://github.com/huginn/huginn/pull/1733) |
+| Apr 21, 2017   | Twilio receiver fix [1980](https://github.com/huginn/huginn/pull/1980) |
+| Apr 19, 2017   | Add another method to ping yourself from huginn [1970](https://github.com/huginn/huginn/pull/1970) |
 | Apr 19, 2017   | `DataOutputAgent` now serves RSS output as `application/rss+xml` by default. (existing agents are automatically configured to use `text/xml`) [1973](https://github.com/huginn/huginn/pull/1973) |
+| Apr 12, 2017   | Set created_at of dry-runned event to the current time [1965](https://github.com/huginn/huginn/pull/1965) |
+| Apr 10, 2017   | Cleanup openshift configuration since it is not supported [1954](https://github.com/huginn/huginn/pull/1954) |
 | Apr 08, 2017   | Add `TumblrLikesAgent`. [1923](https://github.com/huginn/huginn/pull/1923) |
+| Apr 05, 2017   | Fix #1799 by linking to Liquid docs [1953](https://github.com/huginn/huginn/pull/1953) |
 | Mar 31, 2017   | `ChangeDetectorAgent` can now refer to `last_property`. [1950](https://github.com/huginn/huginn/pull/1950) |
+| Mar 26, 2017   | Update Nokogiri to 1.7.1 [1947](https://github.com/huginn/huginn/pull/1947) |
+| Mar 21, 2017   | action_mailer initializer usability fixes [1942](https://github.com/huginn/huginn/pull/1942) |
+| Mar 18, 2017   | Do not allow to "become" a deactivated user [1938](https://github.com/huginn/huginn/pull/1938) |
+| Mar 17, 2017   | docker: generate Rails secret at first run if not configured [1931](https://github.com/huginn/huginn/pull/1931) |
+| Mar 17, 2017   | Fix multi-process image when not specifying  POSTGRES_PORT_5432_TCP_ADDR [1922](https://github.com/huginn/huginn/pull/1922) |
+| Mar 16, 2017   | Fix View diagram : Too many agent to display (#1664) [1935](https://github.com/huginn/huginn/pull/1935) |
+| Mar 12, 2017   | docker: DEBIAN_FRONTEND was missing "export" [1932](https://github.com/huginn/huginn/pull/1932) |
+| Mar 12, 2017   | Update README.md with info on huginn_agent gem [1929](https://github.com/huginn/huginn/pull/1929) |
+| Mar 07, 2017   | Remove some empty documentation files [1926](https://github.com/huginn/huginn/pull/1926) |
+| Mar 07, 2017   | Enable include_sort_info in RssAgent [1925](https://github.com/huginn/huginn/pull/1925) |
+| Feb 27, 2017   | Make feature specs more robust [1917](https://github.com/huginn/huginn/pull/1917) |
+| Feb 27, 2017   | Allow path to accept stored credentials in shell_command_agent.rb [1911](https://github.com/huginn/huginn/pull/1911) |
+| Feb 12, 2017   | Check for agent class file to determine if it's valid [1907](https://github.com/huginn/huginn/pull/1907) |
+| Feb 05, 2017   | Explain time zone labels [1902](https://github.com/huginn/huginn/pull/1902) |
+| Feb 03, 2017   | Fix devise confirmation form, unify unlock form [1897](https://github.com/huginn/huginn/pull/1897) |
+| Feb 01, 2017   | Order TwitterStreamAgents in setup_workers [1890](https://github.com/huginn/huginn/pull/1890) |
 | Feb 01, 2017   | `GoogleFlightsAgent` supports choice of carrier and alliance. [1878](https://github.com/huginn/huginn/pull/1878) |
+| Jan 31, 2017   | Rename Delayed::Job failed scope to prevent warning [1889](https://github.com/huginn/huginn/pull/1889) |
+| Jan 31, 2017   | Add titles to all pages [1884](https://github.com/huginn/huginn/pull/1884) |
+| Jan 30, 2017   | Change "Abort" button to say "Cancel" [1885](https://github.com/huginn/huginn/pull/1885) |
 | Jan 29, 2017   | `WebhookAgent` can redirect to any URL after successful submission. [1923](https://github.com/huginn/huginn/pull/1923) |
+| Jan 28, 2017   | Let default table inherit the boostrap #table css style [1883](https://github.com/huginn/huginn/pull/1883) |
+| Jan 28, 2017   | Allow Redirect Requests [1881](https://github.com/huginn/huginn/pull/1881) |
+| Jan 20, 2017   | Fix scenario import when merges are required [1877](https://github.com/huginn/huginn/pull/1877) |
+| Jan 08, 2017   | Fix #1863 validation issue with schedule names [1864](https://github.com/huginn/huginn/pull/1864) |
+| Jan 08, 2017   | Fix #1853 by hardcoding protocol on image. [1854](https://github.com/huginn/huginn/pull/1854) |
+| Jan 08, 2017   | Credential create should use ace too [1865](https://github.com/huginn/huginn/pull/1865) |
+| Jan 08, 2017   | Cleanup [1866](https://github.com/huginn/huginn/pull/1866) |
+| Jan 07, 2017   | Default selected value for scenario.icon select [1861](https://github.com/huginn/huginn/pull/1861) |
 | Jan 06, 2017   | Agent's id of each incoming event is accessible from Liquid and JavaScriptAgent. [1860](https://github.com/huginn/huginn/pull/1860) |
 | Jan 06, 2017   | "Every X" schedules now run on fixed times. [1844](https://github.com/huginn/huginn/pull/1844) |
 | Jan 03, 2017   | Twitter agents support "extended" tweets that are longer than 140 characters. [1847](https://github.com/huginn/huginn/pull/1847) |
+| Jan 03, 2017   | Make migrations compatible with SQLite [1842](https://github.com/huginn/huginn/pull/1842) |
 | Jan 01, 2017   | A new `include_sort_info` Agent option is added to help sort out an Nth event of a series of events created in a run. [1772](https://github.com/huginn/huginn/pull/1772) |
+| Dec 31, 2016   | Fix HttpStatusAgent [1776](https://github.com/huginn/huginn/pull/1776) |
+| Dec 29, 2016   | Upgrade rails to 5.0.1 [1841](https://github.com/huginn/huginn/pull/1841) |
+| Dec 27, 2016   | Don't use the insecure git:// protocol when fetching git gems [1763](https://github.com/huginn/huginn/pull/1763) |
 | Nov 30, 2016   | `RssAgent` includes podcast tag values in events created from a podcast feed. [1782](https://github.com/huginn/huginn/pull/1782) |
 | Nov 28, 2016   | Remove `BeeperAgent` after Beeper.io shuts down. [1808](https://github.com/huginn/huginn/pull/1808) |
 | Nov 27, 2016   | `WebsiteAgent` can interpolate via the `template` option after extraction. [1743](https://github.com/huginn/huginn/pull/1743), [1816](https://github.com/huginn/huginn/pull/1816) |
+| Nov 27, 2016   | Disable automatic URL normalization and absolutization on `url` [1771](https://github.com/huginn/huginn/pull/1771) |
+| Nov 26, 2016   | Add class of service chooser for Google Flights Agent [1778](https://github.com/huginn/huginn/pull/1778) |
+| Nov 23, 2016   | Fix a double-decoding problem in RssAgent [1813](https://github.com/huginn/huginn/pull/1813) |
+| Nov 22, 2016   | Cache Agent type select options in Agent#new [1804](https://github.com/huginn/huginn/pull/1804) |
+| Nov 20, 2016   | Increase default database pool size to 20 [1805](https://github.com/huginn/huginn/pull/1805) |
 | Nov 20, 2016   | `WebsiteAgent` provides a new extractor option `repeat`. [1769](https://github.com/huginn/huginn/pull/1769) |
+| Nov 19, 2016   | Fixed the online documentation for the Weather Agent class. [1803](https://github.com/huginn/huginn/pull/1803) |
+| Nov 14, 2016   | Fix typos in docker documentation [1792](https://github.com/huginn/huginn/pull/1792) |
+| Nov 13, 2016   | Nitrous.io is shutting down [1789](https://github.com/huginn/huginn/pull/1789) |
+| Nov 13, 2016   | Prevent submit from disabling on invalid json [1790](https://github.com/huginn/huginn/pull/1790) |
+| Nov 13, 2016   | Remove additional nitrous files [1791](https://github.com/huginn/huginn/pull/1791) |
+| Nov 03, 2016   | Revert the special treatment for CDATA introduced in #1071 [1770](https://github.com/huginn/huginn/pull/1770) |
+| Nov 02, 2016   | Fix `url` handling of WebsiteAgent  [1766](https://github.com/huginn/huginn/pull/1766) |
+| Nov 01, 2016   | Fix Stubhub test failures [1764](https://github.com/huginn/huginn/pull/1764) |
+| Oct 31, 2016   | Convert a bunch of HTTP links to HTTPS [1757](https://github.com/huginn/huginn/pull/1757) |
 | Oct 27, 2016   | `WebsiteAgent` now has improved encoding detection for HTML/XML documents. [1751](https://github.com/huginn/huginn/pull/1751) |
+| Oct 27, 2016   | Ignore empty author and link entries in RssAgent [1754](https://github.com/huginn/huginn/pull/1754) |
+| Oct 23, 2016   | Use the XPath expression `string(.)` instead of `.//text()` [1744](https://github.com/huginn/huginn/pull/1744) |
 | Oct 17, 2016   | Normalize URL in `to_uri` and `uri_expand` liquid filters.                                                   |
+| Oct 15, 2016   | Fix delayed_job_active_record overriding defaults [1736](https://github.com/huginn/huginn/pull/1736) |
+| Oct 14, 2016   | Add as_object Liquid filter [1716](https://github.com/huginn/huginn/pull/1716) |
+| Oct 14, 2016   | Retire ar_mysql_column_charset [1729](https://github.com/huginn/huginn/pull/1729) |
+| Oct 11, 2016   | Agent form: ace-editor highlighting and theme [1727](https://github.com/huginn/huginn/pull/1727) |
+| Oct 11, 2016   | Manual event agent validate JSON field before form submit [1728](https://github.com/huginn/huginn/pull/1728) |
+| Oct 09, 2016   | Update forecast_io gem and language [1722](https://github.com/huginn/huginn/pull/1722) |
+| Oct 09, 2016   | Update documentation [1725](https://github.com/huginn/huginn/pull/1725) |
 | Oct 06, 2016   | `RssAgent` is reimplemented migrating its underlying feed parser from FeedNormalizer to Feedjira. [1564](https://github.com/huginn/huginn/pull/1564)     |
 | Oct 05, 2016   | Migrate to Rails 5. [1688](https://github.com/huginn/huginn/pull/1688)                                      |
 | Oct 05, 2016   | Improve URL normalization in `WebsiteAgent`. [1719](https://github.com/huginn/huginn/pull/1719)             |
 | Oct 05, 2016   | `PushoverAgent` now treats parameter options as templates rather than default values. [1720](https://github.com/huginn/huginn/pull/1720) |
+| Sep 30, 2016   | Fix escape characters of events when dry running [1715](https://github.com/huginn/huginn/pull/1715) |
+| Sep 28, 2016   | Allow style tags in sanitized HTML [1712](https://github.com/huginn/huginn/pull/1712) |
+| Sep 23, 2016   | Clarify path for a simple body_text event. [1705](https://github.com/huginn/huginn/pull/1705) |
+| Sep 21, 2016   | Rescue from AR:SubclassNotFound and allow to delete agents [1695](https://github.com/huginn/huginn/pull/1695) |
+| Sep 21, 2016   | Replace jquery.serializeObject with new implementation [1698](https://github.com/huginn/huginn/pull/1698) |
+| Sep 21, 2016   | Ignore the fixture API key in WeatherAgent [1694](https://github.com/huginn/huginn/pull/1694) |
 | Sep 19, 2016   | Add multipart file upload to `PostAgent`. [1690](https://github.com/huginn/huginn/pull/1690)                |
+| Sep 16, 2016   | docker-compose version 2 [1681](https://github.com/huginn/huginn/pull/1681) |
+| Sep 15, 2016   | `service_id` is a valid part of the agent_params [1686](https://github.com/huginn/huginn/pull/1686) |
+| Sep 15, 2016   | interpolated response [1682](https://github.com/huginn/huginn/pull/1682) |
+| Sep 14, 2016   | bundle update net-ssh to 3.0.x (to avoid deprecation warn on Ruby 2.3) [1683](https://github.com/huginn/huginn/pull/1683) |
+| Sep 14, 2016   | storage_engine removed since 5.7.5 replaced by default_storage_engine… [1684](https://github.com/huginn/huginn/pull/1684) |
+| Sep 12, 2016   | Use strong_parameters and drop protected_attributes [1679](https://github.com/huginn/huginn/pull/1679) |
+| Sep 11, 2016   | Updated JsonPathV2 version to latest. [1674](https://github.com/huginn/huginn/pull/1674) |
+| Sep 10, 2016   | Remove unused contact model [1680](https://github.com/huginn/huginn/pull/1680) |
+| Sep 09, 2016   | Option to set response code for webhook agent [1676](https://github.com/huginn/huginn/pull/1676) |
+| Sep 09, 2016   | can_enqueue? propagation detection that does not depend on Rails [1672](https://github.com/huginn/huginn/pull/1672) |
+| Sep 08, 2016   | Add cache_response option to completable form fields [1673](https://github.com/huginn/huginn/pull/1673) |
 | Sep 08, 2016   | Allow `TwitterUserAgent` to retry failed actions. [1645](https://github.com/huginn/huginn/pull/1645)        |
+| Sep 06, 2016   | Update libv8 to fix build issues on OS X [1671](https://github.com/huginn/huginn/pull/1671) |
+| Sep 06, 2016   | minor tweaks [1669](https://github.com/huginn/huginn/pull/1669) |
+| Sep 04, 2016   | Extract service option prviders for non-standard Omniauth payloads [1655](https://github.com/huginn/huginn/pull/1655) |
+| Sep 03, 2016   | Fix SMTP config regression when not using authentication [1663](https://github.com/huginn/huginn/pull/1663) |
+| Sep 02, 2016   | Admin "become" method [1659](https://github.com/huginn/huginn/pull/1659) |
 | Aug 16, 2016   | `EmailDigestAgent` now relies on received events, rather in memory. [1624](https://github.com/huginn/huginn/pull/1624) |
+| Aug 15, 2016   | Update rails to 4.2.7.1 [1630](https://github.com/huginn/huginn/pull/1630) |
+| Aug 15, 2016   | Handle removed events when rendering logs [1634](https://github.com/huginn/huginn/pull/1634) |
+| Aug 09, 2016   | Docker: fix usage of ENV variables that are not in .env.example [1620](https://github.com/huginn/huginn/pull/1620) |
 | Aug 08, 2016   | `DataOutputAgent` now limits events after ordering. [1444](https://github.com/huginn/huginn/pull/1444)      |
+| Aug 05, 2016   | Fix dependency check for Tumblr gem [1615](https://github.com/huginn/huginn/pull/1615) |
 | Aug 05, 2016   | Add `api_key` option to `UserLocationAgent`. [1613](https://github.com/huginn/huginn/pull/1613)             |
+| Jul 27, 2016   | DataOutputAgent cannot create events [1608](https://github.com/huginn/huginn/pull/1608) |
+| Jul 26, 2016   | Monkey patch faraday to fix encoding issue in URLs [1607](https://github.com/huginn/huginn/pull/1607) |
 | Jul 25, 2016   | Add `LiquidOutputAgent`. [1587](https://github.com/huginn/huginn/pull/1587)                                 |
 | Jul 25, 2016   | Allow `PostAgent` headers to interpolate event data. [1606](https://github.com/huginn/huginn/pull/1606)     |
 | Jul 25, 2016   | Remove `smtp.yml` configuration file, the SMTP configuration now needs to be done via environment variables. [1595](https://github.com/huginn/huginn/pull/1595) |
