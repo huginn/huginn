@@ -50,7 +50,27 @@ Restore backed up files
 sudo -u huginn -H cp Procfile.bak Procfile
 ```
 
-### 4. Install gems, migrate and precompile assets
+### 4. Update ruby version
+
+Ensure you have Ruby 2.5+ installed:
+
+```
+ruby -v
+```
+
+Upgrade when required:
+
+```
+mkdir /tmp/ruby && cd /tmp/ruby
+curl -L --progress https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.bz2 | tar xj
+cd ruby-2.6.5
+./configure --disable-install-rdoc
+make -j`nproc`
+sudo make install
+sudo gem install rake bundler foreman --no-document
+```
+
+### 5. Install gems, migrate and precompile assets
 
 Ensure you have rubygems 2.7.0+ installed:
 
@@ -74,7 +94,7 @@ sudo -u huginn -H bundle exec rake assets:clean assets:precompile tmp:cache:clea
 
 ```
 
-### 5. Update the Procfile
+### 6. Update the Procfile
 
 Check for changes made to the default `Procfile`
 ```
@@ -86,7 +106,7 @@ Update your `Procfile` if the default options of the version you are using chang
 sudo -u huginn -H editor Procfile
 ```
 
-### 6. Update the .env file
+### 7. Update the .env file
 
 Check for changes made to the example `.env`
 ```
@@ -99,7 +119,7 @@ sudo -u huginn -H editor .env
 ```
 
 
-### 7. Export init script and start Huginn
+### 8. Export init script and start Huginn
 
 ```
 # Export the init script
