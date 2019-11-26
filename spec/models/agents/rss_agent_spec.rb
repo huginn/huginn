@@ -538,7 +538,7 @@ describe Agents::RssAgent do
 
   describe 'logging errors with the feed url' do
     it 'includes the feed URL when an exception is raised' do
-      mock(Feedjira::Feed).parse(anything) { raise StandardError.new("Some error!") }
+      mock(Feedjira).parse(anything) { raise StandardError.new("Some error!") }
       expect(lambda {
         agent.check
       }).not_to raise_error

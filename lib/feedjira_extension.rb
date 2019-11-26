@@ -315,7 +315,7 @@ module FeedjiraExtension
     end
   end
 
-  Feedjira::Feed.feed_classes.each do |feed_class|
+  Feedjira.parsers.each do |feed_class|
     feed_class.send :include, FeedExtensions
   end
 end
