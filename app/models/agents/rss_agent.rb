@@ -275,7 +275,7 @@ module Agents
       {
         id: entry.id,
         url: entry.url,
-        urls: entry.links.map(&:href),
+        urls: Array(entry.url) | entry.links.map(&:href),
         links: entry.links,
         title: entry.title,
         description: clean_fragment(entry.summary),
