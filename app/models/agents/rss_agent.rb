@@ -6,7 +6,7 @@ module Agents
     can_dry_run!
     default_schedule "every_1d"
 
-    gem_dependency_check { defined?(Feedjira::Feed) }
+    gem_dependency_check { defined?(Feedjira) }
 
     DEFAULT_EVENTS_ORDER = [['{{date_published}}', 'time'], ['{{last_updated}}', 'time']]
 
@@ -164,7 +164,7 @@ module Agents
         begin
           response = faraday.get(url)
           if response.success?
-            feed = Feedjira::Feed.parse(preprocessed_body(response))
+            feed = Feedjira.parse(preprocessed_body(response))
             new_events.concat feed_to_events(feed)
           else
             error "Failed to fetch #{url}: #{response.inspect}"
@@ -275,7 +275,7 @@ module Agents
       {
         id: entry.id,
         url: entry.url,
-        urls: entry.links.map(&:href),
+        urls: Array(entry.url) | entry.links.map(&:href),
         links: entry.links,
         title: entry.title,
         description: clean_fragment(entry.summary),
