@@ -770,7 +770,7 @@ DEPENDENCIES
   xmpp4r (~> 0.5.6)
 
 RUBY VERSION
-   ruby 2.6.0p0
+   ruby 2.6.5p114
 
 BUNDLED WITH
    1.17.3

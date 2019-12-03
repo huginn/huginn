@@ -25,15 +25,15 @@ matrix:
     - env: DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
     - env: DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
   include:
-    - rvm: 2.6.0
+    - rvm: 2.6.5
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn-single-process DOCKERFILE=docker/single-process/Dockerfile
-    - rvm: 2.6.0
+    - rvm: 2.6.5
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
 rvm:
 - 2.3.8
-- 2.4.5
-- 2.5.3
-- 2.6.0
+- 2.4.9
+- 2.5.7
+- 2.6.5
 cache: bundler
 bundler_args: --without development production
 script:
