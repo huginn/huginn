@@ -98,16 +98,13 @@ Install the database packages
 
     sudo apt-get install -y mysql-server mysql-client libmysqlclient-dev
 
-    # Pick a MySQL root password (can be anything), type it and press enter,
-    # retype the MySQL root password and press enter
-
 For Debian Stretch, replace `libmysqlclient-dev` with `default-libmysqlclient-dev`. See the [additional notes section](#additional-notes) for more information.
 
 Check the installed MySQL version (remember if its >= 5.5.3 for the `.env` configuration done later):
 
     mysql --version
 
-Secure your installation
+Secure your installation. During this step, you will be prompted to pick a MySQL root password (can be anything)
 
     sudo mysql_secure_installation
 
