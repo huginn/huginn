@@ -34,7 +34,7 @@ Getting Huginn up and running using docker is quick and painless once you have d
 
 ## Configuration and linking to a database container
 
-Follow the [instructions on the docker hub registry](https://registry.hub.docker.com/u/huginn/huginn/) on how to configure Huginn using environment variables and linking the container to an external MySQL or PostgreSQL database.
+Follow the [instructions on the docker hub registry](https://registry.hub.docker.com/r/huginn/huginn/) on how to configure Huginn using environment variables and linking the container to an external MySQL or PostgreSQL database.
 
 ## Running each Huginn process in a seperate container
 
