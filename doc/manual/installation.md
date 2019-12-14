@@ -108,7 +108,9 @@ Secure your installation. During this step, you will be prompted to pick a MySQL
 
     sudo mysql_secure_installation
 
-Login to MySQL
+The `mysql_secure_installation` script does not apply the user-provided password to the MySQL root user on Ubuntu systems. To apply a password to the MySQL root user on Ubuntu systems, see the [additional notes section](#set-password-for-root-MySQL-user-on-Ubuntu) for more information before proceeding.
+
+Login to MySQL using the root password you set in the previous steps
 
     mysql -u root -p
 
@@ -422,3 +424,21 @@ You probably found an error message or exception backtrace you could not resolve
 ### Additional notes
 
 Debian Stretch switched from MySQL to [MariaDB](https://mariadb.org/). All packages with `mysql` in the name are just wrappers around the MariaDB ones, with some containing some compatibility symlinks. Huginn should also work fine with the MariaDB packages directly, although to keep the installation instructions more compact, they still use the MySQL packages.
+
+#### Set password for root MySQL user on Ubuntu
+
+MySQL installations (>= 5.7.26) on Ubuntu use the UNIX `auth_socket` plugin by default, such that authentication is handled by system user credientials. In order to access the MySQL root user from any system user, you have to set the MySQL root user password in the user database. Sign into the MySQL shell 
+
+    sudo mysql -u root -p
+
+    # The default password upon installation is blank
+
+Once in the MySQL shell, run the following command to set the password for the root user by replacing `new-password` with a password of your choice
+
+    ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'new-password';
+
+After the change has been made, exit the MySQL shell with `\q`. 
+
+For the change to propogate, restart the MySQL server
+
+    sudo service mysql restart
