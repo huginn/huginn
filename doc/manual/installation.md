@@ -431,6 +431,8 @@ MySQL installations (>= 5.7.26) on Ubuntu use the UNIX `auth_socket` plugin by d
 
     sudo mysql -u root -p
 
+    # The default password upon installation is blank
+
 Once in the MySQL shell, run the following command to set the password for the root user by replacing `new-password` with a password of your choice
 
     ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'new-password';
