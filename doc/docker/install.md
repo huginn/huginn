@@ -44,5 +44,5 @@ With the `cantino/huginn-single-process` image you can easily run each process n
 
 Other Docker options:
 
-* If you don't want to use the official repo, see also: https://registry.hub.docker.com/u/andrewcurioso/huginn/
+* If you don't want to use the official repo, see also: https://registry.hub.docker.com/r/andrewcurioso/huginn
 * If you'd like to run Huginn's web process and job worker process in separate containers, another option is https://github.com/hackedu/huginn-docker. It also uses Unicorn as the web server and serves precompiled assets.
