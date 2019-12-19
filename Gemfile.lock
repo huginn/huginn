@@ -326,7 +326,7 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashdiff (0.3.8)
     hashie (3.5.7)
-    haversine (0.3.0)
+    haversine (0.3.2)
     hipchat (1.2.0)
       httparty
     httmultiparty (0.3.16)
