@@ -133,8 +133,8 @@ gem 'bootsnap', '~> 1.4.4', require: false
 group :development do
   gem 'better_errors', '~> 2.5'
   gem 'binding_of_caller', '~> 0.8.0'
-  gem 'guard', '~> 2.14.1'
-  gem 'guard-livereload', '~> 2.5.1'
+  gem 'guard', '~> 2.16'
+  gem 'guard-livereload', '~> 2.5'
   gem 'guard-rspec', '~> 4.7.3'
   gem 'rack-livereload', '~> 0.3.16'
   gem 'letter_opener_web', '~> 1.3.4'
