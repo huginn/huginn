@@ -426,7 +426,7 @@ GEM
     multi_json (1.14.1)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
-    mysql2 (0.5.2)
+    mysql2 (0.5.3)
     naught (1.1.0)
     nenv (0.3.0)
     net-ftp-list (3.2.8)
@@ -744,7 +744,7 @@ DEPENDENCIES
   mini_racer (~> 0.2.4)
   mqtt
   multi_xml
-  mysql2 (~> 0.5.2)
+  mysql2 (~> 0.5.3)
   net-ftp-list (~> 3.2.8)
   nokogiri (>= 1.10.8)
   omniauth (~> 1.9)
