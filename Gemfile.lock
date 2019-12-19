@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/Hirurg103/capybara_select2.git
-  revision: fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76
-  ref: fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76
+  revision: c9481453dbe0dacf4f570c047ae3f7323da03b05
+  tag: 4.0.3
   specs:
-    capybara-select-2 (0.3.2)
+    capybara-select-2 (0.4.3)
 
 GIT
   remote: https://github.com/albertsun/tumblr_client.git
@@ -157,8 +157,8 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
       zeitwerk (~> 2.2)
-    addressable (2.5.2)
-      public_suffix (>= 2.0.2, < 4.0)
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
     airbrussh (1.3.1)
       sshkit (>= 1.6.1, != 1.7.0)
     aws-sdk-core (2.2.15)
@@ -188,15 +188,16 @@ GEM
     capistrano-rails (1.1.3)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
-    capybara (2.18.0)
+    capybara (3.29.0)
       addressable
       mini_mime (>= 0.1.3)
-      nokogiri (>= 1.3.3)
-      rack (>= 1.0.0)
-      rack-test (>= 0.5.4)
-      xpath (>= 2.0, < 4.0)
-    capybara-screenshot (1.0.17)
-      capybara (>= 1.0, < 3)
+      nokogiri (~> 1.8)
+      rack (>= 1.6.0)
+      rack-test (>= 0.6.3)
+      regexp_parser (~> 1.5)
+      xpath (~> 3.2)
+    capybara-screenshot (1.0.24)
+      capybara (>= 1.0, < 4)
       launchy
     cliver (0.3.2)
     coderay (1.1.2)
@@ -377,7 +378,7 @@ GEM
     kaminari-core (1.1.1)
     kgio (2.10.0)
     kramdown (1.3.3)
-    launchy (2.4.2)
+    launchy (2.4.3)
       addressable (~> 2.3)
     letter_opener (1.4.1)
       launchy (~> 2.2)
@@ -420,7 +421,7 @@ GEM
     minitest (5.14.0)
     mqtt (0.3.1)
     msgpack (1.3.1)
-    multi_json (1.13.1)
+    multi_json (1.14.1)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
     mysql2 (0.5.2)
@@ -472,10 +473,9 @@ GEM
     orm_adapter (0.5.0)
     os (0.9.6)
     pg (1.1.4)
-    poltergeist (1.8.1)
-      capybara (~> 2.1)
+    poltergeist (1.18.1)
+      capybara (>= 2.1, < 4)
       cliver (~> 0.3.1)
-      multi_json (~> 1.0)
       websocket-driver (>= 0.2.0)
     polyglot (0.3.5)
     pry (0.11.1)
@@ -486,7 +486,7 @@ GEM
       pry (~> 0.10)
     pry-rails (0.3.4)
       pry (>= 0.9.10)
-    public_suffix (3.0.2)
+    public_suffix (4.0.1)
     rack (2.2.2)
     rack-livereload (0.3.16)
       rack
@@ -529,6 +529,7 @@ GEM
       ffi (>= 0.5.0, < 2)
     rb-kqueue (0.2.4)
       ffi (>= 0.5.0)
+    regexp_parser (1.6.0)
     representable (3.0.4)
       declarative (< 0.1.0)
       declarative-option (< 0.2.0)
@@ -675,7 +676,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.4)
     xmpp4r (0.5.6)
-    xpath (3.0.0)
+    xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.3.0)
 
@@ -693,7 +694,7 @@ DEPENDENCIES
   capistrano (~> 3.11.0)
   capistrano-bundler (~> 1.1.4)
   capistrano-rails (~> 1.1)
-  capybara (~> 2.18)
+  capybara (~> 3.29)
   capybara-screenshot
   capybara-select-2!
   coffee-rails (~> 5)
