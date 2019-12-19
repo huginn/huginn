@@ -270,7 +270,7 @@ GEM
     ffi (1.11.3)
     font-awesome-sass (4.7.0)
       sass (>= 3.2)
-    forecast_io (2.0.1)
+    forecast_io (2.0.2)
       faraday
       hashie
       multi_json
