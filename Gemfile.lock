@@ -731,7 +731,7 @@ DEPENDENCIES
   huginn_agent (~> 0.4.0)
   hypdf (~> 1.0.10)
   jquery-rails (~> 4.2.1)
-  json (~> 2.3)
+  json (~> 2)
   jsonpath (~> 1.0.1)
   kaminari (~> 1.1.1)
   kramdown (~> 1.3.3)
