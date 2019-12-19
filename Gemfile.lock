@@ -613,8 +613,7 @@ GEM
     slack-notifier (1.0.0)
     spectrum-rails (1.3.4)
       railties (>= 3.1)
-    spring (2.0.2)
-      activesupport (>= 4.2)
+    spring (2.1.0)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     spring-watcher-listen (2.0.1)
@@ -775,7 +774,7 @@ DEPENDENCIES
   shoulda-matchers
   slack-notifier (~> 1.0.0)
   spectrum-rails
-  spring (~> 2.0.2)
+  spring (~> 2.1)
   spring-commands-rspec (~> 1.0.4)
   spring-watcher-listen (~> 2.0.1)
   sprockets (~> 3.7.2)
