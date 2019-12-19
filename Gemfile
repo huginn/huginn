@@ -140,9 +140,9 @@ group :development do
   gem 'letter_opener_web', '~> 1.3.4'
   gem 'web-console', '>= 4'
 
-  gem 'capistrano', '~> 3.11.0'
-  gem 'capistrano-rails', '~> 1.1'
-  gem 'capistrano-bundler', '~> 1.1.4'
+  gem 'capistrano', '~> 3.11.2'
+  gem 'capistrano-rails', '~> 1.4'
+  gem 'capistrano-bundler', '~> 1.6'
 
   if_true(ENV['SPRING']) do
     gem 'spring-commands-rspec', '~> 1.0.4'
