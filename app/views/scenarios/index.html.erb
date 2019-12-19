@@ -24,9 +24,9 @@
           <tr>
             <td>
               <% if scenario.icon.blank? %>
-                <%= scenario_label(scenario, icon('gear'))%>
+                <%= scenario_label(scenario, icon('fas', 'cog'))%>
               <% else %>
-                <%= scenario_label(scenario, icon(scenario.icon))%>
+                <%= scenario_label(scenario, icon('fas', scenario.icon))%>
               <% end %>
               <%= link_to(scenario.name, scenario) %>
             </td>
