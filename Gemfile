@@ -197,7 +197,7 @@ ENV['DATABASE_ADAPTER'] ||=
   end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
-  gem 'pg', '~> 1.1.3'
+  gem 'pg', '~> 1.1.4'
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
