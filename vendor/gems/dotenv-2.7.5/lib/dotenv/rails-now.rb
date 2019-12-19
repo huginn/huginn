@@ -2,7 +2,7 @@
 # loaded, then list `dotenv-rails` in the `Gemfile` before those other gems and
 # require `dotenv/rails-now`.
 #
-#     gem "dotenv-rails", :require => "dotenv/rails-now"
+#     gem "dotenv-rails", require: "dotenv/rails-now"
 #     gem "gem-that-requires-env-variables"
 #
 

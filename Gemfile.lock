@@ -92,11 +92,12 @@ GIT
       simple_oauth (~> 0.3.0)
 
 PATH
-  remote: vendor/gems/dotenv-2.0.1
+  remote: vendor/gems/dotenv-2.7.5
   specs:
-    dotenv (2.0.1)
-    dotenv-rails (2.0.1)
-      dotenv (= 2.0.1)
+    dotenv (2.7.5)
+    dotenv-rails (2.7.5)
+      dotenv (= 2.7.5)
+      railties (>= 3.2, < 6.1)
 
 GEM
   remote: https://rubygems.org/
