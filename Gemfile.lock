@@ -529,7 +529,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
-    rb-kqueue (0.2.4)
+    rb-kqueue (0.2.5)
       ffi (>= 0.5.0)
     regexp_parser (1.6.0)
     representable (3.0.4)
