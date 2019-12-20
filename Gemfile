@@ -72,7 +72,7 @@ gem 'omniauth-evernote'
 gem 'evernote_oauth'
 
 # LocalFileAgent (watch functionality)
-gem 'listen', '~> 3.0.5', require: false
+gem 'listen', '~> 3.2', require: false
 
 # S3Agent
 gem 'aws-sdk-core', '~> 2.2.15'
