@@ -136,7 +136,7 @@ group :development do
   gem 'guard', '~> 2.16'
   gem 'guard-livereload', '~> 2.5'
   gem 'guard-rspec', '~> 4.7.3'
-  gem 'rack-livereload', '~> 0.3.16'
+  gem 'rack-livereload', '~> 0.3.17'
   gem 'letter_opener_web', '~> 1.3.4'
   gem 'web-console', '>= 4'
 

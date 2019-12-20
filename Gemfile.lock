@@ -487,7 +487,7 @@ GEM
       pry (>= 0.10.4)
     public_suffix (4.0.1)
     rack (2.2.2)
-    rack-livereload (0.3.16)
+    rack-livereload (0.3.17)
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -750,7 +750,7 @@ DEPENDENCIES
   poltergeist
   pry-byebug
   pry-rails
-  rack-livereload (~> 0.3.16)
+  rack-livereload (~> 0.3.17)
   rails (~> 6.0.2.2)
   rails-controller-testing
   rails-html-sanitizer (~> 1.2)
