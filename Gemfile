@@ -53,7 +53,7 @@ gem 'google-cloud-translate', '~> 1.0.0', require: 'google/cloud/translate'
 # Twitter Agents
 gem 'twitter', '~> 6'
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
-gem 'omniauth-twitter', '~> 1.3.0'
+gem 'omniauth-twitter', '~> 1.4.0'
 
 # Tumblr Agents
 # until merge of https://github.com/tumblr/tumblr_client/pull/61

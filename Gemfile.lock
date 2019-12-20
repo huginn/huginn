@@ -437,7 +437,7 @@ GEM
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    oauth (0.4.7)
+    oauth (0.5.4)
     oauth2 (1.4.1)
       faraday (>= 0.8, < 0.16.0)
       jwt (>= 1.0, < 3.0)
@@ -463,7 +463,7 @@ GEM
     omniauth-tumblr (1.2)
       multi_json
       omniauth-oauth (~> 1.0)
-    omniauth-twitter (1.3.0)
+    omniauth-twitter (1.4.0)
       omniauth-oauth (~> 1.1)
       rack
     omniauth-wunderlist (0.0.2)
@@ -754,7 +754,7 @@ DEPENDENCIES
   omniauth-dropbox-oauth2!
   omniauth-evernote
   omniauth-tumblr (~> 1.2)
-  omniauth-twitter (~> 1.3.0)
+  omniauth-twitter (~> 1.4.0)
   omniauth-wunderlist
   pg (~> 1.1.4)
   poltergeist
