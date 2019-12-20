@@ -39,7 +39,7 @@ gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'mini_racer', '~> 0.2.8'      # JavaScriptAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
-gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
+gem 'slack-notifier', '~> 2'  # SlackAgent
 gem 'hypdf', '~> 1.0.16'          # PDFInfoAgent
 
 # Weibo Agents
