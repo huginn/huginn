@@ -669,7 +669,7 @@ GEM
       raindrops (~> 0.7)
     uuid (2.3.7)
       macaddr (~> 1.0)
-    vcr (3.0.3)
+    vcr (5.0.0)
     warden (1.2.8)
       rack (>= 2.0.6)
     web-console (4.0.1)
