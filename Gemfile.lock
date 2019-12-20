@@ -211,7 +211,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     concurrent-ruby (1.1.6)
-    cookiejar (0.3.2)
+    cookiejar (0.3.3)
     coveralls (0.8.23)
       json (>= 1.8, < 3)
       simplecov (~> 0.16.1)
@@ -237,13 +237,13 @@ GEM
     docile (1.3.2)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
-    em-http-request (1.1.2)
+    em-http-request (1.1.5)
       addressable (>= 2.3.4)
-      cookiejar
+      cookiejar (!= 0.3.1)
       em-socksify (>= 0.3)
       eventmachine (>= 1.0.3)
       http_parser.rb (>= 0.6.0)
-    em-socksify (0.3.0)
+    em-socksify (0.3.2)
       eventmachine (>= 1.0.0.beta.4)
     em-websocket (0.5.1)
       eventmachine (>= 0.12.9)
@@ -345,7 +345,7 @@ GEM
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
     httpclient (2.8.3)
-    huginn_agent (0.4.0)
+    huginn_agent (0.6.1)
       thor
     hypdf (1.0.10)
       httmultiparty (~> 0.3)
@@ -698,7 +698,7 @@ DEPENDENCIES
   dotenv!
   dotenv-rails!
   dropbox-api!
-  em-http-request (~> 1.1.2)
+  em-http-request (~> 1.1.5)
   erector!
   evernote_oauth
   execjs (~> 2.7.0)
@@ -720,7 +720,7 @@ DEPENDENCIES
   hipchat (~> 1.2.0)
   httmultiparty (~> 0.3.16)
   httparty (~> 0.13)
-  huginn_agent (~> 0.4.0)
+  huginn_agent (~> 0.6)
   hypdf (~> 1.0.10)
   jquery-rails (~> 4.2.1)
   json (~> 2)
