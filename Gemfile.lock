@@ -426,7 +426,7 @@ GEM
     mysql2 (0.5.3)
     naught (1.1.0)
     nenv (0.3.0)
-    net-ftp-list (3.2.8)
+    net-ftp-list (3.2.11)
     net-scp (2.0.0)
       net-ssh (>= 2.6.5, < 6.0.0)
     net-ssh (5.2.0)
@@ -737,7 +737,7 @@ DEPENDENCIES
   mqtt
   multi_xml
   mysql2 (~> 0.5.3)
-  net-ftp-list (~> 3.2.8)
+  net-ftp-list (~> 3.2)
   nokogiri (>= 1.10.8)
   omniauth (~> 1.9)
   omniauth-37signals

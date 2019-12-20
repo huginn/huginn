@@ -31,7 +31,7 @@ end
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 gem 'twilio-ruby', '~> 3.11.5'    # TwilioAgent
 gem 'ruby-growl', '~> 4.1.0'      # GrowlAgent
-gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
+gem 'net-ftp-list', '~> 3.2'    # FtpsiteAgent
 gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
