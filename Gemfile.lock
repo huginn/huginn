@@ -594,7 +594,7 @@ GEM
     select2-rails (3.5.9.3)
       thor (~> 0.14)
     shellany (0.0.1)
-    shoulda-matchers (4.0.1)
+    shoulda-matchers (4.1.2)
       activesupport (>= 4.2.0)
     signet (0.11.0)
       addressable (~> 2.3)
