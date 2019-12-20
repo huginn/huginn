@@ -324,7 +324,7 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    hashdiff (0.3.8)
+    hashdiff (1.0.0)
     hashie (3.5.7)
     haversine (0.3.2)
     hipchat (1.2.0)
@@ -577,7 +577,7 @@ GEM
       uuid (~> 2.3, >= 2.3.5)
     rufus-scheduler (3.6.0)
       fugit (~> 1.1, >= 1.1.6)
-    safe_yaml (1.0.4)
+    safe_yaml (1.0.5)
     sass-rails (6.0.0)
       sassc-rails (~> 2.1, >= 2.1.1)
     sassc (2.2.1)
@@ -672,10 +672,10 @@ GEM
       activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
       railties (>= 6.0.0)
-    webmock (3.5.1)
+    webmock (3.7.6)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
-      hashdiff
+      hashdiff (>= 0.4.0, < 2.0.0)
     websocket-driver (0.7.1)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.4)
@@ -793,7 +793,7 @@ DEPENDENCIES
   unicorn (~> 5.5)
   vcr
   web-console (>= 4)
-  webmock (~> 3.5.1)
+  webmock (~> 3.7)
   weibo_2!
   xmpp4r (~> 0.5.6)
 

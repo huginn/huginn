@@ -165,7 +165,7 @@ group :development do
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'
     gem 'vcr'
-    gem 'webmock', '~> 3.5.1'
+    gem 'webmock', '~> 3.7'
   end
 end
 
