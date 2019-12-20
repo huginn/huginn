@@ -55,13 +55,12 @@ gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 gem 'omniauth-twitter', '~> 1.4.0'
 
 # Tumblr Agents
-# until merge of https://github.com/tumblr/tumblr_client/pull/61
-gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master', ref: 'e046fe6e39291c173add0a49081630c7b60a36c7'
+gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master', ref: 'e046fe6e39291c173add0a49081630c7b60a36c7' # https://github.com/tumblr/tumblr_client/pull/61
 gem 'omniauth-tumblr', '~> 1.2'
 
 # Dropbox Agents
-gem 'dropbox-api', github: 'dsander/dropbox-api', ref: '86cb7b5a1254dc5b054de7263835713c4c1018c7'
-gem 'omniauth-dropbox-oauth2', github: 'bamorim/omniauth-dropbox-oauth2', ref: '35046706fb781ed3b57dfb9c3cd44ed0f3d3f8ea'
+gem 'dropbox-api', github: 'dsander/dropbox-api', ref: '86cb7b5a1254dc5b054de7263835713c4c1018c7' # https://github.com/omenking/dropbox-api/pull/1
+gem 'omniauth-dropbox-oauth2', github: 'bamorim/omniauth-dropbox-oauth2', ref: '35046706fb781ed3b57dfb9c3cd44ed0f3d3f8ea' # https://github.com/bamorim/omniauth-dropbox-oauth2/issues/11
 
 # UserLocationAgent
 gem 'haversine'
@@ -92,7 +91,7 @@ gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
 gem 'coffee-rails', '~> 5'
 gem 'delayed_job', '~> 4.1.8'
-gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails6-zeitwerk'
+gem 'delayed_job_active_record', github: 'collectiveidea/delayed_job_active_record', ref: 'd602a5dfdc14973af81f0387ee42c12fcdac73fd'
 gem 'devise', '~> 4.7.1'
 gem 'em-http-request', '~> 1.1.5'
 gem 'faraday', '~> 0.15'
