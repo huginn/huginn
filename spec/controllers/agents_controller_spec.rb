@@ -403,13 +403,13 @@ describe AgentsController do
 
   describe "#form_configurable actions" do
     before(:each) do
-      @params = {attribute: 'auth_token', agent: valid_attributes(:type => "Agents::HipchatAgent", options: {auth_token: '12345'})}
+      @params = {attribute: 'access_key_id', agent: valid_attributes(:type => "Agents::S3Agent", options: {access_key_id: '12345'})}
       sign_in users(:bob)
     end
     describe "POST validate" do
 
       it "returns with status 200 when called with a valid option" do
-        any_instance_of(Agents::HipchatAgent) do |klass|
+        any_instance_of(Agents::S3Agent) do |klass|
           stub(klass).validate_option { true }
         end
 
@@ -418,7 +418,7 @@ describe AgentsController do
       end
 
       it "returns with status 403 when called with an invalid option" do
-        any_instance_of(Agents::HipchatAgent) do |klass|
+        any_instance_of(Agents::S3Agent) do |klass|
           stub(klass).validate_option { false }
         end
 
@@ -429,8 +429,8 @@ describe AgentsController do
 
     describe "POST complete" do
       it "callsAgent#complete_option and renders json" do
-        any_instance_of(Agents::HipchatAgent) do |klass|
-          stub(klass).complete_option { [{name: 'test', value: 1}] }
+        any_instance_of(Agents::S3Agent) do |klass|
+          stub(klass).complete_option { [{text: 'test', value: 1}] }
         end
 
         post :complete, params: @params

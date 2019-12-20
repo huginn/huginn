@@ -327,8 +327,6 @@ GEM
     hashdiff (1.0.0)
     hashie (3.5.7)
     haversine (0.3.2)
-    hipchat (1.2.0)
-      httparty
     httmultiparty (0.3.16)
       httparty (>= 0.7.3)
       mimemagic
@@ -728,7 +726,6 @@ DEPENDENCIES
   guard-livereload (~> 2.5)
   guard-rspec (~> 4.7.3)
   haversine
-  hipchat (~> 1.2.0)
   httmultiparty (~> 0.3.16)
   httparty (~> 0.13)
   huginn_agent (~> 0.6)
