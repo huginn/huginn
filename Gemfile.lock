@@ -75,22 +75,6 @@ GIT
     erector (0.10.0)
       treetop (>= 1.2.3)
 
-GIT
-  remote: https://github.com/sferik/twitter.git
-  revision: d11707edf4abd13f7ada0eef57fc1eaa1062d75b
-  specs:
-    twitter (5.15.0)
-      addressable (~> 2.3)
-      buftok (~> 0.2.0)
-      equalizer (~> 0.0.11)
-      http (~> 2.0)
-      http-form_data (~> 1.0)
-      http_parser.rb (~> 0.6.0)
-      memoizable (~> 0.4.0)
-      multipart-post (~> 2.0)
-      naught (~> 1.0)
-      simple_oauth (~> 0.3.0)
-
 PATH
   remote: vendor/gems/dotenv-2.7.5
   specs:
@@ -248,7 +232,7 @@ GEM
       warden (~> 1.2.3)
     diff-lcs (1.3)
     docile (1.3.2)
-    domain_name (0.5.20170404)
+    domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     em-http-request (1.1.5)
       addressable (>= 2.3.4)
@@ -349,14 +333,14 @@ GEM
       httparty (>= 0.7.3)
       mimemagic
       multipart-post
-    http (2.1.0)
+    http (3.3.0)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
-      http-form_data (~> 1.0.1)
+      http-form_data (~> 2.0)
       http_parser.rb (~> 0.6.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    http-form_data (1.0.1)
+    http-form_data (2.1.1)
     http_parser.rb (0.6.0)
     httparty (0.17.3)
       mime-types (~> 3.0)
@@ -654,6 +638,17 @@ GEM
       builder (>= 2.1.2)
       jwt (>= 0.1.2)
       multi_json (>= 1.3.0)
+    twitter (6.2.0)
+      addressable (~> 2.3)
+      buftok (~> 0.2.0)
+      equalizer (~> 0.0.11)
+      http (~> 3.0)
+      http-form_data (~> 2.0)
+      http_parser.rb (~> 0.6.0)
+      memoizable (~> 0.4.0)
+      multipart-post (~> 2.0)
+      naught (~> 1.0)
+      simple_oauth (~> 0.3.0)
     typhoeus (1.3.1)
       ethon (>= 0.9.0)
     tzinfo (1.2.7)
@@ -663,7 +658,7 @@ GEM
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.4)
+    unf_ext (0.0.7.6)
     unicorn (5.5.2)
       kgio (~> 2.6)
       raindrops (~> 0.7)
@@ -789,7 +784,7 @@ DEPENDENCIES
   sprockets (~> 4)
   tumblr_client!
   twilio-ruby (~> 3.11.5)
-  twitter!
+  twitter (~> 6)
   twitter-stream!
   typhoeus (~> 1.3.1)
   tzinfo (>= 1.2.0)

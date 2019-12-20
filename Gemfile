@@ -51,7 +51,7 @@ gem 'google-api-client', '~> 0.13'
 gem 'google-cloud-translate', '~> 1.0.0', require: 'google/cloud/translate'
 
 # Twitter Agents
-gem 'twitter', github: 'sferik/twitter' # Must to be loaded before cantino-twitter-stream.
+gem 'twitter', '~> 6'
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 gem 'omniauth-twitter', '~> 1.3.0'
 
