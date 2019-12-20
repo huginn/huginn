@@ -126,6 +126,9 @@ module Agents
       contents = safely do
                    get_bucket_contents
                  end
+
+      return if contents.nil?
+
       if boolify(interpolated['watch'])
         watch(contents)
       else
@@ -155,8 +158,10 @@ module Agents
       yield
     rescue Aws::S3::Errors::AccessDenied => e
       error("Could not access '#{interpolated['bucket']}' #{e.class} #{e.message}")
+      nil
     rescue Aws::S3::Errors::ServiceError =>e
       error("#{e.class}: #{e.message}")
+      nil
     end
 
     def watch(contents)
@@ -167,7 +172,7 @@ module Agents
 
       new_memory = contents.dup
 
-      memory['seen_contents'].each do |key, etag|
+      memory.fetch('seen_contents', []).each do |key, etag|
         if contents[key].blank?
           create_event payload: get_file_pointer(key).merge(event_type: :removed)
         elsif contents[key] != etag
