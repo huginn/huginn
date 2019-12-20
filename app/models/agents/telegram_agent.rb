@@ -123,7 +123,7 @@ module Agents
     def send_message(field, params)
       response = HTTMultiParty.post telegram_bot_uri(TELEGRAM_ACTIONS[field]), query: params
       unless response['ok']
-        error(response)
+        error(response.to_s)
       end
     end
 
