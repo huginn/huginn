@@ -391,7 +391,7 @@ GEM
       activerecord
       kaminari-core (= 1.1.1)
     kaminari-core (1.1.1)
-    kgio (2.10.0)
+    kgio (2.11.2)
     kramdown (2.1.0)
     launchy (2.4.3)
       addressable (~> 2.3)
@@ -538,7 +538,7 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.20.3, < 2.0)
-    raindrops (0.17.0)
+    raindrops (0.19.0)
     rake (13.0.1)
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
@@ -664,7 +664,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.4)
-    unicorn (5.1.0)
+    unicorn (5.5.2)
       kgio (~> 2.6)
       raindrops (~> 0.7)
     uuid (2.3.7)
@@ -795,7 +795,7 @@ DEPENDENCIES
   tzinfo (>= 1.2.0)
   tzinfo-data
   uglifier (~> 4)
-  unicorn (~> 5.1.0)
+  unicorn (~> 5.5)
   vcr
   web-console (>= 4)
   webmock (~> 3.5.1)
