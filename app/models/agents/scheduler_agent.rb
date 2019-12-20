@@ -90,13 +90,15 @@ module Agents
 
     def validate_options
       if (spec = options['schedule']).present?
-        begin
-          cron = Rufus::Scheduler::CronLine.new(spec)
-          unless second_precision_enabled || (cron.seconds - [0, 15, 30, 45, 60]).empty?
-            errors.add(:base, "second precision schedule is not allowed in this service")
-          end
-        rescue ArgumentError
+        cron = Fugit::Cron.parse(spec)
+
+        if cron.nil?
           errors.add(:base, "invalid schedule")
+          return
+        end
+
+        unless second_precision_enabled || (cron.seconds - [0, 15, 30, 45, 60]).empty?
+          errors.add(:base, "second precision schedule is not allowed in this service")
         end
       else
         errors.add(:base, "schedule is missing")

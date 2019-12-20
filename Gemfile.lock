@@ -250,7 +250,7 @@ GEM
       http_parser.rb (~> 0.6.0)
     equalizer (0.0.11)
     erubi (1.9.0)
-    et-orbi (1.0.9)
+    et-orbi (1.2.2)
       tzinfo
     ethon (0.12.0)
       ffi (>= 1.3.0)
@@ -276,6 +276,9 @@ GEM
       multi_json
     foreman (0.86.0)
     formatador (0.2.5)
+    fugit (1.3.3)
+      et-orbi (~> 1.1, >= 1.1.8)
+      raabro (~> 1.1)
     geokit (1.13.1)
     geokit-rails (2.3.1)
       geokit (~> 1.5)
@@ -486,6 +489,7 @@ GEM
     pry-rails (0.3.9)
       pry (>= 0.10.4)
     public_suffix (4.0.1)
+    raabro (1.1.6)
     rack (2.2.2)
     rack-livereload (0.3.17)
       rack
@@ -574,8 +578,8 @@ GEM
       rest-client
     ruby-growl (4.1)
       uuid (~> 2.3, >= 2.3.5)
-    rufus-scheduler (3.4.2)
-      et-orbi (~> 1.0)
+    rufus-scheduler (3.6.0)
+      fugit (~> 1.1, >= 1.1.6)
     safe_yaml (1.0.4)
     sass-rails (6.0.0)
       sassc-rails (~> 2.1, >= 2.1.1)
@@ -762,7 +766,7 @@ DEPENDENCIES
   rspec-rails
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)
-  rufus-scheduler (~> 3.4.2)
+  rufus-scheduler (~> 3.6)
   sass-rails (>= 6.0)
   select2-rails (~> 3.5.4)
   shoulda-matchers
