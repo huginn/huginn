@@ -111,7 +111,7 @@ gem 'huginn_agent', '~> 0.6'
 gem 'json', '~> 2'
 gem 'jsonpath', '~> 1.0.5'
 gem 'kaminari', '~> 1.1.1'
-gem 'kramdown', '~> 1.3.3'
+gem 'kramdown', '~> 2'
 gem 'liquid', '~> 4.0.3'
 gem 'loofah', '~> 2.0'
 gem 'mini_magick', ">= 4.9.4"
