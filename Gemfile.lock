@@ -616,7 +616,7 @@ GEM
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
       spring (>= 1.2, < 3.0)
-    sprockets (3.7.2)
+    sprockets (4.0.0)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
     sprockets-rails (3.2.1)
@@ -773,7 +773,7 @@ DEPENDENCIES
   spring (~> 2.1)
   spring-commands-rspec (~> 1.0.4)
   spring-watcher-listen (~> 2.0.1)
-  sprockets (~> 3.7.2)
+  sprockets (~> 4)
   tumblr_client!
   twilio-ruby (~> 3.11.5)
   twitter!
