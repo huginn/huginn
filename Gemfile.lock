@@ -733,7 +733,7 @@ DEPENDENCIES
   listen (~> 3.2)
   loofah (~> 2.0)
   mini_magick (>= 4.9.4)
-  mini_racer (~> 0.2.4)
+  mini_racer (~> 0.2.8)
   mqtt
   multi_xml
   mysql2 (~> 0.5.3)
