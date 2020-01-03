@@ -1,9 +1,8 @@
 module AgentHelper
+
   def agent_show_view(agent)
-    name = agent.short_type.underscore
-    if File.exist?(Rails.root.join("app", "views", "agents", "agent_views", name, "_show.html.erb"))
-      File.join("agents", "agent_views", name, "show")
-    end
+    path = File.join('agents', 'agent_views', @agent.short_type.underscore, 'show')
+    return self.controller.template_exists?(path, [], true) ? path : nil
   end
 
   def toggle_disabled_text
