@@ -5,7 +5,7 @@ describe Agents::JqAgent do
     agents(:jane_weather_agent).events.create!(payload: payload)
   end
 
-  let!(:agent) { 
+  let!(:agent) {
     Agents::JqAgent.create!(
       name: 'somename',
       options: {
