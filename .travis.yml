@@ -6,6 +6,7 @@ services:
   - mysql
   - postgresql
 before_install:
+  - sudo apt-get -y install jq
   - gem install bundler -v '< 2' --conservative --force
 env:
   global:
