@@ -2,6 +2,11 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Jan 11, 2020   | Drop support for Ruby 2.3 which reached EOL |
+| Jan 11, 2020   | Add Jq Agent [2665](https://github.com/huginn/huginn/pull/2665) |
+| Dec 19, 2019   | Upgrade rack to 2.0.8 to fix CVE [2651](https://github.com/huginn/huginn/pull/2651) |
+| Dec 08, 2019   | Allow dry-run of PushoverAgent [2640](https://github.com/huginn/huginn/pull/2640) |
+| Nov 27, 2019   | Upgrade Feedjira to 3.1.0 that improves RssAgent [2629](https://github.com/huginn/huginn/pull/2629) |
 | Oct 03, 2019   | Upgrade typhoeus to fix obscure error SSL validation error [2602](https://github.com/huginn/huginn/pull/2602) |
 | Sep 14, 2019   | Do not sanitize `@body` in a text part in EmailAgent [2595](https://github.com/huginn/huginn/pull/2595) |
 | Aug 25, 2019   | Make JavaScript Agent optional [2590](https://github.com/huginn/huginn/pull/2590) |
