@@ -28,7 +28,7 @@ apt-get update
 $minimal_apt_get_install build-essential checkinstall git-core \
   zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev \
   libncurses5-dev libffi-dev libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev \
-  graphviz libgraphviz-dev \
+  graphviz libgraphviz-dev jq \
   libmysqlclient-dev libpq-dev libsqlite3-dev \
   ruby2.5 ruby2.5-dev
 locale-gen en_US.UTF-8

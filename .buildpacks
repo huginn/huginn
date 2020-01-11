@@ -1,3 +1,4 @@
 https://github.com/cantino/heroku-selectable-procfile.git
 https://github.com/heroku/heroku-buildpack-ruby.git
 https://github.com/weibeld/heroku-buildpack-graphviz.git
+https://github.com/chrismytton/heroku-buildpack-jq.git
