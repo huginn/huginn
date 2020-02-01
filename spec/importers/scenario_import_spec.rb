@@ -548,6 +548,8 @@ describe ScenarioImport do
     end
 
     context "agents which require a service" do
+      let(:service) { services(:generic) }
+
       let(:valid_parsed_services) do
         data = valid_parsed_data
         data[:agents] = [valid_parsed_basecamp_agent_data,
@@ -580,7 +582,7 @@ describe ScenarioImport do
         it "should import" do
           services_scenario_import.merges = {
             "0" => {
-              "service_id" => "0",
+              "service_id" => service.id.to_s,
             }
           }
           expect {
