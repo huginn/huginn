@@ -46,6 +46,10 @@ rm -rf /var/log/*
 # Install the latest jq for JqAgent
 curl -fsSL -o /usr/local/bin/jq https://stedolan.github.io/jq/download/linux64/jq
 chmod +x /usr/local/bin/jq
+# The above link does not always point to the latest version, so using
+# it as a bootstrap check out the latest release on GitHub.
+curl -fsSL -o /usr/local/bin/jq "$(curl -fsSL https://api.github.com/repos/stedolan/jq/releases | /usr/local/bin/jq -r '[.[] | select(.prerelease | not) | .assets[] | select(.name | contains("linux64")) | .browser_download_url][0]')"
+chmod +x /usr/local/bin/jq
 
 mkdir -p /app
 chmod -R g=u /etc/passwd /app
