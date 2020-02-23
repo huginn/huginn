@@ -3,6 +3,7 @@ module Agents
     DEFAULT_USERNAME = 'Huginn'
     ALLOWED_PARAMS = ['channel', 'username', 'unfurl_links', 'attachments']
 
+    can_dry_run!
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!
