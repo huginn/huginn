@@ -116,7 +116,7 @@ gem 'liquid', '~> 4.0.3'
 gem 'loofah', '~> 2.0'
 gem 'mini_magick', ">= 4.9.4"
 gem 'multi_xml'
-gem 'nokogiri'
+gem "nokogiri", ">= 1.10.8"
 gem 'omniauth', '~> 1.6.1'
 gem 'rails', '~> 5.2.0'
 gem 'sprockets', '~> 3.7.2'
