@@ -419,7 +419,7 @@ GEM
     net-ssh (5.0.2)
     netrc (0.11.0)
     nio4r (2.3.1)
-    nokogiri (1.10.5)
+    nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     notiffany (0.1.1)
       nenv (~> 0.1)
@@ -508,7 +508,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.19.0, < 2.0)
     raindrops (0.17.0)
-    rake (12.3.2)
+    rake (12.3.3)
     rb-fsevent (0.10.2)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
@@ -720,7 +720,7 @@ DEPENDENCIES
   multi_xml
   mysql2 (~> 0.5.2)
   net-ftp-list (~> 3.2.8)
-  nokogiri
+  nokogiri (>= 1.10.8)
   omniauth (~> 1.6.1)
   omniauth-37signals
   omniauth-dropbox-oauth2!
