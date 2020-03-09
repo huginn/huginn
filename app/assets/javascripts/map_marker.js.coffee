@@ -12,14 +12,7 @@ window.map_marker = (map, options = {}) ->
       center: pos
       radius: options.radius
     return marker
-  else
-    marker = new google.maps.Marker
-      map: map
-      position: pos
-      title: 'Recorded Location'
-    return marker
-
-  if options.course
+  else if options.course
     p1 = new LatLon(pos.lat(), pos.lng())
     speed = options.speed ? 1
     p2 = p1.destinationPoint(options.course, Math.max(0.2, speed) * 0.1)
@@ -41,5 +34,10 @@ window.map_marker = (map, options = {}) ->
           offset: '100%'
         }
       ]
-
     return arrow
+  else
+    marker = new google.maps.Marker
+      map: map
+      position: pos
+      title: 'Recorded Location'
+    return marker
