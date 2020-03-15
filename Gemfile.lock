@@ -484,6 +484,11 @@ GEM
       evernote-thrift
       multi_json (~> 1.0)
       omniauth-oauth (~> 1.0)
+    omniauth-google-oauth2 (0.8.2)
+      jwt (>= 2.0)
+      oauth2 (~> 1.1)
+      omniauth (~> 1.1)
+      omniauth-oauth2 (>= 1.6)
     omniauth-oauth (1.1.0)
       oauth
       omniauth (~> 1.0)
@@ -781,6 +786,7 @@ DEPENDENCIES
   omniauth-37signals
   omniauth-dropbox-oauth2!
   omniauth-evernote
+  omniauth-google-oauth2 (>= 0.8.0)
   omniauth-tumblr
   omniauth-twitter
   pg (~> 1.1.3)

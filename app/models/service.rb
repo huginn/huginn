@@ -43,7 +43,7 @@ class Service < ActiveRecord::Base
   end
 
   def endpoint
-    client_options = "OmniAuth::Strategies::#{OmniAuth::Utils.camelize(self.provider)}".constantize.default_options['client_options']
+    client_options =  Devise.omniauth_configs[provider.to_sym].strategy_class.default_options['client_options']
     URI.join(client_options['site'], client_options['token_url'])
   end
 
@@ -86,5 +86,12 @@ class Service < ActiveRecord::Base
 
   register_options_provider('37signals') do |omniauth|
     {user_id: omniauth['extra']['accounts'][0]['id'], name: omniauth['info']['name']}
+  end
+
+  register_options_provider('google') do |omniauth|
+    {
+      email: omniauth['info']['email'],
+      name: "#{omniauth['info']['name']} <#{omniauth['info']['email']}>"
+    }
   end
 end
