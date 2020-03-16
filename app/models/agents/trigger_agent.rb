@@ -77,7 +77,7 @@ module Agents
         'rules' => [{
                       'type' => "regex",
                       'value' => "foo\\d+bar",
-                      'path' => "topkey.subkey.subkey.goal",
+                      'path' => "$.topkey.subkey.subkey.goal",
                     }],
         'message' => "Looks like your pattern matched in '{{value}}'!"
       }
