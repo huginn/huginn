@@ -110,11 +110,27 @@ Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](h
 
 Huginn launches on the free version of Heroku [with significant limitations](https://github.com/huginn/huginn/blob/master/doc/heroku/install.md). For non-experimental use, we strongly recommend Heroku's 1GB paid plan or our Docker container.
 
-### OpenShift Online (v3)
+### OpenShift
 
-Try Huginn on OpenShift Online (v3): `oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-mysql.json` or `oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-postgresql.json`. You can also use the web console to import either json file by going to "Add to Project" -> "Import YAML/JSON".
+#### OpenShift v3
+
+Try Huginn on OpenShift Online (v3)
+
+Create a new app with either `mysql` or `postgres`:
+```bash
+oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-mysql.json
+```
+or
+```bash
+oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-postgresql.json
+```
+**Note**: You can also use the web console to import either json file by going to "Add to Project" -> "Import YAML/JSON".
 
 If you are on the Starter plan, make sure to follow the [guide](https://docs.openshift.com/online/getting_started/beyond_the_basics.html#btb-creating-a-new-application-from-source-code) to remove any existing application.
+
+##### OpenShift v4
+
+If you would like to run this on OpenShift v4+ you should look at the [Docker](https://github.com/huginn/huginn/blob/master/doc/docker/install.md) documentaition as your deployment process.
 
 ### Manual installation on any server
 
