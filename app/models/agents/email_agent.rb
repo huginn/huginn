@@ -2,6 +2,7 @@ module Agents
   class EmailAgent < Agent
     include EmailConcern
 
+    can_dry_run!
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!
