@@ -102,7 +102,7 @@
                     "from": {
                         "kind": "ImageStreamTag",
                         "namespace": "${NAMESPACE}",
-                        "name": "ruby:2.3"
+                        "name": "ruby:4.5"
                     },
                     "env": [{
                         "name": "APP_SECRET_TOKEN",
