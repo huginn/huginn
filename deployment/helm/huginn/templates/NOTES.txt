@@ -8,6 +8,16 @@ Please change the invitation code in the values.yml, and anything else you may h
 Please change the SMTP settings for your email server. Without a correct setting for huginn email won't work, with will cause multiple features to work incorrectly.
 ****************************************
 {{- end }}
+{{- if eq .Values.oauth.twitterOauthKey "fillout" }}
+****************************************
+If you are planning on using the Twitter API or OAuth, please fill out the `oauth.twitter` lines. Otherwise you can ignore this message.
+****************************************
+{{- end }}
+{{- if eq .Values.oauth.githubOauthKey "fillout"
+****************************************
+If you are planning on using the GitHub API or OAuth, please fill out the `oauth.github` lines. Otherwise you can ignore this message.
+****************************************
+{{- end }}
 1. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
 {{- range $host := .Values.ingress.hosts }}

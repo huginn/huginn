@@ -57,6 +57,14 @@ spec:
               value: "{{ .Values.smtp.enableStartttlAuto }}"
             - name: EMAIL_FROM_ADDRESS
               value: "{{ .Values.emailFromAddress }}"
+            - name: TWITTER_OAUTH_KEY
+              value: "{{ .Values.oauth.twitterOauthKey }}"
+            - name: TWITTER_OAUTH_SECRET
+              value: "{{ .Values.oauth.twitterOauthSecret }}"
+            - name: GITHUB_OAUTH_KEY
+              value: "{{ .Values.oauth.githubOauthKey }}"
+            - name: GITHUB_OAUTH_SECRET
+              value: "{{ .Values.oauth.githubOauthSecret }}"
             # - name: REQUIRE_CONFIRMED_EMAIL
             #   value: "{{ .Values.requireConfirmedEmail }}"
             # - name: ALLOW_UNCONFIRMED_ACCESS_FOR

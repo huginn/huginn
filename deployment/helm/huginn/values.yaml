@@ -52,6 +52,14 @@ smtp:
 # Set the email from huginn address
 emailFromAddress: "from_address@gmail.com"
 
+# OAuth Configuration
+# https://github.com/huginn/huginn/wiki/Configuring-OAuth-applications
+
+oauth:
+  twitterOauthKey: "fillout"
+  twitterOauthSecret: "fillout"
+  githubOauthKey: "fillout"
+  githubOauthSecret: "fillout"
 
 #
 # This is pulled from here: https://github.com/huginn/huginn/blob/master/.env.example
