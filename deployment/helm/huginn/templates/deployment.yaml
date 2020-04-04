@@ -41,6 +41,22 @@ spec:
               value: "3306"
             - name: INVITATION_CODE
               value: "{{ .Values.invitationCode }}"
+            - name: SMTP_DOMAIN
+              value: "{{ .Values.smtp.domain }}"
+            - name: SMTP_USER_NAME
+              value: "{{ .Values.smtp.username }}"
+            - name: SMTP_PASSWORD
+              value: "{{ .Values.smtp.password }}"
+            - name: SMTP_SERVER
+              value: "{{ .Values.smtp.server }}"
+            - name: SMTP_PORT
+              value: "{{ .Values.smtp.port }}"
+            - name: SMTP_AUTHENTICATION
+              value: "{{ .Values.smtp.authentication }}"
+            - name: SMTP_ENABLE_STARTTLS_AUTO
+              value: "{{ .Values.smtp.enableStartttlAuto }}"
+            - name: EMAIL_FROM_ADDRESS
+              value: "{{ .Values.emailFromAddress }}"
             # - name: REQUIRE_CONFIRMED_EMAIL
             #   value: "{{ .Values.requireConfirmedEmail }}"
             # - name: ALLOW_UNCONFIRMED_ACCESS_FOR

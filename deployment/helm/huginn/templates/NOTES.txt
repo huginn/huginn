@@ -3,6 +3,11 @@
 Please change the invitation code in the values.yml, and anything else you may have missed.
 ****************************************
 {{- end }}
+{{- if eq .Values.smtp.password "somepassword" }}
+****************************************
+Please change the SMTP settings for your email server. Without a correct setting for huginn email won't work, with will cause multiple features to work incorrectly.
+****************************************
+{{- end }}
 1. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
 {{- range $host := .Values.ingress.hosts }}

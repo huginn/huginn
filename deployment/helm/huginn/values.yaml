@@ -39,6 +39,19 @@ requireConfirmedEmail: true
 # If REQUIRE_CONFIRMED_EMAIL is true, set this to the duration in which a user needs to confirm their email address.
 allowUnconfirmedAccessFor: "1.days"
 
+# Settings for SMTP/email should be set
+smtp:
+  domain: "your-domain-here.com"
+  username: "you@gmail.com"
+  password: "somepassword"
+  server: "smtp.gmail.com"
+  port: "587"
+  authentication: "plain"
+  enableStartttlAuto: true
+
+# Set the email from huginn address
+emailFromAddress: "from_address@gmail.com"
+
 
 #
 # This is pulled from here: https://github.com/huginn/huginn/blob/master/.env.example
