@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Apr 04, 2020   | Upgrade ubuntu versions of docker images to 18.04. [2603](https://github.com/huginn/huginn/pull/2603) **If you are using the `huginn/huginn` image with a internal MySQL database, back up your database volume before updating**  |
 | Mar 31, 2020   | Add FUNDING.yml [2728](https://github.com/huginn/huginn/pull/2728) |
 | Mar 30, 2020   | Improve formatting of OpenShift documentation [2724](https://github.com/huginn/huginn/pull/2724) |
 | Mar 30, 2020   | Fix deployment via OpenShift [2726](https://github.com/huginn/huginn/pull/2726) |

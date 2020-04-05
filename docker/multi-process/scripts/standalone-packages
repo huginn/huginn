@@ -13,7 +13,11 @@ rm -rf /var/log/*
 mkdir -p /var/log/supervisor /var/log/mysql
 chgrp -R 0 /etc/supervisor /var/lib/mysql /var/log/supervisor /var/log/mysql
 chmod -R g=u /etc/supervisor /var/lib/mysql /var/log/supervisor /var/log/mysql
-sed -r -i /etc/mysql/my.cnf \
+sed -r -i /etc/mysql/mysql.conf.d/mysqld.cnf \
     -e 's/^ *user *.+/user=1001/' \
     -e 's#/var/run/mysqld/mysqld.sock#/app/tmp/sockets/mysqld.sock#' \
     -e 's#/var/run/mysqld/mysqld.pid#/app/tmp/pids/mysqld.pid#'
+sed -r -i /etc/mysql/debian.cnf \
+    -e 's#/var/run/mysqld/mysqld.sock#/app/tmp/sockets/mysqld.sock#'
+cp /etc/mysql/debian.cnf /etc/mysql/mysql.conf.d/client.cnf
+chmod 644 /etc/mysql/mysql.conf.d/client.cnf
