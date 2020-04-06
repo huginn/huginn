@@ -120,6 +120,7 @@ gem 'rails', '~> 6.0.2.2'
 gem 'sprockets', '~> 4'
 gem 'rails-html-sanitizer', '~> 1.2'
 gem 'rufus-scheduler', '~> 3.6', require: false
+gem 'fugit', '~> 1.3.4'
 gem 'sass-rails', '>= 6.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
