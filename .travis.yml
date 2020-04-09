@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 sudo: required
 language: ruby
 services:
@@ -8,6 +8,8 @@ services:
 before_install:
   - sudo apt-get -y install jq
   - gem install bundler -v '< 2' --conservative --force
+before_script:
+  - sudo systemctl start postgresql
 env:
   global:
     - APP_SECRET_TOKEN=b2724973fd81c2f4ac0f92ac48eb3f0152c4a11824c122bcf783419a4c51d8b9bba81c8ba6a66c7de599677c7f486242cf819775c433908e77c739c5c8ae118d
@@ -30,9 +32,8 @@ matrix:
     - rvm: 2.6.5
       env: DATABASE_ADAPTER=mysql2 DOCKER_IMAGE=huginn/huginn DOCKERFILE=docker/multi-process/Dockerfile
 rvm:
-- 2.4.9
-- 2.5.7
-- 2.6.5
+  - 2.5.8
+  - 2.6.6
 cache: bundler
 bundler_args: --without development production
 script:

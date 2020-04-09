@@ -94,6 +94,7 @@ describe Agents::S3Agent do
         expect { @checker.check }.to change(Event, :count).by(2)
         expect(Event.last.payload).to eq({"file_pointer" => {"file"=>"test2", "agent_id"=> @checker.id}})
       end
+
     end
 
     context "watching" do
@@ -129,16 +130,25 @@ describe Agents::S3Agent do
           expect { @checker.check }.to change(Event, :count).by(1)
           expect(Event.last.payload).to eq({"file_pointer" => {"file" => "test2", "agent_id"=> @checker.id}, "event_type" => "modified"})
         end
+
         it "emits events for added files" do
           contents = {"test"=>"231232", "test2"=>"4564545", "test3" => "31231231"}
           mock(@checker).get_bucket_contents { contents }
           expect { @checker.check }.to change(Event, :count).by(1)
           expect(Event.last.payload).to eq({"file_pointer" => {"file" => "test3", "agent_id"=> @checker.id}, "event_type" => "added"})
         end
+
+        it 'does not choke if the memory was cleared' do
+          contents = {"test"=>"231232"}
+          @checker.memory = {}
+          mock(@checker).get_bucket_contents { contents }
+          expect { @checker.check }.not_to raise_error
+        end
       end
 
       context "error handling" do
         it "handles AccessDenied exceptions" do
+          @checker.options['watch'] = 'false'
           mock(@checker).get_bucket_contents { raise Aws::S3::Errors::AccessDenied.new('', '') }
           expect { @checker.check }.to change(AgentLog, :count).by(1)
           expect(AgentLog.last.message).to eq("Could not access 'testbucket' Aws::S3::Errors::AccessDenied ")

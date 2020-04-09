@@ -8,11 +8,11 @@ Gem::Specification.new "dotenv", Dotenv::VERSION do |gem|
   gem.homepage      = "https://github.com/bkeepers/dotenv"
   gem.license       = "MIT"
 
-  gem.files         = `git ls-files README.md LICENSE lib bin | grep -v rails`
-    .split($OUTPUT_RECORD_SEPARATOR)
-  gem.executables   = gem.files.grep(/^bin\//).map { |f| File.basename(f) }
+  gem_files         = `git ls-files README.md LICENSE lib bin | grep -v rails`
+  gem.files         = gem_files.split($OUTPUT_RECORD_SEPARATOR)
+  gem.executables = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
 
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec"
-  gem.add_development_dependency "rubocop"
+  gem.add_development_dependency "rubocop", "~>0.40.0"
 end

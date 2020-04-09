@@ -70,6 +70,11 @@ describe LiquidMigrator do
   end
 
   describe "migrating an actual agent" do
+    class Agents::LiquidMigratorAgent < Agent
+      TYPES = %w[Agents::LiquidMigratorAgent]
+      cannot_be_scheduled!
+    end
+
     before do
       valid_params = {
                         'auth_token' => 'token',
@@ -85,7 +90,7 @@ describe LiquidMigrator do
                         'color_path' => '',
                       }
 
-      @agent = Agents::HipchatAgent.new(:name => "somename", :options => valid_params)
+      @agent = Agents::LiquidMigratorAgent.new(:name => "somename", :options => valid_params)
       @agent.user = users(:jane)
       @agent.save!
     end

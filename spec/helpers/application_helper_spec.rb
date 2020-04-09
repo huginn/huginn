@@ -142,14 +142,14 @@ describe ApplicationHelper do
     it 'returns a correct icon tag for Twitter' do
       icon = omniauth_provider_icon(:twitter)
       expect(icon).to be_html_safe
-      elem = Nokogiri(icon).at('i.fa.fa-twitter')
+      elem = Nokogiri(icon).at('i.fab.fa-twitter')
       expect(elem).to be_a Nokogiri::XML::Element
     end
 
     it 'returns a correct icon tag for GitHub' do
       icon = omniauth_provider_icon(:github)
       expect(icon).to be_html_safe
-      elem = Nokogiri(icon).at('i.fa.fa-github')
+      elem = Nokogiri(icon).at('i.fab.fa-github')
       expect(elem).to be_a Nokogiri::XML::Element
     end
 

@@ -4,4 +4,4 @@ task :dotenv do
   Dotenv.load
 end
 
-task :environment => :dotenv
+task environment: :dotenv

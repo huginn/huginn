@@ -11,6 +11,7 @@ Capybara.register_driver :poltergeist do |app|
 end
 
 Capybara.javascript_driver = :poltergeist
+Capybara.server = :webrick
 Capybara.default_max_wait_time = CAPYBARA_TIMEOUT
 
 Capybara::Screenshot.prune_strategy = { keep: 3 }

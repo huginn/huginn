@@ -6,16 +6,17 @@
   &.asc:after, &.desc:after {
     text-decoration: none;
     position: absolute;
-    top: 0;
     right: -1em;
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
   }
 
   &.asc:after {
+    top: 3px;
     content: '\f0de'; //fa-sort-asc
   }
 
   &.desc:after {
+    top: -3px;
     content: '\f0dd'; //fa-sort-desc
   }
 }

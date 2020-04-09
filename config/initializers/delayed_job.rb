@@ -10,7 +10,7 @@ Delayed::Worker.logger = Rails.logger
 # Delayed::Worker.logger = Logger.new(Rails.root.join('log', 'delayed_job.log'))
 # Delayed::Worker.logger.level = Logger::DEBUG
 
-ActiveSupport.on_load(:delayed_job_active_record) do
+Huginn::Application.config.after_initialize do
   class Delayed::Job
     scope :pending, -> { where("locked_at IS NULL AND attempts = 0") }
     scope :awaiting_retry, -> { where("failed_at IS NULL AND attempts > 0 AND locked_at IS NULL") }
