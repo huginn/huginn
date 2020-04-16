@@ -2,7 +2,7 @@
 
 You can also use [Capistrano](./capistrano.md) to keep your installation up to date.
 
-### 0. Ensure depencies are up to date
+### 0. Ensure dependencies are up to date
 
 ```
 cd /home/huginn/huginn
