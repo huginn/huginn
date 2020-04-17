@@ -80,7 +80,8 @@ Download Ruby and compile it:
 
 Install the bundler and foreman gems:
 
-    sudo gem install rake bundler foreman --no-document
+    sudo gem install rake foreman --no-document
+    sudo gem install bundler:"~> 1"  --no-document
 
 Update rubygems:
 
