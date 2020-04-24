@@ -31,13 +31,29 @@ class Service < ActiveRecord::Base
     end
   end
 
+  def refresh_token_parameters
+    case provider
+    when  '37signals'
+      {
+        type:          'refresh',
+        client_id:     oauth_key,
+        client_secret: oauth_secret,
+        refresh_token: refresh_token
+      }
+    else
+      # Paramters required by standard compliant OAuth2 providers,
+      # including Google
+      {
+        grant_type: 'refresh_token',
+        client_id:     oauth_key,
+        client_secret: oauth_secret,
+        refresh_token: refresh_token
+      }
+    end
+  end
+
   def refresh_token!
-    response = HTTParty.post(endpoint, query: {
-                  type:          'refresh',
-                  client_id:     oauth_key,
-                  client_secret: oauth_secret,
-                  refresh_token: refresh_token
-    })
+    response = HTTParty.post(endpoint, query: refresh_token_parameters)
     data = JSON.parse(response.body)
     update(expires_at: Time.now + data['expires_in'], token: data['access_token'], refresh_token: data['refresh_token'].presence || refresh_token)
   end
