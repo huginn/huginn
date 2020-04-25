@@ -132,6 +132,9 @@ Grant the Huginn user necessary permissions on the database
 
     mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, LOCK TABLES ON `huginn_production`.* TO 'huginn'@'localhost';
 
+Use the flush privileges command to save the new permissions
+    mysql> FLUSH PRIVILEGES;
+
 Quit the database session
 
     mysql> \q
