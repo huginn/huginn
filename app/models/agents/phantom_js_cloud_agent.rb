@@ -27,7 +27,7 @@ module Agents
       * `Url` - The url to render
       * `Mode` - Create a new `clean` event or `merge` old payload with new values (default: `clean`)
       * `Render type` - Render as html, plain text without html tags, or jpg as screenshot of the page (default: `html`)
-      * `Output as json` - Return the page conents and metadata as a JSON object (default: `false`)
+      * `Output as json` - Return the page contents and metadata as a JSON object (default: `false`)
       * `Ignore images` - Skip loading of inlined images (default: `false`)
       * `Url agent` - A custom User-Agent name (default: `#{default_user_agent}`)
       * `Wait interval` - Milliseconds to delay rendering after the last resource is finished loading.
