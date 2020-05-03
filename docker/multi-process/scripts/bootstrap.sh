@@ -12,7 +12,7 @@ if [ "${START_MYSQL}" = "true" ]; then
 
   # initialize MySQL data directory
   if [ ! -d /var/lib/mysql/mysql ]; then
-    mysql_install_db --admin-auth-plugin=mysql_native_password --insecure --user=$(whoami) --datadir=/tmp/mysql
+    mysqld --initialize-insecure --user=$(whoami) --datadir=/tmp/mysql
     mv -f /tmp/mysql/* /var/lib/mysql/
   fi
 
