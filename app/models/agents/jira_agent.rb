@@ -16,8 +16,9 @@ module Agents
       - `jira_url` specifies the full URL of the jira installation, including https://
       - `jql` is an optional Jira Query Language-based filter to limit the flow of events. See [JQL Docs](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) for details. 
       - `username` and `password` are optional, and may need to be specified if your Jira instance is read-protected
+        - *Note*: Using your Jira `password` is no longer supported in Jira Cloud. You must use an [API token](https://id.atlassian.com/manage-profile/security/api-tokens) as your password.
       - `timeout` is an optional parameter that specifies how long the request processing may take in minutes.
-
+      - The issue's `changelog` is now returned with this Agent.
       The agent does periodic queries and emits the events containing the updated issues in JSON format.
 
       NOTE: upon the first execution, the agent will fetch everything available by the JQL query. So if it's not desirable, limit the `jql` query by date.
@@ -84,7 +85,7 @@ module Agents
 
   private
     def request_url(jql, start_at)
-      "#{interpolated[:jira_url]}/rest/api/2/search?jql=#{CGI::escape(jql)}&fields=*all&startAt=#{start_at}"
+      "#{interpolated[:jira_url]}/rest/api/2/search?jql=#{CGI::escape(jql)}&expand=changelog&fields=*all&startAt=#{start_at}"
     end
 
     def request_options
