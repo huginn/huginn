@@ -29,6 +29,8 @@ module WebRequestConcern
         case @unzip
         when 'gzip'.freeze
           body.replace(ActiveSupport::Gzip.decompress(body))
+        when 'deflate'.freeze
+          body.replace(Zlib::Inflate.inflate(body))
         end
 
         case
