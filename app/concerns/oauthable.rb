@@ -3,11 +3,17 @@ module Oauthable
 
   included do |base|
     @valid_oauth_providers = :all
-    validates_presence_of :service_id
+    validate :validate_service
   end
 
   def oauthable?
     true
+  end
+
+  def validate_service
+    if !service
+      errors.add(:service, :blank)
+    end
   end
 
   def valid_services_for(user)

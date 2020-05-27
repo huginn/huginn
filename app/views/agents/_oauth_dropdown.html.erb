@@ -1,6 +1,6 @@
 <% if agent.try(:oauthable?) %>
   <div class="form-group type-select">
     <%= label_tag :service %>
-    <%= select_tag 'agent[service_id]', options_for_select(agent.valid_services_for(current_user).collect { |s| [service_label_text(s), s.id] }, agent.service_id), class: 'form-control' %>
+    <%= select_tag 'agent[service_id]', options_for_select(agent.valid_services_for(current_user).collect { |s| [service_label_text(s), s.id] }, agent.service_id), include_blank: true, class: 'form-control' %>
   </div>
 <% end %>
