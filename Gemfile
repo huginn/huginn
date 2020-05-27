@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '>=2.4.0'
+ruby '>=2.5.0'
 
 # Ensure github repositories are fetched using HTTPS
 git_source(:github) do |repo_name|
@@ -34,7 +34,7 @@ gem 'ruby-growl', '~> 4.1.0'      # GrowlAgent
 gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
 gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'erector', github: 'dsander/erector', branch: 'fix-fixnum-warning'
+gem 'erector', github: 'dsander/erector', branch: 'rails6'
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'mini_racer', '~> 0.2.4'      # JavaScriptAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
@@ -91,11 +91,11 @@ end
 gem 'ace-rails-ap', '~> 2.0.1'
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
-gem 'coffee-rails', '~> 4.2'
+gem 'coffee-rails', '~> 5'
 gem 'daemons', '~> 1.1.9'
-gem 'delayed_job', '~> 4.1.5'
-gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails52'
-gem 'devise', '~> 4.6.2'
+gem 'delayed_job', '~> 4.1.8'
+gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails6-zeitwerk'
+gem 'devise', '~> 4.7.1'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9'
 gem 'faraday_middleware', '~> 0.12.2'
@@ -118,17 +118,17 @@ gem 'mini_magick', ">= 4.9.4"
 gem 'multi_xml'
 gem "nokogiri", ">= 1.10.8"
 gem 'omniauth', '~> 1.6.1'
-gem 'rails', '~> 5.2.0'
+gem 'rails', '~> 6.0.3.1'
 gem 'sprockets', '~> 3.7.2'
-gem 'rails-html-sanitizer', '~> 1.0.4'
+gem 'rails-html-sanitizer', '~> 1.2'
 gem 'rufus-scheduler', '~> 3.4.2', require: false
-gem 'sass-rails', '~> 5.0'
+gem 'sass-rails', '>= 6.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
 gem 'execjs', '~> 2.7.0'
 gem 'typhoeus', '~> 1.3.1'
 gem 'uglifier', '~> 2.7.2'
-gem 'bootsnap', '>= 1.1.0', require: false
+gem 'bootsnap', '~> 1.4.4', require: false
 
 group :development do
   gem 'better_errors', '~> 1.1'
@@ -151,7 +151,7 @@ group :development do
   end
 
   group :test do
-    gem 'coveralls', '~> 0.8.12', require: false
+    gem 'coveralls', '~> 0.8.23', require: false
     gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
     gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76', require: false
@@ -159,9 +159,9 @@ group :development do
     gem 'pry-rails'
     gem 'pry-byebug'
     gem 'rr'
-    gem 'rspec', '~> 3.7'
+    gem 'rspec', '~> 3.8'
+    gem 'rspec-rails'
     gem 'rspec-collection_matchers', '~> 1.1.0'
-    gem 'rspec-rails', '~> 3.7'
     gem 'rspec-html-matchers', '~> 0.8'
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'

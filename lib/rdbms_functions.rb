@@ -1,4 +1,4 @@
-module RDBMSFunctions
+module RdbmsFunctions
   def rdbms_date_add(source, unit, amount)
     adapter_type = ActiveRecord::Base.connection.adapter_name.downcase.to_sym
     case adapter_type

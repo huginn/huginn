@@ -172,7 +172,7 @@ class AgentsController < ApplicationController
     @agent = current_user.agents.find(params[:id])
 
     respond_to do |format|
-      if @agent.update_attributes(agent_params)
+      if @agent.update(agent_params)
         format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
