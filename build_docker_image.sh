@@ -1,8 +1,6 @@
 #!/bin/bash
 set -ev
 
-docker pull $DOCKER_IMAGE
-
 bin/docker_wrapper build -t $DOCKER_IMAGE -f $DOCKERFILE .
 
 if [[ -n "${DOCKER_USER}" && "${TRAVIS_PULL_REQUEST}" = 'false' && "${TRAVIS_BRANCH}" = "master" ]]; then
