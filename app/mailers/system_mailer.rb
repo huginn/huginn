@@ -6,6 +6,11 @@ class SystemMailer < ActionMailer::Base
     @headline = options[:headline]
     @body = options[:body]
 
+    if options[:attachment] and !options[:attachment].empty? and File.file?(options[:attachment])
+      filename = File.basename(options[:attachment])
+      attachments[filename] = File.read(options[:attachment])
+    end
+
     mail_options = { to: options[:to], subject: options[:subject] }
     mail_options[:from] = options[:from] if options[:from].present?
     if options[:content_type].present?
