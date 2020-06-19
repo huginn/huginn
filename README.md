@@ -152,6 +152,10 @@ Note, Wunderground no longer offers free API keys. You can still use the Weather
 
 We assume your deployment will run over SSL. This is a very good idea! However, if you wish to turn this off, you'll probably need to edit `config/initializers/devise.rb` and modify the line containing `config.rememberable_options = { :secure => true }`.  You will also need to edit `config/environments/production.rb` and modify the value of `config.force_ssl`.
 
+#### Using Email Agent with Gmail and 2-Step-Verification
+
+If you'd like to use the Email Agent with Gmail but your account has 2-Step-Verification enabled, you'll need to [create an App Password](https://support.google.com/accounts/answer/185833) and set SMTP_PASSWORD to the generated value.
+
 ## License
 
 Huginn is provided under the MIT License.
