@@ -95,7 +95,7 @@ Huginn::Application.configure do
   end
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.delivery_method = ENV.fetch('SMTP_DELIVERY_METHOD', 'smtp').to_sym
   config.action_mailer.perform_caching = false
   # smtp_settings moved to config/initializers/action_mailer.rb
 end
