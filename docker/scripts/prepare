@@ -16,7 +16,7 @@ EOF
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
 
-CLEAR_DOCKER_CACHE=2018-08-07
+CLEAR_DOCKER_CACHE=2020-05-28
 
 minimal_apt_get_install='apt-get install -y --no-install-recommends'
 
@@ -28,15 +28,15 @@ apt-get update
 $minimal_apt_get_install build-essential checkinstall git-core \
   zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev \
   libncurses5-dev libffi-dev libxml2-dev libxslt-dev curl libcurl4-openssl-dev libicu-dev \
-  graphviz libgraphviz-dev \
-  libmysqlclient-dev libpq-dev libsqlite3-dev \
-  ruby2.5 ruby2.5-dev
+  graphviz libmysqlclient-dev libpq-dev libsqlite3-dev \
+  ruby2.5 ruby2.5-dev locales tzdata iputils-ping
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 gem install --no-document bundler -v 1.17.3
 
 apt-get purge -y python3* rsyslog rsync manpages
 apt-get -y clean
+apt-get -y autoremove
 rm -rf /var/lib/apt/lists/*
 rm -rf /usr/share/doc/
 rm -rf /usr/share/man/

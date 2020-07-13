@@ -54,7 +54,7 @@ module Agents
           end
 
           if boolify(interpolated['receive_text'])
-            message = message.slice 0..160
+            message = message.slice 0..1600
             send_message message
           end
         end

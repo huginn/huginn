@@ -1,5 +1,5 @@
 module Utils
-  module HTMLTransformer
+  module HtmlTransformer
     SINGLE = 1
     MULTIPLE = 2
     COMMA_SEPARATED = 3

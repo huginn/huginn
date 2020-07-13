@@ -72,7 +72,7 @@ describe Agents::EmailAgent do
     end
 
     it "can take body option for selecting the resulting email's body" do
-      @checker.update_attributes :options => @checker.options.merge({
+      @checker.update :options => @checker.options.merge({
         'subject' => '{{foo.subject}}',
         'body' => '{{some_html}}'
       })
@@ -92,7 +92,7 @@ describe Agents::EmailAgent do
     end
 
     it "can take content type option to set content type of email sent" do
-      @checker.update_attributes :options => @checker.options.merge({
+      @checker.update :options => @checker.options.merge({
         'content_type' => 'text/plain'
       })
 

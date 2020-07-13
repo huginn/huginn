@@ -88,7 +88,7 @@ class ScenariosController < ApplicationController
     @scenario = current_user.scenarios.find(params[:id])
 
     respond_to do |format|
-      if @scenario.update_attributes(scenario_params)
+      if @scenario.update(scenario_params)
         format.html { redirect_to @scenario, notice: 'This Scenario was successfully updated.' }
         format.json { head :no_content }
       else

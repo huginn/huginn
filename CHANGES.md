@@ -2,11 +2,35 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Apr 04, 2020   | Upgrade ubuntu versions of docker images to 18.04. [2603](https://github.com/huginn/huginn/pull/2603) **If you are using the `huginn/huginn` image with a internal MySQL database, back up your database volume before updating**  |
+| Mar 31, 2020   | Add FUNDING.yml [2728](https://github.com/huginn/huginn/pull/2728) |
+| Mar 30, 2020   | Improve formatting of OpenShift documentation [2724](https://github.com/huginn/huginn/pull/2724) |
+| Mar 30, 2020   | Fix deployment via OpenShift [2726](https://github.com/huginn/huginn/pull/2726) |
+| Mar 29, 2020   | Fix UserLocationAgent never displayed the course of the user [2709](https://github.com/huginn/huginn/pull/2709) |
+| Mar 29, 2020   | Allow email agent to dry run [2706](https://github.com/huginn/huginn/pull/2706) |
+| Feb 29, 2020   | Allow slack agent to dry run [2694](https://github.com/huginn/huginn/pull/2694) |
+| Feb 29, 2020   | Upgrade rake and nokogiri to fix CVEs [2698](https://github.com/huginn/huginn/pull/2698) |
+| Feb 16, 2020   | Simplify the download of the latest version of jq [2683](https://github.com/huginn/huginn/pull/2683) |
+| Feb 11, 2020   | Make sure to download the latest release of jq from GitHub [2681](https://github.com/huginn/huginn/pull/2681) |
+| Feb 06, 2020   | Install the latest jq for JqAgent [2675](https://github.com/huginn/huginn/pull/2675) |
 | Jan 11, 2020   | Drop support for Ruby 2.3 which reached EOL |
 | Jan 11, 2020   | Add Jq Agent [2665](https://github.com/huginn/huginn/pull/2665) |
+| Jan 10, 2020   | Update README.md about dockers images, adds details about seeding [2669](https://github.com/huginn/huginn/pull/2669) |
+| Jan 09, 2020   | Upgrade mini-racer to 0.2.9 and libv8 to 7.3.492.27.1 [2664](https://github.com/huginn/huginn/pull/2664) |
+| Jan 07, 2020   | Allow Agents injected as GEMs to define a UI [2659](https://github.com/huginn/huginn/pull/2659) |
 | Dec 19, 2019   | Upgrade rack to 2.0.8 to fix CVE [2651](https://github.com/huginn/huginn/pull/2651) |
+| Dec 19, 2019   | Fix TravisCI build [2650](https://github.com/huginn/huginn/pull/2650) |
+| Dec 18, 2019   | Fix link to andrewcurioso/huginn [2647](https://github.com/huginn/huginn/pull/2647) |
+| Dec 14, 2019   | Sql installation info [2646](https://github.com/huginn/huginn/pull/2646) |
+| Dec 14, 2019   | FIX broken link to docker container [2645](https://github.com/huginn/huginn/pull/2645) |
+| Dec 13, 2019   | fix: password prompt at sql secure step [2643](https://github.com/huginn/huginn/pull/2643) |
 | Dec 08, 2019   | Allow dry-run of PushoverAgent [2640](https://github.com/huginn/huginn/pull/2640) |
+| Dec 03, 2019   | Prevent `GoogleCalendar.open` from raising exception in ensure block [2634](https://github.com/huginn/huginn/pull/2634) |
+| Dec 03, 2019   | Upgrade rubies to the latest minor releases [2630](https://github.com/huginn/huginn/pull/2630) |
 | Nov 27, 2019   | Upgrade Feedjira to 3.1.0 that improves RssAgent [2629](https://github.com/huginn/huginn/pull/2629) |
+| Nov 16, 2019   | email is the plural of email [2623](https://github.com/huginn/huginn/pull/2623) |
+| Nov 10, 2019   | Upgrade loofah and nokogiri [2621](https://github.com/huginn/huginn/pull/2621) |
+| Oct 06, 2019   | Escape MySQL database name during migration [2608](https://github.com/huginn/huginn/pull/2608) |
 | Oct 03, 2019   | Upgrade typhoeus to fix obscure error SSL validation error [2602](https://github.com/huginn/huginn/pull/2602) |
 | Sep 14, 2019   | Do not sanitize `@body` in a text part in EmailAgent [2595](https://github.com/huginn/huginn/pull/2595) |
 | Aug 25, 2019   | Make JavaScript Agent optional [2590](https://github.com/huginn/huginn/pull/2590) |

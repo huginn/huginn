@@ -29,7 +29,7 @@ Join us in our [Gitter room](https://gitter.im/huginn/huginn) to discuss the pro
 
 ### Join us!
 
-Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, [add new Agents](https://github.com/huginn/huginn/wiki/Creating-a-new-agent), write [documentation and tutorials](https://github.com/huginn/huginn/wiki), or try tackling [issues tagged with #help-wanted](https://github.com/huginn/huginn/issues?direction=desc&labels=help-wanted&page=1&sort=created&state=open).  Please fork, add specs, and send pull requests!
+Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, [add new Agents](https://github.com/huginn/huginn/wiki/Creating-a-new-agent), write [documentation and tutorials](https://github.com/huginn/huginn/wiki), or try tackling [issues tagged with #"help wanted"](https://github.com/huginn/huginn/issues?direction=desc&labels=help+wanted&page=1&sort=created&state=open).  Please fork, add specs, and send pull requests!
 
 Really want a fix or feature? Want to solve some community issues and earn some extra coffee money? Take a look at the [current bounties on Bountysource](https://www.bountysource.com/trackers/282580-huginn).
 
@@ -110,11 +110,27 @@ Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](h
 
 Huginn launches on the free version of Heroku [with significant limitations](https://github.com/huginn/huginn/blob/master/doc/heroku/install.md). For non-experimental use, we strongly recommend Heroku's 1GB paid plan or our Docker container.
 
-### OpenShift Online (v3)
+### OpenShift
 
-Try Huginn on OpenShift Online (v3): `oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-mysql.json` or `oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-postgresql.json`. You can also use the web console to import either json file by going to "Add to Project" -> "Import YAML/JSON".
+#### OpenShift v3
+
+Try Huginn on OpenShift Online (v3)
+
+Create a new app with either `mysql` or `postgres`:
+```bash
+oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-mysql.json
+```
+or
+```bash
+oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/templates/huginn-postgresql.json
+```
+**Note**: You can also use the web console to import either json file by going to "Add to Project" -> "Import YAML/JSON".
 
 If you are on the Starter plan, make sure to follow the [guide](https://docs.openshift.com/online/getting_started/beyond_the_basics.html#btb-creating-a-new-application-from-source-code) to remove any existing application.
+
+##### OpenShift v4
+
+If you would like to run this on OpenShift v4+ you should look at the [Docker](https://github.com/huginn/huginn/blob/master/doc/docker/install.md) documentaition as your deployment process.
 
 ### Manual installation on any server
 

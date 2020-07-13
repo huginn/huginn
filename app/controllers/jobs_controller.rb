@@ -29,7 +29,7 @@ class JobsController < ApplicationController
     @job.last_error = nil
 
     respond_to do |format|
-      if !running? && @job.update_attributes!(run_at: Time.now, failed_at: nil)
+      if !running? && @job.update!(run_at: Time.now, failed_at: nil)
         format.html { redirect_to jobs_path, notice: "Job enqueued." }
         format.json { render json: @job, status: :ok }
       else
