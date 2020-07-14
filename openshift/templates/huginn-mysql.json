@@ -96,13 +96,18 @@
                 },
                 "contextDir": "${CONTEXT_DIR}"
             },
+	    "resources":{
+	      "limits":{
+		"memory": "${BUILD_MEMORY_LIMIT}"
+	      }
+	    },
             "strategy": {
                 "type": "Source",
                 "sourceStrategy": {
                     "from": {
                         "kind": "ImageStreamTag",
                         "namespace": "${NAMESPACE}",
-                        "name": "ruby:4.5"
+                        "name": "ruby:2.5"
                     },
                     "env": [{
                         "name": "APP_SECRET_TOKEN",
@@ -591,13 +596,19 @@
         "name": "MEMORY_LIMIT",
         "displayName": "Memory Limit",
         "description": "Maximum amount of memory the Huginn container can use.",
-        "value": "512Mi",
+        "value": "1Gi",
         "required": true
     }, {
         "name": "MEMORY_MYSQL_LIMIT",
         "displayName": "Memory Limit (MySQL)",
         "description": "Maximum amount of memory the MySQL container can use.",
         "value": "512Mi",
+        "required": true
+    }, {
+        "name": "BUILD_MEMORY_LIMIT",
+        "displayName": "Memory Limit",
+        "description": "Maximum amount of memory the Build container can use.",
+        "value": "1024Mi",
         "required": true
     }, {
         "name": "VOLUME_CAPACITY",
