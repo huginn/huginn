@@ -53,7 +53,16 @@ module Agents
     end
 
     def receive_web_request(request)
-      params = request.params.except(:action, :controller, :agent_id, :user_id, :format)
+      # check the secret
+      secret = request.path_parameters[:secret]
+      return ["Not Authorized", 401] unless secret == interpolated['secret']
+
+      params = request.query_parameters.dup
+      begin
+        params.update(request.request_parameters)
+      rescue EOFError
+      end
+
       method = request.method_symbol.to_s
       headers = request.headers.each_with_object({}) { |(name, value), hash|
         case name
@@ -61,10 +70,6 @@ module Agents
           hash[$1.tr('_', '-').gsub(/[^-]+/, &:capitalize)] = value
         end
       }
-
-      # check the secret
-      secret = params.delete('secret')
-      return ["Not Authorized", 401] unless secret == interpolated['secret']
 
       # check the verbs
       verbs = (interpolated['verbs'] || 'post').split(/,/).map { |x| x.strip.downcase }.select { |x| x.present? }
