@@ -36,7 +36,7 @@
       </form>
       
       <li class='job-indicator' role='pending'>
-        <%= link_to current_user.admin? ? jobs_path : '#', class: '.d-block' do %>
+        <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><%= icon_tag('glyphicon-refresh', class: 'icon-white') %> <span class='number'>0</span></span>
         <% end %>
       </li>
