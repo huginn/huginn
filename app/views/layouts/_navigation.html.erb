@@ -41,7 +41,7 @@
         <% end %>
       </li>
       <li class='job-indicator' role='awaiting_retry'>
-        <%= link_to current_user.admin? ? jobs_path : '#', class: '.d-block' do %>
+        <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><%= icon_tag('glyphicon-question-sign', class: 'icon-yellow') %> <span class='number'>0</span></span>
         <% end %>
       </li>
