@@ -915,6 +915,7 @@ describe Agent do
 
     it "should drop pending events while the agent was disabled when set to true" do
       agent1 = agents(:bob_weather_agent)
+      stub.any_instance_of(Agents::TriggerAgent).matches? {true}
       agent2 = agents(:bob_rain_notifier_agent)
 
       expect {
@@ -922,7 +923,7 @@ describe Agent do
           Agent.async_check(agent1.id)
           Agent.receive!
         }.to change { agent1.events.count }.by(1)
-      }.to change { agent2.events.count }.by(0)
+      }.to change { agent2.events.count }.by(1)
 
       agent2.disabled = true
       agent2.save!
