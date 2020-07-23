@@ -89,8 +89,8 @@ module Agents
       interpolated["language"].presence || "en"
     end
 
-    def dark_sky?
-      interpolated["service"].presence && interpolated["service"].presence.downcase == "dark_sky"
+    def darksky?
+      interpolated["service"].presence && interpolated["service"].presence.downcase == "darksky"
     end
 
     def wunderground? 
@@ -131,7 +131,7 @@ module Agents
     end
 
     def validate_options
-      errors.add(:base, "The DarkSky API has been disabled since Aug 1st, 2020; please switch to OpenWeather.") if dark_sky?
+      errors.add(:base, "The DarkSky API has been disabled since Aug 1st, 2020; please switch to OpenWeather.") if darksky?
       errors.add(:base, "The Weather Underground API has been disabled since Jan 1st 2018; please switch to OpenWeather.") if wunderground?
       validate_location
       errors.add(:base, "api_key is required") unless interpolated['api_key'].present?
