@@ -268,10 +268,6 @@ GEM
     ffi (1.12.2)
     font-awesome-sass (4.7.0)
       sass (>= 3.2)
-    forecast_io (2.0.1)
-      faraday
-      hashie
-      multi_json
     foreman (0.63.0)
       dotenv (>= 0.7)
       thor (>= 0.13.6)
@@ -714,7 +710,6 @@ DEPENDENCIES
   feedjira (~> 3.1)
   ffi (>= 1.9.4)
   font-awesome-sass (~> 4.7.0)
-  forecast_io (~> 2.0.0)
   foreman (~> 0.63.0)
   geokit (~> 1.8.4)
   geokit-rails (~> 2.2.0)
