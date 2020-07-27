@@ -134,12 +134,12 @@ module Agents
             send_message field, configure_params(field => message.strip) unless message.strip.blank?
           end
         else
-          caption_array = params[:caption].scan(/\G(?:\w{1024}|.{1,1024}(?=\b|\z))/m)
-          params[:caption] = caption_array.first.strip
+          caption_array = Array(params[:caption]&.scan(/\G(?:\w{1024}|.{1,1024}(?=\b|\z))/m))
+          params[:caption] = caption_array.shift&.strip
           send_message field, params
-          caption_array.drop(1).each do |caption|
+          caption_array.each do |caption|
             send_message(:text, configure_params(text: caption.strip)) unless caption.strip.blank?
-            end
+          end
         end
       else
         params[:caption] = params[:caption][0..1023] if params[:caption]
