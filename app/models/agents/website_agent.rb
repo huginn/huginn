@@ -27,6 +27,17 @@ module Agents
       * Alternatively, set `data_from_event` to a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
 
+      ### HTTP Request Configuration
+      By default the underlying network library ([farady](https://lostisland.github.io/faraday/usage/))
+      will perform a GET request for the `url` with no headers. This behavior
+      can be modified through the following options:
+
+      * `http_verb` - request type (e.g. `post`, `put`, `delete`)
+      * `headers` - hash of strings (e.g., `"content-type" => "application/json"`)
+      * `post_data` - body in `post` requests, if a string it will be used
+        as is, if a hash it will be transformed to JSON and the appropriate
+        `content-type` header will be added.
+
       # Supported Document Types
 
       The `type` value can be `xml`, `html`, `json`, or `text`.
@@ -392,9 +403,19 @@ module Agents
         error "Ignoring a non-HTTP url: #{url.inspect}"
         return
       end
-      uri = Utils.normalize_uri(url)
-      log "Fetching #{uri}"
-      response = faraday.get(uri)
+
+      uri     = Utils.normalize_uri(url)
+      verb    = (interpolated['http_verb'] || 'get').strip.downcase
+      headers = interpolated['headers'] || {}
+      data    = interpolated['post_data'] || {}
+
+      if data.is_a?(Hash) && data.any?
+        headers['content-type'] ||= 'application/json'
+        data = data.to_json
+      end
+
+      log "Fetching #{uri} via #{verb.upcase} with data=#{data} and headers=#{headers.to_json}"
+      response = faraday.send(verb, uri, data, headers)
 
       raise "Failed: #{response.inspect}" unless consider_response_successful?(response)
 

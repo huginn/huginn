@@ -98,7 +98,7 @@ describe Agents::DryRunsController do
         [users(:bob).agents.count, users(:bob).events.count, users(:bob).logs.count, agent.name, agent.updated_at]
       }
       results = assigns(:results)
-      expect(results[:log]).to match(/^\[\d\d:\d\d:\d\d\] INFO -- : Fetching #{Regexp.quote(url_from_event)}$/)
+      expect(results[:log]).to match(/^\[\d\d:\d\d:\d\d\] INFO -- : Fetching #{Regexp.quote(url_from_event)}/)
     end
 
     it "uses the memory of an existing Agent" do
