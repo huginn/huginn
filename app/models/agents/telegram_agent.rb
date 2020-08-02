@@ -130,16 +130,17 @@ module Agents
     def send_telegram_messages(field, params)
       if interpolated['long_message'] == 'split'
         if field == :text
-          params[:text].scan(/\G(?:\w{4096}|.{1,4096}(?=\b|\z))/m) do |message|
-            send_message field, configure_params(field => message.strip) unless message.strip.blank?
+          params[:text].scan(/\G\s*(?:\w{4096}|.{1,4096}(?=\b|\z))/m) do |message|
+            message.strip!
+            send_message field, configure_params(field => message) unless message.blank?
           end
         else
-          caption_array = params[:caption].scan(/\G(?:\w{1024}|.{1,1024}(?=\b|\z))/m)
-          params[:caption] = caption_array.first.strip
+          caption_array = (params[:caption].presence || '').scan(/\G\s*\K(?:\w{1024}|.{1,1024}(?=\b|\z))/m).map(&:strip)
+          params[:caption] = caption_array.shift
           send_message field, params
-          caption_array.drop(1).each do |caption|
-            send_message(:text, configure_params(text: caption.strip)) unless caption.strip.blank?
-            end
+          caption_array.each do |caption|
+            send_message(:text, configure_params(text: caption)) unless caption.blank?
+          end
         end
       else
         params[:caption] = params[:caption][0..1023] if params[:caption]

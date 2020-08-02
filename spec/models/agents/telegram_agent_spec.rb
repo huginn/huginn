@@ -120,6 +120,11 @@ describe Agents::TelegramAgent do
       expect(@sent_messages).to eq([{ photo: { chat_id: 'xxxxxxxx', photo: 'https://example.com/image.png' } }])
     end
 
+    it 'accepts photo key with no caption when long:split is set' do
+      event = event_with_payload photo: 'https://example.com/image.png', long: 'split', caption: nil
+      @checker.receive [event]
+    end
+
     it 'accepts video key and uses :send_video to send the file' do
       event = event_with_payload video: 'https://example.com/video.avi'
       @checker.receive [event]
