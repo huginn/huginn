@@ -60,7 +60,7 @@ module Agents
     def check
       window = interpolated['window_duration_in_days'].to_f.days.ago
       if memory['newest_event_created_at'].present? && Time.at(memory['newest_event_created_at']) < window
-        if !memory['alerted_at'] || (interpolated['alert_on_every_run'].present? && interpolated['alert_on_every_run'] == "true")
+        if !memory['alerted_at'] || (interpolated['alert_on_every_run'].present? && boolify(interpolated['alert_on_every_run']))
           memory['alerted_at'] = Time.now.to_i
           create_event payload: { message: interpolated['message'],
                                   gap_started_at: memory['newest_event_created_at'] }
