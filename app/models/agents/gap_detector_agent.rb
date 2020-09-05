@@ -5,7 +5,7 @@ module Agents
     description <<-MD
       The Gap Detector Agent will watch for holes or gaps in a stream of incoming Events and generate "no data alerts".
 
-      The `value_path` values is a [JSONPath](http://goessner.net/articles/JsonPath/) to a value of interest. If either
+      The `value_path` value is a [JSONPath](http://goessner.net/articles/JsonPath/) to a value of interest. If either
       this value is empty, or no Events are received, during `window_duration_in_days`, an Event will be created with
       a payload of `message`.
     
