@@ -560,6 +560,63 @@ describe Agents::WebhookAgent do
           expect(out).to eq(["Event Created", 201])
           expect(Event.last.payload).to eq(payload)
         end
+
+        it "should accept a request if recaptcha_secret is set and g-recaptcha-response given is verified and
+        reCAPTCHA v3 score is above score_treshold" do
+          agent.options['payload_path'] = '.'
+          agent.options['recaptcha_secret'] = 'supersupersecret'
+          agent.options['score_threshold'] = 0.5
+          webpayload = ActionDispatch::Request.new({
+              'action_dispatch.request.request_parameters' => payload.merge({ 'g-recaptcha-response' => 'somevalue' }),
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
+              'REQUEST_METHOD' => "POST",
+              'HTTP_ACCEPT' => 'application/xml',
+              'HTTP_X_HELLO_WORLD' => "Hello Huginn"
+            })
+
+          checked = false
+          out = nil
+
+          stub_request(:any, /verify/).to_return { |request|
+            checked = true
+            { status: 200, body: '{"success":true, "score":0.9}' }
+          }
+
+          expect {
+            out = agent.receive_web_request(webpayload)
+          }.to change { checked }
+
+          expect(out).to eq(["Event Created", 201])
+          expect(Event.last.payload).to eq(payload)
+        end
+
+        it "should reject a request if recaptcha_secret is set and g-recaptcha-response given is verified and
+        reCAPTCHA v3 score is below score_treshold" do
+          agent.options['payload_path'] = '.'
+          agent.options['recaptcha_secret'] = 'supersupersecret'
+          agent.options['score_threshold'] = 0.5
+          webpayload = ActionDispatch::Request.new({
+              'action_dispatch.request.request_parameters' => payload.merge({ 'g-recaptcha-response' => 'somevalue' }),
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
+              'REQUEST_METHOD' => "POST",
+              'HTTP_ACCEPT' => 'application/xml',
+              'HTTP_X_HELLO_WORLD' => "Hello Huginn"
+            })
+
+          checked = false
+          out = nil
+
+          stub_request(:any, /verify/).to_return { |request|
+            checked = true
+            { status: 200, body: '{"success":true, "score":0.1}' }
+          }
+
+          expect {
+            out = agent.receive_web_request(webpayload)
+          }.to change { checked }
+
+          expect(out).to eq(["Not Authorized", 401])
+        end
       end
     end
     context "with headers" do
