@@ -142,9 +142,9 @@ See [private development instructions](https://github.com/huginn/huginn/wiki/Pri
 
 #### Enable the WeatherAgent
 
-In order to use the WeatherAgent you need an [API key with OpenWeather](https://home.openweathermap.org/api_keys). Signup for one and then change the value of `api_key: your-key` in your seeded WeatherAgent and setting the service key to `openweather`.
+In order to use the WeatherAgent you need an [API key with OpenWeather](https://home.openweathermap.org/api_keys). Signup for one and then change the value of `api_key: your-key` in your seeded WeatherAgent and set the `service` key to `openweather`.
 
-Note, neither DarkSky nor Wunderground offers free API keys any more.
+Note: While Dark Sky is still supported in the Weather Agent, they no longer offer API keys. Support for Wunderground has been removed.
 
 #### Disable SSL
 

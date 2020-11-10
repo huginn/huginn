@@ -280,7 +280,7 @@ describe Agent do
 
     describe ".receive!" do
       before do
-        stub_request(:any, /openweather/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
+        stub_request(:any, /openweather/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/openweather.json")), :status => 200)
         stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       end
 
@@ -910,7 +910,7 @@ describe Agent do
 
   describe ".drop_pending_events" do
     before do
-      stub_request(:any, /openweather/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
+      stub_request(:any, /openweather/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/openweather.json")), status: 200)
     end
 
     it "should drop pending events while the agent was disabled when set to true" do

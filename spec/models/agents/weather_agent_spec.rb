@@ -1,75 +1,6 @@
 require 'rails_helper'
 
 describe Agents::WeatherAgent do
-  let(:agent) do
-    Agents::WeatherAgent.create(
-      name: 'weather',
-      options: {
-          :location => "37.77550,-122.41292",
-        :api_key => 'test',
-        :which_day => 1,
-      }
-    ).tap do |agent|
-      agent.user = users(:bob)
-      agent.save!
-    end
-  end
-
-  let :weather_agent do
-    Agents::WeatherAgent.create(
-      name: "weather from openweather",
-      options: {
-          :location => "37.779329,-122.41915",
-          :service => "openweather",
-          :which_day => 1,
-          :api_key => "test"
-      }
-    ).tap do |agent|
-      agent.user = users(:bob)
-      agent.save!
-    end
-  end
-
-  it "creates a valid agent" do
-    expect(agent).to be_valid
-  end
-
-  it "is valid with put-your-key-here or your-key" do
-    agent.options['api_key'] = 'put-your-key-here'
-    expect(agent).to be_valid
-    expect(agent.working?).to be_falsey
-
-    agent.options['api_key'] = 'your-key'
-    expect(agent).to be_valid
-    expect(agent.working?).to be_falsey
-  end
-
-  context "openweather" do
-    it "validates the location properly" do
-      expect(weather_agent.options["location"]).to eq "37.779329,-122.41915"
-      expect(weather_agent).to be_valid
-      weather_agent.options["location"] = "37.779329, -122.41915" # with a space
-      expect(weather_agent).to be_valid
-      weather_agent.options["location"] = "94103" # a zip code
-      expect(weather_agent).to_not be_valid
-      weather_agent.options["location"] = "37.779329,-122.41915"
-      expect(weather_agent.options["location"]).to eq "37.779329,-122.41915"
-      expect(weather_agent).to be_valid
-    end
-    it "fails cases that pass the first test but are invalid" do
-      weather_agent.options["location"] = "137.779329, -122.41915" # too high latitude
-      expect(weather_agent).to_not be_valid
-      weather_agent.options["location"] = "37.779329, -522.41915" # too low longitude
-      expect(weather_agent).to_not be_valid
-    end
-  end
-
-  describe "#service" do
-    it "doesn't have a Service object attached" do
-      expect(agent.service).to be_nil
-    end
-  end
-
   describe "Agents::WeatherAgent::VALID_COORDS_REGEX" do
     it "matches 37.779329,-122.41915" do
       expect(
@@ -84,6 +15,116 @@ describe Agents::WeatherAgent do
           "#{rand valid_latitude_range},#{rand valid_longitude_range}" =~ Agents::WeatherAgent::VALID_COORDS_REGEX
         ).not_to be_nil
       end
+    end
+  end
+
+  let(:agent) do
+    Agents::WeatherAgent.create(
+      name: 'weather',
+      options: {
+        :location => '37.779329,-122.41915',
+        :api_key => 'test',
+        :which_day => 1,
+      }
+    ).tap do |agent|
+      agent.user = users(:bob)
+      agent.save!
+    end
+  end
+
+  it "is valid with put-your-key-here or your-key" do
+    agent.options['api_key'] = 'put-your-key-here'
+    expect(agent).to be_valid
+    expect(agent.working?).to be_falsey
+
+    agent.options['api_key'] = 'your-key'
+    expect(agent).to be_valid
+    expect(agent.working?).to be_falsey
+  end
+
+  it "is invalid with wunderground service" do
+    agent.options['service'] = 'wunderground'
+    expect(agent.wunderground?).to be true
+    expect(agent).to be_invalid
+    expect(agent.working?).to be_falsey
+  end
+
+  it "creates a valid agent without service" do
+    expect(agent).to be_valid
+    expect(agent.dark_sky?).to be true
+    expect(agent.openweather?).to be false
+    expect(agent.language).to eq 'en'
+  end
+
+  it "validates the location properly" do
+    expect(agent.options["location"]).to eq "37.779329,-122.41915"
+    expect(agent).to be_valid
+    agent.options["location"] = "37.779329, -122.41915" # with a space
+    expect(agent).to be_valid
+    agent.options["location"] = "94103" # a zip code
+    expect(agent).to_not be_valid
+    agent.options["location"] = "37.779329,-122.41915"
+    expect(agent.options["location"]).to eq "37.779329,-122.41915"
+    expect(agent).to be_valid
+  end
+
+  it "fails cases that pass the first test but are invalid" do
+    agent.options["location"] = "137.779329, -122.41915" # too high latitude
+    expect(agent).to_not be_valid
+    agent.options["location"] = "37.779329, -522.41915" # too low longitude
+    expect(agent).to_not be_valid
+  end
+
+  context "openweather" do
+    let :agent do
+      Agents::WeatherAgent.create(
+        name: "weather from openweather",
+        options: {
+            :location => "37.779329,-122.41915",
+            :service => "openweather",
+            :which_day => 1,
+            :api_key => "test"
+        }
+      ).tap do |agent|
+        agent.user = users(:bob)
+        agent.save!
+      end
+    end
+
+    before do
+      stub_request(:any, /openweather/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/openweather.json")), :status => 200)
+      stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
+    end
+
+    it "creates a valid agent with openweather service" do
+      expect(agent).to be_valid
+      expect(agent.dark_sky?).to be false
+      expect(agent.wunderground?).to be false
+      expect(agent.openweather?).to be true
+    end
+  end
+
+  context "dark_sky" do
+    let :agent do
+      Agents::WeatherAgent.create(
+        name: "weather from dark sky",
+        options: {
+            :location => "37.779329,-122.41915",
+            :service => "forecastio",
+            :which_day => 1,
+            :api_key => "test"
+        }
+      ).tap do |agent|
+        agent.user = users(:bob)
+        agent.save!
+      end
+    end
+
+    it "creates a valid agent with forecastio service" do
+      agent.options['service'] = 'forecastio'
+      expect(agent).to be_valid
+      expect(agent.dark_sky?).to be true
+      expect(agent.openweather?).to be false
     end
   end
 end
