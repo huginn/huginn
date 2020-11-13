@@ -6,14 +6,18 @@ module Agents
     description <<-MD
       The Manual Event Agent is used to manually create Events for testing or other purposes.
 
-      Do not set options for this Agent.  Instead, connect it to other Agents and create Events
-      using the UI provided on this Agent's Summary page.
+      Connect this Agent to other Agents and create Events using the UI provided on this Agent's Summary page.
+
+      You can set the default event payload via the "payload" option.
     MD
 
-    event_description "User determined"
+    event_description do
+      "Events are editable in the UI.  The default value is this:\n\n    " +
+        Utils.pretty_print(options["payload"].presence || {})
+    end
 
     def default_options
-      { "no options" => "are needed" }
+      { "payload" => {} }
     end
 
     def handle_details_post(params)
