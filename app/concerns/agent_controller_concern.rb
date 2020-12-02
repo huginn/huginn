@@ -24,8 +24,8 @@ module AgentControllerConcern
         end
       }
     when 'configure'
-      if options['configure_options'].nil? || options['configure_options'].keys.length == 0
-        errors.add(:base, "The 'configure_options' options hash must be supplied when using the 'configure' action.")
+      if !options['configure_options'].is_a?(Hash) || options['configure_options'].empty?
+        errors.add(:base, "A non-empty hash must be specified in the 'configure_options' option when using the 'configure' action.")
       end
     when 'enable', 'disable'
     when nil
