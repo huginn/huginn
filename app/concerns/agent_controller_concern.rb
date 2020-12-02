@@ -75,7 +75,7 @@ module AgentControllerConcern
             target.update! options: target.options.deep_merge(interpolated['configure_options'])
             log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"
           when ''
-            # Do nothing
+            log 'No action is performed.'
           else
             error "Unsupported action '#{action}' ignored for '#{target.name}'"
           end
