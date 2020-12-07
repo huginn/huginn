@@ -71,6 +71,7 @@ module LiquidInterpolatable
   def interpolate_with_each(array)
     array.each do |object|
       interpolate_with(object) do
+        self.current_event = object
         yield object
       end
     end
@@ -243,6 +244,26 @@ module LiquidInterpolatable
       JSON.dump(input)
     end
 
+    def md5(input)
+      Digest::MD5.hexdigest(input.to_s)
+    end
+
+    def sha1(input)
+      Digest::SHA1.hexdigest(input.to_s)
+    end
+
+    def sha256(input)
+      Digest::SHA256.hexdigest(input.to_s)
+    end
+
+    def hmac_sha1(input, key)
+      OpenSSL::HMAC.hexdigest('sha1', key.to_s, input.to_s)
+    end
+
+    def hmac_sha256(input, key)
+      OpenSSL::HMAC.hexdigest('sha256', key.to_s, input.to_s)
+    end
+
     # Returns a Ruby object
     #
     # It can be used as a JSONPath replacement for Agents that only support Liquid:
@@ -260,6 +281,27 @@ module LiquidInterpolatable
     # as_object ALWAYS has be the last filter in a Liquid expression!
     def as_object(object)
       throw :as_object, object.as_json
+    end
+
+    # Group an array of items by a property
+    #
+    # Example usage:
+    #
+    # {% assign posts_by_author = site.posts | group_by: "author" %}
+    # {% for author in posts_by_author %}
+    #   <dt>{{author.name}}</dt>
+    #   {% for post in author.items %}
+    #   <dd><a href="{{post.url}}">{{post.title}}</a></dd>
+    #   {% endfor %}
+    # {% endfor %}
+    def group_by(input, property)
+      if input.respond_to?(:group_by)
+        input.group_by { |item| item[property] }.map do |value, items|
+          { 'name' => value, 'items' => items }
+        end
+      else
+        input
+      end
     end
 
     private

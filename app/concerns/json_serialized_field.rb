@@ -1,13 +1,13 @@
 require 'json_with_indifferent_access'
 
-module JSONSerializedField
+module JsonSerializedField
   extend ActiveSupport::Concern
 
   module ClassMethods
     def json_serialize(*fields)
       fields.each do |field|
         class_eval <<-CODE
-          serialize :#{field}, JSONWithIndifferentAccess
+          serialize :#{field}, JsonWithIndifferentAccess
 
           validate :#{field}_has_no_errors
 

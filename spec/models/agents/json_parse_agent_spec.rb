@@ -48,5 +48,13 @@ describe Agents::JsonParseAgent do
       event = Event.new(payload: { data: '{"test": "data}' } )
       expect { @checker.receive([event]) }.to change(AgentLog, :count).by(1)
     end
+
+    it "support merge mode" do
+      @checker.options[:mode] = "merge"
+      event = Event.new(payload: { data: '{"test": "data"}', extra: 'a' } )
+      expect { @checker.receive([event]) }.to change { Event.count }.by(1)
+      last_payload = Event.last.payload
+      expect(last_payload['extra']).to eq('a')
+    end
   end
 end

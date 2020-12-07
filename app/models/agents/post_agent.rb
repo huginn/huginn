@@ -1,5 +1,6 @@
 module Agents
   class PostAgent < Agent
+    include EventHeadersConcern
     include WebRequestConcern
     include FileHandling
 
@@ -32,6 +33,8 @@ module Agents
         The Event will also have a "headers" hash and a "status" integer value.
 
         If `output_mode` is set to `merge`, the emitted Event will be merged into the original contents of the received Event.
+
+        Set `event_headers` to a list of header names, either in an array of string or in a comma-separated string, to include only some of the header values.
 
         Set `event_headers_style` to one of the following values to normalize the keys of "headers" for downstream agents' convenience:
 
@@ -125,11 +128,7 @@ module Agents
         errors.add(:base, "if provided, emit_events must be true or false")
       end
 
-      begin
-        normalize_response_headers({})
-      rescue ArgumentError => e
-        errors.add(:base, e.message)
-      end
+      validate_event_headers_options!
 
       unless %w[post get put delete patch].include?(method)
         errors.add(:base, "method must be 'post', 'get', 'put', 'delete', or 'patch'")
@@ -168,29 +167,6 @@ module Agents
     end
 
     private
-
-    def normalize_response_headers(headers)
-      case interpolated['event_headers_style']
-      when nil, '', 'capitalized'
-        normalize = ->name {
-          name.gsub(/(?:\A|(?<=-))([[:alpha:]])|([[:alpha:]]+)/) {
-            $1 ? $1.upcase : $2.downcase
-          }
-        }
-      when 'downcased'
-        normalize = :downcase.to_proc
-      when 'snakecased', nil
-        normalize = ->name { name.tr('A-Z-', 'a-z_') }
-      when 'raw'
-        normalize = ->name { name }  # :itself.to_proc in Ruby >= 2.2
-      else
-        raise ArgumentError, "if provided, event_headers_style must be 'capitalized', 'downcased', 'snakecased' or 'raw'"
-      end
-
-      headers.each_with_object({}) { |(key, value), hash|
-        hash[normalize[key]] = value
-      }
-    end
 
     def handle(data, event = Event.new, headers)
       url = interpolated(event.payload)[:post_url]
@@ -234,10 +210,15 @@ module Agents
         new_event = interpolated['output_mode'].to_s == 'merge' ? event.payload.dup : {}
         create_event payload: new_event.merge(
           body: response.body,
-          headers: normalize_response_headers(response.headers),
           status: response.status
+        ).merge(
+          event_headers_payload(response.headers)
         )
       end
+    end
+
+    def event_headers_key
+      super || 'headers'
     end
   end
 end

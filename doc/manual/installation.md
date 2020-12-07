@@ -44,13 +44,9 @@ up-to-date and install it.
     sudo apt-get install -y vim
     sudo update-alternatives --set editor /usr/bin/vim.basic
 
-Import node.js repository (can be skipped on Ubuntu and Debian Jessie):
-
-    curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
-
 Install the required packages (needed to compile Ruby and native extensions to Ruby gems):
 
-    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz
+    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz jq
 
 
 ### Debian Stretch
@@ -59,6 +55,11 @@ Since Debian Stretch, `runit` isn't started anymore automatically, but this gets
 
      sudo apt-get install -y runit-systemd libssl1.0-dev
 
+### Ubuntu 18.04 Bionic
+
+To start `runit` automatically on Ubuntu Bionic, we need to install `runit-systemd`:
+
+    sudo apt-get install -y runit-systemd
 
 ## 2. Ruby
 
@@ -71,15 +72,20 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.1.tar.bz2 | tar xj
-    cd ruby-2.5.1
+    curl -L --progress https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.bz2 | tar xj
+    cd ruby-2.6.5
     ./configure --disable-install-rdoc
     make -j`nproc`
     sudo make install
 
 Install the bundler and foreman gems:
 
-    sudo gem install rake bundler foreman --no-ri --no-rdoc
+    sudo gem install rake foreman --no-document
+    sudo gem install bundler -v '< 2' --no-document
+
+Update rubygems:
+
+    sudo gem update --system --no-document
 
 ## 3. System Users
 
@@ -93,20 +99,19 @@ Install the database packages
 
     sudo apt-get install -y mysql-server mysql-client libmysqlclient-dev
 
-    # Pick a MySQL root password (can be anything), type it and press enter,
-    # retype the MySQL root password and press enter
-
 For Debian Stretch, replace `libmysqlclient-dev` with `default-libmysqlclient-dev`. See the [additional notes section](#additional-notes) for more information.
 
 Check the installed MySQL version (remember if its >= 5.5.3 for the `.env` configuration done later):
 
     mysql --version
 
-Secure your installation
+Secure your installation. During this step, you will be prompted to pick a MySQL root password (can be anything)
 
     sudo mysql_secure_installation
 
-Login to MySQL
+The `mysql_secure_installation` script does not apply the user-provided password to the MySQL root user on Ubuntu systems. To apply a password to the MySQL root user on Ubuntu systems, see the [additional notes section](#set-password-for-root-MySQL-user-on-Ubuntu) for more information before proceeding.
+
+Login to MySQL using the root password you set in the previous steps
 
     mysql -u root -p
 
@@ -126,6 +131,9 @@ Ensure you can use the InnoDB engine which is necessary to support long indexes
 Grant the Huginn user necessary permissions on the database
 
     mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, LOCK TABLES ON `huginn_production`.* TO 'huginn'@'localhost';
+
+Use the flush privileges command to save the new permissions
+    mysql> FLUSH PRIVILEGES;
 
 Quit the database session
 
@@ -256,6 +264,8 @@ Enable (remove the comment) [from these lines](https://github.com/huginn/huginn/
 
     # web: bundle exec unicorn -c config/unicorn.rb
     # jobs: bundle exec rails runner bin/threaded.rb
+
+**Note:** Ensure you have no leading spaces before `web:` or `jobs:` in your `Procfile` file.
 
 Export the init scripts:
 
@@ -420,3 +430,21 @@ You probably found an error message or exception backtrace you could not resolve
 ### Additional notes
 
 Debian Stretch switched from MySQL to [MariaDB](https://mariadb.org/). All packages with `mysql` in the name are just wrappers around the MariaDB ones, with some containing some compatibility symlinks. Huginn should also work fine with the MariaDB packages directly, although to keep the installation instructions more compact, they still use the MySQL packages.
+
+#### Set password for root MySQL user on Ubuntu
+
+MySQL installations (>= 5.7.26) on Ubuntu use the UNIX `auth_socket` plugin by default, such that authentication is handled by system user credientials. In order to access the MySQL root user from any system user, you have to set the MySQL root user password in the user database. Sign into the MySQL shell 
+
+    sudo mysql -u root -p
+
+    # The default password upon installation is blank
+
+Once in the MySQL shell, run the following command to set the password for the root user by replacing `new-password` with a password of your choice
+
+    ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'new-password';
+
+After the change has been made, exit the MySQL shell with `\q`. 
+
+For the change to propogate, restart the MySQL server
+
+    sudo service mysql restart

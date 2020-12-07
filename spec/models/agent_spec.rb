@@ -280,7 +280,7 @@ describe Agent do
 
     describe ".receive!" do
       before do
-        stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
+        stub_request(:any, /darksky/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
         stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       end
 
@@ -653,7 +653,7 @@ describe Agent do
     describe "cleaning up now-expired events" do
       before do
         @time = "2014-01-01 01:00:00 +00:00"
-        time_travel_to @time do
+        travel_to @time do
           @agent = Agents::SomethingSource.new(:name => "something")
           @agent.keep_events_for = 5.days
           @agent.user = users(:bob)
@@ -678,7 +678,7 @@ describe Agent do
 
       describe "when keep_events_for is changed" do
         it "updates events' expires_at" do
-          time_travel_to @time do
+          travel_to @time do
             expect {
                 @agent.options[:foo] = "bar1"
                 @agent.keep_events_for = 3.days
@@ -910,8 +910,7 @@ describe Agent do
 
   describe ".drop_pending_events" do
     before do
-      stub_request(:any, /wunderground/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
-      stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
+      stub_request(:any, /darksky/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
     end
 
     it "should drop pending events while the agent was disabled when set to true" do
@@ -923,7 +922,7 @@ describe Agent do
           Agent.async_check(agent1.id)
           Agent.receive!
         }.to change { agent1.events.count }.by(1)
-      }.to change { agent2.events.count }.by(1)
+      }.to change { agent2.events.count }.by(0)
 
       agent2.disabled = true
       agent2.save!

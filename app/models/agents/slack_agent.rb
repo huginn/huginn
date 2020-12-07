@@ -1,8 +1,9 @@
 module Agents
   class SlackAgent < Agent
     DEFAULT_USERNAME = 'Huginn'
-    ALLOWED_PARAMS = ['channel', 'username', 'unfurl_links', 'attachments']
+    ALLOWED_PARAMS = ['channel', 'username', 'unfurl_links', 'attachments', 'blocks']
 
+    can_dry_run!
     cannot_be_scheduled!
     cannot_create_events!
     no_bulk_receive!

@@ -11,7 +11,7 @@ module Agents
       used events also relies on the `Keep events` option of the emitting Agent, meaning that if events expire before
       this agent is scheduled to run, they will not appear in the email.
 
-      By default, the will have a `subject` and an optional `headline` before listing the Events.  If the Events'
+      By default, the email will have a `subject` and an optional `headline` before listing the Events.  If the Events'
       payloads contain a `message`, that will be highlighted, otherwise everything in
       their payloads will be shown.
 

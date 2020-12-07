@@ -277,6 +277,14 @@ describe Agents::ImapFolderAgent do
         expect { @checker.check }.to change { Event.count }.by(1)
       end
 
+      it 'should delete mails if delete is true' do
+        @checker.options['delete'] = true
+        mails.each { |mail|
+          stub(mail).delete.once
+        }
+        expect { @checker.check }.to change { Event.count }.by(2)
+      end
+
       describe 'processing mails with a broken From header value' do
         before do
           # "from" patterns work against mail addresses and not
@@ -292,6 +300,42 @@ describe Agents::ImapFolderAgent do
           expect {
             expect { @checker.check }.not_to change { Event.count }
           }.not_to raise_exception
+        end
+      end
+
+      describe 'with event_headers' do
+        let(:expected_headers) {
+          [
+            {
+              'mime_version' => '1.0',
+              'x_foo' => "test1-1\ntest1-2"
+            },
+            {
+              'mime_version' => '1.0',
+              'x_foo' => "test2-1\ntest2-2"
+            }
+          ]
+        }
+        before do
+          expected_payloads.zip(expected_headers) do |payload, headers|
+            payload['headers'] = headers
+          end
+
+          @checker.options['event_headers'] = %w[mime-version x-foo]
+          @checker.options['event_headers_style'] = 'snakecased'
+          @checker.save!
+        end
+
+        it 'should check for mails and emit events with headers' do
+          expect { @checker.check }.to change { Event.count }.by(2)
+          expect(@checker.notified.sort).to eq(mails.map(&:message_id).sort)
+          expect(@checker.lastseen).to eq(mails.each_with_object(@checker.make_seen) { |mail, seen|
+              seen[mail.uidvalidity] = mail.uid
+            })
+
+          expect(Event.last(2).map(&:payload)).to match expected_payloads
+
+          expect { @checker.check }.not_to change { Event.count }
         end
       end
 

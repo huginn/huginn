@@ -33,7 +33,7 @@ class GoogleCalendar
     instance = new(*args)
     block.call(instance)
   ensure
-    instance.cleanup!
+    instance&.cleanup!
   end
 
   def auth_as

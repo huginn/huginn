@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  mysqldata:
+    image: mysql:5.7
+    command: /bin/true
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    env_file:
+      - ../mysql.env
+    volumes_from:
+      - mysqldata
+
+  web:
+    build:
+      context: ../../
+      dockerfile: docker/multi-process/Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # - DATABASE_INITIAL_CONNECT_MAX_RETRIES=5
+      - INTENTIONALLY_SLEEP=10
+    env_file:
+      - ../mysql.env
+      - ../secrets.env
+    depends_on:
+      - mysql

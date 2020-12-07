@@ -12,7 +12,7 @@ describe ScenarioImport do
   let(:weather_agent_options) {
     {
       'api_key' => 'some-api-key',
-      'location' => '12345'
+      'location' => '42.3601,-71.0589'
     }
   }
   let(:trigger_agent_options) {

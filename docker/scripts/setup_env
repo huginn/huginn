@@ -5,19 +5,15 @@ export LC_ALL=en_US.UTF-8
 
 cd /app
 
+if [ -f /app/tmp/pids/delayed_job.pid ]; then
+  rm /app/tmp/pids/delayed_job.pid
+fi
+
 export HOME=/app
 if ! whoami &> /dev/null; then
     if [ -w /etc/passwd ]; then
         echo "${USER_NAME:-default}:x:$(id -u):0:${USER_NAME:-default} user:${HOME}:/sbin/nologin" >> /etc/passwd
     fi
-fi
-
-# Do we have a Rails secret yet?
-# If not, generate one, but persist it for the container's lifetime.
-if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW .env.example; then
-    echo 'Generating random APP_SECRET_TOKEN.'
-    secret=$(dd if=/dev/urandom bs=36 count=1 | openssl base64)
-    sed -i "s:REPLACE_ME_NOW!:$secret:" .env.example
 fi
 
 # is a mysql or postgresql database linked?
@@ -44,11 +40,34 @@ DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
 DATABASE_PASSWORD=${HUGINN_DATABASE_PASSWORD:-${DATABASE_PASSWORD:-password}}
 DATABASE_NAME=${HUGINN_DATABASE_NAME:-${DATABASE_NAME:-huginn_production}}
 RAILS_ENV=${HUGINN_RAILS_ENV:-${RAILS_ENV:-production}}
+RAILS_LOG_TO_STDOUT=${RAILS_LOG_TO_STDOUT:-true}
+RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES:-true}
+IP="${IP:-0.0.0.0}"
+PORT=${HUGINN_PORT:-${PORT:-3000}}
+PORT="$(echo $PORT|awk -F ':' '{print $NF}')"
+HUGINN_PORT=${PORT}
+
+cp -a /app/.env.example /tmp/
+
+# Do we have a Rails secret yet?
+# If not, generate one, but persist it for the container's lifetime.
+if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW /tmp/.env.example; then
+    [ -e '/tmp/secret' ] && secret="$(cat /tmp/secret)"
+    if [ -z "$secret" ]; then
+        echo 'Generating random APP_SECRET_TOKEN.'
+        secret=$(dd if=/dev/urandom bs=36 count=1 | openssl base64)
+        echo "$secret" > /tmp/secret
+    fi
+    sed -i "s:REPLACE_ME_NOW!:$secret:" /tmp/.env.example
+fi
 
 # Add ENV variables to .env.example which are not present in it but usable
-cat >> /app/.env.example <<EOF
+cat >> /tmp/.env.example <<EOF
 ASSET_HOST=
 DEFAULT_SCENARIO_FILE=
+IP=
+RAILS_ENV=
+RAILS_LOG_TO_STDOUT=
 RAILS_SERVE_STATIC_FILES=
 SEED_EMAIL=
 SEED_PASSWORD=
@@ -56,24 +75,39 @@ SEED_USERNAME=
 SMTP_OPENSSL_CA_FILE=
 SMTP_OPENSSL_CA_PATH=
 SMTP_OPENSSL_VERIFY_MODE=
+START_MYSQL=
 EOF
 
+[ -e '/app/.env' ] && cat /app/.env >> /tmp/.env.example
+
+quote_if_necessary() {
+  if grep -q -E -e '^".*" *$' -e "^'.*' *$" <<<"$*"; then
+    # preserve single or double quotes if they are provided
+    echo "$*";
+  else
+    # otherwise double quote the string after escaping \, $, `
+    echo "\"$(sed -e 's/\\/\\\\/g' -e 's/\$/\\\$/g' -e 's/`/\\`/g' <<<"$*")\""
+  fi
+}
+
 # Default to the environment variable values set in .env.example
-IFS="="
-sed -n -r -e 's/^#?([A-Za-z0-9_]+ *=.*)/\1/p' /app/.env.example | \
-  while read var value ; do
-    eval "echo \"$var=\${HUGINN_$var:-\${$var:-\$value}}\""
-  done > /app/.env
+sed -n -r -e 's/^#?([A-Za-z0-9_]+=.*)/\1/p' /tmp/.env.example | \
+  while IFS='=' read var value ; do
+    huginn_var="HUGINN_$var"
+    val="${!huginn_var:-${!var:-$value}}"
+    echo "$var=$(quote_if_necessary $val)"
+  done > /tmp/.env
 
-PORT=${HUGINN_PORT:-${PORT:-3000}}
-echo "PORT=$(echo $PORT|awk -F ':' '{print $NF}')" >> .env
-echo "RAILS_ENV=${RAILS_ENV}" >> .env
-echo "RAILS_LOG_TO_STDOUT=true" >> .env
-echo "RAILS_SERVE_STATIC_FILES=true" >> .env
-echo "START_MYSQL=${START_MYSQL}" >> .env
+source /tmp/.env
 
+if [ "${START_MYSQL}" = "true" ]; then
+  echo 'DATABASE_SOCKET=/app/tmp/sockets/mysqld.sock' >> /tmp/.env
+  DATABASE_SOCKET='/app/tmp/sockets/mysqld.sock'
+fi
+
+[ -e '/app/.env' ] || cp -a /tmp/.env /app/
 chmod ugo+r /app/.env
-source /app/.env
+rm -f /tmp/.env.example
 
 # use default port number if it is still not set
 case "${DATABASE_ADAPTER}" in
@@ -85,10 +119,10 @@ esac
 bundle install --without test development --path vendor/bundle
 
 # Configure the unicorn server
-cp -a config/unicorn.rb.example config/unicorn.rb
-sed -ri 's/^listen .*$/listen ENV["PORT"]/' config/unicorn.rb
-sed -ri 's/^stderr_path.*$//' config/unicorn.rb
-sed -ri 's/^stdout_path.*$//' config/unicorn.rb
-sed -ri 's/^pid.*$//' config/unicorn.rb
+sed -r config/unicorn.rb.example \
+    -e "s/^ *listen .+/listen '$IP:$PORT'/" \
+    -e 's;^ *stderr_path .+;stderr_path "/dev/stderr";' \
+    -e 's;^ *stdout_path .+;stdout_path "/dev/stdout";' \
+    -e '/^ *pid .+/d' > config/unicorn.rb
 
 mkdir -p tmp/pids tmp/cache tmp/sockets log

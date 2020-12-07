@@ -26,7 +26,7 @@
   </li>
 
   <li>
-    <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent#{agent.id}" do %>
+    <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent-enable-disable#{agent.id}" do %>
       <% if agent.disabled? %>
         <%= icon_tag('glyphicon-play') %> Enable agent
       <% else %>
@@ -45,6 +45,16 @@
     <% end %>
   <% end %>
 
+  <% if agent.can_create_events? && agent.events_count > 0 %>
+    <li class="divider"></li>
+
+    <li>
+      <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent-reemit-events#{agent.id}" do %>
+        <%= icon_tag('glyphicon-refresh') %> Re-emit all events
+      <% end %>
+    </li>
+  <% end %>
+
   <li class="divider"></li>
 
   <% if agent.can_create_events? && agent.events_count > 0 %>
@@ -58,7 +68,7 @@
   </li>
 </ul>
 
-<div id="confirm-agent<%= agent.id %>" class="confirm-agent modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
+<div id="confirm-agent-enable-disable<%= agent.id %>" class="confirm-agent modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -86,3 +96,29 @@
   </div>
 </div>
 
+<div id="confirm-agent-reemit-events<%= agent.id %>" class="confirm-agent modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Confirm</h4>
+      </div>
+      <div class="modal-body">
+        <p>Re-emit all events for &quot;<%= agent.name %>&quot;?</p>
+      </div>
+      <div class="modal-footer">
+        <%= form_for(agent, as: :agent, url: reemit_events_agent_path(agent, return: return_to), method: 'POST') do |f| %>
+          <% if agent.can_create_events? && agent.events_count > 0 %>
+            <div class="form-group">
+              <%= check_box_tag :delete_old_events %>
+              <%= label_tag :delete_old_events, 'Delete old events' %>
+              <span class="glyphicon glyphicon-question-sign hover-help" data-content="If this is checked, the original copies of the events will be deleted once they are re-emitted."></span>
+            </div>
+          <% end %>
+          <%= f.button 'Cancel', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
+          <%= f.submit 'Re-emit all events', class: 'btn btn-primary' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

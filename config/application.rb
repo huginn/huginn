@@ -11,11 +11,12 @@ module Huginn
     Dotenv.overload File.expand_path('../../spec/env.test', __FILE__) if Rails.env.test?
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.2
+    config.load_defaults 6.0
 
     # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration should go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded.
+    # Application configuration can go into files in config/initializers
+    # -- all .rb files in that directory are automatically loaded after loading
+    # the framework and any gems in your application.
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W(#{config.root}/lib #{config.root}/app/presenters #{config.root}/app/jobs)
@@ -43,5 +44,8 @@ module Huginn
     # config.active_record.schema_format = :sql
 
     config.active_job.queue_adapter = :delayed_job
+
+    config.action_view.sanitized_allowed_tags = %w[strong em b i p code pre tt samp kbd var sub sup dfn cite big small address hr br div span h1 h2 h3 h4 h5 h6 ul ol li dl dt dd abbr acronym a img blockquote del ins style table thead tbody tr th td]
+    config.action_view.sanitized_allowed_attributes = %w[href src width height alt cite datetime title class name xml:lang abbr border cellspacing cellpadding valign style]
   end
 end

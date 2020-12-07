@@ -1,6 +1,8 @@
 module Agents
   class DelayAgent < Agent
-    default_schedule "every_12h"
+    include FormConfigurable
+
+    default_schedule 'every_12h'
 
     description <<-MD
       The DelayAgent stores received Events and emits copies of them on a schedule. Use this as a buffer or queue of Events.
@@ -17,11 +19,17 @@ module Agents
 
     def default_options
       {
-        'expected_receive_period_in_days' => "10",
-        'max_events' => "100",
-        'keep' => 'newest'
+        'expected_receive_period_in_days' => '10',
+        'max_events' => '100',
+        'keep' => 'newest',
+        'max_emitted_events' => ''
       }
     end
+
+    form_configurable :expected_receive_period_in_days, type: :string
+    form_configurable :max_events, type: :string
+    form_configurable :keep, type: :array, values: %w[newest oldest]
+    form_configurable :max_emitted_events, type: :string
 
     def validate_options
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
@@ -32,8 +40,14 @@ module Agents
         errors.add(:base, "The 'keep' option is required and must be set to 'oldest' or 'newest'")
       end
 
-      unless options['max_events'].present? && options['max_events'].to_i > 0
+      unless interpolated['max_events'].present? && interpolated['max_events'].to_i > 0
         errors.add(:base, "The 'max_events' option is required and must be an integer greater than 0")
+      end
+
+      if interpolated['max_emitted_events'].present?
+        unless interpolated['max_emitted_events'].to_i > 0
+          errors.add(:base, "The 'max_emitted_events' option is optional and should be an integer greater than 0")
+        end
       end
     end
 
@@ -46,7 +60,7 @@ module Agents
         memory['event_ids'] ||= []
         memory['event_ids'] << event.id
         if memory['event_ids'].length > interpolated['max_events'].to_i
-          if interpolated['keep'] == 'newest'
+          if options['keep'] == 'newest'
             memory['event_ids'].shift
           else
             memory['event_ids'].pop
@@ -59,8 +73,8 @@ module Agents
       if memory['event_ids'] && memory['event_ids'].length > 0
         events = received_events.where(id: memory['event_ids']).reorder('events.id asc')
 
-        if options['max_emitted_events'].present?
-          events = events.limit(options['max_emitted_events'].to_i)
+        if interpolated['max_emitted_events'].present?
+          events = events.limit(interpolated['max_emitted_events'].to_i)
         end
 
         events.each do |event|

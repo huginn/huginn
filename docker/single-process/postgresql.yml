@@ -1,4 +1,3 @@
-# This needs at least compose 1.6.0
 version: '2'
 
 services:
@@ -8,79 +7,30 @@ services:
 
   postgres:
     image: postgres:9.5
+    restart: always
+    env_file:
+      - ../postgres.env
     volumes_from:
       - postgresdata
-    environment:
-      POSTGRES_PASSWORD: myhuginnpassword
-      POSTGRES_USER: huginn
 
-  huginn_web:
+  web:
     image: huginn/huginn-single-process
     restart: always
-    extends:
-      file: environment.yml
-      service: huginn_base
-    environment:
-      DATABASE_ADAPTER: postgresql
-      POSTGRES_PORT_5432_TCP_ADDR: postgres
-      POSTGRES_PORT_5432_TCP_PORT: 5432
     ports:
-      - 3000:3000
-    links:
+      - "3000:3000"
+    env_file:
+      - ../postgres.env
+      - ../secrets.env
+    depends_on:
       - postgres
 
-  huginn_threaded:
+  threaded:
     image: huginn/huginn-single-process
-    restart: always
-    extends:
-      file: environment.yml
-      service: huginn_base
-    environment:
-      DATABASE_ADAPTER: postgresql
-      POSTGRES_PORT_5432_TCP_ADDR: postgres
-      POSTGRES_PORT_5432_TCP_PORT: 5432
-    links:
-      - postgres
     command: /scripts/init bin/threaded.rb
-
-  # huginn_schedule:
-  #   image: huginn/huginn-single-process
-  #   extends:
-  #     file: environment.yml
-  #     service: huginn_base
-  #   environment:
-  #     DATABASE_ADAPTER: postgresql
-  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
-  #     POSTGRES_PORT_5432_TCP_PORT: 5432
-  #   links:
-  #     - postgres
-  #   command: /scripts/init bin/schedule.rb
-
-
-  # huginn_twitter_stream:
-  #   image: huginn/huginn-single-process
-  #   extends:
-  #     file: environment.yml
-  #     service: huginn_base
-  #   environment:
-  #     DATABASE_ADAPTER: postgresql
-  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
-  #     POSTGRES_PORT_5432_TCP_PORT: 5432
-  #   links:
-  #     - postgres
-  #   command: /scripts/init bin/twitter_stream.rb
-
-
-  # huginn_dj1:
-  #   image: huginn/huginn-single-process
-  #   extends:
-  #     file: environment.yml
-  #     service: huginn_base
-  #   environment:
-  #     DATABASE_ADAPTER: postgresql
-  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
-  #     POSTGRES_PORT_5432_TCP_PORT: 5432
-  #   links:
-  #     - postgres
-  #   command: /scripts/init script/delayed_job run
-
+    restart: always
+    env_file:
+      - ../postgres.env
+      - ../secrets.env
+    depends_on:
+      - postgres
+      - web

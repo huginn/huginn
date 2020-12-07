@@ -385,8 +385,8 @@ describe Agents::RssAgent do
           {
             "feed" => feed_info,
             "id" => "http://example.com/podcasts/archive/aae20140601.mp3",
-            "url" => nil,
-            "urls" => [],
+            "url" => "http://example.com/podcasts/archive/aae20140601.mp3",
+            "urls" => ["http://example.com/podcasts/archive/aae20140601.mp3"],
             "links" => [],
             "title" => "Red,Whine, & Blue",
             "description" => nil,
@@ -410,8 +410,8 @@ describe Agents::RssAgent do
           {
             "feed" => feed_info,
             "id" => "http://example.com/podcasts/archive/aae20140697.m4v",
-            "url" => nil,
-            "urls" => [],
+            "url" => "http://example.com/podcasts/archive/aae20140697.m4v",
+            "urls" => ["http://example.com/podcasts/archive/aae20140697.m4v"],
             "links" => [],
             "title" => "The Best Chili",
             "description" => nil,
@@ -436,8 +436,8 @@ describe Agents::RssAgent do
           {
             "feed" => feed_info,
             "id" => "http://example.com/podcasts/archive/aae20140608.mp4",
-            "url" => nil,
-            "urls" => [],
+            "url" => "http://example.com/podcasts/archive/aae20140608.mp4",
+            "urls" => ["http://example.com/podcasts/archive/aae20140608.mp4"],
             "links" => [],
             "title" => "Socket Wrench Shootout",
             "description" => nil,
@@ -461,8 +461,8 @@ describe Agents::RssAgent do
           {
             "feed" => feed_info,
             "id" => "http://example.com/podcasts/archive/aae20140615.m4a",
-            "url" => nil,
-            "urls" => [],
+            "url" => "http://example.com/podcasts/archive/aae20140615.m4a",
+            "urls" => ["http://example.com/podcasts/archive/aae20140615.m4a"],
             "links" => [],
             "title" => "Shake Shake Shake Your Spices",
             "description" => nil,
@@ -538,10 +538,10 @@ describe Agents::RssAgent do
 
   describe 'logging errors with the feed url' do
     it 'includes the feed URL when an exception is raised' do
-      mock(Feedjira::Feed).parse(anything) { raise StandardError.new("Some error!") }
-      expect(lambda {
+      mock(Feedjira).parse(anything) { raise StandardError.new("Some error!") }
+      expect {
         agent.check
-      }).not_to raise_error
+      }.not_to raise_error
       expect(agent.logs.last.message).to match(%r[Failed to fetch https://github.com])
     end
   end

@@ -28,7 +28,7 @@
   
   <ul class="nav navbar-nav navbar-right">
     <% if user_signed_in? %>
-      <form class="navbar-form navbar-left visible-lg" role="search">
+      <form class="navbar-form navbar-left" role="search">
         <div class="form-group">
           <input type="text" class="form-control" id='agent-navigate' autocomplete="off" placeholder="Search">
           <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
@@ -36,12 +36,12 @@
       </form>
       
       <li class='job-indicator' role='pending'>
-        <%= link_to current_user.admin? ? jobs_path : '#', class: 'visible-lg' do %>
+        <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><%= icon_tag('glyphicon-refresh', class: 'icon-white') %> <span class='number'>0</span></span>
         <% end %>
       </li>
       <li class='job-indicator' role='awaiting_retry'>
-        <%= link_to current_user.admin? ? jobs_path : '#', class: 'visible-lg' do %>
+        <%= link_to current_user.admin? ? jobs_path : '#' do %>
           <span class="badge"><%= icon_tag('glyphicon-question-sign', class: 'icon-yellow') %> <span class='number'>0</span></span>
         <% end %>
       </li>
