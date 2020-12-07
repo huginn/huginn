@@ -264,8 +264,7 @@ describe Agents::TwitterStreamAgent do
       end
 
       it "includes retweets if configured" do
-        @agent.memory[:include_retweets] = "true"
-        @agent.save!
+        agent.options[:include_retweets] = 'true'
         @worker.send(:handle_status, {'text' => 'retweet', 'retweeted_status' => {one: true}, 'id_str' => '1234' })
         expect(@worker.instance_variable_get(:'@recent_tweets')).to include('1234')
       end
