@@ -229,7 +229,7 @@ module Agents
         return if status.has_key?('delete')
         return unless status['text']
         status['text'] = status['text'].gsub(/&lt;/, "<").gsub(/&gt;/, ">").gsub(/[\t\n\r]/, '  ')
-        if options[:include_retweets] != "true" && status["retweeted_status"].present? && status["retweeted_status"].is_a?(Hash)
+        if agent.options[:include_retweets] != "true" && status["retweeted_status"].present? && status["retweeted_status"].is_a?(Hash)
           return
         elsif @recent_tweets.include?(status["id_str"])
           puts "(#{Time.now}) Skipping duplicate tweet: #{status["text"]}"
