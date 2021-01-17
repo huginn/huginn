@@ -16,10 +16,9 @@ module AssignableTypes
 
   module ClassMethods
     def load_types_in(module_name, my_name = module_name.singularize)
-      mod = module_name.constantize
       const_set(:MODULE_NAME, module_name)
       const_set(:BASE_CLASS_NAME, my_name)
-      types = mod.constants
+      types = module_name.constantize.constants
         .select {|t| t.to_s.include?(my_name)}
         .map {|t| "#{module_name}::#{t}"}
       const_set(:TYPES, types)
