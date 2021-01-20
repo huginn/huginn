@@ -7,6 +7,8 @@ module Agents
 
       `property` specifies a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template that expands to the property to be watched, where you can use a variable `last_property` for the last property value.  If you want to detect a new lowest price, try this: `{% assign drop = last_property | minus: price %}{% if last_property == blank or drop > 0 %}{{ price | default: last_property }}{% else %}{{ last_property }}{% endif %}`
 
+      `set_last_property` specifies a value to be written to the variable `last_property` even when no change is detected.
+
       `expected_update_period_in_days` is used to determine if the Agent is working.
 
       The resulting event will be a copy of the received event.
@@ -54,13 +56,20 @@ module Agents
 
     def handle(opts, event = nil)
       property = opts['property']
+      set_last_property = opts['set_last_property']
+
       if has_changed?(property)
         created_event = create_event :payload => event.payload
 
         log("Propagating new event as property has changed to #{property} from #{last_property}", :outbound_event => created_event, :inbound_event => event )
-        update_memory(property)
+        update_memory(property) unless set_last_property.present?
       else
         log("Not propagating as incoming event has not changed from #{last_property}.", :inbound_event => event )
+      end
+
+      if set_last_property.present? && has_changed?(set_last_property)
+        log("Changing last_property to #{set_last_property} from #{last_property}")
+        update_memory(set_last_property)
       end
     end
 
