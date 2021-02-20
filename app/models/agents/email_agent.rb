@@ -3,7 +3,7 @@ module Agents
     include EmailConcern
 
     can_dry_run!
-    cannot_be_scheduled!
+    default_schedule "never"
     cannot_create_events!
     no_bulk_receive!
 
