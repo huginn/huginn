@@ -64,10 +64,9 @@ module Agents
         errors.add(:base, "expected_update_period_in_days, generate, and filters are required fields")
       end
 
-      if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets])
-        errors.add(:base, "include_retweets must be a boolean value string (true/false)")
+      if options[:include_retweets].present? && boolify(options[:include_retweets]).nil?
+        errors.add(:base, "include_retweets must be a boolean value")
       end
-
     end
 
     def working?
@@ -77,7 +76,7 @@ module Agents
     def default_options
       {
         'filters' => %w[keyword1 keyword2],
-        'include_retweets' => "false",
+        'include_retweets' => false,
         'expected_update_period_in_days' => "2",
         'generate' => "events"
       }
@@ -229,7 +228,7 @@ module Agents
         return if status.has_key?('delete')
         return unless status['text']
         status['text'] = status['text'].gsub(/&lt;/, "<").gsub(/&gt;/, ">").gsub(/[\t\n\r]/, '  ')
-        if agent.options[:include_retweets] != "true" && status["retweeted_status"].present? && status["retweeted_status"].is_a?(Hash)
+        if status["retweeted_status"] && !boolify(agent.options[:include_retweets])
           return
         elsif @recent_tweets.include?(status["id_str"])
           puts "(#{Time.now}) Skipping duplicate tweet: #{status["text"]}"
