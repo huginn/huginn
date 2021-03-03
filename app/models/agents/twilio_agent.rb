@@ -66,13 +66,13 @@ module Agents
     end
 
     def send_message(message)
-      client.account.messages.create :from => interpolated['sender_cell'],
+      client.messages.create :from => interpolated['sender_cell'],
                                          :to => interpolated['receiver_cell'],
                                          :body => message
     end
 
     def make_call(secret)
-      client.account.calls.create :from => interpolated['sender_cell'],
+      client.calls.create :from => interpolated['sender_cell'],
                                   :to => interpolated['receiver_cell'],
                                   :url => post_url(interpolated['server_url'], secret)
     end
