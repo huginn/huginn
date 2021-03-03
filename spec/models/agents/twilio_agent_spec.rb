@@ -1,5 +1,13 @@
 require 'rails_helper'
 
+class TwilioDummyCreator
+  attr_accessor :message_calls
+
+  def create(message)
+    @message_calls << message
+  end
+end
+
 describe Agents::TwilioAgent do
   before do
     @checker = Agents::TwilioAgent.new(:name => 'somename',
@@ -20,8 +28,24 @@ describe Agents::TwilioAgent do
     @event.save!
 
     @message_calls = []
-    stub.any_instance_of(Twilio::REST::Messages).create { |message| @message_calls << message }
-    stub.any_instance_of(Twilio::REST::Calls).create
+
+    mc = TwilioDummyCreator.new
+    mc.message_calls = @message_calls
+    stub.any_instance_of(Twilio::REST::Client).messages { mc }
+
+    cc = TwilioDummyCreator.new
+    cc.message_calls = []
+    stub.any_instance_of(Twilio::REST::Client).calls { cc }
+
+    #messages_create = double()
+    #allow(messages_create).to receive(:create) { |message| @message_calls << message }
+    #stub.any_instance_of(Twilio::REST::Client).messages { messages_create }
+    #stub.any_instance_of(Twilio::REST::Client).calls.create
+    # {
+    #  def create(message)
+    #  end
+    #} 
+    stub.any_instance_of(Twilio::TwiML::VoiceResponse)
   end
 
   describe '#receive' do
