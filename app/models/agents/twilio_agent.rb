@@ -83,9 +83,9 @@ module Agents
 
     def receive_web_request(params, method, format)
       if memory['pending_calls'].has_key? params['secret']
-        response = Twilio::TwiML::Response.new {|r| r.Say memory['pending_calls'][params['secret']], :voice => 'woman'}
+        response = Twilio::TwiML::VoiceResponse.new {|r| r.say( message: memory['pending_calls'][params['secret']], voice: 'woman')}
         memory['pending_calls'].delete params['secret']
-        [response.text, 200]
+        [response.to_s, 200]
       end
     end
 
