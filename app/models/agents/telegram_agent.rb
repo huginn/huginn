@@ -12,10 +12,11 @@ module Agents
     description <<-MD
       The Telegram Agent receives and collects events and sends them via [Telegram](https://telegram.org/).
 
-      It is assumed that events have either a `text`, `photo`, `audio`, `document` or `video` key. You can use the EventFormattingAgent if your event does not provide these keys.
+      It is assumed that events have either a `text`, `photo`, `audio`, `document`, `video` or `group` key. You can use the EventFormattingAgent if your event does not provide these keys.
 
       The value of `text` key is sent as a plain text message. You can also tell Telegram how to parse the message with `parse_mode`, set to either `html` or `markdown`.
       The value of `photo`, `audio`, `document` and `video` keys should be a url whose contents will be sent to you.
+      The value of `group` key should be a list and must consist of 2-10 objects representing an [InputMedia](https://core.telegram.org/bots/api#inputmedia) from the [Telegram Bot API](https://core.telegram.org/bots/api#inputmedia). Be careful: the `caption` field is not covered by the "long message" setting. 
 
       **Setup**
 
@@ -31,7 +32,7 @@ module Agents
 
       **Options**
 
-      * `caption`: caption for a media content (0-1024 characters)
+      * `caption`: caption for a media content (0-1024 characters), applied only for `photo`, `audio`, `document`, or `video`
       * `disable_notification`: send a message silently in a channel
       * `disable_web_page_preview`: disable link previews for links in a text message
       * `long_message`: truncate (default) or split text messages and captions that exceed Telegram API limits. Markdown and HTML tags can't span across messages and, if not opened or closed properly, will render as plain text.
@@ -92,7 +93,8 @@ module Agents
       photo:    :sendPhoto,
       audio:    :sendAudio,
       document: :sendDocument,
-      video:    :sendVideo
+      video:    :sendVideo,
+      group:    :sendMediaGroup,
     }.freeze
 
     def configure_params(params)
@@ -101,7 +103,7 @@ module Agents
       if params.has_key?(:text)
         params[:disable_web_page_preview] = interpolated['disable_web_page_preview'] if interpolated['disable_web_page_preview'].present?
         params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
-      else
+      elsif not params.has_key?(:media)
         params[:caption] = interpolated['caption'] if interpolated['caption'].present?
       end
 
@@ -113,7 +115,11 @@ module Agents
         messages_send = TELEGRAM_ACTIONS.count do |field, _method|
           payload = event.payload[field]
           next unless payload.present?
-          send_telegram_messages field, configure_params(field => payload)
+          if field == :group
+            send_telegram_messages field, configure_params(:media => payload)
+          else
+            send_telegram_messages field, configure_params(field => payload)
+          end
           true
         end
         error("No valid key found in event #{event.payload.inspect}") if messages_send.zero?
@@ -121,7 +127,9 @@ module Agents
     end
 
     def send_message(field, params)
-      response = HTTMultiParty.post telegram_bot_uri(TELEGRAM_ACTIONS[field]), query: params
+      response = HTTMultiParty.post telegram_bot_uri(TELEGRAM_ACTIONS[field]),
+                                    body: params.to_json,
+                                    headers: { 'Content-Type' => 'application/json' }
       unless response['ok']
         error(response)
       end
