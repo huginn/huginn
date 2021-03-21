@@ -14,7 +14,7 @@ module Agents
 
       It is assumed that events have either a `text`, `photo`, `audio`, `document` or `video` key. You can use the EventFormattingAgent if your event does not provide these keys.
 
-      The value of `text` key is sent as a plain text message. You can also tell Telegram how to parse the message with `parse_mode`, set to either `html` or `markdown`.
+      The value of `text` key is sent as a plain text message. You can also tell Telegram how to parse the message with `parse_mode`, set to either `html`, `markdown` or `markdownv2`.
       The value of `photo`, `audio`, `document` and `video` keys should be a url whose contents will be sent to you.
 
       **Setup**
@@ -53,7 +53,7 @@ module Agents
     form_configurable :disable_notification, type: :array, values: ['', 'true', 'false']
     form_configurable :disable_web_page_preview, type: :array, values: ['', 'true', 'false']
     form_configurable :long_message, type: :array, values: ['', 'split', 'truncate']
-    form_configurable :parse_mode, type: :array, values: ['', 'html', 'markdown']
+    form_configurable :parse_mode, type: :array, values: ['', 'html', 'markdown', 'markdownv2']
 
     def validate_auth_token
       HTTMultiParty.post(telegram_bot_uri('getMe'))['ok']
@@ -72,7 +72,7 @@ module Agents
       errors.add(:base, "disable_notification has invalid value: should be 'true' or 'false'") if interpolated['disable_notification'].present? && !%w(true false).include?(interpolated['disable_notification'])
       errors.add(:base, "disable_web_page_preview has invalid value: should be 'true' or 'false'") if interpolated['disable_web_page_preview'].present? && !%w(true false).include?(interpolated['disable_web_page_preview'])
       errors.add(:base, "long_message has invalid value: should be 'split' or 'truncate'") if interpolated['long_message'].present? && !%w(split truncate).include?(interpolated['long_message'])
-      errors.add(:base, "parse_mode has invalid value: should be 'html' or 'markdown'") if interpolated['parse_mode'].present? && !%w(html markdown).include?(interpolated['parse_mode'])
+      errors.add(:base, "parse_mode has invalid value: should be 'html', 'markdown' or 'markdownv2'") if interpolated['parse_mode'].present? && !%w(html markdown markdownv2).include?(interpolated['parse_mode'])
     end
 
     def working?
