@@ -5,6 +5,29 @@ export LC_ALL=en_US.UTF-8
 
 cd /app
 
+# taken straight from mysql docker
+# https://github.com/docker-library/mysql/blob/master/5.7/docker-entrypoint.sh#L21-L40
+# usage: file_env VAR [DEFAULT]
+#    ie: file_env 'XYZ_DB_PASSWORD' 'example'
+# (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
+#  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
+file_env() {
+	local var="$1"
+	local fileVar="${var}_FILE"
+	local def="${2:-}"
+	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+		mysql_error "Both $var and $fileVar are set (but are exclusive)"
+	fi
+	local val="$def"
+	if [ "${!var:-}" ]; then
+		val="${!var}"
+	elif [ "${!fileVar:-}" ]; then
+		val="$(< "${!fileVar}")"
+	fi
+	export "$var"="$val"
+	unset "$fileVar"
+}
+
 if [ -f /app/tmp/pids/delayed_job.pid ]; then
   rm /app/tmp/pids/delayed_job.pid
 fi
@@ -33,11 +56,33 @@ else
     START_MYSQL=${START_MYSQL:-true}
 fi
 
+# Initialize values that might be stored in a file
+file_env 'DATABASE_PASSWORD' ${HUGINN_DATABASE_PASSWORD:-${DATABASE_PASSWORD:-password}}
+file_env 'SMTP_USER_NAME'
+file_env 'SMTP_PASSWORD'
+file_env 'TWITTER_OAUTH_KEY'
+file_env 'TWITTER_OAUTH_SECRET'
+file_env 'APP_SECRET_TOKEN'
+file_env 'THIRTY_SEVEN_SIGNALS_OAUTH_KEY'
+file_env 'THIRTY_SEVEN_SIGNALS_OAUTH_SECRET'
+file_env 'GITHUB_OAUTH_KEY'
+file_env 'GITHUB_OAUTH_SECRET'
+file_env 'TUMBLR_OAUTH_KEY'
+file_env 'TUMBLR_OAUTH_SECRET'
+file_env 'DROPBOX_OAUTH_KEY'
+file_env 'DROPBOX_OAUTH_SECRET'
+file_env 'WUNDERLIST_OAUTH_KEY'
+file_env 'WUNDERLIST_OAUTH_SECRET'
+file_env 'EVERNOTE_OAUTH_KEY'
+file_env 'EVERNOTE_OAUTH_SECRET'
+file_env 'AWS_ACCESS_KEY_ID'
+file_env 'AWS_ACCESS_KEY'
+
 USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
 DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
 DATABASE_PORT=${HUGINN_DATABASE_PORT:-${DATABASE_PORT}}
 DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
-DATABASE_PASSWORD=${HUGINN_DATABASE_PASSWORD:-${DATABASE_PASSWORD:-password}}
+#DATABASE_PASSWORD=${HUGINN_DATABASE_PASSWORD:-${DATABASE_PASSWORD:-password}}
 DATABASE_NAME=${HUGINN_DATABASE_NAME:-${DATABASE_NAME:-huginn_production}}
 RAILS_ENV=${HUGINN_RAILS_ENV:-${RAILS_ENV:-production}}
 RAILS_LOG_TO_STDOUT=${RAILS_LOG_TO_STDOUT:-true}
