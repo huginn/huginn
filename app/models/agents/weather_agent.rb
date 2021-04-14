@@ -12,15 +12,15 @@ module Agents
 
       #{'## Include `forecast_io` in your Gemfile to use this Agent!' if dependencies_missing?}
 
-      You also must select when you would like to get the weather forecast for using the `which_day` option, where the number 1 represents today, 2 represents tomorrow and so on. Weather forecast inforation is only returned for at most one week at a time.
-
-      The weather forecast information is provided by Dark Sky. 
+      You can specify for which day you would like the weather forecast using the `which_day` option, where the number 1 represents today, 2 represents tomorrow, and so on. The default is 1 (today). If you schedule this to run at night, you probably want 2 (tomorrow). Weather forecast inforation is only returned for at most one week at a time.
 
       The `location` must be a comma-separated string of map co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
 
-      You must set up an [API key for Dark Sky](https://darksky.net/dev/) in order to use this Agent.
-
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
+
+      The weather forecast information is provided by [OpenWeather](https://home.openweathermap.org) or Dark Sky - to choose which set `sevice` to either `openweather` or `forecastio` (Dark Sky). If `service` is not specified, it will default to `forecastio` to avoid breaking older configurations.
+
+      You must set up an [API key for OpenWeather](https://home.openweathermap.org/api_keys) or have an existing [API key from Dark Sky](https://darksky.net/dev/) in order to use this Agent.
 
     MD
 
@@ -43,7 +43,7 @@ module Agents
             },
             "conditions": "Rain Showers",
             "icon": "rain",
-            "icon_url": "https://icons-ak.wxug.com/i/c/k/rain.gif",
+            "icon_url": "http://openweathermap.org/img/wn/10d@2x.png",
             "skyicon": "mostlycloudy",
             ...
           }
@@ -61,6 +61,7 @@ module Agents
 
     def default_options
       {
+        'service' => 'openweather',
         'api_key' => 'your-key',
         'location' => '37.779329,-122.41915',
         'which_day' => '1',
@@ -75,14 +76,26 @@ module Agents
       end
     end
 
-    private
+    def dark_sky?
+      # Default to Dark Sky if the service is not defined, or set to the old forecastio value for backwards
+      # compatibility with old configurations.
+      interpolated["service"].nil? || interpolated["service"].downcase == "forecastio"
+    end
+
+    def wunderground?
+      interpolated["service"].present? && interpolated["service"].downcase == "wunderground"
+    end
+
+    def openweather?
+      interpolated["service"].present? && interpolated["service"].downcase == "openweather"
+    end
 
     def which_day
       (interpolated["which_day"].presence || 1).to_i
     end
 
     def location
-      interpolated["location"].presence || interpolated["zipcode"]
+      interpolated["location"].presence
     end
 
     def coordinates
@@ -93,8 +106,20 @@ module Agents
       interpolated["language"].presence || "en"
     end
 
-    def wunderground? 
-      interpolated["service"].presence && interpolated["service"].presence.downcase == "wunderground"
+    private
+
+    def openweather_icon(code)
+      "http://openweathermap.org/img/wn/#{code}@2x.png"
+    end
+
+    def figure_rain_or_snow(rain, snow)
+      if rain.present? && (snow.nil? || (rain > snow))
+        "rain"
+      elsif snow.present?
+        "snow"
+      else
+        ""
+      end
     end
 
     VALID_COORDS_REGEX = /^\s*-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*$/
@@ -111,16 +136,32 @@ module Agents
         errors.add(
           :base,
           "Location #{location} is malformed. Location for " +
-          'Dark Sky must be in the format "-00.000,-00.00000". The ' +
+          'OpenWeather must be in the format "-00.000,-00.00000". The ' +
           "number of decimal places does not matter.")
       end
     end
 
     def validate_options
-      errors.add(:base, "The Weather Underground API has been disabled since Jan 1st 2018, please switch to DarkSky") if wunderground?
       validate_location
       errors.add(:base, "api_key is required") unless interpolated['api_key'].present?
       errors.add(:base, "which_day selection is required") unless which_day.present?
+      errors.add(:base, "service must be one of: forecastio, openweather") unless
+        interpolated['service'].nil? or ['forecastio', 'openweather'].include? interpolated['service']
+
+      errors.add(
+        :base,
+        "The Weather Underground API has been disabled since Jan 1st 2018; please switch to OpenWeather."
+      ) if wunderground?
+    end
+
+    def openweather
+      if key_setup?
+        onecall_endpoint = "http://api.openweathermap.org/data/2.5/onecall"
+        lat, lng = coordinates
+        response = HTTParty.get("%s?units=imperial&appid=%s&lat=%s&lon=%s&lang=%s" %
+                                [onecall_endpoint, interpolated['api_key'], lat, lng, language.downcase])
+        JSON.parse(response.body, object_class: OpenStruct).daily
+      end
     end
 
     def dark_sky
@@ -132,6 +173,17 @@ module Agents
     end
 
     def model(which_day)
+      if dark_sky?
+        # AFAIK, there is no warning-level log messages. In any case, I'd like to log this from validate_options but
+        # since the Agent doesn't exist yet, the Log record can't be created (no parent_id)
+        log "NOTICE: The DarkSky API will be disabled at the end of 2021; please switch to OpenWeather." if dark_sky?
+        dark_sky_model(which_day)
+      elsif openweather?
+        openweather_model(which_day)
+      end
+    end
+
+    def dark_sky_model(which_day)
       value = dark_sky[which_day - 1]
       if value
         timestamp = Time.at(value.time)
@@ -192,6 +244,72 @@ module Agents
           'cloudCover' => value.cloudCover.to_s,
           'pressure' => value.pressure.to_s,
           'ozone' => value.ozone.to_s
+        }
+        return day
+      end
+    end
+
+    def openweather_model(which_day)
+      value = openweather[which_day - 1]
+      if value
+        timestamp = Time.at(value.dt)
+        day = {
+          'date' => {
+            'epoch' => value.dt.to_s,
+            'pretty' => timestamp.strftime("%l:%M %p %Z on %B %d, %Y"),
+            'day' => timestamp.day,
+            'month' => timestamp.month,
+            'year' => timestamp.year,
+            'yday' => timestamp.yday,
+            'hour' => timestamp.hour,
+            'min' => timestamp.strftime("%M"),
+            'sec' => timestamp.sec,
+            'isdst' => timestamp.isdst ? 1 : 0 ,
+            'monthname' => timestamp.strftime("%B"),
+            'monthname_short' => timestamp.strftime("%b"),
+            'weekday_short' => timestamp.strftime("%a"),
+            'weekday' => timestamp.strftime("%A"),
+            'ampm' => timestamp.strftime("%p"),
+            'tz_short' => timestamp.zone
+          },
+          'period' => which_day.to_i,
+          'high' => {
+            'fahrenheit' => value.temp.max.round().to_s,
+            'epoch' => nil,
+            'fahrenheit_apparent' => value.feels_like.day.round().to_s,
+            'epoch_apparent' => nil,
+            'celsius' => ((5*(Float(value.temp.max) - 32))/9).round().to_s
+          },
+          'low' => {
+            'fahrenheit' => value.temp.min.round().to_s,
+            'epoch' => nil,
+            'fahrenheit_apparent' => value.feels_like.night.round().to_s,
+            'epoch_apparent' => nil,
+            'celsius' => ((5*(Float(value.temp.min) - 32))/9).round().to_s
+          },
+          'conditions' => value.weather.first.description,
+          'icon' => openweather_icon(value.weather.first.icon),
+          'avehumidity' => (value.humidity * 100).to_i,
+          'sunriseTime' => value.sunrise.to_s,
+          'sunsetTime' => value.sunset.to_s,
+          'moonPhase' => nil,
+          'precip' => {
+            'intensity' => value.rain.to_s.presence || '0',
+            'intensity_max' => nil,
+            'intensity_max_epoch' => nil,
+            'probability' => nil,
+            'type' => figure_rain_or_snow(value.rain, value.snow).presence,
+          },
+          'dewPoint' => value.dew_point.to_s,
+          'avewind' => {
+            'mph' => value.wind_speed.round().to_s,
+            'kph' =>  (Float(value.wind_speed) * 1.609344).round().to_s,
+            'degrees' => value.wind_deg.to_s
+          },
+          'visibility' => value.visibility.to_s,
+          'cloudCover' => value.clouds.to_s,
+          'pressure' => value.pressure.to_s,
+          'ozone' => nil,
         }
         return day
       end

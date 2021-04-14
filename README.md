@@ -15,7 +15,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Watch for air travel or shopping deals
 * Follow your project names on Twitter and get updates when people mention them
 * Scrape websites and receive email when they change
-* Connect to Adioso, HipChat, Basecamp, Growl, FTP, IMAP, Jabber, JIRA, MQTT, nextbus, Pushbullet, Pushover, RSS, Bash, Slack, StubHub, translation APIs, Twilio, Twitter, Wunderground, and Weibo, to name a few.
+* Connect to Adioso, HipChat, Basecamp, Growl, FTP, IMAP, Jabber, JIRA, MQTT, nextbus, Pushbullet, Pushover, RSS, Bash, Slack, StubHub, translation APIs, Twilio, Twitter, OpenWeather, and Weibo, to name a few.
 * Send digest email with things that you care about at specific times during the day
 * Track counts of high frequency events and send an SMS within moments when they spike, such as the term "san francisco emergency"
 * Send and receive WebHooks
@@ -142,9 +142,9 @@ See [private development instructions](https://github.com/huginn/huginn/wiki/Pri
 
 #### Enable the WeatherAgent
 
-In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/). Signup for one and then change the value of `api_key: your-key` in your seeded WeatherAgent.
+In order to use the WeatherAgent you need an [API key with OpenWeather](https://home.openweathermap.org/api_keys). Signup for one and then change the value of `api_key: your-key` in your seeded WeatherAgent and set the `service` key to `openweather`.
 
-Note, Wunderground no longer offers free API keys. You can still use the WeatherAgent by setting the service key to darksky, and getting an [API key from DarkSky](https://darksky.net/dev).
+Note: While Dark Sky is still supported in the Weather Agent, they no longer offer API keys. Support for Wunderground has been removed.
 
 #### Disable SSL
 
