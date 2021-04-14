@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "Setting up environment"
 set -e
 
 export LC_ALL=en_US.UTF-8
@@ -47,10 +48,18 @@ PORT=${HUGINN_PORT:-${PORT:-3000}}
 PORT="$(echo $PORT|awk -F ':' '{print $NF}')"
 HUGINN_PORT=${PORT}
 
-cp -a /app/.env.example /tmp/
+# Copy .env file to /tmp
+if [ -f "/app/.env.custom" ]; then
+    echo "Using .env.custom environment file"
+    cp -a /app/.env.custom /tmp/.env.example
+else
+    echo "Using .env.example environment file"
+    cp -a /app/.env.example /tmp/.env.example
+fi
 
 # Do we have a Rails secret yet?
 # If not, generate one, but persist it for the container's lifetime.
+echo "Checking for Rails secret"
 if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW /tmp/.env.example; then
     [ -e '/tmp/secret' ] && secret="$(cat /tmp/secret)"
     if [ -z "$secret" ]; then
@@ -62,6 +71,7 @@ if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW /tmp/.
 fi
 
 # Add ENV variables to .env.example which are not present in it but usable
+echo "Add ENV variables to .env.example which are not present in it but usable"
 cat >> /tmp/.env.example <<EOF
 ASSET_HOST=
 DEFAULT_SCENARIO_FILE=
@@ -78,8 +88,13 @@ SMTP_OPENSSL_VERIFY_MODE=
 START_MYSQL=
 EOF
 
-[ -e '/app/.env' ] && cat /app/.env >> /tmp/.env.example
+# Copying /app/.env to /tmp/.env.example if .env exists
+if [ -e '/app/.env' ]; then
+    echo "Copying /app/.env to /tmp/.env.example"
+	cat /app/.env >> /tmp/.env.example
+fi
 
+# function quote_if_necessary
 quote_if_necessary() {
   if grep -q -E -e '^".*" *$' -e "^'.*' *$" <<<"$*"; then
     # preserve single or double quotes if they are provided
@@ -91,14 +106,31 @@ quote_if_necessary() {
 }
 
 # Default to the environment variable values set in .env.example
+echo "Default to the environment variable values set in .env.example"
 sed -n -r -e 's/^#?([A-Za-z0-9_]+=.*)/\1/p' /tmp/.env.example | \
   while IFS='=' read var value ; do
-    huginn_var="HUGINN_$var"
+	huginn_var="HUGINN_$var"
     val="${!huginn_var:-${!var:-$value}}"
     echo "$var=$(quote_if_necessary $val)"
   done > /tmp/.env
 
+# Checking if /tmp/.env exists
+if [ -e "/tmp/.env" ]; then
+    echo "Found /tmp/.env"
+else
+    echo "Not found /tmp/.env"
+fi
+
+# Output /tmp/.env file (for debugging)
+echo "Output /tmp/.env file (for debugging)"
+echo "---"
+cat /tmp/.env
+echo "---"
+
+# Run /tmp/.env in current shell environment
+echo "Running 'source /tmp/.env'"
 source /tmp/.env
+
 
 if [ "${START_MYSQL}" = "true" ]; then
   echo 'DATABASE_SOCKET=/app/tmp/sockets/mysqld.sock' >> /tmp/.env
@@ -110,15 +142,18 @@ chmod ugo+r /app/.env
 rm -f /tmp/.env.example
 
 # use default port number if it is still not set
+echo "Use default port number if it is still not set"
 case "${DATABASE_ADAPTER}" in
   mysql2) DATABASE_PORT=${DATABASE_PORT:-3306} ;;
   postgresql) DATABASE_PORT=${DATABASE_PORT:-5432} ;;
   *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
 esac
 
+echo "Running bundle install"
 bundle install --without test development --path vendor/bundle
 
-# Configure the unicorn server
+# Configuring the unicorn server
+echo "Configuring the unicorn server"
 sed -r config/unicorn.rb.example \
     -e "s/^ *listen .+/listen '$IP:$PORT'/" \
     -e 's;^ *stderr_path .+;stderr_path "/dev/stderr";' \
@@ -126,3 +161,5 @@ sed -r config/unicorn.rb.example \
     -e '/^ *pid .+/d' > config/unicorn.rb
 
 mkdir -p tmp/pids tmp/cache tmp/sockets log
+
+echo "Finished setup_env"

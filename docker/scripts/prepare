@@ -18,6 +18,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 CLEAR_DOCKER_CACHE=2020-05-28
 
+echo $'\nInstall packages'
 minimal_apt_get_install='apt-get install -y --no-install-recommends'
 
 apt-get update
@@ -34,6 +35,10 @@ locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 gem install --no-document bundler -v 1.17.3
 
+echo $'\nInstall shared-mime-info'
+apt-get install shared-mime-info
+
+echo $'\nPurge python3* rsyslog rsync manpages'
 apt-get purge -y python3* rsyslog rsync manpages
 apt-get -y clean
 apt-get -y autoremove
@@ -44,8 +49,10 @@ rm -rf /usr/share/locale/
 rm -rf /var/log/*
 
 # Install the latest jq for JqAgent
+echo $'\nInstall the latest jq for JqAgent'
 curl -fsSL -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/latest/download/jq-linux64
 chmod +x /usr/local/bin/jq
 
 mkdir -p /app
 chmod -R g=u /etc/passwd /app
+echo $'\nFinished Docker Prepare Script\n'
