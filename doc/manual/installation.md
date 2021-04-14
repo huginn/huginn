@@ -387,7 +387,7 @@ This file should be empty, it is the first place to look because `nginx` is the 
 
 Common problems:
 
-* `connect() to unix:/home/huginn/huginn/tmp/sockets/unicorn.socket failed`: The Unicorn application server is not running, ensure you uncommented one of the example configuration below the `PRODUCTION` label in your [Profile](#install-init-script) and the unicorn config file (`/home/huginn/huginn/config/unicorn.rb`) exists.
+* `connect() to unix:/home/huginn/huginn/tmp/sockets/unicorn.socket failed`: The Unicorn application server is not running, ensure you uncommented one of the example configuration below the `PRODUCTION` label in your [Procfile](#install-init-script) and the unicorn config file (`/home/huginn/huginn/config/unicorn.rb`) exists.
 * `138 open() "/home/huginn/huginn/public/..." failed (13: Permission denied)`: The `/home/huginn/huginn/public` directory needs to be readable by the nginx user (which is per default `www-data`)
 
 
