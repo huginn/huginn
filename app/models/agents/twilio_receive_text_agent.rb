@@ -71,7 +71,7 @@ module Agents
       signature = headers['HTTP_X_TWILIO_SIGNATURE']
 
       # validate from twilio
-      @validator ||= Twilio::Util::RequestValidator.new interpolated['auth_token']
+      @validator ||= Twilio::Security::RequestValidator.new interpolated['auth_token']
       if !@validator.validate(post_url, params, signature)
         error("Twilio Signature Failed to Validate\n\n"+
           "URL: #{post_url}\n\n"+
@@ -82,12 +82,12 @@ module Agents
       end
 
       if create_event(payload: params)
-        response = Twilio::TwiML::Response.new do |r|
+        response = Twilio::TwiML::MessagingResponse.new do |r|
           if interpolated['reply_text'].present?
-            r.Message interpolated['reply_text']
+            r.message(body: interpolated['reply_text'])
           end
         end
-        return [response.text, 201, "text/xml"]
+        return [response.to_s, 200, "text/xml"]
       else
         return ["Bad request", 400]
       end
