@@ -14,7 +14,7 @@ class Seeder
     user.save!
 
     if DefaultScenarioImporter.seed(user)
-      puts "NOTE: The example 'SF Weather Agent' will not work until you edit it and put in a free API key from http://www.wunderground.com/weather/api/"
+      puts "NOTE: The example 'SF Weather Agent' will not work until you edit it and put in a free API key from https://home.openweathermap.org/api_keys."
       puts "See the Huginn Wiki for more Agent examples!  https://github.com/huginn/huginn/wiki"
     else
       raise('Unable to import the default scenario')
