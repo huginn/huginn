@@ -8,6 +8,8 @@ module Agents
 
     description do <<-MD
       The User Location Agent creates events based on WebHook POSTS that contain a `latitude` and `longitude`.  You can use the [POSTLocation](https://github.com/cantino/post_location) or [PostGPS](https://github.com/chriseidhof/PostGPS) iOS app to post your location to `https://#{ENV['DOMAIN']}/users/#{user.id}/update_location/:secret` where `:secret` is specified in your options.
+      
+      You can also use [SendLocation](https://itunes.apple.com/us/app/sendlocation/id377724446), available on the iOS App Store.  With SendLocation, though, you will need to use a Webhook Agent to receive the GPS pings, and then an Event Formatting Agent to convert "lat" to "latitude" and "lon" to "longitude". These messages can then be handled by your User Location Agent.
 
       #{'## Include `haversine` in your Gemfile to use this Agent!' if dependencies_missing?}
 
