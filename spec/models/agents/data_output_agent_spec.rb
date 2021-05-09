@@ -88,7 +88,7 @@ describe Agents::DataOutputAgent do
         { status: 200, body: 'ok' }
       }
 
-      agent.receive(events(:bob_website_agent_event))
+      agent.receive([])
 
       expect(alist).to eq [
         ["hub.mode", "publish"],
