@@ -36,7 +36,7 @@ module Agents
       {
         'window_duration_in_days' => "2",
         'message' => "No data has been received!",
-	'alert_on_every_run' => false 
+        'alert_on_every_run' => false
       }
     end
 
@@ -64,7 +64,7 @@ module Agents
           memory['alerted_at'] = Time.now.to_i
           create_event payload: { message: interpolated['message'],
                                   gap_started_at: memory['newest_event_created_at'] }
-	end
+        end
       end
     end
   end
