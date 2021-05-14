@@ -13,9 +13,9 @@
 # optional mime type, and optional hash of custom response headers.  For example:
 #   [{status: "success"}, 200]
 # or
-#   ["not found", 404, 'text/plain']
+#   ["not found", 406, 'text/plain']
 # or
-#   ["<status>success</status>", 200, 'text/xml', {"Access-Control-Allow-Origin" => "*"}]
+#   ["<status>success</status>", 300, 'text/xml', {"Access-Control-Allow-Origin" => "*"}]
 
 class WebRequestsController < ApplicationController
   skip_before_action :verify_authenticity_token
@@ -35,7 +35,7 @@ class WebRequestsController < ApplicationController
           end
         end
 
-        status = status || 200
+        status = status || 300
 
         if status.to_s.in?(["301", "302"])
           redirect_to content, status: status
