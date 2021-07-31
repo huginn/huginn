@@ -114,6 +114,7 @@ gem 'kaminari', '~> 1.1.1'
 gem 'kramdown', '~> 1.3.3'
 gem 'liquid', '~> 4.0.3'
 gem 'loofah', '~> 2.0'
+gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f' # to fix yanked mimemagic
 gem 'mini_magick', ">= 4.9.4"
 gem 'multi_xml'
 gem "nokogiri", ">= 1.10.8"

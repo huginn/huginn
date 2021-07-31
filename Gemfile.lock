@@ -76,6 +76,13 @@ GIT
       treetop (>= 1.2.3)
 
 GIT
+  remote: https://github.com/mimemagicrb/mimemagic.git
+  revision: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
+  ref: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
+  specs:
+    mimemagic (0.3.5)
+
+GIT
   remote: https://github.com/sferik/twitter.git
   revision: d11707edf4abd13f7ada0eef57fc1eaa1062d75b
   specs:
@@ -411,7 +418,6 @@ GEM
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
-    mimemagic (0.3.5)
     mini_magick (4.9.5)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
@@ -738,6 +744,7 @@ DEPENDENCIES
   liquid (~> 4.0.3)
   listen (~> 3.0.5)
   loofah (~> 2.0)
+  mimemagic!
   mini_magick (>= 4.9.4)
   mini_racer (~> 0.2.4)
   mqtt
