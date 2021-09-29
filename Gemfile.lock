@@ -416,7 +416,7 @@ GEM
       rake
     mini_magick (4.9.5)
     mini_mime (1.0.2)
-    mini_portile2 (2.4.0)
+    mini_portile2 (2.6.1)
     mini_racer (0.2.9)
       libv8 (>= 6.9.411)
     minitest (5.14.1)
@@ -434,8 +434,9 @@ GEM
     net-ssh (5.0.2)
     netrc (0.11.0)
     nio4r (2.5.2)
-    nokogiri (1.10.9)
-      mini_portile2 (~> 2.4.0)
+    nokogiri (1.12.5)
+      mini_portile2 (~> 2.6.1)
+      racc (~> 1.4)
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
@@ -489,6 +490,7 @@ GEM
     pry-rails (0.3.4)
       pry (>= 0.9.10)
     public_suffix (3.0.2)
+    racc (1.5.2)
     rack (2.2.2)
     rack-livereload (0.3.16)
       rack
