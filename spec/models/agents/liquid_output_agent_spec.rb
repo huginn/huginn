@@ -72,7 +72,14 @@ describe Agents::LiquidOutputAgent do
       expect(agent).not_to be_valid
     end
 
-    it "should should not allow non-integer event limits" do
+    it "should validate the event_limit with relative time" do
+      agent.options[:event_limit] = "15 minutes"
+      expect(agent).to be_valid
+      agent.options[:event_limit] = "1 century"
+      expect(agent).not_to be_valid
+    end
+
+    it "should not allow non-integer event limits" do
       agent.options[:event_limit] = "abc1234"
       expect(agent).not_to be_valid
     end

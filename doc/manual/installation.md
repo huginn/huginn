@@ -72,7 +72,7 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.bz2 | tar xj
+    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.bz2 | tar xj
     cd ruby-2.6.5
     ./configure --disable-install-rdoc
     make -j`nproc`
@@ -264,6 +264,8 @@ Enable (remove the comment) [from these lines](https://github.com/huginn/huginn/
 
     # web: bundle exec unicorn -c config/unicorn.rb
     # jobs: bundle exec rails runner bin/threaded.rb
+
+**Note:** Ensure you have no leading spaces before `web:` or `jobs:` in your `Procfile` file.
 
 Export the init scripts:
 

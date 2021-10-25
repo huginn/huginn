@@ -13,7 +13,8 @@ describe Agents::WebhookAgent do
   describe 'receive_web_request' do
     it 'should create event if secret matches' do
       webpayload = ActionDispatch::Request.new({
-          'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+          'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+          'action_dispatch.request.path_parameters' => { secret: 'foobar' },
           'REQUEST_METHOD' => "POST",
           'HTTP_ACCEPT' => 'application/xml',
           'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -31,7 +32,8 @@ describe Agents::WebhookAgent do
 
     it 'should be able to create multiple events when given an array' do
       webpayload = ActionDispatch::Request.new({
-          'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+          'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+          'action_dispatch.request.path_parameters' => { secret: 'foobar' },
           'REQUEST_METHOD' => "POST",
           'HTTP_ACCEPT' => 'application/xml',
           'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -49,7 +51,8 @@ describe Agents::WebhookAgent do
 
     it 'should not create event if secrets do not match' do
       webpayload = ActionDispatch::Request.new({
-          'action_dispatch.request.request_parameters' => payload.merge({"secret" => "bazbat", 'some_key' => payload}),
+          'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+          'action_dispatch.request.path_parameters' => { secret: 'bazbat' },
           'REQUEST_METHOD' => "POST",
           'HTTP_ACCEPT' => 'application/xml',
           'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -66,7 +69,8 @@ describe Agents::WebhookAgent do
 
     it 'should respond with customized response message if configured with `response` option' do
       webpayload = ActionDispatch::Request.new({
-          'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+          'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+          'action_dispatch.request.path_parameters' => { secret: 'foobar' },
           'REQUEST_METHOD' => "POST",
           'HTTP_ACCEPT' => 'application/xml',
           'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -84,7 +88,8 @@ describe Agents::WebhookAgent do
 
     it 'should respond with interpolated response message if configured with `response` option' do
       webpayload = ActionDispatch::Request.new({
-          'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+          'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+          'action_dispatch.request.path_parameters' => { secret: 'foobar' },
           'REQUEST_METHOD' => "POST",
           'HTTP_ACCEPT' => 'application/xml',
           'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -97,7 +102,8 @@ describe Agents::WebhookAgent do
 
     it 'should respond with custom response header if configured with `response_headers` option' do
       webpayload = ActionDispatch::Request.new({
-          'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+          'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+          'action_dispatch.request.path_parameters' => { secret: 'foobar' },
           'REQUEST_METHOD' => "POST",
           'HTTP_ACCEPT' => 'application/xml',
           'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -109,7 +115,8 @@ describe Agents::WebhookAgent do
 
     it 'should respond with `Event Created` if the response option is nil or missing' do
       webpayload = ActionDispatch::Request.new({
-          'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+          'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+          'action_dispatch.request.path_parameters' => { secret: 'foobar' },
           'REQUEST_METHOD' => "POST",
           'HTTP_ACCEPT' => 'application/xml',
           'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -126,7 +133,8 @@ describe Agents::WebhookAgent do
 
     it 'should respond with customized response code if configured with `code` option' do
       webpayload = ActionDispatch::Request.new({
-          'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+          'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+          'action_dispatch.request.path_parameters' => { secret: 'foobar' },
           'REQUEST_METHOD' => "POST",
           'HTTP_ACCEPT' => 'application/xml',
           'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -139,7 +147,8 @@ describe Agents::WebhookAgent do
 
     it 'should respond with `201` if the code option is empty, nil or missing' do
       webpayload = ActionDispatch::Request.new({
-          'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+          'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+          'action_dispatch.request.path_parameters' => { secret: 'foobar' },
           'REQUEST_METHOD' => "POST",
           'HTTP_ACCEPT' => 'application/xml',
           'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -164,7 +173,8 @@ describe Agents::WebhookAgent do
 
         it "should not accept GET" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "GET",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -179,7 +189,8 @@ describe Agents::WebhookAgent do
 
         it "should accept POST" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -200,7 +211,8 @@ describe Agents::WebhookAgent do
 
         it "should accept GET" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "GET",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -215,7 +227,8 @@ describe Agents::WebhookAgent do
 
         it "should accept POST" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -230,7 +243,8 @@ describe Agents::WebhookAgent do
 
         it "should not accept PUT" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "PUT",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -251,7 +265,8 @@ describe Agents::WebhookAgent do
 
         it "should accept GET" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "GET",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -266,7 +281,8 @@ describe Agents::WebhookAgent do
 
         it "should not accept POST" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -287,7 +303,8 @@ describe Agents::WebhookAgent do
 
         it "should not accept GET" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "GET",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -302,7 +319,8 @@ describe Agents::WebhookAgent do
 
         it "should accept POST" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -323,7 +341,8 @@ describe Agents::WebhookAgent do
 
         it "should accept PUT" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "PUT",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -338,7 +357,8 @@ describe Agents::WebhookAgent do
 
         it "should not accept GET" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "GET",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -353,7 +373,8 @@ describe Agents::WebhookAgent do
 
         it "should not accept POST" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -374,7 +395,8 @@ describe Agents::WebhookAgent do
 
         it "should accept PUT" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "PUT",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -389,7 +411,8 @@ describe Agents::WebhookAgent do
 
         it "should accept GET" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "GET",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -404,7 +427,8 @@ describe Agents::WebhookAgent do
 
         it "should accept POST" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -419,7 +443,8 @@ describe Agents::WebhookAgent do
 
         it "should not accept DELETE" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "DELETE",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -437,7 +462,8 @@ describe Agents::WebhookAgent do
       context "with reCAPTCHA" do
         it "should not check a reCAPTCHA response unless recaptcha_secret is set" do
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -462,7 +488,8 @@ describe Agents::WebhookAgent do
           agent.options['recaptcha_secret'] = 'supersupersecret'
 
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -486,7 +513,8 @@ describe Agents::WebhookAgent do
         it "should reject a request if recaptcha_secret is set and g-recaptcha-response given is not verified" do
           agent.options['recaptcha_secret'] = 'supersupersecret'
           webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload, 'g-recaptcha-response' => 'somevalue'}),
+              'action_dispatch.request.request_parameters' => { 'some_key' => payload, 'g-recaptcha-response' => 'somevalue' },
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -510,7 +538,8 @@ describe Agents::WebhookAgent do
           agent.options['payload_path'] = '.'
           agent.options['recaptcha_secret'] = 'supersupersecret'
           webpayload = ActionDispatch::Request.new({
-            'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'g-recaptcha-response' => 'somevalue'}),
+              'action_dispatch.request.request_parameters' => payload.merge({ 'g-recaptcha-response' => 'somevalue' }),
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
               'REQUEST_METHOD' => "POST",
               'HTTP_ACCEPT' => 'application/xml',
               'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -531,12 +560,70 @@ describe Agents::WebhookAgent do
           expect(out).to eq(["Event Created", 201])
           expect(Event.last.payload).to eq(payload)
         end
+
+        it "should accept a request if recaptcha_secret is set and g-recaptcha-response given is verified and
+        reCAPTCHA v3 score is above score_treshold" do
+          agent.options['payload_path'] = '.'
+          agent.options['recaptcha_secret'] = 'supersupersecret'
+          agent.options['score_threshold'] = 0.5
+          webpayload = ActionDispatch::Request.new({
+              'action_dispatch.request.request_parameters' => payload.merge({ 'g-recaptcha-response' => 'somevalue' }),
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
+              'REQUEST_METHOD' => "POST",
+              'HTTP_ACCEPT' => 'application/xml',
+              'HTTP_X_HELLO_WORLD' => "Hello Huginn"
+            })
+
+          checked = false
+          out = nil
+
+          stub_request(:any, /verify/).to_return { |request|
+            checked = true
+            { status: 200, body: '{"success":true, "score":0.9}' }
+          }
+
+          expect {
+            out = agent.receive_web_request(webpayload)
+          }.to change { checked }
+
+          expect(out).to eq(["Event Created", 201])
+          expect(Event.last.payload).to eq(payload)
+        end
+
+        it "should reject a request if recaptcha_secret is set and g-recaptcha-response given is verified and
+        reCAPTCHA v3 score is below score_treshold" do
+          agent.options['payload_path'] = '.'
+          agent.options['recaptcha_secret'] = 'supersupersecret'
+          agent.options['score_threshold'] = 0.5
+          webpayload = ActionDispatch::Request.new({
+              'action_dispatch.request.request_parameters' => payload.merge({ 'g-recaptcha-response' => 'somevalue' }),
+              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
+              'REQUEST_METHOD' => "POST",
+              'HTTP_ACCEPT' => 'application/xml',
+              'HTTP_X_HELLO_WORLD' => "Hello Huginn"
+            })
+
+          checked = false
+          out = nil
+
+          stub_request(:any, /verify/).to_return { |request|
+            checked = true
+            { status: 200, body: '{"success":true, "score":0.1}' }
+          }
+
+          expect {
+            out = agent.receive_web_request(webpayload)
+          }.to change { checked }
+
+          expect(out).to eq(["Not Authorized", 401])
+        end
       end
     end
     context "with headers" do
       it "should not pass any headers if event_headers_key is not set" do
         webpayload = ActionDispatch::Request.new({
-            'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+            'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+            'action_dispatch.request.path_parameters' => { secret: 'foobar' },
             'REQUEST_METHOD' => "POST",
             'HTTP_ACCEPT' => 'application/xml',
             'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -556,7 +643,8 @@ describe Agents::WebhookAgent do
 
       it "should pass selected headers specified in event_headers_key" do
         webpayload = ActionDispatch::Request.new({
-            'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+            'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+            'action_dispatch.request.path_parameters' => { secret: 'foobar' },
             'REQUEST_METHOD' => "POST",
             'HTTP_ACCEPT' => 'application/xml',
             'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -576,7 +664,8 @@ describe Agents::WebhookAgent do
 
       it "should pass empty event_headers_key if none of the headers exist" do
         webpayload = ActionDispatch::Request.new({
-            'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+            'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+            'action_dispatch.request.path_parameters' => { secret: 'foobar' },
             'REQUEST_METHOD' => "POST",
             'HTTP_ACCEPT' => 'application/xml',
             'HTTP_X_HELLO_WORLD' => "Hello Huginn"
@@ -596,7 +685,8 @@ describe Agents::WebhookAgent do
 
       it "should pass empty event_headers_key if event_headers is empty" do
         webpayload = ActionDispatch::Request.new({
-            'action_dispatch.request.request_parameters' => payload.merge({"secret" => "foobar", 'some_key' => payload}),
+            'action_dispatch.request.request_parameters' => { 'some_key' => payload },
+            'action_dispatch.request.path_parameters' => { secret: 'foobar' },
             'REQUEST_METHOD' => "POST",
             'HTTP_ACCEPT' => 'application/xml',
             'HTTP_X_HELLO_WORLD' => "Hello Huginn"

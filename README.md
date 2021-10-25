@@ -23,7 +23,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Track your location over time
 * Create Amazon Mechanical Turk workflows as the inputs, or outputs, of agents (the Amazon Turk Agent is called the "HumanTaskAgent"). For example: "Once a day, ask 5 people for a funny cat photo; send the results to 5 more people to be rated; send the top-rated photo to 5 people for a funny caption; send to 5 final people to rate for funniest caption; finally, post the best captioned photo on my blog."
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/huginn/huginn?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Changelog #199](https://img.shields.io/badge/changelog-%23199-lightgrey.svg)](https://changelog.com/199)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/huginn/huginn?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Changelog #199](https://img.shields.io/badge/changelog-%23199-lightgrey.svg)](https://changelog.com/podcast/199)
 
 Join us in our [Gitter room](https://gitter.im/huginn/huginn) to discuss the project.
 
@@ -112,9 +112,9 @@ Huginn launches on the free version of Heroku [with significant limitations](htt
 
 ### OpenShift
 
-#### OpenShift v3
+#### OpenShift Online
 
-Try Huginn on OpenShift Online (v3)
+Try Huginn on OpenShift Online
 
 Create a new app with either `mysql` or `postgres`:
 ```bash
@@ -128,9 +128,7 @@ oc new-app -f https://raw.githubusercontent.com/huginn/huginn/master/openshift/t
 
 If you are on the Starter plan, make sure to follow the [guide](https://docs.openshift.com/online/getting_started/beyond_the_basics.html#btb-creating-a-new-application-from-source-code) to remove any existing application.
 
-##### OpenShift v4
-
-If you would like to run this on OpenShift v4+ you should look at the [Docker](https://github.com/huginn/huginn/blob/master/doc/docker/install.md) documentaition as your deployment process.
+The templates should work on a v3 installation or the current v4 online.
 
 ### Manual installation on any server
 

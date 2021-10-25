@@ -16,7 +16,7 @@
 <%= form_tag handle_details_post_agent_path(@agent), :id => "create-event-form" do %>
   <div class="form-group">
     <textarea rows="10" id="payload" name="payload" class="payload-editor" data-height="200">
-      {}
+      <%= (@agent.options["payload"].presence || {}).to_json %>
     </textarea>
   </div>
 

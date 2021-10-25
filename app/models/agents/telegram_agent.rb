@@ -12,10 +12,11 @@ module Agents
     description <<-MD
       The Telegram Agent receives and collects events and sends them via [Telegram](https://telegram.org/).
 
-      It is assumed that events have either a `text`, `photo`, `audio`, `document` or `video` key. You can use the EventFormattingAgent if your event does not provide these keys.
+      It is assumed that events have either a `text`, `photo`, `audio`, `document`, `video` or `group` key. You can use the EventFormattingAgent if your event does not provide these keys.
 
-      The value of `text` key is sent as a plain text message. You can also tell Telegram how to parse the message with `parse_mode`, set to either `html` or `markdown`.
+      The value of `text` key is sent as a plain text message. You can also tell Telegram how to parse the message with `parse_mode`, set to either `html`, `markdown` or `markdownv2`.
       The value of `photo`, `audio`, `document` and `video` keys should be a url whose contents will be sent to you.
+      The value of `group` key should be a list and must consist of 2-10 objects representing an [InputMedia](https://core.telegram.org/bots/api#inputmedia) from the [Telegram Bot API](https://core.telegram.org/bots/api#inputmedia). Be careful: the `caption` field is not covered by the "long message" setting. 
 
       **Setup**
 
@@ -31,7 +32,7 @@ module Agents
 
       **Options**
 
-      * `caption`: caption for a media content (0-1024 characters)
+      * `caption`: caption for a media content (0-1024 characters), applied only for `photo`, `audio`, `document`, or `video`
       * `disable_notification`: send a message silently in a channel
       * `disable_web_page_preview`: disable link previews for links in a text message
       * `long_message`: truncate (default) or split text messages and captions that exceed Telegram API limits. Markdown and HTML tags can't span across messages and, if not opened or closed properly, will render as plain text.
@@ -53,7 +54,7 @@ module Agents
     form_configurable :disable_notification, type: :array, values: ['', 'true', 'false']
     form_configurable :disable_web_page_preview, type: :array, values: ['', 'true', 'false']
     form_configurable :long_message, type: :array, values: ['', 'split', 'truncate']
-    form_configurable :parse_mode, type: :array, values: ['', 'html', 'markdown']
+    form_configurable :parse_mode, type: :array, values: ['', 'html', 'markdown', 'markdownv2']
 
     def validate_auth_token
       HTTMultiParty.post(telegram_bot_uri('getMe'))['ok']
@@ -72,7 +73,7 @@ module Agents
       errors.add(:base, "disable_notification has invalid value: should be 'true' or 'false'") if interpolated['disable_notification'].present? && !%w(true false).include?(interpolated['disable_notification'])
       errors.add(:base, "disable_web_page_preview has invalid value: should be 'true' or 'false'") if interpolated['disable_web_page_preview'].present? && !%w(true false).include?(interpolated['disable_web_page_preview'])
       errors.add(:base, "long_message has invalid value: should be 'split' or 'truncate'") if interpolated['long_message'].present? && !%w(split truncate).include?(interpolated['long_message'])
-      errors.add(:base, "parse_mode has invalid value: should be 'html' or 'markdown'") if interpolated['parse_mode'].present? && !%w(html markdown).include?(interpolated['parse_mode'])
+      errors.add(:base, "parse_mode has invalid value: should be 'html', 'markdown' or 'markdownv2'") if interpolated['parse_mode'].present? && !%w(html markdown markdownv2).include?(interpolated['parse_mode'])
     end
 
     def working?
@@ -92,7 +93,8 @@ module Agents
       photo:    :sendPhoto,
       audio:    :sendAudio,
       document: :sendDocument,
-      video:    :sendVideo
+      video:    :sendVideo,
+      group:    :sendMediaGroup,
     }.freeze
 
     def configure_params(params)
@@ -101,7 +103,7 @@ module Agents
       if params.has_key?(:text)
         params[:disable_web_page_preview] = interpolated['disable_web_page_preview'] if interpolated['disable_web_page_preview'].present?
         params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
-      else
+      elsif not params.has_key?(:media)
         params[:caption] = interpolated['caption'] if interpolated['caption'].present?
       end
 
@@ -113,7 +115,11 @@ module Agents
         messages_send = TELEGRAM_ACTIONS.count do |field, _method|
           payload = event.payload[field]
           next unless payload.present?
-          send_telegram_messages field, configure_params(field => payload)
+          if field == :group
+            send_telegram_messages field, configure_params(:media => payload)
+          else
+            send_telegram_messages field, configure_params(field => payload)
+          end
           true
         end
         error("No valid key found in event #{event.payload.inspect}") if messages_send.zero?
@@ -121,7 +127,9 @@ module Agents
     end
 
     def send_message(field, params)
-      response = HTTMultiParty.post telegram_bot_uri(TELEGRAM_ACTIONS[field]), query: params
+      response = HTTMultiParty.post telegram_bot_uri(TELEGRAM_ACTIONS[field]),
+                                    body: params.to_json,
+                                    headers: { 'Content-Type' => 'application/json' }
       unless response['ok']
         error(response)
       end
@@ -130,16 +138,17 @@ module Agents
     def send_telegram_messages(field, params)
       if interpolated['long_message'] == 'split'
         if field == :text
-          params[:text].scan(/\G(?:\w{4096}|.{1,4096}(?=\b|\z))/m) do |message|
-            send_message field, configure_params(field => message.strip) unless message.strip.blank?
+          params[:text].scan(/\G\s*(?:\w{4096}|.{1,4096}(?=\b|\z))/m) do |message|
+            message.strip!
+            send_message field, configure_params(field => message) unless message.blank?
           end
         else
-          caption_array = params[:caption].scan(/\G(?:\w{1024}|.{1,1024}(?=\b|\z))/m)
-          params[:caption] = caption_array.first.strip
+          caption_array = (params[:caption].presence || '').scan(/\G\s*\K(?:\w{1024}|.{1,1024}(?=\b|\z))/m).map(&:strip)
+          params[:caption] = caption_array.shift
           send_message field, params
-          caption_array.drop(1).each do |caption|
-            send_message(:text, configure_params(text: caption.strip)) unless caption.strip.blank?
-            end
+          caption_array.each do |caption|
+            send_message(:text, configure_params(text: caption)) unless caption.blank?
+          end
         end
       else
         params[:caption] = params[:caption][0..1023] if params[:caption]
