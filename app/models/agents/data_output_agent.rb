@@ -22,12 +22,51 @@ module Agents
 
           * `secrets` - An array of tokens that the requestor must provide for light-weight authentication.
           * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
-          * `template` - A JSON object representing a mapping between item output keys and incoming event values.  Use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to format the values.  Values of the `link`, `title`, `description` and `icon` keys will be put into the \\<channel\\> section of RSS output.  Value of the `self` key will be used as URL for this feed itself, which is useful when you serve it via reverse proxy.  The `item` key will be repeated for every Event.  The `pubDate` key for each item will have the creation time of the Event unless given.
+          * `xml_format` - The XML output format: `rss` or `atom` (default: `rss`)
+          * `xml_content_type` - Content-Type for XML output (default: `application/rss+xml` for RSS and `applicaton/atom+xml` for ATOM)
+          * `template` - A JSON object representing a mapping between item output keys and incoming event values.  Use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to format the values.  This should be configured depending on the `xml_format`.
+
+            * RSS
+
+              Values of the `link`, `title`, `description` and `icon` keys will be put into the \\<channel\\> section of RSS output.  Value of the `self` key will be used as URL for this feed itself, which is useful when you serve it via reverse proxy.  The `item` key will be repeated for every Event.  The `pubDate` key for each item will have the creation time of the Event unless given.
+
+              Example:
+
+                  "template": {
+                    "description": "My awesome feed",
+                    "item": {
+                      "title": "{{title}}",
+                      "link": "{{url}}",
+                      "description": "{{description}}",
+                      "pubDate": "{{date}}"
+                    }
+                  }
+
+            * ATOM
+
+              Values of the `link`, `title`, `subtitle` and `icon` keys will be put directly under the \\<feed\\> section of ATOM output.  Value of the `self` key will be used as URL for this feed itself, which is useful when you serve it via reverse proxy.  The `entry` key will be repeated for every Event.  The `created` and `updated` keys for each item will have the creation time of the Event unless given.
+
+              Example:
+
+                  "template": {
+                    "subtitle": "My awesome feed",
+                    "entry": {
+                      "title": "{{title}}",
+                      "link": {
+                        "_attributes": {
+                          "href": "{{url}}"
+                        },
+                      },
+                      "content": "{{description}}",
+                      "published": "{{date}}",
+                      "updated": "{{date}}"
+                    }
+                  }
+
           * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
           * `ttl` - A value for the \\<ttl\\> element in RSS output. (default: `60`)
           * `ns_media` - Add [yahoo media namespace](https://en.wikipedia.org/wiki/Media_RSS) in output xml
           * `ns_itunes` - Add [itunes compatible namespace](http://lists.apple.com/archives/syndication-dev/2005/Nov/msg00002.html) in output xml
-          * `rss_content_type` - Content-Type for RSS output (default: `application/rss+xml`)
           * `response_headers` - An object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
           * `push_hubs` - Set to a list of PubSubHubbub endpoints you want to publish an update to every time this agent receives an event. (default: none)  Popular hubs include [Superfeedr](https://pubsubhubbub.superfeedr.com/) and [Google](https://pubsubhubbub.appspot.com/).  Note that publishing updates will make your feed URL known to the public, so if you want to keep it secret, set up a reverse proxy to serve your feed via a safe URL and specify it in `template.self`.
 
@@ -102,6 +141,10 @@ module Agents
         errors.add(:base, "Please specify one or more secrets for 'authenticating' incoming feed requests")
       end
 
+      if !response_headers
+        errors.add(:base, "Please provide key-value pairs for 'response_headers'")
+      end
+
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
         errors.add(:base, "Please provide 'expected_receive_period_in_days' to indicate how many days can pass before this Agent is considered to be not working")
       end
@@ -170,11 +213,26 @@ module Agents
     end
 
     def feed_description
-      interpolated['template']['description'].presence || "A feed of Events received by the '#{name}' Huginn Agent"
+      interpolated['template']['description'].presence ||
+        interpolated['template']['subtitle'].presence ||
+        "A feed of Events received by the '#{name}' Huginn Agent"
     end
 
-    def rss_content_type
-      interpolated['rss_content_type'].presence || 'application/rss+xml'
+    def xml_format
+      case format = interpolated['xml_format']
+      when 'rss', 'atom'
+        format.to_sym
+      else
+        :rss
+      end
+    end
+
+    def tag_uri
+      @tag_uri ||= "tag:#{(URI(feed_link).host rescue ENV['DOMAIN'])},2013:#{id}"
+    end
+
+    def event_to_item(event)
+      interpolate_options(options['template']['item'].presence || options['template']['entry'].presence, event)
     end
 
     def xml_namespace
@@ -191,6 +249,25 @@ module Agents
 
     def push_hubs
       interpolated['push_hubs'].presence || []
+    end
+
+    def response_headers
+      case headers = options['response_headers']
+      when Hash
+        headers.transform_values { |v| v.presence&.to_s }.compact
+      when Array
+        if headers.all? { |v| v.is_a?(Array) && v.size == 2 && v.first.is_a?(String) }
+          headers.to_h.transform_values { |v| v.presence&.to_s }.compact
+        else
+          false
+        end
+      else
+        if headers.blank?
+          {}
+        else
+          false
+        end
+      end
     end
 
     DEFAULT_EVENTS_ORDER = {
@@ -258,44 +335,90 @@ module Agents
 
       source_events = sort_events(latest_events(), 'events_list_order')
 
+      xml_format = xml_format()
+
       interpolate_with('events' => source_events) do
-        items = source_events.map do |event|
-          interpolated = interpolate_options(options['template']['item'], event)
-          interpolated['guid'] = {'_attributes' => {'isPermaLink' => 'false'},
-                                  '_contents' => interpolated['guid'].presence || event.id}
-          date_string = interpolated['pubDate'].to_s
-          date =
-            begin
-              Time.zone.parse(date_string)  # may return nil
-            rescue => e
-              error "Error parsing a \"pubDate\" value \"#{date_string}\": #{e.message}"
-              nil
-            end || event.created_at
-          interpolated['pubDate'] = date.rfc2822.to_s
-          interpolated
-        end
+        items =
+          case xml_format
+          when :atom
+            source_events.map do |event|
+              interpolated = event_to_item(event)
+              interpolated['id'] = {
+                '_contents' => interpolated.delete('id').presence || "#{tag_uri},#{event.id}"
+              }
+              set_timestamp(interpolated, 'published', :iso8601) { event.created_at }
+              set_timestamp(interpolated, 'updated', :iso8601) { event.created_at }
+              interpolated
+            end
+          else
+            source_events.map do |event|
+              interpolated = event_to_item(event)
+              interpolated['guid'] = {
+                '_attributes' => { 'isPermaLink' => 'false' },
+                '_contents' => interpolated['guid'].presence || event.id
+              }
+              set_timestamp(interpolated, 'pubDate', :rfc2822) { event.created_at }
+              interpolated
+            end
+          end
 
         now = Time.now
 
-        if format =~ /json/
-          content = {
-            'title' => feed_title,
-            'description' => feed_description,
-            'pubDate' => now,
-            'items' => simplify_item_for_json(items)
-          }
+        case format
+        when /json/
+          content =
+            case xml_format
+            when :atom
+              {
+                'title' => feed_title,
+                'subtitle' => feed_description,
+                'updated' => now,
+                'entries' => simplify_item_for_json(items)
+              }
+            else
+              {
+                'title' => feed_title,
+                'description' => feed_description,
+                'pubDate' => now,
+                'items' => simplify_item_for_json(items)
+              }
+            end
 
-          return [content, 200, "application/json", interpolated['response_headers'].presence]
+          return [content, 200, "application/json", response_headers]
         else
           hub_links = push_hubs.map { |hub|
             <<-XML
- <atom:link rel="hub" href=#{hub.encode(xml: :attr)}/>
+ <link rel="hub" href=#{hub.encode(xml: :attr)}/>
             XML
           }.join
 
-          items = items_to_xml(items)
+          case xml_format
+          when :atom
+            items = items_to_atom(items)
+            content_type = interpolated['xml_content_type'].presence ||
+              'application/atom+xml'
 
-          return [<<-XML, 200, rss_content_type, interpolated['response_headers'].presence]
+            return [<<-XML, 200, content_type, response_headers]
+<?xml version="1.0" encoding="UTF-8" ?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ <id>#{tag_uri}</id>
+ <link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/atom+xml" />
+ <icon>#{feed_icon.encode(xml: :text)}</icon>
+#{hub_links}
+ <title type="text">#{feed_title.encode(xml: :text)}</title>
+ <subtitle type="text">#{feed_description.encode(xml: :text)}</subtitle>
+ <link href="#{feed_link.encode(xml: :text)}" />
+ <updated>#{now.iso8601.encode(xml: :text)}</updated>
+#{items}
+</feed>
+            XML
+          else
+            items = items_to_rss(items)
+            content_type = interpolated['xml_content_type'].presence ||
+              interpolated['rss_content_type'].presence || # backward compatibility
+              'application/rss+xml'
+
+            return [<<-XML, 200, content_type, response_headers]
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" #{xml_namespace}>
 <channel>
@@ -306,13 +429,14 @@ module Agents
  <title>#{feed_title.encode(xml: :text)}</title>
  <description>#{feed_description.encode(xml: :text)}</description>
  <link>#{feed_link.encode(xml: :text)}</link>
- <lastBuildDate>#{now.rfc2822.to_s.encode(xml: :text)}</lastBuildDate>
- <pubDate>#{now.rfc2822.to_s.encode(xml: :text)}</pubDate>
+ <lastBuildDate>#{now.rfc2822.encode(xml: :text)}</lastBuildDate>
+ <pubDate>#{now.rfc2822.encode(xml: :text)}</pubDate>
  <ttl>#{feed_ttl}</ttl>
 #{items}
 </channel>
 </rss>
-          XML
+            XML
+          end
         end
       end
     end
@@ -394,7 +518,23 @@ module Agents
       end
     end
 
-    def items_to_xml(items)
+    def items_to_atom(items)
+      simplify_item_for_xml(items)
+        .to_xml(skip_types: true, root: "entries", skip_instruct: true, indent: 1)
+        .gsub(%r{
+          (?<indent> ^\ + ) < (?<tagname> [^> ]+ ) > \n
+          (?<children>
+            (?: \k<indent> \  < \k<tagname> (?:\ [^>]*)? > [^<>]*? </ \k<tagname> > \n )+
+          )
+          \k<indent> </ \k<tagname> > \n
+        }mx) { $~[:children].gsub(/^ /, '') } # delete redundant nesting of array elements
+        .gsub(%r{
+          (?<indent> ^\ + ) < [^> ]+ /> \n
+        }mx, '') # delete empty elements
+        .gsub(%r{^</?entries>\n}, '')
+    end
+
+    def items_to_rss(items)
       simplify_item_for_xml(items)
         .to_xml(skip_types: true, root: "items", skip_instruct: true, indent: 1)
         .gsub(%r{
@@ -435,6 +575,20 @@ module Agents
      rescue => e
        error "Push failed: #{e.message}"
       end
+    end
+
+    def set_timestamp(hash, key, date_format, &block)
+      date =
+        if date_string = hash[key].presence
+          begin
+            Time.zone.parse(date_string)  # may return nil
+          rescue => e
+            error "Error parsing a \"#{key}\" value \"#{date_string}\": #{e.message}"
+            nil
+          end
+        end || block&.call or return
+
+      hash[key] = date.send(date_format).to_s
     end
   end
 end
