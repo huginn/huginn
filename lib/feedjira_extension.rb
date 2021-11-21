@@ -263,7 +263,7 @@ module FeedjiraExtension
     end
 
     def id
-      entry_id || Digest::MD5.hexdigest(content || summary || '')
+      entry_id || @dc_identifier || Digest::MD5.hexdigest(content || summary || '')
     end
   end
 
