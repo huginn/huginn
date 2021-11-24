@@ -1,31 +1,6 @@
 require 'liquid_migrator'
 
-class MigrateAgentsToLiquidTemplating < ActiveRecord::Migration
-  class Agent < ActiveRecord::Base
-    include JSONSerializedField
-    json_serialize :options, :memory
-  end
-  class Agents::HipchatAgent < Agent
-  end
-  class Agents::EventFormattingAgent < Agent
-  end
-  class Agents::PushbulletAgent < Agent
-  end
-  class Agents::JabberAgent < Agent
-  end
-  class Agents::DataOutputAgent < Agent
-  end
-  class Agents::TranslationAgent < Agent
-  end
-  class Agents::TwitterPublishAgent < Agent
-  end
-  class Agents::TriggerAgent < Agent
-  end
-  class Agents::PeakDetectorAgent < Agent
-  end
-  class Agents::HumanTaskAgent < Agent
-  end
-
+class MigrateAgentsToLiquidTemplating < ActiveRecord::Migration[4.2]
   def up
     Agent.where(:type => 'Agents::HipchatAgent').each do |agent|
       LiquidMigrator.convert_all_agent_options(agent)

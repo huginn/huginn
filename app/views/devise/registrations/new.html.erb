@@ -8,20 +8,20 @@
         <h2>Sign up</h2>
 
         <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: 'form-horizontal' }) do |f| %>
-          <%= devise_error_messages! %>
+          <%= render "devise/shared/error_messages", resource: resource %>
           <% if ENV['ON_HEROKU'] && User.count.zero? %>
           <div class="heroku-instructions">
             <% app_name = request.host[/\A[^.]+/] %>
             <p>If you are the owner of this application, take the following steps to complete the setup:</p>
 
             <ul>
-              <li>Read <a href="https://github.com/cantino/huginn/wiki/Run-Huginn-for-free-on-Heroku" target="_target">this document</a> carefully if you are going to try out Huginn for free on <a href="https://id.heroku.com/" target="_target">Heroku</a>.</li>
+              <li>Read <a href="https://github.com/huginn/huginn/wiki/Run-Huginn-for-free-on-Heroku" target="_target">this document</a> carefully if you are going to try out Huginn for free on <a href="https://id.heroku.com/" target="_target">Heroku</a>.</li>
 
               <li>Install the <a href="https://toolbelt.heroku.com/" target="_target">Heroku Toolbelt</a> and run <kbd>heroku login</kbd>, if you haven't already.</li>
 
               <li>Run the following commands:<br />
                 <%= content_tag :pre do -%>
-git clone https://github.com/cantino/huginn.git <%= content_tag :var, app_name %>
+git clone https://github.com/huginn/huginn.git <%= content_tag :var, app_name %>
 cd <%= content_tag :var, app_name %>
 heroku git:remote -a <%= content_tag :var, app_name %>
 cp .env.example .env

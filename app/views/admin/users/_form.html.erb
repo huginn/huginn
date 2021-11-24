@@ -1,5 +1,5 @@
 <%= form_for([:admin, @user], html: { class: 'form-horizontal' }) do |f| %>
-  <%= devise_error_messages! %>
+  <%= render "devise/shared/error_messages", resource: resource %>
   <%= render partial: '/devise/registrations/common_registration_fields', locals: { f: f } %>
 
   <div class="form-group">
@@ -22,7 +22,7 @@
 <div class="row">
   <div class="col-md-12">
     <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, admin_users_path, class: "btn btn-default" %>
-    <% if @user.persisted? %>
+    <% if @user.persisted? && @user.active? && @user != current_user %>
       <%= link_to 'Become User', switch_to_user_admin_user_path(@user), class: "btn btn-default btn-info", data: { confirm: 'This will log you in as another user. Would you like to continue?' } %>
     <% end %>
   </div>

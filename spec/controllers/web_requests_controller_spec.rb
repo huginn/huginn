@@ -10,7 +10,7 @@ describe WebRequestsController do
         memory[:web_request_values] = params
         memory[:web_request_format] = format
         memory[:web_request_method] = method
-        ["success", (options[:status] || 200).to_i, memory['content_type']]
+        ["success", (options[:status] || 200).to_i, memory['content_type'], memory['response_headers']]
       else
         ["failure", 404]
       end
@@ -29,7 +29,7 @@ describe WebRequestsController do
     post :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"}
     expect(@agent.reload.last_web_request_at).to be_within(2).of(Time.now)
     expect(response.body).to eq("success")
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   it "should call receive_web_request" do
@@ -40,12 +40,12 @@ describe WebRequestsController do
     expect(@agent.memory[:web_request_method]).to eq("post")
     expect(response.body).to eq("success")
     expect(response.headers['Content-Type']).to eq('text/plain; charset=utf-8')
-    expect(response).to be_success
+    expect(response).to be_successful
 
     post :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "not_my_secret", :no => "go"}
     expect(@agent.reload.memory[:web_request_values]).not_to eq({ 'no' => "go" })
     expect(response.body).to eq("failure")
-    expect(response).to be_missing
+    expect(response).to be_not_found
   end
 
   it "should accept gets" do
@@ -55,7 +55,7 @@ describe WebRequestsController do
     expect(@agent.memory[:web_request_format]).to eq("text/html")
     expect(@agent.memory[:web_request_method]).to eq("get")
     expect(response.body).to eq("success")
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   it "should pass through the received format" do
@@ -85,6 +85,21 @@ describe WebRequestsController do
     expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8')
   end
 
+  it "can accept custom response headers to return" do
+    @agent.memory['response_headers'] = {"Access-Control-Allow-Origin" => "*"}
+    @agent.save!
+    get :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"}
+    expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+  end
+
+  it "can accept multiple custom response headers to return" do
+    @agent.memory['response_headers'] = {"Access-Control-Allow-Origin" => "*", "X-My-Custom-Header" => "hello"}
+    @agent.save!
+    get :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret", :key => "value", :another_key => "5"}
+    expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+    expect(response.headers['X-My-Custom-Header']).to eq('hello')
+  end
+
   it 'should redirect correctly' do
     @agent.options['status'] = 302
     @agent.save
@@ -94,12 +109,12 @@ describe WebRequestsController do
 
   it "should fail on incorrect users" do
     post :handle_request, params: {:user_id => users(:jane).to_param, :agent_id => @agent.id, :secret => "my_secret", :no => "go"}
-    expect(response).to be_missing
+    expect(response).to be_not_found
   end
 
   it "should fail on incorrect agents" do
     post :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => 454545, :secret => "my_secret", :no => "go"}
-    expect(response).to be_missing
+    expect(response).to be_not_found
   end
 
   describe "legacy update_location endpoint" do
@@ -126,7 +141,7 @@ describe WebRequestsController do
 
     it "should raise a 404 error when given an invalid user id" do
       post :update_location, params: {user_id: "123", secret: "not_my_secret", longitude: 123, latitude: 45, something: "else"}
-      expect(response).to be_missing
+      expect(response).to be_not_found
     end
 
     it "should only look at agents with the given secret" do

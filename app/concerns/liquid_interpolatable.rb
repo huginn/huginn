@@ -15,6 +15,8 @@ module LiquidInterpolatable
 
   def validate_interpolation
     interpolated
+  rescue Liquid::ZeroDivisionError => e
+    # Ignore error (likely due to possibly missing variables on "divided_by")
   rescue Liquid::Error => e
     errors.add(:options, "has an error with Liquid templating: #{e.message}")
   rescue
@@ -62,6 +64,15 @@ module LiquidInterpolatable
         yield
       ensure
         context.environments.shift
+      end
+    end
+  end
+
+  def interpolate_with_each(array)
+    array.each do |object|
+      interpolate_with(object) do
+        self.current_event = object
+        yield object
       end
     end
   end
@@ -233,6 +244,26 @@ module LiquidInterpolatable
       JSON.dump(input)
     end
 
+    def md5(input)
+      Digest::MD5.hexdigest(input.to_s)
+    end
+
+    def sha1(input)
+      Digest::SHA1.hexdigest(input.to_s)
+    end
+
+    def sha256(input)
+      Digest::SHA256.hexdigest(input.to_s)
+    end
+
+    def hmac_sha1(input, key)
+      OpenSSL::HMAC.hexdigest('sha1', key.to_s, input.to_s)
+    end
+
+    def hmac_sha256(input, key)
+      OpenSSL::HMAC.hexdigest('sha256', key.to_s, input.to_s)
+    end
+
     # Returns a Ruby object
     #
     # It can be used as a JSONPath replacement for Agents that only support Liquid:
@@ -250,6 +281,27 @@ module LiquidInterpolatable
     # as_object ALWAYS has be the last filter in a Liquid expression!
     def as_object(object)
       throw :as_object, object.as_json
+    end
+
+    # Group an array of items by a property
+    #
+    # Example usage:
+    #
+    # {% assign posts_by_author = site.posts | group_by: "author" %}
+    # {% for author in posts_by_author %}
+    #   <dt>{{author.name}}</dt>
+    #   {% for post in author.items %}
+    #   <dd><a href="{{post.url}}">{{post.title}}</a></dd>
+    #   {% endfor %}
+    # {% endfor %}
+    def group_by(input, property)
+      if input.respond_to?(:group_by)
+        input.group_by { |item| item[property] }.map do |value, items|
+          { 'name' => value, 'items' => items }
+        end
+      else
+        input
+      end
     end
 
     private
@@ -386,21 +438,28 @@ module LiquidInterpolatable
         else
           raise Liquid::SyntaxError, 'Syntax Error in regex_replace tag - Valid syntax: regex_replace pattern in'
         end
-        @nodelist = @in_block = []
+        @in_block = Liquid::BlockBody.new
         @with_block = nil
       end
 
+      def parse(tokens)
+        if more = parse_body(@in_block, tokens)
+          @with_block = Liquid::BlockBody.new
+          parse_body(@with_block, tokens)
+       end
+     end
+
       def nodelist
         if @with_block
-          @in_block + @with_block
+          [@in_block, @with_block]
         else
-          @in_block
+          [@in_block]
         end
       end
 
       def unknown_tag(tag, markup, tokens)
         return super unless tag == 'with'.freeze
-        @nodelist = @with_block = []
+        @with_block = Liquid::BlockBody.new
       end
 
       def render(context)
@@ -410,7 +469,7 @@ module LiquidInterpolatable
           raise Liquid::SyntaxError, "Syntax Error in regex_replace tag - #{e.message}"
         end
 
-        subject = render_all(@in_block, context)
+        subject = @in_block.render(context)
 
         subject.send(first? ? :sub : :gsub, regexp) {
           next '' unless @with_block
@@ -420,7 +479,7 @@ module LiquidInterpolatable
               context[name] = m[name]
             end
             context['match'.freeze] = m
-            render_all(@with_block, context)
+            @with_block.render(context)
           end
         }
       end

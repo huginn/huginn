@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:5.7
+    restart: always
+    env_file:
+      - ../mysql.env
+    volumes:
+      - mysql:/var/lib/mysql
+
+  postgres:
+    image: postgres:9.5
+    restart: always
+    env_file:
+      - ../postgres.env
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  test_mysql:
+    build:
+      context: ../../
+      dockerfile: docker/test/Dockerfile
+    restart: 'no'
+    environment:
+      - TEST_DATABASE_NAME=huginn
+    env_file:
+      - ../mysql.env
+      - ../secrets.env
+    volumes:
+      - ../../:/app
+      - /app/vendor/bundle
+    depends_on:
+      - mysql
+
+  test_postgres:
+    build:
+      context: ../../
+      dockerfile: docker/test/Dockerfile
+    restart: 'no'
+    environment:
+      - TEST_DATABASE_NAME=huginn
+    env_file:
+      - ../postgres.env
+      - ../secrets.env
+    volumes:
+      - ../../:/app
+      - /app/vendor/bundle
+    depends_on:
+      - postgres
+
+volumes:
+  mysql:
+  postgres:

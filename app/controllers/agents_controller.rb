@@ -75,6 +75,18 @@ class AgentsController < ApplicationController
     render :json => { :description_html => html }
   end
 
+  def reemit_events
+    @agent = current_user.agents.find(params[:id])
+
+    AgentReemitJob.perform_later(@agent, @agent.most_recent_event.id,
+                                 params[:delete_old_events] == '1')
+
+    respond_to do |format|
+      format.html { redirect_back "Enqueued job to re-emit all events for '#{@agent.name}'" }
+      format.json { head :ok }
+    end
+  end
+
   def remove_events
     @agent = current_user.agents.find(params[:id])
     @agent.events.delete_all
@@ -160,7 +172,7 @@ class AgentsController < ApplicationController
     @agent = current_user.agents.find(params[:id])
 
     respond_to do |format|
-      if @agent.update_attributes(agent_params)
+      if @agent.update(agent_params)
         format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else

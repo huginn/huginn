@@ -72,7 +72,14 @@ describe Agents::LiquidOutputAgent do
       expect(agent).not_to be_valid
     end
 
-    it "should should not allow non-integer event limits" do
+    it "should validate the event_limit with relative time" do
+      agent.options[:event_limit] = "15 minutes"
+      expect(agent).to be_valid
+      agent.options[:event_limit] = "1 century"
+      expect(agent).not_to be_valid
+    end
+
+    it "should not allow non-integer event limits" do
       agent.options[:event_limit] = "abc1234"
       expect(agent).not_to be_valid
     end
@@ -222,6 +229,18 @@ describe Agents::LiquidOutputAgent do
       agent.options['content'] = content
       agent.memory['last_event'] = { key => value }
       agents(:bob_website_agent).events.destroy_all
+    end
+
+    it 'should respond with custom response header if configured with `response_headers` option' do
+      agent.options['response_headers'] = {"X-My-Custom-Header" => 'hello'}
+      result = agent.receive_web_request params, method, format
+      expect(result).to eq(["The key is #{value}.", 200, mime_type, {"X-My-Custom-Header" => "hello"}])
+    end
+
+    it 'should allow the usage custom liquid tags' do
+      agent.options['content'] = "{% credential aws_secret %}"
+      result = agent.receive_web_request params, method, format
+      expect(result).to eq(["1111111111-bob", 200, mime_type, nil])
     end
 
     describe "and the mode is last event in" do

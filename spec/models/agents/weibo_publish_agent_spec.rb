@@ -26,6 +26,7 @@ describe Agents::WeiboPublishAgent do
     @sent_pictures = []
     stub.any_instance_of(Agents::WeiboPublishAgent).publish_tweet { |message| @sent_messages << message}
     stub.any_instance_of(Agents::WeiboPublishAgent).publish_tweet_with_pic { |message, picture| @sent_pictures << picture}
+    stub.any_instance_of(Agents::WeiboPublishAgent).sleep
   end
 
   describe '#receive' do

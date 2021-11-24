@@ -146,18 +146,6 @@ module FeedjiraExtension
         def authors
           _authors.reject(&:empty?)
         end
-
-        def alternate_link
-          links.find { |link|
-            link.is_a?(AtomLink) &&
-              link.rel == 'alternate' &&
-              (link.type == 'text/html'|| link.type.nil?)
-          }
-        end
-
-        def url
-          @url ||= (alternate_link || links.first).try!(:href)
-        end
       end
     end
   end
@@ -203,8 +191,20 @@ module FeedjiraExtension
           else
             alias_method :_links, :rss_links
           end
-        else
+
+          prepend(
+            Module.new {
+              def url
+                super || (alternate_link || links.first).try!(:href)
+              end
+            }
+          )
+        when /Atom/
           elements :link, class: AtomLink, as: :_links
+
+          def url
+            (alternate_link || links.first).try!(:href)
+          end
         end
 
         def links
@@ -217,10 +217,6 @@ module FeedjiraExtension
               link.rel == 'alternate' &&
               (link.type == 'text/html'|| link.type.nil?)
           }
-        end
-
-        def url
-          @url ||= (alternate_link || links.first).try!(:href)
         end
       end
     end
@@ -267,7 +263,7 @@ module FeedjiraExtension
     end
 
     def id
-      entry_id || Digest::MD5.hexdigest(content || summary || '')
+      entry_id || @dc_identifier || Digest::MD5.hexdigest(content || summary || '')
     end
   end
 
@@ -307,6 +303,8 @@ module FeedjiraExtension
               _itunes_owners.reject(&:empty?)
             end
           end
+        else
+          element :subtitle, as: :description unless method_defined?(:description)
         end
 
         sax_config.collection_elements.each_value do |collection_elements|
@@ -325,7 +323,7 @@ module FeedjiraExtension
     end
   end
 
-  Feedjira::Feed.feed_classes.each do |feed_class|
+  Feedjira.parsers.each do |feed_class|
     feed_class.send :include, FeedExtensions
   end
 end

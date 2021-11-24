@@ -23,8 +23,8 @@ module Agents
 
       The WebsiteAgent can also scrape based on incoming events.
 
-      * Set the `url_from_event` option to a Liquid template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
-      * Alternatively, set `data_from_event` to a Liquid template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
+      * Set the `url_from_event` option to a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)
+      * Alternatively, set `data_from_event` to a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template to use data directly without fetching any URL.  (For example, set it to `{{ html }}` to use HTML contained in the `html` key of the incoming Event.)
       * If you specify `merge` for the `mode` option, Huginn will retain the old payload and update it with new values.
 
       # Supported Document Types
@@ -49,21 +49,74 @@ module Agents
             "body_text": { "css": "div.main", "value": "string(.)" },
             "page_title": { "css": "title", "value": "string(.)", "repeat": true }
           }
+      or
+          "extract": {
+            "url": { "xpath": "//*[@class="blog-item"]/a/@href", "value": "."
+            "title": { "xpath": "//*[@class="blog-item"]/a", "value": "normalize-space(.)" },
+            "description": { "xpath": "//*[@class="blog-item"]/div[0]", "value": "string(.)" }
+          }
 
-      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node, and `string(.)` gives a string with all the enclosed text nodes concatenated without entity escaping (such as `&amp;`). To extract the innerHTML, use `./node()`; and to extract the outer HTML, use `.`.
+      "@_attr_" is the XPath expression to extract the value of an attribute named _attr_ from a node (such as "@href" from a hyperlink), and `string(.)` gives a string with all the enclosed text nodes concatenated without entity escaping (such as `&amp;`). To extract the innerHTML, use `./node()`; and to extract the outer HTML, use `.`.
 
       You can also use [XPath functions](https://www.w3.org/TR/xpath/#section-String-Functions) like `normalize-space` to strip and squeeze whitespace, `substring-after` to extract part of a text, and `translate` to remove commas from formatted numbers, etc.  Instead of passing `string(.)` to these functions, you can just pass `.` like `normalize-space(.)` and `translate(., ',', '')`.
 
       Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions, all namespaces are stripped from the document unless the top-level option `use_namespaces` is set to `true`.
 
+      For extraction with `array` set to true, all matches will be extracted into an array. This is useful when extracting list elements or multiple parts of a website that can only be matched with the same selector.
+
       # Scraping JSON
 
-      When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.  For example:
+      When parsing JSON, these sub-hashes specify [JSONPaths](http://goessner.net/articles/JsonPath/) to the values that you care about.
+
+      Sample incoming event:
+
+          { "results": {
+              "data": [
+                {
+                  "title": "Lorem ipsum 1",
+                  "description": "Aliquam pharetra leo ipsum."
+                  "price": 8.95
+                },
+                {
+                  "title": "Lorem ipsum 2",
+                  "description": "Suspendisse a pulvinar lacus."
+                  "price": 12.99
+                },
+                {
+                  "title": "Lorem ipsum 3",
+                  "description": "Praesent ac arcu tellus."
+                  "price": 8.99
+                }
+              ]
+            }
+          }
+
+      Sample rule:
 
           "extract": {
             "title": { "path": "results.data[*].title" },
             "description": { "path": "results.data[*].description" }
           }
+
+      In this example the `*` wildcard character makes the parser to iterate through all items of the `data` array. Three events will be created as a result.
+
+      Sample outgoing events:
+
+          [
+            {
+              "title": "Lorem ipsum 1",
+              "description": "Aliquam pharetra leo ipsum."
+            },
+            {
+              "title": "Lorem ipsum 2",
+              "description": "Suspendisse a pulvinar lacus."
+            },
+            {
+              "title": "Lorem ipsum 3",
+              "description": "Praesent ac arcu tellus."
+            }
+          ]
+
 
       The `extract` option can be skipped for the JSON type, causing the full JSON response to be returned.
 
@@ -72,21 +125,21 @@ module Agents
       When parsing text, each sub-hash should contain a `regexp` and `index`.  Output text is matched against the regular expression repeatedly from the beginning through to the end, collecting a captured group specified by `index` in each match.  Each index should be either an integer or a string name which corresponds to <code>(?&lt;<em>name</em>&gt;...)</code>.  For example, to parse lines of <code><em>word</em>: <em>definition</em></code>, the following should work:
 
           "extract": {
-            "word": { "regexp": "^(.+?): (.+)$", index: 1 },
-            "definition": { "regexp": "^(.+?): (.+)$", index: 2 }
+            "word": { "regexp": "^(.+?): (.+)$", "index": 1 },
+            "definition": { "regexp": "^(.+?): (.+)$", "index": 2 }
           }
 
       Or if you prefer names to numbers for index:
 
           "extract": {
-            "word": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'word' },
-            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", index: 'definition' }
+            "word": { "regexp": "^(?<word>.+?): (?<definition>.+)$", "index": "word" },
+            "definition": { "regexp": "^(?<word>.+?): (?<definition>.+)$", "index": "definition" }
           }
 
       To extract the whole content as one event:
 
           "extract": {
-            "content": { "regexp": "\A(?m:.)*\z", index: 0 }
+            "content": { "regexp": "\\A(?m:.)*\\z", "index": 0 }
           }
 
       Beware that `.` does not match the newline character (LF) unless the `m` flag is in effect, and `^`/`$` basically match every line beginning/end.  See [this document](http://ruby-doc.org/core-#{RUBY_VERSION}/doc/regexp_rdoc.html) to learn the regular expression variant used in this service.
@@ -119,7 +172,7 @@ module Agents
       If a `template` option is given, its value must be a hash, whose key-value pairs are interpolated after extraction for each iteration and merged with the payload.  In the template, keys of extracted data can be interpolated, and some additional variables are also available as explained in the next section.  For example:
 
           "template": {
-            "url": "{{ url | to_uri: _request_.url }}",
+            "url": "{{ url | to_uri: _response_.url }}",
             "description": "{{ body_text }}",
             "last_modified": "{{ _response_.headers.Last-Modified | date: '%FT%T' }}"
           }
@@ -128,7 +181,7 @@ module Agents
 
       # Liquid Templating
 
-      In Liquid templating, the following variables are available:
+      In [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templating, the following variables are available:
 
       * `_url_`: The URL specified to fetch the content from.  When parsing `data_from_event`, this is not set.
 
@@ -138,7 +191,7 @@ module Agents
 
           * `headers`: Response headers; for example, `{{ _response_.headers.Content-Type }}` expands to the value of the Content-Type header.  Keys are insensitive to cases and -/_.  When parsing `data_from_event`, this is constructed from the value of the `headers` key in the incoming Event, if it is a hash.
 
-          * `url`: The final URL of the fetched page, following redirects.  When parsing `data_from_event`, this is set to the value of the `url` key in the incoming Event.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _request_.url }}` and `{{ content | rebase_hrefs: _request_.url }}`.
+          * `url`: The final URL of the fetched page, following redirects.  When parsing `data_from_event`, this is set to the value of the `url` key in the incoming Event.  Using this in the `template` option, you can resolve relative URLs extracted from a document like `{{ link | to_uri: _response_.url }}` and `{{ content | rebase_hrefs: _response_.url }}`.
 
       # Ordering Events
 
@@ -409,26 +462,24 @@ module Agents
     end
 
     def receive(incoming_events)
-      incoming_events.each do |event|
-        interpolate_with(event) do
-          existing_payload = interpolated['mode'].to_s == "merge" ? event.payload : {}
+      interpolate_with_each(incoming_events) do |event|
+        existing_payload = interpolated['mode'].to_s == "merge" ? event.payload : {}
 
-          if data_from_event = options['data_from_event'].presence
-            data = interpolate_options(data_from_event)
-            if data.present?
-              handle_event_data(data, event, existing_payload)
-            else
-              error "No data was found in the Event payload using the template #{data_from_event}", inbound_event: event
-            end
+        if data_from_event = options['data_from_event'].presence
+          data = interpolate_options(data_from_event)
+          if data.present?
+            handle_event_data(data, event, existing_payload)
           else
-            url_to_scrape =
-              if url_template = options['url_from_event'].presence
-                interpolate_options(url_template)
-              else
-                interpolated['url']
-              end
-            check_urls(url_to_scrape, existing_payload)
+            error "No data was found in the Event payload using the template #{data_from_event}", inbound_event: event
           end
+        else
+          url_to_scrape =
+            if url_template = options['url_from_event'].presence
+              interpolate_options(url_template)
+            else
+              interpolated['url']
+            end
+          check_urls(url_to_scrape, existing_payload)
         end
       end
     end
@@ -447,7 +498,7 @@ module Agents
         handle_data(data, event.payload['url'].presence, existing_payload)
       }
     rescue => e
-      error "Error when handling event data: #{e.message}\n#{e.backtrace.join("\n")}", inbound_event: event
+      error "Error when handling event data: #{e.message}\n#{e.backtrace.join("\n")}"
     end
 
     # This method returns true if the result should be stored as a new event.
@@ -569,15 +620,20 @@ module Agents
         log "Extracting #{extraction_type} at #{xpath || css}"
         case nodes
         when Nokogiri::XML::NodeSet
-          nodes.each { |node|
+          stringified_nodes  = nodes.map do |node|
             case value = node.xpath(extraction_details['value'] || '.')
             when Float
               # Node#xpath() returns any numeric value as float;
               # convert it to integer as appropriate.
               value = value.to_i if value.to_i == value
             end
-            values << value.to_s
-          }
+            value.to_s
+          end
+          if boolify(extraction_details['array'])
+            values << stringified_nodes
+          else
+            stringified_nodes.each { |n| values << n }
+          end
         else
           raise "The result of HTML/XML extraction was not a NodeSet"
         end
@@ -600,12 +656,6 @@ module Agents
       else
         raise "Unknown extraction type: #{type}"
       end
-    end
-
-    def is_positive_integer?(value)
-      Integer(value) >= 0
-    rescue
-      false
     end
 
     class UnevenSizeError < ArgumentError
@@ -702,7 +752,7 @@ module Agents
 
     # Wraps Faraday::Utils::Headers
     class HeaderDrop < LiquidDroppable::Drop
-      def before_method(name)
+      def liquid_method_missing(name)
         @object[name.tr('_', '-')]
       end
     end

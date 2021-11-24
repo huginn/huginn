@@ -51,13 +51,14 @@
               </div>
             </div>
 
-            <div class="controller-region" data-has-controllers="<%= !@agent.controllers.empty? %>">
+            <div class="controller-region">
               <div class="form-group">
                 <%= f.label :controllers %>
                 <span class="glyphicon glyphicon-question-sign hover-help" data-content="Other than the system-defined schedule above, this agent may be run or controlled by these user-defined Agents."></span>
-                <div class="controller-list">
-                  <%= agent_controllers(@agent) || 'None' %>
-                </div>
+                <%= f.select(:controller_ids,
+                             options_for_select(current_user.agents.select(&:can_control_other_agents?).pluck(:name, :id),
+                                                @agent.controller_ids),
+                             {}, { multiple: true, size: 5, class: 'select2-linked-tags form-control', data: {url_prefix: '/agents'}}) %>
               </div>
             </div>
 
@@ -105,7 +106,7 @@
               <div class="event-related-region">
                 <% eventTargets = (current_user.agents - [@agent]).find_all { |a| a.can_receive_events? } %>
                 <%= f.select(:receiver_ids,
-                             options_for_select(eventTargets.map {|s| [s.name, s.id] },
+                             options_for_select(eventTargets.pluck(:name, :id),
                                                 @agent.receiver_ids),
                              {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/agents'} }) %>
                 <span class='cannot-create-events text-info'>This type of Agent cannot create events.</span>

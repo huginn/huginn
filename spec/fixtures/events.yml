@@ -6,4 +6,4 @@ bob_website_agent_event:
 jane_website_agent_event:
   user: jane
   agent: jane_website_agent
-  payload: <%= { :title => "foo", :url => "http://foo.com" }.to_json.inspect %>
+  payload: <%= { :title => "bar", :url => "http://bar.com" }.to_json.inspect %>

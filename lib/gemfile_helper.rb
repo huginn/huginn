@@ -1,9 +1,19 @@
 class GemfileHelper
   class << self
+    def rails_env
+      ENV['RAILS_ENV'] ||
+        case File.basename($0)
+        when 'rspec'
+          'test'
+        when 'rake'
+          'test' if ARGV.any? { |arg| /\Aspec(?:\z|:)/ === arg }
+        end || 'development'
+    end
+
     def load_dotenv
       dotenv_dir = Dir[File.join(File.dirname(__FILE__), '../vendor/gems/dotenv-[0-9]*')].sort.last
 
-      yield dotenv_dir
+      yield dotenv_dir if block_given?
 
       return if ENV['ON_HEROKU'] == 'true'
 
@@ -14,7 +24,7 @@ class GemfileHelper
       root = Pathname.new(File.join(File.dirname(__FILE__), '..'))
       sanity_check Dotenv.load(
                                 root.join(".env.local"),
-                                root.join(".env.#{ENV['RAILS_ENV'] || 'development'}"),
+                                root.join(".env.#{rails_env}"),
                                 root.join(".env")
                               )
     end

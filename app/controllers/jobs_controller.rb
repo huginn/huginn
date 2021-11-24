@@ -2,7 +2,7 @@ class JobsController < ApplicationController
   before_action :authenticate_admin!
 
   def index
-    @jobs = Delayed::Job.order("coalesce(failed_at,'1000-01-01'), run_at asc").page(params[:page])
+    @jobs = Delayed::Job.order(Arel.sql("coalesce(failed_at,'1000-01-01'), run_at asc")).page(params[:page])
 
     respond_to do |format|
       format.html { render layout: !request.xhr? }
@@ -29,7 +29,7 @@ class JobsController < ApplicationController
     @job.last_error = nil
 
     respond_to do |format|
-      if !running? && @job.update_attributes!(run_at: Time.now, failed_at: nil)
+      if !running? && @job.update!(run_at: Time.now, failed_at: nil)
         format.html { redirect_to jobs_path, notice: "Job enqueued." }
         format.json { render json: @job, status: :ok }
       else

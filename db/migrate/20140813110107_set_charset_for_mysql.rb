@@ -1,4 +1,4 @@
-class SetCharsetForMysql < ActiveRecord::Migration
+class SetCharsetForMysql < ActiveRecord::Migration[4.2]
   def all_models
     @all_models ||= [
       Agent,
@@ -59,7 +59,7 @@ class SetCharsetForMysql < ActiveRecord::Migration
           execute 'ALTER TABLE %s CHARACTER SET utf8 COLLATE utf8_unicode_ci' % table_name
         }
 
-        execute 'ALTER DATABASE %s CHARACTER SET utf8 COLLATE utf8_unicode_ci' % connection.current_database
+        execute 'ALTER DATABASE `%s` CHARACTER SET utf8 COLLATE utf8_unicode_ci' % connection.current_database
       end
 
       dir.down do

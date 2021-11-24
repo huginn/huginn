@@ -1,9 +1,8 @@
 module AgentHelper
+
   def agent_show_view(agent)
-    name = agent.short_type.underscore
-    if File.exist?(Rails.root.join("app", "views", "agents", "agent_views", name, "_show.html.erb"))
-      File.join("agents", "agent_views", name, "show")
-    end
+    path = File.join('agents', 'agent_views', @agent.short_type.underscore, 'show')
+    return self.controller.template_exists?(path, [], true) ? path : nil
   end
 
   def toggle_disabled_text
@@ -104,13 +103,13 @@ module AgentHelper
       agent_ids = agents.map(&:id)
       cache[:links_as_receiver] = Hash[Link.where(receiver_id: agent_ids)
                                            .group(:receiver_id)
-                                           .pluck('receiver_id', 'count(receiver_id) as id')]
+                                           .pluck(:receiver_id, Arel.sql('count(receiver_id) as id'))]
       cache[:links_as_source]   = Hash[Link.where(source_id: agent_ids)
                                            .group(:source_id)
-                                           .pluck('source_id', 'count(source_id) as id')]
+                                           .pluck(:source_id, Arel.sql('count(source_id) as id'))]
       cache[:control_links_as_controller] = Hash[ControlLink.where(controller_id: agent_ids)
                                                             .group(:controller_id)
-                                                            .pluck('controller_id', 'count(controller_id) as id')]
+                                                            .pluck(:controller_id, Arel.sql('count(controller_id) as id'))]
     end
   end
 end

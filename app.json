@@ -1,9 +1,9 @@
 {
     "name": "Huginn",
     "description": "Build agents that monitor and act on your behalf.  Your agents are standing by!",
-    "website": "https://github.com/cantino/huginn",
-    "repository": "https://github.com/cantino/huginn",
-    "logo": "https://raw.githubusercontent.com/cantino/huginn/master/media/huginn-icon-64.png",
+    "website": "https://github.com/huginn/huginn",
+    "repository": "https://github.com/huginn/huginn",
+    "logo": "https://raw.githubusercontent.com/huginn/huginn/master/media/huginn-icon-64.png",
     "env": {
         "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-multi.git",
         "APP_SECRET_TOKEN": {
@@ -21,5 +21,6 @@
       "postdeploy": "bundle exec rake db:migrate"
     },
     "addons": ["heroku-postgresql"],
-    "success_url": "/users/sign_up"
+    "success_url": "/users/sign_up",
+    "stack": "heroku-18"
 }

@@ -1,0 +1,346 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the top of the
+ * compiled file, but it's generally better to create a new file per style scope.
+ *
+ *= require select2
+ *= require select2-bootstrap
+ *= require jquery.json-editor
+ *= require rickshaw
+ *= require spectrum
+ *= require_tree .
+ *= require_self
+ */
+
+@import "bootstrap";
+@import "font-awesome-sprockets";
+@import "font-awesome";
+
+body { padding-top: 60px; }
+
+#main {
+  margin-bottom: 100px;
+}
+
+.well.description {
+  table {
+    @extend .table;
+  }
+  h1 { font-size: 30px; }
+  h2 { font-size: 26px; }
+  h3 { font-size: 22px; }
+}
+
+/* Rails scaffold style compatibility */
+#error_explanation {
+  color: #f00;
+  ul {
+    list-style: none;
+    margin: 0 0 18px 0;
+  }
+}
+
+.field_with_errors {
+  @extend .has-error;
+}
+
+.modal-body pre { white-space: pre-wrap; }
+
+.select2 {
+  float: none !important;
+  margin-left: 0 !important;
+}
+
+img.odin {
+  position: relative;
+  top: -32px;
+}
+
+.link-region .cannot-receive-events,
+.schedule-region .cannot-be-scheduled {
+  display: none;
+}
+
+.spinner {
+  display: none;
+  vertical-align: bottom;
+}
+
+.hidden {
+  display: none;
+}
+
+#show-tabs {
+  margin-top: 10px;
+  height: 400px;
+}
+
+.digraph {
+  margin-top: 20px;
+}
+
+.show-view {
+  overflow: hidden;
+}
+
+span.not-applicable:after {
+  color: #bbbbbb;
+  content: "n/a";
+}
+
+// Dry Run Results Tabs
+.nav.agent-dry-run-tabs {
+  margin-bottom: 20px;
+}
+
+// Navbar
+.nav > li {
+  &.job-indicator, &#event-indicator {
+    display: none;
+
+    a {
+      padding-right: 4px;
+      padding-left: 4px;
+    }
+  }
+}
+
+.navbar-search > .spinner {
+  position: absolute;
+  top: -1px;
+  right: 1px;
+}
+
+.navbar {
+  .dropdown.dropdown-hover:hover .dropdown-menu {
+    display: block;
+  }
+}
+
+// Flash
+
+.flash {
+  position: fixed;
+  width: 210px;
+  z-index: 99999;
+  right: 20px;
+
+  .alert {
+  }
+}
+
+// Heroku
+
+.heroku-instructions {
+  color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(132, 132, 196, 0.8);
+  border: 3px solid rgba(132, 132, 196, 0.5);
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 10px;
+
+  a {
+    text-decoration: underline;
+  }
+
+  a:link {
+    color: inherit;
+  }
+
+  a:hover, a:visited, a:active {
+    color: #fff;
+  }
+
+  pre {
+    background-color: #ffffff;
+    color: #3F3F44;
+    margin: 4px;
+  }
+}
+
+// Logs
+
+#logs .action-icon {
+  height: 16px;
+  display: inline-block;
+  vertical-align: inherit;
+  cursor: pointer;
+
+  &.refresh {
+    margin: 0 10px;
+  }
+}
+
+#show-tabs li a.recent-errors {
+  font-weight: bold;
+}
+
+// Memory
+
+#memory .action-icon {
+  display: inline-block;
+  cursor: pointer;
+}
+
+// Credentials and Ace Editor
+
+#ace-credential-value {
+  position: relative;
+  width: 940px;
+  height: 300px;
+}
+
+.ace-editor {
+  position: relative;
+  width: 550px;
+  height: 300px;
+}
+
+// Disabled
+
+.agent-unavailable {
+  opacity: 0.5;
+}
+
+// JSON Editor
+
+.live-json-editor {
+  font-family: "Courier New", Courier, monospace;
+}
+
+.json-editor blockquote {
+  font-size: 14px;
+}
+
+// Position tweaks
+
+.hover-help {
+  top: 2px;
+}
+
+.popover {
+  dd {
+    margin-left: 1em;
+  }
+}
+
+.page-header .btn-group {
+  position: relative;
+  top: -5px;
+  left: 4px;
+}
+
+h2 .scenario, a span.label.scenario {
+  position: relative;
+  top: -2px;
+}
+
+// Bootstrappy color styles
+
+.color-danger {
+  color: #d9534f;
+}
+
+.color-warning {
+  color: #f0ad4e;
+}
+
+.color-success {
+  color: #5cb85c;
+}
+
+.form-group {
+  .sp-replacer {
+    @extend .form-control;
+  }
+
+  .sp-preview {
+    width: 100%;
+  }
+
+  .sp-dd {
+    display: none;
+  }
+}
+
+.confirm-agent .popover {
+  width: 200px;
+}
+
+$service-colors: (
+  twitter:      #55acee,
+  37signals:    #8fc857,
+  github:       #444444,
+  tumblr:       #2c4762,
+  dropbox:      #007EE5,
+  wunderlist:   #ED5F27,
+  evernote:     #00C85A
+);
+
+@mixin services {
+  @each $service, $color in $service-colors {
+    &.service-#{$service} {
+      color: #fff;
+      background-color: $color;
+    }
+  }
+}
+
+.btn-service {
+  position: relative;
+  padding-left: 40px;
+  $border-color: rgba(0,0,0,0.2);
+  border-color: $border-color;
+
+  > i:first-child {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    font-size: 24px;
+    border-right: 1px solid $border-color;
+  }
+
+  @include services;
+}
+
+.label-service {
+  @include services;
+}
+
+.select2-highlighted a {
+  color: yellow;
+  text-decoration: underline;
+}
+
+.glyphicon-flipped {
+  -ms-transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -ms-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+}
+
+.tweet-body {
+  .tweet-plain {
+    cursor: help;
+  }
+
+  .twitter-tweet-rendered {
+    display: inline !important;
+    margin: 0 !important;
+    vertical-align: bottom !important;
+  }
+}

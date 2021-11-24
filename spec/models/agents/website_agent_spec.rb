@@ -126,9 +126,10 @@ describe Agents::WebsiteAgent do
 
     describe "#check" do
       it "should check for changes (and update Event.expires_at)" do
-        expect { @checker.check }.to change { Event.count }.by(1)
+        travel(-2.seconds) do
+          expect { @checker.check }.to change { Event.count }.by(1)
+        end
         event = Event.last
-        sleep 2
         expect { @checker.check }.not_to change { Event.count }
         update_event = Event.last
         expect(update_event.expires_at).not_to eq(event.expires_at)
@@ -1074,6 +1075,7 @@ fire: hot
             'url' => 'http://foo.com',
             'link' => 'Random'
           }
+          @event.save!
         end
 
         it "should use url_from_event as the url to scrape" do
@@ -1166,6 +1168,29 @@ fire: hot
           }.to change { Event.count }.by(1)
           last_payload = Event.last.payload
           expect(last_payload['link']).to eq('Random')
+        end
+
+        it 'returns an array of found nodes when the array extract_option is true' do
+          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+
+          @checker.options['extract']['nav_links'] = {'css' => '#topLeft li', 'value' => 'normalize-space(.)', 'array' => 'true'}
+          expect {
+            @checker.receive([@event])
+          }.to change { Event.count }.by(1)
+          expect(Event.last.payload['nav_links']).to eq(["Archive", "What If?", "Blag", "Store", "About"])
+        end
+
+        it "should set the inbound_event when logging errors" do
+          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+           @valid_options['extract'] = {
+            'url' => { 'css' => "div", 'value' => "@src" },
+            'title' => { 'css' => "#comic img", 'value' => "@alt" },
+          }
+          @checker.options = @valid_options
+          @checker.receive([@event])
+          log = @checker.logs.first
+          expect(log.message).to match(/Got an uneven number of matches/)
+          expect(log.inbound_event).to eq(@event)
         end
       end
 
@@ -1312,15 +1337,9 @@ fire: hot
       @checker.user = users(:bob)
       @checker.save!
 
-      case @checker.faraday_backend
-      when :typhoeus
-        # Webmock's typhoeus adapter does not read the Authorization
-        # header: https://github.com/bblimke/webmock/pull/592
-        stub_request(:any, "www.example.com").
-          with(headers: { 'Authorization' => "Basic #{['user:pass'].pack('m0')}" })
-      else
-        stub_request(:any, "user:pass@www.example.com")
-      end.to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+      stub_request(:any, "www.example.com").
+        with(basic_auth: ['user', 'pass']).
+        to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
     end
 
     describe "#check" do

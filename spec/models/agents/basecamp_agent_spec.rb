@@ -44,7 +44,7 @@ describe Agents::BasecampAgent do
 
   describe "helpers" do
     it "should generate a correct request options hash" do
-      expect(@checker.send(:request_options)).to eq({:headers => {"User-Agent" => "Huginn (https://github.com/cantino/huginn)", "Authorization" => 'Bearer "1234token"'}})
+      expect(@checker.send(:request_options)).to eq({headers: {"User-Agent" => "Huginn - https://github.com/huginn/huginn", "Authorization" => 'Bearer "1234token"'}})
     end
 
     it "should generate the correct events url" do

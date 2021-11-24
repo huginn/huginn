@@ -14,7 +14,7 @@ class User < ActiveRecord::Base
 
   validates_presence_of :username
   validates :username, uniqueness: { case_sensitive: false }
-  validates_format_of :username, :with => /\A[a-zA-Z0-9_-]{3,15}\Z/, :message => "can only contain letters, numbers, underscores, and dashes, and must be between 3 and 15 characters in length."
+  validates_format_of :username, :with => /\A[a-zA-Z0-9_-]{3,190}\Z/, :message => "can only contain letters, numbers, underscores, and dashes, and must be between 3 and 190 characters in length."
   validates_inclusion_of :invitation_code, :on => :create, :in => INVITATION_CODES, :message => "is not valid", if: -> { !requires_no_invitation_code? && User.using_invitation_code? }
 
   has_many :user_credentials, :dependent => :destroy, :inverse_of => :user

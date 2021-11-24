@@ -6,7 +6,7 @@ module Agents
     can_dry_run!
     default_schedule "every_1d"
 
-    gem_dependency_check { defined?(Feedjira::Feed) }
+    gem_dependency_check { defined?(Feedjira) }
 
     DEFAULT_EVENTS_ORDER = [['{{date_published}}', 'time'], ['{{last_updated}}', 'time']]
 
@@ -14,7 +14,7 @@ module Agents
       <<-MD
         The RSS Agent consumes RSS feeds and emits events when they change.
 
-        This agent, using [Feedjira](https://github.com/feedjira/feedjira) as a base, can parse various types of RSS and Atom feeds and has some special handlers for FeedBurner, iTunes RSS, and so on.  However, supported fields are limited by its general and abstract nature.  For complex feeds with additional field types, we recommend using a WebsiteAgent.  See [this example](https://github.com/cantino/huginn/wiki/Agent-configuration-examples#itunes-trailers).
+        This agent, using [Feedjira](https://github.com/feedjira/feedjira) as a base, can parse various types of RSS and Atom feeds and has some special handlers for FeedBurner, iTunes RSS, and so on.  However, supported fields are limited by its general and abstract nature.  For complex feeds with additional field types, we recommend using a WebsiteAgent.  See [this example](https://github.com/huginn/huginn/wiki/Agent-configuration-examples#itunes-trailers).
 
         If you want to *output* an RSS feed, use the DataOutputAgent.
 
@@ -31,6 +31,7 @@ module Agents
           * `force_encoding` - Set `force_encoding` to an encoding name if the website is known to respond with a missing, invalid or wrong charset in the Content-Type header.  Note that a text content without a charset is taken as encoded in UTF-8 (not ISO-8859-1).
           * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
           * `max_events_per_run` - Limit number of events created (items parsed) per run for feed.
+          * `remembered_id_count` - Number of IDs to keep track of and avoid re-emitting (default: 500).
 
         # Ordering Events
 
@@ -44,7 +45,7 @@ module Agents
       {
         'expected_update_period_in_days' => "5",
         'clean' => 'false',
-        'url' => "https://github.com/cantino/huginn/commits/master.atom"
+        'url' => "https://github.com/huginn/huginn/commits/master.atom"
       }
     end
 
@@ -133,6 +134,10 @@ module Agents
         errors.add(:base, "Please provide 'expected_update_period_in_days' to indicate how many days can pass without an update before this Agent is considered to not be working")
       end
 
+      if options['remembered_id_count'].present? && options['remembered_id_count'].to_i < 1
+        errors.add(:base, "Please provide 'remembered_id_count' as a number bigger than 0 indicating how many IDs should be saved to distinguish between new and old IDs in RSS feeds. Delete option to use default (500).")
+      end
+
       validate_web_request_options!
       validate_events_order
     end
@@ -159,7 +164,7 @@ module Agents
         begin
           response = faraday.get(url)
           if response.success?
-            feed = Feedjira::Feed.parse(preprocessed_body(response))
+            feed = Feedjira.parse(preprocessed_body(response))
             new_events.concat feed_to_events(feed)
           else
             error "Failed to fetch #{url}: #{response.inspect}"
@@ -169,17 +174,16 @@ module Agents
         end
       end
 
-      created_event_count = 0
-      sort_events(new_events).each.with_index do |event, index|
-        entry_id = event.payload[:id]
-        if check_and_track(entry_id)
-          unless max_events && max_events > 0 && index >= max_events
-            created_event_count += 1
-            create_event(event)
-          end
-        end
-      end
-      log "Fetched #{urls.to_sentence} and created #{created_event_count} event(s)."
+      events = sort_events(new_events).select.with_index { |event, index|
+        check_and_track(event.payload[:id]) &&
+          !(max_events && max_events > 0 && index >= max_events)
+      }
+      create_events(events)
+      log "Fetched #{urls.to_sentence} and created #{events.size} event(s)."
+    end
+
+    def remembered_id_count
+      (options['remembered_id_count'].presence || 500).to_i
     end
 
     def check_and_track(entry_id)
@@ -188,7 +192,7 @@ module Agents
         false
       else
         memory['seen_ids'].unshift entry_id
-        memory['seen_ids'].pop if memory['seen_ids'].length > 500
+        memory['seen_ids'].pop(memory['seen_ids'].length - remembered_id_count) if memory['seen_ids'].length > remembered_id_count
         true
       end
     end
@@ -271,7 +275,7 @@ module Agents
       {
         id: entry.id,
         url: entry.url,
-        urls: entry.links.map(&:href),
+        urls: Array(entry.url) | entry.links.map(&:href),
         links: entry.links,
         title: entry.title,
         description: clean_fragment(entry.summary),

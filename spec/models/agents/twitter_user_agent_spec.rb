@@ -5,6 +5,7 @@ describe Agents::TwitterUserAgent do
     # intercept the twitter API request for @tectonic's user profile
     stub_request(:any, "https://api.twitter.com/1.1/statuses/user_timeline.json?contributor_details=true&count=200&exclude_replies=false&include_entities=true&include_rts=true&screen_name=tectonic&tweet_mode=extended").
       to_return(body: File.read(Rails.root.join("spec/data_fixtures/user_tweets.json")),
+                headers: { 'Content-Type': 'application/json;charset=utf-8' },
                 status: 200)
 
     @opts = {

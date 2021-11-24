@@ -86,11 +86,11 @@ describe LiquidInterpolatable::Filters do
       @agent.interpolation_context['s'] = 'http://example.com/dir/1?q=test'
     end
 
-    it 'should parse an abosule URI' do
+    it 'should parse an absolute URI' do
       expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
-    it 'should parse an abosule URI with a base URI specified' do
+    it 'should parse an absolute URI with a base URI specified' do
       expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
@@ -98,7 +98,7 @@ describe LiquidInterpolatable::Filters do
       expect(@filter.to_uri('foo/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.com/dir/foo/index.html'))
     end
 
-    it 'should parse an abosule URI with a base URI specified' do
+    it 'should parse an absolute URI with a base URI specified' do
       expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
@@ -368,6 +368,66 @@ HTML
       agent.interpolation_context['content'] = fragment
       agent.options['template'] = "{{ content | rebase_hrefs: 'http://example.com/support/files.html' }}"
       expect(agent.interpolated['template']).to eq(replaced_fragment)
+    end
+  end
+
+  describe 'digest filters' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'computes digest values from string input' do
+      agent.interpolation_context['value'] = 'Huginn'
+      agent.interpolation_context['key'] = 'Muninn'
+
+      agent.options['template'] = "{{ value | md5 }}"
+      expect(agent.interpolated['template']).to eq('5fca9fe120027bc87fa9923cc926f8fe')
+
+      agent.options['template'] = "{{ value | sha1 }}"
+      expect(agent.interpolated['template']).to eq('647d81f6dae6ff474cdcef3e9b74f038206af680')
+
+      agent.options['template'] = "{{ value | sha256 }}"
+      expect(agent.interpolated['template']).to eq('62c6099ec14502176974aadf0991525f50332ba552500556fea583ffdf0ba076')
+
+      agent.options['template'] = "{{ value | hmac_sha1: key }}"
+      expect(agent.interpolated['template']).to eq('9bd7cdebac134e06ba87258c28d2deea431407ac')
+
+      agent.options['template'] = "{{ value | hmac_sha256: key }}"
+      expect(agent.interpolated['template']).to eq('38b98bc2625a8cac33369f6204e784482be5e172b242699406270856a841d1ec')
+    end
+  end
+
+  describe 'group_by' do
+    let(:events) do
+      [
+        { "date" => "2019-07-30", "type" => "Snap" },
+        { "date" => "2019-07-30", "type" => "Crackle" },
+        { "date" => "2019-07-29", "type" => "Pop" },
+        { "date" => "2019-07-29", "type" => "Bam" },
+        { "date" => "2019-07-29", "type" => "Pow" },
+      ]
+    end
+
+    it "should group an enumerable by the given attribute" do
+      expect(@filter.group_by(events, "date")).to eq(
+        [
+          {
+            "name" => "2019-07-30", "items" => [
+              { "date" => "2019-07-30", "type" => "Snap" },
+              { "date" => "2019-07-30", "type" => "Crackle" }
+            ]
+          },
+          {
+            "name" => "2019-07-29", "items" => [
+              { "date" => "2019-07-29", "type" => "Pop" },
+              { "date" => "2019-07-29", "type" => "Bam" },
+              { "date" => "2019-07-29", "type" => "Pow" }
+            ]
+          }
+        ]
+      )
+    end
+
+    it "should leave non-groupables alone" do
+      expect(@filter.group_by("some string", "anything")).to eq("some string")
     end
   end
 end

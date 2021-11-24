@@ -9,7 +9,8 @@ describe Agents::TwitterStreamAgent do
       :oauth_token_secret => "---",
       :filters => %w[keyword1 keyword2],
       :expected_update_period_in_days => "2",
-      :generate => "events"
+      :generate => "events",
+      :include_retweets => "false"
     }
 
     @agent = Agents::TwitterStreamAgent.new(:name => "HuginnBot", :options => @opts)
@@ -260,6 +261,13 @@ describe Agents::TwitterStreamAgent do
       it "skips retweets" do
         @worker.send(:handle_status, {'text' => 'retweet', 'retweeted_status' => {one: true}, 'id_str' => '123' })
         expect(@worker.instance_variable_get(:'@recent_tweets')).not_to include('123')
+      end
+
+      it "includes retweets if configured" do
+        @agent.options[:include_retweets] = 'true'
+        @agent.save!
+        @worker.send(:handle_status, {'text' => 'retweet', 'retweeted_status' => {one: true}, 'id_str' => '1234' })
+        expect(@worker.instance_variable_get(:'@recent_tweets')).to include('1234')
       end
 
       it "deduplicates tweets" do

@@ -1,4 +1,4 @@
-class WarnAboutDuplicateUsernames < ActiveRecord::Migration
+class WarnAboutDuplicateUsernames < ActiveRecord::Migration[4.2]
   def up
     names = User.group('LOWER(username)').having('count(*) > 1').pluck('LOWER(username)')
     if names.length > 0

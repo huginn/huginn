@@ -14,6 +14,7 @@ describe Agents::RssAgent do
     stub_request(:any, /bad.onethingwell.org/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/onethingwell.rss")).gsub(/(?<=<link>)[^<]*/, ''), status: 200)
     stub_request(:any, /iso-8859-1/).to_return(body: File.binread(Rails.root.join("spec/data_fixtures/iso-8859-1.rss")), headers: { 'Content-Type' => 'application/rss+xml; charset=ISO-8859-1' }, status: 200)
     stub_request(:any, /podcast/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/podcast.rss")), status: 200)
+    stub_request(:any, /youtube/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/youtube.xml")), status: 200)
   end
 
   let(:agent) do
@@ -61,6 +62,7 @@ describe Agents::RssAgent do
   describe "emitting RSS events" do
     it "should emit items as events for an Atom feed" do
       agent.options['include_feed_info'] = true
+      agent.options['include_sort_info'] = true
 
       expect {
         agent.check
@@ -68,7 +70,7 @@ describe Agents::RssAgent do
 
       first, *, last = agent.events.last(20)
       [first, last].each do |event|
-        expect(first.payload['feed']).to include({
+        expect(event.payload['feed']).to include({
                                                    "type" => "atom",
                                                    "title" => "Recent Commits to huginn:master",
                                                    "url" => "https://github.com/cantino/huginn/commits/master",
@@ -98,6 +100,7 @@ describe Agents::RssAgent do
       expect(first.payload['authors']).to eq(["cantino (https://github.com/cantino)"])
       expect(first.payload['date_published']).to be_nil
       expect(first.payload['last_updated']).to eq("2014-07-16T22:26:22-07:00")
+      expect(first.payload['sort_info']).to eq({ 'position' => 20, 'count' => 20 })
       expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af")
       expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/d465158f77dcd9078697e6167b50abbfdfa8b1af"])
       expect(last.payload['links']).to eq([
@@ -110,11 +113,13 @@ describe Agents::RssAgent do
       expect(last.payload['authors']).to eq(["CloCkWeRX (https://github.com/CloCkWeRX)"])
       expect(last.payload['date_published']).to be_nil
       expect(last.payload['last_updated']).to eq("2014-07-01T16:37:47+09:30")
+      expect(last.payload['sort_info']).to eq({ 'position' => 1, 'count' => 20 })
     end
 
     it "should emit items as events in the order specified in the events_order option" do
       expect {
         agent.options['events_order'] = ['{{title | replace_regex: "^[[:space:]]+", "" }}']
+        agent.options['include_sort_info'] = true
         agent.check
       }.to change { agent.events.count }.by(20)
 
@@ -122,9 +127,11 @@ describe Agents::RssAgent do
       expect(first.payload['title'].strip).to eq('upgrade rails and gems')
       expect(first.payload['url']).to eq("https://github.com/cantino/huginn/commit/87a7abda23a82305d7050ac0bb400ce36c863d01")
       expect(first.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/87a7abda23a82305d7050ac0bb400ce36c863d01"])
+      expect(first.payload['sort_info']).to eq({ 'position' => 20, 'count' => 20 })
       expect(last.payload['title'].strip).to eq('Dashed line in a diagram indicates propagate_immediately being false.')
       expect(last.payload['url']).to eq("https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535")
       expect(last.payload['urls']).to eq(["https://github.com/cantino/huginn/commit/0e80f5341587aace2c023b06eb9265b776ac4535"])
+      expect(last.payload['sort_info']).to eq({ 'position' => 1, 'count' => 20 })
     end
 
     it "should emit items as events for a FeedBurner RSS 2.0 feed" do
@@ -170,8 +177,35 @@ describe Agents::RssAgent do
       expect(agent.memory['seen_ids'][0]).to eq(newest_id)
     end
 
-    it "should truncate the seen_ids in memory at 500 items" do
+    it "should truncate the seen_ids in memory at 500 items per default" do
       agent.memory['seen_ids'] = ['x'] * 490
+      agent.check
+      expect(agent.memory['seen_ids'].length).to eq(500)
+    end
+    
+    it "should truncate the seen_ids in memory at amount of items configured in options" do
+      agent.options['remembered_id_count'] = "600"
+      agent.memory['seen_ids'] = ['x'] * 590
+      agent.check
+      expect(agent.memory['seen_ids'].length).to eq(600)
+    end
+    
+    it "should truncate the seen_ids after configuring a lower limit of items when check is executed" do
+      agent.memory['seen_ids'] = ['x'] * 600
+      agent.options['remembered_id_count'] = "400"
+      expect(agent.memory['seen_ids'].length).to eq(600)
+      agent.check
+      expect(agent.memory['seen_ids'].length).to eq(400)
+    end
+    
+    it "should truncate the seen_ids at default after removing custom limit" do
+      agent.options['remembered_id_count'] = "600"
+      agent.memory['seen_ids'] = ['x'] * 590
+      agent.check
+      expect(agent.memory['seen_ids'].length).to eq(600)
+
+      agent.options.delete('remembered_id_count')
+      agent.memory['seen_ids'] = ['x'] * 590
       agent.check
       expect(agent.memory['seen_ids'].length).to eq(500)
     end
@@ -351,8 +385,8 @@ describe Agents::RssAgent do
           {
             "feed" => feed_info,
             "id" => "http://example.com/podcasts/archive/aae20140601.mp3",
-            "url" => nil,
-            "urls" => [],
+            "url" => "http://example.com/podcasts/archive/aae20140601.mp3",
+            "urls" => ["http://example.com/podcasts/archive/aae20140601.mp3"],
             "links" => [],
             "title" => "Red,Whine, & Blue",
             "description" => nil,
@@ -376,8 +410,8 @@ describe Agents::RssAgent do
           {
             "feed" => feed_info,
             "id" => "http://example.com/podcasts/archive/aae20140697.m4v",
-            "url" => nil,
-            "urls" => [],
+            "url" => "http://example.com/podcasts/archive/aae20140697.m4v",
+            "urls" => ["http://example.com/podcasts/archive/aae20140697.m4v"],
             "links" => [],
             "title" => "The Best Chili",
             "description" => nil,
@@ -402,8 +436,8 @@ describe Agents::RssAgent do
           {
             "feed" => feed_info,
             "id" => "http://example.com/podcasts/archive/aae20140608.mp4",
-            "url" => nil,
-            "urls" => [],
+            "url" => "http://example.com/podcasts/archive/aae20140608.mp4",
+            "urls" => ["http://example.com/podcasts/archive/aae20140608.mp4"],
             "links" => [],
             "title" => "Socket Wrench Shootout",
             "description" => nil,
@@ -427,8 +461,8 @@ describe Agents::RssAgent do
           {
             "feed" => feed_info,
             "id" => "http://example.com/podcasts/archive/aae20140615.m4a",
-            "url" => nil,
-            "urls" => [],
+            "url" => "http://example.com/podcasts/archive/aae20140615.m4a",
+            "urls" => ["http://example.com/podcasts/archive/aae20140615.m4a"],
             "links" => [],
             "title" => "Shake Shake Shake Your Spices",
             "description" => nil,
@@ -452,14 +486,62 @@ describe Agents::RssAgent do
         ])
       end
     end
+
+    context 'of YouTube' do
+      before do
+        @valid_options['url'] = 'http://example.com/youtube.xml'
+        @valid_options['include_feed_info'] = true
+      end
+
+      it "is parsed correctly" do
+        expect {
+          agent.check
+        }.to change { agent.events.count }.by(15)
+
+        expect(agent.events.first.payload).to match({
+          "feed" => {
+            "id" => "yt:channel:UCoTLdfNePDQzvdEgIToLIUg",
+            "type" => "atom",
+            "url" => "https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg",
+            "links" => [
+              { "href" => "http://www.youtube.com/feeds/videos.xml?channel_id=UCoTLdfNePDQzvdEgIToLIUg", "rel" => "self" },
+              { "href" => "https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg", "rel" => "alternate" }
+            ],
+            "title" => "SecDSM",
+            "description" => nil,
+            "copyright" => nil,
+            "generator" => nil,
+            "icon" => nil,
+            "authors" => ["SecDSM (https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg)"],
+            "date_published" => "2016-07-28T18:46:21+00:00",
+            "last_updated" => "2016-07-28T18:46:21+00:00"
+          },
+          "id" => "yt:video:OCs1E0vP7Oc",
+          "authors" => ["SecDSM (https://www.youtube.com/channel/UCoTLdfNePDQzvdEgIToLIUg)"],
+          "categories" => [],
+          "content" => nil,
+          "date_published" => "2017-06-15T02:36:17+00:00",
+          "description" => nil,
+          "enclosure" => nil,
+          "image" => nil,
+          "last_updated" => "2017-06-15T02:36:17+00:00",
+          "links" => [
+            { "href"=>"https://www.youtube.com/watch?v=OCs1E0vP7Oc", "rel"=>"alternate" }
+          ],
+          "title" => "SecDSM 2017 March - Talk 01",
+          "url" => "https://www.youtube.com/watch?v=OCs1E0vP7Oc",
+          "urls" => ["https://www.youtube.com/watch?v=OCs1E0vP7Oc"]
+        })
+      end
+    end
   end
 
   describe 'logging errors with the feed url' do
     it 'includes the feed URL when an exception is raised' do
-      mock(Feedjira::Feed).parse(anything) { raise StandardError.new("Some error!") }
-      expect(lambda {
+      mock(Feedjira).parse(anything) { raise StandardError.new("Some error!") }
+      expect {
         agent.check
-      }).not_to raise_error
+      }.not_to raise_error
       expect(agent.logs.last.message).to match(%r[Failed to fetch https://github.com])
     end
   end

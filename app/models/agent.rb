@@ -2,12 +2,12 @@ require 'utils'
 
 # Agent is the core class in Huginn, representing a configurable, schedulable, reactive system with memory that can
 # be sub-classed for many different purposes.  Agents can emit Events, as well as receive them and react in many different ways.
-# The basic Agent API is detailed on the Huginn wiki: https://github.com/cantino/huginn/wiki/Creating-a-new-agent
+# The basic Agent API is detailed on the Huginn wiki: https://github.com/huginn/huginn/wiki/Creating-a-new-agent
 class Agent < ActiveRecord::Base
   include AssignableTypes
   include MarkdownClassAttributes
-  include JSONSerializedField
-  include RDBMSFunctions
+  include JsonSerializedField
+  include RdbmsFunctions
   include WorkingHelpers
   include LiquidInterpolatable
   include HasGuid
@@ -48,10 +48,10 @@ class Agent < ActiveRecord::Base
   has_many :events, -> { order("events.id desc") }, :dependent => :delete_all, :inverse_of => :agent
   has_one  :most_recent_event, -> { order("events.id desc") }, :inverse_of => :agent, :class_name => "Event"
   has_many :logs,  -> { order("agent_logs.id desc") }, :dependent => :delete_all, :inverse_of => :agent, :class_name => "AgentLog"
-  has_many :received_events, -> { order("events.id desc") }, :through => :sources, :class_name => "Event", :source => :events
   has_many :links_as_source, :dependent => :delete_all, :foreign_key => "source_id", :class_name => "Link", :inverse_of => :source
   has_many :links_as_receiver, :dependent => :delete_all, :foreign_key => "receiver_id", :class_name => "Link", :inverse_of => :receiver
   has_many :sources, :through => :links_as_receiver, :class_name => "Agent", :inverse_of => :receivers
+  has_many :received_events, -> { order("events.id desc") }, :through => :sources, :class_name => "Event", :source => :events
   has_many :receivers, :through => :links_as_source, :class_name => "Agent", :inverse_of => :sources
   has_many :control_links_as_controller, dependent: :delete_all, foreign_key: 'controller_id', class_name: 'ControlLink', inverse_of: :controller
   has_many :control_links_as_control_target, dependent: :delete_all, foreign_key: 'control_target_id', class_name: 'ControlLink', inverse_of: :control_target
@@ -96,7 +96,7 @@ class Agent < ActiveRecord::Base
 
   def receive_web_request(params, method, format)
     # Implement me in your subclass of Agent.
-    ["not implemented", 404]
+    ["not implemented", 404, "text/plain", {}] # last two elements in response array are optional
   end
 
   # alternate method signature for receive_web_request
@@ -222,7 +222,7 @@ class Agent < ActiveRecord::Base
   end
 
   def log(message, options = {})
-    AgentLog.log_for_agent(self, message, options)
+    AgentLog.log_for_agent(self, message, options.merge(inbound_event: current_event))
   end
 
   def error(message, options = {})
@@ -259,13 +259,15 @@ class Agent < ActiveRecord::Base
   end
 
   def possibly_update_event_expirations
-    update_event_expirations! if keep_events_for_changed?
+    update_event_expirations! if saved_change_to_keep_events_for?
   end
   
   #Validation Methods
   
   private
-  
+
+  attr_accessor :current_event
+
   def validate_schedule
     unless cannot_be_scheduled?
       errors.add(:schedule, "is not a valid schedule") unless SCHEDULES.include?(schedule.to_s)
@@ -289,14 +291,20 @@ class Agent < ActiveRecord::Base
     end
   end
 
+  def is_positive_integer?(value)
+    Integer(value) >= 0
+  rescue
+    false
+  end
+
   # Class Methods
 
   class << self
     def build_clone(original)
-      new(original.slice(:type, :options, :schedule, :controller_ids, :control_target_ids,
-                         :source_ids, :keep_events_for, :propagate_immediately, :scenario_ids)) { |clone|
+      new(original.slice(:type, :options, :service_id, :schedule, :controller_ids, :control_target_ids,
+                         :source_ids, :receiver_ids, :keep_events_for, :propagate_immediately, :scenario_ids)) { |clone|
         # Give it a unique name
-        2.upto(count) do |i|
+        2.step do |i|
           name = '%s (%d)' % [original.name, i]
           unless exists?(name: name)
             clone.name = name
@@ -383,7 +391,14 @@ class Agent < ActiveRecord::Base
 
         agents_to_events = {}
         Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_type, receiver_agent_type, event_id|
-          next unless const_defined?(source_agent_type) && const_defined?(receiver_agent_type)
+
+          begin
+            Object.const_get(source_agent_type)
+            Object.const_get(receiver_agent_type)
+          rescue NameError
+            next
+          end
+
           agents_to_events[receiver_agent_id.to_i] ||= []
           agents_to_events[receiver_agent_id.to_i] << event_id
         end
@@ -466,4 +481,12 @@ class AgentDrop
       @object.__send__(attr)
     } unless method_defined?(attr)
   }
+
+  def working
+    @object.working?
+  end
+
+  def url
+    Rails.application.routes.url_helpers.agent_url(@object, Rails.application.config.action_mailer.default_url_options)
+  end
 end

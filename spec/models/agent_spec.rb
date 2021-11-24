@@ -280,7 +280,7 @@ describe Agent do
 
     describe ".receive!" do
       before do
-        stub_request(:any, /wunderground/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
+        stub_request(:any, /darksky/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
         stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       end
 
@@ -563,7 +563,7 @@ describe Agent do
         agent.options = 5
         expect(agent.options["hi"]).to eq(2)
         expect(agent).to have(1).errors_on(:options)
-        expect(agent.errors_on(:options)).to include("cannot be set to an instance of Fixnum")
+        expect(agent.errors_on(:options)).to include("cannot be set to an instance of #{2.class}")  # Integer (ruby >=2.4) or Fixnum (ruby <2.4)
       end
 
       it "should not allow source agents owned by other people" do
@@ -653,7 +653,7 @@ describe Agent do
     describe "cleaning up now-expired events" do
       before do
         @time = "2014-01-01 01:00:00 +00:00"
-        time_travel_to @time do
+        travel_to @time do
           @agent = Agents::SomethingSource.new(:name => "something")
           @agent.keep_events_for = 5.days
           @agent.user = users(:bob)
@@ -678,7 +678,7 @@ describe Agent do
 
       describe "when keep_events_for is changed" do
         it "updates events' expires_at" do
-          time_travel_to @time do
+          travel_to @time do
             expect {
                 @agent.options[:foo] = "bar1"
                 @agent.keep_events_for = 3.days
@@ -910,8 +910,7 @@ describe Agent do
 
   describe ".drop_pending_events" do
     before do
-      stub_request(:any, /wunderground/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
-      stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
+      stub_request(:any, /darksky/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")), status: 200)
     end
 
     it "should drop pending events while the agent was disabled when set to true" do
@@ -923,7 +922,7 @@ describe Agent do
           Agent.async_check(agent1.id)
           Agent.receive!
         }.to change { agent1.events.count }.by(1)
-      }.to change { agent2.events.count }.by(1)
+      }.to change { agent2.events.count }.by(0)
 
       agent2.disabled = true
       agent2.save!
@@ -1033,6 +1032,14 @@ describe AgentDrop do
     expect(interpolate(t, @wsa1)).to eq('0: ')
     expect(interpolate(t, @wsa2)).to eq('0: ')
     expect(interpolate(t, @efa)).to eq('2: XKCD, Dilbert')
+
+    t = '{{agent.sources.first.name}}..{{agent.sources.last.name}}'
+    expect(interpolate(t, @wsa1)).to eq('..')
+    expect(interpolate(t, @wsa2)).to eq('..')
+    expect(interpolate(t, @efa)).to eq('XKCD..Dilbert')
+
+    t = '{{agent.sources[1].name}}'
+    expect(interpolate(t, @efa)).to eq('Dilbert')
   end
 
   it 'should have .receivers' do
@@ -1040,5 +1047,23 @@ describe AgentDrop do
     expect(interpolate(t, @wsa1)).to eq('1: Formatter')
     expect(interpolate(t, @wsa2)).to eq('1: Formatter')
     expect(interpolate(t, @efa)).to eq('0: ')
+  end
+
+  it 'should have .working' do
+    stub(@wsa1).working? { false }
+    stub(@wsa2).working? { true }
+    stub(@efa).working? { false }
+
+    t = '{% if agent.working %}healthy{% else %}unhealthy{% endif %}'
+    expect(interpolate(t, @wsa1)).to eq('unhealthy')
+    expect(interpolate(t, @wsa2)).to eq('healthy')
+    expect(interpolate(t, @efa)).to eq('unhealthy')
+  end
+
+  it 'should have .url' do
+    t = '{{ agent.url }}'
+    expect(interpolate(t, @wsa1)).to match(/http:\/\/localhost(?::\d+)?\/agents\/#{@wsa1.id}/)
+    expect(interpolate(t, @wsa2)).to match(/http:\/\/localhost(?::\d+)?\/agents\/#{@wsa2.id}/)
+    expect(interpolate(t, @efa)).to  match(/http:\/\/localhost(?::\d+)?\/agents\/#{@efa.id}/)
   end
 end

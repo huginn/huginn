@@ -70,6 +70,23 @@ module SortableEvents
     boolify(interpolated['include_sort_info'])
   end
 
+  def create_events(events)
+    if include_sort_info?
+      count = events.count
+      events.each.with_index(1) do |event, position|
+        event.payload[:sort_info] = {
+          position: position,
+          count: count
+        }
+        create_event(event)
+      end
+    else
+      events.each do |event|
+        create_event(event)
+      end
+    end
+  end
+
   module AutomaticSorter
     def check
       return super unless events_order || include_sort_info?
@@ -105,20 +122,7 @@ module SortableEvents
       yield
     ensure
       events, @sortable_events = sort_events(@sortable_events), nil
-      if include_sort_info?
-        count = events.count
-        events.each.with_index(1) do |event, position|
-          event.payload[:sort_info] = {
-            position: position,
-            count: count
-          }
-          create_event(event)
-        end
-      else
-        events.each do |event|
-          create_event(event)
-        end
-      end
+      create_events(events)
     end
   end
 

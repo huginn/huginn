@@ -19,22 +19,22 @@ module Agents
 
       [Sign up](https://dashboard.phantomjscloud.com/dash.html#/signup) to get an api key, and add it in Huginn credentials.
 
-      Please see the [Huginn Wiki for more info](https://github.com/cantino/huginn/wiki/Browser-Emulation-Using-PhantomJS-Cloud).
+      Please see the [Huginn Wiki for more info](https://github.com/huginn/huginn/wiki/Browser-Emulation-Using-PhantomJS-Cloud).
 
       Options:
 
       * `Api key` - PhantomJs Cloud API Key credential stored in Huginn
       * `Url` - The url to render
       * `Mode` - Create a new `clean` event or `merge` old payload with new values (default: `clean`)
-      * `Render type` - Render as html or plain text without html tags (default: `html`)
-      * `Output as json` - Return the page conents and metadata as a JSON object (default: `false`)
+      * `Render type` - Render as html, plain text without html tags, or jpg as screenshot of the page (default: `html`)
+      * `Output as json` - Return the page contents and metadata as a JSON object (default: `false`)
       * `Ignore images` - Skip loading of inlined images (default: `false`)
       * `Url agent` - A custom User-Agent name (default: `#{default_user_agent}`)
       * `Wait interval` - Milliseconds to delay rendering after the last resource is finished loading.
       This is useful in case there are any AJAX requests or animations that need to finish up.
       This can safely be set to 0 if you know there are no AJAX or animations you need to wait for (default: `1000`ms)
 
-      As this agent only provides a limited subset of the most commonly used options, you can follow [this guide](https://github.com/cantino/huginn/wiki/Browser-Emulation-Using-PhantomJS-Cloud) to make full use of additional options PhantomJsCloud provides.
+      As this agent only provides a limited subset of the most commonly used options, you can follow [this guide](https://github.com/huginn/huginn/wiki/Browser-Emulation-Using-PhantomJS-Cloud) to make full use of additional options PhantomJsCloud provides.
     MD
 
     event_description <<-MD
@@ -59,7 +59,7 @@ module Agents
     form_configurable :mode, type: :array, values: ['clean', 'merge']
     form_configurable :api_key, roles: :completable
     form_configurable :url
-    form_configurable :render_type, type: :array, values: ['html', 'plainText']
+    form_configurable :render_type, type: :array, values: ['html', 'plainText', 'jpg']
     form_configurable :output_as_json, type: :boolean
     form_configurable :ignore_images, type: :boolean
     form_configurable :user_agent, type: :text

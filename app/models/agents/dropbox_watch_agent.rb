@@ -18,7 +18,7 @@ module Agents
             "added": [ {
               "path": "/path/to/added/file",
               "rev": "1526952fd5",
-              "modified": "Fri, 10 Oct 2014 19:00:43 +0000"
+              "modified": "2017-10-14T18:39:41Z"
             } ],
             "removed": [ ... ],
             "updated": [ ... ]
@@ -51,18 +51,8 @@ module Agents
 
     private
 
-    def is_positive_integer?(value)
-      Integer(value) >= 0
-    rescue
-      false
-    end
-
     def ls(dir_to_watch)
-      dropbox.ls(dir_to_watch).map { |entry| slice_json(entry, 'path', 'rev', 'modified') }
-    end
-
-    def slice_json(json, *keys)
-      keys.each_with_object({}){|key, hash| hash[key.to_s] = json[key.to_s]}
+      dropbox.ls(dir_to_watch).map { |file| { 'path' => file.path, 'rev' => file.rev, 'modified' => file.server_modified } }
     end
 
     def previous_contents

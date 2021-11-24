@@ -2,14 +2,15 @@ module Agents
   class EmailAgent < Agent
     include EmailConcern
 
-    cannot_be_scheduled!
+    can_dry_run!
+    default_schedule "never"
     cannot_create_events!
     no_bulk_receive!
 
     description <<-MD
       The Email Agent sends any events it receives via email immediately.
 
-      You can specify the email's subject line by providing a `subject` option, which can contain Liquid formatting.  E.g.,
+      You can specify the email's subject line by providing a `subject` option, which can contain [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) formatting.  E.g.,
       you could provide `"Huginn email"` to set a simple subject, or `{{subject}}` to use the `subject` key from the incoming Event.
 
       By default, the email body will contain an optional `headline`, followed by a listing of the Events' keys.

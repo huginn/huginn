@@ -1,0 +1,641 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "huginn-pgsql-persistent",
+        "annotations": {
+            "openshift.io/display-name": "Huginn + PostgreSQL (Persistent)",
+            "description": "A Huginn deployment with a PostgreSQL database. For more information, see https://github.com/huginn/huginn.",
+            "tags": "quickstart,ruby,huginn",
+            "iconClass": "icon-huginn"
+        }
+    },
+    "message": "The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}. Visit https://${NAME}-YOUR_PROJECT_NAME.${ROUTER_SHARD}.${CLUSTER_NAME}.openshiftapps.com and login as '${HUGINN_SEED_USERNAME}' with your password. If you'd like to make more users, you can visit https://${NAME}-YOUR_PROJECT_NAME.${ROUTER_SHARD}.${CLUSTER_NAME}.openshiftapps.com/users/sign_up and use the invitation code: ${HUGINN_INVITATION_CODE}\n\nFor more information, see https://github.com/huginn/huginn.",
+    "labels": {
+        "template": "huginn-pgsql-persistent"
+    },
+    "objects": [{
+        "kind": "Secret",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${NAME}"
+        },
+        "stringData" : {
+            "databaseName" : "${DATABASE_NAME}",
+            "databaseUser" : "${DATABASE_USER}",
+            "databasePassword" : "${DATABASE_PASSWORD}",
+            "seedUser" : "${HUGINN_SEED_USERNAME}",
+            "seedPassword" : "${HUGINN_SEED_PASSWORD}",
+            "seedEmail" : "${HUGINN_SEED_EMAIL}",
+            "smtpDomain" : "${HUGINN_SMTP_DOMAIN}",
+            "smtpUser" : "${HUGINN_SMTP_USER_NAME}",
+            "smtpPassword" : "${HUGINN_SMTP_PASSWORD}",
+            "smtpServer" : "${HUGINN_SMTP_SERVER}"
+        }
+    }, {
+        "kind": "Service",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${NAME}",
+            "annotations": {
+                "description": "Exposes and load balances the application pods",
+                "service.alpha.openshift.io/dependencies": "[{\"name\": \"${DATABASE_SERVICE_NAME}\", \"kind\": \"Service\"}]"
+            }
+        },
+        "spec": {
+            "ports": [{
+                "name": "web",
+                "port": 8080,
+                "targetPort": 8080
+            }],
+            "selector": {
+                "name": "${NAME}"
+            }
+        }
+    }, {
+        "kind": "Route",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${NAME}"
+        },
+        "spec": {
+            "host": "${APPLICATION_DOMAIN}",
+            "tls": {
+                "insecureEdgeTerminationPolicy": "Redirect",
+                "termination": "edge"
+            },
+            "to": {
+                "kind": "Service",
+                "name": "${NAME}"
+            }
+        }
+    }, {
+        "kind": "ImageStream",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${NAME}",
+            "annotations": {
+                "description": "Keeps track of changes in the application image"
+            }
+        }
+    }, {
+        "kind": "BuildConfig",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${NAME}",
+            "annotations": {
+                "description": "Defines how to build the application"
+            }
+        },
+        "spec": {
+            "source": {
+                "type": "Git",
+                "git": {
+                    "uri": "${SOURCE_REPOSITORY_URL}",
+                    "ref": "${SOURCE_REPOSITORY_REF}"
+                },
+                "contextDir": "${CONTEXT_DIR}"
+            },
+	    "resources": {
+		"limits": {
+		   "memory": "${BUILD_MEMORY_LIMIT}"
+		}
+	    },
+            "strategy": {
+                "type": "Source",
+                "sourceStrategy": {
+                    "from": {
+                        "kind": "ImageStreamTag",
+                        "namespace": "${NAMESPACE}",
+                        "name": "ruby:2.5"
+                    },
+                    "env": [{
+                        "name": "APP_SECRET_TOKEN",
+                        "value": "${HUGINN_APP_SECRET}"
+                    }, {
+                        "name": "DATABASE_ADAPTER",
+                        "value": "${DATABASE_ADAPTER}"
+                    }, {
+                        "name": "LC_ALL",
+                        "value": "en_US.UTF-8"
+                    }, {
+                        "name": "ON_HEROKU",
+                        "value": "true"
+                    }]
+                }
+            },
+            "output": {
+                "to": {
+                    "kind": "ImageStreamTag",
+                    "name": "${NAME}:latest"
+                }
+            },
+            "triggers": [{
+                "type": "ImageChange"
+            }, {
+                "type": "ConfigChange"
+            }, {
+                "type": "GitHub",
+                "github": {
+                    "secret": "${GITHUB_WEBHOOK_SECRET}"
+                }
+            }]
+        }
+    }, {
+        "kind": "PersistentVolumeClaim",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${DATABASE_SERVICE_NAME}"
+        },
+        "spec": {
+            "accessModes": [
+                "ReadWriteOnce"
+            ],
+            "resources": {
+                "requests": {
+                    "storage": "${VOLUME_CAPACITY}"
+                }
+            }
+        }
+    }, {
+        "kind": "DeploymentConfig",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${NAME}",
+            "annotations": {
+                "description": "Defines how to deploy the application server"
+            }
+        },
+        "spec": {
+            "strategy": {
+                "type": "Recreate"
+            },
+            "triggers": [{
+                "type": "ImageChange",
+                "imageChangeParams": {
+                    "automatic": true,
+                    "containerNames": [
+                        "huginn-pgsql-persistent"
+                    ],
+                    "from": {
+                        "kind": "ImageStreamTag",
+                        "name": "${NAME}:latest"
+                    }
+                }
+            }, {
+                "type": "ConfigChange"
+            }],
+            "replicas": 1,
+            "selector": {
+                "name": "${NAME}"
+            },
+            "template": {
+                "metadata": {
+                    "name": "${NAME}",
+                    "labels": {
+                        "name": "${NAME}"
+                    }
+                },
+                "spec": {
+                    "containers": [{
+                        "name": "huginn-pgsql-persistent",
+                        "image": "${NAME}",
+                        "ports": [{
+                            "containerPort": 8080
+                        }],
+                        "readinessProbe": {
+                            "timeoutSeconds": 3,
+                            "initialDelaySeconds": 3,
+                            "httpGet": {
+                                "path": "/",
+                                "port": 8080
+                            }
+                        },
+                        "livenessProbe": {
+                            "timeoutSeconds": 3,
+                            "initialDelaySeconds": 30,
+                            "httpGet": {
+                                "path": "/",
+                                "port": 8080
+                            }
+                        },
+                        "env": [{
+                            "name": "SEED_USERNAME",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "seedUser"
+                                }
+                            }
+                        }, {
+                            "name": "SEED_PASSWORD",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "seedPassword"
+                                }
+                            }
+                        }, {
+                            "name": "SEED_EMAIL",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "seedEmail"
+                                }
+                            }
+                        }, {
+                            "name": "INVITATION_CODE",
+                            "value": "${HUGINN_INVITATION_CODE}"
+                        }, {
+                            "name": "SMTP_DOMAIN",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "smtpDomain"
+                                }
+                            }
+                        }, {
+                            "name": "SMTP_USER_NAME",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "smtpUser"
+                                }
+                            }
+                        }, {
+                            "name": "SMTP_PASSWORD",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "smtpPassword"
+                                }
+                            }
+                        }, {
+                            "name": "SMTP_SERVER",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "smtpServer"
+                                }
+                            }
+                        }, {
+                            "name": "EMAIL_FROM_ADDRESS",
+                            "value": "${HUGINN_EMAIL_FROM_ADDRESS}"
+                        }, {
+                            "name": "APPLICATION_DOMAIN",
+                            "value": "${APPLICATION_DOMAIN}"
+                        }, {
+                            "name": "RAILS_ENV",
+                            "value": "${HUGINN_RAILS_ENV}"
+                        }, {
+                            "name": "OPCACHE_REVALIDATE_FREQ",
+                            "value": "${OPCACHE_REVALIDATE_FREQ}"
+                        }, {
+                            "name": "DATABASE_NAME",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "databaseName"
+                                }
+                            }
+                        }, {
+                            "name": "DATABASE_USERNAME",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "databaseUser"
+                                }
+                            }
+                        }, {
+                            "name": "DATABASE_PASSWORD",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "databasePassword"
+                                }
+                            }
+                        }, {
+                            "name": "DATABASE_HOST",
+                            "value": "${DATABASE_SERVICE_NAME}_SERVICE_HOST"
+                        }, {
+                            "name": "DATABASE_PORT",
+                            "value": "${DATABASE_SERVICE_NAME}_SERVICE_PORT"
+                        }, {
+                            "name": "DATABASE_ENCODING",
+                            "value": "utf8"
+                        }, {
+                            "name": "DO_NOT_CREATE_DATABASE",
+                            "value": "1"
+                        }, {
+                            "name": "RAILS_SERVE_STATIC_FILES",
+                            "value": "1"
+                        }, {
+                            "name": "WORKER_CMD",
+                            "value": "unicorn -c ./deployment/heroku/unicorn.rb --listen 0.0.0.0:8080"
+                        }],
+                        "resources": {
+                            "limits": {
+                                "memory": "${MEMORY_LIMIT}"
+                            }
+                        }
+                    }]
+                }
+            }
+        }
+    }, {
+        "kind": "Service",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${DATABASE_SERVICE_NAME}",
+            "annotations": {
+                "description": "Exposes the database server"
+            }
+        },
+        "spec": {
+            "ports": [{
+                "name": "pgsql",
+                "port": 5432,
+                "targetPort": 5432
+            }],
+            "selector": {
+                "name": "${DATABASE_SERVICE_NAME}"
+            }
+        }
+    }, {
+        "kind": "DeploymentConfig",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${DATABASE_SERVICE_NAME}",
+            "annotations": {
+                "description": "Defines how to deploy the database"
+            }
+        },
+        "spec": {
+            "strategy": {
+                "type": "Recreate"
+            },
+            "triggers": [{
+                "type": "ImageChange",
+                "imageChangeParams": {
+                    "automatic": true,
+                    "containerNames": [
+                        "postgresql"
+                    ],
+                    "from": {
+                        "kind": "ImageStreamTag",
+                        "namespace": "${NAMESPACE}",
+                        "name": "postgresql:9.6"
+                    }
+                }
+            }, {
+                "type": "ConfigChange"
+            }],
+            "replicas": 1,
+            "selector": {
+                "name": "${DATABASE_SERVICE_NAME}"
+            },
+            "template": {
+                "metadata": {
+                    "name": "${DATABASE_SERVICE_NAME}",
+                    "labels": {
+                        "name": "${DATABASE_SERVICE_NAME}"
+                    }
+                },
+                "spec": {
+                    "containers": [{
+                        "name": "postgresql",
+                        "image": "postgresql",
+                        "ports": [{
+                            "containerPort": 5432
+                        }],
+                        "readinessProbe": {
+                            "timeoutSeconds": 1,
+                            "initialDelaySeconds": 5,
+                            "exec": {
+                                "command": ["/bin/sh", "-i", "-c", "psql -h 127.0.0.1 -U ${DATABASE_USER} -q -d ${DATABASE_NAME} -c 'SELECT 1'"]
+                            }
+                        },
+                        "livenessProbe": {
+                            "timeoutSeconds": 1,
+                            "initialDelaySeconds": 30,
+                            "tcpSocket": {
+                                "port": 5432
+                            }
+                        },
+                        "env": [{
+                            "name": "POSTGRESQL_DATABASE",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "databaseName"
+                                }
+                            }
+                        }, {
+                            "name": "POSTGRESQL_USER",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "databaseUser"
+                                }
+                            }
+                        }, {
+                            "name": "POSTGRESQL_PASSWORD",
+                            "valueFrom": {
+                                "secretKeyRef" : {
+                                    "name" : "${NAME}",
+                                    "key" : "databasePassword"
+                                }
+                            }
+                        }],
+                        "resources": {
+                            "limits": {
+                                "memory": "${MEMORY_POSTGRESQL_LIMIT}"
+                            }
+                        },
+                        "volumeMounts": [{
+                            "name": "${DATABASE_SERVICE_NAME}-data",
+                            "mountPath": "/var/lib/pgsql/data"
+                        }]
+                    }],
+                    "volumes": [{
+                        "name": "${DATABASE_SERVICE_NAME}-data",
+                        "persistentVolumeClaim": {
+                            "claimName": "${DATABASE_SERVICE_NAME}"
+                        }
+                    }]
+                }
+            }
+        }
+    }],
+    "parameters": [{
+        "name": "NAME",
+        "displayName": "Name",
+        "description": "The name assigned to all of the frontend objects defined in this template.",
+        "required": true,
+        "value": "huginn"
+    }, {
+        "name": "HUGINN_SEED_USERNAME",
+        "displayName": "Huginn SEED_USERNAME",
+        "description": "Account ID for the admin user.",
+        "value": "admin",
+        "required": true
+    }, {
+        "name": "HUGINN_SEED_PASSWORD",
+        "displayName": "Huginn SEED_PASSWORD",
+        "description": "Password for the admin user.",
+        "value": "password",
+        "required": true
+    }, {
+        "name": "HUGINN_SEED_EMAIL",
+        "displayName": "Huginn SEED_EMAIL",
+        "description": "Email for the admin user.",
+        "value": "huginn@example.com",
+        "required": true
+    }, {
+        "name": "HUGINN_INVITATION_CODE",
+        "displayName": "Huginn INVITATION_CODE",
+        "description": "If you'd like to invite more users, give them this invitation code.",
+        "generate": "expression",
+        "from": "[\\w]{10}"
+    }, {
+        "name": "HUGINN_SMTP_DOMAIN",
+        "displayName": "Huginn SMTP_DOMAIN",
+        "description": "Domain for outbound emails.",
+        "value": "example.com",
+        "required": true
+    }, {
+        "name": "HUGINN_SMTP_USER_NAME",
+        "displayName": "Huginn SMTP_USER_NAME",
+        "description": "SMTP user name.",
+        "value": "huginn@example.com",
+        "required": true
+    }, {
+        "name": "HUGINN_SMTP_PASSWORD",
+        "displayName": "Huginn SMTP_PASSWORD",
+        "description": "SMTP password.",
+        "value": "somepassword",
+        "required": true
+    }, {
+        "name": "HUGINN_SMTP_SERVER",
+        "displayName": "Huginn SMTP_SERVER",
+        "description": "SMTP server address.",
+        "value": "smtp.example.com",
+        "required": true
+    }, {
+        "name": "HUGINN_EMAIL_FROM_ADDRESS",
+        "displayName": "Huginn EMAIL_FROM_ADDRESS",
+        "description": "The address from which system emails will appear to be sent.",
+        "value": "huginn@example.com",
+        "required": true
+    }, {
+        "name": "HUGINN_APP_SECRET",
+        "displayName": "Huginn APP_SECRET_TOKEN",
+        "description": "Set this to a 64 character random string (e.g., from 'rake secret').",
+        "generate": "expression",
+        "from": "[\\w]{64}"
+    }, {
+        "name": "SOURCE_REPOSITORY_URL",
+        "displayName": "Git Repository URL",
+        "description": "The URL of the repository with your application source code.",
+        "value": "https://github.com/huginn/huginn.git",
+        "required": true
+    }, {
+        "name": "SOURCE_REPOSITORY_REF",
+        "displayName": "Git Reference",
+        "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch."
+    }, {
+        "name": "CONTEXT_DIR",
+        "displayName": "Context Directory",
+        "description": "Set this to the relative path to your project if it is not in the root of your repository."
+    }, {
+        "name": "GITHUB_WEBHOOK_SECRET",
+        "displayName": "GitHub Webhook Secret",
+        "description": "A secret string used to configure the GitHub webhook.",
+        "generate": "expression",
+        "from": "[a-zA-Z0-9]{40}"
+    }, {
+        "displayName": "Cluster Name",
+        "name": "CLUSTER_NAME",
+        "description": "The name of your current OpenShift cluster (console.CLUSTER_NAME.openshift.com).",
+        "value": "starter-us-west-2",
+        "required": true
+    }, {
+        "displayName": "Router Shard",
+        "name": "ROUTER_SHARD",
+        "description": "The router shard used by routes in your current OpenShift cluster (http://PROJECT_NAME-APPLICATION_NAME.ROUTER_SHARD.CLUSTER_NAME.openshiftapps.com/).",
+        "value": "7e14",
+        "required": true
+    }, {
+        "name": "APPLICATION_DOMAIN",
+        "displayName": "Application Hostname",
+        "description": "The exposed hostname that will route to the Huginn service, if left blank a value will be defaulted.",
+        "value": ""
+    }, {
+        "name": "NAMESPACE",
+        "displayName": "Namespace",
+        "description": "The OpenShift Namespace where the ImageStream resides.",
+        "required": true,
+        "value": "openshift"
+    }, {
+        "name": "DATABASE_SERVICE_NAME",
+        "displayName": "Database Service Name",
+        "value": "postgresql",
+        "required": true
+    }, {
+        "name": "HUGINN_RAILS_ENV",
+        "displayName": "Huginn Application Environment",
+        "description": "Determines the 'environment' your application is currently.",
+        "value": "production",
+        "required": true
+    }, {
+        "name": "OPCACHE_REVALIDATE_FREQ",
+        "displayName": "OPcache Revalidation Frequency",
+        "description": "How often to check script timestamps for updates, in seconds. 0 will result in OPcache checking for updates on every request.",
+        "value": "0"
+    }, {
+        "name": "MEMORY_LIMIT",
+        "displayName": "Memory Limit",
+        "description": "Maximum amount of memory the Huginn container can use.",
+        "value": "1Gi",
+        "required": true
+    }, {
+        "name": "MEMORY_POSTGRESQL_LIMIT",
+        "displayName": "Memory Limit (PostgreSQL)",
+        "description": "Maximum amount of memory the PostgreSQL container can use.",
+        "value": "512Mi",
+        "required": true
+    }, {
+        "name": "BUILD_MEMORY_LIMIT",
+        "displayName": "Memory Limit",
+        "description": "Maximum amount of memory the Huginn container can use.",
+        "value": "1Gi",
+        "required": true
+    }, {
+        "name": "VOLUME_CAPACITY",
+        "displayName": "Volume Capacity",
+        "description": "Volume space available for data, e.g. 512Mi, 2Gi",
+        "value": "1Gi",
+        "required": true
+    }, {
+        "name": "DATABASE_ADAPTER",
+        "displayName": "Database Engine",
+        "description": "Database engine: mysql2 or postgresql (default).",
+        "value": "postgresql",
+        "required": true
+    }, {
+        "name": "DATABASE_NAME",
+        "displayName": "Database Name",
+        "generate": "expression",
+        "from": "[a-zA-Z0-9]{6}"
+    }, {
+        "name": "DATABASE_USER",
+        "displayName": "Database User",
+        "generate": "expression",
+        "from": "[a-zA-Z0-9]{6}"
+    }, {
+        "name": "DATABASE_PASSWORD",
+        "displayName": "Database Password",
+        "generate": "expression",
+        "from": "[a-zA-Z0-9]{16}"
+    }]
+}

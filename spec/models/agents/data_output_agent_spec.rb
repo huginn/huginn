@@ -7,6 +7,7 @@ describe Agents::DataOutputAgent do
     _agent = Agents::DataOutputAgent.new(:name => 'My Data Output Agent')
     _agent.options = _agent.default_options.merge('secrets' => ['secret1', 'secret2'], 'events_to_show' => 3)
     _agent.options['template']['item']['pubDate'] = "{{date}}"
+    _agent.options['template']['item']['category'] = "{{ category | as_object }}"
     _agent.user = users(:bob)
     _agent.sources << agents(:bob_website_agent)
     _agent.save!
@@ -122,7 +123,8 @@ describe Agents::DataOutputAgent do
           "site_title" => "XKCD",
           "url" => "http://imgs.xkcd.com/comics/evolving.png",
           "title" => "Evolving",
-          "hovertext" => "Biologists play reverse Pokemon, trying to avoid putting any one team member on the front lines long enough for the experience to cause evolution."
+          "hovertext" => "Biologists play reverse Pokemon, trying to avoid putting any one team member on the front lines long enough for the experience to cause evolution.",
+          "category" => []
         }
       end
 
@@ -132,7 +134,8 @@ describe Agents::DataOutputAgent do
           "url" => "http://imgs.xkcd.com/comics/evolving2.png",
           "title" => "Evolving again",
           "date" => '',
-          "hovertext" => "Something else"
+          "hovertext" => "Something else",
+          "category" => ["Category 1", "Category 2"]
         }
       end
 
@@ -142,7 +145,8 @@ describe Agents::DataOutputAgent do
           "url" => "http://imgs.xkcd.com/comics/evolving0.png",
           "title" => "Evolving yet again with a past date",
           "date" => '2014/05/05',
-          "hovertext" => "A small text"
+          "hovertext" => "A small text",
+          "category" => ["Some category"]
         }
       end
 
@@ -150,7 +154,7 @@ describe Agents::DataOutputAgent do
         stub(agent).feed_link { "https://yoursite.com" }
         content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         expect(status).to eq(200)
-        expect(content_type).to eq('text/xml')
+        expect(content_type).to eq('application/rss+xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
           <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
@@ -169,6 +173,7 @@ describe Agents::DataOutputAgent do
             <description>Secret hovertext: A small text</description>
             <link>http://imgs.xkcd.com/comics/evolving0.png</link>
             <pubDate>#{Time.zone.parse(event3.payload['date']).rfc2822}</pubDate>
+            <category>Some category</category>
             <guid isPermaLink="false">#{event3.id}</guid>
            </item>
 
@@ -177,6 +182,8 @@ describe Agents::DataOutputAgent do
             <description>Secret hovertext: Something else</description>
             <link>http://imgs.xkcd.com/comics/evolving2.png</link>
             <pubDate>#{event2.created_at.rfc2822}</pubDate>
+            <category>Category 1</category>
+            <category>Category 2</category>
             <guid isPermaLink="false">#{event2.id}</guid>
            </item>
 
@@ -193,12 +200,25 @@ describe Agents::DataOutputAgent do
         XML
       end
 
+      describe "with custom rss_content_type given" do
+        before do
+          agent.options['rss_content_type'] = 'text/xml'
+          agent.save!
+        end
+
+        it "can output RSS with the Content-Type" do
+          content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(content_type).to eq('text/xml')
+        end
+      end
+
       it "can output RSS with hub links when push_hubs is specified" do
         stub(agent).feed_link { "https://yoursite.com" }
         agent.options[:push_hubs] = %w[https://pubsubhubbub.superfeedr.com/ https://pubsubhubbub.appspot.com/]
         content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         expect(status).to eq(200)
-        expect(content_type).to eq('text/xml')
+        expect(content_type).to eq('application/rss+xml')
         xml = Nokogiri::XML(content)
         expect(xml.xpath('/rss/channel/atom:link[@rel="hub"]/@href').map(&:text).sort).to eq agent.options[:push_hubs].sort
       end
@@ -220,6 +240,7 @@ describe Agents::DataOutputAgent do
               'link' => 'http://imgs.xkcd.com/comics/evolving0.png',
               'guid' => {"contents" => event3.id, "isPermaLink" => "false"},
               'pubDate' => Time.zone.parse(event3.payload['date']).rfc2822,
+              'category' => ['Some category'],
               'foo' => 'hi'
             },
             {
@@ -228,6 +249,7 @@ describe Agents::DataOutputAgent do
               'link' => 'http://imgs.xkcd.com/comics/evolving2.png',
               'guid' => {"contents" => event2.id, "isPermaLink" => "false"},
               'pubDate' => event2.created_at.rfc2822,
+              'category' => ['Category 1', 'Category 2'],
               'foo' => 'hi'
             },
             {
@@ -236,10 +258,24 @@ describe Agents::DataOutputAgent do
               'link' => 'http://imgs.xkcd.com/comics/evolving.png',
               'guid' => {"contents" => event1.id, "isPermaLink" => "false"},
               'pubDate' => event1.created_at.rfc2822,
+              'category' => [],
               'foo' => 'hi'
             }
           ]
         })
+      end
+
+      describe "with custom response_headers given" do
+        before do
+          agent.options['response_headers'] = {"Access-Control-Allow-Origin" => "*", "X-My-Custom-Header" => "hello"}
+          agent.save!
+        end
+
+        it "can respond with custom headers" do
+          content, status, content_type, response_headers = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
+          expect(status).to eq(200)
+          expect(response_headers).to eq({"Access-Control-Allow-Origin" => "*", "X-My-Custom-Header" => "hello"})
+        end
       end
 
       context 'with more events' do
@@ -314,7 +350,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('text/xml')
+          expect(content_type).to eq('application/rss+xml')
           expect(Nokogiri(content).at('/rss/channel/title/text()').text).to eq('XKCD comics as a feed (XKCD)')
         end
 
@@ -323,6 +359,28 @@ describe Agents::DataOutputAgent do
           expect(status).to eq(200)
 
           expect(content['title']).to eq('XKCD comics as a feed (XKCD)')
+        end
+
+        context "with event with \"events\"" do
+          before do
+            agent.sources.first.create_event payload: {
+              'site_title' => 'XKCD',
+              'url' => 'http://imgs.xkcd.com/comics/comicX.png',
+              'title' => 'Comic X',
+              'date' => '',
+              'hovertext' => 'Hovertext for Comic X',
+              'events' => 'Events!'
+            }
+            agent.options['template']['item']['events_data'] = "{{ events }}"
+            agent.save!
+          end
+
+          it "can access the value without being overridden" do
+            content, status, content_type = agent.receive_web_request({ 'secret' => 'secret2' }, 'get', 'application/json')
+            expect(status).to eq(200)
+
+            expect(content['items'].first['events_data']).to eq('Events!')
+          end
         end
       end
 
@@ -336,7 +394,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('text/xml')
+          expect(content_type).to eq('application/rss+xml')
           expect(Nokogiri(content).at('/rss/channel/atom:icon/text()').text).to eq('https://somesite.com/icon.png')
         end
       end
@@ -351,7 +409,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('text/xml')
+          expect(content_type).to eq('application/rss+xml')
 
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -369,7 +427,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('text/xml')
+          expect(content_type).to eq('application/rss+xml')
 
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -389,7 +447,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('text/xml')
+          expect(content_type).to eq('application/rss+xml')
 
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -407,11 +465,12 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('text/xml')
-
+          expect(content_type).to eq('application/rss+xml')
+          
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
           expect(namespaces).not_to include("xmlns:itunes")
+          expect(doc.at("/rss/channel/*[local-name()='itunes:image']")).to be_nil
         end
       end
 
@@ -425,13 +484,14 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('text/xml')
-
+          expect(content_type).to eq('application/rss+xml')
+          
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
           expect(namespaces).to include(
             "xmlns:itunes" => 'http://www.itunes.com/dtds/podcast-1.0.dtd'
           )
+          expect(doc.at('/rss/channel/itunes:image').attr('href')).to eq('https://yoursite.com/favicon.ico')          
         end
       end
 
@@ -445,7 +505,7 @@ describe Agents::DataOutputAgent do
           stub(agent).feed_link { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
-          expect(content_type).to eq('text/xml')
+          expect(content_type).to eq('application/rss+xml')
 
           doc = Nokogiri(content)
           namespaces = doc.collect_namespaces
@@ -503,6 +563,7 @@ describe Agents::DataOutputAgent do
           "title" => "Evolving",
           "hovertext" => "Biologists play reverse Pokemon, trying to avoid putting any one team member on the front lines long enough for the experience to cause evolution.",
           "media_url" => "http://google.com/audio.mpeg",
+          "category" => ["Category 1", "Category 2"],
           "foo" => 1
         }
       end
@@ -517,6 +578,7 @@ describe Agents::DataOutputAgent do
             'link' => 'http://imgs.xkcd.com/comics/evolving.png',
             'guid' => {"contents" => event.id, "isPermaLink" => "false"},
             'pubDate' => event.created_at.rfc2822,
+            'category' => ['Category 1', 'Category 2'],
             'enclosure' => {
               "type" => "audio/mpeg",
               "url" => "http://google.com/audio.mpeg"
@@ -547,7 +609,7 @@ describe Agents::DataOutputAgent do
         stub(agent).feed_link { "https://yoursite.com" }
         content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         expect(status).to eq(200)
-        expect(content_type).to eq('text/xml')
+        expect(content_type).to eq('application/rss+xml')
         expect(content.gsub(/\s+/, '')).to eq Utils.unindent(<<-XML).gsub(/\s+/, '')
           <?xml version="1.0" encoding="UTF-8" ?>
           <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" >
@@ -566,6 +628,8 @@ describe Agents::DataOutputAgent do
              <description>Secret hovertext: Biologists play reverse Pokemon, trying to avoid putting any one team member on the front lines long enough for the experience to cause evolution.</description>
              <link>http://imgs.xkcd.com/comics/evolving.png</link>
              <pubDate>#{event.created_at.rfc2822}</pubDate>
+             <category>Category 1</category>
+             <category>Category 2</category>
              <enclosure type="audio/mpeg" url="http://google.com/audio.mpeg" />
              <foo attr="attr-value-1">Foo: 1</foo>
              <nested key="value"><title>some title</title></nested>

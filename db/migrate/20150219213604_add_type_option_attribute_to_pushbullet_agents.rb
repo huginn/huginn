@@ -1,4 +1,4 @@
-class AddTypeOptionAttributeToPushbulletAgents < ActiveRecord::Migration
+class AddTypeOptionAttributeToPushbulletAgents < ActiveRecord::Migration[4.2]
   def up
     Agents::PushbulletAgent.find_each do |agent|
       if agent.options['type'].nil?

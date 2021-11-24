@@ -1,4 +1,4 @@
-class UpdatePushoverAgentOptions < ActiveRecord::Migration
+class UpdatePushoverAgentOptions < ActiveRecord::Migration[4.2]
   DEFAULT_OPTIONS = {
     'message' => '{{ message | default: text }}',
     'device' => '{{ device }}',
