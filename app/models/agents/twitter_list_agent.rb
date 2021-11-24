@@ -46,15 +46,15 @@ module Agents
     default_schedule "every_1h"
 
     def working?
-      event_created_within?(interpolated['expected_update_period_in_days']) && !recent_error_logs?
+      event_created_within?(interpolated["expected_update_period_in_days"]) && !recent_error_logs?
     end
 
     def default_options
       {
-        'owner_screen_name' => 'tectonic',
-        'slug' => 'rubyists',
-        'include_retweets' => 'true',
-        'expected_update_period_in_days' => '2',
+        "owner_screen_name" => "tectonic",
+        "slug" => "rubyists",
+        "include_retweets" => "true",
+        "expected_update_period_in_days" => "2"
       }
     end
 
@@ -67,14 +67,19 @@ module Agents
       end
 
       if options[:starting_at].present?
-        Time.parse(options[:starting_at]) rescue errors.add(:base, "Error parsing starting_at")
+        begin
+          Time.parse(options[:starting_at])
+        rescue
+          errors.add(:base, "Error parsing starting_at")
+        end
       end
     end
 
     def starting_at
-      if interpolated[:starting_at].present?
-        Time.parse(interpolated[:starting_at]) rescue created_at
-      else
+      return created_at unless interpolated[:starting_at].present?
+      begin
+        Time.parse(interpolated[:starting_at])
+      rescue
         created_at
       end
     end
@@ -84,22 +89,20 @@ module Agents
     end
 
     def check
-      since_id = memory['since_id'] || nil
-      opts = {:count => 200, :include_rts => include_retweets?, :include_entities => true, tweet_mode: 'extended'}
-      opts.merge! :since_id => since_id unless since_id.nil?
+      since_id = memory["since_id"] || nil
+      opts = {count: 200, include_rts: include_retweets?, include_entities: true, tweet_mode: "extended"}
+      opts[:since_id] = since_id unless since_id.nil?
 
-      if options[:list_id].present?
-        tweets = twitter.list_timeline(interpolated['list_id'].to_i, opts)
+      tweets = if options[:list_id].present?
+        twitter.list_timeline(interpolated["list_id"].to_i, opts)
       else
-        tweets = twitter.list_timeline(interpolated['owner_screen_name'], interpolated['slug'], opts)
+        twitter.list_timeline(interpolated["owner_screen_name"], interpolated["slug"], opts)
       end
 
       tweets.each do |tweet|
-        if tweet.created_at >= starting_at
-          memory['since_id'] = tweet.id if !memory['since_id'] || (tweet.id > memory['since_id'])
-
-          create_event :payload => tweet.attrs
-        end
+        next if tweet.created_at < starting_at
+        memory["since_id"] = tweet.id if !memory["since_id"] || (tweet.id > memory["since_id"])
+        create_event payload: tweet.attrs
       end
     end
   end
