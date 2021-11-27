@@ -9,7 +9,8 @@ describe Agents::TwitterPublishAgent do
       :consumer_secret => "---",
       :oauth_token => "---",
       :oauth_token_secret => "---",
-      :message => "{{text}}"
+      :message => "{{text}}",
+      :media_url => "{{media_url}}"
     }
 
     @checker = Agents::TwitterPublishAgent.new(:name => "HuginnBot", :options => @opts)
@@ -23,8 +24,10 @@ describe Agents::TwitterPublishAgent do
     @event.save!
 
     @sent_messages = []
-    stub.any_instance_of(Agents::TwitterPublishAgent).publish_tweet { |message|
+    @media_items = []
+    stub.any_instance_of(Agents::TwitterPublishAgent).publish_tweet { |message, media_url|
       @sent_messages << message
+      @media_items << media_url unless media_url.blank?
       OpenStruct.new(:id => 454209588376502272)
     }
   end
@@ -41,9 +44,15 @@ describe Agents::TwitterPublishAgent do
       event2.payload = { :text => 'More payload' }
       event2.save!
 
-      Agents::TwitterPublishAgent.async_receive(@checker.id, [event1.id, event2.id])
-      expect(@sent_messages.count).to eq(2)
-      expect(@checker.events.count).to eq(2)
+      event3 = Event.new
+      event3.agent = agents(:bob_weather_agent)
+      event3.payload = { :text => 'Payload with media', media_url: 'http://images.com/hello.png' }
+      event3.save!
+
+      Agents::TwitterPublishAgent.async_receive(@checker.id, [event1.id, event2.id, event3.id])
+      expect(@sent_messages.count).to eq(3)
+      expect(@checker.events.count).to eq(3)
+      expect(@media_items.count).to eq(1)
     end
   end
 
