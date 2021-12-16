@@ -1,15 +1,16 @@
 #!/bin/bash
 set -ev
 
+: ${DOCKER_IMAGE_TAG:=${GITHUB_SHA:-$(git rev-parse HEAD)}}
+
 bin/docker_wrapper build -t $DOCKER_IMAGE -f $DOCKERFILE .
 
-if [[ -n "${DOCKER_USER}" && "${TRAVIS_PULL_REQUEST}" = 'false' && "${TRAVIS_BRANCH}" = "master" ]]; then
-  docker login -u $DOCKER_USER -p $DOCKER_PASS
-  docker tag $DOCKER_IMAGE $DOCKER_IMAGE:$TRAVIS_COMMIT
+if [[ "$1" == --push ]]; then
+  [[ -n "$DOCKER_USER" && -n "$DOCKER_IMAGE_TAG" ]]
+  docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
+  docker tag $DOCKER_IMAGE $DOCKER_IMAGE:$DOCKER_IMAGE_TAG
   docker push $DOCKER_IMAGE
-  docker push $DOCKER_IMAGE:$TRAVIS_COMMIT
-else
-  echo "Docker image are only pushed for builds of the master branch when Docker Hub credentials are present."
+  docker push $DOCKER_IMAGE:$DOCKER_IMAGE_TAG
 fi
 
 if [[ $DOCKER_IMAGE == "huginn/huginn-single-process" ]]; then

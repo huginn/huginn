@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  run-tests:
+    name: ${{ matrix.os }} ${{ matrix.ruby }} ${{ matrix.database_adapter }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+        database_adapter:
+          - mysql2
+          - postgresql
+        ruby:
+          - "2.7"
+          - "2.6"
+    env:
+      APP_SECRET_TOKEN: ${{ secrets.APP_SECRET_TOKEN }}
+      DATABASE_ADAPTER: ${{ matrix.database_adapter }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        env:
+          BUNDLE_WITHOUT: "development:production"
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+
+      - name: Setup MySQL
+        if: ${{ matrix.database_adapter == 'mysql2' }}
+        run: |
+          sudo systemctl start mysql.service
+
+      - name: Setup PostgreSQL
+        if: ${{ matrix.database_adapter == 'postgresql' }}
+        run: |
+          sudo systemctl start postgresql.service
+          echo "::set-env DATABASE_USERNAME::postgres"
+
+      - name: Set up database
+        run: bundle exec rake db:create db:migrate
+
+      - name: Run tests
+        run: bundle exec rake
+
+  build-docker-images:
+    name: docker-build-${{ matrix.docker_image }}
+    needs: run-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        docker_image:
+          - huginn/huginn
+          - huginn/huginn-single-process
+    env:
+      DOCKER_IMAGE: ${{ matrix.docker_image }}
+      DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
+      DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build a docker image
+        run: |
+          # if [ "$GITHUB_EVENT_NAME" = push -a "$GITHUB_REF_NAME" = master ]; then
+          #   ./build_docker_image.sh --push
+          # else
+          ./build_docker_image.sh
+          # fi
