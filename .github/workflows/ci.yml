@@ -22,6 +22,7 @@ jobs:
     env:
       APP_SECRET_TOKEN: ${{ secrets.APP_SECRET_TOKEN }}
       DATABASE_ADAPTER: ${{ matrix.database_adapter }}
+      DATABASE_HOST: '127.0.0.1'
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: password
     services:
