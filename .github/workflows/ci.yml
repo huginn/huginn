@@ -22,6 +22,33 @@ jobs:
     env:
       APP_SECRET_TOKEN: ${{ secrets.APP_SECRET_TOKEN }}
       DATABASE_ADAPTER: ${{ matrix.database_adapter }}
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: password
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
     steps:
       - uses: actions/checkout@v2
 
@@ -32,17 +59,6 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-
-      - name: Setup MySQL
-        if: ${{ matrix.database_adapter == 'mysql2' }}
-        run: |
-          sudo systemctl start mysql.service
-
-      - name: Setup PostgreSQL
-        if: ${{ matrix.database_adapter == 'postgresql' }}
-        run: |
-          sudo systemctl start postgresql.service
-          echo "::set-env DATABASE_USERNAME::postgres"
 
       - name: Set up database
         run: bundle exec rake db:create db:migrate
