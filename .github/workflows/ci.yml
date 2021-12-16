@@ -28,7 +28,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         env:
-          BUNDLE_WITHOUT: "development:production"
+          BUNDLE_WITHOUT: "production"
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
