@@ -17,7 +17,7 @@ jobs:
           - mysql2
           - postgresql
         ruby:
-          - "2.7"
+          # - "2.7"
           - "2.6"
     env:
       APP_SECRET_TOKEN: ${{ secrets.APP_SECRET_TOKEN }}
