@@ -1,13 +1,5 @@
 require 'rails_helper'
 
-class TwilioDummyCreator
-  attr_accessor :message_calls
-
-  def create(message)
-    @message_calls << message
-  end
-end
-
 describe Agents::TwilioAgent do
   before do
     @checker = Agents::TwilioAgent.new(:name => 'somename',
@@ -27,24 +19,26 @@ describe Agents::TwilioAgent do
     @event.payload = {message: 'Looks like its going to rain', to: 54321}
     @event.save!
 
-    @message_calls = []
+    @messages = []
+    @calls = []
 
-    mc = TwilioDummyCreator.new
-    mc.message_calls = @message_calls
-    stub.any_instance_of(Twilio::REST::Client).messages { mc }
+    stub(Twilio::REST::Client).new do
+      c = Object.new
+      stub(c).calls do |l|
+        stub(l).create do |message|
+          @calls << message
+        end
+        l
+      end
+      stub(c).messages do |l|
+        stub(l).create do |message|
+          @messages << message
+        end
+        l
+      end
+      c
+    end
 
-    cc = TwilioDummyCreator.new
-    cc.message_calls = []
-    stub.any_instance_of(Twilio::REST::Client).calls { cc }
-
-    #messages_create = double()
-    #allow(messages_create).to receive(:create) { |message| @message_calls << message }
-    #stub.any_instance_of(Twilio::REST::Client).messages { messages_create }
-    #stub.any_instance_of(Twilio::REST::Client).calls.create
-    # {
-    #  def create(message)
-    #  end
-    #} 
     stub.any_instance_of(Twilio::TwiML::VoiceResponse)
   end
 
@@ -61,15 +55,17 @@ describe Agents::TwilioAgent do
       event2.save!
 
       @checker.receive([@event,event1,event2])
-      expect(@message_calls).to eq([{from: "x", to: "54321", body: "Looks like its going to rain"},
-                                    {from: "x", to: "12345", body: "Some message"},
-                                    {from: "x", to: "987654", body: "Some other message"}])
+      expect(@messages).to eq [
+        {from: "x", to: "54321", body: "Looks like its going to rain"},
+        {from: "x", to: "12345", body: "Some message"},
+        {from: "x", to: "987654", body: "Some other message"}
+      ]
     end
 
     it 'should check if receive_text is working fine' do
       @checker.options[:receive_text] = 'false'
       @checker.receive([@event])
-      expect(@message_calls).to be_empty
+      expect(@messages).to be_empty
     end
 
     it 'should check if receive_call is working fine' do
