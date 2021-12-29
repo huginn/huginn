@@ -24,7 +24,7 @@ module Agents
           "success": true,
           "published_tweet": "...",
           "tweet_id": ...,
-          "tweet_id_str": "...",
+          "tweet_url": "...",
           "agent_id": ...,
           "event_id": ...
         }
@@ -83,6 +83,7 @@ module Agents
             'success' => true,
             'published_tweet' => tweet_text,
             'tweet_id' => tweet.id,
+            'tweet_url' => tweet.url,
             'agent_id' => event.agent_id,
             'event_id' => event.id
           )
