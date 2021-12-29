@@ -53,16 +53,16 @@ gem 'google-cloud-translate', '~> 2.0', require: 'google/cloud/translate'
 # Twitter Agents
 gem 'twitter', github: 'sferik/twitter' # Must to be loaded before cantino-twitter-stream.
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
-gem 'omniauth-twitter', '~> 1.3.0'
+gem 'omniauth-twitter'
 
 # Tumblr Agents
 # until merge of https://github.com/tumblr/tumblr_client/pull/61
 gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master', ref: 'e046fe6e39291c173add0a49081630c7b60a36c7'
-gem 'omniauth-tumblr', '~> 1.2'
+gem 'omniauth-tumblr'
 
 # Dropbox Agents
 gem 'dropbox-api', github: 'dsander/dropbox-api', ref: '86cb7b5a1254dc5b054de7263835713c4c1018c7'
-gem 'omniauth-dropbox-oauth2', github: 'bamorim/omniauth-dropbox-oauth2', ref: '35046706fb781ed3b57dfb9c3cd44ed0f3d3f8ea'
+gem 'omniauth-dropbox-oauth2', github: 'huginn/omniauth-dropbox-oauth2'
 
 # UserLocationAgent
 gem 'haversine'
@@ -79,7 +79,6 @@ gem 'aws-sdk-core', '~> 2.2.15'
 
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
-gem 'omniauth-wunderlist'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
@@ -117,7 +116,7 @@ gem 'loofah', '~> 2.0'
 gem 'mini_magick', ">= 4.9.4"
 gem 'multi_xml'
 gem "nokogiri", ">= 1.10.8"
-gem 'omniauth', '~> 1.6.1'
+gem 'omniauth'
 gem 'rails', '~> 6.0.4'
 gem 'sprockets', '~> 3.7.2'
 gem 'rails-html-sanitizer', '~> 1.2'
