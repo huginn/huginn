@@ -162,7 +162,7 @@ GEM
       sshkit (>= 1.6.1, != 1.7.0)
     aws-sdk-core (2.2.15)
       jmespath (~> 1.0)
-    bcrypt (3.1.13)
+    bcrypt (3.1.16)
     better_errors (1.1.0)
       coderay (>= 1.0.0)
       erubis (>= 2.6.6)
