@@ -12,6 +12,7 @@ module Agents
       To be able to use this Agent you need to authenticate with Twitter in the [Services](/services) section first.
 
       You must also specify a `message` parameter, you can use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to format the message.
+      Additional parameters can be passed via `parameters`.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -56,6 +57,7 @@ module Agents
       {
         'expected_update_period_in_days' => "10",
         'message' => "{{text}}",
+        'parameters' => {},
         'output_mode' => 'clean'
       }
     end
@@ -66,10 +68,10 @@ module Agents
         incoming_events = incoming_events.first(20)
       end
       incoming_events.each do |event|
-        tweet_text = interpolated(event)['message']
+        tweet_text, parameters = interpolated(event).values_at('message', 'parameters')
         new_event = interpolated['output_mode'].to_s == 'merge' ? event.payload.dup : {}
         begin
-          tweet = publish_tweet tweet_text
+          tweet = publish_tweet(tweet_text, parameters.presence || {})
         rescue Twitter::Error => e
           new_event.update(
             'success' => false,
@@ -92,8 +94,8 @@ module Agents
       end
     end
 
-    def publish_tweet(text)
-      twitter.update(text)
+    def publish_tweet(text, parameters = {})
+      twitter.update(text, parameters)
     end
   end
 end
