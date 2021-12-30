@@ -17,7 +17,7 @@ jobs:
           - mysql2
           - postgresql
         ruby:
-          # - "2.7"
+          - "2.7"
           - "2.6"
     env:
       DATABASE_ADAPTER: ${{ matrix.database_adapter }}
