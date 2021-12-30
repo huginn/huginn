@@ -113,7 +113,7 @@ module Agents
     end
 
     def event_url
-      base_url + "#{URI.encode(interpolated[:path].to_s)}"
+      Utils.normalize_uri(base_url + interpolated[:path].to_s).to_s
     end
 
     def request_options
