@@ -131,27 +131,27 @@ gem 'uglifier', '~> 2.7.2'
 gem 'bootsnap', require: false
 
 group :development do
-  gem 'better_errors', '~> 1.1'
-  gem 'binding_of_caller', '~> 0.8.0'
-  gem 'guard', '~> 2.14.1'
-  gem 'guard-livereload', '~> 2.5.1'
-  gem 'guard-rspec', '~> 4.7.3'
-  gem 'rack-livereload', '~> 0.3.16'
-  gem 'letter_opener_web', '~> 1.3.1'
+  gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'guard'
+  gem 'guard-livereload'
+  gem 'guard-rspec'
+  gem 'rack-livereload'
+  gem 'letter_opener_web', '~> 1.4' # 2.0+ requires Ruby 2.7
   gem 'web-console', '>= 3.3.0'
 
-  gem 'capistrano', '~> 3.11.0'
-  gem 'capistrano-rails', '~> 1.1'
-  gem 'capistrano-bundler', '~> 1.1.4'
+  gem 'capistrano'
+  gem 'capistrano-rails'
+  gem 'capistrano-bundler'
 
   if_true(ENV['SPRING']) do
-    gem 'spring-commands-rspec', '~> 1.0.4'
-    gem 'spring', '~> 2.0.2'
-    gem 'spring-watcher-listen', '~> 2.0.1'
+    gem 'spring-commands-rspec'
+    gem 'spring'
+    gem 'spring-watcher-listen'
   end
 
   group :test do
-    gem 'coveralls', '~> 0.8.23', require: false
+    gem 'coveralls', require: false
     gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
     gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76', require: false
@@ -162,8 +162,8 @@ group :development do
     gem 'rspec', '~> 3.8'
     gem 'rspec-mocks'
     gem 'rspec-rails'
-    gem 'rspec-collection_matchers', '~> 1.1.0'
-    gem 'rspec-html-matchers', '~> 0.8'
+    gem 'rspec-collection_matchers'
+    gem 'rspec-html-matchers'
     gem 'rails-controller-testing'
     gem 'shoulda-matchers'
     gem 'vcr'
