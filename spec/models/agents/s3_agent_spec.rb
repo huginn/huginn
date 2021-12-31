@@ -141,7 +141,7 @@ describe Agents::S3Agent do
         it "handles AccessDenied exceptions" do
           expect(@checker).to receive(:get_bucket_contents) { raise Aws::S3::Errors::AccessDenied.new('', '') }
           expect { @checker.check }.to change(AgentLog, :count).by(1)
-          expect(AgentLog.last.message).to eq("Could not access 'testbucket' Aws::S3::Errors::AccessDenied ")
+          expect(AgentLog.last.message).to match(/Could not access 'testbucket' Aws::S3::Errors::AccessDenied/)
         end
 
         it "handles generic S3 exceptions" do

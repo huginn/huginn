@@ -75,7 +75,7 @@ gem 'evernote_oauth'
 gem 'listen', '~> 3.0.5', require: false
 
 # S3Agent
-gem 'aws-sdk-core', '~> 2.2.15'
+gem 'aws-sdk-s3', '~> 1'
 
 # ImapFolderAgent
 gem 'omniauth-google-oauth2', '>= 0.8.0'
