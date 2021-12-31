@@ -24,13 +24,15 @@ describe Agents::TwilioAgent do
 
     stub(Twilio::REST::Client).new do
       c = Object.new
-      stub(c).calls do |l|
+      stub(c).calls do
+        l = Object.new
         stub(l).create do |message|
           @calls << message
         end
         l
       end
-      stub(c).messages do |l|
+      stub(c).messages do
+        l = Object.new
         stub(l).create do |message|
           @messages << message
         end
