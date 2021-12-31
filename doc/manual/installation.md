@@ -73,13 +73,14 @@ Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
     curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.bz2 | tar xj
-    cd ruby-2.6.5
+    cd ruby-2.6.9
     ./configure --disable-install-rdoc
     make -j`nproc`
     sudo make install
 
-Install the foreman gem:
+Update rubygems and install foreman:
 
+    sudo gem update --system --no-document
     sudo gem install foreman --no-document
 
 ## 3. System Users
