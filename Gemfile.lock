@@ -792,7 +792,7 @@ DEPENDENCIES
   rails-controller-testing
   rails-html-sanitizer (~> 1.2)
   rb-kqueue (>= 0.2)
-  rr
+  rr (< 3)
   rspec (~> 3.8)
   rspec-collection_matchers (~> 1.1.0)
   rspec-html-matchers (~> 0.8)

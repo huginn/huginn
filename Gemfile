@@ -157,7 +157,7 @@ group :development do
     gem 'poltergeist'
     gem 'pry-rails'
     gem 'pry-byebug'
-    gem 'rr'
+    gem 'rr', '< 3', require: false
     gem 'rspec', '~> 3.8'
     gem 'rspec-rails'
     gem 'rspec-collection_matchers', '~> 1.1.0'
