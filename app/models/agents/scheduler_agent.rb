@@ -1,4 +1,4 @@
-require 'rufus-scheduler'
+require 'fugit'
 
 module Agents
   class SchedulerAgent < Agent
@@ -91,7 +91,7 @@ module Agents
     def validate_options
       if (spec = options['schedule']).present?
         begin
-          cron = Rufus::Scheduler::CronLine.new(spec)
+          cron = Fugit::Cron.new(spec) or raise ArgumentError
           unless second_precision_enabled || (cron.seconds - [0, 15, 30, 45, 60]).empty?
             errors.add(:base, "second precision schedule is not allowed in this service")
           end
