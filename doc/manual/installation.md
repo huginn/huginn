@@ -78,14 +78,9 @@ Download Ruby and compile it:
     make -j`nproc`
     sudo make install
 
-Install the bundler and foreman gems:
+Install the foreman gem:
 
-    sudo gem install rake foreman --no-document
-    sudo gem install bundler -v '< 2' --no-document
-
-Update rubygems:
-
-    sudo gem update --system --no-document
+    sudo gem install foreman --no-document
 
 ## 3. System Users
 
