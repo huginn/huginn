@@ -6,7 +6,7 @@ on:
 
 jobs:
   run-tests:
-    name: ${{ matrix.os }} ${{ matrix.ruby }} ${{ matrix.database_adapter }}
+    name: ${{ matrix.os }} ruby-${{ matrix.ruby }} ${{ matrix.database_adapter }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
