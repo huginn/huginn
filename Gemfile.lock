@@ -709,7 +709,7 @@ GEM
     xmpp4r (0.5.6)
     xpath (3.0.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.5.1)
+    zeitwerk (2.5.3)
 
 PLATFORMS
   ruby
