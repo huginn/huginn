@@ -32,24 +32,12 @@ class Service < ActiveRecord::Base
   end
 
   def refresh_token_parameters
-    case provider
-    when  '37signals'
-      {
-        type:          'refresh',
-        client_id:     oauth_key,
-        client_secret: oauth_secret,
-        refresh_token: refresh_token
-      }
-    else
-      # Paramters required by standard compliant OAuth2 providers,
-      # including Google
-      {
-        grant_type: 'refresh_token',
-        client_id:     oauth_key,
-        client_secret: oauth_secret,
-        refresh_token: refresh_token
-      }
-    end
+    {
+      grant_type: 'refresh_token',
+      client_id:     oauth_key,
+      client_secret: oauth_secret,
+      refresh_token: refresh_token
+    }
   end
 
   def refresh_token!
@@ -98,10 +86,6 @@ class Service < ActiveRecord::Base
 
   register_options_provider('default') do |omniauth|
     {name: omniauth['info']['nickname'] || omniauth['info']['name']}
-  end
-
-  register_options_provider('37signals') do |omniauth|
-    {user_id: omniauth['extra']['accounts'][0]['id'], name: omniauth['info']['name']}
   end
 
   register_options_provider('google') do |omniauth|

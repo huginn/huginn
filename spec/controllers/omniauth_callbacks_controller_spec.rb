@@ -15,13 +15,4 @@ describe OmniauthCallbacksController do
       }.to change { users(:bob).services.count }.by(1)
     end
   end
-
-  describe "handling a provider with non-standard omniauth options" do
-    it "should update the user's credentials" do
-      request.env["omniauth.auth"] = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/37signals.json')))
-      expect {
-        get "37signals"
-      }.to change { users(:bob).services.count }.by(1)
-    end
-  end
 end

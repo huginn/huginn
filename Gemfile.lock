@@ -479,9 +479,6 @@ GEM
     omniauth (1.9.1)
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
-    omniauth-37signals (1.0.5)
-      omniauth (~> 1.0)
-      omniauth-oauth2 (~> 1.0)
     omniauth-evernote (1.2.1)
       evernote-thrift
       multi_json (~> 1.0)
@@ -786,7 +783,6 @@ DEPENDENCIES
   net-ftp-list (~> 3.2.8)
   nokogiri (>= 1.10.8)
   omniauth
-  omniauth-37signals
   omniauth-dropbox-oauth2!
   omniauth-evernote
   omniauth-google-oauth2 (>= 0.8.0)

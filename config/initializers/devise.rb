@@ -247,12 +247,6 @@ Devise.setup do |config|
     config.omniauth :'tumblr', key, secret
   end
 
-  if defined?(OmniAuth::Strategies::ThirtySevenSignals) &&
-     (key = ENV["THIRTY_SEVEN_SIGNALS_OAUTH_KEY"]).present? &&
-     (secret = ENV["THIRTY_SEVEN_SIGNALS_OAUTH_SECRET"]).present?
-    config.omniauth :'37signals', key, secret
-  end
-
   if defined?(OmniAuth::Strategies::DropboxOauth2) &&
      (key = ENV["DROPBOX_OAUTH_KEY"]).present? &&
      (secret = ENV["DROPBOX_OAUTH_SECRET"]).present?

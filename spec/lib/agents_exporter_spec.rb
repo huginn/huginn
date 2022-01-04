@@ -43,7 +43,7 @@ describe AgentsExporter do
     end
 
     it "outputs control links to agents within the incoming set, but not outside it" do
-      agents(:jane_rain_notifier_agent).control_targets = [agents(:jane_weather_agent), agents(:jane_basecamp_agent)]
+      agents(:jane_rain_notifier_agent).control_targets = [agents(:jane_weather_agent), agents(:jane_twitter_user_agent)]
       agents(:jane_rain_notifier_agent).save!
 
       expect(exporter.as_json[:control_links]).to eq([{ :controller => guid_order(agent_list, :jane_rain_notifier_agent), :control_target => guid_order(agent_list, :jane_weather_agent) }])

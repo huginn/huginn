@@ -48,16 +48,16 @@ describe ScenarioImport do
       :options => trigger_agent_options
     }
   end
-  let(:valid_parsed_basecamp_agent_data) do
+  let(:valid_parsed_twitter_user_agent_data) do
     {
-      :type => "Agents::BasecampAgent",
-      :name => "Basecamp test",
-      :schedule => "every_2m",
-      :keep_events_for => 0,
-      :propagate_immediately => true,
-      :disabled => false,
-      :guid => "a-basecamp-agent",
-      :options => {project_id: 12345}
+      type: "Agents::TwitterUserAgent",
+      name: "Twitter test",
+      schedule: "every_1h",
+      keep_events_for: 0,
+      propagate_immediately: true,
+      disabled: false,
+      guid: "a-twitter-user-agent",
+      options: { username: "bob", expected_update_period_in_days: 2 }
     }
   end
   let(:valid_parsed_data) do
@@ -552,7 +552,7 @@ describe ScenarioImport do
 
       let(:valid_parsed_services) do
         data = valid_parsed_data
-        data[:agents] = [valid_parsed_basecamp_agent_data,
+        data[:agents] = [valid_parsed_twitter_user_agent_data,
                          valid_parsed_trigger_agent_data]
         data
       end
@@ -568,8 +568,8 @@ describe ScenarioImport do
       describe "#generate_diff" do
         it "should check if the agent requires a service" do
           agent_diffs = services_scenario_import.agent_diffs
-          basecamp_agent_diff = agent_diffs[0]
-          expect(basecamp_agent_diff.requires_service?).to eq(true)
+          twitter_user_agent_diff = agent_diffs[0]
+          expect(twitter_user_agent_diff.requires_service?).to eq(true)
         end
 
         it "should add an error when no service is selected" do
