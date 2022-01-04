@@ -77,6 +77,10 @@ gem 'listen', '~> 3.0.5', require: false
 # S3Agent
 gem 'aws-sdk-core', '~> 2.2.15'
 
+# ImapFolderAgent
+gem 'omniauth-google-oauth2', '>= 0.8.0'
+gem 'gmail_xoauth' # support for Gmail using OAuth
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
 

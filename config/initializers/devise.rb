@@ -270,6 +270,21 @@ Devise.setup do |config|
     end
   end
 
+  if defined?(OmniAuth::Strategies::GoogleOauth2) &&
+      (key = ENV["GOOGLE_CLIENT_ID"]).present? &&
+      (secret = ENV["GOOGLE_CLIENT_SECRET"]).present?
+    config.omniauth :google_oauth2, key, secret, {
+      name: :google,
+      scope: [
+        'userinfo.email',
+        'userinfo.profile',
+        'https://mail.google.com/', # ImapFolderAgent
+      ].join(','),
+      access_type: 'offline',
+      prompt: 'consent'
+    }
+  end
+
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
   # change the failure app, you can configure them inside the config.warden block.
@@ -293,4 +308,6 @@ Devise.setup do |config|
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
   config.omniauth_path_prefix = "/auth"
+
+  OmniAuth.config.logger = Rails.logger
 end

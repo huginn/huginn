@@ -282,6 +282,8 @@ GEM
       rails (>= 3.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
+    gmail_xoauth (0.4.2)
+      oauth (>= 0.3.6)
     google-api-client (0.53.0)
       google-apis-core (~> 0.1)
       google-apis-generator (~> 0.1)
@@ -467,7 +469,7 @@ GEM
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    oauth (0.4.7)
+    oauth (0.5.8)
     oauth2 (1.4.7)
       faraday (>= 0.8, < 2.0)
       jwt (>= 1.0, < 3.0)
@@ -484,6 +486,11 @@ GEM
       evernote-thrift
       multi_json (~> 1.0)
       omniauth-oauth (~> 1.0)
+    omniauth-google-oauth2 (0.8.2)
+      jwt (>= 2.0)
+      oauth2 (~> 1.1)
+      omniauth (~> 1.1)
+      omniauth-oauth2 (>= 1.6)
     omniauth-oauth (1.1.0)
       oauth
       omniauth (~> 1.0)
@@ -750,6 +757,7 @@ DEPENDENCIES
   foreman (~> 0.63.0)
   geokit (~> 1.8.4)
   geokit-rails (~> 2.2.0)
+  gmail_xoauth
   google-api-client (~> 0.13)
   google-cloud-translate (~> 2.0)
   guard (~> 2.14.1)
@@ -781,6 +789,7 @@ DEPENDENCIES
   omniauth-37signals
   omniauth-dropbox-oauth2!
   omniauth-evernote
+  omniauth-google-oauth2 (>= 0.8.0)
   omniauth-tumblr
   omniauth-twitter
   pg (~> 1.1.3)

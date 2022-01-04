@@ -34,6 +34,7 @@ en:
       dropbox: "Dropbox"
       dropbox_oauth2: "Dropbox"
       evernote: "Evernote"
+      google: "Google"
     passwords:
       no_token: "You can't access this page without coming from a password reset email. If you do come from a password reset email, please make sure you used the full URL provided."
       send_instructions: "You will receive an email with instructions on how to reset your password in a few minutes."
