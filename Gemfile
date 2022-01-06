@@ -36,7 +36,7 @@ gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
-gem 'mini_racer', '~> 0.2.4'      # JavaScriptAgent
+# gem 'mini_racer', '~> 0.2.4'      # JavaScriptAgent
 gem 'xmpp4r',  '~> 0.5.6'         # JabberAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
@@ -131,6 +131,7 @@ gem 'spectrum-rails'
 gem 'execjs', '~> 2.7.0'
 gem 'typhoeus', '~> 1.3.1'
 gem 'uglifier', '~> 2.7.2'
+gem 'sqlite3'
 gem 'bootsnap', require: false
 
 group :development do
@@ -185,27 +186,6 @@ gem 'tzinfo', '>= 1.2.0'	# required by rails; 1.2.0 has support for *BSD and Sol
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 # BSD systems require rb-kqueue for "listen" to avoid polling for changes.
 gem 'rb-kqueue', '>= 0.2', require: /bsd|dragonfly/i === RbConfig::CONFIG['target_os']
-
-
-on_heroku = ENV['ON_HEROKU'] ||
-            ENV['HEROKU_POSTGRESQL_ROSE_URL'] ||
-            ENV['HEROKU_POSTGRESQL_GOLD_URL'] ||
-            File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
-
-ENV['DATABASE_ADAPTER'] ||=
-  if on_heroku
-    'postgresql'
-  else
-    'mysql2'
-  end
-
-if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
-  gem 'pg', '~> 1.1.3'
-end
-
-if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
-  gem 'mysql2' , "~> 0.5.2"
-end
 
 GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|
   gem *args

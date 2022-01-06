@@ -6,6 +6,8 @@ module RdbmsFunctions
         "DATE_ADD(`#{source}`, INTERVAL #{amount} #{unit})"
       when :postgresql
         "(#{source} + INTERVAL '#{amount} #{unit}')"
+      when :sqlite
+        "datetime('#{source}', '+ #{amount} #{unit}')"
       else
         raise NotImplementedError, "Unknown adapter type '#{adapter_type}'"
     end

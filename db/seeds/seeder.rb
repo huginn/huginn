@@ -12,12 +12,5 @@ class Seeder
     user.invitation_code = User::INVITATION_CODES.first
     user.admin = true
     user.save!
-
-    if DefaultScenarioImporter.seed(user)
-      puts "NOTE: The example 'SF Weather Agent' will not work until you edit it and put in a free API key from http://www.wunderground.com/weather/api/"
-      puts "See the Huginn Wiki for more Agent examples!  https://github.com/huginn/huginn/wiki"
-    else
-      raise('Unable to import the default scenario')
-    end
   end
 end
