@@ -323,7 +323,7 @@ GEM
       googleauth (~> 0.9)
       grpc (~> 1.24)
       rly (~> 0.2.3)
-    google-protobuf (3.19.1)
+    google-protobuf (3.19.2)
     googleapis-common-protos (1.3.12)
       google-protobuf (~> 3.14)
       googleapis-common-protos-types (~> 1.2)
