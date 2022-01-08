@@ -100,8 +100,4 @@ Huginn::Application.configure do
   config.action_mailer.delivery_method = ENV.fetch('SMTP_DELIVERY_METHOD', 'smtp').to_sym
   config.action_mailer.perform_caching = false
   # smtp_settings moved to config/initializers/action_mailer.rb
- 
-  if ENV['DATABASE_URL'].start_with? "sqlite"
-    config.middleware.use ConnectionManagement
-  end
 end
