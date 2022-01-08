@@ -25,4 +25,4 @@ jobs:
           docker buildx build --push \
             --tag $GITHUB_REPOSITORY:latest \
             --tag $GITHUB_REPOSITORY:${{steps.date.outputs.date}} \
-            --platform linux/amd64,linux/arm64 .
+            --platform linux/amd64 .

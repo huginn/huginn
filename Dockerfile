@@ -43,7 +43,7 @@ RUN umask 002 && git init && \
 
 COPY . .
 
-ENV LC_ALL=en_US.UTF-8 RAILS_ENV=production DATABASE_URL=postgres://localhost
+ENV LC_ALL=en_US.UTF-8 RAILS_ENV=production DATABASE_URL=sqlite3:/data/huginn.db
   
 RUN bundle exec rails assets:precompile && rm -rf app/assets spec
 
@@ -58,7 +58,7 @@ RUN addgroup -g 1000 -S app \
 
 RUN apk --update add --no-cache \
   git zlib yaml libssl3 gdbm readline ncurses-libs libffi libxml2 libxslt icu \
-  mariadb-connector-c libpq \
+  sqlite-libs mariadb-connector-c libpq \
   graphviz curl tzdata shared-mime-info iputils jq \
   libc6-compat nodejs && \
   mkdir /data && \
@@ -74,7 +74,7 @@ ENV LC_ALL=en_US.UTF-8 \
   RAILS_LOG_TO_STDOUT=true \
   RAILS_SERVE_STATIC_FILES=true \
   IP="0.0.0.0" PORT=3000 \
-  DATABASE_URL=postgres://localhost \
+  DATABASE_URL=sqlite3:/data/huginn.db \
   APP_SECRET_TOKEN=changeme 
 
 USER app
