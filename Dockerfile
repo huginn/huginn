@@ -13,7 +13,7 @@ RUN apk --update add --no-cache \
   libxml2-dev \
   libxslt-dev \
   icu-dev \
-  mariadb-dev \
+  mariadb-connector-c-dev \
   libpq-dev \
   sqlite-dev \
   graphviz \
@@ -58,7 +58,7 @@ RUN addgroup -g 1000 -S app \
 
 RUN apk --update add --no-cache \
   git zlib yaml libssl3 gdbm readline ncurses-libs libffi libxml2 libxslt icu \
-  sqlite-libs mariadb-client libpq \
+  sqlite-libs mariadb-connector-c libpq \
   graphviz curl tzdata shared-mime-info iputils jq \
   libc6-compat nodejs && \
   mkdir /data && \
