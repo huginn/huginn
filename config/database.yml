@@ -1,6 +1,7 @@
 default: &default
-  pool: 5
+  pool: 20
   timeout: 5000
+  reconnect: true
   url: <%= ENV['DATABASE_URL'] %>
 
 development:
