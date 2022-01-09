@@ -80,5 +80,6 @@ ENV LC_ALL=en_US.UTF-8 \
 USER app
 
 EXPOSE 3000
+VOLUME /data
 
 CMD ["bundle", "exec", "foreman", "start"]
