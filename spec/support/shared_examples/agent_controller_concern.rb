@@ -149,7 +149,7 @@ shared_examples_for AgentControllerConcern do
 
     it "should configure targets with nested objects" do
       agent.control_targets = [
-        agents(:bob_basecamp_agent),  # does not support a `template` option, but anyway
+        agents(:bob_twitter_user_agent),  # does not support a `template` option, but anyway
         agents(:bob_data_output_agent)
       ]
       agent.options['action'] = 'configure'

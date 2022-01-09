@@ -154,7 +154,7 @@ describe ApplicationHelper do
     end
 
     it 'returns a correct icon tag for other services' do
-      icon = omniauth_provider_icon(:'37signals')
+      icon = omniauth_provider_icon(:evernote)
       expect(icon).to be_html_safe
       elem = Nokogiri(icon).at('i.fa.fa-lock')
       expect(elem).to be_a Nokogiri::XML::Element

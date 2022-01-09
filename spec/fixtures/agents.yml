@@ -141,14 +141,15 @@ bob_manual_event_agent:
   name: "Bob's event testing agent"
   guid: <%= SecureRandom.hex %>
 
-bob_basecamp_agent:
-  type: Agents::BasecampAgent
+bob_twitter_user_agent:
+  type: Agents::TwitterUserAgent
   user: bob
-  name: "bob basecamp agent"
+  name: "bob tweets agent"
   service: generic
   guid: <%= SecureRandom.hex %>
   options: <%= {
-      :project_id => "12345",
+      username: 'bob',
+      expected_update_period_in_days: 2,
     }.to_json.inspect %>
 
 bob_csv_agent:
@@ -157,16 +158,16 @@ bob_csv_agent:
   name: "Bob's CsvAgent"
   guid: <%= SecureRandom.hex %>
 
-jane_basecamp_agent:
-  type: Agents::BasecampAgent
+jane_twitter_user_agent:
+  type: Agents::TwitterUserAgent
   user: jane
-  name: "jane basecamp agent"
+  name: "jane tweets agent"
   service: generic
   guid: <%= SecureRandom.hex %>
   options: <%= {
-      :project_id => "12345",
+      username: 'jane',
+      expected_update_period_in_days: 2,
     }.to_json.inspect %>
-
 
 bob_data_output_agent:
   type: Agents::DataOutputAgent

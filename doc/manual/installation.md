@@ -72,7 +72,7 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.bz2 | tar xj
+    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.9.tar.bz2 | tar xj
     cd ruby-2.6.9
     ./configure --disable-install-rdoc
     make -j`nproc`
@@ -129,6 +129,7 @@ Grant the Huginn user necessary permissions on the database
     mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, LOCK TABLES ON `huginn_production`.* TO 'huginn'@'localhost';
 
 Use the flush privileges command to save the new permissions
+
     mysql> FLUSH PRIVILEGES;
 
 Quit the database session
