@@ -380,7 +380,7 @@ GEM
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
     httpclient (2.8.3)
-    huginn_agent (0.4.0)
+    huginn_agent (0.6.1)
       thor
     hypdf (1.0.10)
       httmultiparty (~> 0.3)
@@ -765,7 +765,7 @@ DEPENDENCIES
   hipchat (~> 1.2.0)
   httmultiparty (~> 0.3.16)
   httparty (~> 0.13)
-  huginn_agent (~> 0.4.0)
+  huginn_agent
   hypdf (~> 1.0.10)
   jquery-rails (~> 4.2.1)
   json (~> 2.3)
