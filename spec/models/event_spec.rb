@@ -73,7 +73,7 @@ describe Event do
       initial_jane_count = agents(:jane_weather_agent).reload.events_count
 
       current_time = Time.now
-      stub(Time).now { current_time }
+      allow(Time).to receive(:now) { current_time }
 
       Event.cleanup_expired!
       expect(Event.find_by_id(half_hour_event.id)).not_to be_nil
@@ -110,7 +110,7 @@ describe Event do
       event.save!
 
       current_time = Time.now
-      stub(Time).now { current_time }
+      allow(Time).to receive(:now) { current_time }
 
       Event.cleanup_expired!
       expect(Event.find_by_id(event.id)).not_to be_nil

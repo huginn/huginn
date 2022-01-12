@@ -46,7 +46,7 @@ describe Agents::EmailAgent do
       event1.payload = { :message => "hi!", :data => "Something you should know about" }
       event1.save!
 
-      mock(SystemMailer).send_message(anything) { raise Net::SMTPAuthenticationError.new("Wrong password") }
+      expect(SystemMailer).to receive(:send_message).with(anything) { raise Net::SMTPAuthenticationError.new("Wrong password") }
 
       expect {
         Agents::EmailAgent.async_receive(@checker.id, [event1.id])
@@ -57,7 +57,6 @@ describe Agents::EmailAgent do
 
     it "can receive complex events and send them on" do
       stub_request(:any, /darksky/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
-      stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       @checker.sources << agents(:bob_weather_agent)
 
       Agent.async_check(agents(:bob_weather_agent).id)

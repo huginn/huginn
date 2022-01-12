@@ -53,8 +53,10 @@ describe Agents::DropboxWatchAgent do
     let(:first_result) { Dropbox::API::Object.convert([{ 'path_display' => '1.json', 'rev' => '1', 'server_modified' => '01-01-01' }], nil) }
 
     before(:each) do
-      stub.proxy(Dropbox::API::Client).new do |api|
-        stub(api).ls('/my/dropbox/dir') { first_result }
+      allow(Dropbox::API::Client).to receive(:new) do
+        instance_double(Dropbox::API::Client).tap { |api|
+          allow(api).to receive(:ls).with('/my/dropbox/dir') { first_result }
+        }
       end
     end
 
@@ -80,24 +82,30 @@ describe Agents::DropboxWatchAgent do
       before(:each) do
         @agent.memory = { 'contents' => 'not_empty' }
 
-        stub.proxy(Dropbox::API::Client).new do |api|
-          stub(api).ls('/my/dropbox/dir') { second_result }
+        allow(Dropbox::API::Client).to receive(:new) do
+          instance_double(Dropbox::API::Client).tap { |api|
+            allow(api).to receive(:ls).with('/my/dropbox/dir') { second_result }
+          }
         end
       end
 
       it 'sends an event upon a different directory listing' do
         payload = { 'diff' => 'object as hash' }
-        stub.proxy(Agents::DropboxWatchAgent::DropboxDirDiff).new(@agent.memory['contents'], [{"path"=>"2.json", "rev"=>"1", "modified"=>"02-02-02"}]) do |diff|
-          stub(diff).empty? { false }
-          stub(diff).to_hash { payload }
+        allow(Agents::DropboxWatchAgent::DropboxDirDiff).to receive(:new).with(@agent.memory['contents'], [{"path"=>"2.json", "rev"=>"1", "modified"=>"02-02-02"}]) do
+          instance_double(Agents::DropboxWatchAgent::DropboxDirDiff).tap { |diff|
+            allow(diff).to receive(:empty?) { false }
+            allow(diff).to receive(:to_hash) { payload }
+          }
         end
         expect { @agent.check }.to change(Event, :count).by(1)
         expect(Event.last.payload).to eq(payload)
       end
 
       it 'does not sent any events when there is no difference on the directory listing' do
-        stub.proxy(Agents::DropboxWatchAgent::DropboxDirDiff).new(@agent.memory['contents'], [{"path"=>"2.json", "rev"=>"1", "modified"=>"02-02-02"}]) do |diff|
-          stub(diff).empty? { true }
+        allow(Agents::DropboxWatchAgent::DropboxDirDiff).to receive(:new).with(@agent.memory['contents'], [{"path"=>"2.json", "rev"=>"1", "modified"=>"02-02-02"}]) do
+          instance_double(Agents::DropboxWatchAgent::DropboxDirDiff).tap { |diff|
+            allow(diff).to receive(:empty?) { true }
+          }
         end
 
         expect { @agent.check }.to_not change(Event, :count)

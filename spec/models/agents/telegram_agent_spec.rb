@@ -26,7 +26,7 @@ describe Agents::TelegramAgent do
   end
 
   def stub_methods
-    stub.any_instance_of(Agents::TelegramAgent).send_message do |method, params|
+    allow_any_instance_of(Agents::TelegramAgent).to receive(:send_message) do |agent, method, params|
       @sent_messages << { method => params }
     end
   end

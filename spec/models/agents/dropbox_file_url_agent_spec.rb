@@ -41,10 +41,12 @@ describe Agents::DropboxFileUrlAgent do
       let(:third_dropbox_url_payload)  { Dropbox::API::Object.new({ 'link' => 'http://dropbox.com/third/path/url' }, nil) }
 
       before(:each) do
-        stub.proxy(Dropbox::API::Client).new do |api|
-          stub(api).find('/first/path')  { stub(Dropbox::API::File.new({}, nil)).direct_url { first_dropbox_url_payload } }
-          stub(api).find('/second/path') { stub(Dropbox::API::File.new({}, nil)).direct_url { second_dropbox_url_payload } }
-          stub(api).find('/third/path')  { stub(Dropbox::API::File.new({}, nil)).direct_url { third_dropbox_url_payload } }
+        allow(Dropbox::API::Client).to receive(:new) do
+          instance_double(Dropbox::API::Client).tap { |api|
+            allow(api).to receive(:find).with('/first/path')  { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:direct_url) { first_dropbox_url_payload } } }
+            allow(api).to receive(:find).with('/second/path') { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:direct_url) { second_dropbox_url_payload } } }
+            allow(api).to receive(:find).with('/third/path')  { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:direct_url) { third_dropbox_url_payload } } }
+          }
         end
       end
 
@@ -80,10 +82,12 @@ describe Agents::DropboxFileUrlAgent do
       let(:third_dropbox_url_payload)  { response_for('/third/path') }
 
       before(:each) do
-        stub.proxy(Dropbox::API::Client).new do |api|
-          stub(api).find('/first/path')  { stub(Dropbox::API::File.new({}, nil)).share_url { first_dropbox_url_payload } }
-          stub(api).find('/second/path') { stub(Dropbox::API::File.new({}, nil)).share_url { second_dropbox_url_payload } }
-          stub(api).find('/third/path')  { stub(Dropbox::API::File.new({}, nil)).share_url { third_dropbox_url_payload } }
+        allow(Dropbox::API::Client).to receive(:new) do
+          instance_double(Dropbox::API::Client).tap { |api|
+            allow(api).to receive(:find).with('/first/path')  { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:share_url) { first_dropbox_url_payload } } }
+            allow(api).to receive(:find).with('/second/path') { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:share_url) { second_dropbox_url_payload } } }
+            allow(api).to receive(:find).with('/third/path')  { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:share_url) { third_dropbox_url_payload } } }
+          }
         end
         @agent.options['link_type'] = 'permanent'
       end

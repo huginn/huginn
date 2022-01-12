@@ -8,7 +8,7 @@ require 'rails_helper'
 
 describe Agents::TwilioReceiveTextAgent do
   before do
-    stub.any_instance_of(Twilio::Security::RequestValidator).validate { true }
+    allow_any_instance_of(Twilio::Security::RequestValidator).to receive(:validate) { true }
   end
 
   let(:payload) { 

@@ -180,7 +180,7 @@ describe Utils do
     end
 
     it "warns and returns nil when not parseable" do
-      mock(STDERR).puts("WARNING: Invalid duration format: 'bogus'")
+      expect(STDERR).to receive(:puts).with("WARNING: Invalid duration format: 'bogus'")
       expect(Utils.parse_duration('bogus')).to be_nil
     end
   end
@@ -191,8 +191,8 @@ describe Utils do
     end
 
     it "calls the specified method when the argument is present" do
-      argument = mock()
-      mock(argument).to_i { 1 }
+      argument = double()
+      expect(argument).to receive(:to_i) { 1 }
       expect(Utils.if_present(argument, :to_i)).to eq(1)
     end
   end

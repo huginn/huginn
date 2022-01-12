@@ -3,8 +3,8 @@ require 'rails_helper'
 describe AgentRunner do
   context "without traps" do
     before do
-      stub.instance_of(Rufus::Scheduler).every
-      stub.instance_of(AgentRunner).set_traps
+      allow_any_instance_of(Rufus::Scheduler).to receive(:every)
+      allow_any_instance_of(AgentRunner).to receive(:set_traps)
       @agent_runner = AgentRunner.new
     end
 
@@ -15,11 +15,11 @@ describe AgentRunner do
 
     context "#run" do
       before do
-        mock(@agent_runner).run_workers
+        allow(@agent_runner).to receive(:run_workers)
       end
 
       it "runs until stop is called" do
-        mock.instance_of(Rufus::Scheduler).join
+        expect_any_instance_of(Rufus::Scheduler).to receive(:join)
         Thread.new { while @agent_runner.instance_variable_get(:@running) != false do sleep 0.1; @agent_runner.stop end }
         @agent_runner.run
       end
@@ -60,37 +60,37 @@ describe AgentRunner do
     context "running workers" do
       before do
         AgentRunner.class_variable_set(:@@agents, [HuginnScheduler, DelayedJobWorker])
-        stub.instance_of(HuginnScheduler).setup
-        stub.instance_of(DelayedJobWorker).setup
+        allow_any_instance_of(HuginnScheduler).to receive(:setup)
+        allow_any_instance_of(DelayedJobWorker).to receive(:setup)
       end
 
       context "#run_workers" do
         it "runs all the workers" do
-          mock.instance_of(HuginnScheduler).run!
-          mock.instance_of(DelayedJobWorker).run!
+          expect_any_instance_of(HuginnScheduler).to receive(:run!)
+          expect_any_instance_of(DelayedJobWorker).to receive(:run!)
           @agent_runner.send(:run_workers)
         end
 
         it "kills no long active workers" do
-          mock.instance_of(HuginnScheduler).run!
-          mock.instance_of(DelayedJobWorker).run!
+          expect_any_instance_of(HuginnScheduler).to receive(:run!)
+          expect_any_instance_of(DelayedJobWorker).to receive(:run!)
           @agent_runner.send(:run_workers)
           AgentRunner.class_variable_set(:@@agents, [DelayedJobWorker])
-          mock.instance_of(HuginnScheduler).stop!
+          expect_any_instance_of(HuginnScheduler).to receive(:stop!)
           @agent_runner.send(:run_workers)
         end
       end
 
       context "#restart_dead_workers" do
         before do
-          mock.instance_of(HuginnScheduler).run!
-          mock.instance_of(DelayedJobWorker).run!
+          allow_any_instance_of(HuginnScheduler).to receive(:setup)
+          allow_any_instance_of(DelayedJobWorker).to receive(:setup)
           @agent_runner.send(:run_workers)
 
         end
         it "restarts dead workers" do
-          stub.instance_of(HuginnScheduler).thread { OpenStruct.new(alive?: false) }
-          mock.instance_of(HuginnScheduler).run!
+          expect_any_instance_of(HuginnScheduler).to receive(:thread) { OpenStruct.new(alive?: false) }
+          expect_any_instance_of(HuginnScheduler).to receive(:run!)
           @agent_runner.send(:restart_dead_workers)
         end
       end
@@ -100,9 +100,9 @@ describe AgentRunner do
   context "#set_traps" do
     it "sets traps for INT TERM and QUIT" do
       agent_runner = AgentRunner.new
-      mock(Signal).trap('INT')
-      mock(Signal).trap('TERM')
-      mock(Signal).trap('QUIT')
+      expect(Signal).to receive(:trap).with('INT')
+      expect(Signal).to receive(:trap).with('TERM')
+      expect(Signal).to receive(:trap).with('QUIT')
       agent_runner.set_traps
 
       agent_runner.stop

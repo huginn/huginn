@@ -26,8 +26,8 @@ shared_examples_for 'FileHandlingConsumer' do
   end
 
   it '#get_upload_io returns a Faraday::UploadIO instance' do
-    io_mock = mock()
-    mock(@checker).get_io(event) { StringIO.new("testdata") }
+    io_mock = double()
+    expect(@checker).to receive(:get_io).with(event) { StringIO.new("testdata") }
 
     upload_io = @checker.get_upload_io(event)
     expect(upload_io).to be_a(Faraday::UploadIO)

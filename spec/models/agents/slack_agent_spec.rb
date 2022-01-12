@@ -60,13 +60,11 @@ describe Agents::SlackAgent do
 
   describe "#receive" do
     it "receive an event without errors" do
-      any_instance_of(Slack::Notifier) do |obj|
-        mock(obj).ping(@event.payload[:message],
+      expect_any_instance_of(Slack::Notifier).to receive(:ping).with(@event.payload[:message],
                        attachments: [{'fallback' => @fallback}],
                        channel: @event.payload[:channel],
                        username: @event.payload[:username]
                       )
-      end
 
       expect { @checker.receive([@event]) }.not_to raise_error
     end
@@ -74,7 +72,7 @@ describe Agents::SlackAgent do
 
   describe "#working?" do
     it "should call received_event_without_error?" do
-      mock(@checker).received_event_without_error?
+      expect(@checker).to receive(:received_event_without_error?)
       @checker.working?
     end
   end

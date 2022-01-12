@@ -22,8 +22,8 @@ describe Agents::JqAgent do
 
     context 'when not enabled' do
       before do
-        stub.proxy(ENV).[](anything)
-        stub(ENV).[]('USE_JQ') { nil }
+        allow(ENV).to receive(:[]) { nil }
+        allow(ENV).to receive(:[]).with('USE_JQ') { nil }
       end
 
       it 'should be false' do
@@ -33,7 +33,7 @@ describe Agents::JqAgent do
 
     context 'when jq command is not available' do
       before do
-        stub(Agents::JqAgent).jq_version { nil }
+        allow(Agents::JqAgent).to receive(:jq_version) { nil }
       end
 
       it 'should be false' do

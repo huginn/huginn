@@ -19,7 +19,7 @@ describe Agents::LiquidOutputAgent do
       Agents::LiquidOutputAgent.async_receive agent.id, [events(:bob_website_agent_event).id]
       expect(agent.reload).to be_working
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(agent.reload).not_to be_working
     end
   end

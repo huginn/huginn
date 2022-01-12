@@ -20,7 +20,7 @@ describe Agents::DigestAgent do
       Agents::DigestAgent.async_receive @checker.id, [event.id]
       expect(@checker.reload).to be_working # Events received
       three_days_from_now = 3.days.from_now
-      stub(Time).now { three_days_from_now }
+      allow(Time).to receive(:now) { three_days_from_now }
       expect(@checker).not_to be_working # too much time has passed
     end
   end

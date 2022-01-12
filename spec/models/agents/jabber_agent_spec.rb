@@ -30,7 +30,7 @@ describe Agents::JabberAgent do
   end
 
   before do
-    stub.any_instance_of(Agents::JabberAgent).deliver { |message| sent << message }
+    allow_any_instance_of(Agents::JabberAgent).to receive(:deliver) { |agent, message| sent << message }
   end
 
   describe "#working?" do
@@ -39,7 +39,7 @@ describe Agents::JabberAgent do
       Agents::JabberAgent.async_receive agent.id, [event.id]
       expect(agent.reload).to be_working # Just received events
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(agent.reload).not_to be_working # More time has passed than the expected receive period without any new events
     end
   end
@@ -78,15 +78,16 @@ describe Agents::JabberAgent do
 
   describe "receive" do
     it "should send an IM for each event" do
-      event2 = Event.new.tap do |e|
-        e.agent = agents(:bob_weather_agent)
-        e.payload = { :title => 'Another Weather Alert!', :url => 'http://www.weather.com/we-are-screwed' }
-        e.save!
-      end
+      event2 = Event.create!(
+        agent: agents(:bob_weather_agent),
+        payload: { title: 'Another Weather Alert!', url: 'http://www.weather.com/we-are-screwed' },
+      )
 
       agent.receive([event, event2])
-      expect(sent).to eq([ 'Warning! Weather Alert! - http://www.weather.com/',
-                       'Warning! Another Weather Alert! - http://www.weather.com/we-are-screwed'])
+      expect(sent).to eq([
+        'Warning! Weather Alert! - http://www.weather.com/',
+        'Warning! Another Weather Alert! - http://www.weather.com/we-are-screwed'
+      ])
     end
   end
 
@@ -94,21 +95,21 @@ describe Agents::JabberAgent do
     before(:each) do
       @worker = Agents::JabberAgent::Worker.new(agent: agent)
       @worker.setup
-      stub.any_instance_of(Jabber::Client).connect
-      stub.any_instance_of(Jabber::Client).auth
+      allow_any_instance_of(Jabber::Client).to receive(:connect)
+      allow_any_instance_of(Jabber::Client).to receive(:auth)
     end
 
     it "runs" do
       agent.options[:jabber_receiver] = 'someJID'
-      mock.any_instance_of(Jabber::MUC::SimpleMUCClient).join('someJID')
+      expect_any_instance_of(Jabber::MUC::SimpleMUCClient).to receive(:join).with('someJID')
       @worker.run
     end
 
     it "stops" do
       @worker.instance_variable_set(:@client, @worker.client)
-      mock.any_instance_of(Jabber::Client).close
-      mock.any_instance_of(Jabber::Client).stop
-      mock(@worker).thread { mock!.terminate }
+      expect_any_instance_of(Jabber::Client).to receive(:close)
+      expect_any_instance_of(Jabber::Client).to receive(:stop)
+      expect(@worker).to receive(:thread) { double(terminate: nil) }
       @worker.stop
     end
 

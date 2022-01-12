@@ -2,12 +2,13 @@ require 'rails_helper'
 
 describe Agents::TumblrLikesAgent do
   before do
-    stub.any_instance_of(Agents::TumblrLikesAgent).tumblr {
-      obj = Object.new
-      stub(obj).blog_likes('wendys.tumblr.com', after: 0) {
-        JSON.parse File.read(Rails.root.join('spec/data_fixtures/tumblr_likes.json'))
+    allow_any_instance_of(Agents::TumblrLikesAgent).to receive(:tumblr) {
+      double.tap { |obj|
+        allow(obj).to receive(:blog_likes).with('wendys.tumblr.com', after: 0) {
+          JSON.parse File.read(Rails.root.join('spec/data_fixtures/tumblr_likes.json'))
+        }
+        allow(obj).to receive(:blog_likes).with('notfound.tumblr.com', after: 0) { { 'status' => 404, 'msg' => 'Not Found' } }
       }
-      stub(obj).blog_likes('notfound.tumblr.com', after: 0) { { 'status' => 404, 'msg' => 'Not Found' } }
     }
   end
 

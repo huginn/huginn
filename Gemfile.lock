@@ -576,7 +576,6 @@ GEM
     retriable (3.1.2)
     rexml (3.2.5)
     rly (0.2.3)
-    rr (1.1.2)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
@@ -798,10 +797,10 @@ DEPENDENCIES
   rails-controller-testing
   rails-html-sanitizer (~> 1.2)
   rb-kqueue (>= 0.2)
-  rr (< 3)
   rspec (~> 3.8)
   rspec-collection_matchers (~> 1.1.0)
   rspec-html-matchers (~> 0.8)
+  rspec-mocks
   rspec-rails
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)

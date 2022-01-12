@@ -69,7 +69,7 @@ describe Agents::JiraAgent do
       expected_url = "https://jira.atlassian.com/rest/api/2/search?jql=resolution+%3D+unresolved&fields=*all&startAt=0"
       expected_headers = {headers: {"User-Agent"=>"Huginn - https://github.com/huginn/huginn"}, basic_auth: {username: "user", password: "pass"}}
       reply = JSON.parse(File.read(Rails.root.join("spec/data_fixtures/jira.json")))
-      mock(@checker).get(expected_url, expected_headers).returns(reply)
+      expect(@checker).to receive(:get).with(expected_url, expected_headers).and_return(reply)
 
       @checker.check
     end
@@ -81,20 +81,16 @@ describe Agents::JiraAgent do
       expected_headers = {headers: {"User-Agent"=>"Huginn - https://github.com/huginn/huginn"}, basic_auth: {username: "user", password: "pass"}}
       reply = JSON.parse(File.read(Rails.root.join("spec/data_fixtures/jira.json")))
 
-      mock(@checker) do 
-        get(expected_url_1, expected_headers).returns(reply)
-        # time specification
-        get(/\d+-\d+-\d+\+\d+%3A\d+/, expected_headers).returns(reply)
-      end
-
+      expect(@checker).to receive(:get).with(expected_url_1, expected_headers).and_return(reply)
       @checker.check
+      expect(@checker).to receive(:get).with(/\d+-\d+-\d+\+\d+%3A\d+/, expected_headers).and_return(reply)
       @checker.check
     end
   end
   describe "#check" do
     it "should be able to retrieve issues" do
       reply = JSON.parse(File.read(Rails.root.join("spec/data_fixtures/jira.json")))
-      mock(@checker).get(anything,anything).returns(reply)
+      expect(@checker).to receive(:get).and_return(reply)
 
       expect { @checker.check }.to change { Event.count }.by(50)
     end
