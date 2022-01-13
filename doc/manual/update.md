@@ -52,7 +52,7 @@ sudo -u huginn -H cp Procfile.bak Procfile
 
 ### 4. Update ruby version
 
-Ensure you have Ruby 2.5+ installed:
+Ensure you have Ruby 2.6+ installed:
 
 ```
 ruby -v
