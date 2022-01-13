@@ -158,6 +158,7 @@ group :development do
     gem 'poltergeist'
     gem 'pry-rails'
     gem 'pry-byebug'
+    gem 'rr', require: false
     gem 'rspec', '~> 3.8'
     gem 'rspec-mocks'
     gem 'rspec-rails'
