@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe AgentPropagateJob do
   it "calls Agent.receive! when run" do
-    mock(Agent).receive!
+    expect(Agent).to receive(:receive!)
     AgentPropagateJob.new.perform
   end
 

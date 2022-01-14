@@ -161,17 +161,17 @@ describe Agents::HumanTaskAgent do
     end
 
     it "should check for reviewable HITs frequently" do
-      mock(@checker).review_hits.twice
-      mock(@checker).create_basic_hit.once
+      expect(@checker).to receive(:review_hits).twice
+      expect(@checker).to receive(:create_basic_hit).once
       @checker.check
       @checker.check
     end
 
     it "should create HITs every 'submission_period' hours" do
       now = Time.now
-      stub(Time).now { now }
-      mock(@checker).review_hits.times(3)
-      mock(@checker).create_basic_hit.twice
+      allow(Time).to receive(:now) { now }
+      expect(@checker).to receive(:review_hits).exactly(3).times
+      expect(@checker).to receive(:create_basic_hit).twice
       @checker.check
       now += 1 * 60 * 60
       @checker.check
@@ -180,7 +180,7 @@ describe Agents::HumanTaskAgent do
     end
 
     it "should ignore events" do
-      mock(@checker).create_basic_hit(anything).times(0)
+      expect(@checker).not_to receive(:create_basic_hit).with(anything)
       @checker.receive([events(:bob_website_agent_event)])
     end
   end
@@ -189,9 +189,9 @@ describe Agents::HumanTaskAgent do
     it "should not create HITs during check but should check for reviewable HITs" do
       @checker.options['submission_period'] = "2"
       now = Time.now
-      stub(Time).now { now }
-      mock(@checker).review_hits.times(3)
-      mock(@checker).create_basic_hit.times(0)
+      allow(Time).to receive(:now) { now }
+      expect(@checker).to receive(:review_hits).exactly(3).times
+      expect(@checker).not_to receive(:create_basic_hit)
       @checker.check
       now += 1 * 60 * 60
       @checker.check
@@ -200,7 +200,7 @@ describe Agents::HumanTaskAgent do
     end
 
     it "should create HITs based on events" do
-      mock(@checker).create_basic_hit(events(:bob_website_agent_event)).times(1)
+      expect(@checker).to receive(:create_basic_hit).with(events(:bob_website_agent_event)).once
       @checker.receive([events(:bob_website_agent_event)])
     end
   end
@@ -214,8 +214,8 @@ describe Agents::HumanTaskAgent do
       question_form = nil
       hitInterface = OpenStruct.new
       hitInterface.id = 123
-      mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm) { |agent_question_form_instance| question_form = agent_question_form_instance }
-      mock(RTurk::Hit).create(:title => "Hi Joe").yields(hitInterface) { hitInterface }
+      expect(hitInterface).to receive(:question_form).with(instance_of Agents::HumanTaskAgent::AgentQuestionForm) { |agent_question_form_instance| question_form = agent_question_form_instance }
+      expect(RTurk::Hit).to receive(:create).with(title: "Hi Joe").and_yield(hitInterface).and_return(hitInterface)
 
       @checker.send :create_basic_hit, @event
 
@@ -235,8 +235,8 @@ describe Agents::HumanTaskAgent do
       @checker.options['hit']['title'] = "Hi {{name}}"
       hitInterface = OpenStruct.new
       hitInterface.id = 123
-      mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm)
-      mock(RTurk::Hit).create(:title => "Hi").yields(hitInterface) { hitInterface }
+      expect(hitInterface).to receive(:question_form).with(instance_of Agents::HumanTaskAgent::AgentQuestionForm)
+      expect(RTurk::Hit).to receive(:create).with(title: "Hi").and_yield(hitInterface).and_return(hitInterface)
       @checker.send :create_basic_hit
       expect(hitInterface.max_assignments).to eq(@checker.options['hit']['assignments'])
       expect(hitInterface.reward).to eq(@checker.options['hit']['reward'])
@@ -299,27 +299,27 @@ describe Agents::HumanTaskAgent do
       @checker.memory['hits']["JH39AA63836DHG"] = { 'event_id' => event2.id }
 
       hit_ids = %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345]
-      mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { hit_ids } } # It sees 3 HITs.
+      expect(RTurk::GetReviewableHITs).to receive(:create) { double(hit_ids: hit_ids) } # It sees 3 HITs.
 
       # It looksup the two HITs that it owns.  Neither are ready yet.
-      mock(RTurk::Hit).new("JH3132836336DHG") { FakeHit.new }
-      mock(RTurk::Hit).new("JH39AA63836DHG") { FakeHit.new }
+      expect(RTurk::Hit).to receive(:new).with("JH3132836336DHG") { FakeHit.new }
+      expect(RTurk::Hit).to receive(:new).with("JH39AA63836DHG") { FakeHit.new }
 
       @checker.send :review_hits
     end
 
     it "shouldn't do anything if an assignment isn't ready" do
       @checker.memory['hits'] = { "JH3132836336DHG" => { 'event_id' => @event.id } }
-      mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
+      expect(RTurk::GetReviewableHITs).to receive(:create) { double(hit_ids: %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345]) }
       assignments = [
         FakeAssignment.new(:status => "Accepted", :answers => {}),
         FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
       ]
       hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
-      mock(RTurk::Hit).new("JH3132836336DHG") { hit }
+      expect(RTurk::Hit).to receive(:new).with("JH3132836336DHG") { hit }
 
       # One of the assignments isn't set to "Submitted", so this should get skipped for now.
-      mock.any_instance_of(FakeAssignment).answers.times(0)
+      expect_any_instance_of(FakeAssignment).not_to receive(:answers)
 
       @checker.send :review_hits
 
@@ -329,15 +329,15 @@ describe Agents::HumanTaskAgent do
 
     it "shouldn't do anything if an assignment is missing" do
       @checker.memory['hits'] = { "JH3132836336DHG" => { 'event_id' => @event.id } }
-      mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
+      expect(RTurk::GetReviewableHITs).to receive(:create) { double(hit_ids: %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345]) }
       assignments = [
         FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
       ]
       hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
-      mock(RTurk::Hit).new("JH3132836336DHG") { hit }
+      expect(RTurk::Hit).to receive(:new).with("JH3132836336DHG") { hit }
 
       # One of the assignments hasn't shown up yet, so this should get skipped for now.
-      mock.any_instance_of(FakeAssignment).answers.times(0)
+      expect_any_instance_of(FakeAssignment).not_to receive(:answers)
 
       @checker.send :review_hits
 
@@ -348,14 +348,14 @@ describe Agents::HumanTaskAgent do
     context "emitting events" do
       before do
         @checker.memory['hits'] = { "JH3132836336DHG" => { 'event_id' => @event.id } }
-        mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
+        expect(RTurk::GetReviewableHITs).to receive(:create) { double(hit_ids: %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345]) }
         @assignments = [
           FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"neutral", "feedback"=>""}),
           FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "feedback"=>"Take 2"})
         ]
         @hit = FakeHit.new(:max_assignments => 2, :assignments => @assignments)
         expect(@hit).not_to be_disposed
-        mock(RTurk::Hit).new("JH3132836336DHG") { @hit }
+        expect(RTurk::Hit).to receive(:new).with("JH3132836336DHG") { @hit }
       end
 
       it "should create events when all assignments are ready" do
@@ -398,7 +398,7 @@ describe Agents::HumanTaskAgent do
       before do
         @checker.options['combination_mode'] = "take_majority"
         @checker.memory['hits'] = { "JH3132836336DHG" => { 'event_id' => @event.id } }
-        mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
+        expect(RTurk::GetReviewableHITs).to receive(:create) { double(hit_ids: %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345]) }
       end
 
       it "should take the majority votes of all questions" do
@@ -422,7 +422,7 @@ describe Agents::HumanTaskAgent do
           FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy", "age_range"=>">50"})
         ]
         hit = FakeHit.new(:max_assignments => 4, :assignments => assignments)
-        mock(RTurk::Hit).new("JH3132836336DHG") { hit }
+        expect(RTurk::Hit).to receive(:new).with("JH3132836336DHG") { hit }
 
         expect {
           @checker.send :review_hits
@@ -475,7 +475,7 @@ describe Agents::HumanTaskAgent do
           FakeAssignment.new(:status => "Submitted", :answers => { "rating"=>"2" })
         ]
         hit = FakeHit.new(:max_assignments => 5, :assignments => assignments)
-        mock(RTurk::Hit).new("JH3132836336DHG") { hit }
+        expect(RTurk::Hit).to receive(:new).with("JH3132836336DHG") { hit }
 
         expect {
           @checker.send :review_hits
@@ -509,7 +509,7 @@ describe Agents::HumanTaskAgent do
           'row_template' => "This is {{sentiment}}"
         }
         @event.save!
-        mock(RTurk::GetReviewableHITs).create { mock!.hit_ids { %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345] } }
+        expect(RTurk::GetReviewableHITs).to receive(:create) { double(hit_ids: %w[JH3132836336DHG JH39AA63836DHG JH39AA63836DH12345]) }
       end
 
       it "creates a poll using the row_template, message, and correct number of assignments" do
@@ -523,7 +523,7 @@ describe Agents::HumanTaskAgent do
           FakeAssignment.new(:status => "Submitted", :answers => {"sentiment"=>"happy",   "feedback"=>"This is my feedback 4"})
         ]
         hit = FakeHit.new(:max_assignments => 4, :assignments => assignments)
-        mock(RTurk::Hit).new("JH3132836336DHG") { hit }
+        expect(RTurk::Hit).to receive(:new).with("JH3132836336DHG") { hit }
 
         expect(@checker.memory['hits']["JH3132836336DHG"]).to be_present
 
@@ -532,8 +532,8 @@ describe Agents::HumanTaskAgent do
         question_form = nil
         hitInterface = OpenStruct.new
         hitInterface.id = "JH39AA63836DH12345"
-        mock(hitInterface).question_form(instance_of Agents::HumanTaskAgent::AgentQuestionForm) { |agent_question_form_instance| question_form = agent_question_form_instance }
-        mock(RTurk::Hit).create(:title => "Hi!").yields(hitInterface) { hitInterface }
+        expect(hitInterface).to receive(:question_form).with(instance_of Agents::HumanTaskAgent::AgentQuestionForm) { |agent_question_form_instance| question_form = agent_question_form_instance }
+        expect(RTurk::Hit).to receive(:create).with(title: "Hi!").and_yield(hitInterface).and_return(hitInterface)
 
         # And finally, the test.
 
@@ -589,7 +589,7 @@ describe Agents::HumanTaskAgent do
           FakeAssignment.new(:status => "Submitted", :answers => {"1" => "3", "2" => "4", "3" => "1", "4" => "4"})
         ]
         hit = FakeHit.new(:max_assignments => 2, :assignments => assignments)
-        mock(RTurk::Hit).new("JH39AA63836DH12345") { hit }
+        expect(RTurk::Hit).to receive(:new).with("JH39AA63836DH12345") { hit }
 
         expect(@checker.memory['hits']["JH39AA63836DH12345"]).to be_present
 

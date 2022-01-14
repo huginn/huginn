@@ -34,14 +34,14 @@ describe Agents::TwitterActionAgent do
 
       context 'when the twitter client succeeds retweeting' do
         it 'should retweet the tweets from the payload' do
-          mock(@agent.twitter).retweet([@tweet1, @tweet2])
+          expect(@agent.twitter).to receive(:retweet).with([@tweet1, @tweet2])
           @agent.receive([@event1, @event2])
         end
       end
 
       context 'when the twitter client fails retweeting' do
         it 'creates an event with tweet info and the error message' do
-          stub(@agent.twitter).retweet(anything) {
+          allow(@agent.twitter).to receive(:retweet).with(anything) {
             raise Twitter::Error.new('uh oh')
           }
 
@@ -77,14 +77,14 @@ describe Agents::TwitterActionAgent do
 
       context 'when the twitter client succeeds favoriting' do
         it 'should favorite the tweets from the payload' do
-          mock(@agent.twitter).favorite([@tweet1, @tweet2])
+          expect(@agent.twitter).to receive(:favorite).with([@tweet1, @tweet2])
           @agent.receive([@event1, @event2])
         end
       end
 
       context 'when the twitter client fails retweeting' do
         it 'creates an event with tweet info and the error message' do
-          stub(@agent.twitter).favorite(anything) {
+          allow(@agent.twitter).to receive(:favorite).with(anything) {
             raise Twitter::Error.new('uh oh')
           }
 
@@ -112,7 +112,7 @@ describe Agents::TwitterActionAgent do
       let(:agent) { build_agent.tap(&:save!) }
 
       it 're-raises the exception on failure' do
-        stub(agent.twitter).retweet(anything) {
+        allow(agent.twitter).to receive(:retweet).with(anything) {
           raise Twitter::Error.new('uh oh')
         }
 
@@ -120,7 +120,7 @@ describe Agents::TwitterActionAgent do
       end
 
       it 'does not re-raise the exception on "already retweeted" error' do
-        stub(agent.twitter).retweet(anything) {
+        allow(agent.twitter).to receive(:retweet).with(anything) {
           raise Twitter::Error::AlreadyRetweeted.new('You have already retweeted this tweet.')
         }
 
@@ -128,7 +128,7 @@ describe Agents::TwitterActionAgent do
       end
 
       it 'does not re-raise the exception on "already favorited" error' do
-        stub(agent.twitter).retweet(anything) {
+        allow(agent.twitter).to receive(:retweet).with(anything) {
           raise Twitter::Error::AlreadyFavorited.new('You have already favorited this status.')
         }
 
@@ -175,7 +175,7 @@ describe Agents::TwitterActionAgent do
 
   describe '#working?' do
     before do
-      stub.any_instance_of(Twitter::REST::Client).retweet(anything)
+      allow_any_instance_of(Twitter::REST::Client).to receive(:retweet)
     end
 
     it 'checks if events have been received within the expected time period' do
@@ -188,7 +188,7 @@ describe Agents::TwitterActionAgent do
       expect(agent.reload).to be_working # Just received events
 
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(agent.reload).not_to be_working # Too much time has passed
     end
   end

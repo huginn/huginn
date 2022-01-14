@@ -56,7 +56,7 @@ describe Agents::JavaScriptAgent do
         @agent.check
         expect(@agent.reload).to be_working
         three_days_from_now = 3.days.from_now
-        stub(Time).now { three_days_from_now }
+        allow(Time).to receive(:now) { three_days_from_now }
         expect(@agent).not_to be_working
       end
     end
@@ -69,7 +69,7 @@ describe Agents::JavaScriptAgent do
         Agents::JavaScriptAgent.async_receive @agent.id, [events(:bob_website_agent_event).id]
         expect(@agent.reload).to be_working
         two_days_from_now = 2.days.from_now
-        stub(Time).now { two_days_from_now }
+        allow(Time).to receive(:now) { two_days_from_now }
         expect(@agent.reload).not_to be_working
       end
     end

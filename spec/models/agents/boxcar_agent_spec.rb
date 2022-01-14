@@ -38,22 +38,22 @@ describe Agents::BoxcarAgent do
 
   describe "#receive" do
     it "sends a message" do
-      stub(HTTParty).post { {"id" => 1, "message" => "blah", "title" => "blah","source_name" => "Custom Notification"} }
+      allow(HTTParty).to receive(:post) { {"id" => 1, "message" => "blah", "title" => "blah","source_name" => "Custom Notification"} }
       @checker.receive([@event])
     end
 
     it "should raise error when invalid response arrives" do
-      stub(HTTParty).post { {"blah" => "blah"} }
+      allow(HTTParty).to receive(:post) { {"blah" => "blah"} }
       expect { @checker.send_notification({}) }.to raise_error(StandardError, /Invalid response from Boxcar:/)
     end
 
     it "should raise error when response says unauthorized" do
-      stub(HTTParty).post { {"Response" => "Not authorized"} }
+      allow(HTTParty).to receive(:post) { {"Response" => "Not authorized"} }
       expect { @checker.send_notification({}) }.to raise_error(StandardError, /Not authorized/)
     end
 
     it "should raise error when response has an error" do
-      stub(HTTParty).post { {"error" => {"message" => "Sample error"}} }
+      allow(HTTParty).to receive(:post) { {"error" => {"message" => "Sample error"}} }
       expect { @checker.send_notification({}) }.to raise_error(StandardError, /Sample error/)
     end
   end

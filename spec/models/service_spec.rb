@@ -58,7 +58,7 @@ describe Service do
     end
 
     it "should call refresh_token! if the token expired" do
-      stub(@service).refresh_token! { @service }
+      allow(@service).to receive(:refresh_token!) { @service }
       @service.expires_at = Time.now - 1.hour
       expect(@service.prepare_request).to eq(@service)
     end

@@ -22,26 +22,24 @@ describe Agents::TwilioAgent do
     @messages = []
     @calls = []
 
-    stub(Twilio::REST::Client).new do
-      c = Object.new
-      stub(c).calls do
-        l = Object.new
-        stub(l).create do |message|
-          @calls << message
+    allow(Twilio::REST::Client).to receive(:new) do
+      instance_double(Twilio::REST::Client).tap { |c|
+        allow(c).to receive(:calls) do
+          double.tap { |l|
+            allow(l).to receive(:create) do |message|
+              @calls << message
+            end
+          }
         end
-        l
-      end
-      stub(c).messages do
-        l = Object.new
-        stub(l).create do |message|
-          @messages << message
+        allow(c).to receive(:messages) do
+          double.tap { |l|
+            allow(l).to receive(:create) do |message|
+              @messages << message
+            end
+          }
         end
-        l
-      end
-      c
+      }
     end
-
-    stub.any_instance_of(Twilio::TwiML::VoiceResponse)
   end
 
   describe '#receive' do
@@ -83,7 +81,7 @@ describe Agents::TwilioAgent do
       Agents::TwilioAgent.async_receive @checker.id, [@event.id]
       expect(@checker.reload).to be_working # Just received events
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(@checker.reload).not_to be_working # More time has passed than the expected receive period without any new events
     end
   end

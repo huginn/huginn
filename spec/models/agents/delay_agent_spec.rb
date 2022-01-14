@@ -27,7 +27,7 @@ describe Agents::DelayAgent do
       Agents::DelayAgent.async_receive agent.id, [events(:bob_website_agent_event).id]
       expect(agent.reload).to be_working
       the_future = (agent.options[:expected_receive_period_in_days].to_i + 1).days.from_now
-      stub(Time).now { the_future }
+      allow(Time).to receive(:now) { the_future }
       expect(agent.reload).not_to be_working
     end
   end

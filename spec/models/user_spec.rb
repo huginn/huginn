@@ -7,7 +7,7 @@ describe User do
     describe "invitation_code" do
       context "when configured to use invitation codes" do
         before do
-          stub(User).using_invitation_code? {true}
+          allow(User).to receive(:using_invitation_code?) {true}
         end
         
         it "only accepts valid invitation codes" do
@@ -31,7 +31,7 @@ describe User do
       
       context "when configured not to use invitation codes" do
         before do
-          stub(User).using_invitation_code? {false}
+          allow(User).to receive(:using_invitation_code?) {false}
         end
         
         it "skips this validation" do

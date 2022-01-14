@@ -406,7 +406,7 @@ module Agents
         title = interpolate_string(opts['title'], payload).strip
         description = interpolate_string(opts['description'], payload).strip
         questions = interpolate_options(opts['questions'], payload)
-        hit = RTurk::Hit.create(:title => title) do |hit|
+        hit = RTurk::Hit.create(title: title) do |hit|
           hit.max_assignments = (opts['assignments'] || 1).to_i
           hit.description = description
           hit.lifetime = (opts['lifetime_in_seconds'] || 24 * 60 * 60).to_i
