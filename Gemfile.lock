@@ -420,7 +420,6 @@ GEM
       actionmailer (>= 3.2)
       letter_opener (~> 1.0)
       railties (>= 3.2)
-    libv8 (7.3.492.27.1)
     liquid (4.0.3)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -447,15 +446,13 @@ GEM
     mini_magick (4.11.0)
     mini_mime (1.1.2)
     mini_portile2 (2.6.1)
-    mini_racer (0.2.9)
-      libv8 (>= 6.9.411)
     minitest (5.15.0)
     mqtt (0.3.1)
     msgpack (1.4.2)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
-    mysql2 (0.5.2)
+    mysql2 (0.5.3)
     naught (1.1.0)
     nenv (0.3.0)
     net-ftp-list (3.2.8)
@@ -503,7 +500,7 @@ GEM
       rack
     orm_adapter (0.5.0)
     os (1.1.4)
-    pg (1.1.3)
+    pg (1.2.3)
     poltergeist (1.8.1)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
@@ -661,6 +658,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
+    sqlite3 (1.4.2)
     sshkit (1.18.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
@@ -777,10 +775,9 @@ DEPENDENCIES
   listen (~> 3.0.5)
   loofah (~> 2.0)
   mini_magick (>= 4.9.4)
-  mini_racer (~> 0.2.4)
   mqtt
   multi_xml
-  mysql2 (~> 0.5.2)
+  mysql2
   net-ftp-list (~> 3.2.8)
   nokogiri (>= 1.10.8)
   omniauth
@@ -789,7 +786,7 @@ DEPENDENCIES
   omniauth-google-oauth2 (>= 0.8.0)
   omniauth-tumblr
   omniauth-twitter
-  pg (~> 1.1.3)
+  pg
   poltergeist
   pry-byebug
   pry-rails
@@ -816,6 +813,7 @@ DEPENDENCIES
   spring-commands-rspec (~> 1.0.4)
   spring-watcher-listen (~> 2.0.1)
   sprockets (~> 3.7.2)
+  sqlite3
   tumblr_client!
   twilio-ruby (~> 5.62.0)
   twitter!

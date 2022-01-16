@@ -1,0 +1,28 @@
+name: build
+
+on:
+  push:
+    branches: alpine
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: install buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          version: latest
+      - name: login to docker hub
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+      - name: get date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: build the image
+        run: |
+          docker buildx build --push \
+            --tag $GITHUB_REPOSITORY:latest \
+            --tag $GITHUB_REPOSITORY:${{steps.date.outputs.date}} \
+            --platform linux/amd64 .
