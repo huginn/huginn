@@ -23,13 +23,13 @@ describe Seeder do
 
     it 'can be run multiple times and exit normally' do
       Seeder.seed
-      mock(Seeder).exit
+      expect(Seeder).to receive(:exit)
       Seeder.seed
     end
   end
 
   def stub_puts_to_prevent_spew_in_spec_output
-    stub(Seeder).puts(anything)
-    stub(Seeder).puts
+    allow(Seeder).to receive(:puts).with(anything)
+    allow(Seeder).to receive(:puts)
   end
 end

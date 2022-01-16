@@ -16,7 +16,7 @@
           <% text = tweet.dig(:extended_tweet, :full_text) %>
           <% next unless text.present? %>
           <% screen_name = tweet.dig(:user, :screen_name) %>
-          <div class='tweet'><span class="tweet-body" data-tweet-id='<%= tweet[:id_str] %>'><span class="tweet-plain" title="Click to expand"><%= link_to "@#{screen_name}", "https://twitter.com/#{URI.encode(screen_name)}" %>: <%= text %> - <%= link_to l(Time.zone.parse(tweet[:created_at]), format: :long), "https://twitter.com/#{URI.encode(screen_name)}/status/#{URI.encode(tweet[:id_str])}" %></span></span> (<%= link_to 'event', event_path(id: event.id) %>)</div>
+          <div class='tweet'><span class="tweet-body" data-tweet-id='<%= tweet[:id_str] %>'><span class="tweet-plain" title="Click to expand"><%= link_to "@#{screen_name}", "https://twitter.com/#{CGI.escape(screen_name)}" %>: <%= text %> - <%= link_to l(Time.zone.parse(tweet[:created_at]), format: :long), "https://twitter.com/#{CGI.escape(screen_name)}/status/#{CGI.escape(tweet[:id_str])}" %></span></span> (<%= link_to 'event', event_path(id: event.id) %>)</div>
         <% end %>
       </div>
     <% end %>

@@ -28,11 +28,10 @@ describe Agents::TumblrPublishAgent do
         "title" => "Gonna rain...",
         "link" => "http://huginnbot.tumblr.com/gonna-rain..."
       }
-      stub.any_instance_of(Agents::TumblrPublishAgent).tumblr {
-        obj = Object.new
-        stub(obj).text(anything, anything) { { "id" => "5" } }
-        stub(obj).posts("huginnbot.tumblr.com", {:id => "5"}) {
-          {"posts" => [@post_body]}
+      allow_any_instance_of(Agents::TumblrPublishAgent).to receive(:tumblr) {
+        double.tap { |obj|
+          allow(obj).to receive(:text).with(anything, anything) { { "id" => "5" } }
+          allow(obj).to receive(:posts).with("huginnbot.tumblr.com", { id: "5" }) { {"posts" => [@post_body]} }
         }
       }
 
@@ -71,8 +70,10 @@ describe Agents::TumblrPublishAgent do
       @event.payload = { :title => "Gonna rain...", :body => 'San Francisco is gonna get wet' }
       @event.save!
 
-      stub.any_instance_of(Agents::TumblrPublishAgent).tumblr {
-        stub!.text(anything, anything) { {"status" => 401,"msg" => "Not Authorized"} }
+      allow_any_instance_of(Agents::TumblrPublishAgent).to receive(:tumblr) {
+        double.tap { |obj|
+          allow(obj).to receive(:text).with(anything, anything) { {"status" => 401,"msg" => "Not Authorized"} }
+        }
       }
     end
 

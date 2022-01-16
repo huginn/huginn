@@ -51,7 +51,7 @@ describe Agents::WitaiAgent do
       Agents::WitaiAgent.async_receive @checker.id, [@event.id]
       expect(@checker.reload).to be_working
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(@checker.reload).not_to be_working
     end
   end

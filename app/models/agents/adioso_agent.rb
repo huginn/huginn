@@ -54,8 +54,13 @@ module Agents
     end
 
     def check
-      auth_options = {:basic_auth => {:username =>interpolated[:username], :password=>interpolated['password']}}
-      parse_response = HTTParty.get "http://api.adioso.com/v2/search/parse?q=#{URI.encode(interpolated['from'])}+to+#{URI.encode(interpolated['to'])}", auth_options
+      auth_options = {
+        basic_auth: {
+          username: interpolated[:username],
+          password: interpolated[:password]
+        }
+      }
+      parse_response = HTTParty.get "http://api.adioso.com/v2/search/parse?#{{ q: "#{interpolated[:from]} to #{interpolated[:to]}" }.to_query}", auth_options
       fare_request = parse_response["search_url"].gsub /(end=)(\d*)([^\d]*)(\d*)/, "\\1#{date_to_unix_epoch(interpolated['end_date'])}\\3#{date_to_unix_epoch(interpolated['start_date'])}"
       fare = HTTParty.get fare_request, auth_options
 

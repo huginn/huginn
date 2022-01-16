@@ -46,14 +46,14 @@ describe Agents::ImapFolderAgent do
       [
         Mail.read(Rails.root.join('spec/data_fixtures/imap1.eml')).tap { |mail|
           mail.extend(MessageMixin)
-          stub(mail).uid.returns(1)
-          stub(mail).raw_mail.returns(mail.encoded)
+          allow(mail).to receive(:uid).and_return(1)
+          allow(mail).to receive(:raw_mail).and_return(mail.encoded)
         },
         Mail.read(Rails.root.join('spec/data_fixtures/imap2.eml')).tap { |mail|
           mail.extend(MessageMixin)
-          stub(mail).uid.returns(2)
-          stub(mail).has_attachment?.returns(true)
-          stub(mail).raw_mail.returns(mail.encoded)
+          allow(mail).to receive(:uid).and_return(2)
+          allow(mail).to receive(:has_attachment?).and_return(true)
+          allow(mail).to receive(:raw_mail).and_return(mail.encoded)
         },
       ]
     }
@@ -94,7 +94,7 @@ describe Agents::ImapFolderAgent do
       @checker.user = users(:bob)
       @checker.save!
 
-      stub(@checker).each_unread_mail.returns { |yielder|
+      allow(@checker).to receive(:each_unread_mail) { |&yielder|
         seen = @checker.lastseen
         notified = @checker.notified
         mails.each_with_object(notified) { |mail|
@@ -255,7 +255,7 @@ describe Agents::ImapFolderAgent do
 
       it 'should never mark mails as read unless mark_as_read is true' do
         mails.each { |mail|
-          stub(mail).mark_as_read.never
+          allow(mail).to receive(:mark_as_read).never
         }
         expect { @checker.check }.to change { Event.count }.by(2)
       end
@@ -263,7 +263,7 @@ describe Agents::ImapFolderAgent do
       it 'should mark mails as read if mark_as_read is true' do
         @checker.options['mark_as_read'] = true
         mails.each { |mail|
-          stub(mail).mark_as_read.once
+          allow(mail).to receive(:mark_as_read).once
         }
         expect { @checker.check }.to change { Event.count }.by(2)
       end
@@ -272,7 +272,7 @@ describe Agents::ImapFolderAgent do
         mails.first.message_id = mails.last.message_id
         @checker.options['mark_as_read'] = true
         mails.each { |mail|
-          stub(mail).mark_as_read.once
+          allow(mail).to receive(:mark_as_read).once
         }
         expect { @checker.check }.to change { Event.count }.by(1)
       end
@@ -280,7 +280,7 @@ describe Agents::ImapFolderAgent do
       it 'should delete mails if delete is true' do
         @checker.options['delete'] = true
         mails.each { |mail|
-          stub(mail).delete.once
+          allow(mail).to receive(:delete).once
         }
         expect { @checker.check }.to change { Event.count }.by(2)
       end

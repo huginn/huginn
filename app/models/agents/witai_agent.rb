@@ -65,11 +65,11 @@ module Agents
 
     private
       def api_endpoint
-        'https://api.wit.ai/message?v=20141022&q='
+        'https://api.wit.ai/message?v=20141022'
       end
 
       def query_url(query)
-        api_endpoint + URI.encode(query)
+        api_endpoint + { q: query }.to_query
       end
 
       def headers

@@ -383,7 +383,7 @@ module LiquidInterpolatable
       end
 
       def render(context)
-        context.registers[:agent].credential(@credential_name)
+        context.registers[:agent].credential(@credential_name) || ""
       end
     end
 

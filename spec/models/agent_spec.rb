@@ -37,19 +37,19 @@ describe Agent do
     end
 
     it "should run all Agents with the given schedule" do
-      mock(Agents::WeatherAgent).async_check(anything).times(@weather_agent_count)
+      expect(Agents::WeatherAgent).to receive(:async_check).with(anything).exactly(@weather_agent_count).times
       Agents::WeatherAgent.bulk_check("midnight")
     end
 
     it "should skip disabled Agents" do
       agents(:bob_weather_agent).update_attribute :disabled, true
-      mock(Agents::WeatherAgent).async_check(anything).times(@weather_agent_count - 1)
+      expect(Agents::WeatherAgent).to receive(:async_check).with(anything).exactly(@weather_agent_count - 1).times
       Agents::WeatherAgent.bulk_check("midnight")
     end
 
     it "should skip agents of deactivated accounts" do
       agents(:bob_weather_agent).user.deactivate!
-      mock(Agents::WeatherAgent).async_check(anything).times(@weather_agent_count - 1)
+      expect(Agents::WeatherAgent).to receive(:async_check).with(anything).exactly(@weather_agent_count - 1).times
       Agents::WeatherAgent.bulk_check("midnight")
     end
   end
@@ -62,53 +62,56 @@ describe Agent do
 
     it "runs agents with the given schedule" do
       weather_agent_ids = [agents(:bob_weather_agent), agents(:jane_weather_agent)].map(&:id)
-      stub(Agents::WeatherAgent).async_check(anything) {|agent_id| weather_agent_ids.delete(agent_id) }
-      stub(Agents::WebsiteAgent).async_check(agents(:bob_website_agent).id)
+      expect(Agents::WeatherAgent).to receive(:async_check) { |agent_id| weather_agent_ids.delete(agent_id) }.twice
+      expect(Agents::WebsiteAgent).to receive(:async_check).with(agents(:bob_website_agent).id)
       Agent.run_schedule("midnight")
       expect(weather_agent_ids).to be_empty
     end
 
     it "groups agents by type" do
-      mock(Agents::WeatherAgent).bulk_check("midnight").once
-      mock(Agents::WebsiteAgent).bulk_check("midnight").once
+      expect(Agents::WeatherAgent).to receive(:bulk_check).with("midnight").once
+      expect(Agents::WebsiteAgent).to receive(:bulk_check).with("midnight").once
       Agent.run_schedule("midnight")
     end
 
     it "ignores unknown types" do
       Agent.where(id: agents(:bob_weather_agent).id).update_all type: 'UnknownTypeAgent'
-      mock(Agents::WeatherAgent).bulk_check("midnight").once
-      mock(Agents::WebsiteAgent).bulk_check("midnight").once
+      expect(Agents::WeatherAgent).to receive(:bulk_check).with("midnight").once
+      expect(Agents::WebsiteAgent).to receive(:bulk_check).with("midnight").once
       Agent.run_schedule("midnight")
     end
 
     it "only runs agents with the given schedule" do
-      do_not_allow(Agents::WebsiteAgent).async_check
+      expect(Agents::WebsiteAgent).not_to receive(:async_check)
       Agent.run_schedule("blah")
     end
 
     it "will not run the 'never' schedule" do
       agents(:bob_weather_agent).update_attribute 'schedule', 'never'
-      do_not_allow(Agents::WebsiteAgent).async_check
+      expect(Agents::WebsiteAgent).not_to receive(:async_check)
       Agent.run_schedule("never")
     end
   end
 
   describe "credential" do
+    let(:agent) { agents(:bob_weather_agent) }
+
     it "should return the value of the credential when credential is present" do
-      expect(agents(:bob_weather_agent).credential("aws_secret")).to eq(user_credentials(:bob_aws_secret).credential_value)
+      expect(agent.credential("aws_secret")).to eq(user_credentials(:bob_aws_secret).credential_value)
     end
 
     it "should return nil when credential is not present" do
-      expect(agents(:bob_weather_agent).credential("non_existing_credential")).to eq(nil)
+      expect(agent.credential("non_existing_credential")).to eq(nil)
     end
 
     it "should memoize the load" do
-      mock.any_instance_of(UserCredential).credential_value.twice { "foo" }
-      expect(agents(:bob_weather_agent).credential("aws_secret")).to eq("foo")
-      expect(agents(:bob_weather_agent).credential("aws_secret")).to eq("foo")
-      agents(:bob_weather_agent).reload
-      expect(agents(:bob_weather_agent).credential("aws_secret")).to eq("foo")
-      expect(agents(:bob_weather_agent).credential("aws_secret")).to eq("foo")
+      count = 0
+      allow_any_instance_of(UserCredential).to receive(:credential_value) { count += 1 }.and_return("foo")
+      expect { expect(agent.credential("aws_secret")).to eq("foo") }.to change { count }.by(1)
+      expect { expect(agent.credential("aws_secret")).to eq("foo") }.not_to change { count }
+      agent.reload
+      expect { expect(agent.credential("aws_secret")).to eq("foo") }.to change { count }.by(1)
+      expect { expect(agent.credential("aws_secret")).to eq("foo") }.not_to change { count }
     end
   end
 
@@ -158,8 +161,8 @@ describe Agent do
     end
 
     before do
-      stub(Agents::SomethingSource).valid_type?("Agents::SomethingSource") { true }
-      stub(Agents::CannotBeScheduled).valid_type?("Agents::CannotBeScheduled") { true }
+      allow(Agents::SomethingSource).to receive(:valid_type?).with("Agents::SomethingSource") { true }
+      allow(Agents::CannotBeScheduled).to receive(:valid_type?).with("Agents::CannotBeScheduled") { true }
     end
 
     describe Agents::SomethingSource do
@@ -229,7 +232,7 @@ describe Agent do
       end
 
       it "should log an error if the Agent has been marked with 'cannot_create_events!'" do
-        mock(@checker).can_create_events? { false }
+        expect(@checker).to receive(:can_create_events?) { false }
         expect {
           @checker.check
         }.not_to change { Event.count }
@@ -245,11 +248,11 @@ describe Agent do
       end
 
       it "records last_check_at and calls check on the given Agent" do
-        mock(@checker).check.once {
+        expect(@checker).to receive(:check).once {
           @checker.options[:new] = true
         }
 
-        mock(Agent).find(@checker.id) { @checker }
+        allow(Agent).to receive(:find).with(@checker.id) { @checker }
 
         expect(@checker.last_check_at).to be_nil
         Agents::SomethingSource.async_check(@checker.id)
@@ -258,10 +261,10 @@ describe Agent do
       end
 
       it "should log exceptions" do
-        mock(@checker).check.once {
+        expect(@checker).to receive(:check).once {
           raise "foo"
         }
-        mock(Agent).find(@checker.id) { @checker }
+        expect(Agent).to receive(:find).with(@checker.id) { @checker }
         expect {
           Agents::SomethingSource.async_check(@checker.id)
         }.to raise_error(RuntimeError)
@@ -271,8 +274,8 @@ describe Agent do
       end
 
       it "should not run disabled Agents" do
-        mock(Agent).find(agents(:bob_weather_agent).id) { agents(:bob_weather_agent) }
-        do_not_allow(agents(:bob_weather_agent)).check
+        expect(Agent).to receive(:find).with(agents(:bob_weather_agent).id) { agents(:bob_weather_agent) }
+        expect(agents(:bob_weather_agent)).not_to receive(:check)
         agents(:bob_weather_agent).update_attribute :disabled, true
         Agent.async_check(agents(:bob_weather_agent).id)
       end
@@ -281,19 +284,18 @@ describe Agent do
     describe ".receive!" do
       before do
         stub_request(:any, /darksky/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
-        stub.any_instance_of(Agents::WeatherAgent).is_tomorrow?(anything) { true }
       end
 
       it "should use available events" do
         Agent.async_check(agents(:bob_weather_agent).id)
-        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(1)
+        expect(Agent).to receive(:async_receive).with(agents(:bob_rain_notifier_agent).id, anything).once
         Agent.receive!
       end
 
       it "should not propagate to disabled Agents" do
         Agent.async_check(agents(:bob_weather_agent).id)
         agents(:bob_rain_notifier_agent).update_attribute :disabled, true
-        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
+        expect(Agent).not_to receive(:async_receive).with(agents(:bob_rain_notifier_agent).id, anything)
         Agent.receive!
       end
 
@@ -303,8 +305,8 @@ describe Agent do
 
         Agent.where(id: agents(:bob_rain_notifier_agent).id).update_all type: 'UnknownTypeAgent'
 
-        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
-        mock(Agent).async_receive(agents(:jane_rain_notifier_agent).id, anything).times(1)
+        expect(Agent).not_to receive(:async_receive).with(agents(:bob_rain_notifier_agent).id, anything)
+        expect(Agent).to receive(:async_receive).with(agents(:jane_rain_notifier_agent).id, anything).once
 
         Agent.receive!
       end
@@ -315,14 +317,16 @@ describe Agent do
 
         Agent.where(id: agents(:bob_weather_agent).id).update_all type: 'UnknownTypeAgent'
 
-        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
-        mock(Agent).async_receive(agents(:jane_rain_notifier_agent).id, anything).times(1)
+        expect(Agent).not_to receive(:async_receive).with(agents(:bob_rain_notifier_agent).id, anything)
+        expect(Agent).to receive(:async_receive).with(agents(:jane_rain_notifier_agent).id, anything).once
 
         Agent.receive!
       end
 
       it "should log exceptions" do
-        mock.any_instance_of(Agents::TriggerAgent).receive(anything).once {
+        count = 0
+        allow_any_instance_of(Agents::TriggerAgent).to receive(:receive) {
+          count += 1
           raise "foo"
         }
         Agent.async_check(agents(:bob_weather_agent).id)
@@ -332,10 +336,12 @@ describe Agent do
         log = agents(:bob_rain_notifier_agent).logs.first
         expect(log.message).to match(/Exception/)
         expect(log.level).to eq(4)
+        expect(count).to eq 1
       end
 
       it "should track when events have been seen and not received them again" do
-        mock.any_instance_of(Agents::TriggerAgent).receive(anything).once
+        count = 0
+        allow_any_instance_of(Agents::TriggerAgent).to receive(:receive) { count += 1 }
         Agent.async_check(agents(:bob_weather_agent).id)
         expect {
           Agent.receive!
@@ -344,28 +350,34 @@ describe Agent do
         expect {
           Agent.receive!
         }.not_to change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+        expect(count).to eq 1
       end
 
       it "should not run consumers that have nothing to do" do
-        do_not_allow.any_instance_of(Agents::TriggerAgent).receive(anything)
+        anything
         Agent.receive!
       end
 
       it "should group events" do
-        mock.any_instance_of(Agents::TriggerAgent).receive(anything).twice { |events|
+        count = 0
+        allow_any_instance_of(Agents::TriggerAgent).to receive(:receive) { |agent, events|
+          count += 1
           expect(events.map(&:user).map(&:username).uniq.length).to eq(1)
         }
         Agent.async_check(agents(:bob_weather_agent).id)
         Agent.async_check(agents(:jane_weather_agent).id)
         Agent.receive!
+        expect(count).to eq 2
       end
 
       it "should call receive for each event when no_bulk_receive! is used" do
-        mock.any_instance_of(Agents::TriggerAgent).receive(anything).twice
-        stub(Agents::TriggerAgent).no_bulk_receive? { true }
+        count = 0
+        allow_any_instance_of(Agents::TriggerAgent).to receive(:receive).with(anything) { count += 1 }
+        allow(Agents::TriggerAgent).to receive(:no_bulk_receive?) { true }
         Agent.async_check(agents(:bob_weather_agent).id)
         Agent.async_check(agents(:bob_weather_agent).id)
         Agent.receive!
+        expect(count).to eq 2
       end
 
       it "should ignore events that were created before a particular Link" do
@@ -374,7 +386,8 @@ describe Agent do
         agent2.save!
         agent2.check
 
-        mock.any_instance_of(Agents::TriggerAgent).receive(anything).twice
+        count = 0
+        allow_any_instance_of(Agents::TriggerAgent).to receive(:receive) { count += 1 }
         agents(:bob_weather_agent).check # bob_weather_agent makes an event
 
         expect {
@@ -399,20 +412,22 @@ describe Agent do
         expect {
           Agent.receive! # and we receive it
         }.to change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+
+        expect(count).to eq 2
       end
 
       it "should not run agents of deactivated accounts" do
         agents(:bob_weather_agent).user.deactivate!
         Agent.async_check(agents(:bob_weather_agent).id)
-        mock(Agent).async_receive(agents(:bob_rain_notifier_agent).id, anything).times(0)
+        expect(Agent).not_to receive(:async_receive).with(agents(:bob_rain_notifier_agent).id, anything)
         Agent.receive!
       end
     end
 
     describe ".async_receive" do
       it "should not run disabled Agents" do
-        mock(Agent).find(agents(:bob_rain_notifier_agent).id) { agents(:bob_rain_notifier_agent) }
-        do_not_allow(agents(:bob_rain_notifier_agent)).receive
+        expect(Agent).to receive(:find).with(agents(:bob_rain_notifier_agent).id) { agents(:bob_rain_notifier_agent) }
+        expect(agents(:bob_rain_notifier_agent)).not_to receive(:receive)
         agents(:bob_rain_notifier_agent).update_attribute :disabled, true
         Agent.async_receive(agents(:bob_rain_notifier_agent).id, [1, 2, 3])
       end
@@ -665,7 +680,7 @@ describe Agent do
 
       describe "when keep_events_for has not changed" do
         it "does nothing" do
-          mock(@agent).update_event_expirations!.times(0)
+          expect(@agent).not_to receive(:update_event_expirations!)
 
           @agent.options[:foo] = "bar1"
           @agent.save!
@@ -762,7 +777,7 @@ describe Agent do
     end
 
     before do
-      stub(Agents::WebRequestReceiver).valid_type?("Agents::WebRequestReceiver") { true }
+      allow(Agents::WebRequestReceiver).to receive(:valid_type?).with("Agents::WebRequestReceiver") { true }
     end
 
     context "when .receive_web_request is defined" do
@@ -835,7 +850,7 @@ describe Agent do
           'HTTP_ACCEPT' => 'text/html'
         })
 
-        mock(Rails.logger).warn("DEPRECATED: The .receive_webhook method is deprecated, please switch your Agent to use .receive_web_request.")
+        expect(Rails.logger).to receive(:warn).with("DEPRECATED: The .receive_webhook method is deprecated, please switch your Agent to use .receive_web_request.")
         @agent.trigger_web_request(request)
         expect(@agent.reload.memory['last_webhook_request']).to eq({ "some_param" => "some_value" })
         expect(@agent.last_web_request_at.to_i).to be_within(1).of(Time.now.to_i)
@@ -1050,9 +1065,9 @@ describe AgentDrop do
   end
 
   it 'should have .working' do
-    stub(@wsa1).working? { false }
-    stub(@wsa2).working? { true }
-    stub(@efa).working? { false }
+    allow(@wsa1).to receive(:working?) { false }
+    allow(@wsa2).to receive(:working?) { true }
+    allow(@efa).to receive(:working?) { false }
 
     t = '{% if agent.working %}healthy{% else %}unhealthy{% endif %}'
     expect(interpolate(t, @wsa1)).to eq('unhealthy')

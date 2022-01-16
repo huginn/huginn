@@ -380,7 +380,7 @@ GEM
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
     httpclient (2.8.3)
-    huginn_agent (0.4.0)
+    huginn_agent (0.6.1)
       thor
     hypdf (1.0.10)
       httmultiparty (~> 0.3)
@@ -410,7 +410,8 @@ GEM
       kaminari-core (= 1.1.1)
     kaminari-core (1.1.1)
     kgio (2.10.0)
-    kramdown (1.3.3)
+    kramdown (2.3.1)
+      rexml
     launchy (2.4.2)
       addressable (~> 2.3)
     letter_opener (1.4.1)
@@ -572,7 +573,7 @@ GEM
     retriable (3.1.2)
     rexml (3.2.5)
     rly (0.2.3)
-    rr (1.1.2)
+    rr (3.0.9)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
@@ -762,13 +763,13 @@ DEPENDENCIES
   hipchat (~> 1.2.0)
   httmultiparty (~> 0.3.16)
   httparty (~> 0.13)
-  huginn_agent (~> 0.4.0)
+  huginn_agent
   hypdf (~> 1.0.10)
   jquery-rails (~> 4.2.1)
   json (~> 2.3)
   jsonpath (~> 1.0.1)
   kaminari (~> 1.1.1)
-  kramdown (~> 1.3.3)
+  kramdown
   letter_opener_web (~> 1.3.1)
   liquid (~> 4.0.3)
   listen (~> 3.0.5)
@@ -794,10 +795,11 @@ DEPENDENCIES
   rails-controller-testing
   rails-html-sanitizer (~> 1.2)
   rb-kqueue (>= 0.2)
-  rr (< 3)
+  rr
   rspec (~> 3.8)
   rspec-collection_matchers (~> 1.1.0)
   rspec-html-matchers (~> 0.8)
+  rspec-mocks
   rspec-rails
   rturk (~> 2.12.1)
   ruby-growl (~> 4.1.0)

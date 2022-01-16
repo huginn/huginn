@@ -5,7 +5,7 @@ describe HuginnScheduler do
   before(:each) do
     @rufus_scheduler = Rufus::Scheduler.new
     @scheduler = HuginnScheduler.new
-    stub(@scheduler).setup {}
+    allow(@scheduler).to receive(:setup)
     @scheduler.setup!(@rufus_scheduler, Mutex.new)
   end
 
@@ -14,27 +14,27 @@ describe HuginnScheduler do
   end
 
   it "schould register the schedules with the rufus scheduler and run" do
-    mock(@rufus_scheduler).join
+    expect(@rufus_scheduler).to receive(:join)
     scheduler = HuginnScheduler.new
     scheduler.setup!(@rufus_scheduler, Mutex.new)
     scheduler.run
   end
 
   it "should run scheduled agents" do
-    mock(Agent).run_schedule('every_1h')
-    mock.instance_of(IO).puts('Queuing schedule for every_1h')
+    expect(Agent).to receive(:run_schedule).with('every_1h')
+    expect_any_instance_of(IO).to receive(:puts).with('Queuing schedule for every_1h')
     @scheduler.send(:run_schedule, 'every_1h')
   end
 
   it "should propagate events" do
-    mock(Agent).receive!
-    stub.instance_of(IO).puts
+    expect(Agent).to receive(:receive!)
+    expect_any_instance_of(IO).to receive(:puts)
     @scheduler.send(:propagate!)
   end
 
   it "schould clean up expired events" do
-    mock(Event).cleanup_expired!
-    stub.instance_of(IO).puts
+    expect(Event).to receive(:cleanup_expired!)
+    expect_any_instance_of(IO).to receive(:puts)
     @scheduler.send(:cleanup_expired_events!)
   end
 
@@ -98,7 +98,7 @@ describe Rufus::Scheduler do
 
     @scheduler = Rufus::Scheduler.new
 
-    stub.any_instance_of(Agents::SchedulerAgent).second_precision_enabled { true }
+    allow_any_instance_of(Agents::SchedulerAgent).to receive(:second_precision_enabled) { true }
 
     @agent1 = Agents::SchedulerAgent.new(name: 'Scheduler 1', options: { action: 'run', schedule: '*/1 * * * * *' }).tap { |a|
       a.user = users(:bob)

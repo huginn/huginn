@@ -25,14 +25,14 @@ describe Agents::CommanderAgent do
 
   describe "check" do
     it "should command targets" do
-      stub(Agent).async_check(target.id).once { nil }
+      allow(Agent).to receive(:async_check).with(target.id).once { nil }
       agent.check
     end
   end
 
   describe "receive_events" do
     it "should command targets" do
-      stub(Agent).async_check(target.id).once { nil }
+      allow(Agent).to receive(:async_check).with(target.id).once { nil }
 
       event = Event.new
       event.agent = agents(:bob_rain_notifier_agent)

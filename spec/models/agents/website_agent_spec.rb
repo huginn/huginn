@@ -616,7 +616,7 @@ describe Agents::WebsiteAgent do
     describe '#working?' do
       it 'checks if events have been received within the expected receive period' do
         stubbed_time = Time.now
-        stub(Time).now { stubbed_time }
+        allow(Time).to receive(:now) { stubbed_time }
 
         expect(@checker).not_to be_working # No events created
         @checker.check

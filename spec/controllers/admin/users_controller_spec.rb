@@ -4,7 +4,7 @@ describe Admin::UsersController do
   describe 'POST #create' do
     context 'with valid user params' do
       it 'imports the default scenario for the new user' do
-        mock(DefaultScenarioImporter).import(is_a(User))
+        expect(DefaultScenarioImporter).to receive(:import).with(kind_of(User))
         sign_in users(:jane)
         post :create, params: {:user => {username: 'jdoe', email: 'jdoe@example.com',
                                          password: 's3cr3t55', password_confirmation: 's3cr3t55', admin: false }}
@@ -13,7 +13,7 @@ describe Admin::UsersController do
     
     context 'with invalid user params' do
       it 'does not import the default scenario' do
-        stub(DefaultScenarioImporter).import(is_a(User)) { fail "Should not attempt import" }
+        allow(DefaultScenarioImporter).to receive(:import).with(kind_of(User)) { fail "Should not attempt import" }
         sign_in users(:jane)
         post :create, params: {:user => {username: 'user'}}
       end

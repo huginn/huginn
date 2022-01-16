@@ -20,7 +20,7 @@ describe Agents::DataOutputAgent do
       Agents::DataOutputAgent.async_receive agent.id, [events(:bob_website_agent_event).id]
       expect(agent.reload).to be_working
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(agent.reload).not_to be_working
     end
   end
@@ -100,7 +100,7 @@ describe Agents::DataOutputAgent do
   describe "#receive_web_request" do
     before do
       current_time = Time.now
-      stub(Time).now { current_time }
+      allow(Time).to receive(:now) { current_time }
       agents(:bob_website_agent).events.destroy_all
     end
 
@@ -151,7 +151,7 @@ describe Agents::DataOutputAgent do
       end
 
       it "can output RSS" do
-        stub(agent).feed_link { "https://yoursite.com" }
+        allow(agent).to receive(:feed_link) { "https://yoursite.com" }
         content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         expect(status).to eq(200)
         expect(content_type).to eq('application/rss+xml')
@@ -214,7 +214,7 @@ describe Agents::DataOutputAgent do
       end
 
       it "can output RSS with hub links when push_hubs is specified" do
-        stub(agent).feed_link { "https://yoursite.com" }
+        allow(agent).to receive(:feed_link) { "https://yoursite.com" }
         agent.options[:push_hubs] = %w[https://pubsubhubbub.superfeedr.com/ https://pubsubhubbub.appspot.com/]
         content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         expect(status).to eq(200)
@@ -347,7 +347,7 @@ describe Agents::DataOutputAgent do
         end
 
         it "can output RSS" do
-          stub(agent).feed_link { "https://yoursite.com" }
+          allow(agent).to receive(:feed_link) { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
@@ -391,7 +391,7 @@ describe Agents::DataOutputAgent do
         end
 
         it "can output RSS" do
-          stub(agent).feed_link { "https://yoursite.com" }
+          allow(agent).to receive(:feed_link) { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
@@ -406,7 +406,7 @@ describe Agents::DataOutputAgent do
         end
 
         it "can output RSS" do
-          stub(agent).feed_link { "https://yoursite.com" }
+          allow(agent).to receive(:feed_link) { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
@@ -424,7 +424,7 @@ describe Agents::DataOutputAgent do
         end
 
         it "can output RSS" do
-          stub(agent).feed_link { "https://yoursite.com" }
+          allow(agent).to receive(:feed_link) { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
@@ -444,7 +444,7 @@ describe Agents::DataOutputAgent do
         end
 
         it "can output RSS" do
-          stub(agent).feed_link { "https://yoursite.com" }
+          allow(agent).to receive(:feed_link) { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
@@ -462,7 +462,7 @@ describe Agents::DataOutputAgent do
         end
 
         it "can output RSS" do
-          stub(agent).feed_link { "https://yoursite.com" }
+          allow(agent).to receive(:feed_link) { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
@@ -481,7 +481,7 @@ describe Agents::DataOutputAgent do
         end
 
         it "can output RSS" do
-          stub(agent).feed_link { "https://yoursite.com" }
+          allow(agent).to receive(:feed_link) { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
@@ -502,7 +502,7 @@ describe Agents::DataOutputAgent do
         end
 
         it "can output RSS" do
-          stub(agent).feed_link { "https://yoursite.com" }
+          allow(agent).to receive(:feed_link) { "https://yoursite.com" }
           content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
           expect(status).to eq(200)
           expect(content_type).to eq('application/rss+xml')
@@ -606,7 +606,7 @@ describe Agents::DataOutputAgent do
       end
 
       it "can output RSS" do
-        stub(agent).feed_link { "https://yoursite.com" }
+        allow(agent).to receive(:feed_link) { "https://yoursite.com" }
         content, status, content_type = agent.receive_web_request({ 'secret' => 'secret1' }, 'get', 'text/xml')
         expect(status).to eq(200)
         expect(content_type).to eq('application/rss+xml')

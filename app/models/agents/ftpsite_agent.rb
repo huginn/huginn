@@ -188,13 +188,13 @@ module Agents
 
       user =
         if str = uri.user
-          URI.decode(str)
+          CGI.unescape(str)
         else
           'anonymous'
         end
       password =
         if str = uri.password
-          URI.decode(str)
+          CGI.unescape(str)
         else
           'anonymous@'
         end

@@ -19,8 +19,8 @@ describe DotHelper do
     end
 
     before do
-      stub(Agents::DotFoo).valid_type?("Agents::DotFoo") { true }
-      stub(Agents::DotBar).valid_type?("Agents::DotBar") { true }
+      allow(Agents::DotFoo).to receive(:valid_type?).with("Agents::DotFoo") { true }
+      allow(Agents::DotBar).to receive(:valid_type?).with("Agents::DotBar") { true }
     end
 
     describe "#agents_dot" do
@@ -56,7 +56,7 @@ describe DotHelper do
 
         # Fix the order of receivers
         @agents.each do |agent|
-          stub.proxy(agent).receivers { |orig| orig.order(:id) }
+          expect(agent).to receive(:receivers).and_wrap_original { |orig| orig.call.order(:id) }
         end
       end
 
