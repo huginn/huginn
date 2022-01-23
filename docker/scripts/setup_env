@@ -138,7 +138,9 @@ case "${DATABASE_ADAPTER}" in
   *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
 esac
 
-bundle install --without test development --path vendor/bundle
+bundle config set --local path vendor/bundle
+bundle config set --local without 'test development'
+bundle install
 
 # Configure the unicorn server
 sed -r config/unicorn.rb.example \
