@@ -20,7 +20,8 @@ fi
 if [[ -n "$DATABASE_URL" ]]; then
     case "${DATABASE_URL%%://*}" in
         mysql)
-            DATABASE_ADAPTER=mysql2 ;;
+            DATABASE_ADAPTER=mysql2
+            DATABASE_URL="$DATABASE_ADAPTER${DATABASE_URL#mysql}" ;;
         postgres)
             DATABASE_ADAPTER=postgresql ;;
         *)
