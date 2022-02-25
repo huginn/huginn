@@ -1,6 +1,6 @@
 ## Why run Huginn with docker
 
-You can play with or deploy Huginn inside of [docker](http://www.docker.io/).
+You can play with or deploy Huginn inside of [docker](http://www.docker.com/).
 
 Getting Huginn up and running using docker is quick and painless once you have docker installed. The docker container is suitable for production and evaluation. Huginn uses environmental variables for configuration, so rather than having a .env file, the Docker container expects variables to be passed into the launch command.
 
@@ -10,7 +10,7 @@ Getting Huginn up and running using docker is quick and painless once you have d
 
 #### OSX GUI using Kitematic
 
-1. Download and install [Kitematic](https://kitematic.com/)
+1. Download and install [Docker](https://www.docker.com/)
 * Start Kitematic and search for `huginn/huginn`
 * Click `create` and wait for the container to be downloaded and booted
 * Click on the link icon next to 'WEB PREVIEW'
