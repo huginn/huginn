@@ -17,13 +17,13 @@ GemfileHelper.load_dotenv do |dotenv_dir|
 end
 
 # Introduces a scope for gem loading based on a condition
-def if_true(condition)
+def if_true(condition, &block)
   if condition
     yield
   else
     # When not including the gems, we still want our Gemfile.lock
     # to include them, so we scope them to an unsupported platform.
-    platform :ruby_18, &proc
+    platform :ruby_18, &block
   end
 end
 
