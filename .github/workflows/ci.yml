@@ -57,6 +57,8 @@ jobs:
           BUNDLE_WITHOUT: "production"
         with:
           ruby-version: ${{ matrix.ruby }}
+          rubygems: latest
+          bundler: latest
           bundler-cache: true
 
       - name: Set up database
