@@ -111,7 +111,7 @@ module LiquidInterpolatable
 
   class Context < Liquid::Context
     def initialize(agent)
-      super({}, {}, { agent: agent }, true)
+      super({}, { '_agent_' => agent }, { agent: agent }, true)
     end
 
     def hash
