@@ -324,6 +324,8 @@ GEM
       grpc (~> 1.24)
       rly (~> 0.2.3)
     google-protobuf (3.19.2)
+    google-protobuf (3.19.2-x86_64-darwin)
+    google-protobuf (3.19.2-x86_64-linux)
     googleapis-common-protos (1.3.12)
       google-protobuf (~> 3.14)
       googleapis-common-protos-types (~> 1.2)
@@ -338,6 +340,12 @@ GEM
       os (>= 0.9, < 2.0)
       signet (~> 0.15)
     grpc (1.42.0)
+      google-protobuf (~> 3.18)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.42.0-x86_64-darwin)
+      google-protobuf (~> 3.18)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.42.0-x86_64-linux)
       google-protobuf (~> 3.18)
       googleapis-common-protos-types (~> 1.0)
     guard (2.14.1)
@@ -420,7 +428,11 @@ GEM
       actionmailer (>= 3.2)
       letter_opener (~> 1.0)
       railties (>= 3.2)
-    libv8 (7.3.492.27.1)
+    libv8-node (16.10.0.0)
+    libv8-node (16.10.0.0-aarch64-linux)
+    libv8-node (16.10.0.0-arm64-darwin)
+    libv8-node (16.10.0.0-x86_64-darwin)
+    libv8-node (16.10.0.0-x86_64-linux)
     liquid (4.0.3)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -447,8 +459,8 @@ GEM
     mini_magick (4.11.0)
     mini_mime (1.1.2)
     mini_portile2 (2.6.1)
-    mini_racer (0.2.9)
-      libv8 (>= 6.9.411)
+    mini_racer (0.6.2)
+      libv8-node (~> 16.10.0.0)
     minitest (5.15.0)
     mqtt (0.3.1)
     msgpack (1.4.2)
@@ -466,6 +478,12 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
+      racc (~> 1.4)
+    nokogiri (1.12.5-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.12.5-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.12.5-x86_64-linux)
       racc (~> 1.4)
     notiffany (0.1.1)
       nenv (~> 0.1)
@@ -717,7 +735,11 @@ GEM
     zeitwerk (2.5.3)
 
 PLATFORMS
+  aarch64-linux
+  arm64-darwin
   ruby
+  x86_64-darwin
+  x86_64-linux
 
 DEPENDENCIES
   ace-rails-ap (~> 2.0.1)
@@ -777,7 +799,7 @@ DEPENDENCIES
   listen (~> 3.0.5)
   loofah (~> 2.0)
   mini_magick (>= 4.9.4)
-  mini_racer (~> 0.2.4)
+  mini_racer
   mqtt
   multi_xml
   mysql2 (~> 0.5.2)
@@ -835,4 +857,4 @@ RUBY VERSION
    ruby 2.6.5p114
 
 BUNDLED WITH
-   2.3.5
+   2.3.10
