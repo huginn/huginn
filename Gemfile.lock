@@ -447,7 +447,7 @@ GEM
     libv8-node (16.10.0.0-arm64-darwin)
     libv8-node (16.10.0.0-x86_64-darwin)
     libv8-node (16.10.0.0-x86_64-linux)
-    liquid (5.1.0)
+    liquid (5.3.0)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
