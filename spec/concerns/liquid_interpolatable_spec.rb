@@ -430,4 +430,13 @@ HTML
       expect(@filter.group_by("some string", "anything")).to eq("some string")
     end
   end
+
+  describe '_agent_' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: 'test', options: { 'foo' => '{{bar}}' }) }
+
+    it 'computes digest values from string input' do
+      agent.options['template'] = 'name={{ _agent_.name }} foo={{ _agent_.options.foo }}'
+      expect(agent.interpolated['template']).to eq 'name=test foo={{bar}}'
+    end
+  end
 end
