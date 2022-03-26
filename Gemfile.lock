@@ -268,7 +268,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    execjs (2.7.0)
+    execjs (2.8.1)
     faraday (0.17.4)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.12.2)
@@ -784,7 +784,7 @@ DEPENDENCIES
   em-http-request (~> 1.1.2)
   erector!
   evernote_oauth
-  execjs (~> 2.7.0)
+  execjs
   faraday (~> 0.9)
   faraday_middleware (~> 0.12.2)
   feedjira (~> 3.1)

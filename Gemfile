@@ -125,7 +125,7 @@ gem 'rufus-scheduler', '~> 3.4', require: false
 gem 'sass-rails', '>= 6.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
-gem 'execjs', '~> 2.7.0'
+gem 'execjs'
 gem 'typhoeus', '~> 1.3.1'
 gem 'uglifier', '~> 2.7.2'
 gem 'bootsnap', require: false
