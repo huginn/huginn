@@ -39,7 +39,7 @@ elsif info =~ /No app specified/i
   puts "It looks like you don't have a Heroku app set up yet for this repo."
   puts "You can either exit now and run 'heroku create', or I can do it for you."
   if yes?("Would you like me to create a Heroku app for you now in this repo?")
-    puts `heroku create`
+    puts `heroku create --stack heroku-18`
     info = capture("heroku info")
   else
     puts "Okay, exiting so you can do it."
