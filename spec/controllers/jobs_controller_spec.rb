@@ -8,9 +8,7 @@ describe JobsController do
 
       Delayed::Job.create!(handler: async_handler_yaml % [agents(:jane_website_agent).id])
       Delayed::Job.create!(handler: async_handler_yaml % [agents(:bob_website_agent).id])
-      Delayed::Job.create!(handler: async_handler_yaml % [agents(:jane_weather_agent).id])
       agents(:jane_website_agent).destroy
-      Delayed::Job.create!(handler: async_handler_yaml % [agents(:bob_weather_agent).id], locked_at: Time.now, locked_by: 'test')
 
       expect(Delayed::Job.count).to be > 0
     end

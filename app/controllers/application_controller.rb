@@ -28,8 +28,7 @@ class ApplicationController < ActionController::Base
 
   def upgrade_warning
     return unless current_user
-    twitter_oauth_check
-    outdated_google_auth_check
+    false
   end
 
   def filtered_agent_return_link(options = {})
@@ -48,20 +47,7 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def twitter_oauth_check
-    unless Devise.omniauth_providers.include?(:twitter)
-      if @twitter_agent = current_user.agents.where("type like 'Agents::Twitter%'").first
-        @twitter_oauth_key    = @twitter_agent.options['consumer_key'].presence || @twitter_agent.credential('twitter_consumer_key')
-        @twitter_oauth_secret = @twitter_agent.options['consumer_secret'].presence || @twitter_agent.credential('twitter_consumer_secret')
-      end
-    end
-  end
 
-  def outdated_google_auth_check
-    @outdated_google_cal_agents = current_user.agents.of_type('Agents::GoogleCalendarPublishAgent').select do |agent|
-      agent.options['google']['key_secret'].present?
-    end
-  end
 
   def agent_params
     return {} unless params[:agent]

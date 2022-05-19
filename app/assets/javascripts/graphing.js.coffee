@@ -1,5 +1,4 @@
-#= require d3
-#= require rickshaw
+#= require rickshaw_with_d3
 #= require_self
 
 # This is not included in the core application.js bundle.

@@ -8,7 +8,6 @@ unless defined?(Spring)
   require 'bundler'
 
   require_relative '../lib/gemfile_helper.rb'
-  GemfileHelper.load_dotenv
 
   if ENV['SPRING']
     lockfile = Bundler::LockfileParser.new(Bundler.default_lockfile.read)

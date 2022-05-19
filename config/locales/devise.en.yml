@@ -27,7 +27,6 @@ en:
       failure: "Could not authenticate you from %{kind} because \"%{reason}\"."
       success: "Successfully authenticated from %{kind} account."
     omniauth_providers:
-      twitter: "Twitter"
       tumblr: "Tumblr"
       github: "GitHub"
       dropbox: "Dropbox"

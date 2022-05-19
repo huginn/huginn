@@ -22,8 +22,8 @@
 
       <% if @event.lat && @event.lng %>
         <% content_for :head do -%>
-<%= javascript_include_tag "https://maps.googleapis.com/maps/api/js?key=#{@event.agent.options[:api_key]}" %>
-<%= javascript_include_tag "map_marker" %>
+            <%= javascript_include_tag "https://maps.googleapis.com/maps/api/js?key=#{@event.agent.options[:api_key]}" %>
+            <%= javascript_include_tag "map_marker" %>
         <% end -%>
 
         <p>

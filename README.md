@@ -10,12 +10,11 @@ Huginn is a system for building agents that perform automated tasks for you onli
 
 #### Here are some of the things that you can do with Huginn:
 
-* Track the weather and get an email when it's going to rain (or snow) tomorrow ("Don't forget your umbrella!")
 * List terms that you care about and receive email when their occurrence on Twitter changes.  (For example, want to know when something interesting has happened in the world of Machine Learning?  Huginn will watch the term "machine learning" on Twitter and tell you when there is a spike in discussion.)
 * Watch for air travel or shopping deals
 * Follow your project names on Twitter and get updates when people mention them
 * Scrape websites and receive email when they change
-* Connect to Adioso, HipChat, Growl, FTP, IMAP, Jabber, JIRA, MQTT, nextbus, Pushbullet, Pushover, RSS, Bash, Slack, StubHub, translation APIs, Twilio, Twitter, and Weibo, to name a few.
+* Connect to Adioso, HipChat, Growl, FTP, IMAP, JIRA, MQTT, nextbus, Pushbullet, Pushover, RSS, Bash, Slack, StubHub, translation APIs, Twilio, Twitter, and Weibo, to name a few.
 * Send digest email with things that you care about at specific times during the day
 * Track counts of high frequency events and send an SMS within moments when they spike, such as the term "san francisco emergency"
 * Send and receive WebHooks
@@ -139,12 +138,6 @@ Have a look at the [installation guide](https://github.com/huginn/huginn/blob/ma
 #### Setup for private development
 
 See [private development instructions](https://github.com/huginn/huginn/wiki/Private-development-instructions) on the wiki.
-
-#### Enable the WeatherAgent
-
-In order to use the WeatherAgent you need an [API key with Wunderground](http://www.wunderground.com/weather/api/). Signup for one and then change the value of `api_key: your-key` in your seeded WeatherAgent.
-
-Note, Wunderground no longer offers free API keys. You can still use the WeatherAgent by setting the service key to darksky, and getting an [API key from DarkSky](https://darksky.net/dev).
 
 #### Disable SSL
 

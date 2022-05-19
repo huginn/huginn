@@ -7,7 +7,7 @@ class ScenarioImport
   include ActiveModel::Callbacks
   include ActiveModel::Validations::Callbacks
 
-  DANGEROUS_AGENT_TYPES = %w[Agents::ShellCommandAgent]
+  DANGEROUS_AGENT_TYPES = %w[]
   URL_REGEX = /\Ahttps?:\/\//i
 
   attr_accessor :file, :url, :data, :do_import, :merges

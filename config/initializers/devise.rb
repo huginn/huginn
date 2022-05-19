@@ -235,49 +235,6 @@ Devise.setup do |config|
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
 
-  if defined?(OmniAuth::Strategies::Twitter) &&
-     (key = ENV["TWITTER_OAUTH_KEY"]).present? &&
-     (secret = ENV["TWITTER_OAUTH_SECRET"]).present?
-    config.omniauth :twitter, key, secret, authorize_params: {force_login: 'true', use_authorize: 'true'}
-  end
-
-  if defined?(OmniAuth::Strategies::Tumblr) &&
-     (key = ENV["TUMBLR_OAUTH_KEY"]).present? &&
-     (secret = ENV["TUMBLR_OAUTH_SECRET"]).present?
-    config.omniauth :'tumblr', key, secret
-  end
-
-  if defined?(OmniAuth::Strategies::DropboxOauth2) &&
-     (key = ENV["DROPBOX_OAUTH_KEY"]).present? &&
-     (secret = ENV["DROPBOX_OAUTH_SECRET"]).present?
-    config.omniauth :dropbox, key, secret, strategy_class: OmniAuth::Strategies::DropboxOauth2, request_path: '/auth/dropbox', callback_path: '/auth/dropbox/callback'
-  end
-
-  if defined?(OmniAuth::Strategies::Evernote) &&
-    (key = ENV["EVERNOTE_OAUTH_KEY"]).present? &&
-    (secret = ENV["EVERNOTE_OAUTH_SECRET"]).present?
-
-    if ENV["USE_EVERNOTE_SANDBOX"] == "true"
-      config.omniauth :evernote, key, secret, client_options: { :site => 'https://sandbox.evernote.com' }
-    else
-      config.omniauth :evernote, key, secret
-    end
-  end
-
-  if defined?(OmniAuth::Strategies::GoogleOauth2) &&
-      (key = ENV["GOOGLE_CLIENT_ID"]).present? &&
-      (secret = ENV["GOOGLE_CLIENT_SECRET"]).present?
-    config.omniauth :google_oauth2, key, secret, {
-      name: :google,
-      scope: [
-        'userinfo.email',
-        'userinfo.profile',
-        'https://mail.google.com/', # ImapFolderAgent
-      ].join(','),
-      access_type: 'offline',
-      prompt: 'consent'
-    }
-  end
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or

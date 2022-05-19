@@ -2,7 +2,6 @@ require 'cgi'
 require 'json'
 require 'rufus-scheduler'
 require 'pp'
-require 'twitter'
 
 class AgentRunner
   @@agents = []
@@ -116,8 +115,6 @@ class AgentRunner
   end
 end
 
-require 'agents/twitter_stream_agent'
-require 'agents/jabber_agent'
 require 'agents/local_file_agent'
 require 'huginn_scheduler'
 require 'delayed_job_worker'

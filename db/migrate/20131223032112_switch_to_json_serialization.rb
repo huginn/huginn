@@ -23,18 +23,7 @@ class SwitchToJsonSerialization < ActiveRecord::Migration[4.2]
     end
   end
 
-  def set_to_utf8
-    if mysql?
-      %w[agent_logs agents delayed_jobs events links users].each do |table_name|
-        quoted_table_name = ActiveRecord::Base.connection.quote_table_name(table_name)
-        execute "ALTER TABLE #{quoted_table_name} CONVERT TO CHARACTER SET utf8"
-      end
-    end
-  end
 
-  def mysql?
-    ActiveRecord::Base.connection.adapter_name =~ /mysql/i
-  end
 
   def data_exists?
     events = ActiveRecord::Base.connection.select_rows("SELECT count(*) FROM #{ActiveRecord::Base.connection.quote_table_name("events")}").first.first.to_i

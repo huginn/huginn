@@ -17,11 +17,5 @@ ActiveSupport.on_load(:delayed_job_active_record) do
     scope :failed_jobs, -> { where("failed_at IS NOT NULL") }
   end
 
-  database_deadlocks_when_using_optimized_strategy = lambda do
-    ENV["DATABASE_ADAPTER"] == "mysql2"
-  end
 
-  Delayed::Backend::ActiveRecord.configure do |config|
-    config.reserve_sql_strategy = :default_sql
-  end if database_deadlocks_when_using_optimized_strategy.call
 end

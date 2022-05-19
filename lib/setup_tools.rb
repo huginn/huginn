@@ -1,8 +1,7 @@
-require 'open3'
-require 'io/console'
-require 'securerandom'
-require 'shellwords'
-require 'active_support/core_ext/object/blank'
+require "open3"
+require "io/console"
+require "securerandom"
+require "active_support/core_ext/object/blank"
 
 module SetupTools
   def capture(cmd, opts = {})
@@ -20,7 +19,7 @@ module SetupTools
     if config_data !~ /has no config vars/
       config_data.split("\n").map do |line|
         next if line =~ /^\s*(#|$)/ # skip comments and empty lines
-        first_equal_sign = line.index('=')
+        first_equal_sign = line.index("=")
         raise "Invalid line found in config: #{line}" unless first_equal_sign
         $config[line.slice(0, first_equal_sign)] = line.slice(first_equal_sign + 1, line.length)
       end
@@ -32,26 +31,26 @@ module SetupTools
       puts
       puts "Your current config:"
       $config.each do |key, value|
-        puts '  ' + key + ' ' * (25 - [key.length, 25].min) + '= ' + value
+        puts "  " + key + " " * (25 - [key.length, 25].min) + "= " + value
       end
     end
   end
 
   def set_defaults!
-    unless $config['APP_SECRET_TOKEN']
+    unless $config["APP_SECRET_TOKEN"]
       puts "Setting up APP_SECRET_TOKEN..."
-      set_value 'APP_SECRET_TOKEN', SecureRandom.hex(64)
+      set_value "APP_SECRET_TOKEN", SecureRandom.hex(64)
     end
-    set_value 'RAILS_ENV', "production"
-    set_value 'FORCE_SSL', "true"
-    set_value 'USE_GRAPHVIZ_DOT', 'dot'
-    unless $config['INVITATION_CODE']
+    set_value "RAILS_ENV", "production"
+    set_value "FORCE_SSL", "true"
+    set_value "USE_GRAPHVIZ_DOT", "dot"
+    unless $config["INVITATION_CODE"]
       puts "You need to set an invitation code for your Huginn instance.  If you plan to share this instance, you will"
       puts "tell this code to anyone who you'd like to invite.  If you won't share it, then just set this to something"
       puts "that people will not guess."
 
       invitation_code = nag("What code would you like to use?")
-      set_value 'INVITATION_CODE', invitation_code
+      set_value "INVITATION_CODE", invitation_code
     end
   end
 
@@ -64,7 +63,7 @@ module SetupTools
 
   # expects set_env(key, value) to be defined.
   def set_value(key, value, options = {})
-    if $config[key].nil? || $config[key] == '' || ($config[key] != value && options[:force] != false)
+    if $config[key].nil? || $config[key] == "" || ($config[key] != value && options[:force] != false)
       puts "Setting #{key} to #{value}" unless options[:silent]
       puts set_env(key, value)
       $config[key] = value
@@ -78,7 +77,7 @@ module SetupTools
   end
 
   def nag(question, opts = {})
-    answer = ''
+    answer = ""
     while answer.length == 0
       answer = ask(question, opts)
     end

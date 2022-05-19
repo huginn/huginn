@@ -1,0 +1,27 @@
+# Docker-compose for the 0.24.3 overrides (lastest)
+
+version: "3"
+services:
+  pg:
+    container_name: huginn_db
+    image: postgres:14
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=DEV-Eem3aim7TaiphohS1oopee7oophul1Th
+      - POSTGRES_USER=huginn
+      - POSTGRES_DB=huginn_lite
+    ports:
+      - "5400:5432"
+
+  mailer:  
+    image: tophfr/mailcatcher
+    ports:
+      - "1080:80"
+
+
+volumes:
+  pg-data: {}
+networks:
+  private:
+    internal: true
