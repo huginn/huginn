@@ -432,16 +432,16 @@ EOF
         agent.options['event_limit'] = 'five days'
         result = agent.receive_web_request params, method, format
 
-        expect(result[0].include?("Howard Roark")).to eq(true)
-        expect(result[0].include?("Dagny Taggart")).to eq(true)
-        expect(result[0].include?("John Galt")).to eq(true)
+        expect(result[0]).to include("Howard Roark")
+        expect(result[0]).to include("Dagny Taggart")
+        expect(result[0]).to include("John Galt")
 
         agent.options['event_limit'] = '5 quibblequarks'
         result = agent.receive_web_request params, method, format
 
-        expect(result[0].include?("Howard Roark")).to eq(true)
-        expect(result[0].include?("Dagny Taggart")).to eq(true)
-        expect(result[0].include?("John Galt")).to eq(true)
+        expect(result[0]).to include("Howard Roark")
+        expect(result[0]).to include("Dagny Taggart")
+        expect(result[0]).to include("John Galt")
       end
 
       describe "but the mode was set to last X events with the wrong casing" do
@@ -450,9 +450,9 @@ EOF
 
         it "should still work as last x events" do
           result = agent.receive_web_request params, method, format
-          expect(result[0].include?("Howard Roark")).to eq(true)
-          expect(result[0].include?("Dagny Taggart")).to eq(true)
-          expect(result[0].include?("John Galt")).to eq(true)
+          expect(result[0]).to include("Howard Roark")
+          expect(result[0]).to include("Dagny Taggart")
+          expect(result[0]).to include("John Galt")
         end
 
       end
