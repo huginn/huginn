@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-: ${DOCKER_IMAGE:=huginn/huginn}
+: ${DOCKER_IMAGE:=aroberts/huginn}
 : ${DOCKER_IMAGE_TAG:=${GITHUB_SHA:-$(git rev-parse HEAD)}}
 : ${DOCKERFILE:=docker/multi-process/Dockerfile}
 
