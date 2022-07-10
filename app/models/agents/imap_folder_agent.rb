@@ -23,6 +23,8 @@ module Agents
 
       List the names of folders to check in `folders`.
 
+      Specify an array of MIME types in 'mime_types' to tell which non-attachment part of a mail among its `text/*` parts should be used as mail body.  The default value is `['text/plain', 'text/enriched', 'text/html']`.
+
       To narrow mails by conditions, build a `conditions` hash with the following keys:
 
       - `subject`
@@ -31,7 +33,7 @@ module Agents
 
           Use the `(?i)` directive for case-insensitive search.  For example, a pattern `(?i)alert` will match "alert", "Alert"or "ALERT".  You can also make only a part of a pattern to work case-insensitively: `Re: (?i:alert)` will match either "Re: Alert" or "Re: alert", but not "RE: alert".
 
-          When a mail has multiple non-attachment text parts, they are prioritized according to the `mime_types` option (which see below) and the first part that matches a "body" pattern, if specified, will be chosen as the "body" value in a created event.
+          When a mail has multiple non-attachment text parts, they are prioritized according to the `mime_types` option (as mentioned above) and the first part that matches a "body" pattern, if specified, will be chosen as the "body" value in a created event.
 
           Named captures will appear in the "matches" hash in a created event.
 
@@ -41,9 +43,6 @@ module Agents
           Patterns match addresses in case insensitive manner.
 
           Multiple pattern strings can be specified in an array, in which case a mail is selected if any of the patterns matches. (i.e. patterns are OR'd)
-
-      - `mime_types`
-          Specify an array of MIME types to tell which non-attachment part of a mail among its text/* parts should be used as mail body.  The default value is `['text/plain', 'text/enriched', 'text/html']`.
 
       - `is_unread`
           Setting this to true or false means only mails that is marked as unread or read respectively, are selected.
