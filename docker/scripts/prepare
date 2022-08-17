@@ -23,7 +23,7 @@ minimal_apt_get_install='apt-get install -y --no-install-recommends'
 apt-get update
 apt-get dist-upgrade -y --no-install-recommends
 $minimal_apt_get_install software-properties-common
-add-apt-repository -y ppa:brightbox/ruby-ng
+add-apt-repository -y ppa:brightbox/ruby-ng-experimental
 apt-get update
 $minimal_apt_get_install build-essential checkinstall git-core \
   zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev \
