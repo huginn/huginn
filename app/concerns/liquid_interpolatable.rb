@@ -96,7 +96,7 @@ module LiquidInterpolatable
 
   def interpolated(self_object = nil)
     interpolate_with(self_object) do
-      (@interpolated_cache ||= {})[[options, interpolation_context]] ||=
+      (@interpolated_cache ||= {})[[options, interpolation_context].hash] ||=
         interpolate_options(options)
     end
   end
