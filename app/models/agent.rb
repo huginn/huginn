@@ -129,9 +129,9 @@ class Agent < ActiveRecord::Base
   def credential(name)
     @credential_cache ||= {}
     if @credential_cache.has_key?(name)
-      @credential_cache[name]
+      interpolate_string(@credential_cache[name])
     else
-      @credential_cache[name] = user.user_credentials.where(:credential_name => name).first.try(:credential_value)
+      interpolate_string(@credential_cache[name] = user.user_credentials.where(:credential_name => name).first.try(:credential_value))
     end
   end
 
