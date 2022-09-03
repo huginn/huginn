@@ -64,54 +64,48 @@ If you just want to play around, then perform the following steps:
 1. Double check your Ruby, the recommended version is `2.7.6` as newer versions tend to fail during bundle.
 2. Clone this repository and enter the project directory.
 3. The app uses environmental variables. Make sure to create an `.env` file with our sample `.env.example` as a base.
+   ```bash
+   cp .env.example .env
+   ```
 
-```bash
-cp .env.example .env
-```
+   Make sure you have [PostgreSQL](https://www.postgresql.org/download/) or [MySQL](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/) installed. MySQL is set by default. If you're using PostgreSQL then make sure to set the `DATABASE_ADAPTER` variable from `.env` to `postgresql`
 
-Make sure you have [PostgreSQL](https://www.postgresql.org/download/) or [MySQL](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/) installed. MySQL is set by default. If you're using PostgreSQL then make sure to set the `DATABASE_ADAPTER` variable from `.env` to `postgresql`
+   ```
+   DATABASE_ADAPTER=postgresql
+   ```
 
-```
-DATABASE_ADAPTER=postgresql
-```
+   Don't forget to fill in your database username and password.
 
-Don't forget to fill in your database username and password.
-
-```
-DATABASE_USERNAME=your_username_here
-DATABASE_PASSWORD=your_password_here
-```
-
+   ```
+   DATABASE_USERNAME=your_username_here
+   DATABASE_PASSWORD=your_password_here
+   ```
 4. Install gem dependencies.
+   ```bash
+   bundle install
+   ```
 
-```bash
-bundle install
-```
-
-* If you get a [mimemagic build error](https://replayable.io/replay/630d064eeb7cb90064a541b7/?share=WTWQtUNucvgYSIlSlN4tA), you may need to install `shared-mime-info` first: If the host is macOS, you may need to run `brew install shared-mime-info`; if the host is Ubuntu or Debian, you may need to run `apt-get install shared-mime-info`.
+   If you get a [mimemagic build error](https://replayable.io/replay/630d064eeb7cb90064a541b7/?share=WTWQtUNucvgYSIlSlN4tA), you may need to install `shared-mime-info` first: If the host is macOS, you may need to run `brew install shared-mime-info`; if the host is Ubuntu or Debian, you may need to run `apt-get install shared-mime-info`.
 
 5. Generate a secret token.
-
-```bash
-rake secret
-```
-[Copy the output and update](https://replayable.io/replay/630cfd6eeb7cb90064a541b6/?share=Z2kTuu23NZCRMh4A1zKD2w) the `APP_SECRET_TOKEN` variable from `.env`.
+   ```bash
+   rake secret
+   ```
+   [Copy the output and update](https://replayable.io/replay/630cfd6eeb7cb90064a541b6/?share=Z2kTuu23NZCRMh4A1zKD2w) the `APP_SECRET_TOKEN` variable from `.env`.
 
 6. Create the database and run migrations. Don't forget to seed example Agents.
-
-```bash
-rake db:create && rake db:migrate && rake db:seed
-```
+   ```bash
+   rake db:create && rake db:migrate && rake db:seed
+   ```
 
 7. Start the server via foreman
-
-```bash
-bundle exec foreman start
-```
+   ```bash
+   bundle exec foreman start
+   ```
 
 8. Everything should work. You can visit the app at [http://localhost:3000/](http://localhost:3000/) and login with the username of `admin` and the password of `password`.
 
-Don't forget to check out the [wiki](https://github.com/huginn/huginn/wiki) for usage examples.
+   Don't forget to check out the [wiki](https://github.com/huginn/huginn/wiki) for usage examples.
 
 ### Develop
 
