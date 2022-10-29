@@ -33,6 +33,7 @@ $minimal_apt_get_install build-essential checkinstall git-core \
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 gem update --system --no-document
+gem update bundler --conservative --no-document
 
 apt-get purge -y python3* rsyslog rsync manpages
 apt-get -y clean
