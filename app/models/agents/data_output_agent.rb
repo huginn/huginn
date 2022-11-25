@@ -25,6 +25,7 @@ module Agents
           * `template` - A JSON object representing a mapping between item output keys and incoming event values.  Use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to format the values.  Values of the `link`, `title`, `description` and `icon` keys will be put into the \\<channel\\> section of RSS output.  Value of the `self` key will be used as URL for this feed itself, which is useful when you serve it via reverse proxy.  The `item` key will be repeated for every Event.  The `pubDate` key for each item will have the creation time of the Event unless given.
           * `events_to_show` - The number of events to output in RSS or JSON. (default: `40`)
           * `ttl` - A value for the \\<ttl\\> element in RSS output. (default: `60`)
+          * `ns_dc` - Add [DCMI Metadata Terms namespace](http://purl.org/dc/elements/1.1/) in output xml
           * `ns_media` - Add [yahoo media namespace](https://en.wikipedia.org/wiki/Media_RSS) in output xml
           * `ns_itunes` - Add [itunes compatible namespace](http://lists.apple.com/archives/syndication-dev/2005/Nov/msg00002.html) in output xml
           * `rss_content_type` - Content-Type for RSS output (default: `application/rss+xml`)
@@ -180,6 +181,9 @@ module Agents
     def xml_namespace
       namespaces = ['xmlns:atom="http://www.w3.org/2005/Atom"']
 
+      if (boolify(interpolated['ns_dc']))
+        namespaces << 'xmlns:dc="http://purl.org/dc/elements/1.1/"'
+      end
       if (boolify(interpolated['ns_media']))
         namespaces << 'xmlns:media="http://search.yahoo.com/mrss/"'
       end
