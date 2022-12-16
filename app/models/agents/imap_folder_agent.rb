@@ -5,6 +5,7 @@ require 'mail'
 
 module Agents
   class ImapFolderAgent < Agent
+    include GoogleOauth2Concern
     include EventHeadersConcern
 
     cannot_receive_events!
@@ -16,11 +17,13 @@ module Agents
     description <<-MD
       The Imap Folder Agent checks an IMAP server in specified folders and creates Events based on new mails found since the last run. In the first visit to a folder, this agent only checks for the initial status and does not create events.
 
-      Specify an IMAP server to connect with `host`, and set `ssl` to true if the server supports IMAP over SSL.  Specify `port` if you need to connect to a port other than standard (143 or 993 depending on the `ssl` value).
+      Specify an IMAP server to connect with `host`, and set `ssl` to true if the server supports IMAP over SSL.  Specify `port` if you need to connect to a port other than standard (143 or 993 depending on the `ssl` value), and specify login credentials in `username` and `password`.
 
-      Specify login credentials in `username` and `password`.
+      Alternatively, if you want to use Gmail, go to the Services page and authenticate with Google beforehand, and then select the service.  In this case, `host`, `ssl`, `port`, `username` and `password` are unnecessary and will be ignored.
 
       List the names of folders to check in `folders`.
+
+      Specify an array of MIME types in 'mime_types' to tell which non-attachment part of a mail among its `text/*` parts should be used as mail body.  The default value is `['text/plain', 'text/enriched', 'text/html']`.
 
       To narrow mails by conditions, build a `conditions` hash with the following keys:
 
@@ -30,7 +33,7 @@ module Agents
 
           Use the `(?i)` directive for case-insensitive search.  For example, a pattern `(?i)alert` will match "alert", "Alert"or "ALERT".  You can also make only a part of a pattern to work case-insensitively: `Re: (?i:alert)` will match either "Re: Alert" or "Re: alert", but not "RE: alert".
 
-          When a mail has multiple non-attachment text parts, they are prioritized according to the `mime_types` option (which see below) and the first part that matches a "body" pattern, if specified, will be chosen as the "body" value in a created event.
+          When a mail has multiple non-attachment text parts, they are prioritized according to the `mime_types` option (as mentioned above) and the first part that matches a "body" pattern, if specified, will be chosen as the "body" value in a created event.
 
           Named captures will appear in the "matches" hash in a created event.
 
@@ -40,9 +43,6 @@ module Agents
           Patterns match addresses in case insensitive manner.
 
           Multiple pattern strings can be specified in an array, in which case a mail is selected if any of the patterns matches. (i.e. patterns are OR'd)
-
-      - `mime_types`
-          Specify an array of MIME types to tell which non-attachment part of a mail among its text/* parts should be used as mail body.  The default value is `['text/plain', 'text/enriched', 'text/html']`.
 
       - `is_unread`
           Setting this to true or false means only mails that is marked as unread or read respectively, are selected.
@@ -120,10 +120,12 @@ module Agents
     end
 
     def validate_options
-      %w[host username password].each { |key|
-        String === options[key] or
-          errors.add(:base, '%s is required and must be a string' % key)
-      }
+      if !service
+        %w[host username password].each { |key|
+          String === options[key] or
+            errors.add(:base, '%s is required and must be a string' % key)
+        }
+      end
 
       if options['port'].present?
         errors.add(:base, "port must be a positive integer") unless is_positive_integer?(options['port'])
@@ -207,6 +209,11 @@ module Agents
       if options['expected_update_period_in_days'].present?
         errors.add(:base, "Invalid expected_update_period_in_days format") unless is_positive_integer?(options['expected_update_period_in_days'])
       end
+    end
+
+    def validate_service
+      # Override Oauthable#validate_service; service is optional in
+      # this agent.
     end
 
     def check
@@ -325,14 +332,27 @@ module Agents
     end
 
     def each_unread_mail
-      host, port, ssl, username = interpolated.values_at(:host, :port, :ssl, :username)
+      if service
+        host = 'imap.gmail.com'
+        port = 993
+        ssl = true
+        username = google_oauth2_email
+        password = google_oauth2_access_token
+      else
+        host, port, ssl, username = interpolated.values_at(:host, :port, :ssl, :username)
+        password = interpolated[:password]
+      end
       ssl = boolify(ssl)
       port = (Integer(port) if port.present?)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
       Client.open(host, port: port, ssl: ssl) { |imap|
         log "Logging in as #{username}"
-        imap.login(username, interpolated[:password])
+        if service
+          imap.authenticate('XOAUTH2', username, password)
+        else
+          imap.login(username, password)
+        end
 
         # 'lastseen' keeps a hash of { uidvalidity => lastseenuid, ... }
         lastseen, seen = self.lastseen, self.make_seen

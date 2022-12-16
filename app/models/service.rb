@@ -31,19 +31,23 @@ class Service < ActiveRecord::Base
     end
   end
 
+  def refresh_token_parameters
+    {
+      grant_type: 'refresh_token',
+      client_id:     oauth_key,
+      client_secret: oauth_secret,
+      refresh_token: refresh_token
+    }
+  end
+
   def refresh_token!
-    response = HTTParty.post(endpoint, query: {
-                  type:          'refresh',
-                  client_id:     oauth_key,
-                  client_secret: oauth_secret,
-                  refresh_token: refresh_token
-    })
+    response = HTTParty.post(endpoint, query: refresh_token_parameters)
     data = JSON.parse(response.body)
     update(expires_at: Time.now + data['expires_in'], token: data['access_token'], refresh_token: data['refresh_token'].presence || refresh_token)
   end
 
   def endpoint
-    client_options = "OmniAuth::Strategies::#{OmniAuth::Utils.camelize(self.provider)}".constantize.default_options['client_options']
+    client_options =  Devise.omniauth_configs[provider.to_sym].strategy_class.default_options['client_options']
     URI.join(client_options['site'], client_options['token_url'])
   end
 
@@ -84,7 +88,10 @@ class Service < ActiveRecord::Base
     {name: omniauth['info']['nickname'] || omniauth['info']['name']}
   end
 
-  register_options_provider('37signals') do |omniauth|
-    {user_id: omniauth['extra']['accounts'][0]['id'], name: omniauth['info']['name']}
+  register_options_provider('google') do |omniauth|
+    {
+      email: omniauth['info']['email'],
+      name: "#{omniauth['info']['name']} <#{omniauth['info']['email']}>"
+    }
   end
 end

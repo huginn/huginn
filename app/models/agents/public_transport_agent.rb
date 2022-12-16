@@ -56,8 +56,12 @@ module Agents
     MD
 
     def check_url
-      stop_query = URI.encode(interpolated["stops"].collect{|a| "&stops=#{a}"}.join)
-      "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=#{interpolated["agency"]}#{stop_query}"
+      query = URI.encode_www_form([
+        ["command", "predictionsForMultiStops"],
+        ["a", interpolated["agency"]],
+        *interpolated["stops"].map { |a| ["stops", a] }
+      ])
+      "http://webservices.nextbus.com/service/publicXMLFeed?#{query}"
     end
 
     def stops

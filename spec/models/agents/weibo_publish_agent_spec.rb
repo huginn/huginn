@@ -24,9 +24,9 @@ describe Agents::WeiboPublishAgent do
 
     @sent_messages = []
     @sent_pictures = []
-    stub.any_instance_of(Agents::WeiboPublishAgent).publish_tweet { |message| @sent_messages << message}
-    stub.any_instance_of(Agents::WeiboPublishAgent).publish_tweet_with_pic { |message, picture| @sent_pictures << picture}
-    stub.any_instance_of(Agents::WeiboPublishAgent).sleep
+    allow_any_instance_of(Agents::WeiboPublishAgent).to receive(:publish_tweet) { |agent, message| @sent_messages << message}
+    allow_any_instance_of(Agents::WeiboPublishAgent).to receive(:publish_tweet_with_pic) { |agent, message, picture| @sent_pictures << picture}
+    allow_any_instance_of(Agents::WeiboPublishAgent).to receive(:sleep)
   end
 
   describe '#receive' do
@@ -99,7 +99,7 @@ describe Agents::WeiboPublishAgent do
       Agents::WeiboPublishAgent.async_receive(@checker.id, [@event.id])
       expect(@checker.reload).to be_working # Just received events
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(@checker.reload).not_to be_working # More time has passed than the expected receive period without any new events
     end
   end

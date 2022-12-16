@@ -41,4 +41,11 @@ Huginn::Application.configure do
 
   config.action_mailer.default_url_options = { host: ENV['DOMAIN'] || 'localhost' }
   config.action_mailer.perform_deliveries = true
+
+  if ENV['CI']
+    config.eager_load = true
+    config.assets.debug = false
+    config.assets.compile = true
+    config.assets.digest = true
+  end
 end

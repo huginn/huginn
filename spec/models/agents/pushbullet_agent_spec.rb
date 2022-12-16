@@ -80,19 +80,19 @@ describe Agents::PushbulletAgent do
 
   describe '#validate_api_key' do
     it "should return true when working" do
-      mock(@checker).devices
+      expect(@checker).to receive(:devices)
       expect(@checker.validate_api_key).to be_truthy
     end
 
     it "should return true when working" do
-      mock(@checker).devices { raise Agents::PushbulletAgent::Unauthorized }
+      expect(@checker).to receive(:devices) { raise Agents::PushbulletAgent::Unauthorized }
       expect(@checker.validate_api_key).to be_falsy
     end
   end
 
   describe '#complete_device_id' do
     it "should return an array" do
-      mock(@checker).devices { [{'iden' => '12345', 'nickname' => 'huginn'}] }
+      expect(@checker).to receive(:devices) { [{'iden' => '12345', 'nickname' => 'huginn'}] }
       expect(@checker.complete_device_id).to eq([{:text=>"All Devices", :id=>"__ALL__"}, {:text=>"huginn", :id=>"12345"}])
     end
   end
@@ -103,7 +103,7 @@ describe Agents::PushbulletAgent do
         with(basic_auth: [@checker.options[:api_key], ''],
              body: "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
         to_return(status: 200, body: "{}", headers: {})
-      dont_allow(@checker).error
+      expect(@checker).not_to receive(:error)
       @checker.receive([@event])
     end
 
@@ -112,7 +112,7 @@ describe Agents::PushbulletAgent do
         with(basic_auth: [@checker.options[:api_key], ''],
              body: "device_iden=124&type=note&title=hello%20from%20huginn&body=One%20two%20test").
         to_return(status: 200, body: '{"error": {"message": "error"}}', headers: {})
-      mock(@checker).error("error")
+      expect(@checker).to receive(:error).with("error")
       @checker.receive([@event])
     end
   end
@@ -136,7 +136,7 @@ describe Agents::PushbulletAgent do
     end
 
     it "should return an empty array on error" do
-      stub(@checker).request { raise Agents::PushbulletAgent::Unauthorized }
+      allow(@checker).to receive(:request) { raise Agents::PushbulletAgent::Unauthorized }
       expect(@checker.send(:devices)).to eq([])
     end
   end

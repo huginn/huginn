@@ -46,7 +46,7 @@ up-to-date and install it.
 
 Install the required packages (needed to compile Ruby and native extensions to Ruby gems):
 
-    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz jq
+    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz jq shared-mime-info
 
 
 ### Debian Stretch
@@ -72,20 +72,16 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.bz2 | tar xj
-    cd ruby-2.6.5
+    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.6.tar.bz2 | tar xj
+    cd ruby-2.7.6
     ./configure --disable-install-rdoc
     make -j`nproc`
     sudo make install
 
-Install the bundler and foreman gems:
-
-    sudo gem install rake foreman --no-document
-    sudo gem install bundler -v '< 2' --no-document
-
-Update rubygems:
+Update rubygems and install foreman:
 
     sudo gem update --system --no-document
+    sudo gem install foreman --no-document
 
 ## 3. System Users
 
@@ -100,7 +96,9 @@ Install the database packages
     sudo apt-get install -y mysql-server mysql-client libmysqlclient-dev
 
 For Debian Stretch, replace `libmysqlclient-dev` with `default-libmysqlclient-dev`. See the [additional notes section](#additional-notes) for more information.
-
+For Debian BullEye:
+    sudo apt-get install -y default-mysql-server default-mysql-client default-libmysqlclient-dev
+    
 Check the installed MySQL version (remember if its >= 5.5.3 for the `.env` configuration done later):
 
     mysql --version
@@ -133,6 +131,7 @@ Grant the Huginn user necessary permissions on the database
     mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, LOCK TABLES ON `huginn_production`.* TO 'huginn'@'localhost';
 
 Use the flush privileges command to save the new permissions
+
     mysql> FLUSH PRIVILEGES;
 
 Quit the database session
@@ -387,7 +386,7 @@ This file should be empty, it is the first place to look because `nginx` is the 
 
 Common problems:
 
-* `connect() to unix:/home/huginn/huginn/tmp/sockets/unicorn.socket failed`: The Unicorn application server is not running, ensure you uncommented one of the example configuration below the `PRODUCTION` label in your [Profile](#install-init-script) and the unicorn config file (`/home/huginn/huginn/config/unicorn.rb`) exists.
+* `connect() to unix:/home/huginn/huginn/tmp/sockets/unicorn.socket failed`: The Unicorn application server is not running, ensure you uncommented one of the example configuration below the `PRODUCTION` label in your [Procfile](#install-init-script) and the unicorn config file (`/home/huginn/huginn/config/unicorn.rb`) exists.
 * `138 open() "/home/huginn/huginn/public/..." failed (13: Permission denied)`: The `/home/huginn/huginn/public` directory needs to be readable by the nginx user (which is per default `www-data`)
 
 

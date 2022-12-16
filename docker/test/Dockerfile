@@ -19,7 +19,10 @@ RUN apt-get update && \
     curl -Ls https://bitbucket.org/ariya/phantomjs/downloads/${PHANTOM_JS}.tar.bz2 \
       | tar jxvf - --strip-components=2 -C /usr/local/bin/ ${PHANTOM_JS}/bin/phantomjs
 
-RUN LC_ALL=en_US.UTF-8 ON_HEROKU=true bundle install --with test development --path vendor/bundle -j 4
+RUN export LC_ALL=en_US.UTF-8 ON_HEROKU=true && \
+    bundle config set --local path vendor/bundle && \
+    bundle config set --local without 'test development' && \
+    bundle install -j 4
 
 COPY docker/test/scripts/test_env /scripts/
 ENTRYPOINT ["/scripts/test_env"]

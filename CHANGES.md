@@ -2,6 +2,26 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Aug 18, 2022   | Upgrade Ruby to 2.7 and update various gems to address security issues. [3055](https://github.com/huginn/huginn/pull/3055) |
+| Mar 26, 2022   | Add a Liquid variable referring to the agent itself as `_agent_`. [3104](https://github.com/huginn/huginn/pull/3104) |
+| Jan 08, 2022   | BasecampAgent is removed, which was written for the obsoleted API. [3056](https://github.com/huginn/huginn/pull/3056) |
+| Jan 04, 2022   | ImapFolderAgent supports the Google XOAUTH2 authentication. [2712](https://github.com/huginn/huginn/pull/2712) |
+| Jan 04, 2022   | TwitterPublishAgent emits `tweet_url`.  It takes optional parameters for the status update API. [3053](https://github.com/huginn/huginn/pull/3053) |
+| Dec 29, 2021   | WunderlistAgent is deleted long after the service shutdown. [3052](https://github.com/huginn/huginn/pull/3052) |
+| Dec 18, 2021   | TwilioAgent gets a client library update. [2960](https://github.com/huginn/huginn/pull/2960) |
+| Dec 18, 2021   | TwitterPublishAgent supports the merge mode.  It takes optional parameters for the status update API. [3044](https://github.com/huginn/huginn/pull/3044) |
+| Dec 17, 2021   | Migrate to GitHub Actions as CI from Travis CI and fix Docker builds |
+| Dec 17, 2021   | Ruby is upgraded to 2.6 |
+| Apr 14, 2021   | TelegramAgent can send multiple media files in one message [2962](https://github.com/huginn/huginn/pull/2962) |
+| Apr 14, 2021   | TelegramAgent supports `markdownv2` as the parse mode [2969](https://github.com/huginn/huginn/pull/2969) |
+| Feb 20, 2021   | TwitterStreamAgent supports the `include_retweet` option [2918](https://github.com/huginn/huginn/pull/2918) |
+| Feb 20, 2021   | EmailAgent can run on schedule [2911](https://github.com/huginn/huginn/pull/2911) |
+| Nov 13, 2020   | Add a `payload` option to ManualEventAgent [2901](https://github.com/huginn/huginn/pull/2901) |
+| Aug 14, 2020   | SlackAgent accepts `blocks` [2854](https://github.com/huginn/huginn/pull/2854) |
+| Jul 22, 2020   | Fix request parameter glitches in WebsiteAgent [2844](https://github.com/huginn/huginn/pull/2844) |
+| Jul 10, 2020   | Support SMTP_DELIVERY_METHOD=sendmail instead of SMTP [2819](https://github.com/huginn/huginn/pull/2819) |
+| May 27, 2020   | Upgrade Rails to 6.0 [2805](https://github.com/huginn/huginn/pull/2805) |
+| Apr 25, 2020   | TwilioAgent allows messages up to 1600 characters in length [2756](https://github.com/huginn/huginn/pull/2756) |
 | Apr 04, 2020   | Upgrade ubuntu versions of docker images to 18.04. [2603](https://github.com/huginn/huginn/pull/2603) **If you are using the `huginn/huginn` image with a internal MySQL database, back up your database volume before updating**  |
 | Mar 31, 2020   | Add FUNDING.yml [2728](https://github.com/huginn/huginn/pull/2728) |
 | Mar 30, 2020   | Improve formatting of OpenShift documentation [2724](https://github.com/huginn/huginn/pull/2724) |

@@ -7,7 +7,7 @@ unless defined?(Spring)
   require 'rubygems'
   require 'bundler'
 
-  require File.join(File.dirname(__FILE__), '../lib/gemfile_helper.rb')
+  require_relative '../lib/gemfile_helper.rb'
   GemfileHelper.load_dotenv
 
   if ENV['SPRING']

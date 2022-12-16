@@ -19,7 +19,7 @@ describe Agents::LiquidOutputAgent do
       Agents::LiquidOutputAgent.async_receive agent.id, [events(:bob_website_agent_event).id]
       expect(agent.reload).to be_working
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(agent.reload).not_to be_working
     end
   end
@@ -432,16 +432,16 @@ EOF
         agent.options['event_limit'] = 'five days'
         result = agent.receive_web_request params, method, format
 
-        expect(result[0].include?("Howard Roark")).to eq(true)
-        expect(result[0].include?("Dagny Taggart")).to eq(true)
-        expect(result[0].include?("John Galt")).to eq(true)
+        expect(result[0]).to include("Howard Roark")
+        expect(result[0]).to include("Dagny Taggart")
+        expect(result[0]).to include("John Galt")
 
         agent.options['event_limit'] = '5 quibblequarks'
         result = agent.receive_web_request params, method, format
 
-        expect(result[0].include?("Howard Roark")).to eq(true)
-        expect(result[0].include?("Dagny Taggart")).to eq(true)
-        expect(result[0].include?("John Galt")).to eq(true)
+        expect(result[0]).to include("Howard Roark")
+        expect(result[0]).to include("Dagny Taggart")
+        expect(result[0]).to include("John Galt")
       end
 
       describe "but the mode was set to last X events with the wrong casing" do
@@ -450,9 +450,9 @@ EOF
 
         it "should still work as last x events" do
           result = agent.receive_web_request params, method, format
-          expect(result[0].include?("Howard Roark")).to eq(true)
-          expect(result[0].include?("Dagny Taggart")).to eq(true)
-          expect(result[0].include?("John Galt")).to eq(true)
+          expect(result[0]).to include("Howard Roark")
+          expect(result[0]).to include("Dagny Taggart")
+          expect(result[0]).to include("John Galt")
         end
 
       end

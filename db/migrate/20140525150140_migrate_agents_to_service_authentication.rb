@@ -41,16 +41,6 @@ class MigrateAgentsToServiceAuthentication < ActiveRecord::Migration[4.2]
       EOF
       migrated = true
     end
-    if Agent.where(type: ['Agents::BasecampAgent']).count > 0
-      puts <<-EOF.strip_heredoc
-
-        Your Basecamp agents can not be migrated automatically. You need to manually register an application with 37signals and authenticate Huginn to use it.
-        Have a look at the wiki (https://github.com/huginn/huginn/wiki/Configuring-OAuth-applications) if you need help.
-
-
-      EOF
-      migrated = true
-    end
     sleep 20 if migrated
   end
 

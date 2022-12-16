@@ -44,11 +44,11 @@ describe Agents::SchedulerAgent do
       agent.options['schedule'] = '*/1 * * *'
       expect(agent).not_to be_valid
 
-      stub(agent).second_precision_enabled { true }
+      allow(agent).to receive(:second_precision_enabled) { true }
       agent.options['schedule'] = '*/15 * * * * *'
       expect(agent).to be_valid
 
-      stub(agent).second_precision_enabled { false }
+      allow(agent).to receive(:second_precision_enabled) { false }
       agent.options['schedule'] = '*/10 * * * * *'
       expect(agent).not_to be_valid
 

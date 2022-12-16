@@ -65,18 +65,18 @@ describe Agents::S3Agent do
 
   describe "#validating" do
     it "validates the key" do
-      mock(@checker).client { raise Aws::S3::Errors::SignatureDoesNotMatch.new('', '') }
+      expect(@checker).to receive(:client) { raise Aws::S3::Errors::SignatureDoesNotMatch.new('', '') }
       expect(@checker.validate_access_key_id).to be_falsy
     end
 
     it "validates the secret" do
-      mock(@checker).buckets { true }
+      expect(@checker).to receive(:buckets) { true }
       expect(@checker.validate_access_key_secret).to be_truthy
     end
   end
 
   it "completes the buckets" do
-    mock(@checker).buckets { [OpenStruct.new(name: 'test'), OpenStruct.new(name: 'test2')]}
+    expect(@checker).to receive(:buckets) { [OpenStruct.new(name: 'test'), OpenStruct.new(name: 'test2')]}
     expect(@checker.complete_bucket).to eq([{text: 'test', id: 'test'}, {text: 'test2', id: 'test2'}])
   end
 
@@ -90,7 +90,7 @@ describe Agents::S3Agent do
   context "#check" do
     context "not watching" do
       it "emits an event for every file" do
-        mock(@checker).get_bucket_contents { {"test"=>"231232", "test2"=>"4564545"} }
+        expect(@checker).to receive(:get_bucket_contents) { {"test"=>"231232", "test2"=>"4564545"} }
         expect { @checker.check }.to change(Event, :count).by(2)
         expect(Event.last.payload).to eq({"file_pointer" => {"file"=>"test2", "agent_id"=> @checker.id}})
       end
@@ -103,7 +103,7 @@ describe Agents::S3Agent do
 
       it "does not emit any events on the first run" do
         contents = {"test"=>"231232", "test2"=>"4564545"}
-        mock(@checker).get_bucket_contents { contents }
+        expect(@checker).to receive(:get_bucket_contents) { contents }
         expect { @checker.check }.not_to change(Event, :count)
         expect(@checker.memory).to eq('seen_contents' => contents)
       end
@@ -111,27 +111,27 @@ describe Agents::S3Agent do
       context "detecting changes" do
         before(:each) do
           contents = {"test"=>"231232", "test2"=>"4564545"}
-          mock(@checker).get_bucket_contents { contents }
+          expect(@checker).to receive(:get_bucket_contents) { contents }
           expect { @checker.check }.not_to change(Event, :count)
           @checker.last_check_at = Time.now
         end
 
         it "emits events for removed files" do
           contents = {"test"=>"231232"}
-          mock(@checker).get_bucket_contents { contents }
+          expect(@checker).to receive(:get_bucket_contents) { contents }
           expect { @checker.check }.to change(Event, :count).by(1)
           expect(Event.last.payload).to eq({"file_pointer" => {"file" => "test2", "agent_id"=> @checker.id}, "event_type" => "removed"})
         end
 
         it "emits events for modified files" do
           contents = {"test"=>"231232", "test2"=>"changed"}
-          mock(@checker).get_bucket_contents { contents }
+          expect(@checker).to receive(:get_bucket_contents) { contents }
           expect { @checker.check }.to change(Event, :count).by(1)
           expect(Event.last.payload).to eq({"file_pointer" => {"file" => "test2", "agent_id"=> @checker.id}, "event_type" => "modified"})
         end
         it "emits events for added files" do
           contents = {"test"=>"231232", "test2"=>"4564545", "test3" => "31231231"}
-          mock(@checker).get_bucket_contents { contents }
+          expect(@checker).to receive(:get_bucket_contents) { contents }
           expect { @checker.check }.to change(Event, :count).by(1)
           expect(Event.last.payload).to eq({"file_pointer" => {"file" => "test3", "agent_id"=> @checker.id}, "event_type" => "added"})
         end
@@ -139,13 +139,13 @@ describe Agents::S3Agent do
 
       context "error handling" do
         it "handles AccessDenied exceptions" do
-          mock(@checker).get_bucket_contents { raise Aws::S3::Errors::AccessDenied.new('', '') }
+          expect(@checker).to receive(:get_bucket_contents) { raise Aws::S3::Errors::AccessDenied.new('', '') }
           expect { @checker.check }.to change(AgentLog, :count).by(1)
-          expect(AgentLog.last.message).to eq("Could not access 'testbucket' Aws::S3::Errors::AccessDenied ")
+          expect(AgentLog.last.message).to match(/Could not access 'testbucket' Aws::S3::Errors::AccessDenied/)
         end
 
         it "handles generic S3 exceptions" do
-          mock(@checker).get_bucket_contents { raise Aws::S3::Errors::PermanentRedirect.new('', 'error') }
+          expect(@checker).to receive(:get_bucket_contents) { raise Aws::S3::Errors::PermanentRedirect.new('', 'error') }
           expect { @checker.check }.to change(AgentLog, :count).by(1)
           expect(AgentLog.last.message).to eq("Aws::S3::Errors::PermanentRedirect: error")
         end
@@ -155,30 +155,30 @@ describe Agents::S3Agent do
 
   it "get_io returns a StringIO object" do
     stringio =StringIO.new
-    mock_response = mock()
-    mock(mock_response).body { stringio }
-    mock_client = mock()
-    mock(mock_client).get_object(bucket: 'testbucket', key: 'testfile') { mock_response }
-    mock(@checker).client { mock_client }
+    mock_response = double()
+    expect(mock_response).to receive(:body) { stringio }
+    mock_client = double()
+    expect(mock_client).to receive(:get_object).with(bucket: 'testbucket', key: 'testfile') { mock_response }
+    expect(@checker).to receive(:client) { mock_client }
     @checker.get_io('testfile')
   end
 
   context "#get_bucket_contents" do
     it "returns a hash with the contents of the bucket" do
-      mock_response = mock()
-      mock(mock_response).contents { [OpenStruct.new(key: 'test', etag: '231232'), OpenStruct.new(key: 'test2', etag: '4564545')] }
-      mock_client = mock()
-      mock(mock_client).list_objects(bucket: 'testbucket') { [mock_response] }
-      mock(@checker).client { mock_client }
+      mock_response = double()
+      expect(mock_response).to receive(:contents) { [OpenStruct.new(key: 'test', etag: '231232'), OpenStruct.new(key: 'test2', etag: '4564545')] }
+      mock_client = double()
+      expect(mock_client).to receive(:list_objects).with(bucket: 'testbucket') { [mock_response] }
+      expect(@checker).to receive(:client) { mock_client }
       expect(@checker.send(:get_bucket_contents)).to eq({"test"=>"231232", "test2"=>"4564545"})
     end
   end
 
   context "#client" do
     it "initializes the S3 client correctly" do
-      mock_credential = mock()
-      mock(Aws::Credentials).new('32343242', '1231312') { mock_credential }
-      mock(Aws::S3::Client).new(credentials: mock_credential,
+      mock_credential = double()
+      expect(Aws::Credentials).to receive(:new).with('32343242', '1231312') { mock_credential }
+      expect(Aws::S3::Client).to receive(:new).with(credentials: mock_credential,
                                       region: 'us-east-1')
       @checker.send(:client)
     end
@@ -204,9 +204,9 @@ describe Agents::S3Agent do
     end
 
     it "writes the data at data into a file" do
-      client_mock = mock()
-      mock(client_mock).put_object(bucket: @checker.options['bucket'], key: @checker.options['filename'], body: 'hello world!')
-      mock(@checker).client { client_mock }
+      client_mock = double()
+      expect(client_mock).to receive(:put_object).with(bucket: @checker.options['bucket'], key: @checker.options['filename'], body: 'hello world!')
+      expect(@checker).to receive(:client) { client_mock }
       event = Event.new(payload: {'data' => 'hello world!'})
       @checker.receive([event])
     end

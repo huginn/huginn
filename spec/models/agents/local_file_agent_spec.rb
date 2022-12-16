@@ -144,7 +144,7 @@ describe Agents::LocalFileAgent do
   end
 
   it "get_io opens the file" do
-    mock(File).open('test', 'r')
+    expect(File).to receive(:open).with('test', 'r')
     @checker.get_io('test')
   end
 
@@ -164,21 +164,21 @@ describe Agents::LocalFileAgent do
     before(:each) do
       @checker.options['mode'] = 'write'
       @checker.options['data'] = '{{ data }}'
-      @file_mock = mock()
+      @file_mock = double()
     end
 
     it "writes the data at data into a file" do
-      mock(@file_mock).write('hello world')
+      expect(@file_mock).to receive(:write).with('hello world')
       event = Event.new(payload: {'data' => 'hello world'})
-      mock(File).open(File.join(Rails.root, 'tmp', 'spec'), 'w').yields @file_mock
+      expect(File).to receive(:open).with(File.join(Rails.root, 'tmp', 'spec'), 'w').and_yield(@file_mock)
       @checker.receive([event])
     end
 
     it "appends the data at data onto a file" do
-      mock(@file_mock).write('hello world')
+      expect(@file_mock).to receive(:write).with('hello world')
       @checker.options['append'] = 'true'
       event = Event.new(payload: {'data' => 'hello world'})
-      mock(File).open(File.join(Rails.root, 'tmp', 'spec'), 'a').yields @file_mock
+      expect(File).to receive(:open).with(File.join(Rails.root, 'tmp', 'spec'), 'a').and_yield(@file_mock)
       @checker.receive([event])
     end
 
@@ -196,41 +196,41 @@ describe Agents::LocalFileAgent do
       @checker.options['watch'] = true
       @checker.save
       @worker = Agents::LocalFileAgent::Worker.new(agent: @checker)
-      @listen_mock = mock()
+      @listen_mock = double()
     end
 
     context "#setup" do
       it "initializes the listen gem" do
-        mock(Listen).to(@checker.options['path'], ignore!: [])
+        expect(Listen).to receive(:to).with(@checker.options['path'], ignore!: [])
         @worker.setup
       end
     end
 
     context "#run" do
       before(:each) do
-        stub(Listen).to { @listen_mock }
+        allow(Listen).to receive(:to) { @listen_mock }
         @worker.setup
       end
 
       it "starts to listen to changes in the directory when the path is present" do
-        mock(@worker).sleep
-        mock(@listen_mock).start
+        expect(@worker).to receive(:sleep)
+        expect(@listen_mock).to receive(:start)
         @worker.run
       end
 
       it "does nothing when the path does not exist" do
-        mock(@worker.agent).check_path_existance(true) { false }
-        dont_allow(@listen_mock).start
-        mock(@worker).sleep { raise "Sleeping" }
+        expect(@worker.agent).to receive(:check_path_existance).with(true) { false }
+        expect(@listen_mock).not_to receive(:start)
+        expect(@worker).to receive(:sleep) { raise "Sleeping" }
         expect { @worker.run }.to raise_exception(RuntimeError, 'Sleeping')
       end
     end
 
     context "#stop" do
       it "stops the listen gem" do
-        stub(Listen).to { @listen_mock }
+        allow(Listen).to receive(:to) { @listen_mock }
         @worker.setup
-        mock(@listen_mock).stop
+        expect(@listen_mock).to receive(:stop)
         @worker.stop
       end
     end

@@ -16,8 +16,8 @@ describe Service do
     end
 
     it "disconnects agents and disables them if the previously global service is made private again" do
-      agent = agents(:bob_basecamp_agent)
-      jane_agent = agents(:jane_basecamp_agent)
+      agent = agents(:bob_twitter_user_agent)
+      jane_agent = agents(:jane_twitter_user_agent)
 
       service = agent.service
       service.toggle_availability!
@@ -34,7 +34,7 @@ describe Service do
   end
 
   it "disables all agents before beeing destroyed" do
-    agent = agents(:bob_basecamp_agent)
+    agent = agents(:bob_twitter_user_agent)
     service = agent.service
     service.destroy
     agent.reload
@@ -58,7 +58,7 @@ describe Service do
     end
 
     it "should call refresh_token! if the token expired" do
-      stub(@service).refresh_token! { @service }
+      allow(@service).to receive(:refresh_token!) { @service }
       @service.expires_at = Time.now - 1.hour
       expect(@service.prepare_request).to eq(@service)
     end
@@ -70,14 +70,14 @@ describe Service do
     end
 
     it "should return the correct endpoint" do
-      @service.provider = '37signals'
-      expect(@service.send(:endpoint).to_s).to eq("https://launchpad.37signals.com/authorization/token")
+      @service.provider = 'google'
+      expect(@service.send(:endpoint).to_s).to eq("https://oauth2.googleapis.com/token")
     end
 
     it "should update the token" do
-      stub_request(:post, "https://launchpad.37signals.com/authorization/token?client_id=TESTKEY&client_secret=TESTSECRET&refresh_token=refreshtokentest&type=refresh").
+      stub_request(:post, "https://oauth2.googleapis.com/token?client_id=googleclientid&client_secret=googleclientsecret&grant_type=refresh_token&refresh_token=refreshtokentest").
         to_return(:status => 200, :body => '{"expires_in":1209600,"access_token": "NEWTOKEN"}', :headers => {})
-      @service.provider = '37signals'
+      @service.provider = 'google'
       @service.refresh_token = 'refreshtokentest'
       @service.refresh_token!
       expect(@service.token).to eq('NEWTOKEN')
@@ -97,22 +97,6 @@ describe Service do
       expect(service.provider).to eq('twitter')
       expect(service.token).to eq('a1b2c3d4...')
       expect(service.secret).to eq('abcdef1234')
-    end
-
-    it "should work with 37signals services" do
-      signals = JSON.parse(File.read(Rails.root.join('spec/data_fixtures/services/37signals.json')))
-      expect {
-        service = @user.services.initialize_or_update_via_omniauth(signals)
-        service.save!
-      }.to change { @user.services.count }.by(1)
-      service = @user.services.first
-      expect(service.provider).to eq('37signals')
-      expect(service.name).to eq('Dominik Sander')
-      expect(service.token).to eq('abcde')
-      expect(service.uid).to eq('12345')
-      expect(service.refresh_token).to eq('fghrefresh')
-      expect(service.options[:user_id]).to eq(12345)
-      service.expires_at = Time.at(1401554352)
     end
 
     it "should work with github services" do

@@ -23,7 +23,7 @@ describe LongRunnable do
 
   context "#setup_worker" do
     it "returns active agent workers" do
-      mock(LongRunnableAgent).active { [@agent] }
+      expect(LongRunnableAgent).to receive(:active) { [@agent] }
       workers = LongRunnableAgent.setup_worker
       expect(workers.length).to eq(1)
       expect(workers.first).to be_a(LongRunnableAgent::Worker)
@@ -31,7 +31,7 @@ describe LongRunnable do
     end
 
     it "returns an empty array when no agent is active" do
-      mock(LongRunnableAgent).active { [] }
+      expect(LongRunnableAgent).to receive(:active) { [] }
       workers = LongRunnableAgent.setup_worker
       expect(workers.length).to eq(0)
     end
@@ -51,7 +51,7 @@ describe LongRunnable do
     end
 
     it "calls boolify of the agent" do
-      mock(@agent).boolify('true') { true }
+      expect(@agent).to receive(:boolify).with('true') { true }
       expect(@worker.boolify('true')).to be_truthy
     end
 
@@ -61,32 +61,32 @@ describe LongRunnable do
 
     context "#run!" do
       it "runs the agent worker" do
-        mock(@worker).run
+        expect(@worker).to receive(:run)
         @worker.run!.join
       end
 
       it "stops when rescueing a SystemExit" do
-        mock(@worker).run { raise SystemExit }
-        mock(@worker).stop!
+        expect(@worker).to receive(:run) { raise SystemExit }
+        expect(@worker).to receive(:stop!)
         @worker.run!.join
       end
 
       it "creates an agent log entry for a generic exception" do
-        stub(STDERR).puts
-        mock(@worker).run { raise "woups" }
-        mock(@agent).error(/woups/)
+        allow(STDERR).to receive(:puts)
+        expect(@worker).to receive(:run) { raise "woups" }
+        expect(@agent).to receive(:error).with(/woups/)
         @worker.run!.join
       end
     end
 
     context "#stop!" do
       it "terminates the thread" do
-        mock.proxy(@worker).terminate_thread!
+        expect(@worker).to receive(:terminate_thread!)
         @worker.stop!
       end
 
       it "gracefully stops the worker" do
-        mock(@worker).stop
+        expect(@worker).to receive(:stop)
         @worker.stop!
       end
     end
@@ -95,47 +95,47 @@ describe LongRunnable do
       before do
         @skip_thread_terminate = true
         mock_thread = Object.new
-        stub(@worker).thread { mock_thread }
+        allow(@worker).to receive(:thread) { mock_thread }
       end
 
       it "terminates the thread" do
-        mock(@worker.thread).terminate
-        do_not_allow(@worker.thread).wakeup
-        mock(@worker.thread).status { 'run' }
+        expect(@worker.thread).to receive(:terminate)
+        expect(@worker.thread).not_to receive(:wakeup)
+        expect(@worker.thread).to receive(:status) { 'run' }
         @worker.terminate_thread!
       end
 
       it "wakes up sleeping threads after termination" do
-        mock(@worker.thread).terminate
-        mock(@worker.thread).wakeup
-        mock(@worker.thread).status { 'sleep' }
+        expect(@worker.thread).to receive(:terminate)
+        expect(@worker.thread).to receive(:wakeup)
+        expect(@worker.thread).to receive(:status) { 'sleep' }
         @worker.terminate_thread!
       end
     end
 
     context "#restart!" do
       it "stops, setups and starts the worker" do
-        mock(@worker).stop!
-        mock(@worker).setup!(@worker.scheduler, @worker.mutex)
-        mock(@worker).run!
-        mock(@worker).puts(anything) { |text| expect(text).to match(/Restarting/) }
+        expect(@worker).to receive(:stop!)
+        expect(@worker).to receive(:setup!).with(@worker.scheduler, @worker.mutex)
+        expect(@worker).to receive(:run!)
+        expect(@worker).to receive(:puts).with(anything) { |text| expect(text).to match(/Restarting/) }
         @worker.restart!
       end
     end
 
     context "scheduling" do
       it "schedules tasks once" do
-        mock(@worker.scheduler).send(:schedule_in, 1.hour, tag: 'test1234')
+        expect(@worker.scheduler).to receive(:send).with(:schedule_in, 1.hour, tag: 'test1234')
         @worker.schedule_in 1.hour do noop; end
       end
 
       it "schedules repeating tasks" do
-        mock(@worker.scheduler).send(:every, 1.hour, tag: 'test1234')
+        expect(@worker.scheduler).to receive(:send).with(:every, 1.hour, tag: 'test1234')
         @worker.every 1.hour do noop; end
       end
 
       it "allows the cron syntax" do
-        mock(@worker.scheduler).send(:cron, '0 * * * *', tag: 'test1234')
+        expect(@worker.scheduler).to receive(:send).with(:cron, '0 * * * *', tag: 'test1234')
         @worker.cron '0 * * * *' do noop; end
       end
     end

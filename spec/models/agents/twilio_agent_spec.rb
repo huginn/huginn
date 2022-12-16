@@ -19,9 +19,27 @@ describe Agents::TwilioAgent do
     @event.payload = {message: 'Looks like its going to rain', to: 54321}
     @event.save!
 
-    @message_calls = []
-    stub.any_instance_of(Twilio::REST::Messages).create { |message| @message_calls << message }
-    stub.any_instance_of(Twilio::REST::Calls).create
+    @messages = []
+    @calls = []
+
+    allow(Twilio::REST::Client).to receive(:new) do
+      instance_double(Twilio::REST::Client).tap { |c|
+        allow(c).to receive(:calls) do
+          double.tap { |l|
+            allow(l).to receive(:create) do |message|
+              @calls << message
+            end
+          }
+        end
+        allow(c).to receive(:messages) do
+          double.tap { |l|
+            allow(l).to receive(:create) do |message|
+              @messages << message
+            end
+          }
+        end
+      }
+    end
   end
 
   describe '#receive' do
@@ -37,15 +55,17 @@ describe Agents::TwilioAgent do
       event2.save!
 
       @checker.receive([@event,event1,event2])
-      expect(@message_calls).to eq([{from: "x", to: "54321", body: "Looks like its going to rain"},
-                                    {from: "x", to: "12345", body: "Some message"},
-                                    {from: "x", to: "987654", body: "Some other message"}])
+      expect(@messages).to eq [
+        {from: "x", to: "54321", body: "Looks like its going to rain"},
+        {from: "x", to: "12345", body: "Some message"},
+        {from: "x", to: "987654", body: "Some other message"}
+      ]
     end
 
     it 'should check if receive_text is working fine' do
       @checker.options[:receive_text] = 'false'
       @checker.receive([@event])
-      expect(@message_calls).to be_empty
+      expect(@messages).to be_empty
     end
 
     it 'should check if receive_call is working fine' do
@@ -61,7 +81,7 @@ describe Agents::TwilioAgent do
       Agents::TwilioAgent.async_receive @checker.id, [@event.id]
       expect(@checker.reload).to be_working # Just received events
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(@checker.reload).not_to be_working # More time has passed than the expected receive period without any new events
     end
   end

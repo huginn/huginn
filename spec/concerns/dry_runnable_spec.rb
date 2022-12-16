@@ -29,7 +29,7 @@ describe DryRunnable do
   end
 
   before do
-    stub(Agents::SandboxedAgent).valid_type?("Agents::SandboxedAgent") { true }
+    allow(Agents::SandboxedAgent).to receive(:valid_type?).with("Agents::SandboxedAgent") { true }
 
     @agent = Agents::SandboxedAgent.create(name: "some agent") { |agent|
       agent.user = users(:bob)
@@ -59,7 +59,7 @@ describe DryRunnable do
   end
 
   it "does not perform dry-run if Agent does not support dry-run" do
-    stub(@agent).can_dry_run? { false }
+    allow(@agent).to receive(:can_dry_run?) { false }
 
     results = nil
 

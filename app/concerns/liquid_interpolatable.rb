@@ -96,7 +96,7 @@ module LiquidInterpolatable
 
   def interpolated(self_object = nil)
     interpolate_with(self_object) do
-      (@interpolated_cache ||= {})[[options, interpolation_context]] ||=
+      (@interpolated_cache ||= {})[[options, interpolation_context].hash] ||=
         interpolate_options(options)
     end
   end
@@ -111,7 +111,7 @@ module LiquidInterpolatable
 
   class Context < Liquid::Context
     def initialize(agent)
-      super({}, {}, { agent: agent }, true)
+      super({}, { '_agent_' => agent }, { agent: agent }, true)
     end
 
     def hash
@@ -383,7 +383,7 @@ module LiquidInterpolatable
       end
 
       def render(context)
-        context.registers[:agent].credential(@credential_name)
+        context.registers[:agent].credential(@credential_name) || ""
       end
     end
 

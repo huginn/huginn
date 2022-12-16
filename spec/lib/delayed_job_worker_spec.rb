@@ -6,14 +6,14 @@ describe DelayedJobWorker do
   end
 
   it "should run" do
-    mock.instance_of(Delayed::Worker).start
+    expect_any_instance_of(Delayed::Worker).to receive(:start)
     @djw.run
   end
 
   it "should stop" do
-    mock.instance_of(Delayed::Worker).start
-    mock.instance_of(Delayed::Worker).stop
+    expect_any_instance_of(Delayed::Worker).to receive(:start)
     @djw.run
+    expect_any_instance_of(Delayed::Worker).to receive(:stop)
     @djw.stop
   end
 

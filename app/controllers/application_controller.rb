@@ -29,7 +29,6 @@ class ApplicationController < ActionController::Base
   def upgrade_warning
     return unless current_user
     twitter_oauth_check
-    basecamp_auth_check
     outdated_google_auth_check
   end
 
@@ -55,12 +54,6 @@ class ApplicationController < ActionController::Base
         @twitter_oauth_key    = @twitter_agent.options['consumer_key'].presence || @twitter_agent.credential('twitter_consumer_key')
         @twitter_oauth_secret = @twitter_agent.options['consumer_secret'].presence || @twitter_agent.credential('twitter_consumer_secret')
       end
-    end
-  end
-
-  def basecamp_auth_check
-    unless Devise.omniauth_providers.include?(:'37signals')
-      @basecamp_agent = current_user.agents.where(type: 'Agents::BasecampAgent').first
     end
   end
 

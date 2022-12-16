@@ -16,27 +16,50 @@ if ! whoami &> /dev/null; then
     fi
 fi
 
+# DATABASE_URL takes the highest precedence.
+if [[ -n "$DATABASE_URL" ]]; then
+    case "${DATABASE_URL%%://*}" in
+        mysql)
+            DATABASE_ADAPTER=mysql2
+            DATABASE_URL="$DATABASE_ADAPTER${DATABASE_URL#mysql}" ;;
+        postgres)
+            DATABASE_ADAPTER=postgresql ;;
+        *)
+            DATABASE_ADAPTER="${DATABASE_URL%%://*}" ;;
+    esac
+    eval "$(ruby -ruri -rshellwords -e 'u = URI(ARGV[0]); {
+      HOST: u.hostname,
+      PORT: u.port,
+      USERNAME: u.user,
+      PASSWORD: u.password,
+      NAME: u.path[%r{[^/]+}]
+    }.each {|k,v| puts "HUGINN_DATABASE_#{k}=#{v.to_s.shellescape}" }' "$DATABASE_URL")"
 # is a mysql or postgresql database linked?
 # requires that the mysql or postgresql containers have exposed
 # port 3306 and 5432 respectively.
-if [[ -n "${MYSQL_PORT_3306_TCP_ADDR}" || ("${DATABASE_ADAPTER}" == "mysql2" && -n "${DATABASE_HOST}") ]]; then
+elif [[ -n "${MYSQL_PORT_3306_TCP_ADDR}" || ("${DATABASE_ADAPTER}" == "mysql2" && -n "${DATABASE_HOST}") ]]; then
     DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
     DATABASE_HOST=${DATABASE_HOST:-${MYSQL_PORT_3306_TCP_ADDR}}
     DATABASE_PORT=${DATABASE_PORT:-${MYSQL_PORT_3306_TCP_PORT:-3306}}
-    DATABASE_ENCODING=${DATABASE_ENCODING:-utf8mb4}
 elif [[ -n "${POSTGRES_PORT_5432_TCP_ADDR}" || ("${DATABASE_ADAPTER}" == "postgresql" && -n "${DATABASE_HOST}") ]]; then
     DATABASE_ADAPTER=${DATABASE_ADAPTER:-postgresql}
     DATABASE_HOST=${DATABASE_HOST:-${POSTGRES_PORT_5432_TCP_ADDR}}
     DATABASE_PORT=${DATABASE_PORT:-${POSTGRES_PORT_5432_TCP_PORT:-5432}}
-    DATABASE_ENCODING=utf8
 else
     START_MYSQL=${START_MYSQL:-true}
+    DATABASE_ADAPTER=${DATABASE_ADAPTER:-mysql2}
 fi
 
 USE_GRAPHVIZ_DOT=${HUGINN_USE_GRAPHVIZ_DOT:-${USE_GRAPHVIZ_DOT:-dot}}
 DATABASE_HOST=${HUGINN_DATABASE_HOST:-${DATABASE_HOST:-localhost}}
 DATABASE_PORT=${HUGINN_DATABASE_PORT:-${DATABASE_PORT}}
-DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING}}
+case "$DATABASE_ADAPTER" in
+    mysql*)
+        DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING:-utf8mb4}} ;;
+    *)
+        DATABASE_ENCODING=${HUGINN_DATABASE_ENCODING:-${DATABASE_ENCODING:-utf8}} ;;
+esac
+DATABASE_USERNAME=${HUGINN_DATABASE_USERNAME:-${DATABASE_USERNAME}}
 DATABASE_PASSWORD=${HUGINN_DATABASE_PASSWORD:-${DATABASE_PASSWORD:-password}}
 DATABASE_NAME=${HUGINN_DATABASE_NAME:-${DATABASE_NAME:-huginn_production}}
 RAILS_ENV=${HUGINN_RAILS_ENV:-${RAILS_ENV:-production}}
@@ -116,7 +139,9 @@ case "${DATABASE_ADAPTER}" in
   *) echo "Unsupported database adapter. Available adapters are mysql2, and postgresql." && exit 1 ;;
 esac
 
-bundle install --without test development --path vendor/bundle
+bundle config set --local path vendor/bundle
+bundle config set --local without 'test development'
+bundle install
 
 # Configure the unicorn server
 sed -r config/unicorn.rb.example \

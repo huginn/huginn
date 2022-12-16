@@ -23,7 +23,7 @@ describe Agents::TwitterPublishAgent do
     @event.save!
 
     @sent_messages = []
-    stub.any_instance_of(Agents::TwitterPublishAgent).publish_tweet { |message|
+    allow_any_instance_of(Agents::TwitterPublishAgent).to receive(:publish_tweet) { |message|
       @sent_messages << message
       OpenStruct.new(:id => 454209588376502272)
     }
@@ -53,7 +53,7 @@ describe Agents::TwitterPublishAgent do
       Agents::TwitterPublishAgent.async_receive(@checker.id, [@event.id])
       expect(@checker.reload).to be_working # Just received events
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(@checker.reload).not_to be_working # More time has passed than the expected receive period without any new events
     end
   end

@@ -12,8 +12,8 @@ if [ -n "${DATABASE_INITIAL_CONNECT_MAX_RETRIES}" ]; then
   count=0
   while ! rake database_test:ping > /dev/null 2>&1 && [[ $count -le $max ]] ; do
     count=$[$count+1]
-    echo "Retry $count of $max attempting to connect to $DATABASE_HOST. Sleeping ${DATABASE_INITIAL_CONNECT_SLEEP:5}"
-    sleep ${DATABASE_INITIAL_CONNECT_SLEEP:5}
+    echo "Retry $count of $max attempting to connect to $DATABASE_HOST. Sleeping ${DATABASE_INITIAL_CONNECT_SLEEP:-5}"
+    sleep ${DATABASE_INITIAL_CONNECT_SLEEP:-5}
   done
 fi
 

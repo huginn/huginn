@@ -28,7 +28,7 @@ describe Agents::PushoverAgent do
     @event.save!
 
     @sent_notifications = []
-    stub.any_instance_of(Agents::PushoverAgent).send_notification  { |notification| @sent_notifications << notification}
+    allow_any_instance_of(Agents::PushoverAgent).to receive(:send_notification) { |agent, notification| @sent_notifications << notification }
   end
 
   describe '#receive' do
@@ -159,7 +159,7 @@ describe Agents::PushoverAgent do
       # Just received events
       expect(@checker.reload).to be_working
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
 
       # More time has passed than the expected receive period without any new events
       expect(@checker.reload).not_to be_working

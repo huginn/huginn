@@ -53,7 +53,7 @@ describe Agents::EvernoteAgent do
   end
 
   before do
-    stub.any_instance_of(Agents::EvernoteAgent).evernote_note_store { en_note_store }
+    allow_any_instance_of(Agents::EvernoteAgent).to receive(:evernote_note_store) { en_note_store }
   end
 
   describe "#receive" do
@@ -90,7 +90,7 @@ describe Agents::EvernoteAgent do
       end
 
       it "adds a note for any payload it receives" do
-        stub(en_note_store).findNotesMetadata { OpenStruct.new(notes: []) }
+        allow(en_note_store).to receive(:findNotesMetadata) { OpenStruct.new(notes: []) }
         Agents::EvernoteAgent.async_receive(@agent.id, [@event.id])
 
         expect(en_note_store.notes.size).to eq(1)
@@ -115,7 +115,7 @@ describe Agents::EvernoteAgent do
           [note1, note2].each { |note| en_note_store.createNote(note) }
           en_note_store.createNotebook(OpenStruct.new(name: "xkcd"))
 
-          stub(en_note_store).findNotesMetadata {
+          allow(en_note_store).to receive(:findNotesMetadata) {
             OpenStruct.new(notes: [note1]) }
         end
 
@@ -135,7 +135,7 @@ describe Agents::EvernoteAgent do
         end
 
         it "creates an event with note content wrapped in ENML" do
-          stub(en_note_store).findNotesMetadata { OpenStruct.new(notes: []) }
+          allow(en_note_store).to receive(:findNotesMetadata) { OpenStruct.new(notes: []) }
           Agents::EvernoteAgent.async_receive(@agent.id, [@event.id])
 
           payload = @agent.events.first.payload
@@ -184,7 +184,7 @@ describe Agents::EvernoteAgent do
         tag2 = OpenStruct.new(name: "comic")
         [tag1, tag2].each { |tag| en_note_store.createTag(tag) }
 
-        stub(en_note_store).findNotesMetadata {
+        allow(en_note_store).to receive(:findNotesMetadata) {
           notes = en_note_store.notes.select do |note|
             note.notebookGuid == 1 &&
             %w(funny comic).all? { |tag_name| note.tagNames.include?(tag_name) }
@@ -385,7 +385,7 @@ describe Agents::EvernoteAgent do
 
       context "a note with given title and notebook does not exist" do
         before do
-          stub(en_note_store).findNotesMetadata { OpenStruct.new(notes: []) }
+          allow(en_note_store).to receive(:findNotesMetadata) { OpenStruct.new(notes: []) }
         end
 
         it "creates a note" do
@@ -407,7 +407,7 @@ describe Agents::EvernoteAgent do
 
         before do
           en_note_store.createNote(note)
-          stub(en_note_store).findNotesMetadata { OpenStruct.new(notes: [note]) }
+          allow(en_note_store).to receive(:findNotesMetadata) { OpenStruct.new(notes: [note]) }
         end
 
         it "updates the note" do
@@ -459,7 +459,7 @@ describe Agents::EvernoteAgent do
 
     describe "#note_guids" do
       it "returns the guids of notes satisfying search options" do
-        stub(en_note_store).findNotesMetadata { OpenStruct.new(notes: [note1]) }
+        allow(en_note_store).to receive(:findNotesMetadata) { OpenStruct.new(notes: [note1]) }
         result = search.note_guids
 
         expect(result.size).to eq(1)
@@ -470,7 +470,7 @@ describe Agents::EvernoteAgent do
     describe "#notes" do
       context "last_checked_at is not set" do
         it "returns notes satisfying the search options" do
-          stub(en_note_store).findNotesMetadata { OpenStruct.new(notes: [note1]) }
+          allow(en_note_store).to receive(:findNotesMetadata) { OpenStruct.new(notes: [note1]) }
           result = search.notes
 
           expect(result.size).to eq(1)
@@ -482,7 +482,7 @@ describe Agents::EvernoteAgent do
       context "last_checked_at is set" do
         context "notes_with_tags is not set" do
           it "only returns notes updated since then" do
-            stub(en_note_store).findNotesMetadata { OpenStruct.new(notes: [note1, note3]) }
+            allow(en_note_store).to receive(:findNotesMetadata) { OpenStruct.new(notes: [note1, note3]) }
             result = search_with_time.notes
 
             expect(result.size).to eq(1)
@@ -493,7 +493,7 @@ describe Agents::EvernoteAgent do
         context "notes_with_tags is set" do
           it "returns notes updated since then or notes with recently added tags" do
             note3.tagNames = ["funny", "comic"]
-            stub(en_note_store).findNotesMetadata { OpenStruct.new(notes: [note1, note3]) }
+            allow(en_note_store).to receive(:findNotesMetadata) { OpenStruct.new(notes: [note1, note3]) }
 
             result = search_with_time_and_tags.notes
             expect(result.size).to eq(2)

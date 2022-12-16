@@ -74,9 +74,9 @@ describe Agents::GoogleCalendarPublishAgent do
 
     def setup_mock!
       fake_interface = Object.new
-      mock(GoogleCalendar).new(agent.interpolate_options(agent.options), Rails.logger) { fake_interface }
-      mock(fake_interface).publish_as(calendar_id, message) { response_hash }
-      mock(fake_interface).cleanup!
+      expect(GoogleCalendar).to receive(:new).with(agent.interpolate_options(agent.options), Rails.logger) { fake_interface }
+      expect(fake_interface).to receive(:publish_as).with(calendar_id, message) { response_hash }
+      expect(fake_interface).to receive(:cleanup!)
     end
 
     describe 'when the calendar_id is in the options' do
@@ -188,9 +188,9 @@ describe Agents::GoogleCalendarPublishAgent do
 
     def setup_mock!
       fake_interface = Object.new
-      mock(GoogleCalendar).new(agent.interpolate_options(agent.options), Rails.logger) { fake_interface }
-      mock(fake_interface).publish_as(calendar_id, message) { response_hash }
-      mock(fake_interface).cleanup!
+      expect(GoogleCalendar).to receive(:new).with(agent.interpolate_options(agent.options), Rails.logger) { fake_interface }
+      expect(fake_interface).to receive(:publish_as).with(calendar_id, message) { response_hash }
+      expect(fake_interface).to receive(:cleanup!)
     end
 
     describe 'when the calendar_id is in the options' do

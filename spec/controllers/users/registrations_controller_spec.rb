@@ -9,7 +9,7 @@ module Users
 
       context 'with valid params' do
         it "imports the default scenario for the new user" do
-          mock(DefaultScenarioImporter).import(is_a(User))
+          expect(DefaultScenarioImporter).to receive(:import).with(kind_of(User))
 
           post :create, params: {
             :user => {username: 'jdoe', email: 'jdoe@example.com',
@@ -20,7 +20,7 @@ module Users
 
       context 'with invalid params' do
         it "does not import the default scenario" do
-          stub(DefaultScenarioImporter).import(is_a(User)) { fail "Should not attempt import" }
+          allow(DefaultScenarioImporter).to receive(:import).with(kind_of(User)) { fail "Should not attempt import" }
 
           setup_controller_for_warden
           post :create, params: {:user => {}}

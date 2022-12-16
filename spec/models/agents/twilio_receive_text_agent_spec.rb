@@ -8,7 +8,7 @@ require 'rails_helper'
 
 describe Agents::TwilioReceiveTextAgent do
   before do
-    stub.any_instance_of(Twilio::Util::RequestValidator).validate { true }
+    allow_any_instance_of(Twilio::Security::RequestValidator).to receive(:validate) { true }
   end
 
   let(:payload) { 
@@ -61,7 +61,7 @@ describe Agents::TwilioReceiveTextAgent do
       expect {
         out = @agent.receive_web_request(request)
       }.to change { Event.count }.by(1)
-      expect(out).to eq(["<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response></Response>", 201, "text/xml"])
+      expect(out).to eq(["<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response/>\n", 200, "text/xml"])
       expect(Event.last.payload).to eq(payload)
     end
   end
@@ -92,7 +92,7 @@ describe Agents::TwilioReceiveTextAgent do
       expect {
         out = @agent.receive_web_request(request)
       }.to change { Event.count }.by(1)
-      expect(out).to eq(["<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Message>thanks!</Message></Response>", 201, "text/xml"])
+      expect(out).to eq(["<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n<Message>thanks!</Message>\n</Response>\n", 200, "text/xml"])
       expect(Event.last.payload).to eq(payload)
     end
   end

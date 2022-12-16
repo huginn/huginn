@@ -247,22 +247,10 @@ Devise.setup do |config|
     config.omniauth :'tumblr', key, secret
   end
 
-  if defined?(OmniAuth::Strategies::ThirtySevenSignals) &&
-     (key = ENV["THIRTY_SEVEN_SIGNALS_OAUTH_KEY"]).present? &&
-     (secret = ENV["THIRTY_SEVEN_SIGNALS_OAUTH_SECRET"]).present?
-    config.omniauth :'37signals', key, secret
-  end
-
   if defined?(OmniAuth::Strategies::DropboxOauth2) &&
      (key = ENV["DROPBOX_OAUTH_KEY"]).present? &&
      (secret = ENV["DROPBOX_OAUTH_SECRET"]).present?
     config.omniauth :dropbox, key, secret, strategy_class: OmniAuth::Strategies::DropboxOauth2, request_path: '/auth/dropbox', callback_path: '/auth/dropbox/callback'
-  end
-
-  if defined?(OmniAuth::Strategies::Wunderlist) &&
-     (key = ENV["WUNDERLIST_OAUTH_KEY"]).present? &&
-     (secret = ENV["WUNDERLIST_OAUTH_SECRET"]).present?
-    config.omniauth :wunderlist, key, secret
   end
 
   if defined?(OmniAuth::Strategies::Evernote) &&
@@ -274,6 +262,21 @@ Devise.setup do |config|
     else
       config.omniauth :evernote, key, secret
     end
+  end
+
+  if defined?(OmniAuth::Strategies::GoogleOauth2) &&
+      (key = ENV["GOOGLE_CLIENT_ID"]).present? &&
+      (secret = ENV["GOOGLE_CLIENT_SECRET"]).present?
+    config.omniauth :google_oauth2, key, secret, {
+      name: :google,
+      scope: [
+        'userinfo.email',
+        'userinfo.profile',
+        'https://mail.google.com/', # ImapFolderAgent
+      ].join(','),
+      access_type: 'offline',
+      prompt: 'consent'
+    }
   end
 
   # ==> Warden configuration
@@ -299,4 +302,6 @@ Devise.setup do |config|
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
   config.omniauth_path_prefix = "/auth"
+
+  OmniAuth.config.logger = Rails.logger
 end

@@ -60,7 +60,7 @@ describe Agents::StubhubAgent do
       Agents::StubhubAgent.async_check @stubhub_agent.id
       expect(@stubhub_agent.reload).to be_working
       two_days_from_now = 2.days.from_now
-      stub(Time).now { two_days_from_now }
+      allow(Time).to receive(:now) { two_days_from_now }
       expect(@stubhub_agent.reload).not_to be_working
     end
   end
