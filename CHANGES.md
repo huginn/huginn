@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Dec 15, 2022   | DataOutputAgent Add dc namespace option. [3189](https://github.com/huginn/huginn/pull/3189) |
 | Aug 18, 2022   | Upgrade Ruby to 2.7 and update various gems to address security issues. [3055](https://github.com/huginn/huginn/pull/3055) |
 | Mar 26, 2022   | Add a Liquid variable referring to the agent itself as `_agent_`. [3104](https://github.com/huginn/huginn/pull/3104) |
 | Jan 08, 2022   | BasecampAgent is removed, which was written for the obsoleted API. [3056](https://github.com/huginn/huginn/pull/3056) |
