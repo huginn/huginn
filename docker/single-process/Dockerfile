@@ -30,4 +30,8 @@ EXPOSE 3000
 COPY ["docker/scripts/setup_env", "docker/single-process/scripts/init", "/scripts/"]
 CMD ["/scripts/init"]
 
-USER 1001
+ARG UID=1001
+RUN useradd -u "$UID" -g 0 -d /app -s /sbin/nologin -c "default user" default
+
+USER $UID
+ENV HOME /app

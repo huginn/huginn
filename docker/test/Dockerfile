@@ -28,4 +28,7 @@ COPY docker/test/scripts/test_env /scripts/
 ENTRYPOINT ["/scripts/test_env"]
 CMD ["rake spec"]
 
-USER 1001
+ARG UID=1001
+
+USER $UID
+ENV HOME /app
