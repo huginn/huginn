@@ -18,7 +18,6 @@ jobs:
           - postgresql
         ruby:
           - "2.7"
-          - "2.6"
     env:
       DATABASE_ADAPTER: ${{ matrix.database_adapter }}
       DATABASE_HOST: '127.0.0.1'
