@@ -3,17 +3,11 @@ set -e
 
 export LC_ALL=en_US.UTF-8
 
-cd /app
+export HOME=/app
+cd
 
 if [ -f /app/tmp/pids/delayed_job.pid ]; then
   rm /app/tmp/pids/delayed_job.pid
-fi
-
-export HOME=/app
-if ! whoami &> /dev/null; then
-    if [ -w /etc/passwd ]; then
-        echo "${USER_NAME:-default}:x:$(id -u):0:${USER_NAME:-default} user:${HOME}:/sbin/nologin" >> /etc/passwd
-    fi
 fi
 
 # DATABASE_URL takes the highest precedence.

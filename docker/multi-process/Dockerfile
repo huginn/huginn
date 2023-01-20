@@ -41,6 +41,10 @@ COPY ["docker/multi-process/scripts/bootstrap.sh", \
       "docker/scripts/setup_env", "/scripts/"]
 CMD ["/scripts/init"]
 
-USER 1001
+ARG UID=1001
+RUN useradd -u "$UID" -g 0 -d /app -s /sbin/nologin -c "default user" default
+
+USER $UID
+ENV HOME /app
 
 VOLUME /var/lib/mysql
