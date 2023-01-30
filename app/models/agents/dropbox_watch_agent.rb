@@ -52,7 +52,9 @@ module Agents
     private
 
     def ls(dir_to_watch)
-      dropbox.ls(dir_to_watch).map { |file| { 'path' => file.path, 'rev' => file.rev, 'modified' => file.server_modified } }
+      dropbox.ls(dir_to_watch)
+             .select { |entry| entry.respond_to?(:rev) }
+             .map { |file| { 'path' => file.path, 'rev' => file.rev, 'modified' => file.server_modified } }
     end
 
     def previous_contents
