@@ -1,0 +1,20 @@
+{
+3    "name": "huginnHS",
+4    "version": "1.0.0",
+5    "description": "Required for cyclic.sh",
+6    "scripts": {
+7        "build": "bundle; mysql-ctl start; bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:seed",
+8        "test": "echo \"No test specified\" && exit 1",
+9        "start": "bundle exec foreman start"
+10    },
+11    "repository": {
+12        "type": "git",
+13        "url": "git+https://github.com/haroonis/huginnHS.git"
+14    },
+15    "author": "",
+16    "license": "ISC",
+17    "bugs": {
+18        "url": "https://github.com/haroonis/huginnHS/issues"
+19    },
+20    "homepage": "https://github.com/haroonis/huginnHS#readme"
+21}
