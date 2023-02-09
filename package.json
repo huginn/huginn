@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Required for cyclic.sh",
     "scripts": {
-        "build": "bundle; mysql-ctl start; bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:seed",
+        "build": "mysql-ctl start; bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:seed",
         "test": "echo \"No test specified\" && exit 1",
         "start": "bundle exec foreman start"
     },
