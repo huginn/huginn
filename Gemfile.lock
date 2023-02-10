@@ -829,6 +829,7 @@ DEPENDENCIES
   liquid (~> 5.1)
   listen (~> 3.0.5)
   loofah (~> 2.0)
+  mail (>= 2.8.1)
   mini_magick (>= 4.9.4)
   mini_racer
   mqtt

@@ -1,3 +1,5 @@
+require 'net/smtp'
+
 module Agents
   class EmailDigestAgent < Agent
     include EmailConcern
