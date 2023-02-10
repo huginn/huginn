@@ -290,16 +290,16 @@ describe Agents::ImapFolderAgent do
           # "from" patterns work against mail addresses and not
           # against text parts, so these mails should be skipped if a
           # "from" condition is given.
-          mails.first.header['from'] = '.'
-          mails.last.header['from'] = '@'
+          #
+          # Mail::Header#[]= does not accept an invalid value, so set it directly
+          mails.first.header.fields.replace_field Mail::Field.new('from', '.')
+          mails.last.header.fields.replace_field Mail::Field.new('from', '@')
         end
 
         it 'should ignore them without failing if a "from" condition is given' do
           @checker.options['conditions']['from'] = '*'
 
-          expect {
-            expect { @checker.check }.not_to change { Event.count }
-          }.not_to raise_exception
+          expect { @checker.check }.not_to change { Event.count }
         end
       end
 
