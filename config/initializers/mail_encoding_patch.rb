@@ -1,5 +1,7 @@
+require 'mail'
+
 module Mail
-  class Ruby19
+  module Utilities
     class ImprovedEncoder < BestEffortCharsetEncoder
       def pick_encoding(charset)
         case charset
