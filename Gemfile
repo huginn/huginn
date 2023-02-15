@@ -160,7 +160,7 @@ group :development do
     gem 'pry-rails'
     gem 'pry-byebug'
     gem 'rr', require: false
-    gem 'rspec', '~> 3.8'
+    gem 'rspec'
     gem 'rspec-mocks'
     gem 'rspec-rails'
     gem 'rspec-collection_matchers'
