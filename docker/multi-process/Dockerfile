@@ -33,7 +33,8 @@ ENV OUTDATED_DOCKER_IMAGE_NAMESPACE=${OUTDATED_DOCKER_IMAGE_NAMESPACE}
 
 RUN umask 002 && \
     APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle exec rake assets:clean assets:precompile && \
-    chmod g=u /app/.env.example /app/Gemfile.lock /app/config/ /app/tmp/
+    chmod g=u /app/.env.example /app/Gemfile.lock /app/config/ /app/tmp/ && \
+    chown -R "$UID" /app
 
 EXPOSE 3000
 
