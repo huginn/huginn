@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Feb 19, 2023   | Add a new Liquid filter named `regex_extract`. [3220](https://github.com/huginn/huginn/pull/3220) |
 | Feb 18, 2023   | Fix permissions on /app in the Docker images. [3218](https://github.com/huginn/huginn/pull/3218) |
 | Feb 06, 2023   | BoxcarAgent is removed; the service is long gone. |
 | Dec 15, 2022   | DataOutputAgent Add dc namespace option. [3189](https://github.com/huginn/huginn/pull/3189) |
