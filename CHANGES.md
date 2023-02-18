@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Feb 18, 2023   | Fix permissions on /app in the Docker images. [3218](https://github.com/huginn/huginn/pull/3218) |
 | Feb 06, 2023   | BoxcarAgent is removed; the service is long gone. |
 | Dec 15, 2022   | DataOutputAgent Add dc namespace option. [3189](https://github.com/huginn/huginn/pull/3189) |
 | Aug 18, 2022   | Upgrade Ruby to 2.7 and update various gems to address security issues. [3055](https://github.com/huginn/huginn/pull/3055) |
