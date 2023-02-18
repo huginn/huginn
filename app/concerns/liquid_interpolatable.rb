@@ -231,6 +231,12 @@ module LiquidInterpolatable
       end
     end
 
+    def regex_extract(input, regex, index = 0)
+      input.to_s[Regexp.new(regex), index]
+    rescue Index
+      nil
+    end
+
     def regex_replace(input, regex, replacement = nil)
       input.to_s.gsub(Regexp.new(regex), unescape_replacement(replacement.to_s))
     end
