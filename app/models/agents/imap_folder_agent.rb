@@ -469,6 +469,13 @@ module Agents
         ensure
           imap.disconnect unless imap.nil?
         end
+
+        private
+
+        def authenticators
+          # The authenticators table is stored in the Net::IMAP instance.
+          Net::IMAP.send(:authenticators)
+        end
       end
 
       attr_reader :uidvalidity
