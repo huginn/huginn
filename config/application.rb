@@ -22,7 +22,7 @@ module Huginn
     Dotenv.overload File.expand_path('../../spec/env.test', __FILE__) if Rails.env.test?
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 6.0
+    config.load_defaults 6.1
 
     # Configuration for the application, engines, and railties goes here.
     #
