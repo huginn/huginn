@@ -228,6 +228,22 @@ describe LiquidInterpolatable::Filters do
     end
   end
 
+  describe 'regex_extract' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should extract the matched part' do
+      agent.interpolation_context['something'] = "foo BAR BAZ"
+      agent.options['test'] = "{{ something | regex_extract: '[A-Z]+' }} / {{ something | regex_extract: '[A-Z]([A-Z]+)', 1 }} / {{ something | regex_extract: '(?<x>.)AZ', 'x' }}"
+      expect(agent.interpolated['test']).to eq("BAR / AR / B")
+    end
+
+    it 'should return nil if not matched' do
+      agent.interpolation_context['something'] = "foo BAR BAZ"
+      agent.options['test'] = "{% assign var = something | regex_extract: '[A-Z][a-z]+' %}{% if var == nil %}nil{% else %}non-nil{% endif %}"
+      expect(agent.interpolated['test']).to eq("nil")
+    end
+  end
+
   describe 'regex_replace' do
     let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
 
