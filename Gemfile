@@ -93,8 +93,8 @@ gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
 gem 'coffee-rails', '~> 5'
 gem 'daemons', '~> 1.1.9'
-gem 'delayed_job', '~> 4.1.8'
-gem 'delayed_job_active_record', github: 'dsander/delayed_job_active_record', branch: 'rails6-zeitwerk'
+gem 'delayed_job'
+gem 'delayed_job_active_record'
 gem 'devise', '~> 4.8'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9'
@@ -119,7 +119,7 @@ gem 'mini_magick', ">= 4.9.4"
 gem 'multi_xml'
 gem "nokogiri", ">= 1.10.8"
 gem 'omniauth'
-gem 'rails', '~> 6.0.4'
+gem 'rails', '~> 6.1.7'
 gem 'sprockets', '~> 3.7.2'
 gem 'rails-html-sanitizer', '~> 1.2'
 gem 'rufus-scheduler', '~> 3.4', require: false
@@ -160,7 +160,7 @@ group :development do
     gem 'pry-rails'
     gem 'pry-byebug'
     gem 'rr', require: false
-    gem 'rspec', '~> 3.8'
+    gem 'rspec'
     gem 'rspec-mocks'
     gem 'rspec-rails'
     gem 'rspec-collection_matchers'
