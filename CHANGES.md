@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Mar 01, 2023   | Rails is upgraded to 6.1. [3217](https://github.com/huginn/huginn/pull/3217) |
 | Feb 19, 2023   | Add a new Liquid filter named `regex_extract`. [3220](https://github.com/huginn/huginn/pull/3220) |
 | Feb 18, 2023   | Fix permissions on /app in the Docker images. [3218](https://github.com/huginn/huginn/pull/3218) |
 | Feb 06, 2023   | BoxcarAgent is removed; the service is long gone. |
