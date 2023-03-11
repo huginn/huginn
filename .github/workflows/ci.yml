@@ -24,7 +24,7 @@ jobs:
           - "2.7"
     env:
       DATABASE_ADAPTER: ${{ matrix.database_adapter }}
-      DATABASE_HOST: '127.0.0.1'
+      DATABASE_HOST: "127.0.0.1"
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: password
     services:
@@ -52,7 +52,7 @@ jobs:
           --health-timeout 5s
           --health-retries 3
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -84,7 +84,7 @@ jobs:
       DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build a docker image
         run: |
