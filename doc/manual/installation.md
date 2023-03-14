@@ -305,6 +305,9 @@ Enable (remove the comment) [from these lines](https://github.com/huginn/huginn/
 
 **Note:** Ensure you have no leading spaces before `web:` or `jobs:` in your `Procfile` file.
 
+If you use a directory other than `/home/huginn/huginn/` for the app, change the location of the `runit` logfile in `lib/tasks/production.rake`, for example:
+    run('foreman export runit -a huginn -l /opt/huginn/log /etc/service')
+
 Export the init scripts:
 
     sudo bundle exec rake production:export
@@ -315,6 +318,7 @@ Export the init scripts:
 
     sudo cp deployment/logrotate/huginn /etc/logrotate.d/huginn
 
+Change the location of the log directory if you have chosen to log to a different directory other than `/home/huginn/huginn/log/`
 
 ### Ensure Your Huginn Instance Is Running
 
