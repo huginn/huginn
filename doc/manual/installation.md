@@ -91,6 +91,8 @@ Create a user for Huginn:
 
 ## 4. Database
 
+### MySQL / MariaDB
+
 Install the database packages
 
     sudo apt-get install -y mysql-server mysql-client libmysqlclient-dev
@@ -150,6 +152,27 @@ You should now see `ERROR 1049 (42000): Unknown database 'huginn_production'` wh
 
 You are done installing the database and can go back to the rest of the installation.
 
+### PostgreSQL
+
+Install the database packages
+
+    sudo apt-get install -y postgresql libpq-dev
+
+Create a user for Huginn and set its database connection password. If you want the user to be able to create the database, add `-d`
+
+    sudo -u postgres -H createuser -P huginn
+
+Create a database
+
+    sudo -u postgres -H createdb -O huginn -T template0 huginn_production
+
+Try connecting to the new database with the new user
+
+    sudo -u huginn psql -h localhost -W huginn_production
+
+    # Type the password you set earlier
+
+You should now be greeted by the `psql` interactive client and be connected to the `huginn_production` database. Quit the database session with `\q` or `CTRL-D`
 
 ## 5. Huginn
 
@@ -204,6 +227,20 @@ If you are using a local MySQL server the database configuration should look lik
     # set DATABASE_ENCODING to utf8mb4 instead of utf8 so that the
     # database can hold 4-byte UTF-8 characters like emoji.
     #DATABASE_ENCODING=utf8mb4
+
+If you are using a local PostgreSQL server the database configuration should look like this (use the password of the huginn PostgreSQL user you created earlier):
+
+    DATABASE_ADAPTER=postgresql
+    DATABASE_RECONNECT=true
+    DATABASE_NAME=huginn_production
+    DATABASE_POOL=20
+    DATABASE_USERNAME=huginn
+    DATABASE_PASSWORD='$password'
+    DATABASE_HOST=localhost
+    DATABASE_PORT=5432
+    DATABASE_SOCKET=/var/run/postgresql/.s.PGSQL.5432
+
+    DATABASE_ENCODING=utf8
 
 **Important**: Uncomment the RAILS_ENV setting to run Huginn in the production rails environment
 
