@@ -96,9 +96,11 @@ Install the database packages
     sudo apt-get install -y mysql-server mysql-client libmysqlclient-dev
 
 For Debian Stretch, replace `libmysqlclient-dev` with `default-libmysqlclient-dev`. See the [additional notes section](#additional-notes) for more information.
-For Debian BullEye:
+
+For Debian BullsEye:
+
     sudo apt-get install -y default-mysql-server default-mysql-client default-libmysqlclient-dev
-    
+
 Check the installed MySQL version (remember if its >= 5.5.3 for the `.env` configuration done later):
 
     mysql --version
