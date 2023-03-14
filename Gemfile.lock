@@ -567,7 +567,7 @@ GEM
     public_suffix (5.0.0)
     raabro (1.4.0)
     racc (1.6.2)
-    rack (2.2.6.2)
+    rack (2.2.6.4)
     rack-livereload (0.3.17)
       rack
     rack-test (2.0.2)
