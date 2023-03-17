@@ -68,6 +68,33 @@ jobs:
       - name: Run tests
         run: bundle exec rake
 
+  ghcr-build-docker-images:
+    name: ghcr-docker-build-${{ matrix.docker_image }}
+    needs: run-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        docker_image:
+          - huginn/huginn
+          - huginn/huginn-single-process
+    env:
+      DOCKER_IMAGE: ghcr.io/${{ matrix.docker_image }}
+      DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
+      DOCKER_USER: ${{ github.actor }}
+      DOCKER_PASS: ${{ secrets.GITHUB_TOKEN }}
+      REGISTRY: ghcr.io
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build a docker image
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = push -a "$GITHUB_REF_NAME" = master ]; then
+            ./build_docker_image.sh --push
+          else
+            ./build_docker_image.sh
+          fi
+
   build-docker-images:
     name: docker-build-${{ matrix.docker_image }}
     needs: run-tests
@@ -90,6 +117,4 @@ jobs:
         run: |
           if [ "$GITHUB_EVENT_NAME" = push -a "$GITHUB_REF_NAME" = master ]; then
             ./build_docker_image.sh --push
-          else
-            ./build_docker_image.sh
           fi
