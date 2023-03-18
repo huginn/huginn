@@ -1,2 +1,2 @@
 build:
-	docker build -t huginn/huginn .
+	docker build -t ghcr.io/huginn/huginn .

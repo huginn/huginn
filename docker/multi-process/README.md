@@ -51,11 +51,11 @@ The CMD launches Huginn via the scripts/init script. This may become the ENTRYPO
 
 Simple stand-alone usage (use only for testing/evaluation as it can not be updated without losing data):
 
-    docker run -it -p 3000:3000 huginn/huginn
+    docker run -it -p 3000:3000 ghcr.io/huginn/huginn
 
 Use a volume to export the data of the internal mysql server:
 
-    docker run --rm -it -p 3000:3000 -v /home/huginn/mysql-data:/var/lib/mysql huginn/huginn
+    docker run --rm -it -p 3000:3000 -v /home/huginn/mysql-data:/var/lib/mysql ghcr.io/huginn/huginn
 
 To link to another mysql container, for example:
 
@@ -72,7 +72,7 @@ To link to another mysql container, for example:
         -e HUGINN_DATABASE_NAME=huginn \
         -e HUGINN_DATABASE_USERNAME=huginn \
         -e HUGINN_DATABASE_PASSWORD=somethingsecret \
-        huginn/huginn
+        ghcr.io/huginn/huginn
 
 To link to another container named 'postgres':
 
@@ -86,7 +86,7 @@ To link to another container named 'postgres':
         -e HUGINN_DATABASE_USERNAME=huginn \
         -e HUGINN_DATABASE_PASSWORD=mysecretpassword \
         -e HUGINN_DATABASE_ADAPTER=postgresql \
-        huginn/huginn
+        ghcr.io/huginn/huginn
 
 To use a separate, non-linked mysql container:
 
@@ -97,7 +97,7 @@ To use a separate, non-linked mysql container:
         -e HUGINN_DATABASE_PASSWORD=mysecretpassword \
         -e HUGINN_DATABASE_HOST=myname.mydomain \
         -e HUGINN_DATABASE_PORT=3306
-        huginn/huginn
+        ghcr.io/huginn/huginn
 
 The `docker/multi-process` folder also has a `docker-compose.yml` that allows for a sample database formation with a data volume container:
 
