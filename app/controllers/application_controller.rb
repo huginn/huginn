@@ -29,6 +29,7 @@ class ApplicationController < ActionController::Base
   def upgrade_warning
     return unless current_user
     twitter_oauth_check
+    outdated_docker_registry_check
     outdated_google_auth_check
   end
 
@@ -55,6 +56,10 @@ class ApplicationController < ActionController::Base
         @twitter_oauth_secret = @twitter_agent.options['consumer_secret'].presence || @twitter_agent.credential('twitter_consumer_secret')
       end
     end
+  end
+
+  def outdated_docker_registry_check
+    @outdated_docker_registry = ENV['OUTDATED_DOCKER_REGISTRY'] == 'true'
   end
 
   def outdated_google_auth_check
