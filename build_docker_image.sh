@@ -4,7 +4,6 @@ set -e
 : ${DOCKER_IMAGE:=huginn/huginn}
 : ${DOCKER_IMAGE_TAG:=${GITHUB_SHA:-$(git rev-parse HEAD)}}
 : ${DOCKERFILE:=docker/multi-process/Dockerfile}
-: ${REGISTRY:=docker.com}
 
 bin/docker_wrapper build -t "$DOCKER_IMAGE" -f "$DOCKERFILE" .
 
