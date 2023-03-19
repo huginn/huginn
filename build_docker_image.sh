@@ -5,7 +5,7 @@ set -e
 : ${DOCKER_IMAGE_TAG:=${GITHUB_SHA:-$(git rev-parse HEAD)}}
 : ${DOCKERFILE:=docker/multi-process/Dockerfile}
 
-bin/docker_wrapper build $BUILD_ARGS -t "$DOCKER_IMAGE" -f "$DOCKERFILE" .
+docker build $BUILD_ARGS -t "$DOCKER_IMAGE" -f "$DOCKERFILE" .
 
 if [[ "$1" == --push ]]; then
   [[ -n "$DOCKER_USER" && -n "$DOCKER_IMAGE_TAG" ]]
