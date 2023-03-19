@@ -110,6 +110,7 @@ jobs:
       DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
       DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+      BUILD_ARGS: --build-arg OUTDATED_DOCKER_REGISTRY=true
     steps:
       - uses: actions/checkout@v3
 

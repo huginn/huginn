@@ -1,4 +1,4 @@
-FROM huginn/huginn-single-process
+FROM ghcr.io/huginn/huginn-single-process
 
 ENV PHANTOM_VERSION "phantomjs-2.1.1"
 ENV PHANTOM_JS "${PHANTOM_VERSION}-linux-x86_64"

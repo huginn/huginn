@@ -39,3 +39,22 @@ TWITTER_OAUTH_SECRET=<%= @twitter_oauth_secret %>
     </div>
   </dir>
 <% end -%>
+<% if @outdated_docker_registry %>
+  <dir class="container">
+    <div class="alert alert-danger" role="alert">
+      <p>
+        <b>Warning!</b> This message is informing you that the source from which the Huginn Docker image is obtained needs to be updated.
+      </p>
+      <br/>
+      <p>
+        Docker Hub is discontinuing team accounts, and as a result, the Huginn Docker images will now be hosted on GitHub Container Registry (GHCR). Therefore, you need to update your configuration to the new registry.
+        <p>
+          <ul>
+            <li><code>huginn/huginn</code> is now <code>ghcr.io/huginn/huginn</code></li>
+            <li><code>huginn/huginn-single-process</code> is now <code>ghcr.io/huginn/huginn-single-process</code></li>
+          </ul>
+        </p>
+      </p>
+    </div>
+  </dir>
+<% end -%>

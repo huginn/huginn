@@ -9,7 +9,7 @@ Getting Huginn up and running using docker is quick and painless once you have d
 ### Quick start to check out Huginn
 
 1. Install Docker using the [install instructions](https://docs.docker.com/get-docker/)
-* Start your Huginn container using `docker run -it -p 3000:3000 huginn/huginn`
+* Start your Huginn container using `docker run -it -p 3000:3000 ghcr.io/huginn/huginn`
 * Open Huginn in the browser [http://localhost:3000](http://localhost:3000)
 * Log in to your Huginn instance using the username `admin` and password `password`
 
