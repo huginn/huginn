@@ -17,6 +17,7 @@ ENV RAILS_ENV=production
 
 COPY --chown="$UID:0" ["Gemfile", "Gemfile.lock", "/app/"]
 COPY --chown="$UID:0" lib/gemfile_helper.rb /app/lib/
+RUN mkdir /app/vendor
 COPY --chown="$UID:0" vendor/gems/ /app/vendor/gems/
 
 ARG ADDITIONAL_GEMS=
