@@ -38,11 +38,9 @@ module DotHelper
   class DotDrawer
     def initialize(vars = {})
       @dot = ''
-      @vars = vars.symbolize_keys
-    end
-
-    def method_missing(var, *args)
-      @vars.fetch(var) { super }
+      vars.each do |key, value|
+        define_singleton_method(key) { value }
+      end
     end
 
     def to_s
