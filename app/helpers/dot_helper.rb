@@ -27,10 +27,10 @@ module DotHelper
   private def dot_to_svg(dot)
     command = ENV['USE_GRAPHVIZ_DOT'] or return nil
 
-    IO.popen(*%W[#{command} -Tsvg -q1 -o/dev/stdout /dev/stdin], 'w+') do |dot|
-      dot.print dot
-      dot.close_write
-      dot.read
+    IO.popen(%W[#{command} -Tsvg -q1 -o/dev/stdout /dev/stdin], 'w+') do |rw|
+      rw.print dot
+      rw.close_write
+      rw.read
     rescue StandardError
     end
   end
@@ -38,11 +38,9 @@ module DotHelper
   class DotDrawer
     def initialize(vars = {})
       @dot = ''
-      @vars = vars.symbolize_keys
-    end
-
-    def method_missing(var, *args)
-      @vars.fetch(var) { super }
+      vars.each do |key, value|
+        define_singleton_method(key) { value }
+      end
     end
 
     def to_s
