@@ -67,14 +67,14 @@ Manual startup and linking to a MySQL container:
         -e DATABASE_NAME=huginn \
         -e DATABASE_USERNAME=huginn \
         -e DATABASE_PASSWORD=somethingsecret \
-        huginn/huginn-single-process
+        ghcr.io/huginn/huginn-single-process
 
     docker run --rm --name huginn_threaded \
         --link huginn_mysql:mysql \
         -e DATABASE_NAME=huginn \
         -e DATABASE_USERNAME=huginn \
         -e DATABASE_PASSWORD=somethingsecret \
-        huginn/huginn-single-process /scripts/init bin/threaded.rb
+        ghcr.io/huginn/huginn-single-process /scripts/init bin/threaded.rb
 
 or alternatively:
 
@@ -84,7 +84,7 @@ or alternatively:
         -e DATABASE_USERNAME=huginn \
         -e DATABASE_PASSWORD=somethingsecret \
         -e WORKER_CMD='bin/threaded.rb' \
-        huginn/huginn-single-process
+        ghcr.io/huginn/huginn-single-process
 
 ## Environment Variables
 

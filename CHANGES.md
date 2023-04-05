@@ -2,6 +2,12 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Mar 12, 2023   | Twitter agents are improved so that every tweet event has an `expanded_text` in it. [3230](https://github.com/huginn/huginn/pull/3230) |
+| Mar 01, 2023   | Rails is upgraded to 6.1. [3217](https://github.com/huginn/huginn/pull/3217) |
+| Feb 19, 2023   | Add a new Liquid filter named `regex_extract`. [3220](https://github.com/huginn/huginn/pull/3220) |
+| Feb 18, 2023   | Fix permissions on /app in the Docker images. [3218](https://github.com/huginn/huginn/pull/3218) |
+| Feb 06, 2023   | BoxcarAgent is removed; the service is long gone. |
+| Dec 15, 2022   | DataOutputAgent Add dc namespace option. [3189](https://github.com/huginn/huginn/pull/3189) |
 | Aug 18, 2022   | Upgrade Ruby to 2.7 and update various gems to address security issues. [3055](https://github.com/huginn/huginn/pull/3055) |
 | Mar 26, 2022   | Add a Liquid variable referring to the agent itself as `_agent_`. [3104](https://github.com/huginn/huginn/pull/3104) |
 | Jan 08, 2022   | BasecampAgent is removed, which was written for the obsoleted API. [3056](https://github.com/huginn/huginn/pull/3056) |

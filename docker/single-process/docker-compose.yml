@@ -14,7 +14,7 @@ services:
       - mysqldata
 
   web:
-    image: huginn/huginn-single-process
+    image: ghcr.io/huginn/huginn-single-process
     restart: always
     ports:
       - "3000:3000"
@@ -25,7 +25,7 @@ services:
       - mysql
 
   threaded:
-    image: huginn/huginn-single-process
+    image: ghcr.io/huginn/huginn-single-process
     command: /scripts/init bin/threaded.rb
     restart: always
     env_file:
