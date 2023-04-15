@@ -113,6 +113,32 @@ describe Agents::KeyValueStoreAgent do
         }
       )
     end
+
+    describe "using _value_" do
+      let(:value_template) { "{% if _value_ %}{{ _value_ }}, {% endif %}{{ name }}" }
+
+      it "represents the existing value" do
+        agent.receive(events[0..2])
+
+        expect(agent.reload.memory).to match(
+          {
+            "1" => "foo",
+            "2" => "bar",
+            "3" => "baz",
+          }
+        )
+
+        agent.receive([events[3]])
+
+        expect(agent.reload.memory).to match(
+          {
+            "1" => "foo, FOO",
+            "2" => "bar",
+            "3" => "baz",
+          }
+        )
+      end
+    end
   end
 
   describe "control target" do
