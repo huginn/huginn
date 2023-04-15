@@ -62,8 +62,8 @@ module Agents
       /\A(?!\d)\w+\z/ === options[:variable] or
         errors.add(:base, "variable is required and must be valid as a variable name.")
 
-      options[:max_keys].to_i > 0 or
-        errors.add(:base, "max_keys is required and must be a positive number.")
+      max_keys > 0 or
+        errors.add(:base, "max_keys must be a positive number.")
     end
 
     def default_options
@@ -78,8 +78,16 @@ module Agents
       !recent_error_logs?
     end
 
+    def max_keys
+      if value = options[:max_keys].presence
+        value.to_i
+      else
+        100
+      end
+    end
+
     def receive(incoming_events)
-      max_keys = options[:max_keys].to_i
+      max_keys = max_keys()
 
       incoming_events.each do |event|
         interpolate_with(event) do

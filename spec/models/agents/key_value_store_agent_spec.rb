@@ -69,6 +69,15 @@ describe Agents::KeyValueStoreAgent do
       agent.options.delete(:variable)
       expect(agent).not_to be_valid
     end
+
+    it "should validate max_keys" do
+      agent.options.delete(:max_keys)
+      expect(agent).to be_valid
+      expect(agent.max_keys).to eq 100
+
+      agent.options[:max_keys] = 0
+      expect(agent).not_to be_valid
+    end
   end
 
   describe "#receive" do
