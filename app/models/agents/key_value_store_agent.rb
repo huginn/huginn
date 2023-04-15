@@ -78,6 +78,10 @@ module Agents
       !recent_error_logs?
     end
 
+    def control_action
+      'provide'
+    end
+
     def max_keys
       if value = options[:max_keys].presence
         value.to_i
