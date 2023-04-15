@@ -111,7 +111,13 @@ module LiquidInterpolatable
 
   class Context < Liquid::Context
     def initialize(agent)
-      super({}, { '_agent_' => agent }, { agent: agent }, true)
+      outer_scope = { '_agent_' => agent }
+
+      Agents::KeyValueStoreAgent.merge(agent.controllers).find_each do |kvs|
+        outer_scope[kvs.options[:variable]] = kvs.memory
+      end
+
+      super({}, outer_scope, { agent: agent }, true)
     end
 
     def hash
