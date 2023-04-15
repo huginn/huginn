@@ -2,6 +2,8 @@ module AgentControllerConcern
   extend ActiveSupport::Concern
 
   included do
+    can_control_other_agents!
+
     validate :validate_control_action
   end
 

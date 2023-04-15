@@ -343,8 +343,12 @@ class Agent < ActiveRecord::Base
       !!@cannot_receive_events
     end
 
+    def can_control_other_agents!
+      @can_control_other_agents = true
+    end
+
     def can_control_other_agents?
-      include? AgentControllerConcern
+      !!@can_control_other_agents
     end
 
     def can_dry_run!
