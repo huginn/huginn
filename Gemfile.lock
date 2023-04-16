@@ -490,6 +490,9 @@ GEM
     mysql2 (0.5.4)
     naught (1.1.0)
     nenv (0.3.0)
+    net-ftp (0.2.0)
+      net-protocol
+      time
     net-ftp-list (3.2.8)
     net-imap (0.3.4)
       date
@@ -744,6 +747,8 @@ GEM
     thor (1.2.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
+    time (0.2.2)
+      date
     timeout (0.3.1)
     tins (1.31.0)
       sync
@@ -862,7 +867,8 @@ DEPENDENCIES
   mqtt
   multi_xml
   mysql2 (~> 0.5)
-  net-ftp-list (~> 3.2.8)
+  net-ftp
+  net-ftp-list
   nokogiri (>= 1.10.8)
   omniauth
   omniauth-dropbox-oauth2!

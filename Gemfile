@@ -35,7 +35,8 @@ gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'hypdf', '~> 1.0.10'          # PDFInfoAgent
 gem 'mini_racer'                  # JavaScriptAgent
 gem 'mqtt'                        # MQTTAgent
-gem 'net-ftp-list', '~> 3.2.8'    # FtpsiteAgent
+gem 'net-ftp'
+gem 'net-ftp-list'                # FtpsiteAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'ruby-growl', '~> 4.1.0'      # GrowlAgent
 gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
