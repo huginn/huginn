@@ -56,9 +56,13 @@ module Agents
     def handle(opts, event = nil)
       property = get_hash(options['property'].blank? ? JSON.dump(event.payload) : opts['property'])
       if is_unique?(property)
-        created_event = create_event payload: event.payload
+        outbound_event = create_event payload: event.payload
 
-        log("Propagating new event as '#{property}' is a new unique property.", inbound_event: event)
+        log(
+          "Propagating new event as '#{property}' is a new unique property.",
+          inbound_event: event,
+          outbound_event:
+        )
         update_memory(property, opts['lookback'].to_i)
       else
         log("Not propagating as incoming event is a duplicate.", inbound_event: event)
