@@ -33,6 +33,9 @@ describe Agents::TwitterFavorites do
   describe "making sure check method works" do
     it "expect change method to change event" do
       expect { @agent.check }.to change { Event.count }.by(3)
+      Event.last(3).each_cons(2) do |t1, t2|
+        expect(t1.payload[:id]).to be < t2.payload[:id]
+      end
     end
   end
 
