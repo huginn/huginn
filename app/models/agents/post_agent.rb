@@ -13,7 +13,7 @@ module Agents
     default_schedule "never"
 
     description do
-      <<-MD
+      <<~MD
         A Post Agent receives events from other agents (or runs periodically), merges those events with the [Liquid-interpolated](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) contents of `payload`, and sends the results as POST (or GET) requests to a specified url.  To skip merging in the incoming event, but still send the interpolated payload, set `no_merge` to `true`.
 
         The `post_url` field must specify where you would like to send requests. Please include the URI scheme (`http` or `https`).
@@ -56,16 +56,17 @@ module Agents
       MD
     end
 
-    event_description <<-MD
+    event_description <<~MD
       Events look like this:
-        {
-          "status": 200,
-          "headers": {
-            "Content-Type": "text/html",
-            ...
-          },
-          "body": "<html>Some data...</html>"
-        }
+
+          {
+            "status": 200,
+            "headers": {
+              "Content-Type": "text/html",
+              ...
+            },
+            "body": "<html>Some data...</html>"
+          }
 
       Original event contents will be merged when `output_mode` is set to `merge`.
     MD
@@ -89,7 +90,7 @@ module Agents
 
     def working?
       return false if recent_error_logs?
-      
+
       if interpolated['expected_receive_period_in_days'].present?
         return false unless last_receive_at && last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago
       end
@@ -106,7 +107,8 @@ module Agents
         errors.add(:base, "post_url is a required field")
       end
 
-      if options['payload'].present? && %w[get delete].include?(method) && !(options['payload'].is_a?(Hash) || options['payload'].is_a?(Array))
+      if options['payload'].present? && %w[get
+                                           delete].include?(method) && !(options['payload'].is_a?(Hash) || options['payload'].is_a?(Array))
         errors.add(:base, "if provided, payload must be a hash or an array")
       end
 
@@ -134,11 +136,11 @@ module Agents
         errors.add(:base, "method must be 'post', 'get', 'put', 'delete', or 'patch'")
       end
 
-      if options['no_merge'].present? && !%[true false].include?(options['no_merge'].to_s)
+      if options['no_merge'].present? && !%(true false).include?(options['no_merge'].to_s)
         errors.add(:base, "if provided, no_merge must be 'true' or 'false'")
       end
 
-      if options['output_mode'].present? && !options['output_mode'].to_s.include?('{') && !%[clean merge].include?(options['output_mode'].to_s)
+      if options['output_mode'].present? && !options['output_mode'].to_s.include?('{') && !%(clean merge).include?(options['output_mode'].to_s)
         errors.add(:base, "if provided, output_mode must be 'clean' or 'merge'")
       end
 
@@ -173,7 +175,8 @@ module Agents
 
       case method
       when 'get', 'delete'
-        params, body = data, nil
+        params = data
+        body = nil
       when 'post', 'put', 'patch'
         params = nil
 

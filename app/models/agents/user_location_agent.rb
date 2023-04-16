@@ -6,20 +6,21 @@ module Agents
 
     gem_dependency_check { defined?(Haversine) }
 
-    description do <<-MD
-      The User Location Agent creates events based on WebHook POSTS that contain a `latitude` and `longitude`.  You can use the [POSTLocation](https://github.com/cantino/post_location) or [PostGPS](https://github.com/chriseidhof/PostGPS) iOS app to post your location to `https://#{ENV['DOMAIN']}/users/#{user.id}/update_location/:secret` where `:secret` is specified in your options.
+    description do
+      <<~MD
+        The User Location Agent creates events based on WebHook POSTS that contain a `latitude` and `longitude`.  You can use the [POSTLocation](https://github.com/cantino/post_location) or [PostGPS](https://github.com/chriseidhof/PostGPS) iOS app to post your location to `https://#{ENV['DOMAIN']}/users/#{user.id}/update_location/:secret` where `:secret` is specified in your options.
 
-      #{'## Include `haversine` in your Gemfile to use this Agent!' if dependencies_missing?}
+        #{'## Include `haversine` in your Gemfile to use this Agent!' if dependencies_missing?}
 
-      If you want to only keep more precise locations, set `max_accuracy` to the upper bound, in meters. The default name for this field is `accuracy`, but you can change this by setting a value for `accuracy_field`.
+        If you want to only keep more precise locations, set `max_accuracy` to the upper bound, in meters. The default name for this field is `accuracy`, but you can change this by setting a value for `accuracy_field`.
 
-      If you want to require a certain distance traveled, set `min_distance` to the minimum distance, in meters. Note that GPS readings and the measurement itself aren't exact, so don't rely on this for precision filtering.
+        If you want to require a certain distance traveled, set `min_distance` to the minimum distance, in meters. Note that GPS readings and the measurement itself aren't exact, so don't rely on this for precision filtering.
 
-      To view the locations on a map, set `api_key` to your [Google Maps JavaScript API key](https://developers.google.com/maps/documentation/javascript/get-api-key#key).
-    MD
+        To view the locations on a map, set `api_key` to your [Google Maps JavaScript API key](https://developers.google.com/maps/documentation/javascript/get-api-key#key).
+      MD
     end
 
-    event_description <<-MD
+    event_description <<~MD
       Assuming you're using the iOS application, events look like this:
 
           {
@@ -49,7 +50,8 @@ module Agents
     end
 
     def validate_options
-      errors.add(:base, "secret is required and must be longer than 4 characters") unless options['secret'].present? && options['secret'].length > 4
+      errors.add(:base,
+                 "secret is required and must be longer than 4 characters") unless options['secret'].present? && options['secret'].length > 4
     end
 
     def receive(incoming_events)
@@ -71,7 +73,7 @@ module Agents
 
       handle_payload params.except(:secret)
 
-      return ['ok', 200]
+      ['ok', 200]
     end
 
     private
@@ -87,7 +89,12 @@ module Agents
 
       def far_enough?(payload)
         if memory['last_location'].present?
-          travel = Haversine.distance(memory['last_location']['latitude'].to_i, memory['last_location']['longitude'].to_i, payload['latitude'].to_i, payload['longitude'].to_i).to_meters
+          travel = Haversine.distance(
+            memory['last_location']['latitude'].to_i,
+            memory['last_location']['longitude'].to_i,
+            payload['latitude'].to_i,
+            payload['longitude'].to_i
+          ).to_meters
           !interpolated[:min_distance].present? || travel > interpolated[:min_distance].to_i
         else # for the first run, before "last_location" exists
           true
@@ -98,7 +105,7 @@ module Agents
         if interpolated[:max_accuracy].present? && !payload[accuracy_field].present?
           log "Accuracy field missing; all locations will be kept"
         end
-        create_event payload: payload, location: location
+        create_event(payload:, location:)
         memory["last_location"] = payload
       end
     end

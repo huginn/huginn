@@ -9,7 +9,7 @@ module Agents
     cannot_create_events!
     no_bulk_receive!
 
-    description <<-MD
+    description <<~MD
       The Email Agent sends any events it receives via email immediately.
 
       You can specify the email's subject line by providing a `subject` option, which can contain [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) formatting.  E.g.,
@@ -35,9 +35,9 @@ module Agents
 
     def default_options
       {
-          'subject' => "You have a notification!",
-          'headline' => "Your notification:",
-          'expected_receive_period_in_days' => "2"
+        'subject' => "You have a notification!",
+        'headline' => "Your notification:",
+        'expected_receive_period_in_days' => "2"
       }
     end
 
@@ -48,21 +48,19 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         recipients(event.payload).each do |recipient|
-          begin
-            SystemMailer.send_message(
-              to: recipient,
-              from: interpolated(event)['from'],
-              subject: interpolated(event)['subject'],
-              headline: interpolated(event)['headline'],
-              body: interpolated(event)['body'],
-              content_type: interpolated(event)['content_type'],
-              groups: [present(event.payload)]
-            ).deliver_now
-            log "Sent mail to #{recipient} with event #{event.id}"
-          rescue => e
-            error("Error sending mail to #{recipient} with event #{event.id}: #{e.message}")
-            raise
-          end
+          SystemMailer.send_message(
+            to: recipient,
+            from: interpolated(event)['from'],
+            subject: interpolated(event)['subject'],
+            headline: interpolated(event)['headline'],
+            body: interpolated(event)['body'],
+            content_type: interpolated(event)['content_type'],
+            groups: [present(event.payload)]
+          ).deliver_now
+          log "Sent mail to #{recipient} with event #{event.id}"
+        rescue StandardError => e
+          error("Error sending mail to #{recipient} with event #{event.id}: #{e.message}")
+          raise
         end
       end
     end

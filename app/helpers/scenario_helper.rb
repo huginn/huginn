@@ -1,7 +1,6 @@
 module ScenarioHelper
-
   def style_colors(scenario)
-    colors = {
+    {
       color: scenario.tag_fg_color || default_scenario_fg_color,
       background_color: scenario.tag_bg_color || default_scenario_bg_color
     }.map { |key, value| "#{key.to_s.dasherize}:#{value}" }.join(';')
@@ -19,5 +18,4 @@ module ScenarioHelper
   def default_scenario_fg_color
     '#FFFFFF'
   end
-
 end

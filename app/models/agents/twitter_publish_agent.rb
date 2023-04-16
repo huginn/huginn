@@ -4,7 +4,7 @@ module Agents
 
     cannot_be_scheduled!
 
-    description <<-MD
+    description <<~MD
       The Twitter Publish Agent publishes tweets from the events it receives.
 
       #{twitter_dependencies_missing if dependencies_missing?}
@@ -19,32 +19,34 @@ module Agents
       If `output_mode` is set to `merge`, the emitted Event will be merged into the original contents of the received Event.
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       Events look like this:
-        {
-          "success": true,
-          "published_tweet": "...",
-          "tweet_id": ...,
-          "tweet_url": "...",
-          "agent_id": ...,
-          "event_id": ...
-        }
 
-        {
-          "success": false,
-          "error": "...",
-          "failed_tweet": "...",
-          "agent_id": ...,
-          "event_id": ...
-        }
+          {
+            "success": true,
+            "published_tweet": "...",
+            "tweet_id": ...,
+            "tweet_url": "...",
+            "agent_id": ...,
+            "event_id": ...
+          }
+
+          {
+            "success": false,
+            "error": "...",
+            "failed_tweet": "...",
+            "agent_id": ...,
+            "event_id": ...
+          }
 
       Original event contents will be merged when `output_mode` is set to `merge`.
     MD
 
     def validate_options
-      errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
+      errors.add(:base,
+                 "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
 
-      if options['output_mode'].present? && !options['output_mode'].to_s.include?('{') && !%[clean merge].include?(options['output_mode'].to_s)
+      if options['output_mode'].present? && !options['output_mode'].to_s.include?('{') && !%(clean merge).include?(options['output_mode'].to_s)
         errors.add(:base, "if provided, output_mode must be 'clean' or 'merge'")
       end
     end

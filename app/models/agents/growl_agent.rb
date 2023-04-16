@@ -9,7 +9,7 @@ module Agents
 
     gem_dependency_check { defined?(Growl) }
 
-    description <<-MD
+    description <<~MD
       The Growl Agent sends any events it receives to a Growl GNTP server immediately.
 
       #{'## Include `ruby-growl` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -27,15 +27,15 @@ module Agents
 
     def default_options
       {
-          'growl_server' => 'localhost',
-          'growl_password' => '',
-          'growl_app_name' => 'HuginnGrowl',
-          'growl_notification_name' => 'Notification',
-          'expected_receive_period_in_days' => "2",
-          'subject' => '{{subject}}',
-          'message' => '{{message}}',
-          'sticky' => 'false',
-          'priority' => '0'
+        'growl_server' => 'localhost',
+        'growl_password' => '',
+        'growl_app_name' => 'HuginnGrowl',
+        'growl_notification_name' => 'Notification',
+        'expected_receive_period_in_days' => "2",
+        'subject' => '{{subject}}',
+        'message' => '{{message}}',
+        'sticky' => 'false',
+        'priority' => '0'
       }
     end
 
@@ -78,8 +78,8 @@ module Agents
           subject = interpolated[:subject]
           if message.present? && subject.present?
             log "Sending Growl notification '#{subject}': '#{message}' to #{interpolated(event)['growl_server']} with event #{event.id}"
-            notify_growl(subject: subject,
-                         message: message,
+            notify_growl(subject:,
+                         message:,
                          priority: interpolated[:priority].to_i,
                          sticky: boolify(interpolated[:sticky]) || false,
                          callback_url: interpolated[:callback_url].presence)

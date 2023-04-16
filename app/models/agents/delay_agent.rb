@@ -4,7 +4,7 @@ module Agents
 
     default_schedule 'every_12h'
 
-    description <<-MD
+    description <<~MD
       The DelayAgent stores received Events and emits copies of them on a schedule. Use this as a buffer or queue of Events.
 
       `max_events` should be set to the maximum number of events that you'd like to hold in the buffer. When this number is
@@ -33,7 +33,8 @@ module Agents
 
     def validate_options
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
-        errors.add(:base, "Please provide 'expected_receive_period_in_days' to indicate how many days can pass before this Agent is considered to be not working")
+        errors.add(:base,
+                   "Please provide 'expected_receive_period_in_days' to indicate how many days can pass before this Agent is considered to be not working")
       end
 
       unless options['keep'].present? && options['keep'].in?(%w[newest oldest])

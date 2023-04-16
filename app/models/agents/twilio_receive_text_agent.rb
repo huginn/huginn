@@ -5,20 +5,21 @@ module Agents
 
     gem_dependency_check { defined?(Twilio) }
 
-    description do <<-MD
-      The Twilio Receive Text Agent receives text messages from Twilio and emits them as events.
+    description do
+      <<~MD
+        The Twilio Receive Text Agent receives text messages from Twilio and emits them as events.
 
-      #{'## Include `twilio-ruby` in your Gemfile to use this Agent!' if dependencies_missing?}
+        #{'## Include `twilio-ruby` in your Gemfile to use this Agent!' if dependencies_missing?}
 
-      In order to create events with this agent, configure Twilio to send POST requests to:
+        In order to create events with this agent, configure Twilio to send POST requests to:
 
-      ```
-      #{post_url}
-      ```
+        ```
+        #{post_url}
+        ```
 
-      #{'The placeholder symbols above will be replaced by their values once the agent is saved.' unless id}
+        #{'The placeholder symbols above will be replaced by their values once the agent is saved.' unless id}
 
-      Options:
+        Options:
 
         * `server_url` must be set to the URL of your
         Huginn installation (probably "https://#{ENV['DOMAIN']}"), which must be web-accessible.  Be sure to set http/https correctly.
@@ -35,8 +36,8 @@ module Agents
       {
         'account_sid' => 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         'auth_token' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        'server_url'    => "https://#{ENV['DOMAIN'].presence || 'example.com'}",
-        'reply_text'    => '',
+        'server_url' => "https://#{ENV['DOMAIN'].presence || 'example.com'}",
+        'reply_text' => '',
         "expected_receive_period_in_days" => 1
       }
     end
@@ -73,11 +74,10 @@ module Agents
       # validate from twilio
       @validator ||= Twilio::Security::RequestValidator.new interpolated['auth_token']
       if !@validator.validate(post_url, params, signature)
-        error("Twilio Signature Failed to Validate\n\n"+
-          "URL: #{post_url}\n\n"+
-          "POST params: #{params.inspect}\n\n"+
-          "Signature: #{signature}"
-          )
+        error("Twilio Signature Failed to Validate\n\n" +
+          "URL: #{post_url}\n\n" +
+          "POST params: #{params.inspect}\n\n" +
+          "Signature: #{signature}")
         return ["Not authorized", 401]
       end
 
@@ -87,9 +87,9 @@ module Agents
             r.message(body: interpolated['reply_text'])
           end
         end
-        return [response.to_s, 200, "text/xml"]
+        [response.to_s, 200, "text/xml"]
       else
-        return ["Bad request", 400]
+        ["Bad request", 400]
       end
     end
   end

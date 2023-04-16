@@ -1,12 +1,10 @@
-# encoding: utf-8
-
 module Agents
   class WeiboPublishAgent < Agent
     include WeiboConcern
 
     cannot_be_scheduled!
 
-    description <<-MD
+    description <<~MD
       The Weibo Publish Agent publishes tweets from the events it receives.
 
       #{'## Include `weibo_2` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -24,7 +22,7 @@ module Agents
 
     def validate_options
       unless options['uid'].present? &&
-             options['expected_update_period_in_days'].present?
+          options['expected_update_period_in_days'].present?
         errors.add(:base, "expected_update_period_in_days and uid are required")
       end
     end
@@ -62,7 +60,7 @@ module Agents
           else
             publish_tweet tweet_text
           end
-          create_event :payload => {
+          create_event payload: {
             'success' => true,
             'published_tweet' => tweet_text,
             'published_pic' => pic_url,
@@ -70,7 +68,7 @@ module Agents
             'event_id' => event.id
           }
         rescue OAuth2::Error => e
-          create_event :payload => {
+          create_event payload: {
             'success' => false,
             'error' => e.message,
             'failed_tweet' => tweet_text,
@@ -84,29 +82,27 @@ module Agents
       end
     end
 
-    def publish_tweet text
+    def publish_tweet(text)
       weibo_client.statuses.update text
     end
 
-    def publish_tweet_with_pic text, pic
+    def publish_tweet_with_pic(text, pic)
       weibo_client.statuses.upload text, open(pic)
     end
 
     def valid_image?(url)
-      begin
-        url = URI.parse(url)
-        http = Net::HTTP.new(url.host, url.port)
-        http.use_ssl = (url.scheme == "https")
-        http.start do |http|
-          # images supported #http://open.weibo.com/wiki/2/statuses/upload
-          return ['image/gif', 'image/jpeg', 'image/png'].include? http.head(url.request_uri)['Content-Type']
-        end
-      rescue => e
-        return false
+      url = URI.parse(url)
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = (url.scheme == "https")
+      http.start do |http|
+        # images supported #http://open.weibo.com/wiki/2/statuses/upload
+        return ['image/gif', 'image/jpeg', 'image/png'].include? http.head(url.request_uri)['Content-Type']
       end
+    rescue StandardError => e
+      false
     end
 
-    def unwrap_tco_urls text, tweet_json
+    def unwrap_tco_urls(text, tweet_json)
       tweet_json[:entities][:urls].each do |url|
         text.gsub! url[:url], url[:expanded_url]
       end

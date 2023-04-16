@@ -6,7 +6,7 @@ module Agents
 
     cannot_be_scheduled!
 
-    description <<-MD
+    description <<~MD
       The Sentiment Agent generates `good-bad` (psychological valence or happiness index), `active-passive` (arousal), and  `strong-weak` (dominance) score. It will output a value between 1 and 9. It will only work on English content.
 
       Make sure the content this agent is analyzing is of sufficient length to get respectable results.
@@ -14,7 +14,7 @@ module Agents
       Provide a JSONPath in `content` field where content is residing and set `expected_receive_period_in_days` to the maximum number of days you would allow to be passed between events being received by this agent.
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       Events look like:
 
           {
@@ -41,17 +41,22 @@ module Agents
       incoming_events.each do |event|
         Utils.values_at(event.payload, interpolated['content']).each do |content|
           sent_values = sentiment_values anew, content
-          create_event :payload => { 'content' => content,
-                                     'valence' => sent_values[0],
-                                     'arousal' => sent_values[1],
-                                     'dominance' => sent_values[2],
-                                     'original_event' => event.payload }
+          create_event payload: {
+            'content' => content,
+            'valence' => sent_values[0],
+            'arousal' => sent_values[1],
+            'dominance' => sent_values[2],
+            'original_event' => event.payload
+          }
         end
       end
     end
 
     def validate_options
-      errors.add(:base, "content and expected_receive_period_in_days must be present") unless options['content'].present? && options['expected_receive_period_in_days'].present?
+      errors.add(
+        :base,
+        "content and expected_receive_period_in_days must be present"
+      ) unless options['content'].present? && options['expected_receive_period_in_days'].present?
     end
 
     def self.sentiment_hash
@@ -67,15 +72,15 @@ module Agents
     def sentiment_values(anew, text)
       valence, arousal, dominance, freq = [0] * 4
       text.downcase.strip.gsub(/[^a-z ]/, "").split.each do |word|
-        if anew.has_key? word
-          valence += anew[word][0]
-          arousal += anew[word][1]
-          dominance += anew[word][2]
-          freq += 1
-        end
+        next unless anew.has_key? word
+
+        valence += anew[word][0]
+        arousal += anew[word][1]
+        dominance += anew[word][2]
+        freq += 1
       end
       if valence != 0
-        [valence/freq, arousal/freq, dominance/freq]
+        [valence / freq, arousal / freq, dominance / freq]
       else
         ["Insufficient data for meaningful answer"] * 3
       end

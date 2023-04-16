@@ -114,7 +114,9 @@ describe "Creating a new agent", js: true do
       "expected_receive_period_in_days": "2"
       "keep_event": "false"
     }')
-    expect(get_alert_text_from { click_on "Save" }).to have_text("Sorry, there appears to be an error in your JSON input. Please fix it before continuing.")
+    expect(get_alert_text_from {
+             click_on "Save"
+           }).to have_text("Sorry, there appears to be an error in your JSON input. Please fix it before continuing.")
   end
 
   context "displaying the correct information" do

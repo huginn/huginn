@@ -1,8 +1,8 @@
 class Service < ActiveRecord::Base
   serialize :options, Hash
 
-  belongs_to :user, :inverse_of => :services
-  has_many :agents, :inverse_of => :service
+  belongs_to :user, inverse_of: :services
+  has_many :agents, inverse_of: :service
 
   validates_presence_of :user_id, :provider, :name, :token
 
@@ -20,7 +20,7 @@ class Service < ActiveRecord::Base
   end
 
   def toggle_availability!
-    disable_agents(where_not: {user_id: self.user_id}) if global
+    disable_agents(where_not: { user_id: self.user_id }) if global
     self.global = !self.global
     self.save!
   end
@@ -34,20 +34,21 @@ class Service < ActiveRecord::Base
   def refresh_token_parameters
     {
       grant_type: 'refresh_token',
-      client_id:     oauth_key,
+      client_id: oauth_key,
       client_secret: oauth_secret,
-      refresh_token: refresh_token
+      refresh_token:
     }
   end
 
   def refresh_token!
     response = HTTParty.post(endpoint, query: refresh_token_parameters)
     data = JSON.parse(response.body)
-    update(expires_at: Time.now + data['expires_in'], token: data['access_token'], refresh_token: data['refresh_token'].presence || refresh_token)
+    update(expires_at: Time.now + data['expires_in'], token: data['access_token'],
+           refresh_token: data['refresh_token'].presence || refresh_token)
   end
 
   def endpoint
-    client_options =  Devise.omniauth_configs[provider.to_sym].strategy_class.default_options['client_options']
+    client_options = Devise.omniauth_configs[provider.to_sym].strategy_class.default_options['client_options']
     URI.join(client_options['site'], client_options['token_url'])
   end
 
@@ -63,12 +64,14 @@ class Service < ActiveRecord::Base
     options = get_options(omniauth)
 
     find_or_initialize_by(provider: omniauth['provider'], uid: omniauth['uid'].to_s).tap do |service|
-      service.assign_attributes token: omniauth['credentials']['token'],
-                                secret: omniauth['credentials']['secret'],
-                                name: options[:name],
-                                refresh_token: omniauth['credentials']['refresh_token'],
-                                expires_at: omniauth['credentials']['expires_at'] && Time.at(omniauth['credentials']['expires_at']),
-                                options: options
+      service.attributes = {
+        token: omniauth['credentials']['token'],
+        secret: omniauth['credentials']['secret'],
+        name: options[:name],
+        refresh_token: omniauth['credentials']['refresh_token'],
+        expires_at: omniauth['credentials']['expires_at'] && Time.at(omniauth['credentials']['expires_at']),
+        options:
+      }
     end
   end
 
@@ -80,12 +83,11 @@ class Service < ActiveRecord::Base
     option_providers.fetch(omniauth['provider'], option_providers['default']).call(omniauth)
   end
 
-  private
   @@option_providers = HashWithIndifferentAccess.new
   cattr_reader :option_providers
 
   register_options_provider('default') do |omniauth|
-    {name: omniauth['info']['nickname'] || omniauth['info']['name']}
+    { name: omniauth['info']['nickname'] || omniauth['info']['name'] }
   end
 
   register_options_provider('google') do |omniauth|

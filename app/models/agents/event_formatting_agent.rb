@@ -3,7 +3,7 @@ module Agents
     cannot_be_scheduled!
     can_dry_run!
 
-    description <<-MD
+    description <<~MD
       The Event Formatting Agent allows you to format incoming Events, adding new fields as needed.
 
       For example, here is a possible Event:
@@ -96,9 +96,10 @@ module Agents
     end
 
     def validate_options
-      errors.add(:base, "instructions and mode need to be present.") unless options['instructions'].present? && options['mode'].present?
+      errors.add(:base,
+                 "instructions and mode need to be present.") unless options['instructions'].present? && options['mode'].present?
 
-      if options['mode'].present? && !options['mode'].to_s.include?('{{') && !%[clean merge].include?(options['mode'].to_s)
+      if options['mode'].present? && !options['mode'].to_s.include?('{{') && !%(clean merge).include?(options['mode'].to_s)
         errors.add(:base, "mode must be 'clean' or 'merge'")
       end
 
@@ -108,7 +109,7 @@ module Agents
     def default_options
       {
         'instructions' => {
-          'message' =>  "You received a text {{text}} from {{fields.from}}",
+          'message' => "You received a text {{text}} from {{fields.from}}",
           'agent' => "{{agent.type}}",
           'some_other_field' => "Looks like the weather is going to be {{fields.weather}}"
         },
@@ -156,7 +157,7 @@ module Agents
         if regexp.present?
           begin
             Regexp.new(regexp)
-          rescue
+          rescue StandardError
             errors.add(:base, "bad regexp found in matchers: #{regexp}")
           end
         else

@@ -8,7 +8,7 @@ module Agents
 
     gem_dependency_check { defined?(Twilio) }
 
-    description <<-MD
+    description <<~MD
       The Twilio Agent receives and collects events and sends them via text message (up to 160 characters) or gives you a call when scheduled.
 
       #{'## Include `twilio-ruby` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -29,16 +29,17 @@ module Agents
         'auth_token' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         'sender_cell' => 'xxxxxxxxxx',
         'receiver_cell' => 'xxxxxxxxxx',
-        'server_url'    => 'http://somename.com:3000',
-        'receive_text'  => 'true',
-        'receive_call'  => 'false',
+        'server_url' => 'http://somename.com:3000',
+        'receive_text' => 'true',
+        'receive_call' => 'false',
         'expected_receive_period_in_days' => '1'
       }
     end
 
     def validate_options
       unless options['account_sid'].present? && options['auth_token'].present? && options['sender_cell'].present? && options['receiver_cell'].present? && options['expected_receive_period_in_days'].present? && options['receive_call'].present? && options['receive_text'].present?
-        errors.add(:base, 'account_sid, auth_token, sender_cell, receiver_cell, receive_text, receive_call and expected_receive_period_in_days are all required')
+        errors.add(:base,
+                   'account_sid, auth_token, sender_cell, receiver_cell, receive_text, receive_call and expected_receive_period_in_days are all required')
       end
     end
 
@@ -66,15 +67,15 @@ module Agents
     end
 
     def send_message(message)
-      client.messages.create :from => interpolated['sender_cell'],
-                                         :to => interpolated['receiver_cell'],
-                                         :body => message
+      client.messages.create from: interpolated['sender_cell'],
+                             to: interpolated['receiver_cell'],
+                             body: message
     end
 
     def make_call(secret)
-      client.calls.create :from => interpolated['sender_cell'],
-                                  :to => interpolated['receiver_cell'],
-                                  :url => post_url(interpolated['server_url'], secret)
+      client.calls.create from: interpolated['sender_cell'],
+                          to: interpolated['receiver_cell'],
+                          url: post_url(interpolated['server_url'], secret)
     end
 
     def post_url(server_url, secret)
@@ -83,7 +84,9 @@ module Agents
 
     def receive_web_request(params, method, format)
       if memory['pending_calls'].has_key? params['secret']
-        response = Twilio::TwiML::VoiceResponse.new {|r| r.say( message: memory['pending_calls'][params['secret']], voice: 'woman')}
+        response = Twilio::TwiML::VoiceResponse.new { |r|
+          r.say(message: memory['pending_calls'][params['secret']], voice: 'woman')
+        }
         memory['pending_calls'].delete params['secret']
         [response.to_s, 200]
       end

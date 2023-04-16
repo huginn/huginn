@@ -5,7 +5,7 @@ module Agents
     can_dry_run!
     cannot_receive_events!
 
-    description <<-MD
+    description <<~MD
       The Twitter Search Agent performs and emits the results of a specified Twitter search.
 
       #{twitter_dependencies_missing if dependencies_missing?}

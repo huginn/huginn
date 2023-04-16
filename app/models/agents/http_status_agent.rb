@@ -1,9 +1,7 @@
 require 'time_tracker'
 
 module Agents
-
   class HttpStatusAgent < Agent
-
     include WebRequestConcern
     include FormConfigurable
 
@@ -17,7 +15,7 @@ module Agents
     form_configurable :changes_only, type: :boolean
     form_configurable :headers_to_save
 
-    description <<-MD
+    description <<~MD
       The HttpStatusAgent will check a url and emit the resulting HTTP status code with the time that it waited for a reply. Additionally, it will optionally emit the value of one or more specified headers.
 
       Specify a `Url` and the Http Status Agent will produce an event with the HTTP status code. If you specify one or more `Headers to save` (comma-delimited) as well, that header or headers' value(s) will be included in the event.
@@ -27,7 +25,7 @@ module Agents
       The `changes only` option causes the Agent to report an event only when the status changes. If set to false, an event will be created for every check.  If set to true, an event will only be created when the status changes (like if your site goes from 200 to 500).
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       Events will have the following fields:
 
           {
@@ -86,27 +84,28 @@ module Agents
       # Deal with failures
       if measured_result.result
         final_url = boolify(interpolated['disable_redirect_follow']) ? url : measured_result.result.env.url.to_s
-        payload.merge!({ 'final_url' => final_url, 'redirected' => (url != final_url), 'response_received' => true, 'status' => current_status })
+        payload.merge!({ 'final_url' => final_url, 'redirected' => (url != final_url), 'response_received' => true,
+                         'status' => current_status })
         # Deal with headers
         if local_headers.present?
-          header_results = local_headers.each_with_object({}) { |header, hash| hash[header] = measured_result.result.headers[header] }
+          header_results = local_headers.each_with_object({}) { |header, hash|
+            hash[header] = measured_result.result.headers[header]
+          }
           payload.merge!({ 'headers' => header_results })
         end
-        create_event payload: payload
+        create_event(payload:)
         memory['last_status'] = measured_result.status.to_s
       else
-        create_event payload: payload
+        create_event(payload:)
         memory['last_status'] = nil
       end
-
     end
 
     def ping(url)
       result = faraday.get url
       result.status > 0 ? result : nil
-    rescue
+    rescue StandardError
       nil
     end
   end
-
 end

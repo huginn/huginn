@@ -325,7 +325,7 @@ class Agent < ActiveRecord::Base
         # Give it a unique name
         2.step do |i|
           name = '%s (%d)' % [original.name, i]
-          unless exists?(name: name)
+          unless exists?(name:)
             clone.name = name
             break
           end
@@ -454,7 +454,7 @@ class Agent < ActiveRecord::Base
     def run_schedule(schedule)
       return if schedule == 'never'
 
-      types = where(schedule: schedule).group(:type).pluck(:type)
+      types = where(schedule:).group(:type).pluck(:type)
       types.each do |type|
         next unless valid_type?(type)
 

@@ -14,11 +14,11 @@ module EventHeadersConcern
   def event_headers_normalizer
     case interpolated['event_headers_style']
     when nil, '', 'capitalized'
-      ->name { name.gsub(/[^-]+/, &:capitalize) }
+      ->(name) { name.gsub(/[^-]+/, &:capitalize) }
     when 'downcased'
       :downcase.to_proc
-    when 'snakecased', nil
-      ->name { name.tr('A-Z-', 'a-z_') }
+    when 'snakecased'
+      ->(name) { name.tr('A-Z-', 'a-z_') }
     when 'raw'
       :itself.to_proc
     else

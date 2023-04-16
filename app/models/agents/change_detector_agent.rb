@@ -2,7 +2,7 @@ module Agents
   class ChangeDetectorAgent < Agent
     cannot_be_scheduled!
 
-    description <<-MD
+    description <<~MD
       The Change Detector Agent receives a stream of events and emits a new event when a property of the received event changes.
 
       `property` specifies a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template that expands to the property to be watched, where you can use a variable `last_property` for the last property value.  If you want to detect a new lowest price, try this: `{% assign drop = last_property | minus: price %}{% if last_property == blank or drop > 0 %}{{ price | default: last_property }}{% else %}{{ last_property }}{% endif %}`
@@ -12,22 +12,22 @@ module Agents
       The resulting event will be a copy of the received event.
     MD
 
-    event_description <<-MD
-    This will change based on the source event. If you were event from the ShellCommandAgent, your outbound event might look like:
+    event_description <<~MD
+      This will change based on the source event. If you were event from the ShellCommandAgent, your outbound event might look like:
 
-      {
-        'command' => 'pwd',
-        'path' => '/home/Huginn',
-        'exit_status' => '0',
-        'errors' => '',
-        'output' => '/home/Huginn'
-      }
+          {
+            'command' => 'pwd',
+            'path' => '/home/Huginn',
+            'exit_status' => '0',
+            'errors' => '',
+            'output' => '/home/Huginn'
+          }
     MD
 
     def default_options
       {
-          'property' => '{{output}}',
-          'expected_update_period_in_days' => 1
+        'property' => '{{output}}',
+        'expected_update_period_in_days' => 1
       }
     end
 
@@ -55,12 +55,13 @@ module Agents
     def handle(opts, event = nil)
       property = opts['property']
       if has_changed?(property)
-        created_event = create_event :payload => event.payload
+        created_event = create_event payload: event.payload
 
-        log("Propagating new event as property has changed to #{property} from #{last_property}", :outbound_event => created_event, :inbound_event => event )
+        log("Propagating new event as property has changed to #{property} from #{last_property}",
+            outbound_event: created_event, inbound_event: event)
         update_memory(property)
       else
-        log("Not propagating as incoming event has not changed from #{last_property}.", :inbound_event => event )
+        log("Not propagating as incoming event has not changed from #{last_property}.", inbound_event: event)
       end
     end
 

@@ -9,14 +9,14 @@ module Agents
     no_bulk_receive!
     can_dry_run!
 
-    description <<-MD
+    description <<~MD
       The Telegram Agent receives and collects events and sends them via [Telegram](https://telegram.org/).
 
       It is assumed that events have either a `text`, `photo`, `audio`, `document`, `video` or `group` key. You can use the EventFormattingAgent if your event does not provide these keys.
 
       The value of `text` key is sent as a plain text message. You can also tell Telegram how to parse the message with `parse_mode`, set to either `html`, `markdown` or `markdownv2`.
       The value of `photo`, `audio`, `document` and `video` keys should be a url whose contents will be sent to you.
-      The value of `group` key should be a list and must consist of 2-10 objects representing an [InputMedia](https://core.telegram.org/bots/api#inputmedia) from the [Telegram Bot API](https://core.telegram.org/bots/api#inputmedia). Be careful: the `caption` field is not covered by the "long message" setting. 
+      The value of `group` key should be a list and must consist of 2-10 objects representing an [InputMedia](https://core.telegram.org/bots/api#inputmedia) from the [Telegram Bot API](https://core.telegram.org/bots/api#inputmedia). Be careful: the `caption` field is not covered by the "long message" setting.#{' '}
 
       **Setup**
 
@@ -63,17 +63,31 @@ module Agents
     def complete_chat_id
       response = HTTMultiParty.post(telegram_bot_uri('getUpdates'))
       return [] unless response['ok']
+
       response['result'].map { |update| update_to_complete(update) }.uniq
     end
 
     def validate_options
       errors.add(:base, 'auth_token is required') unless options['auth_token'].present?
       errors.add(:base, 'chat_id is required') unless options['chat_id'].present?
-      errors.add(:base, 'caption should be 1024 characters or less') if interpolated['caption'].present? && interpolated['caption'].length > 1024 && (!interpolated['long_message'].present? || interpolated['long_message'] != 'split')
-      errors.add(:base, "disable_notification has invalid value: should be 'true' or 'false'") if interpolated['disable_notification'].present? && !%w(true false).include?(interpolated['disable_notification'])
-      errors.add(:base, "disable_web_page_preview has invalid value: should be 'true' or 'false'") if interpolated['disable_web_page_preview'].present? && !%w(true false).include?(interpolated['disable_web_page_preview'])
-      errors.add(:base, "long_message has invalid value: should be 'split' or 'truncate'") if interpolated['long_message'].present? && !%w(split truncate).include?(interpolated['long_message'])
-      errors.add(:base, "parse_mode has invalid value: should be 'html', 'markdown' or 'markdownv2'") if interpolated['parse_mode'].present? && !%w(html markdown markdownv2).include?(interpolated['parse_mode'])
+      errors.add(:base,
+                 'caption should be 1024 characters or less') if interpolated['caption'].present? && interpolated['caption'].length > 1024 && (!interpolated['long_message'].present? || interpolated['long_message'] != 'split')
+      errors.add(:base,
+                 "disable_notification has invalid value: should be 'true' or 'false'") if interpolated['disable_notification'].present? && !%w[
+                   true false
+                 ].include?(interpolated['disable_notification'])
+      errors.add(:base,
+                 "disable_web_page_preview has invalid value: should be 'true' or 'false'") if interpolated['disable_web_page_preview'].present? && !%w[
+                   true false
+                 ].include?(interpolated['disable_web_page_preview'])
+      errors.add(:base,
+                 "long_message has invalid value: should be 'split' or 'truncate'") if interpolated['long_message'].present? && !%w[
+                   split truncate
+                 ].include?(interpolated['long_message'])
+      errors.add(:base,
+                 "parse_mode has invalid value: should be 'html', 'markdown' or 'markdownv2'") if interpolated['parse_mode'].present? && !%w[
+                   html markdown markdownv2
+                 ].include?(interpolated['parse_mode'])
     end
 
     def working?
@@ -99,11 +113,13 @@ module Agents
 
     def configure_params(params)
       params[:chat_id] = interpolated['chat_id']
-      params[:disable_notification] = interpolated['disable_notification'] if interpolated['disable_notification'].present?
+      params[:disable_notification] =
+        interpolated['disable_notification'] if interpolated['disable_notification'].present?
       if params.has_key?(:text)
-        params[:disable_web_page_preview] = interpolated['disable_web_page_preview'] if interpolated['disable_web_page_preview'].present?
+        params[:disable_web_page_preview] =
+          interpolated['disable_web_page_preview'] if interpolated['disable_web_page_preview'].present?
         params[:parse_mode] = interpolated['parse_mode'] if interpolated['parse_mode'].present?
-      elsif not params.has_key?(:media)
+      elsif !params.has_key?(:media)
         params[:caption] = interpolated['caption'] if interpolated['caption'].present?
       end
 
@@ -115,8 +131,9 @@ module Agents
         messages_send = TELEGRAM_ACTIONS.count do |field, _method|
           payload = event.payload[field]
           next unless payload.present?
+
           if field == :group
-            send_telegram_messages field, configure_params(:media => payload)
+            send_telegram_messages field, configure_params(media: payload)
           else
             send_telegram_messages field, configure_params(field => payload)
           end
@@ -163,7 +180,7 @@ module Agents
 
     def update_to_complete(update)
       chat = (update['message'] || update.fetch('channel_post', {})).fetch('chat', {})
-      {id: chat['id'], text: chat['title'] || "#{chat['first_name']} #{chat['last_name']}"}
+      { id: chat['id'], text: chat['title'] || "#{chat['first_name']} #{chat['last_name']}" }
     end
   end
 end

@@ -1,12 +1,10 @@
-# encoding: utf-8 
-
 module Agents
   class WeiboUserAgent < Agent
     include WeiboConcern
 
     cannot_receive_events!
 
-    description <<-MD
+    description <<~MD
       The Weibo User Agent follows the timeline of a specified Weibo user. It uses this endpoint: http://open.weibo.com/wiki/2/statuses/user_timeline/en
 
       #{'## Include `weibo_2` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -18,7 +16,7 @@ module Agents
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       Events are the raw JSON provided by the Weibo API. Should look something like:
 
           {
@@ -72,7 +70,7 @@ module Agents
 
     def validate_options
       unless options['uid'].present? &&
-             options['expected_update_period_in_days'].present?
+          options['expected_update_period_in_days'].present?
         errors.add(:base, "expected_update_period_in_days and uid are required")
       end
     end
@@ -93,18 +91,17 @@ module Agents
 
     def check
       since_id = memory['since_id'] || nil
-      opts = {:uid => interpolated['uid'].to_i}
-      opts.merge! :since_id => since_id unless since_id.nil?
+      opts = { uid: interpolated['uid'].to_i }
+      opts.merge! since_id: since_id unless since_id.nil?
 
       # http://open.weibo.com/wiki/2/statuses/user_timeline/en
       resp = weibo_client.statuses.user_timeline opts
       if resp[:statuses]
 
-
         resp[:statuses].each do |status|
           memory['since_id'] = status.id if !memory['since_id'] || (status.id > memory['since_id'])
 
-          create_event :payload => status.as_json
+          create_event payload: status.as_json
         end
       end
 

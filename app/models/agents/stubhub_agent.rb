@@ -2,24 +2,25 @@ module Agents
   class StubhubAgent < Agent
     cannot_receive_events!
 
-    description <<-MD
+    description <<~MD
       The StubHub Agent creates an event for a given StubHub Event.
 
       It can be used to track how many tickets are available for the event and the minimum and maximum price. All that is required is that you paste in the url from the actual event, e.g. https://www.stubhub.com/outside-lands-music-festival-tickets/outside-lands-music-festival-3-day-pass-san-francisco-golden-gate-park-polo-fields-8-8-2014-9020701/
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       Events looks like this:
-        {
-          "url": "https://stubhub.com/valid-event-url"
-          "name": "Event Name"
-          "date": "2014-08-01"
-          "max_price": "999.99"
-          "min_price": "100.99"
-          "total_postings": "50"
-          "total_tickets": "150"
-          "venue_name": "Venue Name"
-        }
+
+          {
+            "url": "https://stubhub.com/valid-event-url"
+            "name": "Event Name"
+            "date": "2014-08-01"
+            "max_price": "999.99"
+            "min_price": "100.99"
+            "total_postings": "50"
+            "total_tickets": "150"
+            "venue_name": "Venue Name"
+          }
     MD
 
     default_schedule "every_1d"
@@ -29,7 +30,7 @@ module Agents
     end
 
     def default_options
-      { 'url' =>  'https://stubhub.com/enter-your-event-here' }
+      { 'url' => 'https://stubhub.com/enter-your-event-here' }
     end
 
     def validate_options
@@ -41,7 +42,7 @@ module Agents
     end
 
     def check
-      create_event :payload => fetch_stubhub_data(url)
+      create_event payload: fetch_stubhub_data(url)
     end
 
     def fetch_stubhub_data(url)
@@ -49,7 +50,6 @@ module Agents
     end
 
     class StubhubFetcher
-
       def self.call(url)
         new(url).fields
       end
@@ -63,7 +63,7 @@ module Agents
       end
 
       def base_url
-       'https://www.stubhub.com/listingCatalog/select/?q='
+        'https://www.stubhub.com/listingCatalog/select/?q='
       end
 
       def build_url
@@ -96,7 +96,6 @@ module Agents
       private
 
       attr_reader :url
-
     end
   end
 end

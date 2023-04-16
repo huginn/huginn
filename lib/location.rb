@@ -13,6 +13,7 @@ class Location
     case data
     when Array
       raise ArgumentError, 'unsupported location data' unless data.size == 2
+
       self.lat, self.lng = data
     when Hash, Location
       data.each { |key, value|
@@ -91,7 +92,7 @@ class Location
   def floatify(value)
     case value
     when nil, ''
-      return nil
+      nil
     else
       float = Float(value)
       if block_given?

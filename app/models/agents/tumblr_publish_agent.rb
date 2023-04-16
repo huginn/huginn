@@ -6,7 +6,7 @@ module Agents
 
     gem_dependency_check { defined?(Tumblr::Client) }
 
-    description <<-MD
+    description <<~MD
       The Tumblr Publish Agent publishes Tumblr posts from the events it receives.
 
       #{'## Include `tumblr_client` and `omniauth-tumblr` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -59,7 +59,8 @@ module Agents
     MD
 
     def validate_options
-      errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
+      errors.add(:base,
+                 "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
     end
 
     def working?
@@ -112,9 +113,9 @@ module Agents
             return
           end
           expanded_post = get_post(blog_name, post["id"])
-          create_event :payload => {
+          create_event payload: {
             'success' => true,
-            'published_post' => "["+blog_name+"] "+post_type,
+            'published_post' => "[" + blog_name + "] " + post_type,
             'post_id' => post["id"],
             'agent_id' => event.agent_id,
             'event_id' => event.id,
@@ -126,13 +127,13 @@ module Agents
 
     def publish_post(blog_name, post_type, options)
       options_obj = {
-          :state => options['state'],
-          :tags => options['tags'],
-          :tweet => options['tweet'],
-          :date => options['date'],
-          :format => options['format'],
-          :slug => options['slug'],
-        }
+        state: options['state'],
+        tags: options['tags'],
+        tweet: options['tweet'],
+        date: options['date'],
+        format: options['format'],
+        slug: options['slug'],
+      }
 
       case post_type
       when "text"
@@ -174,9 +175,7 @@ module Agents
     end
 
     def get_post(blog_name, id)
-      obj = tumblr.posts(blog_name, {
-        :id => id
-      })
+      obj = tumblr.posts(blog_name, { id: })
       obj["posts"].first
     end
   end

@@ -2,7 +2,7 @@ module Agents
   class AttributeDifferenceAgent < Agent
     cannot_be_scheduled!
 
-    description <<-MD
+    description <<~MD
       The Attribute Difference Agent receives events and emits a new event with
       the difference or change of a specific attribute in comparison to the previous
       event received.
@@ -30,7 +30,7 @@ module Agents
       All configuration options will be liquid interpolated based on the incoming event.
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       This will change based on the source event.
     MD
 
@@ -80,23 +80,26 @@ module Agents
         payload[opts['output']] = difference
       end
 
-      created_event = create_event(payload: payload)
+      created_event = create_event(payload:)
       log('Propagating new event', outbound_event: created_event, inbound_event: event)
       update_memory(attribute_value)
     end
 
     def calculate_integer_difference(new_value)
       return 0 if last_value.nil?
+
       (new_value.to_i - last_value.to_i)
     end
 
     def calculate_decimal_difference(new_value, dec_pre)
       return 0.0 if last_value.nil?
+
       (new_value.to_f - last_value.to_f).round(dec_pre.to_i)
     end
 
     def calculate_percentage_change(new_value, dec_pre)
       return 0.0 if last_value.nil?
+
       (((new_value.to_f / last_value.to_f) * 100) - 100).round(dec_pre.to_i)
     end
 
