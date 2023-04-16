@@ -61,7 +61,7 @@ describe Agents::ShellCommandAgent do
 
   describe "#working?" do
     it "generating events as scheduled" do
-      allow(@checker).to receive(:run_command).with(@valid_path, 'pwd', nil, {}) { ["fake pwd output", "", 0] }
+      allow(@checker).to receive(:run_command).with(@valid_path, 'pwd', nil) { ["fake pwd output", "", 0] }
 
       expect(@checker).not_to be_working
       @checker.check
@@ -75,17 +75,18 @@ describe Agents::ShellCommandAgent do
   describe "#check" do
     before do
       orig_run_command = @checker.method(:run_command)
-      allow(@checker).to receive(:run_command).with(@valid_path, 'pwd', nil, {}) { ["fake pwd output", "", 0] }
-      allow(@checker).to receive(:run_command).with(@valid_path, 'empty_output', nil, {}) { ["", "", 0] }
-      allow(@checker).to receive(:run_command).with(@valid_path, 'failure', nil, {}) { ["failed", "error message", 1] }
+      allow(@checker).to receive(:run_command).with(@valid_path, 'pwd', nil) { ["fake pwd output", "", 0] }
+      allow(@checker).to receive(:run_command).with(@valid_path, 'empty_output', nil) { ["", "", 0] }
+      allow(@checker).to receive(:run_command).with(@valid_path, 'failure', nil) { ["failed", "error message", 1] }
       allow(@checker).to receive(:run_command).with(@valid_path, 'echo $BUNDLE_GEMFILE', nil, unbundle: true) {
-                           orig_run_command.call(@valid_path, 'echo $BUNDLE_GEMFILE', nil, unbundle: true)
-                         }
-      [[], [{}], [{ unbundle: false }]].each do |rest|
-        allow(@checker).to receive(:run_command).with(@valid_path, 'echo $BUNDLE_GEMFILE', nil, *rest) {
-                             [ENV['BUNDLE_GEMFILE'].to_s, "", 0]
-                           }
-      end
+        orig_run_command.call(@valid_path, 'echo $BUNDLE_GEMFILE', nil, unbundle: true)
+      }
+      allow(@checker).to receive(:run_command).with(@valid_path, 'echo $BUNDLE_GEMFILE', nil) {
+        [ENV['BUNDLE_GEMFILE'].to_s, "", 0]
+      }
+      allow(@checker).to receive(:run_command).with(@valid_path, 'echo $BUNDLE_GEMFILE', nil, unbundle: false) {
+        [ENV['BUNDLE_GEMFILE'].to_s, "", 0]
+      }
     end
 
     it "should create an event when checking" do
@@ -177,9 +178,9 @@ describe Agents::ShellCommandAgent do
 
   describe "#receive" do
     before do
-      allow(@checker).to receive(:run_command).with(@valid_path, @event.payload[:cmd], nil, {}) {
-                           ["fake ls output", "", 0]
-                         }
+      allow(@checker).to receive(:run_command).with(@valid_path, @event.payload[:cmd], nil) {
+        ["fake ls output", "", 0]
+      }
     end
 
     it "creates events" do

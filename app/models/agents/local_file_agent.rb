@@ -154,7 +154,8 @@ module Agents
     class Worker < LongRunnable::Worker
       def setup
         require 'listen'
-        @listener = Listen.to(*listen_options, &method(:callback))
+        path, options = listen_options
+        @listener = Listen.to(path, **options, &method(:callback))
       end
 
       def run
@@ -183,10 +184,15 @@ module Agents
 
       def listen_options
         if File.directory?(agent.expanded_path)
-          [agent.expanded_path, ignore!: []]
+          [
+            agent.expanded_path,
+            ignore!: []
+          ]
         else
-          [File.dirname(agent.expanded_path),
-           { ignore!: [], only: /\A#{Regexp.escape(File.basename(agent.expanded_path))}\z/ }]
+          [
+            File.dirname(agent.expanded_path),
+            ignore!: [], only: /\A#{Regexp.escape(File.basename(agent.expanded_path))}\z/
+          ]
         end
       end
     end

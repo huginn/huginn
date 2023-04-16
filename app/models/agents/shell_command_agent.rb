@@ -97,7 +97,7 @@ module Agents
         path = opts['path']
         stdin = opts['stdin']
 
-        result, errors, exit_status = run_command(path, command, stdin, interpolated.slice(:unbundle).symbolize_keys)
+        result, errors, exit_status = run_command(path, command, stdin, **interpolated.slice(:unbundle).symbolize_keys)
 
         payload = {
           'command' => command,

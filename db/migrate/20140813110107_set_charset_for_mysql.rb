@@ -29,7 +29,7 @@ class SetCharsetForMysql < ActiveRecord::Migration[4.2]
             type = column.type
             limit = column.limit
             options = {
-              limit: limit,
+              limit:,
               null: column.null,
               default: column.default,
             }
@@ -53,7 +53,7 @@ class SetCharsetForMysql < ActiveRecord::Migration[4.2]
               next
             end
 
-            change_column table_name, name, type, options
+            change_column table_name, name, type, **options
           }
 
           execute 'ALTER TABLE %s CHARACTER SET utf8 COLLATE utf8_unicode_ci' % table_name
