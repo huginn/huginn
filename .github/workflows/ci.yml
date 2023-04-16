@@ -68,6 +68,9 @@ jobs:
       - name: Run tests
         run: bundle exec rake
 
+      - name: Coveralls
+        uses: coverallsapp/github-action@v1
+
   ghcr-build-docker-images:
     name: ghcr-docker-build-${{ matrix.docker_image }}
     needs: run-tests

@@ -159,9 +159,9 @@ group :development do
   group :test do
     gem 'capybara', '~> 2.18'
     gem 'capybara-screenshot'
-    gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76',
+    gem 'capybara-select-2', github: 'Hirurg103/capybara_select2',
+                             ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76',
                              require: false
-    gem 'coveralls', require: false
     gem 'poltergeist'
     gem 'rails-controller-testing'
     gem 'rr', require: false
@@ -171,6 +171,8 @@ group :development do
     gem 'rspec-mocks'
     gem 'rspec-rails'
     gem 'shoulda-matchers'
+    gem 'simplecov', require: false
+    gem 'simplecov-lcov', '~> 0.8.0', require: false
     gem 'vcr'
     gem 'webmock', '~> 3.5.1'
   end
