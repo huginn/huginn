@@ -197,17 +197,15 @@ GEM
     capistrano-rails (1.6.1)
       capistrano (~> 3.1)
       capistrano-bundler (>= 1.1, < 3)
-    capybara (2.18.0)
+    capybara (3.39.0)
       addressable
+      matrix
       mini_mime (>= 0.1.3)
-      nokogiri (>= 1.3.3)
-      rack (>= 1.0.0)
-      rack-test (>= 0.5.4)
-      xpath (>= 2.0, < 4.0)
-    capybara-screenshot (1.0.17)
-      capybara (>= 1.0, < 3)
-      launchy
-    cliver (0.3.2)
+      nokogiri (~> 1.8)
+      rack (>= 1.6.0)
+      rack-test (>= 0.6.3)
+      regexp_parser (>= 1.5, < 3.0)
+      xpath (~> 3.2)
     coderay (1.1.3)
     coffee-rails (5.0.0)
       coffee-script (>= 2.2.0)
@@ -457,6 +455,7 @@ GEM
       net-pop
       net-smtp
     marcel (1.0.2)
+    matrix (0.4.2)
     memoist (0.16.2)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -550,16 +549,13 @@ GEM
     parser (3.2.2.0)
       ast (~> 2.4.1)
     pg (1.4.4)
-    poltergeist (1.8.1)
-      capybara (~> 2.1)
-      cliver (~> 0.3.1)
-      multi_json (~> 1.0)
-      websocket-driver (>= 0.2.0)
     polyglot (0.3.5)
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (5.0.1)
+    puma (6.2.1)
+      nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.6.2)
     rack (2.2.6.4)
@@ -672,6 +668,7 @@ GEM
       rubocop (~> 1.33)
       rubocop-capybara (~> 2.17)
     ruby-progressbar (1.13.0)
+    rubyzip (2.3.2)
     rufus-scheduler (3.8.1)
       fugit (~> 1.1, >= 1.1.6)
     sass (3.7.4)
@@ -691,6 +688,10 @@ GEM
       tilt
     sax-machine (1.3.2)
     select2-rails (3.5.11)
+    selenium-webdriver (4.8.6)
+      rexml (~> 3.2, >= 3.2.5)
+      rubyzip (>= 1.2.2, < 3.0)
+      websocket (~> 1.0)
     shellany (0.0.1)
     shoulda-matchers (4.0.1)
       activesupport (>= 4.2.0)
@@ -754,7 +755,7 @@ GEM
     unicorn (6.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
-    vcr (3.0.3)
+    vcr (6.1.0)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.2.0)
@@ -762,11 +763,12 @@ GEM
       activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
       railties (>= 6.0.0)
-    webmock (3.5.1)
-      addressable (>= 2.3.6)
+    webmock (3.18.1)
+      addressable (>= 2.8.0)
       crack (>= 0.3.2)
-      hashdiff
+      hashdiff (>= 0.4.0, < 2.0.0)
     webrick (1.7.0)
+    websocket (1.2.9)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -794,7 +796,6 @@ DEPENDENCIES
   capistrano-bundler
   capistrano-rails
   capybara
-  capybara-screenshot
   capybara-select-2!
   coffee-rails (~> 5)
   daemons (~> 1.1.9)
@@ -854,7 +855,7 @@ DEPENDENCIES
   omniauth-tumblr
   omniauth-twitter
   pg (~> 1.1)
-  poltergeist
+  puma
   rack-livereload
   rails (~> 6.1.7)
   rails-controller-testing
@@ -873,6 +874,7 @@ DEPENDENCIES
   rufus-scheduler (~> 3.4)
   sass-rails (>= 6.0)
   select2-rails (~> 3.5.4)
+  selenium-webdriver
   shoulda-matchers
   simplecov
   simplecov-lcov (~> 0.8.0)
@@ -893,7 +895,7 @@ DEPENDENCIES
   unicorn
   vcr
   web-console (>= 3.3.0)
-  webmock (~> 3.5.1)
+  webmock
   weibo_2!
   xmpp4r (~> 0.5.6)
 
