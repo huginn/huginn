@@ -145,6 +145,10 @@ group :development do
   gem 'capistrano-rails'
   gem 'capistrano-bundler'
 
+  gem 'rubocop', require: false
+  gem 'rubocop-performance', require: false
+  gem 'rubocop-rspec', require: false
+
   if_true(ENV['SPRING']) do
     gem 'spring-commands-rspec'
     gem 'spring'
