@@ -163,8 +163,6 @@ group :development do
                              require: false
     gem 'coveralls', require: false
     gem 'poltergeist'
-    gem 'pry-byebug'
-    gem 'pry-rails'
     gem 'rails-controller-testing'
     gem 'rr', require: false
     gem 'rspec'

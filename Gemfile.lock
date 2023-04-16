@@ -187,7 +187,6 @@ GEM
       rails (>= 3.1)
     buftok (0.2.0)
     builder (3.2.4)
-    byebug (11.1.3)
     capistrano (3.16.0)
       airbrussh (>= 1.0.0)
       i18n
@@ -566,11 +565,6 @@ GEM
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    pry-byebug (3.9.0)
-      byebug (~> 11.0)
-      pry (~> 0.13.0)
-    pry-rails (0.3.9)
-      pry (>= 0.10.4)
     public_suffix (5.0.0)
     raabro (1.4.0)
     racc (1.6.2)
@@ -871,8 +865,6 @@ DEPENDENCIES
   omniauth-twitter
   pg (~> 1.1)
   poltergeist
-  pry-byebug
-  pry-rails
   rack-livereload
   rails (~> 6.1.7)
   rails-controller-testing
