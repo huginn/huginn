@@ -72,7 +72,7 @@ module Agents
       tweets = twitter.favorites(interpolated[:username], opts)
       memory[:last_seen] ||= []
 
-      tweets.each do |tweet|
+      tweets.sort_by(&:id).each do |tweet|
         next if memory[:last_seen].include?(tweet.id) || tweet.created_at < starting_at
 
         memory[:last_seen].push(tweet.id)

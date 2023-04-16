@@ -87,7 +87,7 @@ module Agents
           twitter.user_timeline(interpolated[:username], opts)
         end
 
-      tweets.each do |tweet|
+      tweets.sort_by(&:id).each do |tweet|
         next unless tweet.created_at >= starting_at
 
         memory[:since_id] = [tweet.id, *memory[:since_id]].max
