@@ -1,0 +1,22 @@
+window.setupJsonEditor = function ($editors) {
+  if ($editors == null) {
+    $editors = $(".live-json-editor");
+  }
+  JSONEditor.prototype.ADD_IMG = "<%= image_path 'json-editor/add.png' %>";
+  JSONEditor.prototype.DELETE_IMG = "<%= image_path 'json-editor/delete.png' %>";
+  const editors = [];
+  $editors.each(function () {
+    const $editor = $(this);
+    const jsonEditor = new JSONEditor(
+      $editor,
+      $editor.data("width") || 400,
+      $editor.data("height") || 500
+    );
+    jsonEditor.doTruncation(true);
+    jsonEditor.showFunctionButtons();
+    return editors.push(jsonEditor);
+  });
+  return editors;
+};
+
+$(() => (window.jsonEditor = setupJsonEditor()[0]));

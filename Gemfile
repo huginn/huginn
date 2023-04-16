@@ -89,7 +89,7 @@ unless Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.5.0')
   exit 1
 end
 
-gem 'ace-rails-ap', '~> 2.0.1'
+gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
 gem 'bundler', '>= 1.5.0'
@@ -128,7 +128,7 @@ gem 'rufus-scheduler', '~> 3.4', require: false
 gem 'sass-rails', '>= 6.0'
 gem 'select2-rails', '~> 3.5.4'
 gem 'spectrum-rails'
-gem 'sprockets', '~> 3.7.2'
+gem 'sprockets'
 gem 'typhoeus', '~> 1.3.1'
 gem 'uglifier', '~> 2.7.2'
 
@@ -157,7 +157,7 @@ group :development do
   end
 
   group :test do
-    gem 'capybara', '~> 2.18'
+    gem 'capybara'
     gem 'capybara-screenshot'
     gem 'capybara-select-2', github: 'Hirurg103/capybara_select2',
                              ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76',

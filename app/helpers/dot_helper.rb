@@ -1,6 +1,6 @@
 module DotHelper
   def render_agents_diagram(agents, layout: nil)
-    if svg = dot_to_svg(agents_dot(agents, rich: true, layout: layout))
+    if svg = dot_to_svg(agents_dot(agents, rich: true, layout:))
       decorate_svg(svg, agents).html_safe
     else
       # Google chart request url
@@ -141,7 +141,7 @@ module DotHelper
   end
 
   def agents_dot(agents, rich: false, layout: nil)
-    draw(agents: agents,
+    draw(agents:,
          agent_id: ->(agent) { 'a%d' % agent.id },
          agent_label: ->(agent) {
            agent.name.gsub(/(.{20}\S*)\s+/) {
@@ -150,7 +150,7 @@ module DotHelper
            }
          },
          agent_url: ->(agent) { agent_path(agent.id) },
-         rich: rich) {
+         rich:) {
       @disabled = '#999999'
 
       def agent_node(agent)
@@ -175,7 +175,7 @@ module DotHelper
       block('digraph', 'Agent Event Flow') {
         layout ||= ENV['DIAGRAM_DEFAULT_LAYOUT'].presence
         if rich && /\A[a-z]+\z/ === layout
-          statement 'graph', layout: layout, overlap: 'false'
+          statement 'graph', layout:, overlap: 'false'
         end
         statement 'node',
                   shape: 'box',
@@ -253,7 +253,7 @@ module DotHelper
           }
         }
       }
-      # See also: app/assets/diagram.js.coffee
+      # See also: app/assets/diagram.js
     }.at('div.agent-diagram').to_s
   end
 end

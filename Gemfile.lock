@@ -91,7 +91,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    ace-rails-ap (2.0.1)
+    ace-rails-ap (4.5)
     actioncable (6.1.7.2)
       actionpack (= 6.1.7.2)
       activesupport (= 6.1.7.2)
@@ -151,7 +151,7 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
-    addressable (2.8.1)
+    addressable (2.8.4)
       public_suffix (>= 2.0.2, < 6.0)
     airbrussh (1.4.0)
       sshkit (>= 1.6.1, != 1.7.0)
@@ -216,7 +216,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.2.0)
+    concurrent-ruby (1.2.2)
     cookiejar (0.3.3)
     crack (0.4.5)
       rexml
@@ -559,13 +559,13 @@ GEM
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    public_suffix (5.0.0)
+    public_suffix (5.0.1)
     raabro (1.4.0)
     racc (1.6.2)
     rack (2.2.6.4)
     rack-livereload (0.3.17)
       rack
-    rack-test (2.0.2)
+    rack-test (2.1.0)
       rack (>= 1.3)
     rails (6.1.7.2)
       actioncable (= 6.1.7.2)
@@ -716,9 +716,9 @@ GEM
     spring-watcher-listen (2.1.0)
       listen (>= 2.7, < 4.0)
       spring (>= 4)
-    sprockets (3.7.2)
+    sprockets (4.2.0)
       concurrent-ruby (~> 1.0)
-      rack (> 1, < 3)
+      rack (>= 2.2.4, < 4)
     sprockets-rails (3.4.2)
       actionpack (>= 5.2)
       activesupport (>= 5.2)
@@ -771,7 +771,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     xmpp4r (0.5.6)
-    xpath (3.0.0)
+    xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.6.7)
 
@@ -783,7 +783,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  ace-rails-ap (~> 2.0.1)
+  ace-rails-ap
   aws-sdk-s3 (~> 1)
   better_errors
   binding_of_caller
@@ -793,7 +793,7 @@ DEPENDENCIES
   capistrano
   capistrano-bundler
   capistrano-rails
-  capybara (~> 2.18)
+  capybara
   capybara-screenshot
   capybara-select-2!
   coffee-rails (~> 5)
@@ -881,7 +881,7 @@ DEPENDENCIES
   spring
   spring-commands-rspec
   spring-watcher-listen
-  sprockets (~> 3.7.2)
+  sprockets
   tumblr_client!
   twilio-ruby (~> 5.62.0)
   twitter!
