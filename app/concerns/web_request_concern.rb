@@ -15,11 +15,11 @@ module WebRequestConcern
   end
 
   class CharacterEncoding < Faraday::Middleware
-    def initialize(app, force_encoding: nil, default_encoding: nil, unzip: nil)
+    def initialize(app, options = {})
       super(app)
-      @force_encoding   = force_encoding
-      @default_encoding = default_encoding
-      @unzip            = unzip
+      @force_encoding   = options[:force_encoding]
+      @default_encoding = options[:default_encoding]
+      @unzip            = options[:unzip]
     end
 
     def call(env)
