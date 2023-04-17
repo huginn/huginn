@@ -7,7 +7,7 @@ describe "Creating a new agent", js: true do
 
   it "creates an agent" do
     visit "/"
-    page.find("a", text: "Agents").trigger(:mouseover)
+    page.find("a", text: "Agents").hover
     click_on("New Agent")
 
     select_agent_type("Trigger Agent")
@@ -43,7 +43,7 @@ describe "Creating a new agent", js: true do
 
     it "creates an agent with a source and a receiver" do
       visit "/"
-      page.find("a", text: "Agents").trigger(:mouseover)
+      page.find("a", text: "Agents").hover
       click_on("New Agent")
 
       select_agent_type("Trigger Agent")
@@ -64,7 +64,7 @@ describe "Creating a new agent", js: true do
 
     it "creates an agent with a control target" do
       visit "/"
-      page.find("a", text: "Agents").trigger(:mouseover)
+      page.find("a", text: "Agents").hover
       click_on("New Agent")
 
       select_agent_type("Scheduler Agent")
@@ -83,7 +83,7 @@ describe "Creating a new agent", js: true do
 
     it "creates an agent with a controller" do
       visit "/"
-      page.find("a", text: "Agents").trigger(:mouseover)
+      page.find("a", text: "Agents").hover
       click_on("New Agent")
 
       select_agent_type("Weather Agent")
@@ -103,7 +103,7 @@ describe "Creating a new agent", js: true do
 
   it "creates an alert if a new agent with invalid json is submitted" do
     visit "/"
-    page.find("a", text: "Agents").trigger(:mouseover)
+    page.find("a", text: "Agents").hover
     click_on("New Agent")
 
     select_agent_type("Trigger Agent")
