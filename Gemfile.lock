@@ -1,9 +1,8 @@
 GIT
   remote: https://github.com/Hirurg103/capybara_select2.git
-  revision: fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76
-  ref: fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76
+  revision: 48e2c458c2827cf2af2b0a287b30468fa8d761bf
   specs:
-    capybara-select-2 (0.3.2)
+    capybara-select-2 (0.5.1)
 
 GIT
   remote: https://github.com/albertsun/tumblr_client.git
@@ -687,7 +686,7 @@ GEM
       sprockets-rails
       tilt
     sax-machine (1.3.2)
-    select2-rails (3.5.11)
+    select2-rails (4.0.13)
     selenium-webdriver (4.8.6)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
@@ -873,7 +872,7 @@ DEPENDENCIES
   rubocop-rspec
   rufus-scheduler (~> 3.4)
   sass-rails (>= 6.0)
-  select2-rails (~> 3.5.4)
+  select2-rails
   selenium-webdriver
   shoulda-matchers
   simplecov

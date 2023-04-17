@@ -126,7 +126,7 @@ gem 'rails', '~> 6.1.7'
 gem 'rails-html-sanitizer', '~> 1.2'
 gem 'rufus-scheduler', '~> 3.4', require: false
 gem 'sass-rails', '>= 6.0'
-gem 'select2-rails', '~> 3.5.4'
+gem 'select2-rails'
 gem 'spectrum-rails'
 gem 'sprockets'
 gem 'typhoeus', '~> 1.3.1'
@@ -158,9 +158,7 @@ group :development do
 
   group :test do
     gem 'capybara'
-    gem 'capybara-select-2', github: 'Hirurg103/capybara_select2',
-                             ref: 'fbf22fb74dec10fa0edcd26da7c5184ba8fa2c76',
-                             require: false
+    gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', require: false
     gem 'puma'
     gem 'rails-controller-testing'
     gem 'rr', require: false

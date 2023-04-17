@@ -77,15 +77,15 @@
         $("select#agent_type").select2({
           width: "resolve",
           formatResult: formatAgentForSelect,
-          escapeMarkup(m) {
-            return m;
-          },
-          matcher(term, text, opt) {
-            const description = opt.attr("title");
-            return (
-              text.toUpperCase().indexOf(term.toUpperCase()) >= 0 ||
-              description.toUpperCase().indexOf(term.toUpperCase()) >= 0
-            );
+          escapeMarkup: (m) => m,
+          matcher: (params, data) => {
+            const term = params.term;
+            if (term == null) return data;
+            const upperTerm = term.toUpperCase();
+            return data.text.toUpperCase().indexOf(upperTerm) >= 0 ||
+              data.title.toUpperCase().indexOf(upperTerm) >= 0
+              ? data
+              : null;
           },
         });
       } else {

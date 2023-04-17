@@ -23,12 +23,12 @@ $(function () {
 
   $(".select2-linked-tags").select2({
     width: "resolve",
-    formatSelection(obj) {
-      return `<a href=\"${this.element.data("urlPrefix")}/${
-        obj.id
-      }/edit\" onClick=\"Utils.select2TagClickHandler(event, this)\">${Utils.escape(
-        obj.text
-      )}</a>`;
+    templateSelection: ({ id, text, element }) => {
+      const a = document.createElement("a");
+      a.href = `${element.closest("select").dataset.urlPrefix}/${id}/edit`;
+      a.onClick = "Utils.select2TagClickHandler(event, this)";
+      a.appendChild(document.createTextNode(text));
+      return a;
     },
   });
 
