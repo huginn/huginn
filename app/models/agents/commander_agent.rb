@@ -28,7 +28,7 @@ module Agents
 
       - If you want to update a WeatherAgent based on a UserLocationAgent, you could use `'action': 'configure'` and set 'configure_options' to `{ 'location': '{{_location_.latlng}}' }`.
 
-      - In templating, you can use the variable `target` to refer to each target agent, which has the following attributes: #{AgentDrop.instance_methods(false).map { |m| "`#{m}`" }.to_sentence}.
+      - In templating, you can use the variable `target` to refer to each target agent, which has the following attributes: #{Agent::Drop.instance_methods(false).map { |m| "`#{m}`" }.to_sentence}.
 
       # Targets
 

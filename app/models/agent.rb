@@ -11,7 +11,6 @@ class Agent < ActiveRecord::Base
   include WorkingHelpers
   include LiquidInterpolatable
   include HasGuid
-  include LiquidDroppable
   include DryRunnable
   include SortableEvents
 
@@ -478,40 +477,47 @@ class Agent < ActiveRecord::Base
       AgentCheckJob.perform_later(agent_id)
     end
   end
-end
 
-class AgentDrop
-  def type
-    @object.short_type
+  public def to_liquid
+    Drop.new(self)
   end
 
-  METHODS = %i[
-    id
-    name
-    type
-    options
-    memory
-    sources
-    receivers
-    schedule
-    controllers
-    control_targets
-    disabled
-    keep_events_for
-    propagate_immediately
-  ]
+  class Drop < LiquidDroppable::Drop
+    def type
+      @object.short_type
+    end
 
-  METHODS.each { |attr|
-    define_method(attr) {
-      @object.__send__(attr)
-    } unless method_defined?(attr)
-  }
+    METHODS = %i[
+      id
+      name
+      type
+      options
+      memory
+      sources
+      receivers
+      schedule
+      controllers
+      control_targets
+      disabled
+      keep_events_for
+      propagate_immediately
+    ]
 
-  def working
-    @object.working?
-  end
+    METHODS.each { |attr|
+      define_method(attr) {
+        @object.__send__(attr)
+      } unless method_defined?(attr)
+    }
 
-  def url
-    Rails.application.routes.url_helpers.agent_url(@object, Rails.application.config.action_mailer.default_url_options)
+    def working
+      @object.working?
+    end
+
+    def url
+      Rails.application.routes.url_helpers.agent_url(
+        @object,
+        Rails.application.config.action_mailer.default_url_options
+      )
+    end
   end
 end

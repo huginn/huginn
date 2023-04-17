@@ -34,7 +34,7 @@ module Agents
 
       The special key `created_at` refers to the timestamp of the Event, which can be reformatted by the `date` filter, like `{{created_at | date:"at %I:%M %p" }}`.
 
-      The upstream agent of each received event is accessible via the key `agent`, which has the following attributes: #{''.tap { |s| s << AgentDrop.instance_methods(false).map { |m| "`#{m}`" }.join(', ') }}.
+      The upstream agent of each received event is accessible via the key `agent`, which has the following attributes: #{''.tap { |s| s << Agent::Drop.instance_methods(false).map { |m| "`#{m}`" }.join(', ') }}.
 
       Have a look at the [Wiki](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to learn more about liquid templating.
 

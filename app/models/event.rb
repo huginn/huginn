@@ -100,44 +100,48 @@ class Event < ActiveRecord::Base
     propagate_ids = agent.receivers.where(propagate_immediately: true).pluck(:id)
     Agent.receive!(only_receivers: propagate_ids) unless propagate_ids.empty?
   end
-end
 
-class EventDrop
-  def initialize(object)
-    @payload = object.payload
-    super
+  public def to_liquid
+    Drop.new(self)
   end
 
-  def liquid_method_missing(key)
-    @payload[key]
-  end
+  class Drop < LiquidDroppable::Drop
+    def initialize(object)
+      @payload = object.payload
+      super
+    end
 
-  def each(&block)
-    @payload.each(&block)
-  end
+    def liquid_method_missing(key)
+      @payload[key]
+    end
 
-  def agent
-    @payload.fetch(__method__) {
-      @object.agent
-    }
-  end
+    def each(&block)
+      @payload.each(&block)
+    end
 
-  def created_at
-    @payload.fetch(__method__) {
-      @object.created_at
-    }
-  end
+    def agent
+      @payload.fetch(__method__) {
+        @object.agent
+      }
+    end
 
-  def _location_
-    @object.location
-  end
+    def created_at
+      @payload.fetch(__method__) {
+        @object.created_at
+      }
+    end
 
-  def as_json
-    {
-      location: _location_.as_json,
-      agent: @object.agent.to_liquid.as_json,
-      payload: @payload.as_json,
-      created_at: created_at.as_json
-    }
+    def _location_
+      @object.location
+    end
+
+    def as_json
+      {
+        location: _location_.as_json,
+        agent: @object.agent.to_liquid.as_json,
+        payload: @payload.as_json,
+        created_at: created_at.as_json
+      }
+    end
   end
 end

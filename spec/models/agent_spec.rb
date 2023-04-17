@@ -967,7 +967,7 @@ describe Agent do
   end
 end
 
-describe AgentDrop do
+describe Agent::Drop do
   def interpolate(string, agent)
     agent.interpolate_string(string, "agent" => agent)
   end
@@ -1032,9 +1032,9 @@ describe AgentDrop do
   end
 
   it 'should be created via Agent#to_liquid' do
-    expect(@wsa1.to_liquid.class).to be(AgentDrop)
-    expect(@wsa2.to_liquid.class).to be(AgentDrop)
-    expect(@efa.to_liquid.class).to be(AgentDrop)
+    expect(@wsa1.to_liquid.class).to be(Agent::Drop)
+    expect(@wsa2.to_liquid.class).to be(Agent::Drop)
+    expect(@efa.to_liquid.class).to be(Agent::Drop)
   end
 
   it 'should have .id, .type and .name' do

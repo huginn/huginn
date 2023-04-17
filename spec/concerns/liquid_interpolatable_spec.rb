@@ -23,7 +23,7 @@ describe LiquidInterpolatable::Filters do
       include LiquidInterpolatable
 
       def check
-        create_event :payload => {}
+        create_event payload: {}
       end
 
       def validate_options
@@ -52,7 +52,7 @@ describe LiquidInterpolatable::Filters do
     let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
 
     it 'serializes data to json' do
-      agent.interpolation_context['something'] = {foo: 'bar'}
+      agent.interpolation_context['something'] = { foo: 'bar' }
       agent.options['cleaned'] = '{{ something | json }}'
       expect(agent.interpolated['cleaned']).to eq('{"foo":"bar"}')
     end
@@ -67,8 +67,8 @@ describe LiquidInterpolatable::Filters do
 
     it 'should escape a string for use in XPath expression' do
       [
-        %q{abc}.freeze,
-        %q{'a"bc'dfa""fds''fa}.freeze,
+        'abc'.freeze,
+        %q('a"bc'dfa""fds''fa).freeze,
       ].each { |string|
         expect(@filter.to_xpath_roundtrip(string)).to eq(string)
       }
@@ -82,7 +82,8 @@ describe LiquidInterpolatable::Filters do
 
   describe 'to_uri' do
     before do
-      @agent = Agents::InterpolatableAgent.new(name: "test", options: { 'foo' => '{% assign u = s | to_uri %}{{ u.path }}' })
+      @agent = Agents::InterpolatableAgent.new(name: "test",
+                                               options: { 'foo' => '{% assign u = s | to_uri %}{{ u.path }}' })
       @agent.interpolation_context['s'] = 'http://example.com/dir/1?q=test'
     end
 
@@ -132,21 +133,21 @@ describe LiquidInterpolatable::Filters do
 
   describe 'uri_expand' do
     before do
-      stub_request(:head, 'https://t.co.x/aaaa').
-        to_return(status: 301, headers: { Location: 'https://bit.ly.x/bbbb' })
-      stub_request(:head, 'https://bit.ly.x/bbbb').
-        to_return(status: 301, headers: { Location: 'http://tinyurl.com.x/cccc' })
-      stub_request(:head, 'http://tinyurl.com.x/cccc').
-        to_return(status: 301, headers: { Location: 'http://www.example.com/welcome' })
-      stub_request(:head, 'http://www.example.com/welcome').
-        to_return(status: 200)
+      stub_request(:head, 'https://t.co.x/aaaa')
+        .to_return(status: 301, headers: { Location: 'https://bit.ly.x/bbbb' })
+      stub_request(:head, 'https://bit.ly.x/bbbb')
+        .to_return(status: 301, headers: { Location: 'http://tinyurl.com.x/cccc' })
+      stub_request(:head, 'http://tinyurl.com.x/cccc')
+        .to_return(status: 301, headers: { Location: 'http://www.example.com/welcome' })
+      stub_request(:head, 'http://www.example.com/welcome')
+        .to_return(status: 200)
 
       (1..5).each do |i|
-        stub_request(:head, "http://2many.x/#{i}").
-          to_return(status: 301, headers: { Location: "http://2many.x/#{i+1}" })
+        stub_request(:head, "http://2many.x/#{i}")
+          .to_return(status: 301, headers: { Location: "http://2many.x/#{i + 1}" })
       end
-      stub_request(:head, 'http://2many.x/6').
-        to_return(status: 301, headers: { 'Content-Length' => '5' })
+      stub_request(:head, 'http://2many.x/6')
+        .to_return(status: 301, headers: { 'Content-Length' => '5' })
     end
 
     it 'should handle inaccessible URIs' do
@@ -171,20 +172,20 @@ describe LiquidInterpolatable::Filters do
     end
 
     it 'should detect a redirect loop' do
-      stub_request(:head, 'http://bad.x/aaaa').
-        to_return(status: 301, headers: { Location: 'http://bad.x/bbbb' })
-      stub_request(:head, 'http://bad.x/bbbb').
-        to_return(status: 301, headers: { Location: 'http://bad.x/aaaa' })
+      stub_request(:head, 'http://bad.x/aaaa')
+        .to_return(status: 301, headers: { Location: 'http://bad.x/bbbb' })
+      stub_request(:head, 'http://bad.x/bbbb')
+        .to_return(status: 301, headers: { Location: 'http://bad.x/aaaa' })
 
       expect(@filter.uri_expand('http://bad.x/aaaa')).to eq('http://bad.x/aaaa')
     end
 
     it 'should be able to handle an FTP URL' do
-      stub_request(:head, 'http://downloads.x/aaaa').
-        to_return(status: 301, headers: { Location: 'http://downloads.x/download?file=aaaa.zip' })
-      stub_request(:head, 'http://downloads.x/download').
-        with(query: { file: 'aaaa.zip' }).
-        to_return(status: 301, headers: { Location: 'ftp://downloads.x/pub/aaaa.zip' })
+      stub_request(:head, 'http://downloads.x/aaaa')
+        .to_return(status: 301, headers: { Location: 'http://downloads.x/download?file=aaaa.zip' })
+      stub_request(:head, 'http://downloads.x/download')
+        .with(query: { file: 'aaaa.zip' })
+        .to_return(status: 301, headers: { Location: 'ftp://downloads.x/pub/aaaa.zip' })
 
       expect(@filter.uri_expand('http://downloads.x/aaaa')).to eq('ftp://downloads.x/pub/aaaa.zip')
     end
@@ -223,7 +224,8 @@ describe LiquidInterpolatable::Filters do
 
     it 'should support escaped characters' do
       agent.interpolation_context['something'] = "foo\\1\n\nfoo\\bar\n\nfoo\\baz"
-      agent.options['test'] = "{{ something | regex_replace_first: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace_first: '\\n+', '\\n'  }}"
+      agent.options['test'] =
+        "{{ something | regex_replace_first: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace_first: '\\n+', '\\n'  }}"
       expect(agent.interpolated['test']).to eq("foo\\1\nfoobar\\\n\nfoo\\baz")
     end
   end
@@ -233,13 +235,15 @@ describe LiquidInterpolatable::Filters do
 
     it 'should extract the matched part' do
       agent.interpolation_context['something'] = "foo BAR BAZ"
-      agent.options['test'] = "{{ something | regex_extract: '[A-Z]+' }} / {{ something | regex_extract: '[A-Z]([A-Z]+)', 1 }} / {{ something | regex_extract: '(?<x>.)AZ', 'x' }}"
+      agent.options['test'] =
+        "{{ something | regex_extract: '[A-Z]+' }} / {{ something | regex_extract: '[A-Z]([A-Z]+)', 1 }} / {{ something | regex_extract: '(?<x>.)AZ', 'x' }}"
       expect(agent.interpolated['test']).to eq("BAR / AR / B")
     end
 
     it 'should return nil if not matched' do
       agent.interpolation_context['something'] = "foo BAR BAZ"
-      agent.options['test'] = "{% assign var = something | regex_extract: '[A-Z][a-z]+' %}{% if var == nil %}nil{% else %}non-nil{% endif %}"
+      agent.options['test'] =
+        "{% assign var = something | regex_extract: '[A-Z][a-z]+' %}{% if var == nil %}nil{% else %}non-nil{% endif %}"
       expect(agent.interpolated['test']).to eq("nil")
     end
   end
@@ -255,7 +259,8 @@ describe LiquidInterpolatable::Filters do
 
     it 'should support escaped characters' do
       agent.interpolation_context['something'] = "foo\\1\n\nfoo\\bar\n\nfoo\\baz"
-      agent.options['test'] = "{{ something | regex_replace: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace: '\\n+', '\\n'  }}"
+      agent.options['test'] =
+        "{{ something | regex_replace: '\\\\(\\w{2,})', '\\1\\\\' | regex_replace: '\\n+', '\\n'  }}"
       expect(agent.interpolated['test']).to eq("foo\\1\nfoobar\\\nfoobaz\\")
     end
   end
@@ -265,21 +270,24 @@ describe LiquidInterpolatable::Filters do
 
     it 'should replace the first occurrence of a string using regex' do
       agent.interpolation_context['something'] = 'foobar zoobar'
-      agent.options['cleaned'] = '{% regex_replace_first "(?<word>\S+)(?<suffix>bar)" in %}{{ something }}{% with %}{{ word | upcase }}{{ suffix }}{% endregex_replace_first %}'
+      agent.options['cleaned'] =
+        '{% regex_replace_first "(?<word>\S+)(?<suffix>bar)" in %}{{ something }}{% with %}{{ word | upcase }}{{ suffix }}{% endregex_replace_first %}'
       expect(agent.interpolated['cleaned']).to eq('FOObar zoobar')
     end
 
     it 'should be able to take a pattern in a variable' do
       agent.interpolation_context['something'] = 'foobar zoobar'
       agent.interpolation_context['pattern'] = "(?<word>\\S+)(?<suffix>bar)"
-      agent.options['cleaned'] = '{% regex_replace_first pattern in %}{{ something }}{% with %}{{ word | upcase }}{{ suffix }}{% endregex_replace_first %}'
+      agent.options['cleaned'] =
+        '{% regex_replace_first pattern in %}{{ something }}{% with %}{{ word | upcase }}{{ suffix }}{% endregex_replace_first %}'
       expect(agent.interpolated['cleaned']).to eq('FOObar zoobar')
     end
 
     it 'should define a variable named "match" in a "with" block' do
       agent.interpolation_context['something'] = 'foobar zoobar'
       agent.interpolation_context['pattern'] = "(?<word>\\S+)(?<suffix>bar)"
-      agent.options['cleaned'] = '{% regex_replace_first pattern in %}{{ something }}{% with %}{{ match.word | upcase }}{{ match["suffix"] }}{% endregex_replace_first %}'
+      agent.options['cleaned'] =
+        '{% regex_replace_first pattern in %}{{ something }}{% with %}{{ match.word | upcase }}{{ match["suffix"] }}{% endregex_replace_first %}'
       expect(agent.interpolated['cleaned']).to eq('FOObar zoobar')
     end
   end
@@ -289,7 +297,8 @@ describe LiquidInterpolatable::Filters do
 
     it 'should replace the all occurrences of a string using regex' do
       agent.interpolation_context['something'] = 'foobar zoobar'
-      agent.options['cleaned'] = '{% regex_replace "(?<word>\S+)(?<suffix>bar)" in %}{{ something }}{% with %}{{ word | upcase }}{{ suffix }}{% endregex_replace %}'
+      agent.options['cleaned'] =
+        '{% regex_replace "(?<word>\S+)(?<suffix>bar)" in %}{{ something }}{% with %}{{ word | upcase }}{{ suffix }}{% endregex_replace %}'
       expect(agent.interpolated['cleaned']).to eq('FOObar ZOObar')
     end
   end
@@ -304,9 +313,9 @@ describe LiquidInterpolatable::Filters do
     end
 
     it 'returns an object that was not modified in liquid' do
-      agent.interpolation_context['something'] = {'nested' => {'abc' => 'test'}}
+      agent.interpolation_context['something'] = { 'nested' => { 'abc' => 'test' } }
       agent.options['object'] = "{{something.nested | as_object}}"
-      expect(agent.interpolated['object']).to eq({"abc" => 'test'})
+      expect(agent.interpolated['object']).to eq({ "abc" => 'test' })
     end
 
     context 'as_json' do
@@ -315,19 +324,19 @@ describe LiquidInterpolatable::Filters do
       end
 
       it 'it converts "complex" objects' do
-        agent.interpolation_context['something'] = {'nested' => Service.new}
+        agent.interpolation_context['something'] = { 'nested' => Service.new }
         agent.options['object'] = "{{something | as_object}}"
-        expect(agent.interpolated['object']).to eq({'nested'=> ensure_safety(Service.new.as_json)})
+        expect(agent.interpolated['object']).to eq({ 'nested' => ensure_safety(Service.new.as_json) })
       end
 
-      it 'works with AgentDrops' do
+      it 'works with Agent::Drops' do
         agent.interpolation_context['something'] = agent
         agent.options['object'] = "{{something | as_object}}"
         expect(agent.interpolated['object']).to eq(ensure_safety(agent.to_liquid.as_json.stringify_keys))
       end
 
-      it 'works with EventDrops' do
-        event = Event.new(payload: {some: 'payload'}, agent: agent, created_at: Time.now)
+      it 'works with Event::Drops' do
+        event = Event.new(payload: { some: 'payload' }, agent:, created_at: Time.now)
         agent.interpolation_context['something'] = event
         agent.options['object'] = "{{something | as_object}}"
         expect(agent.interpolated['object']).to eq(ensure_safety(event.to_liquid.as_json.stringify_keys))
@@ -352,33 +361,33 @@ describe LiquidInterpolatable::Filters do
   describe 'rebase_hrefs' do
     let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
 
-    let(:fragment) { <<HTML }
-<ul>
-  <li>
-    <a href="downloads/file1"><img src="/images/iconA.png" srcset="/images/iconA.png 1x, /images/iconA@2x.png 2x">file1</a>
-  </li>
-  <li>
-    <a href="downloads/file2"><img src="/images/iconA.png" srcset="/images/iconA.png 1x, /images/iconA@2x.png 2x">file2</a>
-  </li>
-  <li>
-    <a href="downloads/file3"><img src="/images/iconB.png" srcset="/images/iconB.png 1x, /images/iconB@2x.png 2x">file3</a>
-  </li>
-</ul>
-HTML
+    let(:fragment) { <<~HTML }
+      <ul>
+        <li>
+          <a href="downloads/file1"><img src="/images/iconA.png" srcset="/images/iconA.png 1x, /images/iconA@2x.png 2x">file1</a>
+        </li>
+        <li>
+          <a href="downloads/file2"><img src="/images/iconA.png" srcset="/images/iconA.png 1x, /images/iconA@2x.png 2x">file2</a>
+        </li>
+        <li>
+          <a href="downloads/file3"><img src="/images/iconB.png" srcset="/images/iconB.png 1x, /images/iconB@2x.png 2x">file3</a>
+        </li>
+      </ul>
+    HTML
 
-    let(:replaced_fragment) { <<HTML }
-<ul>
-  <li>
-    <a href="http://example.com/support/downloads/file1"><img src="http://example.com/images/iconA.png" srcset="http://example.com/images/iconA.png 1x, http://example.com/images/iconA@2x.png 2x">file1</a>
-  </li>
-  <li>
-    <a href="http://example.com/support/downloads/file2"><img src="http://example.com/images/iconA.png" srcset="http://example.com/images/iconA.png 1x, http://example.com/images/iconA@2x.png 2x">file2</a>
-  </li>
-  <li>
-    <a href="http://example.com/support/downloads/file3"><img src="http://example.com/images/iconB.png" srcset="http://example.com/images/iconB.png 1x, http://example.com/images/iconB@2x.png 2x">file3</a>
-  </li>
-</ul>
-HTML
+    let(:replaced_fragment) { <<~HTML }
+      <ul>
+        <li>
+          <a href="http://example.com/support/downloads/file1"><img src="http://example.com/images/iconA.png" srcset="http://example.com/images/iconA.png 1x, http://example.com/images/iconA@2x.png 2x">file1</a>
+        </li>
+        <li>
+          <a href="http://example.com/support/downloads/file2"><img src="http://example.com/images/iconA.png" srcset="http://example.com/images/iconA.png 1x, http://example.com/images/iconA@2x.png 2x">file2</a>
+        </li>
+        <li>
+          <a href="http://example.com/support/downloads/file3"><img src="http://example.com/images/iconB.png" srcset="http://example.com/images/iconB.png 1x, http://example.com/images/iconB@2x.png 2x">file3</a>
+        </li>
+      </ul>
+    HTML
 
     it 'rebases relative URLs in a fragment' do
       agent.interpolation_context['content'] = fragment
