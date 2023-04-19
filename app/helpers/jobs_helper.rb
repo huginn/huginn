@@ -1,5 +1,4 @@
 module JobsHelper
-
   def status(job)
     case
     when job.failed_at
@@ -24,7 +23,7 @@ module JobsHelper
   #
   # Can return nil, or an instance of Agent.
   def agent_from_job(job)
-    data = YAML.load(job.handler.to_s).try(:job_data)
+    data = YAML.unsafe_load(job.handler.to_s).try(:job_data)
     case data['job_class']
     when 'AgentCheckJob', 'AgentReceiveJob'
       Agent.find_by_id(data['arguments'][0])
