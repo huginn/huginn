@@ -1,7 +1,6 @@
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y python2.7 python-docutils mysql-server \
-                   supervisor python-pip && \
+apt-get install -y python3-pip mysql-server supervisor && \
 apt-get -y clean
 pip install supervisor-stdout
 rm -rf /var/lib/apt/lists/*
