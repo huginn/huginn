@@ -274,9 +274,7 @@ GEM
       faraday
       hashie
       multi_json
-    foreman (0.63.0)
-      dotenv (>= 0.7)
-      thor (>= 0.13.6)
+    foreman (0.87.2)
     formatador (1.1.0)
     fugit (1.5.2)
       et-orbi (~> 1.1, >= 1.1.8)
@@ -816,7 +814,7 @@ DEPENDENCIES
   ffi (>= 1.9.4)
   font-awesome-sass (~> 4.7.0)
   forecast_io (~> 2.0.0)
-  foreman (~> 0.63.0)
+  foreman (~> 0.87.2)
   geokit (~> 1.13)
   geokit-rails (~> 2.3)
   gmail_xoauth
