@@ -726,6 +726,8 @@ GEM
     sshkit (1.21.2)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
+    terser (1.1.14)
+      execjs (>= 0.3.0, < 3)
     thor (1.2.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
@@ -883,6 +885,7 @@ DEPENDENCIES
   spring-commands-rspec
   spring-watcher-listen
   sprockets
+  terser
   tumblr_client!
   twilio-ruby (~> 5.62.0)
   twitter!
