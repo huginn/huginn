@@ -233,6 +233,10 @@ class Agent < ActiveRecord::Base
     self.class.can_dry_run?
   end
 
+  def should_run?
+    self.class.should_run?
+  end
+
   def no_bulk_receive?
     self.class.no_bulk_receive?
   end
@@ -377,6 +381,10 @@ class Agent < ActiveRecord::Base
       !!@can_dry_run
     end
 
+    def should_run?
+      true
+    end
+
     def no_bulk_receive!
       @no_bulk_receive = true
     end
@@ -453,8 +461,7 @@ class Agent < ActiveRecord::Base
     def run_schedule(schedule)
       return if schedule == 'never'
 
-      types = where(schedule:).group(:type).pluck(:type)
-      types.each do |type|
+      where(schedule:).group(:type).pluck(:type).each do |type|
         next unless valid_type?(type)
 
         type.constantize.bulk_check(schedule)
