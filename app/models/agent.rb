@@ -92,6 +92,64 @@ class Agent < ActiveRecord::Base
     type.demodulize
   end
 
+  def self.archive_all!
+    transaction do
+      id2type = connection.select_rows(
+        where.not(type: 'Agents::ArchivedAgent').select(:id, :type).to_sql
+      ).to_h
+
+      agents = unscoped.where(id: id2type.keys)
+
+      agents.update_all(type: 'Agents::ArchivedAgent')
+
+      agents.find_each do |agent|
+        id = agent.id
+        options = {
+          "type" => id2type.fetch(id),
+        }.update(
+          agent.slice(
+            :schedule,
+            :last_check_at,
+            :last_receive_at,
+            :last_checked_event_id,
+            :last_web_request_at,
+            :last_event_at,
+            :last_error_log_at,
+            :keep_events_for,
+            :propagate_immediately,
+            :deactivated,
+            :disabled,
+            :options,
+            :memory,
+          )
+        )
+
+        agent.update_columns(
+          disabled: true,
+          options:,
+          memory: {}
+        )
+
+        agent.update!(keep_events_for: 0)
+      end
+
+      agents.reset
+    end
+  end
+
+  def self.unarchive_all!
+    transaction do
+      ids = []
+
+      where(type: 'Agents::ArchivedAgent').find_each do |agent|
+        ids << agent.id
+        agent.update_columns(agent.options)
+      end
+
+      unscoped.where(id: ids)
+    end
+  end
+
   def check
     # Implement me in your subclass of Agent.
   end

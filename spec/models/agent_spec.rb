@@ -31,6 +31,76 @@ describe Agent do
     end
   end
 
+  describe '.archive_all!/.unarchive_all!' do
+    let!(:agent_id) { agents(:bob_weather_agent).id }
+
+    it 'archives and unarchives Agents' do
+      expect {
+        Agent.where(id: [agent_id]).archive_all!
+      }.to change {
+        Agent.find(agent_id)
+      }.from(
+        be_a(Agents::WeatherAgent) & have_attributes(
+          disabled: false,
+          keep_events_for: be > 0,
+          options: hash_including(:location, :api_key)
+        )
+      ).to(
+        be_a(Agents::ArchivedAgent) & have_attributes(
+          disabled: true,
+          keep_events_for: 0,
+          options: hash_including(
+            :schedule,
+            :last_check_at,
+            :last_receive_at,
+            :last_checked_event_id,
+            :last_web_request_at,
+            :last_event_at,
+            :last_error_log_at,
+            :propagate_immediately,
+            type: 'Agents::WeatherAgent',
+            keep_events_for: be > 0,
+            deactivated: false,
+            disabled: false,
+            options: hash_including(:location, :api_key)
+          )
+        )
+      )
+
+      expect {
+        Agent.where(id: [agent_id]).unarchive_all!
+      }.to change {
+        Agent.find(agent_id)
+      }.from(
+        be_a(Agents::ArchivedAgent) & have_attributes(
+          disabled: true,
+          keep_events_for: 0,
+          options: hash_including(
+            :schedule,
+            :last_check_at,
+            :last_receive_at,
+            :last_checked_event_id,
+            :last_web_request_at,
+            :last_event_at,
+            :last_error_log_at,
+            :propagate_immediately,
+            type: 'Agents::WeatherAgent',
+            keep_events_for: be > 0,
+            deactivated: false,
+            disabled: false,
+            options: hash_including(:location, :api_key)
+          )
+        )
+      ).to(
+        be_a(Agents::WeatherAgent) & have_attributes(
+          disabled: false,
+          keep_events_for: be > 0,
+          options: hash_including(:location, :api_key)
+        )
+      )
+    end
+  end
+
   describe ".bulk_check" do
     before do
       @weather_agent_count = Agents::WeatherAgent.where(schedule: "midnight", disabled: false).count
