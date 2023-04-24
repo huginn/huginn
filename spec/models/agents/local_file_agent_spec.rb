@@ -187,6 +187,15 @@ describe Agents::LocalFileAgent do
       expect { @checker.receive([]) }.to change(AgentLog, :count).by(1)
       ENV['ENABLE_INSECURE_AGENTS'] = 'true'
     end
+
+    it "emits an event containing the file pointer" do
+      expect(@file_mock).to receive(:write).with('hello world')
+      event = Event.new(payload: {'data' => 'hello world'})
+      expect(File).to receive(:open).with(File.join(Rails.root, 'tmp', 'spec'), 'w').and_yield(@file_mock)
+
+      expect { @checker.receive([event]) }.to change(Event, :count).by(1)
+      expect(Event.last.payload.has_key?('file_pointer')).to be_truthy
+    end
   end
 
   describe describe Agents::LocalFileAgent::Worker do

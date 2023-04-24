@@ -114,9 +114,11 @@ module Agents
 
       incoming_events.each do |event|
         mo = interpolated(event)
-        File.open(File.expand_path(mo['path']), boolify(mo['append']) ? 'a' : 'w') do |file|
+        expanded_path = File.expand_path(mo['path'])
+        File.open(expanded_path, boolify(mo['append']) ? 'a' : 'w') do |file|
           file.write(mo['data'])
         end
+        create_event payload: get_file_pointer(expanded_path)
       end
     end
 
