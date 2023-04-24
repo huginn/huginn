@@ -238,7 +238,6 @@ If you are using a local PostgreSQL server the database configuration should loo
     DATABASE_PASSWORD='$password'
     DATABASE_HOST=localhost
     DATABASE_PORT=5432
-    DATABASE_SOCKET=/var/run/postgresql/.s.PGSQL.5432
 
     DATABASE_ENCODING=utf8
 
