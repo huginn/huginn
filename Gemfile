@@ -58,8 +58,7 @@ gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 # Tumblr Agents
 # until merge of https://github.com/tumblr/tumblr_client/pull/61
 gem 'omniauth-tumblr'
-gem 'tumblr_client', github: 'albertsun/tumblr_client', branch: 'master',
-                     ref: 'e046fe6e39291c173add0a49081630c7b60a36c7'
+gem 'tumblr_client', '~> 0.8.6', github: 'tumblr/tumblr_client'
 
 # Dropbox Agents
 gem 'dropbox-api', github: 'dsander/dropbox-api', ref: '86cb7b5a1254dc5b054de7263835713c4c1018c7'
@@ -100,8 +99,8 @@ gem 'delayed_job_active_record'
 gem 'devise', '~> 4.8'
 gem 'em-http-request', '~> 1.1.2'
 gem 'execjs'
-gem 'faraday', '~> 0.9'
-gem 'faraday_middleware', '~> 0.12.2'
+gem 'faraday', '~> 1.0'
+gem 'faraday_middleware'
 gem 'feedjira', '~> 3.1'
 gem 'font-awesome-sass', '~> 4.7.0'
 gem 'foreman', '~> 0.87.2'

@@ -5,20 +5,6 @@ GIT
     capybara-select-2 (0.5.1)
 
 GIT
-  remote: https://github.com/albertsun/tumblr_client.git
-  revision: e046fe6e39291c173add0a49081630c7b60a36c7
-  ref: e046fe6e39291c173add0a49081630c7b60a36c7
-  branch: master
-  specs:
-    tumblr_client (0.8.5)
-      faraday (<= 1.0.0)
-      faraday_middleware (<= 1.0.0)
-      json
-      mime-types
-      oauth
-      simple_oauth
-
-GIT
   remote: https://github.com/albertsun/weibo_2.git
   revision: ac38d04434747c4b88e86c5337cd436d00c34349
   branch: master
@@ -79,6 +65,18 @@ GIT
       multipart-post (~> 2.0)
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
+
+GIT
+  remote: https://github.com/tumblr/tumblr_client.git
+  revision: a72b7f4636cb0ea75cb65ce90df902c3cb7d96b7
+  specs:
+    tumblr_client (0.8.6)
+      faraday (~> 1.0)
+      faraday_middleware (~> 1.0)
+      json
+      mime-types
+      oauth
+      simple_oauth
 
 PATH
   remote: vendor/gems/dotenv-2.0.1
@@ -260,10 +258,31 @@ GEM
       evernote-thrift
       oauth (>= 0.4.1)
     execjs (2.8.1)
-    faraday (0.17.6)
-      multipart-post (>= 1.2, < 3)
-    faraday_middleware (0.12.2)
-      faraday (>= 0.7.4, < 1.0)
+    faraday (1.10.3)
+      faraday-em_http (~> 1.0)
+      faraday-em_synchrony (~> 1.0)
+      faraday-excon (~> 1.1)
+      faraday-httpclient (~> 1.0)
+      faraday-multipart (~> 1.0)
+      faraday-net_http (~> 1.0)
+      faraday-net_http_persistent (~> 1.0)
+      faraday-patron (~> 1.0)
+      faraday-rack (~> 1.0)
+      faraday-retry (~> 1.0)
+      ruby2_keywords (>= 0.0.4)
+    faraday-em_http (1.0.0)
+    faraday-em_synchrony (1.0.0)
+    faraday-excon (1.1.0)
+    faraday-httpclient (1.0.1)
+    faraday-multipart (1.0.4)
+      multipart-post (~> 2)
+    faraday-net_http (1.0.1)
+    faraday-net_http_persistent (1.2.0)
+    faraday-patron (1.0.0)
+    faraday-rack (1.0.0)
+    faraday-retry (1.0.3)
+    faraday_middleware (1.2.0)
+      faraday (~> 1.0)
     feedjira (3.2.0)
       loofah (>= 2.3.1)
       sax-machine (>= 1.0)
@@ -671,6 +690,7 @@ GEM
       rubocop (~> 1.33)
       rubocop-capybara (~> 2.17)
     ruby-progressbar (1.13.0)
+    ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
     rufus-scheduler (3.8.1)
       fugit (~> 1.1, >= 1.1.6)
@@ -814,8 +834,8 @@ DEPENDENCIES
   erector!
   evernote_oauth
   execjs
-  faraday (~> 0.9)
-  faraday_middleware (~> 0.12.2)
+  faraday (~> 1.0)
+  faraday_middleware
   feedjira (~> 3.1)
   ffi (>= 1.9.4)
   font-awesome-sass (~> 4.7.0)
@@ -890,7 +910,7 @@ DEPENDENCIES
   spring-watcher-listen
   sprockets
   terser
-  tumblr_client!
+  tumblr_client (~> 0.8.6)!
   twilio-ruby (~> 5.62.0)
   twitter!
   twitter-stream!
