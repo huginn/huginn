@@ -260,7 +260,7 @@ GEM
       evernote-thrift
       oauth (>= 0.4.1)
     execjs (2.8.1)
-    faraday (0.17.4)
+    faraday (0.17.6)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.12.2)
       faraday (>= 0.7.4, < 1.0)
