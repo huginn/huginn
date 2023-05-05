@@ -123,7 +123,7 @@ module WebRequestConcern
 
       builder.headers[:user_agent] = user_agent
 
-      builder.proxy interpolated['proxy'].presence
+      builder.proxy = interpolated['proxy'].presence
 
       unless boolify(interpolated['disable_redirect_follow'])
         builder.use FaradayMiddleware::FollowRedirects
