@@ -57,7 +57,7 @@ class GemfileHelper
     end
 
     def sanity_check(env)
-      return if ENV['CI'] == 'true' || !env.empty?
+      return if ENV['CI'] == 'true' || ENV['APP_SECRET_TOKEN'] || !env.empty?
       puts warning
       raise "Could not load huginn settings from .env file."
     end
