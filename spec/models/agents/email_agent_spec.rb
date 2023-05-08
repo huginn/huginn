@@ -90,6 +90,26 @@ describe Agents::EmailAgent do
       expect(get_message_part(ActionMailer::Base.deliveries.last, /html/).strip).to match(/<body>\s*#{Regexp.escape("console.log('hello, world.')<strong>rain!</strong>")}\s*<\/body>/)
     end
 
+    it "can take attachment option for attaching a file to the email" do
+      @checker.update :options => @checker.options.merge({
+                                                             'subject' => '{{foo.subject}}',
+                                                             'attachment' => '{{attachment}}'
+                                                         })
+      event = Event.new
+      event.agent = agents(:bob_rain_notifier_agent)
+      event.payload = { :foo => { :subject => "Something you should know about" }, :attachment => Rails.root.join('spec', 'data_fixtures', 'podcast.rss') }
+      event.save!
+
+      Agents::EmailAgent.async_receive(@checker.id, [event.id])
+
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect(ActionMailer::Base.deliveries.last.to).to eq(["bob@example.com"])
+      expect(ActionMailer::Base.deliveries.last.subject).to eq("Something you should know about")
+
+      attachment_part = ActionMailer::Base.deliveries.last.body.parts.find { |p| p.content_type.match /application\/rss/ }
+      expect(attachment_part.filename).to eq("podcast.rss")
+    end
+
     it "can take content type option to set content type of email sent" do
       @checker.update :options => @checker.options.merge({
         'content_type' => 'text/plain'

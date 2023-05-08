@@ -30,6 +30,8 @@ module Agents
       You can provide a `content_type` for the email and specify `text/plain` or `text/html` to be sent.
       If you do not specify `content_type`, then the recipient email server will determine the correct rendering.
 
+      You can specify a local file `attachment` for the email by providing the fully qualified path and filename.
+
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
     MD
 
@@ -56,6 +58,7 @@ module Agents
               headline: interpolated(event)['headline'],
               body: interpolated(event)['body'],
               content_type: interpolated(event)['content_type'],
+              attachment: interpolated(event)['attachment'],
               groups: [present(event.payload)]
             ).deliver_now
             log "Sent mail to #{recipient} with event #{event.id}"
