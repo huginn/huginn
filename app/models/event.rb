@@ -131,6 +131,10 @@ class EventDrop
     @object.location
   end
 
+  def event_uuid
+    @object.uuid
+  end
+
   def as_json
     {location: _location_.as_json, agent: @object.agent.to_liquid.as_json, payload: @payload.as_json, created_at: created_at.as_json}
   end

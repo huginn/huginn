@@ -14,6 +14,7 @@ class Agent < ActiveRecord::Base
   include LiquidDroppable
   include DryRunnable
   include SortableEvents
+  include WrapReceive
 
   markdown_class_attributes :description, :event_description
 
@@ -135,6 +136,7 @@ class Agent < ActiveRecord::Base
   def create_event(event)
     if can_create_events?
       event = build_event(event)
+      event.uuid = @receiving_event.try(:uuid) || SecureRandom.uuid
       event.save!
       event
     else

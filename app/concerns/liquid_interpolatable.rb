@@ -411,9 +411,25 @@ module LiquidInterpolatable
         "\n"
       end
     end
+
+    class PreviousEvent < Liquid::Tag
+      def initialize(_, args, tokens)
+        (@agent_name, @template) = args.scan(Liquid::QuotedString).map { |e| Liquid::Expression.parse(e) }
+        super
+      end
+
+      def render(context)
+        return if context['event_uuid'].blank?
+        user = context.registers[:agent].user
+        payload = user.events.joins(:agent).where(uuid: context['event_uuid'], agents: {name: @agent_name}).first.try(:payload) || {}
+        throw :as_object, payload unless @template
+        Liquid::Template.parse(@template).render!(payload)
+      end
+    end
   end
   Liquid::Template.register_tag('credential', LiquidInterpolatable::Tags::Credential)
   Liquid::Template.register_tag('line_break', LiquidInterpolatable::Tags::LineBreak)
+  Liquid::Template.register_tag('previous_event', LiquidInterpolatable::Tags::PreviousEvent)
 
   module Blocks
     # Replace every occurrence of a given regex pattern in the first
