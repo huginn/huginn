@@ -50,7 +50,7 @@ module Agents
           If this key is unspecified or set to null, it is ignored.
 
       - `has_attachment`
-      
+
           Setting this to true or false means only mails that does or does not have an attachment are selected.
 
           If this key is unspecified or set to null, it is ignored.
@@ -583,18 +583,18 @@ module Agents
         if mail.multipart?
           mail.body.set_sort_order(mime_types)
           mail.body.sort_parts!
-          mail.all_parts
+          mail.all_parts.select { |part|
+            if part.multipart? || part.attachment? || !part.text? ||
+               !mime_types.include?(part.mime_type)
+              false
+            else
+              part.extend(Scrubbed)
+              true
+            end
+          }
         else
-          [mail]
-        end.select { |part|
-          if part.multipart? || part.attachment? || !part.text? ||
-             !mime_types.include?(part.mime_type)
-            false
-          else
-            part.extend(Scrubbed)
-            true
-          end
-        }
+          [mail.extend(Scrubbed)]
+        end
       end
 
       def mark_as_read
