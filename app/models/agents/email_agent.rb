@@ -30,6 +30,9 @@ module Agents
       You can provide a `content_type` for the email and specify `text/plain` or `text/html` to be sent.
       If you do not specify `content_type`, then the recipient email server will determine the correct rendering.
 
+      For more complex message formatting, if you specify a `content_type` then you can also provide an alternate message `template`.
+      It is best to use the liquid `credential` tag like so `{% credential message_template %}` to define the template format.
+
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
     MD
 
@@ -56,6 +59,7 @@ module Agents
               headline: interpolated(event)['headline'],
               body: interpolated(event)['body'],
               content_type: interpolated(event)['content_type'],
+              template: interpolated(event)['template'],
               groups: [present(event.payload)]
             ).deliver_now
             log "Sent mail to #{recipient} with event #{event.id}"
