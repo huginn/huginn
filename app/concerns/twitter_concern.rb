@@ -85,19 +85,10 @@ module TwitterConcern
     text.gsub!(RE_HTML_ENTITIES, HTML_ENTITIES)
     expanded_text.gsub!(RE_HTML_ENTITIES, HTML_ENTITIES)
 
-    if attrs[:text]
-      {
-        **attrs,
-        text: text,
-        expanded_text: expanded_text,
-      }
-    else
-      {
-        **attrs,
-        full_text: text,
-        expanded_text: expanded_text,
-      }
-    end
+    attrs[:text] &&= text
+    attrs[:full_text] &&= text
+
+    attrs.update(expanded_text:)
   end
 
   module_function :format_tweet

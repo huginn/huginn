@@ -3,7 +3,7 @@ class UserCredential < ActiveRecord::Base
 
   belongs_to :user
 
-  validates :credential_name, presence: true, uniqueness: { case_sensitive: true, scope: :user_id}
+  validates :credential_name, presence: true, uniqueness: { case_sensitive: true, scope: :user_id }
   validates :credential_value, presence: true
   validates :mode, inclusion: { in: MODES }
   validates :user_id, presence: true

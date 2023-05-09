@@ -2,7 +2,7 @@ module Agents
   class EvernoteAgent < Agent
     include EvernoteConcern
 
-    description <<-MD
+    description <<~MD
       The Evernote Agent connects with a user's Evernote note store.
 
       Visit [Evernote](https://dev.evernote.com/doc/) to set up an Evernote app and receive an api key and secret.
@@ -53,7 +53,7 @@ module Agents
                 }
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       When `mode` is `update`, events look like:
 
           {
@@ -106,7 +106,7 @@ module Agents
     end
 
     def validate_options
-      errors.add(:base, "mode must be 'update' or 'read'") unless %w(read update).include?(options[:mode])
+      errors.add(:base, "mode must be 'update' or 'read'") unless %w[read update].include?(options[:mode])
 
       if options[:mode] == "update" && schedule != "never"
         errors.add(:base, "when mode is set to 'update', schedule must be 'never'")
@@ -116,7 +116,8 @@ module Agents
         errors.add(:base, "when mode is set to 'read', agent must have a schedule")
       end
 
-      errors.add(:base, "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
+      errors.add(:base,
+                 "expected_update_period_in_days is required") unless options['expected_update_period_in_days'].present?
 
       if options[:mode] == "update" && options[:note].values.all?(&:empty?)
         errors.add(:base, "you must specify at least one note parameter to create or update a note")
@@ -131,7 +132,7 @@ module Agents
       if options[:mode] == "update"
         incoming_events.each do |event|
           note = note_store.create_or_update_note(note_params(event))
-          create_event :payload => note.attr(include_content: include_xhtml_content?)
+          create_event payload: note.attr(include_content: include_xhtml_content?)
         end
       end
     end
@@ -146,15 +147,17 @@ module Agents
         opts.merge!(last_checked_at: (memory[:last_checked_at] ||= created_at.to_i * 1000))
 
         if opts[:tagNames]
-          opts.merge!(notes_with_tags: (memory[:notes_with_tags] ||=
-            NoteStore::Search.new(note_store, {tagNames: opts[:tagNames]}).note_guids))
+          notes_with_tags =
+            memory[:notes_with_tags] ||=
+              NoteStore::Search.new(note_store, { tagNames: opts[:tagNames] }).note_guids
+          opts.merge!(notes_with_tags:)
         end
 
         notes = NoteStore::Search.new(note_store, opts).notes
         notes.each do |note|
           memory[:notes_with_tags] << note.guid unless memory[:notes_with_tags].include?(note.guid)
 
-          create_event :payload => note.attr(include_resources: true, include_content: include_xhtml_content?)
+          create_event payload: note.attr(include_resources: true, include_content: include_xhtml_content?)
         end
 
         memory[:last_checked_at] = Time.now.to_i * 1000
@@ -185,19 +188,20 @@ module Agents
     # https://dev.evernote.com/doc/reference/
     class NoteStore
       attr_reader :en_note_store
+
       delegate :createNote, :updateNote, :getNote, :listNotebooks, :listTags, :getNotebook,
-               :createNotebook, :findNotesMetadata, :getNoteTagNames, :to => :en_note_store
+               :createNotebook, :findNotesMetadata, :getNoteTagNames, to: :en_note_store
 
       def initialize(en_note_store)
         @en_note_store = en_note_store
       end
 
       def create_or_update_note(params)
-        search = Search.new(self, {title: params[:title], notebook: params[:notebook]})
+        search = Search.new(self, { title: params[:title], notebook: params[:notebook] })
 
         # evernote search can only filter notes with titles containing a substring;
         # this finds a note with the exact title
-        note = search.notes.detect {|note| note.title == params[:title]}
+        note = search.notes.detect { |note| note.title == params[:title] }
 
         if note
           # a note with specified title and notebook exists, so update it
@@ -227,7 +231,8 @@ module Agents
         # evernote will create any new tags
         tags = getNoteTagNames(params[:guid])
         tags.each { |tag|
-          params[:tagNames] << tag unless params[:tagNames].include?(tag) }
+          params[:tagNames] << tag unless params[:tagNames].include?(tag)
+        }
 
         note = Evernote::EDAM::Type::Note.new(params)
         updateNote(note)
@@ -247,19 +252,19 @@ module Agents
       end
 
       def find_tags(guids)
-        listTags.select {|tag| guids.include?(tag.guid)}
+        listTags.select { |tag| guids.include?(tag.guid) }
       end
 
       def find_notebook(params)
         if params[:guid]
-          listNotebooks.detect {|notebook| notebook.guid == params[:guid]}
+          listNotebooks.detect { |notebook| notebook.guid == params[:guid] }
         elsif params[:name]
-          listNotebooks.detect {|notebook| notebook.name == params[:name]}
+          listNotebooks.detect { |notebook| notebook.name == params[:name] }
         end
       end
 
       def create_notebook(name)
-        notebook = Evernote::EDAM::Type::Notebook.new(name: name)
+        notebook = Evernote::EDAM::Type::Notebook.new(name:)
         createNotebook(notebook)
       end
 
@@ -270,7 +275,7 @@ module Agents
           params[:content] =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" \
             "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">" \
-            "<en-note>#{params[:content].encode(:xml => :text)}</en-note>"
+            "<en-note>#{params[:content].encode(xml: :text)}</en-note>"
         end
 
         params
@@ -278,6 +283,7 @@ module Agents
 
       class Search
         attr_reader :note_store, :opts
+
         def initialize(note_store, opts)
           @note_store = note_store
           @opts = opts
@@ -297,7 +303,7 @@ module Agents
             # and notes that recently had the specified tags added
             metadata.select! do |note_data|
               note_data.updated > opts[:last_checked_at] ||
-              !opts[:notes_with_tags].include?(note_data.guid)
+                !opts[:notes_with_tags].include?(note_data.guid)
             end
 
           elsif opts[:last_checked_at]
@@ -326,7 +332,8 @@ module Agents
         private
 
         def filtered_metadata
-          filter, spec = create_filter, create_spec
+          filter = create_filter
+          spec = create_spec
           metadata = note_store.findNotesMetadata(filter, 0, 100, spec).notes
         end
 
@@ -346,8 +353,9 @@ module Agents
     class Note
       attr_accessor :en_note
       attr_reader :notebook, :tags
+
       delegate :guid, :notebookGuid, :title, :tagGuids, :content, :resources,
-               :attributes, :to => :en_note
+               :attributes, to: :en_note
 
       def initialize(en_note, notebook, tags)
         @en_note = en_note
@@ -357,11 +365,11 @@ module Agents
 
       def attr(opts = {})
         return_attr = {
-          title:        title,
-          notebook:     notebook,
-          tags:         tags,
-          source:       attributes.source,
-          source_url:   attributes.sourceURL
+          title:,
+          notebook:,
+          tags:,
+          source: attributes.source,
+          source_url: attributes.sourceURL
         }
 
         return_attr[:content] = content if opts[:include_content]

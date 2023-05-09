@@ -7,24 +7,23 @@ module Agents
 
     gem_dependency_check { defined?(ForecastIO) }
 
-    description <<-MD
+    description <<~MD
       The Weather Agent creates an event for the day's weather at a given `location`.
 
       #{'## Include `forecast_io` in your Gemfile to use this Agent!' if dependencies_missing?}
 
       You also must select when you would like to get the weather forecast for using the `which_day` option, where the number 1 represents today, 2 represents tomorrow and so on. Weather forecast inforation is only returned for at most one week at a time.
 
-      The weather forecast information is provided by Dark Sky. 
+      The weather forecast information is provided by Dark Sky.
 
       The `location` must be a comma-separated string of map co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
 
       You must set up an [API key for Dark Sky](https://darksky.net/dev/) in order to use this Agent.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
-
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       Events look like this:
 
           {
@@ -71,7 +70,7 @@ module Agents
 
     def check
       if key_setup?
-        create_event :payload => model(which_day).merge('location' => location)
+        create_event payload: model(which_day).merge('location' => location)
       end
     end
 
@@ -93,7 +92,7 @@ module Agents
       interpolated["language"].presence || "en"
     end
 
-    def wunderground? 
+    def wunderground?
       interpolated["service"].presence && interpolated["service"].presence.downcase == "wunderground"
     end
 
@@ -112,12 +111,14 @@ module Agents
           :base,
           "Location #{location} is malformed. Location for " +
           'Dark Sky must be in the format "-00.000,-00.00000". The ' +
-          "number of decimal places does not matter.")
+          "number of decimal places does not matter."
+        )
       end
     end
 
     def validate_options
-      errors.add(:base, "The Weather Underground API has been disabled since Jan 1st 2018, please switch to DarkSky") if wunderground?
+      errors.add(:base,
+                 "The Weather Underground API has been disabled since Jan 1st 2018, please switch to DarkSky") if wunderground?
       validate_location
       errors.add(:base, "api_key is required") unless interpolated['api_key'].present?
       errors.add(:base, "which_day selection is required") unless which_day.present?
@@ -127,7 +128,7 @@ module Agents
       if key_setup?
         ForecastIO.api_key = interpolated['api_key']
         lat, lng = coordinates
-        ForecastIO.forecast(lat, lng, params: {lang: language.downcase})['daily']['data']
+        ForecastIO.forecast(lat, lng, params: { lang: language.downcase })['daily']['data']
       end
     end
 
@@ -135,7 +136,7 @@ module Agents
       value = dark_sky[which_day - 1]
       if value
         timestamp = Time.at(value.time)
-        day = {
+        {
           'date' => {
             'epoch' => value.time.to_s,
             'pretty' => timestamp.strftime("%l:%M %p %Z on %B %d, %Y"),
@@ -146,7 +147,7 @@ module Agents
             'hour' => timestamp.hour,
             'min' => timestamp.strftime("%M"),
             'sec' => timestamp.sec,
-            'isdst' => timestamp.isdst ? 1 : 0 ,
+            'isdst' => timestamp.isdst ? 1 : 0,
             'monthname' => timestamp.strftime("%B"),
             'monthname_short' => timestamp.strftime("%b"),
             'weekday_short' => timestamp.strftime("%a"),
@@ -156,18 +157,18 @@ module Agents
           },
           'period' => which_day.to_i,
           'high' => {
-            'fahrenheit' => value.temperatureMax.round().to_s,
+            'fahrenheit' => value.temperatureMax.round.to_s,
             'epoch' => value.temperatureMaxTime.to_s,
-            'fahrenheit_apparent' => value.apparentTemperatureMax.round().to_s,
+            'fahrenheit_apparent' => value.apparentTemperatureMax.round.to_s,
             'epoch_apparent' => value.apparentTemperatureMaxTime.to_s,
-            'celsius' => ((5*(Float(value.temperatureMax) - 32))/9).round().to_s
+            'celsius' => ((5 * (Float(value.temperatureMax) - 32)) / 9).round.to_s
           },
           'low' => {
-            'fahrenheit' => value.temperatureMin.round().to_s,
+            'fahrenheit' => value.temperatureMin.round.to_s,
             'epoch' => value.temperatureMinTime.to_s,
-            'fahrenheit_apparent' => value.apparentTemperatureMin.round().to_s,
+            'fahrenheit_apparent' => value.apparentTemperatureMin.round.to_s,
             'epoch_apparent' => value.apparentTemperatureMinTime.to_s,
-            'celsius' => ((5*(Float(value.temperatureMin) - 32))/9).round().to_s
+            'celsius' => ((5 * (Float(value.temperatureMin) - 32)) / 9).round.to_s
           },
           'conditions' => value.summary,
           'icon' => value.icon,
@@ -184,8 +185,8 @@ module Agents
           },
           'dewPoint' => value.dewPoint.to_s,
           'avewind' => {
-            'mph' => value.windSpeed.round().to_s,
-            'kph' =>  (Float(value.windSpeed) * 1.609344).round().to_s,
+            'mph' => value.windSpeed.round.to_s,
+            'kph' => (Float(value.windSpeed) * 1.609344).round.to_s,
             'degrees' => value.windBearing.to_s
           },
           'visibility' => value.visibility.to_s,
@@ -193,7 +194,6 @@ module Agents
           'pressure' => value.pressure.to_s,
           'ozone' => value.ozone.to_s
         }
-        return day
       end
     end
   end

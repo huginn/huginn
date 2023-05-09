@@ -6,7 +6,7 @@ module Agents
     cannot_be_scheduled!
     cannot_create_events!
 
-    description <<-MD
+    description <<~MD
       The Key-Value Store Agent is a data storage that keeps an associative array in its memory.  It receives events to store values and provides the data to other agents as an object via Liquid Templating.
 
       Liquid templates specified in the `key` and `value` options are evaluated for each received event to be stored in the memory.

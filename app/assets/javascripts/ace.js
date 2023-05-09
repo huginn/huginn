@@ -1,0 +1,1 @@
+//= require ace-rails-ap

@@ -5,7 +5,7 @@ module Agents
     can_dry_run!
     cannot_receive_events!
 
-    description <<-MD
+    description <<~MD
       The Twitter Favorites List Agent follows the favorites list of a specified Twitter user.
 
       #{twitter_dependencies_missing if dependencies_missing?}

@@ -11,7 +11,7 @@ module Agents
 
     gem_dependency_check { defined?(MiniRacer) }
 
-    description <<-MD
+    description <<~MD
       The JavaScript Agent allows you to write code in JavaScript that can create and receive events.  If other Agents aren't meeting your needs, try this one!
 
       #{'## Include `mini_racer` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -45,7 +45,8 @@ module Agents
     def validate_options
       cred_name = credential_referenced_by_code
       if cred_name
-        errors.add(:base, "The credential '#{cred_name}' referenced by code cannot be found") unless credential(cred_name).present?
+        errors.add(:base,
+                   "The credential '#{cred_name}' referenced by code cannot be found") unless credential(cred_name).present?
       else
         errors.add(:base, "The 'code' option is required") unless options['code'].present?
       end
@@ -114,22 +115,22 @@ module Agents
       context = MiniRacer::Context.new
       context.eval(setup_javascript)
 
-      context.attach("doCreateEvent", -> (y) { create_event(payload: clean_nans(JSON.parse(y))).payload.to_json })
+      context.attach("doCreateEvent", ->(y) { create_event(payload: clean_nans(JSON.parse(y))).payload.to_json })
       context.attach("getIncomingEvents", -> { incoming_events.to_json })
       context.attach("getOptions", -> { interpolated.to_json })
-      context.attach("doLog", -> (x) { log x })
-      context.attach("doError", -> (x) { error x })
+      context.attach("doLog", ->(x) { log x })
+      context.attach("doError", ->(x) { error x })
       context.attach("getMemory", -> { memory.to_json })
-      context.attach("setMemoryKey", -> (x, y) { memory[x] = clean_nans(y) })
-      context.attach("setMemory", -> (x) { memory.replace(clean_nans(x)) })
-      context.attach("deleteKey", -> (x) { memory.delete(x).to_json })
-      context.attach("escapeHtml", -> (x) { CGI.escapeHTML(x) })
-      context.attach("unescapeHtml", -> (x) { CGI.unescapeHTML(x) })
-      context.attach('getCredential', -> (k) { credential(k); })
-      context.attach('setCredential', -> (k, v) { set_credential(k, v) })
+      context.attach("setMemoryKey", ->(x, y) { memory[x] = clean_nans(y) })
+      context.attach("setMemory", ->(x) { memory.replace(clean_nans(x)) })
+      context.attach("deleteKey", ->(x) { memory.delete(x).to_json })
+      context.attach("escapeHtml", ->(x) { CGI.escapeHTML(x) })
+      context.attach("unescapeHtml", ->(x) { CGI.unescapeHTML(x) })
+      context.attach('getCredential', ->(k) { credential(k); })
+      context.attach('setCredential', ->(k, v) { set_credential(k, v) })
 
       if (options['language'] || '').downcase == 'coffeescript'
-        context.eval(CoffeeScript.compile code)
+        context.eval(CoffeeScript.compile(code))
       else
         context.eval(code)
       end
@@ -223,20 +224,19 @@ module Agents
     end
 
     def log_errors
-      begin
-        yield
-      rescue MiniRacer::Error => e
-        error "JavaScript error: #{e.message}"
-      end
+      yield
+    rescue MiniRacer::Error => e
+      error "JavaScript error: #{e.message}"
     end
 
     def clean_nans(input)
-      if input.is_a?(Array)
-        input.map {|v| clean_nans(v) }
-      elsif input.is_a?(Hash)
-        input.inject({}) { |m, (k, v)| m[k] = clean_nans(v); m }
-      elsif input.is_a?(Float) && input.nan?
-        'NaN'
+      case input
+      when Array
+        input.map { |v| clean_nans(v) }
+      when Hash
+        input.transform_values { |v| clean_nans(v) }
+      when Float
+        input.nan? ? 'NaN' : input
       else
         input
       end

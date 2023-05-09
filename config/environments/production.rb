@@ -30,18 +30,18 @@ Rails.application.configure do
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
 
   if ENV["RAILS_LOG_TO_STDOUT"].present? ||
-       ENV['ON_HEROKU'] ||
-       ENV['HEROKU_POSTGRESQL_ROSE_URL'] ||
-       ENV['HEROKU_POSTGRESQL_GOLD_URL'] ||
-       File.read(File.join(File.dirname(__FILE__), '../../Procfile')) =~ /intended for Heroku/
+      ENV['ON_HEROKU'] ||
+      ENV['HEROKU_POSTGRESQL_ROSE_URL'] ||
+      ENV['HEROKU_POSTGRESQL_GOLD_URL'] ||
+      File.read(File.join(File.dirname(__FILE__), '../../Procfile')) =~ /intended for Heroku/
     logger           = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter
     config.logger = ActiveSupport::TaggedLogging.new(logger)
   end
 
   # Compress JavaScripts and CSS
-  config.assets.js_compressor  = :uglifier
-  config.assets.css_compressor = :sass
+  config.assets.js_compressor  = :terser
+  config.assets.css_compressor = :scss
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = false
@@ -69,7 +69,7 @@ Rails.application.configure do
   config.log_level = :info
 
   # Prepend all log lines with the following tags.
-  config.log_tags = [ :request_id ]
+  config.log_tags = [:request_id]
 
   # Use a different cache store in production.
   config.cache_store = :memory_store
@@ -86,7 +86,7 @@ Rails.application.configure do
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
-  config.action_mailer.default_url_options = { :host => ENV['DOMAIN'] }
+  config.action_mailer.default_url_options = { host: ENV['DOMAIN'] }
   config.action_mailer.asset_host = ENV['DOMAIN']
   if ENV['ASSET_HOST'].present?
     config.action_mailer.asset_host = ENV['ASSET_HOST']

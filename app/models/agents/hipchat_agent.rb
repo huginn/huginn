@@ -8,7 +8,7 @@ module Agents
 
     gem_dependency_check { defined?(HipChat) }
 
-    description <<-MD
+    description <<~MD
       The Hipchat Agent sends messages to a Hipchat Room
 
       #{'## Include `hipchat` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -52,16 +52,18 @@ module Agents
       client.rooms
       true
     rescue HipChat::UnknownResponseCode
-      return false
+      false
     end
 
     def complete_room_name
-      client.rooms.collect { |room| {text: room.name, id: room.name} }
+      client.rooms.collect { |room| { text: room.name, id: room.name } }
     end
 
     def validate_options
-      errors.add(:base, "you need to specify a hipchat auth_token or provide a credential named hipchat_auth_token") unless options['auth_token'].present? || credential('hipchat_auth_token').present?
-      errors.add(:base, "you need to specify a room_name or a room_name_path") if options['room_name'].blank? && options['room_name_path'].blank?
+      errors.add(:base,
+                 "you need to specify a hipchat auth_token or provide a credential named hipchat_auth_token") unless options['auth_token'].present? || credential('hipchat_auth_token').present?
+      errors.add(:base,
+                 "you need to specify a room_name or a room_name_path") if options['room_name'].blank? && options['room_name_path'].blank?
     end
 
     def working?
@@ -71,15 +73,18 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         mo = interpolated(event)
-        client[mo[:room_name]].send(mo[:username][0..14], mo[:message],
-                                      notify: boolify(mo[:notify]),
-                                      color: mo[:color],
-                                      message_format: mo[:format].presence || 'html'
-                                    )
+        client[mo[:room_name]].send(
+          mo[:username][0..14],
+          mo[:message],
+          notify: boolify(mo[:notify]),
+          color: mo[:color],
+          message_format: mo[:format].presence || 'html'
+        )
       end
     end
 
     private
+
     def client
       @client ||= HipChat::Client.new(interpolated[:auth_token].presence || credential('hipchat_auth_token'))
     end

@@ -189,7 +189,7 @@ describe Agents::TwitterStreamAgent do
 
       it "yields received tweets" do
         expect(@worker).to receive(:stream!).with(['agent'], @agent).and_yield('status' => 'hello')
-        expect(@worker).to receive(:handle_status).with('status' => 'hello')
+        expect(@worker).to receive(:handle_status).with({ 'status' => 'hello' })
         expect(Thread).to receive(:stop)
         @worker.run
       end

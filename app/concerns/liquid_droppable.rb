@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
-# Include this mix-in to make a class droppable to Liquid, and adjust
-# its behavior in Liquid by implementing its dedicated Drop class
-# named with a "Drop" suffix.
 module LiquidDroppable
-  extend ActiveSupport::Concern
-
   class Drop < Liquid::Drop
     def initialize(object)
       @object = object
@@ -23,21 +18,9 @@ module LiquidDroppable
 
     def as_json
       return {} unless defined?(self.class::METHODS)
-      Hash[self.class::METHODS.map { |m| [m, send(m).as_json]}]
+
+      self.class::METHODS.to_h { |m| [m, send(m).as_json] }
     end
-  end
-
-  included do
-    const_set :Drop,
-              if Kernel.const_defined?(drop_name = "#{name}Drop")
-                Kernel.const_get(drop_name)
-              else
-                Kernel.const_set(drop_name, Class.new(Drop))
-              end
-  end
-
-  def to_liquid
-    self.class::Drop.new(self)
   end
 
   class MatchDataDrop < Drop

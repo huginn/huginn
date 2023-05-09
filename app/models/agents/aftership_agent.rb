@@ -2,21 +2,20 @@ require 'uri'
 
 module Agents
   class AftershipAgent < Agent
-
     cannot_receive_events!
 
     default_schedule "every_10m"
 
-    description <<-MD
+    description <<~MD
       The Aftership agent allows you to track your shipment from aftership and emit them into events.
 
       To be able to use the Aftership API, you need to generate an `API Key`. You need a paying plan to use their tracking feature.
 
       You can use this agent to retrieve tracking data.
- 
-      Provide the `path` for the API endpoint that you'd like to hit. For example, for all active packages, enter `trackings` 
-      (see https://www.aftership.com/docs/api/4/trackings), for a specific package, use `trackings/SLUG/TRACKING_NUMBER` 
-      and replace `SLUG` with a courier code and `TRACKING_NUMBER` with the tracking number. You can request last checkpoint of a package 
+
+      Provide the `path` for the API endpoint that you'd like to hit. For example, for all active packages, enter `trackings`
+      (see https://www.aftership.com/docs/api/4/trackings), for a specific package, use `trackings/SLUG/TRACKING_NUMBER`
+      and replace `SLUG` with a courier code and `TRACKING_NUMBER` with the tracking number. You can request last checkpoint of a package
       by providing `last_checkpoint/SLUG/TRACKING_NUMBER` instead.
 
       You can get a list of courier information here `https://www.aftership.com/courier`
@@ -27,7 +26,7 @@ module Agents
       * `path request and its full path`
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       A typical tracking event have 2 important objects (tracking, and checkpoint) and the tracking/checkpoint looks like this.
 
           "trackings": [
@@ -87,8 +86,9 @@ module Agents
     MD
 
     def default_options
-      { 'api_key' => 'YOUR_API_KEY',
-        'path' => 'trackings'
+      {
+        'api_key' => 'YOUR_API_KEY',
+        'path' => 'trackings',
       }
     end
 
@@ -104,10 +104,11 @@ module Agents
     def check
       response = HTTParty.get(event_url, request_options)
       events = JSON.parse response.body
-      create_event :payload => events
+      create_event payload: events
     end
 
-  private
+    private
+
     def base_url
       "https://api.aftership.com/v4/"
     end
@@ -117,7 +118,12 @@ module Agents
     end
 
     def request_options
-      {:headers => {"aftership-api-key" => interpolated['api_key'], "Content-Type"=>"application/json"} }
+      {
+        headers: {
+          "aftership-api-key" => interpolated['api_key'],
+          "Content-Type" => "application/json",
+        }
+      }
     end
   end
 end

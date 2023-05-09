@@ -7,7 +7,7 @@ module Agents
                   current_user.agents.find_by(id: params[:agent_id]).received_events.limit(5)
                 elsif params[:source_ids]
                   Event.where(agent_id: current_user.agents.where(id: params[:source_ids]).pluck(:id))
-                       .order("id DESC").limit(5)
+                    .order("id DESC").limit(5)
                 else
                   []
                 end
@@ -40,11 +40,14 @@ module Agents
 
         @results = agent.dry_run!(event)
       else
-        @results = { events: [], memory: [],
-                     log:  [
-                       "#{pluralize(agent.errors.count, "error")} prohibited this Agent from being saved:",
-                       *agent.errors.full_messages
-                     ].join("\n- ") }
+        @results = {
+          events: [],
+          memory: [],
+          log: [
+            "#{pluralize(agent.errors.count, "error")} prohibited this Agent from being saved:",
+            *agent.errors.full_messages
+          ].join("\n- ")
+        }
       end
 
       render layout: false

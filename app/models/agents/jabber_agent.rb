@@ -7,7 +7,7 @@ module Agents
 
     gem_dependency_check { defined?(Jabber) }
 
-    description <<-MD
+    description <<~MD
       The Jabber Agent will send any events it receives to your Jabber/XMPP IM account.
 
       #{'## Include `xmpp4r` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -23,7 +23,7 @@ module Agents
       Have a look at the [Wiki](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to learn more about liquid templating.
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       `event` will be set to either `on_join`, `on_leave`, `on_message`, `on_room_message` or `on_subject`
 
           {
@@ -36,12 +36,12 @@ module Agents
 
     def default_options
       {
-        'jabber_server'   => '127.0.0.1',
-        'jabber_port'     => '5222',
-        'jabber_sender'   => 'huginn@localhost',
+        'jabber_server' => '127.0.0.1',
+        'jabber_port' => '5222',
+        'jabber_sender' => 'huginn@localhost',
         'jabber_receiver' => 'muninn@localhost',
         'jabber_password' => '',
-        'message'         => 'It will be {{temp}} out tomorrow',
+        'message' => 'It will be {{temp}} out tomorrow',
         'expected_receive_period_in_days' => "2"
       }
     end
@@ -71,7 +71,7 @@ module Agents
     end
 
     def deliver(text)
-      client.send Jabber::Message::new(interpolated['jabber_receiver'], text).set_type(:chat)
+      client.send Jabber::Message.new(interpolated['jabber_receiver'], text).set_type(:chat)
     end
 
     def start_worker?
@@ -81,7 +81,7 @@ module Agents
     private
 
     def client
-      Jabber::Client.new(Jabber::JID::new(interpolated['jabber_sender'])).tap do |sender|
+      Jabber::Client.new(Jabber::JID.new(interpolated['jabber_sender'])).tap do |sender|
         sender.connect(interpolated['jabber_server'], interpolated['jabber_port'] || '5222')
         sender.auth interpolated['jabber_password']
       end
@@ -96,7 +96,7 @@ module Agents
     end
 
     class Worker < LongRunnable::Worker
-      IGNORE_MESSAGES_FOR=5
+      IGNORE_MESSAGES_FOR = 5
 
       def setup
         require 'xmpp4r/muc/helper/simplemucclient'
@@ -124,7 +124,7 @@ module Agents
         time, nick, message = normalize_args(event, args)
 
         AgentRunner.with_connection do
-          agent.create_event(payload: {event: event, time: time, nick: nick, message: message})
+          agent.create_event(payload: { event:, time:, nick:, message: })
         end
       end
 
@@ -139,6 +139,7 @@ module Agents
       end
 
       private
+
       def normalize_args(event, args)
         case event
         when :on_join, :on_leave

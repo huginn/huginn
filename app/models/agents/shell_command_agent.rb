@@ -5,12 +5,11 @@ module Agents
     can_dry_run!
     no_bulk_receive!
 
-
     def self.should_run?
       ENV['ENABLE_INSECURE_AGENTS'] == "true"
     end
 
-    description <<-MD
+    description <<~MD
       The Shell Command Agent will execute commands on your local system, returning the output.
 
       `command` specifies the command (either a shell command line string or an array of command line arguments) to be executed, and `path` will tell ShellCommandAgent in what directory to run this command.  The content of `stdin` will be fed to the command via the standard input.
@@ -33,26 +32,26 @@ module Agents
       You can enable this Agent in your .env file by setting `ENABLE_INSECURE_AGENTS` to `true`.
     MD
 
-    event_description <<-MD
-    Events look like this:
+    event_description <<~MD
+      Events look like this:
 
-        {
-          "command": "pwd",
-          "path": "/home/Huginn",
-          "exit_status": 0,
-          "errors": "",
-          "output": "/home/Huginn"
-        }
+          {
+            "command": "pwd",
+            "path": "/home/Huginn",
+            "exit_status": 0,
+            "errors": "",
+            "output": "/home/Huginn"
+          }
     MD
 
     def default_options
       {
-          'path' => "/",
-          'command' => "pwd",
-          'unbundle' => false,
-          'suppress_on_failure' => false,
-          'suppress_on_empty_output' => false,
-          'expected_update_period_in_days' => 1
+        'path' => "/",
+        'command' => "pwd",
+        'unbundle' => false,
+        'suppress_on_failure' => false,
+        'suppress_on_empty_output' => false,
+        'expected_update_period_in_days' => 1
       }
     end
 
@@ -98,7 +97,7 @@ module Agents
         path = opts['path']
         stdin = opts['stdin']
 
-        result, errors, exit_status = run_command(path, command, stdin, interpolated.slice(:unbundle).symbolize_keys)
+        result, errors, exit_status = run_command(path, command, stdin, **interpolated.slice(:unbundle).symbolize_keys)
 
         payload = {
           'command' => command,
@@ -109,7 +108,7 @@ module Agents
         }
 
         unless suppress_event?(payload)
-          created_event = create_event payload: payload
+          created_event = create_event(payload:)
         end
 
         log("Ran '#{command}' under '#{path}'", outbound_event: created_event, inbound_event: event)
@@ -146,7 +145,7 @@ module Agents
 
         _, status = Process.wait2(pid)
         exit_status = status.exitstatus
-      rescue => e
+      rescue StandardError => e
         errors = e.to_s
         result = ''.freeze
         exit_status = nil

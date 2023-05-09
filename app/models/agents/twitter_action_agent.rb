@@ -4,7 +4,7 @@ module Agents
 
     cannot_be_scheduled!
 
-    description <<-MD
+    description <<~MD
       The Twitter Action Agent is able to retweet or favorite tweets from the events it receives.
 
       #{twitter_dependencies_missing if dependencies_missing?}

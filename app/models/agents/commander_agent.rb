@@ -4,7 +4,7 @@ module Agents
 
     cannot_create_events!
 
-    description <<-MD
+    description <<~MD
       The Commander Agent is triggered by schedule or an incoming event, and commands other agents ("targets") to run, disable, configure, or enable themselves.
 
       # Action types
@@ -28,7 +28,7 @@ module Agents
 
       - If you want to update a WeatherAgent based on a UserLocationAgent, you could use `'action': 'configure'` and set 'configure_options' to `{ 'location': '{{_location_.latlng}}' }`.
 
-      - In templating, you can use the variable `target` to refer to each target agent, which has the following attributes: #{AgentDrop.instance_methods(false).map { |m| "`#{m}`" }.to_sentence}.
+      - In templating, you can use the variable `target` to refer to each target agent, which has the following attributes: #{Agent::Drop.instance_methods(false).map { |m| "`#{m}`" }.to_sentence}.
 
       # Targets
 
