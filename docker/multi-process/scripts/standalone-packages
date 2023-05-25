@@ -5,8 +5,9 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y gnupg
 
-echo "deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7" > /etc/apt/sources.list.d/mysql.list
-apt-key adv --keyserver pgp.mit.edu --recv-keys 3A79BD29
+mkdir -m700 $HOME/.gnupg
+gpg --no-default-keyring --keyring /usr/share/keyrings/mysql-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 5072E1F5 3A79BD29
+echo "deb [signed-by=/usr/share/keyrings/mysql-keyring.gpg] http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7" > /etc/apt/sources.list.d/mysql.list
 apt-get update
 
 apt-get install -y --allow-downgrades python3-pip mysql-server supervisor \
