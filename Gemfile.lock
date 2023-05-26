@@ -78,6 +78,14 @@ GIT
       oauth
       simple_oauth
 
+GIT
+  remote: https://knu@bitbucket.org/knu/hypdf_gem.git
+  revision: e11df6bd71356c9211e5001d729f3e92bfd6e19e
+  branch: uploadio_namespace
+  specs:
+    hypdf (1.0.19)
+      httparty (> 0.16.0, < 1.0)
+
 PATH
   remote: vendor/gems/dotenv-2.0.1
   specs:
@@ -420,8 +428,6 @@ GEM
     httpclient (2.8.3)
     huginn_agent (0.6.1)
       thor
-    hypdf (1.0.19)
-      httparty (> 0.16.0, < 1.0)
     i18n (1.13.0)
       concurrent-ruby (~> 1.0)
     jmespath (1.6.2)
@@ -872,7 +878,7 @@ DEPENDENCIES
   httmultiparty (~> 0.3.16)
   httparty (~> 0.13)
   huginn_agent
-  hypdf (~> 1.0.10)
+  hypdf!
   jquery-rails (~> 4.2.1)
   json (~> 2.3)
   jsonpath (~> 1.1)
