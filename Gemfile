@@ -32,7 +32,7 @@ end
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
 gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
-gem 'hypdf', '~> 1.0.10'          # PDFInfoAgent
+gem 'hypdf', bitbucket: 'knu/hypdf_gem', branch: 'uploadio_namespace' # PDFInfoAgent
 gem 'mini_racer'                  # JavaScriptAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'net-ftp'
