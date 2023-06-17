@@ -2,6 +2,10 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Jun 18, 2023   | Add Re-emit and Delete buttons to the event show page. [#3276](https://github.com/huginn/huginn/pull/3276) |
+| Jun 07, 2023   | Upgrade various gems that have been out-of-date for a long time. [#3216](https://github.com/huginn/huginn/pull/3216) |
+| May 09, 2023   | Upgrade Ruby to 3.2 after 2.7 reached its end of life.  Migrate from CoffeeScript to JavaScript. [#3216](https://github.com/huginn/huginn/pull/3216) |
+| Apr 17, 2023   | Remove `GrowlAgent`. |
 | Apr 15, 2023   | Add KeyValueStoreAgent. [#3247](https://github.com/huginn/huginn/pull/3247) |
 | Mar 12, 2023   | Twitter agents are improved so that every tweet event has an `expanded_text` in it. [3230](https://github.com/huginn/huginn/pull/3230) |
 | Mar 01, 2023   | Rails is upgraded to 6.1. [3217](https://github.com/huginn/huginn/pull/3217) |
