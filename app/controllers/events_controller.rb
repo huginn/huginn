@@ -21,7 +21,7 @@ class EventsController < ApplicationController
         load_event
       rescue ActiveRecord::RecordNotFound
         return_to = params[:return] or raise
-        redirect_to return_to
+        redirect_to return_to, allow_other_host: false
       end
       format.json { render json: @event }
     end
