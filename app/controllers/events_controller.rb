@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_action :load_event, except: :index
+  before_action :load_event, except: [:index, :show]
 
   def index
     if params[:agent_id]
@@ -17,7 +17,12 @@ class EventsController < ApplicationController
 
   def show
     respond_to do |format|
-      format.html
+      format.html do
+        load_event
+      rescue ActiveRecord::RecordNotFound
+        return_to = params[:return] or raise
+        redirect_to return_to
+      end
       format.json { render json: @event }
     end
   end
