@@ -52,6 +52,8 @@
       <br />
       <div class="btn-group">
         <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, filtered_agent_return_link || events_path, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-refresh') + ' Re-emit', reemit_event_path(@event), method: :post, data: { confirm: 'Are you sure you want to duplicate this event and emit the new one now?' }, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-remove', class: 'color-danger') + ' Delete', event_path(@event), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default" %>
       </div>
     </div>
   </div>
