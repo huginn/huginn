@@ -21,7 +21,7 @@ describe Agents::KeyValueStoreAgent do
   end
 
   def create_event(payload)
-    source_agent.events.create!(payload: payload)
+    source_agent.events.create!(payload:)
   end
 
   let(:events) do
@@ -112,6 +112,47 @@ describe Agents::KeyValueStoreAgent do
           "4" => { id: 4, name: "quux" },
         }
       )
+
+      expect {
+        agent.receive([create_event({ name: "empty key" })])
+      }.not_to(change { agent.reload.memory })
+    end
+
+    describe "empty value" do
+      let(:value_template) { "{{ name | as_object }}" }
+
+      it "deletes the key" do
+        agent.receive(events[0..2])
+
+        expect(agent.reload.memory).to match(
+          {
+            "1" => "foo",
+            "2" => "bar",
+            "3" => "baz",
+          }
+        )
+
+        agent.receive([create_event({ id: 1, name: "" })])
+
+        expect(agent.reload.memory).to match(
+          {
+            "2" => "bar",
+            "3" => "baz",
+          }
+        )
+
+        agent.receive([create_event({ id: 2, name: [] })])
+
+        expect(agent.reload.memory).to match(
+          {
+            "3" => "baz",
+          }
+        )
+
+        agent.receive([create_event({ id: 3, name: {} })])
+
+        expect(agent.reload.memory).to eq({})
+      end
     end
 
     describe "using _value_" do
