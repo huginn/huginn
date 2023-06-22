@@ -103,9 +103,14 @@ module Agents
             storage = memory
             interpolation_context['_value_'] = storage.delete(key)
 
-            storage[key] = interpolate_options(options)['value']
+            value = interpolate_options(options)['value']
 
-            storage.shift while storage.size > max_keys
+            if value.nil? || value.try(:empty?)
+              storage.delete(key)
+            else
+              storage[key] = value
+              storage.shift while storage.size > max_keys
+            end
 
             update!(memory: storage)
           end
