@@ -413,4 +413,52 @@ describe Agents::JavaScriptAgent do
       end
     end
   end
+
+  describe "KVS" do
+    before do
+      Agents::KeyValueStoreAgent.create!(
+        name: "kvs1",
+        options: {
+          key: "{{ key }}",
+          value: "{{ value }}",
+          variable: "var1",
+        },
+        memory: {
+          x: "Huginn",
+        },
+        user: users(:jane),
+        control_targets: [@agent]
+      )
+
+      Agents::KeyValueStoreAgent.create!(
+        name: "kvs2",
+        options: {
+          key: "{{ key }}",
+          value: "{{ value }}",
+          variable: "var2",
+        },
+        memory: {
+          y: "Muninn",
+        },
+        user: users(:jane),
+        control_targets: [@agent]
+      )
+    end
+
+    it "can be accessed via Agent.kvs()" do
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          this.createEvent({ message: `I got values from KVS: ${this.kvs.var1["x"]} and ${this.kvs.var2["y"]}.` });
+        };
+      JS
+      @agent.save!
+
+      expect {
+        @agent.check
+      }.to change { @agent.events.count }.by(1)
+
+      created_event = @agent.events.last
+      expect(created_event.payload).to eq("message" => "I got values from KVS: Huginn and Muninn.")
+    end
+  end
 end

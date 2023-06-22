@@ -33,6 +33,7 @@ module Agents
       * `this.options(key)`
       * `this.log(message)`
       * `this.error(message)`
+      * `this.kvs` (whose properties are variables provided by KeyValueStoreAgents)
       * `this.escapeHtml(htmlToEscape)`
       * `this.unescapeHtml(htmlToUnescape)`
     MD
@@ -128,6 +129,12 @@ module Agents
       context.attach("unescapeHtml", ->(x) { CGI.unescapeHTML(x) })
       context.attach('getCredential', ->(k) { credential(k); })
       context.attach('setCredential', ->(k, v) { set_credential(k, v) })
+
+      kvs = Agents::KeyValueStoreAgent.merge(controllers).find_each.to_h { |kvs|
+        [kvs.options[:variable], kvs.memory.as_json]
+      }
+      context.attach("getKeyValueStores", -> { kvs })
+      context.eval("Object.defineProperty(Agent, 'kvs', { get: getKeyValueStores })")
 
       if (options['language'] || '').downcase == 'coffeescript'
         context.eval(CoffeeScript.compile(code))
