@@ -112,6 +112,10 @@ describe Agents::KeyValueStoreAgent do
           "4" => { id: 4, name: "quux" },
         }
       )
+
+      expect {
+        agent.receive([create_event({ name: "empty key" })])
+      }.not_to(change { agent.reload.memory })
     end
 
     describe "empty value" do

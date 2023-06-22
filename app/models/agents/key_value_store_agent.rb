@@ -40,6 +40,7 @@ module Agents
 
       - Keys are always stringified as mandated by the JSON format.
       - Values are stringified by default.  Use the `as_object` filter to store non-string values.
+      - If the key is evaluated to an empty string, the event is ignored.
       - If the value is evaluated to either `null` or empty (`""`, `[]`, `{}`) the key gets deleted.
       - In the `value` template, the existing value (if any) can be accessed via the variable `_value_`.
       - In the `key` and `value` templates, the whole event payload can be accessed via the variable `_event_`.
@@ -99,6 +100,7 @@ module Agents
             interpolation_context['_event_'] = event.payload
 
             key = interpolate_options(options)['key'].to_s
+            next if key.empty?
 
             storage = memory
             interpolation_context['_value_'] = storage.delete(key)
