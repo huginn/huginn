@@ -26,6 +26,12 @@ GIT
       simple_oauth (~> 0.3.0)
 
 GIT
+  remote: https://github.com/ddollar/foreman.git
+  revision: a5f9b78fa5cf657733c8a4cfd01b2c0c151b4fce
+  specs:
+    foreman (0.87.2)
+
+GIT
   remote: https://github.com/dsander/dropbox-api.git
   revision: 86cb7b5a1254dc5b054de7263835713c4c1018c7
   ref: 86cb7b5a1254dc5b054de7263835713c4c1018c7
@@ -304,7 +310,6 @@ GEM
       faraday
       hashie
       multi_json
-    foreman (0.87.2)
     formatador (1.1.0)
     fugit (1.8.1)
       et-orbi (~> 1, >= 1.2.7)
@@ -864,7 +869,7 @@ DEPENDENCIES
   ffi (>= 1.9.4)
   font-awesome-sass (~> 4.7.0)
   forecast_io (~> 2.0.0)
-  foreman (~> 0.87.2)
+  foreman (~> 0.87.2)!
   geokit (~> 1.13)
   geokit-rails (~> 2.3)
   gmail_xoauth
