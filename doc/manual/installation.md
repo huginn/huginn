@@ -46,7 +46,7 @@ up-to-date and install it.
 
 Install the required packages (needed to compile Ruby and native extensions to Ruby gems):
 
-    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate pkg-config cmake nodejs graphviz jq shared-mime-info
+    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate pkg-config cmake nodejs graphviz jq shared-mime-info libtool-bin
 
 
 ### Debian Stretch
@@ -72,8 +72,8 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.7.tar.bz2 | tar xj
-    cd ruby-2.7.7
+    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.2.tar.bz2 | tar xj
+    cd ruby-3.2.2
     ./configure --disable-install-rdoc
     make -j`nproc`
     sudo make install
