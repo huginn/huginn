@@ -419,9 +419,16 @@ module LiquidInterpolatable
         "\n"
       end
     end
+
+    class Uuidv4 < Liquid::Tag
+      def render(context)
+        SecureRandom.uuid
+      end
+    end
   end
   Liquid::Template.register_tag('credential', LiquidInterpolatable::Tags::Credential)
   Liquid::Template.register_tag('line_break', LiquidInterpolatable::Tags::LineBreak)
+  Liquid::Template.register_tag('uuidv4', LiquidInterpolatable::Tags::Uuidv4)
 
   module Blocks
     # Replace every occurrence of a given regex pattern in the first
