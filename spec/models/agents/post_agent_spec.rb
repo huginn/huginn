@@ -100,7 +100,7 @@ describe Agents::PostAgent do
         expect {
           @checker.receive([@event, event1])
         }.to change { @sent_requests[:post].length }.by(2)
-      }.not_to change { @sent_requests[:get].length }
+      }.not_to(change { @sent_requests[:get].length })
 
       expect(@sent_requests[:post][0].data).to eq(@event.payload.merge('default' => 'value').to_query)
       expect(@sent_requests[:post][1].data).to eq(event1.payload.to_query)
@@ -113,7 +113,7 @@ describe Agents::PostAgent do
         expect {
           @checker.receive([@event])
         }.to change { @sent_requests[:get].length }.by(1)
-      }.not_to change { @sent_requests[:post].length }
+      }.not_to(change { @sent_requests[:post].length })
 
       expect(@sent_requests[:get][0].data).to eq(@event.payload.merge('default' => 'value').to_query)
     end
@@ -168,17 +168,17 @@ describe Agents::PostAgent do
 
     it 'makes a multipart request when receiving a file_pointer' do
       WebMock.reset!
-      stub_request(:post, "http://www.example.com/").
-        with(headers: {
-               'Accept-Encoding' => 'gzip,deflate',
-               'Content-Type' => /\Amultipart\/form-data; boundary=/,
-               'User-Agent' => 'Huginn - https://github.com/huginn/huginn'
+      stub_request(:post, "http://www.example.com/")
+        .with(headers: {
+          'Accept-Encoding' => 'gzip,deflate',
+          'Content-Type' => /\Amultipart\/form-data; boundary=/,
+          'User-Agent' => 'Huginn - https://github.com/huginn/huginn'
         }) { |request|
         qboundary = Regexp.quote(request.headers['Content-Type'][/ boundary=(.+)/, 1])
         /\A--#{qboundary}\r\nContent-Disposition: form-data; name="default"\r\n\r\nvalue\r\n--#{qboundary}\r\nContent-Disposition: form-data; name="file"; filename="local.path"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n--#{qboundary}--\r\n\z/ === request.body
       }.to_return(status: 200, body: "", headers: {})
-      event = Event.new(payload: {file_pointer: {agent_id: 111, file: 'test'}})
-      io_mock = double()
+      event = Event.new(payload: { file_pointer: { agent_id: 111, file: 'test' } })
+      io_mock = double
       expect(@checker).to receive(:get_io).with(event) { StringIO.new("testdata") }
       @checker.options['no_merge'] = true
       @checker.receive([event])
@@ -209,7 +209,7 @@ describe Agents::PostAgent do
         @checker.check
       }.to change { @sent_requests[:post].length }.by(1)
 
-      expect(@sent_requests[:post][0].data.keys).to eq([ 'post' ])
+      expect(@sent_requests[:post][0].data.keys).to eq(['post'])
       expect(@sent_requests[:post][0].data['post']).to eq(@checker.options['payload'])
     end
 
@@ -220,7 +220,7 @@ describe Agents::PostAgent do
         @checker.check
       }.to change { @sent_requests[:post].length }.by(1)
 
-      expect(@sent_requests[:post][0].data.keys).to eq([ 'foobar' ])
+      expect(@sent_requests[:post][0].data.keys).to eq(['foobar'])
       expect(@sent_requests[:post][0].data['foobar']).to eq(@checker.options['payload'])
     end
 
@@ -230,7 +230,7 @@ describe Agents::PostAgent do
         expect {
           @checker.check
         }.to change { @sent_requests[:get].length }.by(1)
-      }.not_to change { @sent_requests[:post].length }
+      }.not_to(change { @sent_requests[:post].length })
 
       expect(@sent_requests[:get][0].data).to eq(@checker.options['payload'].to_query)
     end
@@ -259,7 +259,7 @@ describe Agents::PostAgent do
         it "does not emit events" do
           expect {
             @checker.check
-          }.not_to change { @checker.events.count }
+          }.not_to(change { @checker.events.count })
         end
       end
 
@@ -475,7 +475,7 @@ describe Agents::PostAgent do
     end
 
     it "requires headers to be a hash, if present" do
-      @checker.options['headers'] = [1,2,3]
+      @checker.options['headers'] = [1, 2, 3]
       expect(@checker).not_to be_valid
 
       @checker.options['headers'] = "hello world"
