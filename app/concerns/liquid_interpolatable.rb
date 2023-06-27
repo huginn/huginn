@@ -117,7 +117,7 @@ module LiquidInterpolatable
         outer_scope[kvs.options[:variable]] = kvs.memory
       end
 
-      super({}, outer_scope, { agent: agent }, true)
+      super({}, outer_scope, { agent: }, true)
     end
 
     def hash
@@ -261,6 +261,14 @@ module LiquidInterpolatable
     # Serializes data as JSON
     def json(input)
       JSON.dump(input)
+    end
+
+    def hex_encode(input)
+      input.to_s.unpack1('H*')
+    end
+
+    def hex_decode(input)
+      [input.to_s].pack('H*')
     end
 
     def md5(input)
