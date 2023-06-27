@@ -117,7 +117,7 @@ module LiquidInterpolatable
         outer_scope[kvs.options[:variable]] = kvs.memory
       end
 
-      super({}, outer_scope, { agent: agent }, true)
+      super({}, outer_scope, { agent: }, true)
     end
 
     def hash
@@ -261,6 +261,14 @@ module LiquidInterpolatable
     # Serializes data as JSON
     def json(input)
       JSON.dump(input)
+    end
+
+    def hex_encode(input)
+      input.to_s.unpack1('H*')
+    end
+
+    def hex_decode(input)
+      [input.to_s].pack('H*')
     end
 
     def md5(input)
@@ -411,9 +419,16 @@ module LiquidInterpolatable
         "\n"
       end
     end
+
+    class Uuidv4 < Liquid::Tag
+      def render(context)
+        SecureRandom.uuid
+      end
+    end
   end
   Liquid::Template.register_tag('credential', LiquidInterpolatable::Tags::Credential)
   Liquid::Template.register_tag('line_break', LiquidInterpolatable::Tags::LineBreak)
+  Liquid::Template.register_tag('uuidv4', LiquidInterpolatable::Tags::Uuidv4)
 
   module Blocks
     # Replace every occurrence of a given regex pattern in the first
