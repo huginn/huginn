@@ -2,6 +2,17 @@ require 'rails_helper'
 require 'ostruct'
 
 describe Agents::PostAgent do
+  let(:mocked_response) do
+    {
+      status: 200,
+      body: "<html>a webpage!</html>",
+      headers: {
+        'Content-type' => 'text/html',
+        'X-Foo-Bar' => 'baz',
+      }
+    }
+  end
+
   before do
     @valid_options = {
       'post_url' => "http://www.example.com",
@@ -52,7 +63,7 @@ describe Agents::PostAgent do
           raise "unexpected Content-Type: #{content_type}"
         end
       end
-      { status: 200, body: "<html>a webpage!</html>", headers: { 'Content-type' => 'text/html', 'X-Foo-Bar' => 'baz' } }
+      mocked_response
     }
   end
 
@@ -268,6 +279,33 @@ describe Agents::PostAgent do
         it "emits the body" do
           @checker.check
           expect(@checker.events.last.payload['body']).to eq '<html>a webpage!</html>'
+        end
+
+        context "and the response is in JSON" do
+          let(:json_data) {
+            { "foo" => 123, "bar" => 456 }
+          }
+          let(:mocked_response) do
+            {
+              status: 200,
+              body: json_data.to_json,
+              headers: {
+                'Content-type' => 'application/json',
+                'X-Foo-Bar' => 'baz',
+              }
+            }
+          end
+
+          it "emits the unparsed JSON body" do
+            @checker.check
+            expect(@checker.events.last.payload['body']).to eq json_data.to_json
+          end
+
+          it "emits the parsed JSON body when parse_body is true" do
+            @checker.options['parse_body'] = 'true'
+            @checker.check
+            expect(@checker.events.last.payload['body']).to eq json_data
+          end
         end
 
         it "emits the response headers capitalized by default" do

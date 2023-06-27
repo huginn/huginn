@@ -28,8 +28,7 @@ module Agents
 
         When `content_type` contains a [MIME](https://en.wikipedia.org/wiki/Media_type) type, and `payload` is a string, its interpolated value will be sent as a string in the HTTP request's body and the request's `Content-Type` HTTP header will be set to `content_type`. When `payload` is a string `no_merge` has to be set to `true`.
 
-        If `emit_events` is set to `true`, the server response will be emitted as an Event and can be fed to a WebsiteAgent for parsing (using its `data_from_event` and `type` options). No data processing
-        will be attempted by this Agent, so the Event's "body" value will always be raw text.
+        If `emit_events` is set to `true`, the server response will be emitted as an Event.  The "body" value of the Event is the response body.  If the `parse_body` option is set to `true` and the content type of the response is JSON, it is parsed to a JSON object.  Otherwise it is raw text.  A raw HTML/XML text can be fed to a WebsiteAgent for parsing (using its `data_from_event` and `type` options).
         The Event will also have a "headers" hash and a "status" integer value.
 
         If `output_mode` is set to `merge`, the emitted Event will be merged into the original contents of the received Event.
@@ -83,6 +82,7 @@ module Agents
         },
         'headers' => {},
         'emit_events' => 'false',
+        'parse_body' => 'true',
         'no_merge' => 'true',
         'output_mode' => 'clean'
       }
@@ -144,11 +144,19 @@ module Agents
         errors.add(:base, "if provided, output_mode must be 'clean' or 'merge'")
       end
 
+      if options['parse_body'].present? && /\A(?:true|false)\z|\{/.match?(options['parse_body'].to_s)
+        errors.add(:base, "if provided, parse_body must be 'true' or 'false'")
+      end
+
       unless headers.is_a?(Hash)
         errors.add(:base, "if provided, headers must be a hash")
       end
 
       validate_web_request_options!
+    end
+
+    def parse_body?
+      boolify(interpolated['parse_body'])
     end
 
     def receive(incoming_events)

@@ -106,6 +106,10 @@ module WebRequestConcern
     Encoding::UTF_8
   end
 
+  def parse_body?
+    false
+  end
+
   def faraday
     faraday_options = {
       ssl: {
@@ -114,6 +118,10 @@ module WebRequestConcern
     }
 
     @faraday ||= Faraday.new(faraday_options) { |builder|
+      if parse_body?
+        builder.response :json
+      end
+
       builder.response :character_encoding,
                        force_encoding: interpolated['force_encoding'].presence,
                        default_encoding:,
