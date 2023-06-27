@@ -47,9 +47,9 @@ module Agents
 
     def default_options
       {
-        "secret" => "supersecretstring",
+        "secret" => SecureRandom.uuid,
         "expected_receive_period_in_days" => 1,
-        "payload_path" => "some_key",
+        "payload_path" => ".",
         "event_headers" => "",
         "event_headers_key" => "headers",
         "score_threshold" => 0.5
