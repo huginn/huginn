@@ -53,8 +53,9 @@ module Agents
       when String
         true
       when Hash
-        rule.values_at('type', 'value', 'path').all?(&:present?) &&
-          VALID_COMPARISON_TYPES.include?(rule['type'])
+        VALID_COMPARISON_TYPES.include?(rule['type']) &&
+          /\S/.match?(rule['path']) &&
+          rule['value'].is_a?(String)
       else
         false
       end

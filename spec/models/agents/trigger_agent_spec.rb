@@ -82,9 +82,13 @@ describe Agents::TriggerAgent do
     it "should validate the three fields in each rule" do
       @checker.options['rules'] << { 'path' => "foo", 'type' => "fake", 'value' => "6" }
       expect(@checker).not_to be_valid
-      @checker.options['rules'].last['type'] = "field>=value"
+      @checker.options['rules'].last['type'] = "field!=value"
       expect(@checker).to be_valid
       @checker.options['rules'].last.delete('value')
+      expect(@checker).not_to be_valid
+      @checker.options['rules'].last['value'] = ''
+      expect(@checker).to be_valid
+      @checker.options['rules'].last['path'] = ''
       expect(@checker).not_to be_valid
     end
 
