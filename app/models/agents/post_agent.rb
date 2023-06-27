@@ -83,7 +83,7 @@ module Agents
         },
         'headers' => {},
         'emit_events' => 'false',
-        'no_merge' => 'false',
+        'no_merge' => 'true',
         'output_mode' => 'clean'
       }
     end

@@ -65,6 +65,8 @@ module Agents
             "1": "10:00 PM EST"
           }
 
+      You could also use the `regex_extract` filter to achieve the same goal.
+
       So you can use it in `instructions` like this:
 
           "instructions": {
@@ -113,7 +115,6 @@ module Agents
           'agent' => "{{agent.type}}",
           'some_other_field' => "Looks like the weather is going to be {{fields.weather}}"
         },
-        'matchers' => [],
         'mode' => "clean",
       }
     end
