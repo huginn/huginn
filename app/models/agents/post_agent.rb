@@ -144,7 +144,7 @@ module Agents
         errors.add(:base, "if provided, output_mode must be 'clean' or 'merge'")
       end
 
-      if options['parse_body'].present? && /\A(?:true|false)\z|\{/.match?(options['parse_body'].to_s)
+      if options['parse_body'].present? && !/\A(?:true|false)\z|\{/.match?(options['parse_body'].to_s)
         errors.add(:base, "if provided, parse_body must be 'true' or 'false'")
       end
 

@@ -303,6 +303,7 @@ describe Agents::PostAgent do
 
           it "emits the parsed JSON body when parse_body is true" do
             @checker.options['parse_body'] = 'true'
+            @checker.save!
             @checker.check
             expect(@checker.events.last.payload['body']).to eq json_data
           end
