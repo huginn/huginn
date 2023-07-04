@@ -83,6 +83,13 @@
               </p>
             <% end %>
 
+            <% if (agents = @agent.controllers).length > 0 %>
+              <p>
+                <b>Controllers:</b>
+                <%= agents.map { |agent| link_to(agent.name, agent_path(agent)) }.to_sentence.html_safe %>
+              </p>
+            <% end %>
+
             <% if @agent.can_create_events? %>
               <p>
                 <b>Keep events:</b>
