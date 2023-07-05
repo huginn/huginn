@@ -31,10 +31,10 @@ module Agents
       }
     end
 
-    form_configurable :expected_receive_period_in_days, type: :string
-    form_configurable :max_events, type: :string
+    form_configurable :expected_receive_period_in_days, type: :number, html_options: { min: 1 }
+    form_configurable :max_events, type: :number, html_options: { min: 1 }
     form_configurable :keep, type: :array, values: %w[newest oldest]
-    form_configurable :max_emitted_events, type: :string
+    form_configurable :max_emitted_events, type: :number, html_options: { min: 0 }
     form_configurable :events_order, type: :json
 
     def validate_options
