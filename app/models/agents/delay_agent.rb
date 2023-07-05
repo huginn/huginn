@@ -15,6 +15,10 @@ module Agents
       that you anticipate passing without this Agent receiving an incoming Event.
 
       `max_emitted_events` is used to limit the number of the maximum events which should be created. If you omit this DelayAgent will create events for every event stored in the memory.
+
+      # Ordering Events
+
+      #{description_events_order("events in which buffered events are emitted")}
     MD
 
     def default_options
@@ -22,7 +26,8 @@ module Agents
         'expected_receive_period_in_days' => '10',
         'max_events' => '100',
         'keep' => 'newest',
-        'max_emitted_events' => ''
+        'max_emitted_events' => '',
+        'events_order' => [],
       }
     end
 
@@ -30,6 +35,7 @@ module Agents
     form_configurable :max_events, type: :string
     form_configurable :keep, type: :array, values: %w[newest oldest]
     form_configurable :max_emitted_events, type: :string
+    form_configurable :events_order, type: :json
 
     def validate_options
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
@@ -71,11 +77,16 @@ module Agents
     end
 
     def check
-      if memory['event_ids'] && memory['event_ids'].length > 0
+      if memory['event_ids'].present?
         events = received_events.where(id: memory['event_ids']).reorder('events.id asc')
-
         if interpolated['max_emitted_events'].present?
-          events = events.limit(interpolated['max_emitted_events'].to_i)
+          limit = interpolated['max_emitted_events'].to_i
+          events =
+            if options[SortableEvents::EVENTS_ORDER_KEY].present?
+              sort_events(events).first(limit)
+            else
+              events.limit(limit)
+            end
         end
 
         events.each do |event|
