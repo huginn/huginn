@@ -56,6 +56,9 @@ class FormConfigurableAgentPresenter < Decorator
     when :string
       @view.text_field_tag "agent[options][#{attribute}]", value,
                            html_options.deep_merge(class: 'form-control', data: { cache_response: data[:cache_response] != false })
+    when :json
+      @view.text_area_tag "agent[options][#{attribute}]", value,
+                          html_options.deep_merge(class: 'form-control live-json-editor', rows: 10)
     end
   end
 end

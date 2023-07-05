@@ -3,7 +3,7 @@ module FormConfigurable
 
   included do
     class_attribute :_form_configurable_fields
-    self._form_configurable_fields = HashWithIndifferentAccess.new { |h,k| h[k] = [] }
+    self._form_configurable_fields = HashWithIndifferentAccess.new { |h, k| h[k] = [] }
   end
 
   delegate :form_configurable_attributes, to: :class
@@ -43,11 +43,28 @@ module FormConfigurable
         options[:roles] = [options[:roles]]
       end
 
-      if options[:type] == :array
+      case options[:type]
+      when :array
         options[:roles] << :completable
-        class_eval <<-EOF
+        class_eval <<-EOF, __FILE__, __LINE__ + 1
           def complete_#{name}
             #{options[:values]}.map { |v| {text: v, id: v} }
+          end
+        EOF
+      when :json
+        class_eval <<-EOF, __FILE__, __LINE__ + 1
+          before_validation :decode_#{name}_json
+
+          private def decode_#{name}_json
+            case value = options[:#{name}]
+            when String
+              options[:#{name}] =
+                begin
+                  JSON.parse(value)
+                rescue StandardError
+                  value
+                end
+            end
           end
         EOF
       end

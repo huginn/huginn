@@ -9,6 +9,7 @@ describe FormConfigurableAgentPresenter do
     form_configurable :text, type: :text, roles: :completable
     form_configurable :boolean, type: :boolean
     form_configurable :array, type: :array, values: [1, 2, 3]
+    form_configurable :json, type: :json
   end
 
   before(:all) do
@@ -65,6 +66,20 @@ describe FormConfigurableAgentPresenter do
           'data-attribute': 'array',
           role: 'completable form-configurable',
           name: 'agent[options][array]'
+        }
+      )
+    )
+  end
+
+  it "works for the type :json" do
+    expect(@presenter.option_field_for(:json)).to(
+      have_tag(
+        'textarea',
+        with: {
+          'data-attribute': 'json',
+          role: 'form-configurable',
+          name: 'agent[options][json]',
+          class: 'live-json-editor',
         }
       )
     )
