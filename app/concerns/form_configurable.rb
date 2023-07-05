@@ -31,8 +31,8 @@ module FormConfigurable
     def form_configurable(name, *args)
       options = args.extract_options!.reverse_merge(roles: [], type: :string)
 
-      if args.all? { |arg| arg.is_a?(Symbol) }
-        options.assert_valid_keys([:type, :roles, :values, :ace, :cache_response])
+      if args.all?(Symbol)
+        options.assert_valid_keys([:type, :roles, :values, :ace, :cache_response, :html_options])
       end
 
       if options[:type] == :array && (options[:values].blank? || !options[:values].is_a?(Array))

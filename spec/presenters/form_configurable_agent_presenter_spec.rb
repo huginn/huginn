@@ -6,6 +6,7 @@ describe FormConfigurableAgentPresenter do
     include FormConfigurable
 
     form_configurable :string, roles: :validatable
+    form_configurable :number, type: :number, html_options: { min: 0 }
     form_configurable :text, type: :text, roles: :completable
     form_configurable :boolean, type: :boolean
     form_configurable :array, type: :array, values: [1, 2, 3]
@@ -26,6 +27,21 @@ describe FormConfigurableAgentPresenter do
           role: 'validatable form-configurable',
           type: 'text',
           name: 'agent[options][string]'
+        }
+      )
+    )
+  end
+
+  it "works for the type :number" do
+    expect(@presenter.option_field_for(:number)).to(
+      have_tag(
+        'input',
+        with: {
+          'data-attribute': 'number',
+          role: 'form-configurable',
+          type: 'number',
+          name: 'agent[options][number]',
+          min: '0',
         }
       )
     )

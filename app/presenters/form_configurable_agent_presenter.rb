@@ -16,7 +16,10 @@ class FormConfigurableAgentPresenter < Decorator
   def option_field_for(attribute)
     data = @agent.form_configurable_fields[attribute]
     value = @agent.options[attribute.to_s] || @agent.default_options[attribute.to_s]
-    html_options = { role: (data[:roles] + ['form-configurable']).join(' '), data: { attribute: } }
+    html_options = data.fetch(:html_options, {}).deep_merge({
+      role: (data[:roles] + ['form-configurable']).join(' '),
+      data: { attribute: },
+    })
 
     case data[:type]
     when :text
@@ -56,6 +59,9 @@ class FormConfigurableAgentPresenter < Decorator
     when :string
       @view.text_field_tag "agent[options][#{attribute}]", value,
                            html_options.deep_merge(class: 'form-control', data: { cache_response: data[:cache_response] != false })
+    when :number
+      @view.number_field_tag "agent[options][#{attribute}]", value,
+                             html_options.deep_merge(class: 'form-control', data: { cache_response: data[:cache_response] != false })
     when :json
       @view.text_area_tag "agent[options][#{attribute}]", value,
                           html_options.deep_merge(class: 'form-control live-json-editor', rows: 10)
