@@ -15,6 +15,7 @@ module SortableEvents
   module ClassMethods
     def can_order_created_events!
       raise 'Cannot order events for agent that cannot create events' if cannot_create_events?
+
       prepend AutomaticSorter
     end
 
@@ -75,8 +76,8 @@ module SortableEvents
       count = events.count
       events.each.with_index(1) do |event, position|
         event.payload[:sort_info] = {
-          position: position,
-          count: count
+          position:,
+          count:
         }
         create_event(event)
       end
@@ -90,6 +91,7 @@ module SortableEvents
   module AutomaticSorter
     def check
       return super unless events_order || include_sort_info?
+
       sorting_events do
         super
       end
@@ -97,6 +99,7 @@ module SortableEvents
 
     def receive(incoming_events)
       return super unless events_order || include_sort_info?
+
       # incoming events should be processed sequentially
       incoming_events.each do |event|
         sorting_events do
@@ -121,7 +124,8 @@ module SortableEvents
       @sortable_events = []
       yield
     ensure
-      events, @sortable_events = sort_events(@sortable_events), nil
+      events = sort_events(@sortable_events)
+      @sortable_events = nil
       create_events(events)
     end
   end
@@ -129,9 +133,9 @@ module SortableEvents
   private
 
   EXPRESSION_PARSER = {
-    'string' => ->string { string },
-    'number' => ->string { string.to_f },
-    'time'   => ->string { Time.zone.parse(string) },
+    'string' => ->(string) { string },
+    'number' => ->(string) { string.to_f },
+    'time'   => ->(string) { Time.zone.parse(string) },
   }
   EXPRESSION_TYPES = EXPRESSION_PARSER.keys.freeze
 
@@ -153,7 +157,8 @@ module SortableEvents
         when nil, *EXPRESSION_TYPES
           # ok
         else
-          errors.add(:base, "second element of each #{events_order_key} tuple must be #{EXPRESSION_TYPES.to_sentence(last_word_connector: ' or ')}")
+          errors.add(:base,
+                     "second element of each #{events_order_key} tuple must be #{EXPRESSION_TYPES.to_sentence(last_word_connector: ' or ')}")
           break
         end
         if !desc.nil? && boolify(desc).nil?
@@ -181,7 +186,7 @@ module SortableEvents
             string = interpolate_string(expression)
             begin
               EXPRESSION_PARSER[type || 'string'.freeze][string]
-            rescue
+            rescue StandardError
               error "Cannot parse #{string.inspect} as #{type}; treating it as string"
               string
             end
