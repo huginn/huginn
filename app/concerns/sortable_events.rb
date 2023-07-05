@@ -27,7 +27,7 @@ module SortableEvents
     end
 
     def description_events_order(events = EVENTS_DESCRIPTION, events_order_key = EVENTS_ORDER_KEY)
-      <<-MD.lstrip
+      <<~MD
         To specify the order of #{events}, set `#{events_order_key}` to an array of sort keys, each of which looks like either `expression` or `[expression, type, descending]`, as described as follows:
 
         * _expression_ is a Liquid template to generate a string to be used as sort key.
