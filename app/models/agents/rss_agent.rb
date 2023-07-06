@@ -11,7 +11,7 @@ module Agents
     DEFAULT_EVENTS_ORDER = [['{{date_published}}', 'time'], ['{{last_updated}}', 'time']]
 
     description do
-      <<-MD
+      <<~MD
         The RSS Agent consumes RSS feeds and emits events when they change.
 
         This agent, using [Feedjira](https://github.com/feedjira/feedjira) as a base, can parse various types of RSS and Atom feeds and has some special handlers for FeedBurner, iTunes RSS, and so on.  However, supported fields are limited by its general and abstract nature.  For complex feeds with additional field types, we recommend using a WebsiteAgent.  See [this example](https://github.com/huginn/huginn/wiki/Agent-configuration-examples#itunes-trailers).
@@ -49,7 +49,7 @@ module Agents
       }
     end
 
-    event_description <<-MD
+    event_description <<~MD
       Events look like:
 
           {
@@ -131,11 +131,13 @@ module Agents
       errors.add(:base, "url is required") unless options['url'].present?
 
       unless options['expected_update_period_in_days'].present? && options['expected_update_period_in_days'].to_i > 0
-        errors.add(:base, "Please provide 'expected_update_period_in_days' to indicate how many days can pass without an update before this Agent is considered to not be working")
+        errors.add(:base,
+                   "Please provide 'expected_update_period_in_days' to indicate how many days can pass without an update before this Agent is considered to not be working")
       end
 
       if options['remembered_id_count'].present? && options['remembered_id_count'].to_i < 1
-        errors.add(:base, "Please provide 'remembered_id_count' as a number bigger than 0 indicating how many IDs should be saved to distinguish between new and old IDs in RSS feeds. Delete option to use default (500).")
+        errors.add(:base,
+                   "Please provide 'remembered_id_count' as a number bigger than 0 indicating how many IDs should be saved to distinguish between new and old IDs in RSS feeds. Delete option to use default (500).")
       end
 
       validate_web_request_options!
@@ -161,17 +163,15 @@ module Agents
       max_events = (interpolated['max_events_per_run'].presence || 0).to_i
 
       urls.each do |url|
-        begin
-          response = faraday.get(url)
-          if response.success?
-            feed = Feedjira.parse(preprocessed_body(response))
-            new_events.concat feed_to_events(feed)
-          else
-            error "Failed to fetch #{url}: #{response.inspect}"
-          end
-        rescue => e
-          error "Failed to fetch #{url} with message '#{e.message}': #{e.backtrace}"
+        response = faraday.get(url)
+        if response.success?
+          feed = Feedjira.parse(preprocessed_body(response))
+          new_events.concat feed_to_events(feed)
+        else
+          error "Failed to fetch #{url}: #{response.inspect}"
         end
+      rescue StandardError => e
+        error "Failed to fetch #{url} with message '#{e.message}': #{e.backtrace}"
       end
 
       events = sort_events(new_events).select.with_index { |event, index|
@@ -210,7 +210,8 @@ module Agents
       else
         # Encoding is already known, so do not let the parser detect
         # it from the XML declaration in the content.
-        body.sub!(/(?<noenc>\A\u{FEFF}?\s*<\?xml(?:\s+\w+(?<av>\s*=\s*(?:'[^']*'|"[^"]*")))*?)\s+encoding\g<av>/, '\\k<noenc>')
+        body.sub!(/(?<noenc>\A\u{FEFF}?\s*<\?xml(?:\s+\w+(?<av>\s*=\s*(?:'[^']*'|"[^"]*")))*?)\s+encoding\g<av>/,
+                  '\\k<noenc>')
       end
       body
     end
@@ -226,7 +227,7 @@ module Agents
 
       {
         id: feed.feed_id,
-        type: type,
+        type:,
         url: feed.url,
         links: feed.links,
         title: feed.title,
@@ -257,15 +258,15 @@ module Agents
           itunes_summary
           language
         ].each { |attr|
-          if value = feed.try(attr).presence
-            data[attr] =
-              case attr
-              when :itunes_summary
-                clean_fragment(value)
-              else
-                value
-              end
-          end
+          next unless value = feed.try(attr).presence
+
+          data[attr] =
+            case attr
+            when :itunes_summary
+              clean_fragment(value)
+            else
+              value
+            end
         }
       end
       data

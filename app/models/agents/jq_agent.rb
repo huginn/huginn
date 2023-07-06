@@ -29,7 +29,7 @@ module Agents
 
     gem_dependency_check { jq_version }
 
-    description <<-MD
+    description <<~MD
       The Jq Agent allows you to process incoming Events with [jq](https://stedolan.github.io/jq/) the JSON processor. (#{jq_info})
 
       It allows you to filter, transform and restructure Events in the way you want using jq's powerful features.
@@ -97,7 +97,8 @@ module Agents
 
     def validate_options
       errors.add(:base, "filter needs to be present.") if !options['filter'].is_a?(String)
-      errors.add(:base, "variables must be a hash if present.") if options.key?('variables') && !options['variables'].is_a?(Hash)
+      errors.add(:base,
+                 "variables must be a hash if present.") if options.key?('variables') && !options['variables'].is_a?(Hash)
     end
 
     def default_options
@@ -196,7 +197,7 @@ module Agents
           log "Creating #{results.size} events"
 
           results.each do |payload|
-            create_event payload: payload
+            create_event(payload:)
           end
         end
       end

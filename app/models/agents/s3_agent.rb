@@ -11,7 +11,7 @@ module Agents
     gem_dependency_check { defined?(Aws::S3) }
 
     description do
-      <<-MD
+      <<~MD
         The S3Agent can watch a bucket for changes or emit an event for every file in that bucket. When receiving events, it writes the data into a file on S3.
 
         #{'## Include `aws-sdk-core` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -41,22 +41,23 @@ module Agents
     end
 
     event_description do
-      "Events will looks like this:\n\n    %s" % if boolify(interpolated['watch'])
-        Utils.pretty_print({
-          "file_pointer" => {
-            "file" => "filename",
-            "agent_id" => id
-          },
-          "event_type" => "modified/added/removed"
-        })
-      else
-        Utils.pretty_print({
-          "file_pointer" => {
-            "file" => "filename",
-            "agent_id" => id
-          }
-        })
-      end
+      "Events will looks like this:\n\n    " +
+        if boolify(interpolated['watch'])
+          Utils.pretty_print({
+            "file_pointer" => {
+              "file" => "filename",
+              "agent_id" => id
+            },
+            "event_type" => "modified/added/removed"
+          })
+        else
+          Utils.pretty_print({
+            "file_pointer" => {
+              "file" => "filename",
+              "agent_id" => id
+            }
+          })
+        end
     end
 
     def default_options
@@ -70,11 +71,12 @@ module Agents
       }
     end
 
-    form_configurable :mode, type: :array, values: %w(read write)
+    form_configurable :mode, type: :array, values: %w[read write]
     form_configurable :access_key_id, roles: :validatable
     form_configurable :access_key_secret, roles: :validatable
-    form_configurable :region, type: :array, values: %w(us-east-1 us-west-1 us-west-2 eu-west-1 eu-central-1 ap-southeast-1 ap-southeast-2 ap-northeast-1 ap-northeast-2 sa-east-1)
-    form_configurable :watch, type: :array, values: %w(true false)
+    form_configurable :region, type: :array,
+                               values: %w[us-east-1 us-west-1 us-west-2 eu-west-1 eu-central-1 ap-southeast-1 ap-southeast-2 ap-northeast-1 ap-northeast-2 sa-east-1]
+    form_configurable :watch, type: :array, values: %w[true false]
     form_configurable :bucket, roles: :completable
     form_configurable :filename
     form_configurable :data
@@ -114,7 +116,7 @@ module Agents
     end
 
     def complete_bucket
-      (buckets || []).collect { |room| {text: room.name, id: room.name} }
+      (buckets || []).collect { |room| { text: room.name, id: room.name } }
     end
 
     def working?
@@ -123,9 +125,10 @@ module Agents
 
     def check
       return if interpolated['mode'] != 'read'
+
       contents = safely do
-                   get_bucket_contents
-                 end
+        get_bucket_contents
+      end
       if boolify(interpolated['watch'])
         watch(contents)
       else
@@ -141,6 +144,7 @@ module Agents
 
     def receive(incoming_events)
       return if interpolated['mode'] != 'write'
+
       incoming_events.each do |event|
         safely do
           mo = interpolated(event)
@@ -155,7 +159,7 @@ module Agents
       yield
     rescue Aws::S3::Errors::AccessDenied => e
       error("Could not access '#{interpolated['bucket']}' #{e.class} #{e.message}")
-    rescue Aws::S3::Errors::ServiceError =>e
+    rescue Aws::S3::Errors::ServiceError => e
       error("#{e.class}: #{e.message}")
     end
 
@@ -175,7 +179,7 @@ module Agents
         end
         contents.delete(key)
       end
-      contents.each do |key, etag|
+      contents.each do |key, _etag|
         create_event payload: get_file_pointer(key).merge(event_type: :added)
       end
 

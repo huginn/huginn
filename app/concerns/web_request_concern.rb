@@ -15,11 +15,11 @@ module WebRequestConcern
   end
 
   class CharacterEncoding < Faraday::Middleware
-    def initialize(app, force_encoding: nil, default_encoding: nil, unzip: nil)
+    def initialize(app, options = {})
       super(app)
-      @force_encoding   = force_encoding
-      @default_encoding = default_encoding
-      @unzip            = unzip
+      @force_encoding   = options[:force_encoding]
+      @default_encoding = options[:default_encoding]
+      @unzip            = options[:unzip]
     end
 
     def call(env)
@@ -38,8 +38,12 @@ module WebRequestConcern
           # Not all Faraday adapters support automatic charset
           # detection, so we do that.
           case env[:response_headers][:content_type]
-          when /;\s*charset\s*=\s*([^()<>@,;:\\\"\/\[\]?={}\s]+)/i
-            encoding = Encoding.find($1) rescue @default_encoding
+          when /;\s*charset\s*=\s*([^()<>@,;:\\"\/\[\]?={}\s]+)/i
+            encoding = begin
+              Encoding.find($1)
+            rescue StandardError
+              @default_encoding
+            end
           when /\A\s*(?:text\/[^\s;]+|application\/(?:[^\s;]+\+)?(?:xml|json))\s*(?:;|\z)/i
             encoding = @default_encoding
           else
@@ -62,11 +66,11 @@ module WebRequestConcern
     if options['user_agent'].present?
       errors.add(:base, "user_agent must be a string") unless options['user_agent'].is_a?(String)
     end
-    
+
     if options['proxy'].present?
       errors.add(:base, "proxy must be a string") unless options['proxy'].is_a?(String)
     end
-    
+
     if options['disable_ssl_verification'].present? && boolify(options['disable_ssl_verification']).nil?
       errors.add(:base, "if provided, disable_ssl_verification must be true or false")
     end
@@ -102,6 +106,10 @@ module WebRequestConcern
     Encoding::UTF_8
   end
 
+  def parse_body?
+    false
+  end
+
   def faraday
     faraday_options = {
       ssl: {
@@ -110,16 +118,20 @@ module WebRequestConcern
     }
 
     @faraday ||= Faraday.new(faraday_options) { |builder|
+      if parse_body?
+        builder.response :json
+      end
+
       builder.response :character_encoding,
                        force_encoding: interpolated['force_encoding'].presence,
-                       default_encoding: default_encoding,
+                       default_encoding:,
                        unzip: interpolated['unzip'].presence
 
       builder.headers = headers if headers.length > 0
 
       builder.headers[:user_agent] = user_agent
-      
-      builder.proxy interpolated['proxy'].presence
+
+      builder.proxy = interpolated['proxy'].presence
 
       unless boolify(interpolated['disable_redirect_follow'])
         builder.use FaradayMiddleware::FollowRedirects
@@ -131,6 +143,8 @@ module WebRequestConcern
         builder.options.params_encoder = DoNotEncoder
       end
 
+      builder.options.timeout = (Delayed::Worker.max_run_time.seconds - 2).to_i
+
       if userinfo = basic_auth_credentials
         builder.request :basic_auth, *userinfo
       end
@@ -138,8 +152,8 @@ module WebRequestConcern
       builder.use FaradayMiddleware::Gzip
 
       case backend = faraday_backend
-        when :typhoeus
-          require 'typhoeus/adapters/faraday'
+      when :typhoeus
+        require 'typhoeus/adapters/faraday'
       end
       builder.adapter backend
     }
@@ -151,12 +165,12 @@ module WebRequestConcern
 
   def basic_auth_credentials(value = interpolated['basic_auth'])
     case value
-      when nil, ''
-        return nil
-      when Array
-        return value if value.size == 2
-      when /:/
-        return value.split(/:/, 2)
+    when nil, ''
+      return nil
+    when Array
+      return value if value.size == 2
+    when /:/
+      return value.split(/:/, 2)
     end
     raise ArgumentError.new("bad value for basic_auth: #{value.inspect}")
   end

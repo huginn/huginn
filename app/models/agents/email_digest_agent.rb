@@ -8,7 +8,7 @@ module Agents
 
     cannot_create_events!
 
-    description <<-MD
+    description <<~MD
       The Email Digest Agent collects any Events sent to it and sends them all via email when scheduled. The number of
       used events also relies on the `Keep events` option of the emitting Agent, meaning that if events expire before
       this agent is scheduled to run, they will not appear in the email.
@@ -30,9 +30,9 @@ module Agents
 
     def default_options
       {
-          'subject' => "You have some notifications!",
-          'headline' => "Your notifications:",
-          'expected_receive_period_in_days' => "2"
+        'subject' => "You have some notifications!",
+        'headline' => "Your notifications:",
+        'expected_receive_period_in_days' => "2"
       }
     end
 
@@ -52,21 +52,19 @@ module Agents
         payloads = received_events.reorder("events.id ASC").where(id: self.memory['events']).pluck(:payload).to_a
         groups = payloads.map { |payload| present(payload) }
         recipients.each do |recipient|
-          begin
-            SystemMailer.send_message(
-              to: recipient,
-              from: interpolated['from'],
-              subject: interpolated['subject'],
-              headline: interpolated['headline'],
-              content_type: interpolated['content_type'],
-              groups: groups
-            ).deliver_now
+          SystemMailer.send_message(
+            to: recipient,
+            from: interpolated['from'],
+            subject: interpolated['subject'],
+            headline: interpolated['headline'],
+            content_type: interpolated['content_type'],
+            groups:
+          ).deliver_now
 
-            log "Sent digest mail to #{recipient}"
-          rescue => e
-            error("Error sending digest mail to #{recipient}: #{e.message}")
-            raise
-          end
+          log "Sent digest mail to #{recipient}"
+        rescue StandardError => e
+          error("Error sending digest mail to #{recipient}: #{e.message}")
+          raise
         end
         self.memory['events'] = []
       end

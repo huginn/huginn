@@ -13,7 +13,7 @@ module Agents
     end
 
     description do
-      <<-MD
+      <<~MD
         The ReadFileAgent takes events from `FileHandling` agents, reads the file, and emits the contents as a string.
 
         `data_key` specifies the key of the emitted event which contains the file contents.
@@ -22,10 +22,12 @@ module Agents
       MD
     end
 
-    event_description <<-MD
-      {
-        "data" => '...'
-      }
+    event_description <<~MD
+      Events look like:
+
+          {
+            "data" => '...'
+          }
     MD
 
     form_configurable :data_key, type: :string
@@ -43,6 +45,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         next unless io = get_io(event)
+
         create_event payload: { interpolated['data_key'] => io.read }
       end
     end

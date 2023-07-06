@@ -1,11 +1,10 @@
-# encoding: utf-8 
 require "json"
 
 module Agents
   class MqttAgent < Agent
     gem_dependency_check { defined?(MQTT) }
 
-    description <<-MD
+    description <<~MD
       The MQTT Agent allows both publication and subscription to an MQTT topic.
 
       #{'## Include `mqtt` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -59,19 +58,19 @@ module Agents
       Find out more detail on [subscription wildcards](http://www.eclipse.org/paho/files/mqttdoc/Cclient/wildcard.html)
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       Events are simply nested MQTT payloads. For example, an MQTT payload for Owntracks
 
-      <pre><code>{
-        "topic": "owntracks/kcqlmkgx/Dan",
-        "message": {"_type": "location", "lat": "-34.8493644", "lon": "138.5218119", "tst": "1401771049", "acc": "50.0", "batt": "31", "desc": "Home", "event": "enter"},
-        "time": 1401771051
-      }</code></pre>
+          {
+            "topic": "owntracks/kcqlmkgx/Dan",
+            "message": {"_type": "location", "lat": "-34.8493644", "lon": "138.5218119", "tst": "1401771049", "acc": "50.0", "batt": "31", "desc": "Home", "event": "enter"},
+            "time": 1401771051
+          }
     MD
 
     def validate_options
       unless options['uri'].present? &&
-             options['topic'].present?
+          options['topic'].present?
         errors.add(:base, "topic and uri are required")
       end
     end
@@ -84,7 +83,7 @@ module Agents
       {
         'uri' => 'mqtts://user:pass@localhost:8883',
         'ssl' => :TLSv1,
-        'ca_file'  => './ca.pem',
+        'ca_file' => './ca.pem',
         'cert_file' => './client.crt',
         'key_file' => './client.key',
         'topic' => 'huginn',
@@ -94,16 +93,14 @@ module Agents
     end
 
     def mqtt_client
-      @client ||= begin
-        MQTT::Client.new(interpolated['uri']).tap do |c|
-          if interpolated['ssl']
-            c.ssl = interpolated['ssl'].to_sym
-            c.ca_file = interpolated['ca_file']
-            c.cert_file = interpolated['cert_file']
-            c.key_file = interpolated['key_file']
-          end
+      @client ||= MQTT::Client.new(interpolated['uri']).tap { |c|
+        if interpolated['ssl']
+          c.ssl = interpolated['ssl'].to_sym
+          c.ca_file = interpolated['ca_file']
+          c.cert_file = interpolated['cert_file']
+          c.key_file = interpolated['key_file']
         end
-      end
+      }
     end
 
     def receive(incoming_events)
@@ -113,7 +110,6 @@ module Agents
         end
       end
     end
-
 
     def check
       last_message = memory['last_message']
@@ -131,7 +127,7 @@ module Agents
           # A lot of services generate JSON, so try that.
           begin
             payload = JSON.parse(payload)
-          rescue
+          rescue StandardError
           end
 
           create_event payload: {
@@ -151,6 +147,5 @@ module Agents
       self.memory['last_message'] = last_message
       save!
     end
-
   end
 end

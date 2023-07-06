@@ -5,13 +5,13 @@ module Agents
     cannot_receive_events!
     default_schedule "every_1m"
 
-    description <<-MD
+    description <<~MD
       The Dropbox Watch Agent watches the given `dir_to_watch` and emits events with the detected changes.
-      
+
       #{'## Include the `dropbox-api` and `omniauth-dropbox` gems in your `Gemfile` and set `DROPBOX_OAUTH_KEY` and `DROPBOX_OAUTH_SECRET` in your environment to use Dropbox Agents.' if dependencies_missing?}
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       The event payload will contain the following fields:
 
           {
@@ -34,7 +34,8 @@ module Agents
 
     def validate_options
       errors.add(:base, 'The `dir_to_watch` property is required.') unless options['dir_to_watch'].present?
-      errors.add(:base, 'Invalid `expected_update_period_in_days` format.') unless options['expected_update_period_in_days'].present? && is_positive_integer?(options['expected_update_period_in_days'])
+      errors.add(:base,
+                 'Invalid `expected_update_period_in_days` format.') unless options['expected_update_period_in_days'].present? && is_positive_integer?(options['expected_update_period_in_days'])
     end
 
     def working?
@@ -52,7 +53,9 @@ module Agents
     private
 
     def ls(dir_to_watch)
-      dropbox.ls(dir_to_watch).map { |file| { 'path' => file.path, 'rev' => file.rev, 'modified' => file.server_modified } }
+      dropbox.ls(dir_to_watch)
+        .select { |entry| entry.respond_to?(:rev) }
+        .map { |file| { 'path' => file.path, 'rev' => file.rev, 'modified' => file.server_modified } }
     end
 
     def previous_contents
@@ -67,7 +70,8 @@ module Agents
 
     class DropboxDirDiff
       def initialize(previous, current)
-        @previous, @current = [previous || [], current || []]
+        @previous = previous || []
+        @current = current || []
       end
 
       def empty?
@@ -99,7 +103,5 @@ module Agents
         array.find { |entry| entry['path'] == path }
       end
     end
-
   end
-
 end

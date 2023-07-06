@@ -14,7 +14,7 @@ def runit_installed
 end
 
 def remove_upstart_config
-  return true unless File.exists?('/etc/init/huginn.conf')
+  return true unless File.exist?('/etc/init/huginn.conf')
   puts "#{failed} Please stop huginn and remove the huginn upstart init scripts:\n\n"
   puts "sudo stop huginn"
   puts "sudo rm /etc/init/huginn*\n\n"
@@ -62,7 +62,7 @@ namespace :production do
     while services.length > 0
       services.each do |p|
         supervise = File.join(p, 'supervise')
-        next if !Dir.exists?(supervise)
+        next if !Dir.exist?(supervise)
         run("chown -R huginn:huginn #{p}")
         services.delete(p)
       end

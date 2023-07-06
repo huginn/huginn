@@ -107,6 +107,7 @@ describe TwitterConcern do
 
     context "when a Twitter::Tweet object is given" do
       let(:input) { Twitter::Tweet.new(tweet_hash) }
+      let(:expected) { super().then { |attrs| attrs.update(text: attrs[:full_text]) } }
       it "formats a tweet" do
         expect(subject).to eq(expected)
       end

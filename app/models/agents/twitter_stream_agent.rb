@@ -5,7 +5,7 @@ module Agents
 
     cannot_receive_events!
 
-    description <<-MD
+    description <<~MD
       The Twitter Stream Agent follows the Twitter stream in real time, watching for certain keywords, or filters, that you provide.
 
       #{twitter_dependencies_missing if dependencies_missing?}
@@ -147,7 +147,7 @@ module Agents
         config_hash.push(oauth_token)
 
         Worker.new(id: agents.first.worker_id(config_hash),
-                   config: { filter_to_agent_map: filter_to_agent_map },
+                   config: { filter_to_agent_map: },
                    agent: agents.first)
       end
     end
@@ -155,7 +155,7 @@ module Agents
     class Worker < LongRunnable::Worker
       RELOAD_TIMEOUT = 60.minutes
       DUPLICATE_DETECTION_LENGTH = 1000
-      SEPARATOR = /[^\w_-]+/
+      SEPARATOR = /[^\w-]+/
 
       def setup
         require 'twitter/json_stream'
@@ -187,13 +187,13 @@ module Agents
 
         path =
           if track.present?
-            "/1.1/statuses/filter.json?#{{ track: track }.to_param}"
+            "/1.1/statuses/filter.json?#{{ track: }.to_param}"
           else
             "/1.1/statuses/sample.json"
           end
 
         stream = Twitter::JSONStream.connect(
-          path: path,
+          path:,
           ssl: true,
           oauth: {
             consumer_key: agent.twitter_consumer_key,

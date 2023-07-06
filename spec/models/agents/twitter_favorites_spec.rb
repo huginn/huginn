@@ -2,14 +2,15 @@ require 'rails_helper'
 
 describe Agents::TwitterFavorites do
   before do
-    stub_request(:any, /tectonic.*[?&]tweet_mode=extended/).
-      to_return(body: File.read(Rails.root.join("spec/data_fixtures/user_fav_tweets.json")),
-                headers: { 'Content-Type': 'application/json;charset=utf-8' },
-                status: 200)
+    stub_request(:any, /tectonic.*[?&]tweet_mode=extended/)
+      .to_return(body: File.read(Rails.root.join("spec/data_fixtures/user_fav_tweets.json")),
+                 headers: { 'Content-Type': 'application/json;charset=utf-8' },
+                 status: 200)
   end
 
   before do
-    @opts = {:username => "tectonic", :number => "10", :history => "100", :expected_update_period_in_days => "2", :starting_at => "Sat Feb 20 01:32:08 +0000 2016"}
+    @opts = { username: "tectonic", number: "10", history: "100", expected_update_period_in_days: "2",
+              starting_at: "Sat Feb 20 01:32:08 +0000 2016" }
 
     @agent = Agents::TwitterFavorites.new(name: "tectonic", options: @opts)
     @agent.service = services(:generic)
@@ -31,7 +32,10 @@ describe Agents::TwitterFavorites do
 
   describe "making sure check method works" do
     it "expect change method to change event" do
-      expect { @agent.check }.to change {Event.count}.by(3)
+      expect { @agent.check }.to change { Event.count }.by(3)
+      Event.last(3).each_cons(2) do |t1, t2|
+        expect(t1.payload[:id]).to be < t2.payload[:id]
+      end
     end
   end
 

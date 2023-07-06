@@ -6,16 +6,17 @@ module Agents
     cannot_be_scheduled!
     cannot_receive_events!
 
-    description do <<-MD
-      The Webhook Agent will create events by receiving webhooks from any source. In order to create events with this agent, make a POST request to:
+    description do
+      <<~MD
+        The Webhook Agent will create events by receiving webhooks from any source. In order to create events with this agent, make a POST request to:
 
-      ```
-         https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || ':id'}/#{options['secret'] || ':secret'}
-      ```
+        ```
+        https://#{ENV['DOMAIN']}/users/#{user.id}/web_requests/#{id || ':id'}/#{options['secret'] || ':secret'}
+        ```
 
-      #{'The placeholder symbols above will be replaced by their values once the agent is saved.' unless id}
+        #{'The placeholder symbols above will be replaced by their values once the agent is saved.' unless id}
 
-      Options:
+        Options:
 
         * `secret` - A token that the host will provide for authentication.
         * `expected_receive_period_in_days` - How often you expect to receive
@@ -38,16 +39,17 @@ module Agents
     end
 
     event_description do
-      <<-MD
+      <<~MD
         The event payload is based on the value of the `payload_path` option,
         which is set to `#{interpolated['payload_path']}`.
       MD
     end
 
     def default_options
-      { "secret" => "supersecretstring",
+      {
+        "secret" => SecureRandom.uuid,
         "expected_receive_period_in_days" => 1,
-        "payload_path" => "some_key",
+        "payload_path" => ".",
         "event_headers" => "",
         "event_headers_key" => "headers",
         "score_threshold" => 0.5
@@ -97,7 +99,7 @@ module Agents
         begin
           response = faraday.post('https://www.google.com/recaptcha/api/siteverify',
                                   parameters)
-        rescue => e
+        rescue StandardError => e
           error "Verification failed: #{e.message}"
           return ["Not Authorized", 401]
         end
@@ -117,9 +119,17 @@ module Agents
       end
 
       if interpolated['response_headers'].presence
-        [interpolated(params)['response'] || 'Event Created', code, "text/plain", interpolated['response_headers'].presence]
+        [
+          interpolated(params)['response'] || 'Event Created',
+          code,
+          "text/plain",
+          interpolated['response_headers'].presence
+        ]
       else
-        [interpolated(params)['response'] || 'Event Created', code]
+        [
+          interpolated(params)['response'] || 'Event Created',
+          code
+        ]
       end
     end
 

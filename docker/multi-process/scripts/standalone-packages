@@ -1,9 +1,19 @@
+set -e
+
 export DEBIAN_FRONTEND=noninteractive
+
 apt-get update
-apt-get install -y python2.7 python-docutils mysql-server \
-                   supervisor python-pip && \
+apt-get install -y gnupg
+
+mkdir -m700 $HOME/.gnupg
+gpg --no-default-keyring --keyring /usr/share/keyrings/mysql-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 5072E1F5 3A79BD29
+echo "deb [signed-by=/usr/share/keyrings/mysql-keyring.gpg] http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7" > /etc/apt/sources.list.d/mysql.list
+apt-get update
+
+apt-get install -y --allow-downgrades python3-pip mysql-server supervisor \
+                   mysql-server=5.7.42-1ubuntu18.04 mysql-client=5.7.42-1ubuntu18.04 libmysqlclient-dev=5.7.42-1ubuntu18.04 && \
 apt-get -y clean
-pip install supervisor-stdout
+pip install git+https://github.com/coderanger/supervisor-stdout
 rm -rf /var/lib/apt/lists/*
 rm -rf /usr/share/doc/
 rm -rf /usr/share/man/
@@ -14,10 +24,13 @@ mkdir -p /var/log/supervisor /var/log/mysql
 chgrp -R 0 /etc/supervisor /var/lib/mysql /var/log/supervisor /var/log/mysql
 chmod -R g=u /etc/supervisor /var/lib/mysql /var/log/supervisor /var/log/mysql
 sed -r -i /etc/mysql/mysql.conf.d/mysqld.cnf \
-    -e 's/^ *user *.+/user=1001/' \
     -e 's#/var/run/mysqld/mysqld.sock#/app/tmp/sockets/mysqld.sock#' \
     -e 's#/var/run/mysqld/mysqld.pid#/app/tmp/pids/mysqld.pid#'
-sed -r -i /etc/mysql/debian.cnf \
-    -e 's#/var/run/mysqld/mysqld.sock#/app/tmp/sockets/mysqld.sock#'
-cp /etc/mysql/debian.cnf /etc/mysql/mysql.conf.d/client.cnf
-chmod 644 /etc/mysql/mysql.conf.d/client.cnf
+echo "user=1001" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+cat >> /etc/mysql/conf.d/mysql.cnf << EOF
+[client]
+socket   = /app/tmp/sockets/mysqld.sock
+[mysql_upgrade]
+socket   = /app/tmp/sockets/mysqld.sock
+find /etc/mysql/
+EOF

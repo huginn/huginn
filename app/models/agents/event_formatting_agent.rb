@@ -3,7 +3,7 @@ module Agents
     cannot_be_scheduled!
     can_dry_run!
 
-    description <<-MD
+    description <<~MD
       The Event Formatting Agent allows you to format incoming Events, adding new fields as needed.
 
       For example, here is a possible Event:
@@ -34,7 +34,7 @@ module Agents
 
       The special key `created_at` refers to the timestamp of the Event, which can be reformatted by the `date` filter, like `{{created_at | date:"at %I:%M %p" }}`.
 
-      The upstream agent of each received event is accessible via the key `agent`, which has the following attributes: #{''.tap { |s| s << AgentDrop.instance_methods(false).map { |m| "`#{m}`" }.join(', ') }}.
+      The upstream agent of each received event is accessible via the key `agent`, which has the following attributes: #{''.tap { |s| s << Agent::Drop.instance_methods(false).map { |m| "`#{m}`" }.join(', ') }}.
 
       Have a look at the [Wiki](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) to learn more about liquid templating.
 
@@ -64,6 +64,8 @@ module Agents
             "0": "10:00 PM EST on January 11, 2013"
             "1": "10:00 PM EST"
           }
+
+      You could also use the `regex_extract` filter to achieve the same goal.
 
       So you can use it in `instructions` like this:
 
@@ -96,9 +98,10 @@ module Agents
     end
 
     def validate_options
-      errors.add(:base, "instructions and mode need to be present.") unless options['instructions'].present? && options['mode'].present?
+      errors.add(:base,
+                 "instructions and mode need to be present.") unless options['instructions'].present? && options['mode'].present?
 
-      if options['mode'].present? && !options['mode'].to_s.include?('{{') && !%[clean merge].include?(options['mode'].to_s)
+      if options['mode'].present? && !options['mode'].to_s.include?('{{') && !%(clean merge).include?(options['mode'].to_s)
         errors.add(:base, "mode must be 'clean' or 'merge'")
       end
 
@@ -108,11 +111,10 @@ module Agents
     def default_options
       {
         'instructions' => {
-          'message' =>  "You received a text {{text}} from {{fields.from}}",
+          'message' => "You received a text {{text}} from {{fields.from}}",
           'agent' => "{{agent.type}}",
           'some_other_field' => "Looks like the weather is going to be {{fields.weather}}"
         },
-        'matchers' => [],
         'mode' => "clean",
       }
     end
@@ -156,7 +158,7 @@ module Agents
         if regexp.present?
           begin
             Regexp.new(regexp)
-          rescue
+          rescue StandardError
             errors.add(:base, "bad regexp found in matchers: #{regexp}")
           end
         else

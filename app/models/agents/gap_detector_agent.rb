@@ -2,7 +2,7 @@ module Agents
   class GapDetectorAgent < Agent
     default_schedule "every_10m"
 
-    description <<-MD
+    description <<~MD
       The Gap Detector Agent will watch for holes or gaps in a stream of incoming Events and generate "no data alerts".
 
       The `value_path` value is a [JSONPath](http://goessner.net/articles/JsonPath/) to a value of interest. If either
@@ -13,7 +13,7 @@ module Agents
 
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       Events look like:
 
           {
@@ -62,8 +62,10 @@ module Agents
       if memory['newest_event_created_at'].present? && Time.at(memory['newest_event_created_at']) < window
         if !memory['alerted_at'] || (interpolated['alert_on_every_run'].present? && boolify(interpolated['alert_on_every_run']))
           memory['alerted_at'] = Time.now.to_i
-          create_event payload: { message: interpolated['message'],
-                                  gap_started_at: memory['newest_event_created_at'] }
+          create_event payload: {
+            message: interpolated['message'],
+            gap_started_at: memory['newest_event_created_at']
+          }
         end
       end
     end

@@ -12,10 +12,12 @@ class Event < ActiveRecord::Base
   json_serialize :payload
 
   belongs_to :user, optional: true
-  belongs_to :agent, :counter_cache => true
+  belongs_to :agent, counter_cache: true
 
-  has_many :agent_logs_as_inbound_event, :class_name => "AgentLog", :foreign_key => :inbound_event_id, :dependent => :nullify
-  has_many :agent_logs_as_outbound_event, :class_name => "AgentLog", :foreign_key => :outbound_event_id, :dependent => :nullify
+  has_many :agent_logs_as_inbound_event, class_name: "AgentLog", foreign_key: :inbound_event_id,
+                                         dependent: :nullify
+  has_many :agent_logs_as_outbound_event, class_name: "AgentLog", foreign_key: :outbound_event_id,
+                                          dependent: :nullify
 
   scope :recent, lambda { |timespan = 12.hours.ago|
     where("events.created_at > ?", timespan)
@@ -44,20 +46,18 @@ class Event < ActiveRecord::Base
   def location
     @location ||= Location.new(
       # lat and lng are BigDecimal, but converted to Float by the Location class
-      lat: lat,
-      lng: lng,
+      lat:,
+      lng:,
       radius:
-        begin
-          h = payload[:horizontal_accuracy].presence
-          v = payload[:vertical_accuracy].presence
-          if h && v
-            (h.to_f + v.to_f) / 2
-          else
-            (h || v || payload[:accuracy]).to_f
-          end
+        if (h = payload[:horizontal_accuracy].presence) &&
+            (v = payload[:vertical_accuracy].presence)
+          (h.to_f + v.to_f) / 2
+        else
+          (h || v || payload[:accuracy]).to_f
         end,
       course: payload[:course],
-      speed: payload[:speed].presence)
+      speed: payload[:speed].presence
+    )
   end
 
   def location=(location)
@@ -69,13 +69,14 @@ class Event < ActiveRecord::Base
     else
       location = Location.new(location)
     end
-    self.lat, self.lng = location.lat, location.lng
+    self.lat = location.lat
+    self.lng = location.lng
     location
   end
 
   # Emit this event again, as a new Event.
   def reemit!
-    agent.create_event :payload => payload, :lat => lat, :lng => lng
+    agent.create_event(payload:, lat:, lng:)
   end
 
   # Look for Events whose `expires_at` is present and in the past.  Remove those events and then update affected Agents'
@@ -95,43 +96,52 @@ class Event < ActiveRecord::Base
   end
 
   def possibly_propagate
-    #immediately schedule agents that want immediate updates
-    propagate_ids = agent.receivers.where(:propagate_immediately => true).pluck(:id)
-    Agent.receive!(:only_receivers => propagate_ids) unless propagate_ids.empty?
-  end
-end
-
-class EventDrop
-  def initialize(object)
-    @payload = object.payload
-    super
+    # immediately schedule agents that want immediate updates
+    propagate_ids = agent.receivers.where(propagate_immediately: true).pluck(:id)
+    Agent.receive!(only_receivers: propagate_ids) unless propagate_ids.empty?
   end
 
-  def liquid_method_missing(key)
-    @payload[key]
+  public def to_liquid
+    Drop.new(self)
   end
 
-  def each(&block)
-    @payload.each(&block)
-  end
+  class Drop < LiquidDroppable::Drop
+    def initialize(object)
+      @payload = object.payload
+      super
+    end
 
-  def agent
-    @payload.fetch(__method__) {
-      @object.agent
-    }
-  end
+    def liquid_method_missing(key)
+      @payload[key]
+    end
 
-  def created_at
-    @payload.fetch(__method__) {
-      @object.created_at
-    }
-  end
+    def each(&block)
+      @payload.each(&block)
+    end
 
-  def _location_
-    @object.location
-  end
+    def agent
+      @payload.fetch(__method__) {
+        @object.agent
+      }
+    end
 
-  def as_json
-    {location: _location_.as_json, agent: @object.agent.to_liquid.as_json, payload: @payload.as_json, created_at: created_at.as_json}
+    def created_at
+      @payload.fetch(__method__) {
+        @object.created_at
+      }
+    end
+
+    def _location_
+      @object.location
+    end
+
+    def as_json
+      {
+        location: _location_.as_json,
+        agent: @object.agent.to_liquid.as_json,
+        payload: @payload.as_json,
+        created_at: created_at.as_json
+      }
+    end
   end
 end

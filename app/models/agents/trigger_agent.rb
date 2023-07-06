@@ -3,9 +3,19 @@ module Agents
     cannot_be_scheduled!
     can_dry_run!
 
-    VALID_COMPARISON_TYPES = %w[regex !regex field<value field<=value field==value field!=value field>=value field>value not\ in]
+    VALID_COMPARISON_TYPES = %w[
+      regex
+      !regex
+      field<value
+      field<=value
+      field==value
+      field!=value
+      field>=value
+      field>value
+      not\ in
+    ]
 
-    description <<-MD
+    description <<~MD
       The Trigger Agent will watch for a specific value in an Event payload.
 
       The `rules` array contains a mixture of strings and hashes.
@@ -32,7 +42,7 @@ module Agents
       Set `expected_receive_period_in_days` to the maximum amount of time that you'd expect to pass between Events being received by this Agent.
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       Events look like this:
 
           { "message": "Your message" }
@@ -43,8 +53,9 @@ module Agents
       when String
         true
       when Hash
-        rule.values_at('type', 'value', 'path').all?(&:present?) &&
-          VALID_COMPARISON_TYPES.include?(rule['type'])
+        VALID_COMPARISON_TYPES.include?(rule['type']) &&
+          /\S/.match?(rule['path']) &&
+          rule['value'].is_a?(String)
       else
         false
       end
@@ -52,14 +63,19 @@ module Agents
 
     def validate_options
       unless options['expected_receive_period_in_days'].present? &&
-             options['rules'].present? &&
-             options['rules'].all? { |rule| valid_rule?(rule) }
-        errors.add(:base, "expected_receive_period_in_days, message, and rules, with a type, value, and path for every rule, are required")
+          options['rules'].present? &&
+          options['rules'].all? { |rule| valid_rule?(rule) }
+        errors.add(:base,
+                   "expected_receive_period_in_days, message, and rules, with a type, value, and path for every rule, are required")
       end
 
-      errors.add(:base, "message is required unless 'keep_event' is 'true'") unless options['message'].present? || keep_event?
+      errors.add(:base,
+                 "message is required unless 'keep_event' is 'true'") unless options['message'].present? || keep_event?
 
-      errors.add(:base, "keep_event, when present, must be 'true' or 'false'") unless options['keep_event'].blank? || %w[true false].include?(options['keep_event'])
+      errors.add(:base,
+                 "keep_event, when present, must be 'true' or 'false'") unless options['keep_event'].blank? || %w[
+                   true false
+                 ].include?(options['keep_event'])
 
       if options['must_match'].present?
         if options['must_match'].to_i < 1
@@ -75,10 +91,10 @@ module Agents
         'expected_receive_period_in_days' => "2",
         'keep_event' => 'false',
         'rules' => [{
-                      'type' => "regex",
-                      'value' => "foo\\d+bar",
-                      'path' => "topkey.subkey.subkey.goal",
-                    }],
+          'type' => "regex",
+          'value' => "foo\\d+bar",
+          'path' => "topkey.subkey.subkey.goal",
+        }],
         'message' => "Looks like your pattern matched in '{{value}}'!"
       }
     end
@@ -89,7 +105,6 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-
         opts = interpolated(event)
 
         match_results = opts['rules'].map do |rule|
@@ -129,16 +144,16 @@ module Agents
           end
         end
 
-        if matches?(match_results)
-          if keep_event?
-            payload = event.payload.dup
-            payload['message'] = opts['message'] if opts['message'].present?
-          else
-            payload = { 'message' => opts['message'] }
-          end
+        next unless matches?(match_results)
 
-          create_event :payload => payload
+        if keep_event?
+          payload = event.payload.dup
+          payload['message'] = opts['message'] if opts['message'].present?
+        else
+          payload = { 'message' => opts['message'] }
         end
+
+        create_event(payload:)
       end
     end
 

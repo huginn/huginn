@@ -13,6 +13,7 @@ class Location
     case data
     when Array
       raise ArgumentError, 'unsupported location data' unless data.size == 2
+
       self.lat, self.lng = data
     when Hash, Location
       data.each { |key, value|
@@ -91,7 +92,7 @@ class Location
   def floatify(value)
     case value
     when nil, ''
-      return nil
+      nil
     else
       float = Float(value)
       if block_given?
@@ -101,14 +102,18 @@ class Location
       end
     end
   end
-end
 
-class LocationDrop
-  KEYS = Location.members.map(&:to_s).concat(%w[latitude longitude latlng])
+  public def to_liquid
+    Drop.new(self)
+  end
 
-  def liquid_method_missing(key)
-    if KEYS.include?(key)
-      @object.__send__(key)
+  class Drop < LiquidDroppable::Drop
+    KEYS = Location.members.map(&:to_s).concat(%w[latitude longitude latlng])
+
+    def liquid_method_missing(key)
+      if KEYS.include?(key)
+        @object.__send__(key)
+      end
     end
   end
 end

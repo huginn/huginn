@@ -5,7 +5,7 @@ module Agents
     can_dry_run!
     cannot_receive_events!
 
-    description <<-MD
+    description <<~MD
       The Twitter User Agent either follows the timeline of a specific Twitter user or follows your own home timeline including both your tweets and tweets from people whom you are following.
 
       #{twitter_dependencies_missing if dependencies_missing?}
@@ -87,7 +87,7 @@ module Agents
           twitter.user_timeline(interpolated[:username], opts)
         end
 
-      tweets.each do |tweet|
+      tweets.sort_by(&:id).each do |tweet|
         next unless tweet.created_at >= starting_at
 
         memory[:since_id] = [tweet.id, *memory[:since_id]].max

@@ -21,7 +21,7 @@ jobs:
           - mysql2
           - postgresql
         ruby:
-          - "2.7"
+          - "3.2"
     env:
       DATABASE_ADAPTER: ${{ matrix.database_adapter }}
       DATABASE_HOST: "127.0.0.1"
@@ -67,6 +67,9 @@ jobs:
 
       - name: Run tests
         run: bundle exec rake
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@v1
 
   ghcr-build-docker-images:
     name: ghcr-docker-build-${{ matrix.docker_image }}

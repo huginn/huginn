@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_back(fallback_path, **args)
-    super(fallback_location: fallback_path, **args)
+    super(fallback_location: fallback_path, allow_other_host: false, **args)
   end
 
   protected

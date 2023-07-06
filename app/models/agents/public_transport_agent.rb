@@ -6,7 +6,7 @@ module Agents
 
     default_schedule "every_2m"
 
-    description <<-MD
+    description <<~MD
       The Public Transport Request Agent generates Events based on NextBus GPS transit predictions.
 
       Specify the following user settings:
@@ -17,7 +17,7 @@ module Agents
 
       First, select an agency by visiting [http://www.nextbus.com/predictor/adaAgency.jsp](http://www.nextbus.com/predictor/adaAgency.jsp) and finding your transit system.  Once you find it, copy the part of the URL after `?a=`.  For example, for the San Francisco MUNI system, you would end up on [http://www.nextbus.com/predictor/adaDirection.jsp?a=**sf-muni**](http://www.nextbus.com/predictor/adaDirection.jsp?a=sf-muni) and copy "sf-muni".  Put that into this Agent's agency setting.
 
-      Next, find the stop tags that you care about. 
+      Next, find the stop tags that you care about.
 
       Select your destination and lets use the n-judah route. The link should be [http://www.nextbus.com/predictor/adaStop.jsp?a=sf-muni&r=N](http://www.nextbus.com/predictor/adaStop.jsp?a=sf-muni&r=N) Once you find it, copy the part of the URL after `r=`.
 
@@ -42,18 +42,22 @@ module Agents
           alert_window_in_minutes: 5
     MD
 
-    event_description <<-MD
-    Events look like this:
-      { "routeTitle":"N-Judah",
-        "stopTag":"5215",
-        "prediction":
-           {"epochTime":"1389622846689",
-            "seconds":"3454","minutes":"57","isDeparture":"false",
-            "affectedByLayover":"true","dirTag":"N__OB4KJU","vehicle":"1489",
-            "block":"9709","tripTag":"5840086"
-            }
-      }
-    MD
+    event_description "Events look like this:\n\n    " +
+      Utils.pretty_print({
+        "routeTitle": "N-Judah",
+        "stopTag": "5215",
+        "prediction": {
+          "epochTime": "1389622846689",
+          "seconds": "3454",
+          "minutes": "57",
+          "isDeparture": "false",
+          "affectedByLayover": "true",
+          "dirTag": "N__OB4KJU",
+          "vehicle": "1489",
+          "block": "9709",
+          "tripTag": "5840086"
+        }
+      })
 
     def check_url
       query = URI.encode_www_form([
@@ -65,27 +69,27 @@ module Agents
     end
 
     def stops
-      interpolated["stops"].collect{|a| a.split("|").last}
+      interpolated["stops"].collect { |a| a.split("|").last }
     end
 
     def check
       hydra = Typhoeus::Hydra.new
-      request = Typhoeus::Request.new(check_url, :followlocation => true)
+      request = Typhoeus::Request.new(check_url, followlocation: true)
       request.on_success do |response|
         page = Nokogiri::XML response.body
         predictions = page.css("//prediction")
         predictions.each do |pr|
           parent = pr.parent.parent
-          vals = {"routeTitle" => parent["routeTitle"], "stopTag" => parent["stopTag"]}
-          if pr["minutes"] && pr["minutes"].to_i < interpolated["alert_window_in_minutes"].to_i
-            vals = vals.merge Hash.from_xml(pr.to_xml)
-            if not_already_in_memory?(vals)
-              create_event(:payload => vals)
-              log "creating event..."
-              update_memory(vals)
-            else
-              log "not creating event since already in memory"
-            end
+          vals = { "routeTitle" => parent["routeTitle"], "stopTag" => parent["stopTag"] }
+          next unless pr["minutes"] && pr["minutes"].to_i < interpolated["alert_window_in_minutes"].to_i
+
+          vals = vals.merge Hash.from_xml(pr.to_xml)
+          if not_already_in_memory?(vals)
+            create_event(payload: vals)
+            log "creating event..."
+            update_memory(vals)
+          else
+            log "not creating event since already in memory"
           end
         end
       end
@@ -100,20 +104,26 @@ module Agents
 
     def cleanup_old_memory
       self.memory["existing_routes"] ||= []
-      self.memory["existing_routes"].reject!{|h| h["currentTime"].to_time <= (Time.now - 2.hours)}
+      time = 2.hours.ago
+      self.memory["existing_routes"].reject! { |h| h["currentTime"].to_time <= time }
     end
 
     def add_to_memory(vals)
-      self.memory["existing_routes"] ||= []
-      self.memory["existing_routes"] << {"stopTag" => vals["stopTag"], "tripTag" => vals["prediction"]["tripTag"], "epochTime" => vals["prediction"]["epochTime"], "currentTime" => Time.now}
+      (self.memory["existing_routes"] ||= []) << {
+        "stopTag" => vals["stopTag"],
+        "tripTag" => vals["prediction"]["tripTag"],
+        "epochTime" => vals["prediction"]["epochTime"],
+        "currentTime" => Time.now
+      }
     end
 
     def not_already_in_memory?(vals)
       m = self.memory["existing_routes"] || []
-      m.select{|h| h['stopTag'] == vals["stopTag"] &&
-                h['tripTag'] == vals["prediction"]["tripTag"] &&
-                h['epochTime'] == vals["prediction"]["epochTime"]
-              }.count == 0
+      m.select { |h|
+        h['stopTag'] == vals["stopTag"] &&
+          h['tripTag'] == vals["prediction"]["tripTag"] &&
+          h['epochTime'] == vals["prediction"]["epochTime"]
+      }.count == 0
     end
 
     def default_options

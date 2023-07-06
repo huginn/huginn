@@ -5,13 +5,13 @@ module Agents
     cannot_be_scheduled!
     cannot_create_events!
 
-    description  do
-      <<-MD
+    description do
+      <<~MD
         The Data Output Agent outputs received events as either RSS or JSON.  Use it to output a public or private stream of Huginn data.
 
         This Agent will output data at:
 
-        `https://#{ENV['DOMAIN']}#{Rails.application.routes.url_helpers.web_requests_path(agent_id: ':id', user_id: user_id, secret: ':secret', format: :xml)}`
+        `https://#{ENV['DOMAIN']}#{Rails.application.routes.url_helpers.web_requests_path(agent_id: ':id', user_id:, secret: ':secret', format: :xml)}`
 
         where `:secret` is one of the allowed secrets specified in your options and the extension can be `xml` or `json`.
 
@@ -104,7 +104,8 @@ module Agents
       end
 
       unless options['expected_receive_period_in_days'].present? && options['expected_receive_period_in_days'].to_i > 0
-        errors.add(:base, "Please provide 'expected_receive_period_in_days' to indicate how many days can pass before this Agent is considered to be not working")
+        errors.add(:base,
+                   "Please provide 'expected_receive_period_in_days' to indicate how many days can pass before this Agent is considered to be not working")
       end
 
       unless options['template'].present? && options['template']['item'].present? && options['template']['item'].is_a?(Hash)
@@ -153,11 +154,12 @@ module Agents
 
     def feed_url(options = {})
       interpolated['template']['self'].presence ||
-        feed_link + Rails.application.routes.url_helpers.
-                    web_requests_path(agent_id: id || ':id',
-                                      user_id: user_id,
-                                      secret: options[:secret],
-                                      format: options[:format])
+        feed_link + Rails.application.routes.url_helpers.web_requests_path(
+          agent_id: id || ':id',
+          user_id:,
+          secret: options[:secret],
+          format: options[:format]
+        )
     end
 
     def feed_icon
@@ -165,9 +167,9 @@ module Agents
     end
 
     def itunes_icon
-      if(boolify(interpolated['ns_itunes']))
+      if boolify(interpolated['ns_itunes'])
         "<itunes:image href=#{feed_icon.encode(xml: :attr)} />"
-      end  
+      end
     end
 
     def feed_description
@@ -181,13 +183,13 @@ module Agents
     def xml_namespace
       namespaces = ['xmlns:atom="http://www.w3.org/2005/Atom"']
 
-      if (boolify(interpolated['ns_dc']))
+      if boolify(interpolated['ns_dc'])
         namespaces << 'xmlns:dc="http://purl.org/dc/elements/1.1/"'
       end
-      if (boolify(interpolated['ns_media']))
+      if boolify(interpolated['ns_media'])
         namespaces << 'xmlns:media="http://search.yahoo.com/mrss/"'
       end
-      if (boolify(interpolated['ns_itunes']))
+      if boolify(interpolated['ns_itunes'])
         namespaces << 'xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"'
       end
       namespaces.join(' ')
@@ -211,8 +213,8 @@ module Agents
 
       events =
         if (event_ids = memory[:event_ids]) &&
-           memory[:events_order] == events_order &&
-           memory[:events_to_show] >= events_to_show
+            memory[:events_order] == events_order &&
+            memory[:events_to_show] >= events_to_show
           received_events.where(id: event_ids).to_a
         else
           memory[:last_event_id] = nil
@@ -231,8 +233,8 @@ module Agents
             source_ids.flat_map { |source_id|
               # dig twice as many events as the number of
               # `events_to_show`
-              received_events.where(agent_id: source_id).
-                last(2 * events_to_show)
+              received_events.where(agent_id: source_id)
+                .last(2 * events_to_show)
             }.sort_by(&:id)
           end
 
@@ -260,18 +262,20 @@ module Agents
         end
       end
 
-      source_events = sort_events(latest_events(), 'events_list_order')
+      source_events = sort_events(latest_events, 'events_list_order')
 
       interpolate_with('events' => source_events) do
         items = source_events.map do |event|
           interpolated = interpolate_options(options['template']['item'], event)
-          interpolated['guid'] = {'_attributes' => {'isPermaLink' => 'false'},
-                                  '_contents' => interpolated['guid'].presence || event.id}
+          interpolated['guid'] = {
+            '_attributes' => { 'isPermaLink' => 'false' },
+            '_contents' => interpolated['guid'].presence || event.id
+          }
           date_string = interpolated['pubDate'].to_s
           date =
             begin
-              Time.zone.parse(date_string)  # may return nil
-            rescue => e
+              Time.zone.parse(date_string) # may return nil
+            rescue StandardError => e
               error "Error parsing a \"pubDate\" value \"#{date_string}\": #{e.message}"
               nil
             end || event.created_at
@@ -299,23 +303,23 @@ module Agents
 
           items = items_to_xml(items)
 
-          return [<<-XML, 200, rss_content_type, interpolated['response_headers'].presence]
-<?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0" #{xml_namespace}>
-<channel>
- <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
- <atom:icon>#{feed_icon.encode(xml: :text)}</atom:icon>
- #{itunes_icon}
-#{hub_links}
- <title>#{feed_title.encode(xml: :text)}</title>
- <description>#{feed_description.encode(xml: :text)}</description>
- <link>#{feed_link.encode(xml: :text)}</link>
- <lastBuildDate>#{now.rfc2822.to_s.encode(xml: :text)}</lastBuildDate>
- <pubDate>#{now.rfc2822.to_s.encode(xml: :text)}</pubDate>
- <ttl>#{feed_ttl}</ttl>
-#{items}
-</channel>
-</rss>
+          return [<<~XML, 200, rss_content_type, interpolated['response_headers'].presence]
+            <?xml version="1.0" encoding="UTF-8" ?>
+            <rss version="2.0" #{xml_namespace}>
+            <channel>
+             <atom:link href=#{feed_url(secret: params['secret'], format: :xml).encode(xml: :attr)} rel="self" type="application/rss+xml" />
+             <atom:icon>#{feed_icon.encode(xml: :text)}</atom:icon>
+             #{itunes_icon}
+            #{hub_links}
+             <title>#{feed_title.encode(xml: :text)}</title>
+             <description>#{feed_description.encode(xml: :text)}</description>
+             <link>#{feed_link.encode(xml: :text)}</link>
+             <lastBuildDate>#{now.rfc2822.to_s.encode(xml: :text)}</lastBuildDate>
+             <pubDate>#{now.rfc2822.to_s.encode(xml: :text)}</pubDate>
+             <ttl>#{feed_ttl}</ttl>
+            #{items}
+            </channel>
+            </rss>
           XML
         end
       end
@@ -336,13 +340,17 @@ module Agents
 
     class XMLNode
       def initialize(tag_name, attributes, contents)
-        @tag_name, @attributes, @contents = tag_name, attributes, contents
+        @tag_name = tag_name
+        @attributes = attributes
+        @contents = contents
       end
 
       def to_xml(options)
         if @contents.is_a?(Hash)
           options[:builder].tag! @tag_name, @attributes do
-            @contents.each { |key, value| ActiveSupport::XmlMini.to_tag(key, value, options.merge(skip_instruct: true)) }
+            @contents.each { |key, value|
+              ActiveSupport::XmlMini.to_tag(key, value, options.merge(skip_instruct: true))
+            }
           end
         else
           options[:builder].tag! @tag_name, @attributes, @contents
@@ -353,15 +361,16 @@ module Agents
     def simplify_item_for_xml(item)
       if item.is_a?(Hash)
         item.each.with_object({}) do |(key, value), memo|
-          if value.is_a?(Hash)
-            if value.key?('_attributes') || value.key?('_contents')
-              memo[key] = XMLNode.new(key, value['_attributes'], simplify_item_for_xml(value['_contents']))
+          memo[key] =
+            if value.is_a?(Hash)
+              if value.key?('_attributes') || value.key?('_contents')
+                XMLNode.new(key, value['_attributes'], simplify_item_for_xml(value['_contents']))
+              else
+                simplify_item_for_xml(value)
+              end
             else
-              memo[key] = simplify_item_for_xml(value)
+              value
             end
-          else
-            memo[key] = value
-          end
         end
       elsif item.is_a?(Array)
         item.map { |value| simplify_item_for_xml(value) }
@@ -375,13 +384,14 @@ module Agents
         item.each.with_object({}) do |(key, value), memo|
           if value.is_a?(Hash)
             if value.key?('_attributes') || value.key?('_contents')
-              contents = if value['_contents'] && value['_contents'].is_a?(Hash)
-                           simplify_item_for_json(value['_contents'])
-                         elsif value['_contents']
-                           { "contents" => value['_contents'] }
-                         else
-                           {}
-                         end
+              contents =
+                if value['_contents'] && value['_contents'].is_a?(Hash)
+                  simplify_item_for_json(value['_contents'])
+                elsif value['_contents']
+                  { "contents" => value['_contents'] }
+                else
+                  {}
+                end
 
               memo[key] = contents.merge(value['_attributes'] || {})
             else
@@ -436,8 +446,8 @@ module Agents
           'hub.mode' => 'publish',
           'hub.url' => url
         }
-     rescue => e
-       error "Push failed: #{e.message}"
+      rescue StandardError => e
+        error "Push failed: #{e.message}"
       end
     end
   end

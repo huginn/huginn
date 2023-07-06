@@ -5,10 +5,9 @@ module Agents
     cannot_create_events!
     no_bulk_receive!
 
-
     API_URL = 'https://api.pushover.net/1/messages.json'
 
-    description <<-MD
+    description <<~MD
       The Pushover Agent receives and collects events and sends them via push notification to a user/group.
 
       **You need a Pushover API Token:** [https://pushover.net/apps/build](https://pushover.net/apps/build)
@@ -88,15 +87,15 @@ module Agents
             retry
             expire
           ].each do |key|
-            if value = String.try_convert(interpolated[key].presence)
-              case key
-              when 'url'
-                value.slice!(512..-1)
-              when 'url_title'
-                value.slice!(100..-1)
-              end
-              post_params[key] = value
+            value = String.try_convert(interpolated[key].presence) or next
+
+            case key
+            when 'url'
+              value.slice!(512..-1)
+            when 'url_title'
+              value.slice!(100..-1)
             end
+            post_params[key] = value
           end
           # html is special because String.try_convert(true) gives nil (not even "nil", just nil)
           if value = interpolated['html'].presence

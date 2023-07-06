@@ -50,7 +50,15 @@ describe Agents::DropboxWatchAgent do
 
   describe '#check' do
 
-    let(:first_result) { Dropbox::API::Object.convert([{ 'path_display' => '1.json', 'rev' => '1', 'server_modified' => '01-01-01' }], nil) }
+    let(:first_result) do
+      Dropbox::API::Object.convert(
+        [
+          { 'path_display' => '1.json', 'rev' => '1', 'server_modified' => '01-01-01' },
+          { 'path_display' => 'sub_dir_1', '.tag' => 'folder' }
+        ],
+        nil
+      )
+    end
 
     before(:each) do
       allow(Dropbox::API::Client).to receive(:new) do
@@ -77,7 +85,15 @@ describe Agents::DropboxWatchAgent do
 
     context 'subsequent calls' do
 
-      let(:second_result) { Dropbox::API::Object.convert([{ 'path_display' => '2.json', 'rev' => '1', 'server_modified' => '02-02-02' }], nil) }
+      let(:second_result) do
+        Dropbox::API::Object.convert(
+          [
+            { 'path_display' => '2.json', 'rev' => '1', 'server_modified' => '02-02-02' },
+            { 'path_display' => 'sub_dir_2', '.tag' => 'folder' }
+          ],
+          nil
+        )
+      end
 
       before(:each) do
         @agent.memory = { 'contents' => 'not_empty' }

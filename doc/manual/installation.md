@@ -46,7 +46,7 @@ up-to-date and install it.
 
 Install the required packages (needed to compile Ruby and native extensions to Ruby gems):
 
-    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake nodejs graphviz jq shared-mime-info
+    sudo apt-get install -y runit build-essential git zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate pkg-config cmake nodejs graphviz jq shared-mime-info
 
 
 ### Debian Stretch
@@ -72,8 +72,8 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.7.tar.bz2 | tar xj
-    cd ruby-2.7.7
+    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.2.tar.bz2 | tar xj
+    cd ruby-3.2.2
     ./configure --disable-install-rdoc
     make -j`nproc`
     sudo make install
@@ -91,14 +91,18 @@ Create a user for Huginn:
 
 ## 4. Database
 
+### MySQL / MariaDB
+
 Install the database packages
 
     sudo apt-get install -y mysql-server mysql-client libmysqlclient-dev
 
 For Debian Stretch, replace `libmysqlclient-dev` with `default-libmysqlclient-dev`. See the [additional notes section](#additional-notes) for more information.
-For Debian BullEye:
+
+For Debian BullsEye:
+
     sudo apt-get install -y default-mysql-server default-mysql-client default-libmysqlclient-dev
-    
+
 Check the installed MySQL version (remember if its >= 5.5.3 for the `.env` configuration done later):
 
     mysql --version
@@ -148,6 +152,27 @@ You should now see `ERROR 1049 (42000): Unknown database 'huginn_production'` wh
 
 You are done installing the database and can go back to the rest of the installation.
 
+### PostgreSQL
+
+Install the database packages
+
+    sudo apt-get install -y postgresql libpq-dev
+
+Create a user for Huginn and set its database connection password. If you want the user to be able to create the database, add `-d`
+
+    sudo -u postgres -H createuser -P huginn
+
+Create a database
+
+    sudo -u postgres -H createdb -O huginn -T template0 huginn_production
+
+Try connecting to the new database with the new user
+
+    sudo -u huginn psql -h localhost -W huginn_production
+
+    # Type the password you set earlier
+
+You should now be greeted by the `psql` interactive client and be connected to the `huginn_production` database. Quit the database session with `\q` or `CTRL-D`
 
 ## 5. Huginn
 
@@ -202,6 +227,19 @@ If you are using a local MySQL server the database configuration should look lik
     # set DATABASE_ENCODING to utf8mb4 instead of utf8 so that the
     # database can hold 4-byte UTF-8 characters like emoji.
     #DATABASE_ENCODING=utf8mb4
+
+If you are using a local PostgreSQL server the database configuration should look like this (use the password of the huginn PostgreSQL user you created earlier):
+
+    DATABASE_ADAPTER=postgresql
+    DATABASE_RECONNECT=true
+    DATABASE_NAME=huginn_production
+    DATABASE_POOL=20
+    DATABASE_USERNAME=huginn
+    DATABASE_PASSWORD='$password'
+    DATABASE_HOST=localhost
+    DATABASE_PORT=5432
+
+    DATABASE_ENCODING=utf8
 
 **Important**: Uncomment the RAILS_ENV setting to run Huginn in the production rails environment
 
@@ -266,6 +304,9 @@ Enable (remove the comment) [from these lines](https://github.com/huginn/huginn/
 
 **Note:** Ensure you have no leading spaces before `web:` or `jobs:` in your `Procfile` file.
 
+If you use a directory other than `/home/huginn/huginn/` for the app, change the location of the `runit` logfile in `lib/tasks/production.rake`, for example:
+    run('foreman export runit -a huginn -l /opt/huginn/log /etc/service')
+
 Export the init scripts:
 
     sudo bundle exec rake production:export
@@ -276,6 +317,7 @@ Export the init scripts:
 
     sudo cp deployment/logrotate/huginn /etc/logrotate.d/huginn
 
+Change the location of the log directory if you have chosen to log to a different directory other than `/home/huginn/huginn/log/`
 
 ### Ensure Your Huginn Instance Is Running
 

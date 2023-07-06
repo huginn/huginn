@@ -65,7 +65,9 @@ describe Agents::S3Agent do
 
   describe "#validating" do
     it "validates the key" do
-      expect(@checker).to receive(:client) { raise Aws::S3::Errors::SignatureDoesNotMatch.new('', '') }
+      expect(@checker).to receive(:client) {
+        Aws::S3::Client.new(stub_responses: { list_buckets: ['SignatureDoesNotMatch'] })
+      }
       expect(@checker.validate_access_key_id).to be_falsy
     end
 
@@ -139,15 +141,19 @@ describe Agents::S3Agent do
 
       context "error handling" do
         it "handles AccessDenied exceptions" do
-          expect(@checker).to receive(:get_bucket_contents) { raise Aws::S3::Errors::AccessDenied.new('', '') }
+          expect(@checker).to receive(:client) {
+            Aws::S3::Client.new(stub_responses: { list_objects: ['AccessDenied'] })
+          }
           expect { @checker.check }.to change(AgentLog, :count).by(1)
           expect(AgentLog.last.message).to match(/Could not access 'testbucket' Aws::S3::Errors::AccessDenied/)
         end
 
         it "handles generic S3 exceptions" do
-          expect(@checker).to receive(:get_bucket_contents) { raise Aws::S3::Errors::PermanentRedirect.new('', 'error') }
+          expect(@checker).to receive(:client) {
+            Aws::S3::Client.new(stub_responses: { list_objects: ['PermanentRedirect'] })
+          }
           expect { @checker.check }.to change(AgentLog, :count).by(1)
-          expect(AgentLog.last.message).to eq("Aws::S3::Errors::PermanentRedirect: error")
+          expect(AgentLog.last.message).to eq("Aws::S3::Errors::PermanentRedirect: stubbed-response-error-message")
         end
       end
     end

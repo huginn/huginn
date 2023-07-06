@@ -5,7 +5,7 @@ module Agents
     can_dry_run!
     cannot_receive_events!
 
-    description <<-MD
+    description <<~MD
       The Twitter Favorites List Agent follows the favorites list of a specified Twitter user.
 
       #{twitter_dependencies_missing if dependencies_missing?}
@@ -72,7 +72,7 @@ module Agents
       tweets = twitter.favorites(interpolated[:username], opts)
       memory[:last_seen] ||= []
 
-      tweets.each do |tweet|
+      tweets.sort_by(&:id).each do |tweet|
         next if memory[:last_seen].include?(tweet.id) || tweet.created_at < starting_at
 
         memory[:last_seen].push(tweet.id)

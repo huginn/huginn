@@ -7,10 +7,10 @@ describe Agents::TriggerAgent do
       'options' => {
         'expected_receive_period_in_days' => 2,
         'rules' => [{
-                      'type' => "regex",
-                      'value' => "a\\db",
-                      'path' => "foo.bar.baz",
-                    }],
+          'type' => "regex",
+          'value' => "a\\db",
+          'path' => "foo.bar.baz",
+        }],
         'message' => "I saw '{{foo.bar.baz}}' from {{name}}"
       }
     }
@@ -21,7 +21,7 @@ describe Agents::TriggerAgent do
 
     @event = Event.new
     @event.agent = agents(:bob_rain_notifier_agent)
-    @event.payload = { 'foo' => { "bar" => { 'baz' => "a2b" }},
+    @event.payload = { 'foo' => { "bar" => { 'baz' => "a2b" } },
                        'name' => "Joe" }
   end
 
@@ -82,9 +82,13 @@ describe Agents::TriggerAgent do
     it "should validate the three fields in each rule" do
       @checker.options['rules'] << { 'path' => "foo", 'type' => "fake", 'value' => "6" }
       expect(@checker).not_to be_valid
-      @checker.options['rules'].last['type'] = "field>=value"
+      @checker.options['rules'].last['type'] = "field!=value"
       expect(@checker).to be_valid
       @checker.options['rules'].last.delete('value')
+      expect(@checker).not_to be_valid
+      @checker.options['rules'].last['value'] = ''
+      expect(@checker).to be_valid
+      @checker.options['rules'].last['path'] = ''
       expect(@checker).not_to be_valid
     end
 
@@ -115,7 +119,7 @@ describe Agents::TriggerAgent do
       @event.payload['foo']['bar']['baz'] = "a222b"
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @event.payload['foo']['bar']['baz'] = "a2b"
       expect {
@@ -132,7 +136,7 @@ describe Agents::TriggerAgent do
       }
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @event.payload['foo']['bar']['baz'] = "a2b"
       expect {
@@ -155,7 +159,7 @@ describe Agents::TriggerAgent do
 
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @event.payload['foo']['bar']['baz'] = "a22b"
       expect {
@@ -173,7 +177,7 @@ describe Agents::TriggerAgent do
 
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @event.payload['foo']['bar']['baz'] = "a3b"
       expect {
@@ -198,7 +202,7 @@ describe Agents::TriggerAgent do
       @checker.options['rules'].first['value'] = 3
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
     end
 
     it "handles array of numerical comparisons" do
@@ -213,7 +217,7 @@ describe Agents::TriggerAgent do
       @checker.options['rules'].first['value'] = [4, 3]
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
     end
 
     it "handles exact comparisons" do
@@ -223,7 +227,7 @@ describe Agents::TriggerAgent do
       @checker.options['rules'].first['value'] = "hello there"
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @checker.options['rules'].first['value'] = "hello world"
       expect {
@@ -238,7 +242,7 @@ describe Agents::TriggerAgent do
       @checker.options['rules'].first['value'] = ["hello there", "hello universe"]
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @checker.options['rules'].first['value'] = ["hello world", "hello universe"]
       expect {
@@ -253,7 +257,7 @@ describe Agents::TriggerAgent do
 
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @checker.options['rules'].first['value'] = "hello there"
 
@@ -269,7 +273,7 @@ describe Agents::TriggerAgent do
 
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @checker.options['rules'].first['value'] = ["hello there", "hello world"]
 
@@ -285,13 +289,13 @@ describe Agents::TriggerAgent do
 
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @checker.options['rules'].first['value'] = ["hello there", "hello world"]
 
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @checker.options['rules'].first['value'] = ["hello there", "hello here"]
 
@@ -312,22 +316,22 @@ describe Agents::TriggerAgent do
       @checker.options['rules'].first['path'] = "foo"
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
 
       @checker.options['rules'].first['value'] = "hi"
       expect {
         @checker.receive([@event])
-      }.not_to change { Event.count }
+      }.not_to(change { Event.count })
     end
 
     it "handles multiple events" do
       event2 = Event.new
       event2.agent = agents(:bob_weather_agent)
-      event2.payload = { 'foo' => { 'bar' => { 'baz' => "a2b" }}}
+      event2.payload = { 'foo' => { 'bar' => { 'baz' => "a2b" } } }
 
       event3 = Event.new
       event3.agent = agents(:bob_weather_agent)
-      event3.payload = { 'foo' => { 'bar' => { 'baz' => "a222b" }}}
+      event3.payload = { 'foo' => { 'bar' => { 'baz' => "a222b" } } }
 
       expect {
         @checker.receive([@event, event2, event3])
@@ -376,7 +380,7 @@ describe Agents::TriggerAgent do
 
         expect {
           @checker.receive([@event])
-        }.not_to change { Event.count }
+        }.not_to(change { Event.count })
       end
 
       it "can accept a partial rule set match when 'must_match' is present and less than the total number of rules" do
@@ -392,8 +396,7 @@ describe Agents::TriggerAgent do
 
         expect {
           @checker.receive([@event])
-        }.to change { Event.count }         # but the first one matches
-
+        }.to(change { Event.count }) # but the first one matches
 
         @checker.options['must_match'] = "2"
 
@@ -407,7 +410,7 @@ describe Agents::TriggerAgent do
 
         expect {
           @checker.receive([@event])
-        }.not_to change { Event.count }     # only 1 matches, we needed 2
+        }.not_to(change { Event.count })     # only 1 matches, we needed 2
       end
     end
 
@@ -425,7 +428,7 @@ describe Agents::TriggerAgent do
 
         expect {
           @checker.receive([@event])
-        }.not_to change { Event.count }
+        }.not_to(change { Event.count })
 
         @checker.options['rules'].first['value'] = 6
         expect {
@@ -440,7 +443,7 @@ describe Agents::TriggerAgent do
 
         @checker.receive([@event])
 
-        expect(@checker.most_recent_event.payload).to eq(@event.payload.merge(:message => "I saw '5' from Joe"))
+        expect(@checker.most_recent_event.payload).to eq(@event.payload.merge(message: "I saw '5' from Joe"))
       end
     end
   end

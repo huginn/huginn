@@ -11,7 +11,7 @@ module Agents
     emits_file_pointer!
 
     description do
-      <<-MD
+      <<~MD
         The Ftp Site Agent checks an FTP site and creates Events based on newly uploaded files in a directory. When receiving events it creates files on the configured FTP server.
 
         #{'## Include `net-ftp-list` in your Gemfile to use this Agent!' if dependencies_missing?}
@@ -40,7 +40,7 @@ module Agents
       MD
     end
 
-    event_description <<-MD
+    event_description <<~MD
       Events look like this:
 
           {
@@ -83,7 +83,7 @@ module Agents
           URI::FTP === uri or raise
           errors.add(:base, "url must end with a slash") if uri.path.present? && !uri.path.end_with?('/')
         end
-      rescue
+      rescue StandardError
         errors.add(:base, "url must be a valid FTP URL")
       end
 
@@ -118,18 +118,20 @@ module Agents
       if (timestamp = options['timestamp']).present?
         begin
           Time.parse(timestamp)
-        rescue
+        rescue StandardError
           errors.add(:base, "timestamp cannot be parsed as time")
         end
       end
 
       if options['expected_update_period_in_days'].present?
-        errors.add(:base, "Invalid expected_update_period_in_days format") unless is_positive_integer?(options['expected_update_period_in_days'])
+        errors.add(:base,
+                   "Invalid expected_update_period_in_days format") unless is_positive_integer?(options['expected_update_period_in_days'])
       end
     end
 
     def check
       return if interpolated['mode'] != 'read'
+
       saving_entries do |found|
         each_entry { |filename, mtime|
           found[filename, mtime]
@@ -139,9 +141,14 @@ module Agents
 
     def receive(incoming_events)
       return if interpolated['mode'] != 'write'
+
       incoming_events.each do |event|
         mo = interpolated(event)
-        mo['data'].encode!(interpolated['force_encoding'], invalid: :replace, undef: :replace) if interpolated['force_encoding'].present?
+        mo['data'].encode!(
+          interpolated['force_encoding'],
+          invalid: :replace,
+          undef: :replace
+        ) if interpolated['force_encoding'].present?
         open_ftp(base_uri) do |ftp|
           ftp.storbinary("STOR #{mo['filename']}", StringIO.new(mo['data']), Net::FTP::DEFAULT_BLOCKSIZE)
         end
@@ -168,7 +175,7 @@ module Agents
           entry = Net::FTP::List.parse line
           filename = entry.basename
           mtime = Time.parse(entry.mtime.to_s).utc
-          
+
           patterns.any? { |pattern|
             File.fnmatch?(pattern, filename)
           } or next

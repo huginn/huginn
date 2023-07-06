@@ -3,7 +3,7 @@ module Agents
     include FormConfigurable
     cannot_be_scheduled!
 
-    description <<-MD
+    description <<~MD
       The De-duplication Agent receives a stream of events and remits the event if it is not a duplicate.
 
       `property` the value that should be used to determine the uniqueness of the event (empty to use the whole payload)
@@ -13,7 +13,7 @@ module Agents
       `expected_update_period_in_days` is used to determine if the Agent is working.
     MD
 
-    event_description <<-MD
+    event_description <<~MD
       The DeDuplicationAgent just reemits events it received.
     MD
 
@@ -56,18 +56,22 @@ module Agents
     def handle(opts, event = nil)
       property = get_hash(options['property'].blank? ? JSON.dump(event.payload) : opts['property'])
       if is_unique?(property)
-        created_event = create_event :payload => event.payload
+        outbound_event = create_event payload: event.payload
 
-        log("Propagating new event as '#{property}' is a new unique property.", :inbound_event => event )
+        log(
+          "Propagating new event as '#{property}' is a new unique property.",
+          inbound_event: event,
+          outbound_event:
+        )
         update_memory(property, opts['lookback'].to_i)
       else
-        log("Not propagating as incoming event is a duplicate.", :inbound_event => event )
+        log("Not propagating as incoming event is a duplicate.", inbound_event: event)
       end
     end
 
     def get_hash(property)
       if property.to_s.length > 10
-        Zlib::crc32(property).to_s
+        Zlib.crc32(property).to_s
       else
         property
       end

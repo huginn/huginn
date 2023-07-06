@@ -98,7 +98,7 @@ In newer versions of Docker you are able to pass your own .env file in to the co
 
 You don't need to do this on your own, but if you really want run this command in the Huginn root directory:
 
-    bin/docker_wrapper build --rm=true --tag={yourname}/huginn -f docker/single-process/Dockerfile .
+    docker build --rm=true --tag={yourname}/huginn -f docker/single-process/Dockerfile .
 
 ## Source
 
