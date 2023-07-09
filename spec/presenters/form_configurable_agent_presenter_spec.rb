@@ -6,9 +6,11 @@ describe FormConfigurableAgentPresenter do
     include FormConfigurable
 
     form_configurable :string, roles: :validatable
+    form_configurable :number, type: :number, html_options: { min: 0 }
     form_configurable :text, type: :text, roles: :completable
     form_configurable :boolean, type: :boolean
     form_configurable :array, type: :array, values: [1, 2, 3]
+    form_configurable :json, type: :json
   end
 
   before(:all) do
@@ -25,6 +27,21 @@ describe FormConfigurableAgentPresenter do
           role: 'validatable form-configurable',
           type: 'text',
           name: 'agent[options][string]'
+        }
+      )
+    )
+  end
+
+  it "works for the type :number" do
+    expect(@presenter.option_field_for(:number)).to(
+      have_tag(
+        'input',
+        with: {
+          'data-attribute': 'number',
+          role: 'form-configurable',
+          type: 'number',
+          name: 'agent[options][number]',
+          min: '0',
         }
       )
     )
@@ -65,6 +82,20 @@ describe FormConfigurableAgentPresenter do
           'data-attribute': 'array',
           role: 'completable form-configurable',
           name: 'agent[options][array]'
+        }
+      )
+    )
+  end
+
+  it "works for the type :json" do
+    expect(@presenter.option_field_for(:json)).to(
+      have_tag(
+        'textarea',
+        with: {
+          'data-attribute': 'json',
+          role: 'form-configurable',
+          name: 'agent[options][json]',
+          class: 'live-json-editor',
         }
       )
     )

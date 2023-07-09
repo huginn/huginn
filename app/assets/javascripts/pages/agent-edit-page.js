@@ -16,9 +16,9 @@
 
       // Validate agents_options Json on form submit
       $("form.agent-form").submit(function (e) {
-        if ($("textarea#agent_options").length) {
+        for (const textarea of $("textarea.live-json-editor").toArray()) {
           try {
-            JSON.parse($("#agent_options").val());
+            JSON.parse($(textarea).val());
           } catch (err) {
             e.preventDefault();
             alert(
