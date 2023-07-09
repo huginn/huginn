@@ -88,6 +88,12 @@ describe Agents::TriggerAgent do
       expect(@checker).not_to be_valid
       @checker.options['rules'].last['value'] = ''
       expect(@checker).to be_valid
+      @checker.options['rules'].last['value'] = nil
+      expect(@checker).to be_valid
+      @checker.options['rules'].last.delete('value')
+      expect(@checker).not_to be_valid
+      @checker.options['rules'].last['value'] = ['a']
+      expect(@checker).to be_valid
       @checker.options['rules'].last['path'] = ''
       expect(@checker).not_to be_valid
     end

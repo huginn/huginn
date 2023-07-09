@@ -55,7 +55,7 @@ module Agents
       when Hash
         VALID_COMPARISON_TYPES.include?(rule['type']) &&
           /\S/.match?(rule['path']) &&
-          rule['value'].is_a?(String)
+          rule.key?('value')
       else
         false
       end
