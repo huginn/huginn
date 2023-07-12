@@ -263,6 +263,12 @@ module LiquidInterpolatable
       JSON.dump(input)
     end
 
+    def fromjson(input)
+      JSON.parse(input.to_s)
+    rescue StandardError
+      nil
+    end
+
     def hex_encode(input)
       input.to_s.unpack1('H*')
     end
