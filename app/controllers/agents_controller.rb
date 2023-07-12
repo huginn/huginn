@@ -111,8 +111,10 @@ class AgentsController < ApplicationController
   end
 
   def destroy_memory
-    @agent = current_user.agents.find(params[:id])
-    @agent.update!(memory: {})
+    Agent.transaction do
+      @agent = current_user.agents.lock.find(params[:id])
+      @agent.update!(memory: {})
+    end
 
     respond_to do |format|
       format.html { redirect_back "Memory erased for '#{@agent.name}'" }
@@ -132,11 +134,12 @@ class AgentsController < ApplicationController
   def new
     agents = current_user.agents
 
-    if id = params[:id]
-      @agent = agents.build_clone(agents.find(id))
-    else
-      @agent = agents.build
-    end
+    @agent =
+      if id = params[:id]
+        agents.build_clone(agents.find(id))
+      else
+        agents.build
+      end
 
     @agent.scenario_ids = [params[:scenario_id]] if params[:scenario_id] && current_user.scenarios.find_by(id: params[:scenario_id])
 
@@ -169,10 +172,13 @@ class AgentsController < ApplicationController
   end
 
   def update
-    @agent = current_user.agents.find(params[:id])
+    saved = Agent.transaction do
+      @agent = current_user.agents.lock.find(params[:id])
+      @agent.update(agent_params)
+    end
 
     respond_to do |format|
-      if @agent.update(agent_params)
+      if saved
         format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
@@ -184,9 +190,11 @@ class AgentsController < ApplicationController
   end
 
   def leave_scenario
-    @agent = current_user.agents.find(params[:id])
-    @scenario = current_user.scenarios.find(params[:scenario_id])
-    @agent.scenarios.destroy(@scenario)
+    Agent.transaction do
+      @agent = current_user.agents.lock.find(params[:id])
+      @scenario = current_user.scenarios.find(params[:scenario_id])
+      @agent.scenarios.destroy(@scenario)
+    end
 
     respond_to do |format|
       format.html { redirect_back "'#{@agent.name}' removed from '#{@scenario.name}'" }
@@ -195,8 +203,10 @@ class AgentsController < ApplicationController
   end
 
   def destroy
-    @agent = current_user.agents.find(params[:id])
-    @agent.destroy
+    Agent.transaction do
+      @agent = current_user.agents.lock.find(params[:id])
+      @agent.destroy
+    end
 
     respond_to do |format|
       format.html { redirect_back "'#{@agent.name}' deleted" }
@@ -250,6 +260,7 @@ class AgentsController < ApplicationController
   end
 
   private
+
   def show_only_enabled_agents?
     !!cookies[:huginn_view_only_enabled_agents]
   end

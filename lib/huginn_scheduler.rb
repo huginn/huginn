@@ -82,7 +82,9 @@ class Rufus::Scheduler
   # orphaned jobs if any.
   def schedule_scheduler_agents
     scheduled_jobs = Agent.of_type(Agents::SchedulerAgent).map { |scheduler_agent|
-      schedule_scheduler_agent(scheduler_agent)
+      scheduler_agent.with_lock do
+        schedule_scheduler_agent(scheduler_agent)
+      end
     }.compact
 
     (scheduler_agent_jobs - scheduled_jobs).each { |job|

@@ -424,7 +424,7 @@ class Agent < ActiveRecord::Base
           agents_to_events[receiver_agent_id.to_i] << event_id
         end
 
-        Agent.where(id: agents_to_events.keys).each do |agent|
+        Agent.lock.where(id: agents_to_events.keys).each do |agent|
           event_ids = agents_to_events[agent.id].uniq
           agent.update_attribute :last_checked_event_id, event_ids.max
 

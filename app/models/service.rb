@@ -12,10 +12,12 @@ class Service < ActiveRecord::Base
   scope :by_name, lambda { |dir = 'desc'| order("services.name #{dir}") }
 
   def disable_agents(conditions = {})
-    agents.where.not(conditions[:where_not] || {}).each do |agent|
-      agent.service_id = nil
-      agent.disabled = true
-      agent.save!(validate: false)
+    Agent.transaction do
+      agents.lock.where.not(conditions[:where_not] || {}).each do |agent|
+        agent.service_id = nil
+        agent.disabled = true
+        agent.save!(validate: false)
+      end
     end
   end
 

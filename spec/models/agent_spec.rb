@@ -248,11 +248,10 @@ describe Agent do
       end
 
       it "records last_check_at and calls check on the given Agent" do
-        expect(@checker).to receive(:check).once {
-          @checker.options[:new] = true
-        }
-
-        allow(Agent).to receive(:find).with(@checker.id) { @checker }
+        expect_any_instance_of(Agents::SomethingSource).to(receive(:check).once { |agent|
+          expect(agent.id).to eq @checker.id
+          agent.options[:new] = true
+        })
 
         expect(@checker.last_check_at).to be_nil
         Agents::SomethingSource.async_check(@checker.id)
@@ -261,10 +260,11 @@ describe Agent do
       end
 
       it "should log exceptions" do
-        expect(@checker).to receive(:check).once {
+        expect_any_instance_of(Agents::SomethingSource).to(receive(:check).once { |agent|
+          expect(agent.id).to eq @checker.id
           raise "foo"
-        }
-        expect(Agent).to receive(:find).with(@checker.id) { @checker }
+        })
+
         expect {
           Agents::SomethingSource.async_check(@checker.id)
         }.to raise_error(RuntimeError)
@@ -274,8 +274,7 @@ describe Agent do
       end
 
       it "should not run disabled Agents" do
-        expect(Agent).to receive(:find).with(agents(:bob_weather_agent).id) { agents(:bob_weather_agent) }
-        expect(agents(:bob_weather_agent)).not_to receive(:check)
+        expect_any_instance_of(agents(:bob_weather_agent).class).not_to receive(:check)
         agents(:bob_weather_agent).update_attribute :disabled, true
         Agent.async_check(agents(:bob_weather_agent).id)
       end
@@ -426,11 +425,12 @@ describe Agent do
     end
 
     describe ".async_receive" do
+      let(:agent) { agents(:bob_rain_notifier_agent) }
+
       it "should not run disabled Agents" do
-        expect(Agent).to receive(:find).with(agents(:bob_rain_notifier_agent).id) { agents(:bob_rain_notifier_agent) }
-        expect(agents(:bob_rain_notifier_agent)).not_to receive(:receive)
-        agents(:bob_rain_notifier_agent).update_attribute :disabled, true
-        Agent.async_receive(agents(:bob_rain_notifier_agent).id, [1, 2, 3])
+        agent.update_attribute :disabled, true
+        expect_any_instance_of(agent.class).not_to receive(:receive)
+        Agent.async_receive(agent.id, [1, 2, 3])
       end
     end
 
