@@ -108,10 +108,10 @@ describe Agent do
       count = 0
       allow_any_instance_of(UserCredential).to receive(:credential_value) { count += 1 }.and_return("foo")
       expect { expect(agent.credential("aws_secret")).to eq("foo") }.to change { count }.by(1)
-      expect { expect(agent.credential("aws_secret")).to eq("foo") }.not_to change { count }
+      expect { expect(agent.credential("aws_secret")).to eq("foo") }.not_to(change { count })
       agent.reload
       expect { expect(agent.credential("aws_secret")).to eq("foo") }.to change { count }.by(1)
-      expect { expect(agent.credential("aws_secret")).to eq("foo") }.not_to change { count }
+      expect { expect(agent.credential("aws_secret")).to eq("foo") }.not_to(change { count })
     end
   end
 
@@ -235,7 +235,7 @@ describe Agent do
         expect(@checker).to receive(:can_create_events?) { false }
         expect {
           @checker.check
-        }.not_to change { Event.count }
+        }.not_to(change { Event.count })
         expect(@checker.logs.first.message).to match(/cannot create events/i)
       end
     end
@@ -345,11 +345,11 @@ describe Agent do
         Agent.async_check(agents(:bob_weather_agent).id)
         expect {
           Agent.receive!
-        }.to change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+        }.to(change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id })
 
         expect {
           Agent.receive!
-        }.not_to change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+        }.not_to(change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id })
         expect(count).to eq 1
       end
 
@@ -392,7 +392,7 @@ describe Agent do
 
         expect {
           Agent.receive! # event gets propagated
-        }.to change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+        }.to(change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id })
 
         # This agent creates a few events before we link to it, but after our last check.
         agent2.check
@@ -404,14 +404,14 @@ describe Agent do
 
         expect {
           Agent.receive! # but we don't receive those events because they're too old
-        }.not_to change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+        }.not_to(change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id })
 
         # Now a new event is created by agent2
         agent2.check
 
         expect {
           Agent.receive! # and we receive it
-        }.to change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id }
+        }.to(change { agents(:bob_rain_notifier_agent).reload.last_checked_event_id })
 
         expect(count).to eq 2
       end
@@ -699,7 +699,7 @@ describe Agent do
               @agent.options[:foo] = "bar1"
               @agent.keep_events_for = 3.days
               @agent.save!
-            }.to change { @event.reload.expires_at }
+            }.to(change { @event.reload.expires_at })
             expect(@event.expires_at.to_i).to be_within(2).of(3.days.from_now.to_i)
           end
         end
@@ -712,7 +712,7 @@ describe Agent do
             @agent.options[:foo] = "bar2"
             @agent.keep_events_for = 3.days
             @agent.save!
-          }.to change { @event.reload.expires_at }
+          }.to(change { @event.reload.expires_at })
           expect(@event.expires_at.to_i).to be_within(60 * 61).of(1.days.from_now.to_i) # The larger time is to deal with daylight savings
         end
 
@@ -954,7 +954,7 @@ describe Agent do
           Agent.async_check(agent1.id)
           Agent.receive!
         }.to change { agent1.events.count }.by(1)
-      }.not_to change { agent2.events.count }
+      }.not_to(change { agent2.events.count })
 
       agent2.disabled = false
       agent2.drop_pending_events = true
@@ -962,7 +962,7 @@ describe Agent do
 
       expect {
         Agent.receive!
-      }.not_to change { agent2.events.count }
+      }.not_to(change { agent2.events.count })
     end
   end
 end

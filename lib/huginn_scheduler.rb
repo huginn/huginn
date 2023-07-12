@@ -49,6 +49,7 @@ class Rufus::Scheduler
     else
       if job
         return job if agent.memory['scheduled_at'] == job.scheduled_at.to_i
+
         puts "Rescheduling SchedulerAgent##{agent.id}"
         job.unschedule
       else
@@ -133,7 +134,7 @@ class HuginnScheduler < LongRunnable::Worker
 
     # Schedule repeating events.
     SCHEDULE_TO_CRON.keys.each do |schedule|
-      cron "#{SCHEDULE_TO_CRON[schedule]} #{tzinfo_friendly_timezone}"  do
+      cron "#{SCHEDULE_TO_CRON[schedule]} #{tzinfo_friendly_timezone}" do
         run_schedule "every_#{schedule}"
       end
     end
@@ -172,6 +173,7 @@ class HuginnScheduler < LongRunnable::Worker
   def propagate!
     with_mutex do
       return unless AgentPropagateJob.can_enqueue?
+
       puts "Queuing event propagation"
       AgentPropagateJob.perform_later
     end
@@ -202,11 +204,9 @@ class HuginnScheduler < LongRunnable::Worker
     end
   end
 
-  def with_mutex
+  def with_mutex(&block)
     mutex.synchronize do
-      ActiveRecord::Base.connection_pool.with_connection do
-        yield
-      end
+      ActiveRecord::Base.connection_pool.with_connection(&block)
     end
   end
 end

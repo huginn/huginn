@@ -4,7 +4,8 @@ class AgentsController < ApplicationController
   include SortableTable
 
   def index
-    set_table_sort sorts: %w[name created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
+    set_table_sort sorts: %w[name created_at last_check_at last_event_at last_receive_at],
+                   default: { created_at: :desc }
 
     @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
@@ -31,7 +32,7 @@ class AgentsController < ApplicationController
   def handle_details_post
     @agent = current_user.agents.find(params[:id])
     if @agent.respond_to?(:handle_details_post)
-      render :json => @agent.handle_details_post(params) || {}
+      render json: @agent.handle_details_post(params) || {}
     else
       @agent.error "#handle_details_post called on an instance of #{@agent.class} that does not define it."
       head 500
@@ -53,16 +54,16 @@ class AgentsController < ApplicationController
     initialize_presenter
 
     render json: {
-        can_be_scheduled: @agent.can_be_scheduled?,
-        default_schedule: @agent.default_schedule,
-        can_receive_events: @agent.can_receive_events?,
-        can_create_events: @agent.can_create_events?,
-        can_control_other_agents: @agent.can_control_other_agents?,
-        can_dry_run: @agent.can_dry_run?,
-        options: @agent.default_options,
-        description_html: @agent.html_description,
-        oauthable: render_to_string(partial: 'oauth_dropdown', locals: { agent: @agent }),
-        form_options: render_to_string(partial: 'options', locals: { agent: @agent })
+      can_be_scheduled: @agent.can_be_scheduled?,
+      default_schedule: @agent.default_schedule,
+      can_receive_events: @agent.can_receive_events?,
+      can_create_events: @agent.can_create_events?,
+      can_control_other_agents: @agent.can_control_other_agents?,
+      can_dry_run: @agent.can_dry_run?,
+      options: @agent.default_options,
+      description_html: @agent.html_description,
+      oauthable: render_to_string(partial: 'oauth_dropdown', locals: { agent: @agent }),
+      form_options: render_to_string(partial: 'options', locals: { agent: @agent })
     }
   end
 
@@ -71,8 +72,8 @@ class AgentsController < ApplicationController
       agents.map(&:html_event_description).uniq.map { |desc|
         "<p><strong>#{type}</strong><br />" + desc + "</p>"
       }
-    }.flatten.join()
-    render :json => { :description_html => html }
+    }.flatten.join
+    render json: { description_html: html }
   end
 
   def reemit_events
@@ -101,7 +102,9 @@ class AgentsController < ApplicationController
     respond_to do |format|
       if AgentPropagateJob.can_enqueue?
         details = Agent.receive! # Eventually this should probably be scoped to the current_user.
-        format.html { redirect_back "Queued propagation calls for #{details[:event_count]} event(s) on #{details[:agent_count]} agent(s)" }
+        format.html {
+          redirect_back "Queued propagation calls for #{details[:event_count]} event(s) on #{details[:agent_count]} agent(s)"
+        }
         format.json { head :ok }
       else
         format.html { redirect_back "Event propagation is already scheduled to run." }
