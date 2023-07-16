@@ -303,6 +303,16 @@ describe LiquidInterpolatable::Filters do
     end
   end
 
+  describe 'fromjson' do
+    let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
+
+    it 'should parse a JSON string' do
+      agent.interpolation_context['json'] = '{"array": ["a", "b", "c"], "number": 42}'
+      agent.options['key'] = '{% assign obj = json | fromjson %}{{ obj["array"][1] }} and {{ obj.number }}'
+      expect(agent.interpolated['key']).to eq('b and 42')
+    end
+  end
+
   context 'as_object' do
     let(:agent) { Agents::InterpolatableAgent.new(name: "test") }
 
