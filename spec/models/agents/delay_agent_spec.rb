@@ -1,25 +1,24 @@
 require 'rails_helper'
 
 describe Agents::DelayAgent do
-  let(:agent) do
-    _agent = Agents::DelayAgent.new(name: 'My DelayAgent')
-    _agent.options = _agent.default_options.merge('max_events' => 2)
-    _agent.user = users(:bob)
-    _agent.sources << agents(:bob_website_agent)
-    _agent.save!
-    _agent
+  let(:agent) {
+    Agents::DelayAgent.create!(
+      name: 'My DelayAgent',
+      user: users(:bob),
+      options: default_options.merge('max_events' => 2),
+      sources: [agents(:bob_website_agent)]
+    )
+  }
+
+  let(:default_options) { Agents::DelayAgent.new.default_options }
+
+  def create_event(value)
+    Event.create!(payload: { value: }, agent: agents(:bob_website_agent))
   end
 
-  def create_event
-    _event = Event.new(payload: { random: rand })
-    _event.agent = agents(:bob_website_agent)
-    _event.save!
-    _event
-  end
-
-  let(:first_event) { create_event }
-  let(:second_event) { create_event }
-  let(:third_event) { create_event }
+  let(:first_event) { create_event("one") }
+  let(:second_event) { create_event("two") }
+  let(:third_event) { create_event("three") }
 
   describe "#working?" do
     it "checks if events have been received within expected receive period" do
@@ -45,6 +44,21 @@ describe Agents::DelayAgent do
       agent.options['max_events'] = "0"
       expect(agent).not_to be_valid
       agent.options['max_events'] = "10"
+      expect(agent).to be_valid
+    end
+
+    it "should validate emit_interval" do
+      agent.options.delete('emit_interval')
+      expect(agent).to be_valid
+      agent.options['emit_interval'] = "0"
+      expect(agent).to be_valid
+      agent.options['emit_interval'] = "0.5"
+      expect(agent).to be_valid
+      agent.options['emit_interval'] = 0.5
+      expect(agent).to be_valid
+      agent.options['emit_interval'] = ''
+      expect(agent).not_to be_valid
+      agent.options['emit_interval'] = nil
       expect(agent).to be_valid
     end
 
@@ -98,30 +112,62 @@ describe Agents::DelayAgent do
       agent.receive([first_event, second_event, third_event])
       expect(agent.memory['event_ids']).to eq [second_event.id, third_event.id]
 
+      expect(agent).to receive(:sleep).with(0).once
+
       expect {
         agent.check
       }.to change { agent.events.count }.by(2)
 
-      events = agent.events.reorder('events.id desc')
+      events = agent.events.reorder(id: :desc)
       expect(events.first.payload).to eq third_event.payload
       expect(events.second.payload).to eq second_event.payload
 
       expect(agent.memory['event_ids']).to eq []
     end
 
-    it "re-emits max_emitted_events and clears just them from the memory" do
-      agent.options['max_emitted_events'] = 1
-      agent.receive([first_event, second_event, third_event])
-      expect(agent.memory['event_ids']).to eq [second_event.id, third_event.id]
+    context "with events_order and emit_interval" do
+      before do
+        agent.update!(options: agent.options.merge(
+          'events_order' => ['{{ value }}'],
+          'emit_interval' => 1,
+        ))
+      end
 
-      expect {
-        agent.check
-      }.to change { agent.events.count }.by(1)
+      it "re-emits Events in that order and clears the memory with that interval" do
+        agent.receive([first_event, second_event, third_event])
+        expect(agent.memory['event_ids']).to eq [second_event.id, third_event.id]
 
-      events = agent.events.reorder('events.id desc')
-      expect(agent.memory['event_ids']).to eq [third_event.id]
-      expect(events.first.payload).to eq second_event.payload
+        expect(agent).to receive(:sleep).with(1).once
 
+        expect {
+          agent.check
+        }.to change { agent.events.count }.by(2)
+
+        events = agent.events.reorder(id: :desc)
+        expect(events.first.payload).to eq second_event.payload
+        expect(events.second.payload).to eq third_event.payload
+
+        expect(agent.memory['event_ids']).to eq []
+      end
+    end
+
+    context "with max_emitted_events" do
+      before do
+        agent.update!(options: agent.options.merge('max_emitted_events' => 1))
+      end
+
+      it "re-emits max_emitted_events and clears just them from the memory" do
+        agent.receive([first_event, second_event, third_event])
+        expect(agent.memory['event_ids']).to eq [second_event.id, third_event.id]
+
+        expect {
+          agent.check
+        }.to change { agent.events.count }.by(1)
+
+        events = agent.events.reorder(id: :desc)
+        expect(agent.memory['event_ids']).to eq [third_event.id]
+        expect(events.first.payload).to eq second_event.payload
+      end
     end
   end
 end
