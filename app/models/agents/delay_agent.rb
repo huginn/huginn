@@ -14,6 +14,8 @@ module Agents
       `expected_receive_period_in_days` is used to determine if the Agent is working. Set it to the maximum number of days
       that you anticipate passing without this Agent receiving an incoming Event.
 
+      `emit_interval` specifies the interval in seconds between emitting events.  This is zero (no interval) by default.
+
       `max_emitted_events` is used to limit the number of the maximum events which should be created. If you omit this DelayAgent will create events for every event stored in the memory.
 
       # Ordering Events
@@ -23,10 +25,11 @@ module Agents
 
     def default_options
       {
-        'expected_receive_period_in_days' => '10',
-        'max_events' => '100',
+        'expected_receive_period_in_days' => 10,
+        'max_events' => 100,
         'keep' => 'newest',
         'max_emitted_events' => '',
+        'emit_interval' => 0,
         'events_order' => [],
       }
     end
@@ -35,6 +38,7 @@ module Agents
     form_configurable :max_events, type: :number, html_options: { min: 1 }
     form_configurable :keep, type: :array, values: %w[newest oldest]
     form_configurable :max_emitted_events, type: :number, html_options: { min: 0 }
+    form_configurable :emit_interval, type: :number, html_options: { min: 0, step: 0.001 }
     form_configurable :events_order, type: :json
 
     def validate_options
@@ -55,6 +59,10 @@ module Agents
         unless interpolated['max_emitted_events'].to_i > 0
           errors.add(:base, "The 'max_emitted_events' option is optional and should be an integer greater than 0")
         end
+      end
+
+      unless interpolated['emit_interval'] in nil | 0.. | /\A\d+(?:\.\d+)?\z/
+        errors.add(:base, "The 'emit_interval' option should be a non-negative number if set")
       end
     end
 
@@ -77,22 +85,24 @@ module Agents
     end
 
     def check
-      if memory['event_ids'].present?
-        events = received_events.where(id: memory['event_ids']).reorder('events.id asc')
-        if interpolated['max_emitted_events'].present?
-          limit = interpolated['max_emitted_events'].to_i
-          events =
-            if options[SortableEvents::EVENTS_ORDER_KEY].present?
-              sort_events(events).first(limit)
-            else
-              events.limit(limit)
-            end
-        end
+      return if memory['event_ids'].blank?
 
-        events.each do |event|
-          create_event payload: event.payload
-          memory['event_ids'].delete(event.id)
-        end
+      events = received_events.where(id: memory['event_ids']).reorder(:id).to_a
+
+      if interpolated[SortableEvents::EVENTS_ORDER_KEY].present?
+        events = sort_events(events)
+      end
+
+      if interpolated['max_emitted_events'].present?
+        events[interpolated['max_emitted_events'].to_i..] = []
+      end
+
+      interval = (options['emit_interval'].presence&.to_f || 0).clamp(0..)
+
+      events.each_with_index do |event, i|
+        sleep interval unless i.zero?
+        create_event payload: event.payload
+        memory['event_ids'].delete(event.id)
       end
     end
   end
