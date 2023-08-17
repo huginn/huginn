@@ -39,12 +39,12 @@ jobs: bundle exec rails runner bin/threaded.rb
 # Every uncommented line starts an additional DelayedJob worker. This works for development, production
 # and for the threaded and separate worker processes. Keep in mind one worker needs about 300MB of RAM.
 #
-#dj2: bundle exec script/delayed_job -i 2 run
-#dj3: bundle exec script/delayed_job -i 3 run
-#dj4: bundle exec script/delayed_job -i 4 run
-#dj5: bundle exec script/delayed_job -i 5 run
-#dj6: bundle exec script/delayed_job -i 6 run
-#dj7: bundle exec script/delayed_job -i 7 run
-#dj8: bundle exec script/delayed_job -i 8 run
-#dj9: bundle exec script/delayed_job -i 9 run
-#dj10: bundle exec script/delayed_job -i 10 run
+#dj2: bundle exec script/delayed_job -i2 run
+#dj3: bundle exec script/delayed_job -i3 run
+#dj4: bundle exec script/delayed_job -i4 run
+#dj5: bundle exec script/delayed_job -i5 run
+#dj6: bundle exec script/delayed_job -i6 run
+#dj7: bundle exec script/delayed_job -i7 run
+#dj8: bundle exec script/delayed_job -i8 run
+#dj9: bundle exec script/delayed_job -i9 run
+#dj10: bundle exec script/delayed_job -i10 run
