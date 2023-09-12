@@ -96,6 +96,10 @@ module Agents
       interpolated["service"].presence && interpolated["service"].presence.downcase == "wunderground"
     end
 
+    def darksky?
+      interpolated["service"].presence && interpolated["service"].presence.downcase == "darksky"
+    end
+
     VALID_COORDS_REGEX = /^\s*-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*$/
 
     def validate_location
@@ -118,7 +122,8 @@ module Agents
 
     def validate_options
       errors.add(:base,
-                 "The Weather Underground API has been disabled since Jan 1st 2018, please switch to DarkSky") if wunderground?
+                 "The Weather Underground API has been disabled since Jan 1st 2018, please switch to Pirate Weather") if wunderground?
+      errors.add(:base, "The Dark Sky API has been disabled since March 31, 2023, please switch to Pirate Weather") if darksky?
       validate_location
       errors.add(:base, "api_key is required") unless interpolated['api_key'].present?
       errors.add(:base, "which_day selection is required") unless which_day.present?
