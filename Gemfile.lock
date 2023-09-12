@@ -306,10 +306,6 @@ GEM
       rake
     font-awesome-sass (4.7.0)
       sass (>= 3.2)
-    forecast_io (2.0.2)
-      faraday
-      hashie
-      multi_json
     formatador (1.1.0)
     fugit (1.8.1)
       et-orbi (~> 1, >= 1.2.7)
@@ -589,6 +585,10 @@ GEM
     parser (3.2.2.1)
       ast (~> 2.4.1)
     pg (1.5.3)
+    pirate_weather_forecast_ruby (0.1.0)
+      faraday
+      hashie
+      multi_json
     polyglot (0.3.5)
     pry (0.14.2)
       coderay (~> 1.1)
@@ -868,7 +868,6 @@ DEPENDENCIES
   feedjira (~> 3.1)
   ffi (>= 1.9.4)
   font-awesome-sass (~> 4.7.0)
-  forecast_io (~> 2.0.0)
   foreman (~> 0.87.2)!
   geokit (~> 1.13)
   geokit-rails (~> 2.3)
@@ -909,6 +908,7 @@ DEPENDENCIES
   omniauth-tumblr
   omniauth-twitter
   pg (~> 1.1)
+  pirate_weather_forecast_ruby
   puma
   rack-livereload
   rails (~> 6.1.7)
