@@ -14,11 +14,11 @@ module Agents
 
       You also must select when you would like to get the weather forecast for using the `which_day` option, where the number 1 represents today, 2 represents tomorrow and so on. Weather forecast inforation is only returned for at most one week at a time.
 
-      The weather forecast information is provided by Dark Sky.
+      The weather forecast information is provided by Pirate Weather, a drop-in replacement for the Dark Sky API (which no longer has a free tier).
 
       The `location` must be a comma-separated string of map co-ordinates (longitude, latitude). For example, San Francisco would be `37.7771,-122.4196`.
 
-      You must set up an [API key for Dark Sky](https://darksky.net/dev/) in order to use this Agent.
+      You must set up an [API key for Pirate Weather](https://pirate-weather.apiable.io/) in order to use this Agent.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
@@ -110,7 +110,7 @@ module Agents
         errors.add(
           :base,
           "Location #{location} is malformed. Location for " +
-          'Dark Sky must be in the format "-00.000,-00.00000". The ' +
+          'Pirate Weather must be in the format "-00.000,-00.00000". The ' +
           "number of decimal places does not matter."
         )
       end
@@ -124,7 +124,7 @@ module Agents
       errors.add(:base, "which_day selection is required") unless which_day.present?
     end
 
-    def dark_sky
+    def pirate_weather
       if key_setup?
         ForecastIO.api_key = interpolated['api_key']
         lat, lng = coordinates
@@ -133,7 +133,7 @@ module Agents
     end
 
     def model(which_day)
-      value = dark_sky[which_day - 1]
+      value = pirate_weather[which_day - 1]
       if value
         timestamp = Time.at(value.time)
         {
