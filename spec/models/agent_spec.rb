@@ -283,7 +283,7 @@ describe Agent do
 
     describe ".receive!" do
       before do
-        stub_request(:any, /darksky/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")),
+        stub_request(:any, /pirateweather/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")),
                                                 status: 200)
       end
 
@@ -931,7 +931,7 @@ describe Agent do
 
   describe ".drop_pending_events" do
     before do
-      stub_request(:any, /darksky/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")),
+      stub_request(:any, /pirateweather/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/weather.json")),
                                               status: 200)
     end
 
