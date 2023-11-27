@@ -84,7 +84,7 @@ describe Agents::EmailDigestAgent do
     end
 
     it "can receive complex events and send them on" do
-      stub_request(:any, /darksky/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
+      stub_request(:any, /pirateweather/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/weather.json")), :status => 200)
       @checker.sources << agents(:bob_weather_agent)
 
       Agent.async_check(agents(:bob_weather_agent).id)

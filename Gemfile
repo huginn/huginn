@@ -30,7 +30,7 @@ end
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
-gem 'forecast_io', '~> 2.0.0'     # WeatherAgent
+gem 'pirate_weather_forecast_ruby'  # WeatherAgent
 gem 'hipchat', '~> 1.2.0'         # HipchatAgent
 gem 'hypdf', bitbucket: 'knu/hypdf_gem', branch: 'uploadio_namespace' # PDFInfoAgent
 gem 'mini_racer'                  # JavaScriptAgent
