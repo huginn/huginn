@@ -53,7 +53,7 @@ module WebRequestConcern
           # Return body as binary if default_encoding is nil
           next if encoding.nil?
         end
-        body.encode!(Encoding::UTF_8, encoding)
+        body.encode!(Encoding::UTF_8, encoding, invalid: :replace, undef: :replace, replace: " " )
       end
     end
   end
