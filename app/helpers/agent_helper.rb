@@ -1,8 +1,7 @@
 module AgentHelper
-
   def agent_show_view(agent)
     path = File.join('agents', 'agent_views', @agent.short_type.underscore, 'show')
-    return self.controller.template_exists?(path, [], true) ? path : nil
+    controller.template_exists?(path, [], true) ? path : nil
   end
 
   def toggle_disabled_text
@@ -32,7 +31,7 @@ module AgentHelper
     else
       [
         builtin_schedule_name(agent.schedule),
-        *(agent_controllers(agent, delimiter))
+        *agent_controllers(agent, delimiter)
       ].join(delimiter).html_safe
     end
   end
@@ -91,7 +90,21 @@ module AgentHelper
 
   def agent_type_select_options
     Rails.cache.fetch('agent_type_select_options') do
-      [['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name, User.new(id: 0), {}).html_description.lines.first.strip)}] }
+      [
+        [
+          'Select an Agent Type',
+          'Agent',
+          { title: '' }
+        ],
+        *Agent.types.select(&:should_run?).map { |type|
+          agent = Agent.build_for_type(type.name, User.new(id: 0), {})
+          [
+            agent_type_to_human(type.name),
+            type,
+            { title: h(agent.html_description.lines.first.strip) }
+          ]
+        }
+      ]
     end
   end
 
@@ -101,15 +114,18 @@ module AgentHelper
     @counter_cache ||= {}
     @counter_cache[agents.__id__] ||= {}.tap do |cache|
       agent_ids = agents.map(&:id)
-      cache[:links_as_receiver] = Hash[Link.where(receiver_id: agent_ids)
-                                           .group(:receiver_id)
-                                           .pluck(:receiver_id, Arel.sql('count(receiver_id) as id'))]
-      cache[:links_as_source]   = Hash[Link.where(source_id: agent_ids)
-                                           .group(:source_id)
-                                           .pluck(:source_id, Arel.sql('count(source_id) as id'))]
-      cache[:control_links_as_controller] = Hash[ControlLink.where(controller_id: agent_ids)
-                                                            .group(:controller_id)
-                                                            .pluck(:controller_id, Arel.sql('count(controller_id) as id'))]
+      cache[:links_as_receiver] = Link.where(receiver_id: agent_ids)
+        .group(:receiver_id)
+        .pluck(:receiver_id, Arel.sql('count(receiver_id) as id'))
+        .to_h
+      cache[:links_as_source] = Link.where(source_id: agent_ids)
+        .group(:source_id)
+        .pluck(:source_id, Arel.sql('count(source_id) as id'))
+        .to_h
+      cache[:control_links_as_controller] = ControlLink.where(controller_id: agent_ids)
+        .group(:controller_id)
+        .pluck(:controller_id, Arel.sql('count(controller_id) as id'))
+        .to_h
     end
   end
 end
