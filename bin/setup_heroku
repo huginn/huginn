@@ -18,7 +18,7 @@ def set_env(key, value)
 end
 
 def check_login!
-  unless File.exists?(File.expand_path("~/.netrc")) && File.read(File.expand_path("~/.netrc")) =~ /heroku/
+  unless File.exist?(File.expand_path("~/.netrc")) && File.read(File.expand_path("~/.netrc")) =~ /heroku/
     puts "It looks like you need to log in to Heroku.  Please run 'heroku auth:login' before continuing."
     exit 1
   end
@@ -39,7 +39,7 @@ elsif info =~ /No app specified/i
   puts "It looks like you don't have a Heroku app set up yet for this repo."
   puts "You can either exit now and run 'heroku create', or I can do it for you."
   if yes?("Would you like me to create a Heroku app for you now in this repo?")
-    puts `heroku create --stack heroku-18`
+    puts `heroku create --stack heroku-22`
     info = capture("heroku info")
   else
     puts "Okay, exiting so you can do it."
