@@ -131,6 +131,8 @@ gem 'sprockets'
 gem 'terser'
 gem 'typhoeus', '~> 1.3.1'
 gem 'uglifier', '~> 2.7.2'
+# Required for the stashboard agent
+gem 'stashboard', '~> 0.0.2', require: false
 
 group :development do
   gem 'better_errors'
