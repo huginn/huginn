@@ -29,4 +29,16 @@ describe JobsHelper do
       expect(relative_distance_of_time_in_words(Time.now+5.minutes)).to eq('in 5m')
     end
   end
+
+  describe "#agent_from_job" do
+    context "when handler does not contain job_data" do
+      before do
+        job.handler = "--- !ruby/object:AgentCheckJob\narguments:\n- 1\n"
+      end
+
+      it "finds the agent for AgentCheckJob" do
+        expect(agent_from_job(job)).to eq(false)
+      end
+    end
+  end
 end
