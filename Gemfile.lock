@@ -880,7 +880,6 @@ DEPENDENCIES
   gmail_xoauth
   google-api-client (~> 0.13)
   google-cloud-translate (~> 2.0)
-  grpc (~> 1.62.0)
   guard
   guard-livereload
   guard-rspec
