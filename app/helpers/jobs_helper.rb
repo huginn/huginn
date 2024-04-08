@@ -23,15 +23,9 @@ module JobsHelper
   #
   # Can return nil, or an instance of Agent.
   def agent_from_job(job)
-<<<<<<< HEAD
     data = YAML.unsafe_load(job.handler.to_s).try(:job_data)
-||||||| parent of feed2ebc (fix: do not find agent from job when no job_data)
-    data = YAML.load(job.handler.to_s).try(:job_data)
-=======
-    data = YAML.load(job.handler.to_s).try(:job_data)
     return false unless data
 
->>>>>>> feed2ebc (fix: do not find agent from job when no job_data)
     case data['job_class']
     when 'AgentCheckJob', 'AgentReceiveJob'
       Agent.find_by_id(data['arguments'][0])
