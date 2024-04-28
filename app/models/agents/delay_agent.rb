@@ -93,7 +93,7 @@ module Agents
         events = sort_events(events)
       end
 
-      if interpolated['max_emitted_events'].present?
+      if interpolated['max_emitted_events'].present? and interpolated['max_emitted_events'].to_i < events.length
         events[interpolated['max_emitted_events'].to_i..] = []
       end
 
