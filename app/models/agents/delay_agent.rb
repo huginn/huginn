@@ -72,15 +72,16 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        memory['event_ids'] ||= []
-        memory['event_ids'] << event.id
-        if memory['event_ids'].length > interpolated['max_events'].to_i
+        event_ids = memory['event_ids'] || []
+        event_ids << event.id
+        if event_ids.length > interpolated['max_events'].to_i
           if options['keep'] == 'newest'
-            memory['event_ids'].shift
+            event_ids.shift
           else
-            memory['event_ids'].pop
+            event_ids.pop
           end
         end
+        memory['event_ids'] = event_ids
       end
     end
 
@@ -93,8 +94,10 @@ module Agents
         events = sort_events(events)
       end
 
-      if interpolated['max_emitted_events'].present? and interpolated['max_emitted_events'].to_i < events.length
-        events[interpolated['max_emitted_events'].to_i..] = []
+      max_emitted_events = interpolated['max_emitted_events'].presence&.to_i
+
+      if max_emitted_events&.< events.length
+        events[max_emitted_events..] = []
       end
 
       interval = (options['emit_interval'].presence&.to_f || 0).clamp(0..)
