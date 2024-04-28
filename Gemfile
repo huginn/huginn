@@ -12,7 +12,6 @@ require File.join(File.dirname(__FILE__), 'lib/gemfile_helper.rb')
 GemfileHelper.load_dotenv do |dotenv_dir|
   path dotenv_dir do
     gem 'dotenv'
-    gem 'dotenv-rails'
   end
 end
 

@@ -93,11 +93,9 @@ GIT
       httparty (> 0.16.0, < 1.0)
 
 PATH
-  remote: vendor/gems/dotenv-2.0.1
+  remote: vendor/gems/dotenv-3.1.0
   specs:
-    dotenv (2.0.1)
-    dotenv-rails (2.0.1)
-      dotenv (= 2.0.1)
+    dotenv (3.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -865,7 +863,6 @@ DEPENDENCIES
   delayed_job_active_record
   devise (~> 4.8)
   dotenv!
-  dotenv-rails!
   dropbox-api!
   em-http-request (~> 1.1.2)
   erector!
