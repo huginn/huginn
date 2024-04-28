@@ -58,7 +58,11 @@ class GemfileHelper
 
     def sanity_check(env)
       return if ENV['CI'] == 'true' || ENV['APP_SECRET_TOKEN'] || !env.empty?
+      # .env is not necessary in bundle update/lock; this helps Renovate
+      return if (File.basename($0) in 'bundle' | 'bundler') && (ARGV.first in 'lock' | 'update')
       puts warning
+      require "shellwords"
+      puts "command: #{[$0, *ARGV].shelljoin}"
       raise "Could not load huginn settings from .env file."
     end
 
