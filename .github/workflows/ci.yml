@@ -70,6 +70,7 @@ jobs:
 
       - name: Coveralls
         uses: coverallsapp/github-action@v1
+        fail-on-error: false
 
   ghcr-build-docker-images:
     name: ghcr-docker-build-${{ matrix.docker_image }}
