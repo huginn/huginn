@@ -10,6 +10,6 @@ ActionMailer::Base.smtp_settings = {
   openssl_verify_mode: ENV['SMTP_OPENSSL_VERIFY_MODE'].presence,
   ca_path: ENV['SMTP_OPENSSL_CA_PATH'].presence,
   ca_file: ENV['SMTP_OPENSSL_CA_FILE'].presence,
-  read_timeout: ENV['SMTP_READ_TIMEOUT'] || nil,
-  open_timeout: ENV['SMTP_OPEN_TIMEOUT'] || nil
+  read_timeout: ENV['SMTP_READ_TIMEOUT']&.to_i,
+  open_timeout: ENV['SMTP_OPEN_TIMEOUT']&.to_i,
  }
