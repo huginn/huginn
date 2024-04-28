@@ -15,6 +15,6 @@
   # as our "lastaction" action:
   lastaction
     pid=/home/huginn/huginn/tmp/pids/unicorn.pid
-    test -s $pid && kill -USR1 "$(cat $pid)"
+    if test -s $pid; then kill -USR1 "$(cat $pid)"; fi
   endscript
 }
