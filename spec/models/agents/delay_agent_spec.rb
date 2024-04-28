@@ -117,11 +117,10 @@ describe Agents::DelayAgent do
       expect {
         agent.check
       }.to change { agent.events.count }.by(2)
-
-      events = agent.events.reorder(id: :desc)
-      expect(events.first.payload).to eq third_event.payload
-      expect(events.second.payload).to eq second_event.payload
-
+      expect(agent.events.take(2).map(&:payload)).to eq [
+        third_event,
+        second_event,
+      ].map(&:payload)
       expect(agent.memory['event_ids']).to eq []
     end
 
@@ -143,9 +142,10 @@ describe Agents::DelayAgent do
           agent.check
         }.to change { agent.events.count }.by(2)
 
-        events = agent.events.reorder(id: :desc)
-        expect(events.first.payload).to eq second_event.payload
-        expect(events.second.payload).to eq third_event.payload
+        expect(agent.events.take(2).map(&:payload)).to eq [
+          second_event,
+          third_event,
+        ].map(&:payload)
 
         expect(agent.memory['event_ids']).to eq []
       end
@@ -156,17 +156,25 @@ describe Agents::DelayAgent do
         agent.update!(options: agent.options.merge('max_emitted_events' => 1))
       end
 
-      it "re-emits max_emitted_events and clears just them from the memory" do
+      it "re-emits max_emitted_events per run" do
         agent.receive([first_event, second_event, third_event])
         expect(agent.memory['event_ids']).to eq [second_event.id, third_event.id]
 
         expect {
           agent.check
         }.to change { agent.events.count }.by(1)
-
-        events = agent.events.reorder(id: :desc)
+        expect(agent.events.take.payload).to eq second_event.payload
         expect(agent.memory['event_ids']).to eq [third_event.id]
-        expect(events.first.payload).to eq second_event.payload
+
+        expect {
+          agent.check
+        }.to change { agent.events.count }.by(1)
+        expect(agent.events.take.payload).to eq third_event.payload
+        expect(agent.memory['event_ids']).to eq []
+
+        expect {
+          agent.check
+        }.not_to(change { agent.events.count })
       end
     end
   end
