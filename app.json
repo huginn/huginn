@@ -22,5 +22,5 @@
     },
     "addons": ["heroku-postgresql"],
     "success_url": "/users/sign_up",
-    "stack": "heroku-18"
+    "stack": "heroku-22"
 }
