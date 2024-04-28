@@ -91,7 +91,7 @@ end
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.3'
-gem 'bundler', '>= 1.5.0'
+gem 'bundler', '>= 2.2.33'
 gem 'coffee-rails', '~> 5'
 gem 'daemons', '~> 1.1.9'
 gem 'delayed_job'
