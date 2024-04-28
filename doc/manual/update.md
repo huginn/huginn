@@ -62,8 +62,8 @@ Upgrade when required:
 
 ```
 mkdir /tmp/ruby && cd /tmp/ruby
-curl -L --progress https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.2.tar.xz | tar xJ
-cd ruby-3.2.2
+curl -L --progress https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.4.tar.xz | tar xJ
+cd ruby-3.2.4
 ./configure --disable-install-rdoc
 make -j`nproc`
 sudo make install
