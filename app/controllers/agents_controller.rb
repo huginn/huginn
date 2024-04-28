@@ -79,7 +79,7 @@ class AgentsController < ApplicationController
     @agent = current_user.agents.find(params[:id])
 
     AgentReemitJob.perform_later(@agent, @agent.most_recent_event.id,
-                                 params[:delete_old_events] == '1')
+                                 params[:delete_old_events] == '1') if @agent.most_recent_event
 
     respond_to do |format|
       format.html { redirect_back "Enqueued job to re-emit all events for '#{@agent.name}'" }
