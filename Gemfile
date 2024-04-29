@@ -46,8 +46,8 @@ gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 gem 'weibo_2', github: 'albertsun/weibo_2', branch: 'master'
 
 # GoogleCalendarPublishAgent and GoogleTranslateAgent
-gem 'google-api-client', '~> 0.13'
-gem 'google-cloud-translate', '~> 2.0', require: 'google/cloud/translate'
+gem 'google-api-client', '~> 0.53'
+gem 'google-cloud-translate', '~> 2.3', require: 'google/cloud/translate'
 
 # Twitter Agents
 gem 'omniauth-twitter'
@@ -89,39 +89,39 @@ end
 
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
-gem 'bootstrap-kaminari-views', '~> 0.0.3'
+gem 'bootstrap-kaminari-views', '~> 0.0.5'
 gem 'bundler', '>= 2.2.33'
 gem 'coffee-rails', '~> 5'
 gem 'daemons', '~> 1.1.9'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
-gem 'devise', '~> 4.8'
-gem 'em-http-request', '~> 1.1.2'
+gem 'devise', '~> 4.9', '>= 4.9.4'
+gem 'em-http-request', '~> 1.1.7'
 gem 'execjs'
-gem 'faraday', '~> 1.0'
+gem 'faraday', '~> 1.10', '>= 1.10.3'
 gem 'faraday_middleware'
-gem 'feedjira', '~> 3.1'
+gem 'feedjira', '~> 3.2', '>= 3.2.3'
 gem 'font-awesome-sass', '~> 4.7.0'
 gem 'foreman', '~> 0.87.2', github: 'ddollar/foreman'
-gem 'geokit', '~> 1.13'
-gem 'geokit-rails', '~> 2.3'
+gem 'geokit', '~> 1.14'
+gem 'geokit-rails', '~> 2.5'
 gem 'httmultiparty', '~> 0.3.16'
-gem 'httparty', '~> 0.13'
+gem 'httparty', '~> 0.21'
 gem 'huginn_agent'
-gem 'jquery-rails', '~> 4.4'
+gem 'jquery-rails', '~> 4.6'
 gem 'json', '~> 2.3'
-gem 'jsonpath', '~> 1.1'
-gem 'kaminari', '~> 1.2'
+gem 'jsonpath', '~> 1.1', '>= 1.1.5'
+gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
 gem 'liquid', '~> 5.1'
-gem 'loofah', '~> 2.0'
+gem 'loofah', '~> 2.22'
 gem 'mail', '>= 2.8.1'
-gem 'mini_magick', ">= 4.9.4"
+gem 'mini_magick', ">= 4.12.0"
 gem 'multi_xml'
-gem "nokogiri", ">= 1.10.8"
+gem "nokogiri", ">= 1.16.4"
 gem 'omniauth'
-gem 'rails', '~> 6.1.7'
-gem 'rails-html-sanitizer', '~> 1.2'
+gem 'rails', '~> 6.1.7', '>= 6.1.7.7'
+gem 'rails-html-sanitizer', '~> 1.6'
 gem 'rufus-scheduler', '~> 3.4', require: false
 gem 'sass-rails', '>= 6.0'
 gem 'select2-rails'
@@ -137,9 +137,9 @@ group :development do
   gem 'guard'
   gem 'guard-livereload'
   gem 'guard-rspec'
-  gem 'letter_opener_web', '~> 1.4' # 2.0+ requires Ruby 2.7
+  gem 'letter_opener_web', '~> 1.4', '>= 1.4.1' # 2.0+ requires Ruby 2.7
   gem 'rack-livereload'
-  gem 'web-console', '>= 3.3.0'
+  gem 'web-console', '>= 4.2.1'
 
   gem 'capistrano'
   gem 'capistrano-bundler'
@@ -182,11 +182,11 @@ end
 # Platform requirements.
 require 'rbconfig'
 gem 'ffi', '>= 1.9.4'	# required by typhoeus; 1.9.4 has fixes for *BSD.
-gem 'tzinfo', '>= 1.2.0'	# required by rails; 1.2.0 has support for *BSD and Solaris.
+gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 # BSD systems require rb-kqueue for "listen" to avoid polling for changes.
-gem 'rb-kqueue', '>= 0.2', require: /bsd|dragonfly/i === RbConfig::CONFIG['target_os']
+gem 'rb-kqueue', '>= 0.2.8', require: /bsd|dragonfly/i === RbConfig::CONFIG['target_os']
 
 on_heroku = ENV['ON_HEROKU'] ||
   ENV['HEROKU_POSTGRESQL_ROSE_URL'] ||
@@ -201,11 +201,11 @@ ENV['DATABASE_ADAPTER'] ||=
   end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
-  gem 'pg', '~> 1.1'
+  gem 'pg', '~> 1.5', '>= 1.5.6'
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
-  gem 'mysql2', "~> 0.5"
+  gem 'mysql2', "~> 0.5", ">= 0.5.6"
 end
 
 GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|
