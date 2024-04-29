@@ -50,7 +50,6 @@ bob_disabled_website_agent:
                  }
                }.to_json.inspect %>
 
-
 bob_weather_agent:
   type: Agents::WeatherAgent
   user: bob

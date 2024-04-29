@@ -30,9 +30,7 @@ $minimal_apt_get_install build-essential checkinstall git-core \
   locales tzdata shared-mime-info iputils-ping
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
-# Specific version 3.3.20: 3.3.21 changes platform support, breaks our build
-# This needs to be fixed in libv8-node: https://github.com/rubyjs/libv8-node/pull/36
-gem update --system 3.3.20 --no-document
+gem update --system --no-document
 gem update bundler --conservative --no-document
 
 apt-get purge -y python3* rsyslog rsync manpages

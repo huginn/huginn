@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-tests:
+    name: ${{ matrix.os }} ruby-${{ matrix.ruby }} ${{ matrix.database_adapter }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+        database_adapter:
+          - mysql2
+          - postgresql
+        ruby:
+          - "3.2"
+    env:
+      DATABASE_ADAPTER: ${{ matrix.database_adapter }}
+      DATABASE_HOST: "127.0.0.1"
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: password
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          rubygems: latest
+          bundler: latest
+          bundler-cache: true
+
+      - name: Set up database
+        run: bundle exec rake db:create db:migrate
+
+      - name: Run tests
+        run: bundle exec rake
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          fail-on-error: false
+
+  ghcr-build-docker-images:
+    name: ghcr-docker-build-${{ matrix.docker_image }}
+    needs: run-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        docker_image:
+          - huginn/huginn
+          - huginn/huginn-single-process
+    env:
+      DOCKER_IMAGE: ghcr.io/${{ matrix.docker_image }}
+      DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
+      DOCKER_USER: ${{ github.actor }}
+      DOCKER_PASS: ${{ secrets.GITHUB_TOKEN }}
+      REGISTRY: ghcr.io
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build a docker image
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = push -a "$GITHUB_REF_NAME" = master ]; then
+            ./build_docker_image.sh --push
+          else
+            ./build_docker_image.sh
+          fi
+
+  build-docker-images:
+    name: docker-build-${{ matrix.docker_image }}
+    needs: run-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        docker_image:
+          - huginn/huginn
+          - huginn/huginn-single-process
+    env:
+      DOCKER_IMAGE: ${{ matrix.docker_image }}
+      DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
+      DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+      BUILD_ARGS: --build-arg OUTDATED_DOCKER_REGISTRY=true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build a docker image
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = push -a "$GITHUB_REF_NAME" = master ]; then
+            ./build_docker_image.sh --push
+          fi

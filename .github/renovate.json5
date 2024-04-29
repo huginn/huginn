@@ -1,0 +1,30 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  labels: ["dependencies", "automerge"],
+  prHourlyLimit: 0,
+  prConcurrentLimit: 10,
+  timezone: "Asia/Tokyo",
+  schedule: ["after 9am and before 1pm on Saturday"],
+  packageRules: [
+    {
+      groupName: "patch updated gems",
+      matchDatasources: ["rubygems"],
+      matchUpdateTypes: ["patch", "digest"],
+    },
+    {
+      groupName: "minor updated gems",
+      matchDatasources: ["rubygems"],
+      matchUpdateTypes: ["minor"],
+    },
+    {
+      matchDatasources: ["rubygems"],
+      rangeStrategy: "bump",
+    },
+  ],
+  vulnerabilityAlerts: {
+    enabled: true,
+    addLabels: ["security"],
+  },
+  osvVulnerabilityAlerts: true,
+}

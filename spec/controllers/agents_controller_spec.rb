@@ -67,6 +67,16 @@ describe AgentsController do
       post :reemit_events, params: params
     end
 
+    context "when agent has no events" do
+      let(:agent) { agents(:bob_weather_agent) }
+
+      it "does not enqueue an AgentReemitJob" do
+        expect(AgentReemitJob).not_to receive(:perform_later)
+        sign_in users(:bob)
+        post :reemit_events, params: params
+      end
+    end
+
     context "when delete_old_events passed" do
       it "enqueues an AgentReemitJob with delete_old_events set to true" do
         expect(AgentReemitJob).to receive(:perform_later).with(agent, agent.most_recent_event.id, true)
