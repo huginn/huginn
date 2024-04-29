@@ -3,21 +3,25 @@ require 'rails_helper'
 describe Agents::HipchatAgent do
   before(:each) do
     @valid_params = {
-                      'auth_token' => 'token',
-                      'room_name' => 'test',
-                      'username' => "{{username}}",
-                      'message' => "{{message}}",
-                      'notify' => 'false',
-                      'color' => 'yellow',
-                    }
+      'auth_token' => 'token',
+      'room_name' => 'test',
+      'username' => "{{username}}",
+      'message' => "{{message}}",
+      'notify' => 'false',
+      'color' => 'yellow',
+    }
 
-    @checker = Agents::HipchatAgent.new(:name => "somename", :options => @valid_params)
+    @checker = Agents::HipchatAgent.new(name: "somename", options: @valid_params)
     @checker.user = users(:jane)
     @checker.save!
 
     @event = Event.new
     @event.agent = agents(:bob_weather_agent)
-    @event.payload = { :room_name => 'test room', :message => 'Looks like its going to rain', username: "Huggin user                  "}
+    @event.payload = {
+      room_name: 'test room',
+      message: 'Looks like its going to rain',
+      username: "Huggin user                  "
+    }
     @event.save!
   end
 
@@ -45,7 +49,7 @@ describe Agents::HipchatAgent do
     it "should also allow a credential" do
       @checker.options['auth_token'] = nil
       expect(@checker).not_to be_valid
-      @checker.user.user_credentials.create :credential_name => 'hipchat_auth_token', :credential_value => 'something'
+      @checker.user.user_credentials.create credential_name: 'hipchat_auth_token', credential_value: 'something'
       expect(@checker.reload).to be_valid
     end
   end
@@ -57,21 +61,24 @@ describe Agents::HipchatAgent do
     end
 
     it "should return false when invalid" do
-      allow_any_instance_of(HipChat::Client).to receive(:rooms) { raise HipChat::UnknownResponseCode.new }
+      allow_any_instance_of(HipChat::Client).to receive(:rooms).and_raise(HipChat::UnknownResponseCode, '403')
       expect(@checker.validate_auth_token).to be false
     end
   end
 
   describe "#complete_room_name" do
     it "should return a array of hashes" do
-      allow_any_instance_of(HipChat::Client).to receive(:rooms) { [OpenStruct.new(name: 'test'), OpenStruct.new(name: 'test1')] }
-      expect(@checker.complete_room_name).to eq [{text: 'test', id: 'test'},{text: 'test1', id: 'test1'}]
+      allow_any_instance_of(HipChat::Client).to receive(:rooms) {
+                                                  [OpenStruct.new(name: 'test'), OpenStruct.new(name: 'test1')]
+                                                }
+      expect(@checker.complete_room_name).to eq [{ text: 'test', id: 'test' }, { text: 'test1', id: 'test1' }]
     end
   end
 
   describe "#receive" do
     it "send a message to the hipchat" do
-      expect_any_instance_of(HipChat::Room).to receive(:send).with(@event.payload[:username][0..14], @event.payload[:message], { notify: false, color: 'yellow', message_format: 'html' })
+      expect_any_instance_of(HipChat::Room).to receive(:send).with(@event.payload[:username][0..14],
+                                                                   @event.payload[:message], { notify: false, color: 'yellow', message_format: 'html' })
       @checker.receive([@event])
     end
   end
