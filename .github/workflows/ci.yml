@@ -52,7 +52,7 @@ jobs:
           --health-timeout 5s
           --health-retries 3
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -90,7 +90,7 @@ jobs:
       DOCKER_PASS: ${{ secrets.GITHUB_TOKEN }}
       REGISTRY: ghcr.io
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build a docker image
         run: |
@@ -117,7 +117,7 @@ jobs:
       DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
       BUILD_ARGS: --build-arg OUTDATED_DOCKER_REGISTRY=true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build a docker image
         run: |
