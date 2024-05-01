@@ -30,15 +30,15 @@ end
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
 gem 'pirate_weather_forecast_ruby'  # WeatherAgent
-gem 'hipchat', '~> 1.2.0'         # HipchatAgent
+gem 'hipchat', '~> 1.6.0'         # HipchatAgent
 gem 'hypdf', bitbucket: 'knu/hypdf_gem', branch: 'uploadio_namespace' # PDFInfoAgent
 gem 'mini_racer'                  # JavaScriptAgent
 gem 'mqtt'                        # MQTTAgent
 gem 'net-ftp'
 gem 'net-ftp-list'                # FtpsiteAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
-gem 'twilio-ruby', '~> 5.62.0'    # TwilioAgent
+gem 'slack-notifier', '~> 1.5.1'  # SlackAgent
+gem 'twilio-ruby', '~> 5.77.0'    # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -71,14 +71,14 @@ gem 'evernote_oauth'
 gem 'omniauth-evernote'
 
 # LocalFileAgent (watch functionality)
-gem 'listen', '~> 3.0.5', require: false
+gem 'listen', '~> 3.9.0', require: false
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1'
+gem 'aws-sdk-s3', '~> 1', '>= 1.148.0'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
-gem 'omniauth-google-oauth2', '>= 0.8.0'
+gem 'omniauth-google-oauth2', '>= 0.8.2'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
@@ -90,9 +90,9 @@ end
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'bundler', '>= 2.2.33'
+gem 'bundler', '>= 2.5.9'
 gem 'coffee-rails', '~> 5'
-gem 'daemons', '~> 1.1.9'
+gem 'daemons', '~> 1.4.1'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'devise', '~> 4.9', '>= 4.9.4'
@@ -102,18 +102,18 @@ gem 'faraday', '~> 1.10', '>= 1.10.3'
 gem 'faraday_middleware'
 gem 'feedjira', '~> 3.2', '>= 3.2.3'
 gem 'font-awesome-sass', '~> 4.7.0'
-gem 'foreman', '~> 0.87.2', github: 'ddollar/foreman'
+gem 'foreman', '~> 0.88.1', github: 'ddollar/foreman'
 gem 'geokit', '~> 1.14'
 gem 'geokit-rails', '~> 2.5'
 gem 'httmultiparty', '~> 0.3.16'
 gem 'httparty', '~> 0.21'
 gem 'huginn_agent'
 gem 'jquery-rails', '~> 4.6'
-gem 'json', '~> 2.3'
+gem 'json', '~> 2.7', '>= 2.7.2'
 gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
-gem 'liquid', '~> 5.1'
+gem 'liquid', '~> 5.5'
 gem 'loofah', '~> 2.22'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', ">= 4.12.0"
@@ -122,13 +122,13 @@ gem "nokogiri", ">= 1.16.4"
 gem 'omniauth'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.7'
 gem 'rails-html-sanitizer', '~> 1.6'
-gem 'rufus-scheduler', '~> 3.4', require: false
+gem 'rufus-scheduler', '~> 3.9', '>= 3.9.1', require: false
 gem 'sass-rails', '>= 6.0'
 gem 'select2-rails'
 gem 'spectrum-rails'
 gem 'sprockets'
 gem 'terser'
-gem 'typhoeus', '~> 1.3.1'
+gem 'typhoeus', '~> 1.4.1'
 gem 'uglifier', '~> 2.7.2'
 
 group :development do
@@ -182,7 +182,7 @@ end
 
 # Platform requirements.
 require 'rbconfig'
-gem 'ffi', '>= 1.9.4'	# required by typhoeus; 1.9.4 has fixes for *BSD.
+gem 'ffi', '>= 1.16.3'	# required by typhoeus; 1.9.4 has fixes for *BSD.
 gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
