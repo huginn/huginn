@@ -271,7 +271,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    execjs (2.8.1)
+    execjs (2.9.1)
     faraday (1.10.3)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -810,9 +810,8 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uber (0.1.0)
-    uglifier (2.7.2)
-      execjs (>= 0.3.0)
-      json (>= 1.8.0)
+    uglifier (4.2.0)
+      execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.2)
@@ -959,7 +958,7 @@ DEPENDENCIES
   typhoeus (~> 1.4.1)
   tzinfo (>= 2.0.6)
   tzinfo-data
-  uglifier (~> 2.7.2)
+  uglifier (~> 4.2.0)
   unicorn
   unicorn-rails
   vcr
