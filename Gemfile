@@ -129,7 +129,7 @@ gem 'spectrum-rails'
 gem 'sprockets'
 gem 'terser'
 gem 'typhoeus', '~> 1.4.1'
-gem 'uglifier', '~> 2.7.2'
+gem 'uglifier', '~> 4.2.0'
 
 group :development do
   gem 'better_errors'
