@@ -912,7 +912,7 @@ DEPENDENCIES
   mysql2 (~> 0.5, >= 0.5.6)
   net-ftp
   net-ftp-list
-  nokogiri (>= 1.16.4)
+  nokogiri (>= 1.16.5)
   omniauth
   omniauth-dropbox-oauth2!
   omniauth-evernote
