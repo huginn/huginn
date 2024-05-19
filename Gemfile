@@ -118,7 +118,7 @@ gem 'loofah', '~> 2.22'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', ">= 4.12.0"
 gem 'multi_xml'
-gem "nokogiri", ">= 1.16.4"
+gem "nokogiri", ">= 1.16.5"
 gem 'omniauth'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.7'
 gem 'rails-html-sanitizer', '~> 1.6'
