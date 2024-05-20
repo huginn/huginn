@@ -118,7 +118,7 @@ gem 'loofah', '~> 2.22'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', ">= 4.12.0"
 gem 'multi_xml'
-gem "nokogiri", ">= 1.16.4"
+gem "nokogiri", ">= 1.16.5"
 gem 'omniauth'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.7'
 gem 'rails-html-sanitizer', '~> 1.6'
@@ -129,7 +129,7 @@ gem 'spectrum-rails'
 gem 'sprockets'
 gem 'terser'
 gem 'typhoeus', '~> 1.4.1'
-gem 'uglifier', '~> 2.7.2'
+gem 'uglifier', '~> 4.2.0'
 
 group :development do
   gem 'better_errors'
