@@ -317,7 +317,7 @@ GEM
       rails (>= 3.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
-    gmail_xoauth (0.4.2)
+    gmail_xoauth (0.4.3)
       oauth (>= 0.3.6)
     google-api-client (0.53.0)
       google-apis-core (~> 0.1)
@@ -823,7 +823,7 @@ GEM
       rack
       unicorn
     vcr (6.1.0)
-    version_gem (1.1.2)
+    version_gem (1.1.4)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.2.1)
