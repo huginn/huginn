@@ -768,7 +768,7 @@ GEM
     simplecov-html (0.12.3)
     simplecov-lcov (0.8.0)
     simplecov_json_formatter (0.1.4)
-    slack-notifier (1.5.1)
+    slack-notifier (2.4.0)
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
@@ -944,7 +944,7 @@ DEPENDENCIES
   shoulda-matchers
   simplecov
   simplecov-lcov (~> 0.8.0)
-  slack-notifier (~> 1.5.1)
+  slack-notifier (~> 2.4.0)
   spectrum-rails
   spring
   spring-commands-rspec
