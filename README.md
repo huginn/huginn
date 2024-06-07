@@ -110,6 +110,13 @@ Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](h
 
 Huginn launches on the free version of Heroku [with significant limitations](https://github.com/huginn/huginn/blob/master/doc/heroku/install.md). For non-experimental use, we strongly recommend Heroku's 1GB paid plan or our Docker container.
 
+### Elestio
+
+Try Huginn on Elestio: [![Deploy](https://pub-da36157c854648669813f3f76c526c2b.r2.dev/deploy-on-elestio-black.png)](https://elest.io/open-source/huginn)
+
+Takes a few clicks to setup a fully managed service with centralised dashboard. Read the [documentation](https://github.com/huginn/huginn/blob/master/doc/elestio/install.md). Additionally you get option to select your preferred cloud service providers and custom tiers to save costs.
+
+
 ### OpenShift
 
 #### OpenShift Online
