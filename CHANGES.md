@@ -2,6 +2,19 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| May 01, 2024   | Web requesting agents can handle invalid characters by replacing them with U+FFFD. [#3336](https://github.com/huginn/huginn/pull/3336) |
+| May 01, 2024   | Allow setting ActionMailer read and open timeouts. [#3361](https://github.com/huginn/huginn/pull/3361) |
+| May 01, 2024   | Add support for `ttl` and `monospace` to PushoverAgent. [#3389](https://github.com/huginn/huginn/pull/3389) |
+| Apr 30, 2024   | Use unicorn (instead of webrick) in production. [#3387](https://github.com/huginn/huginn/pull/3387) |
+| Nov 19, 2023   | Use Pirate Weather with the WeatherAgent. [#3317](https://github.com/huginn/huginn/pull/3317) |
+| Jul 17, 2023   | Add a new option to DelayAgent: `emit_interval`. [#3301](https://github.com/huginn/huginn/pull/3301) |
+| Jul 16, 2023   | New Liquid filter: `fromjson`. [#3298](https://github.com/huginn/huginn/pull/3298) |
+| Jul 10, 2023   | DelayAgent can sort buffered events with user-given sort keys when emitting them. [#3294](https://github.com/huginn/huginn/pull/3294) |
+| Jul 04, 2023   | Agent show page shows controller agents. [#3290](https://github.com/huginn/huginn/pull/3290) |
+| Jul 02, 2023   | PostAgent can parse a JSON body when the `parse_body` is set to true. [#3287](https://github.com/huginn/huginn/pull/3287) |
+| Jun 27, 2023   | TriggerAgent allows an empty string value in a rule. [#3284](https://github.com/huginn/huginn/pull/3284) |
+| Jun 27, 2023   | New Liquid features: the `hex_encode` and `hex_decode` filters and `uuidv4` tag. [#3285](https://github.com/huginn/huginn/pull/3285) |
+| Jun 23, 2023   | JavaScriptAgent can access storage provided by KeyValueStoreAgent via `this.kvs`. [#3280](https://github.com/huginn/huginn/pull/3280) |
 | Jun 18, 2023   | Add Re-emit and Delete buttons to the event show page. [#3276](https://github.com/huginn/huginn/pull/3276) |
 | Jun 07, 2023   | Upgrade various gems that have been out-of-date for a long time. [#3216](https://github.com/huginn/huginn/pull/3216) |
 | May 09, 2023   | Upgrade Ruby to 3.2 after 2.7 reached its end of life.  Migrate from CoffeeScript to JavaScript. [#3216](https://github.com/huginn/huginn/pull/3216) |
