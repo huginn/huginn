@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "huginn.fullname" . }}
+  labels:
+    {{- include "huginn.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "huginn.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "huginn.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "huginn.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
+          env:
+            - name: HUGINN_DATABASE_NAME
+              value: {{ .Values.mariadb.db.name }}
+            - name: HUGINN_DATABASE_USERNAME
+              value: {{ .Values.mariadb.db.user }}
+            - name: HUGINN_DATABASE_PASSWORD
+              value: "{{ .Values.mariadb.db.password }}"
+            - name: DATABASE_ADAPTER
+              value: mysql2
+            - name: DATABASE_HOST
+              value: "{{ .Release.Name }}-mariadb"
+            - name: DATABASE_PORT
+              value: "3306"
+            - name: INVITATION_CODE
+              value: "{{ .Values.invitationCode }}"
+            - name: SMTP_DOMAIN
+              value: "{{ .Values.smtp.domain }}"
+            - name: SMTP_USER_NAME
+              value: "{{ .Values.smtp.username }}"
+            - name: SMTP_PASSWORD
+              value: "{{ .Values.smtp.password }}"
+            - name: SMTP_SERVER
+              value: "{{ .Values.smtp.server }}"
+            - name: SMTP_PORT
+              value: "{{ .Values.smtp.port }}"
+            - name: SMTP_AUTHENTICATION
+              value: "{{ .Values.smtp.authentication }}"
+            - name: SMTP_ENABLE_STARTTLS_AUTO
+              value: "{{ .Values.smtp.enableStartttlAuto }}"
+            - name: EMAIL_FROM_ADDRESS
+              value: "{{ .Values.emailFromAddress }}"
+            - name: TWITTER_OAUTH_KEY
+              value: "{{ .Values.oauth.twitterOauthKey }}"
+            - name: TWITTER_OAUTH_SECRET
+              value: "{{ .Values.oauth.twitterOauthSecret }}"
+            - name: GITHUB_OAUTH_KEY
+              value: "{{ .Values.oauth.githubOauthKey }}"
+            - name: GITHUB_OAUTH_SECRET
+              value: "{{ .Values.oauth.githubOauthSecret }}"
+            # - name: REQUIRE_CONFIRMED_EMAIL
+            #   value: "{{ .Values.requireConfirmedEmail }}"
+            # - name: ALLOW_UNCONFIRMED_ACCESS_FOR
+            #   value: "{{ .Values.allowUnconfirmedAccessFor }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /about
+              port: http
+            initialDelaySeconds: 300
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /about
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
