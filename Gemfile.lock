@@ -445,7 +445,7 @@ GEM
     json (2.7.2)
     jsonpath (1.1.5)
       multi_json
-    jwt (2.8.1)
+    jwt (2.8.2)
       base64
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
@@ -507,7 +507,7 @@ GEM
       rake
     mini_magick (4.12.0)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.6)
+    mini_portile2 (2.8.7)
     mini_racer (0.6.3)
       libv8-node (~> 16.10.0.0)
     minitest (5.22.3)
@@ -515,7 +515,7 @@ GEM
     msgpack (1.7.2)
     multi_json (1.15.0)
     multi_xml (0.6.0)
-    multipart-post (2.4.0)
+    multipart-post (2.4.1)
     mysql2 (0.5.6)
     naught (1.1.0)
     nenv (0.3.0)
@@ -537,16 +537,16 @@ GEM
     net-ssh (7.1.0)
     netrc (0.11.0)
     nio4r (2.7.1)
-    nokogiri (1.16.5)
+    nokogiri (1.16.6)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.16.5-aarch64-linux)
+    nokogiri (1.16.6-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.16.5-arm64-darwin)
+    nokogiri (1.16.6-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.5-x86_64-darwin)
+    nokogiri (1.16.6-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.5-x86_64-linux)
+    nokogiri (1.16.6-x86_64-linux)
       racc (~> 1.4)
     notiffany (0.1.3)
       nenv (~> 0.1)
@@ -606,7 +606,7 @@ GEM
     puma (6.4.2)
       nio4r (~> 2.0)
     raabro (1.4.0)
-    racc (1.7.3)
+    racc (1.8.0)
     rack (2.2.9)
     rack-livereload (0.5.1)
       rack
@@ -801,7 +801,7 @@ GEM
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
-    twilio-ruby (5.77.0)
+    twilio-ruby (7.2.2)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
@@ -952,7 +952,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client (~> 0.8.6)!
-  twilio-ruby (~> 5.77.0)
+  twilio-ruby (~> 7.2.2)
   twitter!
   twitter-stream!
   typhoeus (~> 1.4.1)
