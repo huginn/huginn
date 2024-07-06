@@ -445,7 +445,7 @@ GEM
     json (2.7.2)
     jsonpath (1.1.5)
       multi_json
-    jwt (2.8.1)
+    jwt (2.8.2)
       base64
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
@@ -515,7 +515,7 @@ GEM
     msgpack (1.7.2)
     multi_json (1.15.0)
     multi_xml (0.6.0)
-    multipart-post (2.4.0)
+    multipart-post (2.4.1)
     mysql2 (0.5.6)
     naught (1.1.0)
     nenv (0.3.0)
@@ -801,7 +801,7 @@ GEM
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
-    twilio-ruby (5.77.0)
+    twilio-ruby (7.2.2)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
@@ -952,7 +952,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client (~> 0.8.6)!
-  twilio-ruby (~> 5.77.0)
+  twilio-ruby (~> 7.2.2)
   twitter!
   twitter-stream!
   typhoeus (~> 1.4.1)
