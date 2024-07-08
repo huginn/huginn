@@ -38,7 +38,7 @@ gem 'net-ftp'
 gem 'net-ftp-list'                # FtpsiteAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 1.5.1'  # SlackAgent
-gem 'twilio-ruby', '~> 5.77.0'    # TwilioAgent
+gem 'twilio-ruby', '~> 7.2.2'    # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -90,7 +90,7 @@ end
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'bundler', '>= 2.5.10'
+gem 'bundler', '>= 2.5.14'
 gem 'coffee-rails', '~> 5'
 gem 'daemons', '~> 1.4.1'
 gem 'delayed_job'
@@ -118,9 +118,9 @@ gem 'loofah', '~> 2.22'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', ">= 4.12.0"
 gem 'multi_xml'
-gem "nokogiri", ">= 1.16.5"
+gem "nokogiri", ">= 1.16.6"
 gem 'omniauth'
-gem 'rails', '~> 6.1.7', '>= 6.1.7.7'
+gem 'rails', '~> 6.1.7', '>= 6.1.7.8'
 gem 'rails-html-sanitizer', '~> 1.6'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.1', require: false
 gem 'sass-rails', '>= 6.0'
