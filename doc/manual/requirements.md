@@ -27,7 +27,7 @@ Please consider using a virtual machine to run Huginn on Windows.
 
 ## Ruby versions
 
-Huginn requires Ruby (MRI) >= 3.2.2.
+Huginn requires Ruby (MRI) >= 3.2.
 On Debian Stable, you should use a Ruby Package Manager to install the latest Ruby. Apt version is too old.
 
 You will have to use the standard MRI implementation of Ruby.
