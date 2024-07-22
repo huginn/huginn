@@ -24,7 +24,7 @@
           <tr>
             <td><%= user_credential.credential_name %></td>
             <td>
-              <%= truncate user_credential.credential_value %>
+              <%= truncate masked_value(user_credential.credential_value) %>
               <div class="btn-group btn-group-xs" style="float: right">
                 <%= link_to 'Edit', edit_user_credential_path(user_credential), class: "btn btn-default" %>
                 <%= link_to 'Delete', user_credential_path(user_credential), method: :delete, data: {confirm: 'Are you sure?'}, class: "btn btn-default" %>
