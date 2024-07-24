@@ -505,7 +505,7 @@ GEM
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
-    mini_magick (4.12.0)
+    mini_magick (5.0.1)
     mini_mime (1.1.5)
     mini_portile2 (2.8.7)
     mini_racer (0.6.3)
@@ -905,7 +905,7 @@ DEPENDENCIES
   listen (~> 3.9.0)
   loofah (~> 2.22)
   mail (>= 2.8.1)
-  mini_magick (>= 4.12.0)
+  mini_magick (>= 5.0.1)
   mini_racer
   mqtt
   multi_xml
