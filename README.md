@@ -104,6 +104,12 @@ Our general intention is to encourage complex and specific Agents to be written 
 
 Please see [the Huginn Wiki](https://github.com/huginn/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
+### Dome
+
+Try the full version of Huginn with a free trial on Dome with [one-click](https://app.trydome.io/signup?package=huginn):
+
+[![Deploy to Dome](https://trydome.io/button.svg)](https://app.trydome.io/signup?package=huginn)
+
 ### Heroku
 
 Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup. Read the [documentation](https://github.com/huginn/huginn/blob/master/doc/heroku/install.md) while you are waiting and be sure to click 'View it' after launch!)
