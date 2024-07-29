@@ -26,7 +26,7 @@ module Agents
 
         Change `content_type` to `xml` to send XML, where the name of the root element may be specified using `xml_root`, defaulting to `post`.
 
-        When `content_type` contains a [MIME](https://en.wikipedia.org/wiki/Media_type) type, and `payload` is a string, its interpolated value will be sent as a string in the HTTP request's body and the request's `Content-Type` HTTP header will be set to `content_type`. When `payload` is a string `no_merge` has to be set to `true`.
+        If `content_type` contains a [MIME](https://en.wikipedia.org/wiki/Media_type) type such as `text/plain`, the data are emitted raw. If `payload` is a string, its interpolated value will be sent as a string in the HTTP request's body and the request's `Content-Type` HTTP header will be set to `content_type`. When `payload` is a string `no_merge` has to be set to `true`. This can also be used to directly output json (as MIME type `application/json`) from incoming event as the payload, using either `{{ payload | json}}` or `{{payload | as_object }}` depending on formatting desired.
 
         If `emit_events` is set to `true`, the server response will be emitted as an Event.  The "body" value of the Event is the response body.  If the `parse_body` option is set to `true` and the content type of the response is JSON, it is parsed to a JSON object.  Otherwise it is raw text.  A raw HTML/XML text can be fed to a WebsiteAgent for parsing (using its `data_from_event` and `type` options).
         The Event will also have a "headers" hash and a "status" integer value.
