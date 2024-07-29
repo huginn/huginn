@@ -1,0 +1,127 @@
+# Default values for huginn.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: huginn/huginn
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+mariadb:
+  enabled: true
+  rootUser:
+    password: "SuperS3cr3t"
+  db:
+    name: "huginn"
+    user: "huginn"
+    password: "hug1nnpAssw0rd"
+  master:
+    persistence:
+      enabled: false
+  slave:
+    persistence:
+      enabled: false
+
+#
+# Please change this ASAP, and before you deploy this app.
+#
+invitationCode: "Please-Change-Me"
+
+# If you'd like to require new users to confirm their email address after sign up, set this to true.
+requireConfirmedEmail: true
+
+# If REQUIRE_CONFIRMED_EMAIL is true, set this to the duration in which a user needs to confirm their email address.
+allowUnconfirmedAccessFor: "1.days"
+
+# Settings for SMTP/email should be set
+smtp:
+  domain: "your-domain-here.com"
+  username: "you@gmail.com"
+  password: "somepassword"
+  server: "smtp.gmail.com"
+  port: "587"
+  authentication: "plain"
+  enableStartttlAuto: true
+
+# Set the email from huginn address
+emailFromAddress: "from_address@gmail.com"
+
+# OAuth Configuration
+# https://github.com/huginn/huginn/wiki/Configuring-OAuth-applications
+
+oauth:
+  twitterOauthKey: "fillout"
+  twitterOauthSecret: "fillout"
+  githubOauthKey: "fillout"
+  githubOauthSecret: "fillout"
+
+#
+# This is pulled from here: https://github.com/huginn/huginn/blob/master/.env.example
+#
+extraEnvs:
+#  - name: GITHUB_OAUTH_KEY
+#    value:
+#  - name: GITHUB_OAUTH_SECRET
+#    value:
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: true
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    # add your ingress subdomain here
+    - host: huginn.example.com
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
