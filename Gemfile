@@ -38,7 +38,7 @@ gem 'net-ftp'
 gem 'net-ftp-list'                # FtpsiteAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 1.5.1'  # SlackAgent
-gem 'twilio-ruby', '~> 7.2.2'    # TwilioAgent
+gem 'twilio-ruby', '~> 7.2.3'    # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -90,7 +90,7 @@ end
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'bundler', '>= 2.5.14'
+gem 'bundler', '>= 2.5.17'
 gem 'coffee-rails', '~> 5'
 gem 'daemons', '~> 1.4.1'
 gem 'delayed_job'
@@ -113,12 +113,12 @@ gem 'json', '~> 2.7', '>= 2.7.2'
 gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
-gem 'liquid', '~> 5.5'
+gem 'liquid', '~> 5.5', '>= 5.5.1'
 gem 'loofah', '~> 2.22'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', ">= 4.12.0"
 gem 'multi_xml'
-gem "nokogiri", ">= 1.16.6"
+gem "nokogiri", ">= 1.16.7"
 gem 'omniauth'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.8'
 gem 'rails-html-sanitizer', '~> 1.6'
@@ -202,7 +202,7 @@ ENV['DATABASE_ADAPTER'] ||=
   end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
-  gem 'pg', '~> 1.5', '>= 1.5.6'
+  gem 'pg', '~> 1.5', '>= 1.5.7'
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
