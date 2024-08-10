@@ -120,7 +120,7 @@ gem 'mini_magick', ">= 4.12.0"
 gem 'multi_xml'
 gem "nokogiri", ">= 1.16.6"
 gem 'omniauth'
-gem 'rails', '~> 6.1.7', '>= 6.1.7.8'
+gem 'rails', '~> 7.2.0'
 gem 'rails-html-sanitizer', '~> 1.6'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.1', require: false
 gem 'sass-rails', '>= 6.0'
