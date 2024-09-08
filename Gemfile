@@ -116,7 +116,7 @@ gem 'kramdown'
 gem 'liquid', '~> 5.5'
 gem 'loofah', '~> 2.22'
 gem 'mail', '>= 2.8.1'
-gem 'mini_magick', ">= 4.12.0"
+gem 'mini_magick', ">= 5.0.1"
 gem 'multi_xml'
 gem "nokogiri", ">= 1.16.6"
 gem 'omniauth'
