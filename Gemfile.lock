@@ -536,7 +536,7 @@ GEM
       net-protocol
     net-ssh (7.1.0)
     netrc (0.11.0)
-    nio4r (2.7.1)
+    nio4r (2.7.3)
     nokogiri (1.16.6)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
@@ -603,7 +603,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (5.0.5)
-    puma (6.4.2)
+    puma (6.4.3)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.0)
