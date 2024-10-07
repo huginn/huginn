@@ -90,7 +90,7 @@ end
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'bundler', '>= 2.5.14'
+gem 'bundler', '>= 2.5.21'
 gem 'coffee-rails', '~> 5'
 gem 'daemons', '~> 1.4.1'
 gem 'delayed_job'
@@ -98,7 +98,7 @@ gem 'delayed_job_active_record'
 gem 'devise', '~> 4.9', '>= 4.9.4'
 gem 'em-http-request', '~> 1.1.7'
 gem 'execjs'
-gem 'faraday', '~> 1.10', '>= 1.10.3'
+gem 'faraday', '~> 1.10', '>= 1.10.4'
 gem 'faraday_middleware'
 gem 'feedjira', '~> 3.2', '>= 3.2.3'
 gem 'font-awesome-sass', '~> 4.7.0'
@@ -113,23 +113,23 @@ gem 'json', '~> 2.7', '>= 2.7.2'
 gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
-gem 'liquid', '~> 5.5'
+gem 'liquid', '~> 5.5', '>= 5.5.1'
 gem 'loofah', '~> 2.22'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', ">= 4.12.0"
 gem 'multi_xml'
-gem "nokogiri", ">= 1.16.6"
+gem "nokogiri", ">= 1.16.7"
 gem 'omniauth'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.8'
 gem 'rails-html-sanitizer', '~> 1.6'
-gem 'rufus-scheduler', '~> 3.9', '>= 3.9.1', require: false
+gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
 gem 'sass-rails', '>= 6.0'
 gem 'select2-rails'
 gem 'spectrum-rails'
 gem 'sprockets'
 gem 'terser'
 gem 'typhoeus', '~> 1.4.1'
-gem 'uglifier', '~> 4.2.0'
+gem 'uglifier', '~> 4.2.1'
 
 group :development do
   gem 'better_errors'
@@ -202,7 +202,7 @@ ENV['DATABASE_ADAPTER'] ||=
   end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
-  gem 'pg', '~> 1.5', '>= 1.5.6'
+  gem 'pg', '~> 1.5', '>= 1.5.8'
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
