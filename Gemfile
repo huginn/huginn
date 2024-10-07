@@ -37,7 +37,7 @@ gem 'mqtt'                        # MQTTAgent
 gem 'net-ftp'
 gem 'net-ftp-list'                # FtpsiteAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'slack-notifier', '~> 1.5.1'  # SlackAgent
+gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
 gem 'twilio-ruby', '~> 7.2.2'    # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
