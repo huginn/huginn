@@ -5,6 +5,16 @@ describe "Creating a new agent", js: true do
     login_as(users(:bob))
   end
 
+  it "does not support ArchivedAgent" do
+    visit "/"
+    page.find("a", text: "Agents").hover
+    click_on("New Agent")
+
+    select2_open(from: 'Type')
+    expect(page).to have_select2_option('Website Agent', from: 'Type')
+    expect(page).not_to have_select2_option('Archived Agent', from: 'Type')
+  end
+
   it "creates an agent" do
     visit "/"
     page.find("a", text: "Agents").hover

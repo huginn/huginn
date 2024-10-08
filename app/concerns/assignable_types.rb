@@ -10,7 +10,17 @@ module AssignableTypes
   end
 
   def validate_type
-    errors.add(:type, "cannot be changed once an instance has been created") if type_changed? && !new_record?
+    case type
+    when 'Agents::ArchivedAgent'
+      if new_record?
+        errors.add(:type, "cannot be #{type} for a new agent")
+      end
+    else
+      if !new_record? && type_changed?
+        errors.add(:type, "cannot be changed once an instance has been created")
+      end
+    end
+
     errors.add(:type, "is not a valid type") unless self.class.valid_type?(type)
   end
 
@@ -18,7 +28,9 @@ module AssignableTypes
     def load_types_in(module_name, my_name = module_name.singularize)
       const_set(:MODULE_NAME, module_name)
       const_set(:BASE_CLASS_NAME, my_name)
-      const_set(:TYPES, Dir[Rails.root.join("app", "models", module_name.underscore, "*.rb")].map { |path| module_name + "::" + File.basename(path, ".rb").camelize })
+      const_set(:TYPES, Dir[Rails.root.join("app", "models", module_name.underscore, "*.rb")].map { |path|
+                          module_name + "::" + File.basename(path, ".rb").camelize
+                        })
     end
 
     def types
