@@ -157,11 +157,15 @@ module Agents
       end
     end
 
-    def receive_web_request(params, method, format)
-      if valid_authentication?(params)
-        [liquified_content, 200, mime_type, interpolated['response_headers'].presence]
+    def receive_web_request(request)
+      if valid_authentication?(request.params)
+        if request.headers['If-None-Match'].presence&.include?(etag)
+          [nil, 304, {}]
+        else
+          [liquified_content, 200, mime_type, response_headers]
+        end
       else
-        [unauthorized_content(format), 401]
+        [unauthorized_content(request.format.to_s), 401]
       end
     end
 
@@ -202,6 +206,26 @@ module Agents
       else
         memory['last_event'] || {}
       end
+    end
+
+    public def etag
+      last_modified_at.strftime('"%s.%9N"')
+    end
+
+    def last_modified_at
+      last_receive_at || Time.at(0)
+    end
+
+    def max_age
+      options['expected_receive_period_in_days'].to_i * 86400
+    end
+
+    def response_headers
+      {
+        'Last-Modified' => last_modified_at.httpdate,
+        'ETag' => etag,
+        'Cache-Control' => "max-age=#{max_age}",
+      }.update(interpolated['response_headers'].presence || {})
     end
 
     def count_limit
