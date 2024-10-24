@@ -90,7 +90,7 @@ end
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'bundler', '>= 2.5.21'
+gem 'bundler', '>= 2.5.22'
 gem 'coffee-rails', '~> 5'
 gem 'daemons', '~> 1.4.1'
 gem 'delayed_job'
@@ -109,7 +109,7 @@ gem 'httmultiparty', '~> 0.3.16'
 gem 'httparty', '~> 0.21'
 gem 'huginn_agent'
 gem 'jquery-rails', '~> 4.6'
-gem 'json', '~> 2.7', '>= 2.7.2'
+gem 'json', '~> 2.7', '>= 2.7.3'
 gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
@@ -120,7 +120,7 @@ gem 'mini_magick', ">= 5.0.1"
 gem 'multi_xml'
 gem "nokogiri", ">= 1.16.7"
 gem 'omniauth'
-gem 'rails', '~> 6.1.7', '>= 6.1.7.8'
+gem 'rails', '~> 6.1.7', '>= 6.1.7.10'
 gem 'rails-html-sanitizer', '~> 1.6'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
 gem 'sass-rails', '>= 6.0'
