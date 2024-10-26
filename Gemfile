@@ -109,7 +109,7 @@ gem 'httmultiparty', '~> 0.3.16'
 gem 'httparty', '~> 0.21'
 gem 'huginn_agent'
 gem 'jquery-rails', '~> 4.6'
-gem 'json', '~> 2.7', '>= 2.7.3'
+gem 'json', '~> 2.7', '>= 2.7.4'
 gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
@@ -202,7 +202,7 @@ ENV['DATABASE_ADAPTER'] ||=
   end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
-  gem 'pg', '~> 1.5', '>= 1.5.8'
+  gem 'pg', '~> 1.5', '>= 1.5.9'
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
