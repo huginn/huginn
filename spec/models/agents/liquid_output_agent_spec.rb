@@ -203,7 +203,7 @@ describe Agents::LiquidOutputAgent do
     end
   end
 
-  describe "#receive_web_request?" do
+  describe "#receive_web_request" do
     let(:secret) { SecureRandom.uuid }
 
     let(:headers) { {} }
@@ -231,6 +231,21 @@ describe Agents::LiquidOutputAgent do
       agent.memory['last_event'] = { key => value }
       agent.save!
       agents(:bob_website_agent).events.destroy_all
+    end
+
+    it "should output LF-terminated lines if line_break_is_lf is true" do
+      agent.options["content"] = "hello\r\nworld\r\n"
+
+      result = agent.receive_web_request request
+      expect(result[0]).to eq "hello\r\nworld\r\n"
+
+      agent.options["line_break_is_lf"] = "true"
+      result = agent.receive_web_request request
+      expect(result[0]).to eq "hello\nworld\n"
+
+      agent.options["line_break_is_lf"] = "false"
+      result = agent.receive_web_request request
+      expect(result[0]).to eq "hello\r\nworld\r\n"
     end
 
     it 'should respond with custom response header if configured with `response_headers` option' do

@@ -22,6 +22,7 @@ module Agents
         * `secret` - A token that the requestor must provide for light-weight authentication.
         * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
         * `content` - The content to display when someone requests this page.
+        * `line_break_is_lf` - Use LF as line breaks instead of CRLF.
         * `mime_type` - The mime type to use when someone requests this page.
         * `response_headers` - An object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
         * `mode` - The behavior that determines what data is passed to the Liquid template.
@@ -98,6 +99,7 @@ module Agents
     form_configurable :secret
     form_configurable :expected_receive_period_in_days
     form_configurable :content, type: :text
+    form_configurable :line_break_is_lf, type: :boolean
     form_configurable :mime_type
     form_configurable :mode, type: :array, values: ['Last event in', 'Merge events', 'Last X events']
     form_configurable :event_limit
@@ -195,7 +197,9 @@ module Agents
     end
 
     def liquified_content
-      interpolated(data_for_liquid_template)['content']
+      content = interpolated(data_for_liquid_template)['content']
+      content.gsub!(/\r(?=\n)/, '') if boolify(options['line_break_is_lf'])
+      content
     end
 
     def data_for_liquid_template
