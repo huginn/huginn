@@ -738,7 +738,8 @@ describe Agents::WebsiteAgent do
           'url' => "http://xkcd.com",
           'mode' => "on_change",
           'extract' => {
-            'slogan' => { 'css' => "#slogan", 'value' => ".//text()", 'raw' => true }
+            'slogan' => { 'css' => "#slogan", 'value' => ".//text()", 'raw' => true },
+            'slogan_length' => { 'css' => "#slogan", 'value' => "string-length(.)", 'raw' => true },
           }
         }
         rel = Agents::WebsiteAgent.new(name: "xkcd", options: rel_site)
@@ -747,6 +748,7 @@ describe Agents::WebsiteAgent do
         rel.check
         event = Event.last
         expect(event.payload['slogan']).to eq(["A webcomic of romance,", " sarcasm, math, &amp; language."])
+        expect(event.payload['slogan_length']).to eq(49)
       end
 
       it "should return a string value returned by XPath" do
@@ -757,7 +759,8 @@ describe Agents::WebsiteAgent do
           'url' => "http://xkcd.com",
           'mode' => "on_change",
           'extract' => {
-            'slogan' => { 'css' => "#slogan", 'value' => "string(.)" }
+            'slogan' => { 'css' => "#slogan", 'value' => "string(.)" },
+            'slogan_length' => { 'css' => "#slogan", 'value' => "string-length(.)" },
           }
         }
         rel = Agents::WebsiteAgent.new(name: "xkcd", options: rel_site)
@@ -766,6 +769,7 @@ describe Agents::WebsiteAgent do
         rel.check
         event = Event.last
         expect(event.payload['slogan']).to eq("A webcomic of romance, sarcasm, math, & language.")
+        expect(event.payload['slogan_length']).to eq("49")
       end
 
       it "should interpolate _response_" do
