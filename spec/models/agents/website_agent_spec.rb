@@ -729,6 +729,25 @@ describe Agents::WebsiteAgent do
         expect(event.payload['slogan']).to eq("A webcomic of romance, sarcasm, math, &amp; language.")
       end
 
+      it "should return an array if XPath returns many nodes and the raw option is specified" do
+        rel_site = {
+          'name' => "XKCD",
+          'expected_update_period_in_days' => 2,
+          'type' => "html",
+          'url' => "http://xkcd.com",
+          'mode' => "on_change",
+          'extract' => {
+            'slogan' => {'css' => "#slogan", 'value' => ".//text()", 'raw' => true}
+          }
+        }
+        rel = Agents::WebsiteAgent.new(name: "xkcd", options: rel_site)
+        rel.user = users(:bob)
+        rel.save!
+        rel.check
+        event = Event.last
+        expect(event.payload['slogan']).to eq(["A webcomic of romance,", " sarcasm, math, &amp; language."])
+      end
+
       it "should return a string value returned by XPath" do
         rel_site = {
           'name' => "XKCD",
