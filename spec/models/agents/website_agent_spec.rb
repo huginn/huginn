@@ -122,6 +122,27 @@ describe Agents::WebsiteAgent do
           expect(@checker).to be_valid
         end
       end
+
+      context "in 'html' type" do
+        it "should ensure that all extractions have either 'xpath' or 'css'" do
+          @checker.options['type'] = 'html'
+          @checker.options['extract'] = {
+            'url' => { 'array' => true },
+          }
+          expect(@checker).to_not be_valid
+          expect(@checker.errors_on(:base)).to include(/When type is html or xml, all extractions must have a css or xpath attribute/) & include(/Unknown key "array"/)
+
+          @checker.options['extract'] = {
+            'url' => { 'xpath' => '//bar', 'single_array' => true },
+          }
+          expect(@checker).to be_valid
+
+          @checker.options['extract'] = {
+            'url' => { 'css' => 'bar' },
+          }
+          expect(@checker).to be_valid
+        end
+      end
     end
 
     describe "#check" do
@@ -781,7 +802,7 @@ describe Agents::WebsiteAgent do
               'title' => { 'xpath' => '/feed/entry', 'value' => 'normalize-space(./title)' },
               'url' => { 'xpath' => '/feed/entry', 'value' => './link[1]/@href' },
               'thumbnail' => { 'xpath' => '/feed/entry', 'value' => './thumbnail/@url' },
-              'page_title': { 'xpath': '/feed/title', 'value': 'string(.)', 'repeat' => true }
+              'page_title' => { 'xpath' => '/feed/title', 'value' => 'string(.)', 'repeat' => true }
             }
           }, keep_events_for: 2.days)
           @checker.user = users(:bob)
@@ -1173,7 +1194,7 @@ fire: hot
         it 'returns an array of found nodes when the array extract_option is true' do
           stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
 
-          @checker.options['extract']['nav_links'] = {'css' => '#topLeft li', 'value' => 'normalize-space(.)', 'array' => 'true'}
+          @checker.options['extract']['nav_links'] = {'css' => '#topLeft li', 'value' => 'normalize-space(.)', 'single_array' => 'true'}
           expect {
             @checker.receive([@event])
           }.to change { Event.count }.by(1)

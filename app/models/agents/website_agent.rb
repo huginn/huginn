@@ -62,7 +62,7 @@ module Agents
 
       Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions, all namespaces are stripped from the document unless the top-level option `use_namespaces` is set to `true`.
 
-      For extraction with `array` set to true, all matches will be extracted into an array. This is useful when extracting list elements or multiple parts of a website that can only be matched with the same selector.
+      For extraction with `single_array` set to true, all matches will be extracted into an array. This is useful when extracting list elements or multiple parts of a website that can only be matched with the same selector.
 
       # Scraping JSON
 
@@ -295,6 +295,15 @@ module Agents
           case extraction_type
           when 'html', 'xml'
             extract.each do |name, details|
+              details.each do |name,|
+                case name
+                when 'css', 'xpath', 'value', 'repeat', 'hidden', 'single_array'
+                  # ok
+                else
+                  errors.add(:base, "Unknown key #{name.inspect} in extraction details")
+                end
+              end
+
               case details['css']
               when String
                 # ok
@@ -639,7 +648,7 @@ module Agents
             end
             value.to_s
           end
-          if boolify(extraction_details['array'])
+          if boolify(extraction_details['single_array'])
             values << stringified_nodes
           else
             stringified_nodes.each { |n| values << n }
