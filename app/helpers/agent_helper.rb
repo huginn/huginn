@@ -91,7 +91,9 @@ module AgentHelper
 
   def agent_type_select_options
     Rails.cache.fetch('agent_type_select_options') do
-      [['Select an Agent Type', 'Agent', {title: ''}]] + Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name, User.new(id: 0), {}).html_description.lines.first.strip)}] }
+      types = Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name, User.new(id: 0), {}).html_description.lines.first.strip)}] }
+      types.sort_by! { |t| t[0] }
+      [['Select an Agent Type', 'Agent', {title: ''}]] + types
     end
   end
 

@@ -22,6 +22,7 @@ module Agents
         * `secret` - A token that the requestor must provide for light-weight authentication.
         * `expected_receive_period_in_days` - How often you expect data to be received by this Agent from other Agents.
         * `content` - The content to display when someone requests this page.
+        * `line_break_is_lf` - Use LF as line breaks instead of CRLF.
         * `mime_type` - The mime type to use when someone requests this page.
         * `response_headers` - An object with any custom response headers. (example: `{"Access-Control-Allow-Origin": "*"}`)
         * `mode` - The behavior that determines what data is passed to the Liquid template.
@@ -98,9 +99,12 @@ module Agents
     form_configurable :secret
     form_configurable :expected_receive_period_in_days
     form_configurable :content, type: :text
+    form_configurable :line_break_is_lf, type: :boolean
     form_configurable :mime_type
     form_configurable :mode, type: :array, values: ['Last event in', 'Merge events', 'Last X events']
     form_configurable :event_limit
+
+    before_save :update_last_modified_at, if: :options_changed?
 
     def working?
       last_receive_at && last_receive_at > options['expected_receive_period_in_days'].to_i.days.ago && !recent_error_logs?
@@ -155,13 +159,18 @@ module Agents
             event.payload
           end
       end
+      update_last_modified_at
     end
 
-    def receive_web_request(params, method, format)
-      if valid_authentication?(params)
-        [liquified_content, 200, mime_type, interpolated['response_headers'].presence]
+    def receive_web_request(request)
+      if valid_authentication?(request.params)
+        if request.headers['If-None-Match'].presence&.include?(etag)
+          [nil, 304, {}]
+        else
+          [liquified_content, 200, mime_type, response_headers]
+        end
       else
-        [unauthorized_content(format), 401]
+        [unauthorized_content(request.format.to_s), 401]
       end
     end
 
@@ -188,7 +197,9 @@ module Agents
     end
 
     def liquified_content
-      interpolated(data_for_liquid_template)['content']
+      content = interpolated(data_for_liquid_template)['content']
+      content.gsub!(/\r(?=\n)/, '') if boolify(options['line_break_is_lf'])
+      content
     end
 
     def data_for_liquid_template
@@ -204,13 +215,39 @@ module Agents
       end
     end
 
+    public def etag
+      memory['etag'] || '"0.000000000"'
+    end
+
+    def last_modified_at
+      memory['last_modified_at']&.to_time || Time.at(0)
+    end
+
+    def last_modified_at=(time)
+      memory['last_modified_at'] = time.iso8601(9)
+      memory['etag'] = time.strftime('"%s.%9N"')
+    end
+
+    def update_last_modified_at
+      self.last_modified_at = Time.now
+    end
+
+    def max_age
+      options['expected_receive_period_in_days'].to_i * 86400
+    end
+
+    def response_headers
+      {
+        'Last-Modified' => last_modified_at.httpdate,
+        'ETag' => etag,
+        'Cache-Control' => "max-age=#{max_age}",
+      }.update(interpolated['response_headers'].presence || {})
+    end
+
     def count_limit
-      limit = begin
-        Integer(options['event_limit'])
-      rescue StandardError
-        1000
-      end
-      limit <= 1000 ? limit : 1000
+      [Integer(options['event_limit']), 1000].min
+    rescue StandardError
+      1000
     end
 
     def date_limit

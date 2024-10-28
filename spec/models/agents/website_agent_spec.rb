@@ -24,7 +24,7 @@ describe Agents::WebsiteAgent do
           'hovertext' => { 'css' => "#comic img", 'value' => "@title" }
         }
       }
-      @checker = Agents::WebsiteAgent.new(:name => "xkcd", :options => @valid_options, :keep_events_for => 2.days)
+      @checker = Agents::WebsiteAgent.new(name: "xkcd", options: @valid_options, keep_events_for: 2.days)
       @checker.user = users(:bob)
       @checker.save!
     end
@@ -122,6 +122,27 @@ describe Agents::WebsiteAgent do
           expect(@checker).to be_valid
         end
       end
+
+      context "in 'html' type" do
+        it "should ensure that all extractions have either 'xpath' or 'css'" do
+          @checker.options['type'] = 'html'
+          @checker.options['extract'] = {
+            'url' => { 'array' => true },
+          }
+          expect(@checker).to_not be_valid
+          expect(@checker.errors_on(:base)).to include(/When type is html or xml, all extractions must have a css or xpath attribute/) & include(/Unknown key "array"/)
+
+          @checker.options['extract'] = {
+            'url' => { 'xpath' => '//bar', 'single_array' => true },
+          }
+          expect(@checker).to be_valid
+
+          @checker.options['extract'] = {
+            'url' => { 'css' => 'bar' },
+          }
+          expect(@checker).to be_valid
+        end
+      end
     end
 
     describe "#check" do
@@ -130,7 +151,7 @@ describe Agents::WebsiteAgent do
           expect { @checker.check }.to change { Event.count }.by(1)
         end
         event = Event.last
-        expect { @checker.check }.not_to change { Event.count }
+        expect { @checker.check }.not_to(change { Event.count })
         update_event = Event.last
         expect(update_event.expires_at).not_to eq(event.expires_at)
       end
@@ -158,7 +179,7 @@ describe Agents::WebsiteAgent do
           @valid_options['uniqueness_look_back'] = 2
           @checker.options = @valid_options
           @checker.check
-        }.not_to change { Event.count }
+        }.not_to(change { Event.count })
 
         expect {
           @valid_options['mode'] = 'on_change'
@@ -178,8 +199,8 @@ describe Agents::WebsiteAgent do
       it "should accept an array for url" do
         @valid_options['url'] = ["http://xkcd.com/1/", "http://xkcd.com/2/"]
         @checker.options = @valid_options
-        expect { @checker.save! }.not_to raise_error;
-        expect { @checker.check }.not_to raise_error;
+        expect { @checker.save! }.not_to raise_error
+        expect { @checker.check }.not_to raise_error
       end
 
       it "should parse events from all urls in array" do
@@ -222,7 +243,7 @@ describe Agents::WebsiteAgent do
           },
           # no unzip option
         }
-        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker = Agents::WebsiteAgent.new(name: "Weather Site", options: site)
         checker.user = users(:bob)
         checker.save!
 
@@ -253,7 +274,7 @@ describe Agents::WebsiteAgent do
           },
           # no unzip option
         }
-        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker = Agents::WebsiteAgent.new(name: "Weather Site", options: site)
         checker.user = users(:bob)
         checker.save!
 
@@ -282,7 +303,7 @@ describe Agents::WebsiteAgent do
           },
           'unzip' => 'gzip',
         }
-        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker = Agents::WebsiteAgent.new(name: "Weather Site", options: site)
         checker.user = users(:bob)
         checker.save!
 
@@ -292,13 +313,13 @@ describe Agents::WebsiteAgent do
       end
 
       it 'should either avoid or support a raw deflate stream (#1018)' do
-        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /\A(?!.*deflate)/ }).
-          to_return(body: 'hello',
-                    status: 200)
-        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /deflate/ }).
-          to_return(body: "\xcb\x48\xcd\xc9\xc9\x07\x00\x06\x2c".b,
-                    headers: { 'Content-Encoding' => 'deflate' },
-                    status: 200)
+        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /\A(?!.*deflate)/ })
+          .to_return(body: 'hello',
+                     status: 200)
+        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /deflate/ })
+          .to_return(body: "\xcb\x48\xcd\xc9\xc9\x07\x00\x06\x2c".b,
+                     headers: { 'Content-Encoding' => 'deflate' },
+                     status: 200)
 
         site = {
           'name' => 'Some Response',
@@ -349,7 +370,8 @@ describe Agents::WebsiteAgent do
             'Content-Type' => content_type,
           },
           body: body.b,
-          status: 200)
+          status: 200
+        )
       end
 
       let :options do
@@ -362,7 +384,7 @@ describe Agents::WebsiteAgent do
       end
 
       let :checker do
-        Agents::WebsiteAgent.create!(name: 'Encoding Checker', options: options) { |agent|
+        Agents::WebsiteAgent.create!(name: 'Encoding Checker', options:) { |agent|
           agent.user = users(:bob)
         }
       end
@@ -415,10 +437,10 @@ describe Agents::WebsiteAgent do
             end
 
             let :body do
-              <<-HTML.encode(Encoding::ISO_8859_1)
-<!DOCTYPE html>
-<title>#{odin}</title>
-<p>Hello, world.
+              <<~HTML.encode(Encoding::ISO_8859_1)
+                <!DOCTYPE html>
+                <title>#{odin}</title>
+                <p>Hello, world.
               HTML
             end
 
@@ -431,11 +453,11 @@ describe Agents::WebsiteAgent do
 
           context 'with no charset in the header' do
             let :body do
-              <<-HTML.encode(Encoding::ISO_8859_1)
-<!DOCTYPE html>
-<meta charset="iso-8859-1">
-<title>#{odin}</title>
-<p>Hello, world.
+              <<~HTML.encode(Encoding::ISO_8859_1)
+                <!DOCTYPE html>
+                <meta charset="iso-8859-1">
+                <title>#{odin}</title>
+                <p>Hello, world.
               HTML
             end
 
@@ -452,11 +474,11 @@ describe Agents::WebsiteAgent do
             end
 
             let :body do
-              <<-HTML.encode(Encoding::ISO_8859_1)
-<!DOCTYPE html>
-<meta charset="UTF-8">
-<title>#{odin}</title>
-<p>Hello, world.
+              <<~HTML.encode(Encoding::ISO_8859_1)
+                <!DOCTYPE html>
+                <meta charset="UTF-8">
+                <title>#{odin}</title>
+                <p>Hello, world.
               HTML
             end
 
@@ -488,11 +510,11 @@ describe Agents::WebsiteAgent do
             end
 
             let :body do
-              <<-XML.encode(Encoding::EUC_JP)
-<?xml version="1.0"?>
-<root>
-  <message>#{huginn}</message>
-</root>
+              <<~XML.encode(Encoding::EUC_JP)
+                <?xml version="1.0"?>
+                <root>
+                  <message>#{huginn}</message>
+                </root>
               XML
             end
 
@@ -506,11 +528,11 @@ describe Agents::WebsiteAgent do
           context 'with no charset in the header' do
             context 'but in XML declaration' do
               let :body do
-                <<-XML.encode(Encoding::EUC_JP)
-<?xml version="1.0" encoding="euc-jp"?>
-<root>
-  <message>#{huginn}</message>
-</root>
+                <<~XML.encode(Encoding::EUC_JP)
+                  <?xml version="1.0" encoding="euc-jp"?>
+                  <root>
+                    <message>#{huginn}</message>
+                  </root>
                 XML
               end
 
@@ -523,11 +545,11 @@ describe Agents::WebsiteAgent do
 
             context 'but having a BOM' do
               let :body do
-                <<-XML.encode(Encoding::UTF_16LE)
-\u{feff}<?xml version="1.0"?>
-<root>
-  <message>#{huginn}</message>
-</root>
+                <<~XML.encode(Encoding::UTF_16LE)
+                  \u{feff}<?xml version="1.0"?>
+                  <root>
+                    <message>#{huginn}</message>
+                  </root>
                 XML
               end
 
@@ -586,11 +608,11 @@ describe Agents::WebsiteAgent do
             end
 
             let :body do
-              <<-HTML.encode(Encoding::EUC_JP)
-<!DOCTYPE html>
-<meta charset="UTF-8"/>
-<title>#{huginn}</title>
-<p>Hello, world.
+              <<~HTML.encode(Encoding::EUC_JP)
+                <!DOCTYPE html>
+                <meta charset="UTF-8"/>
+                <title>#{huginn}</title>
+                <p>Hello, world.
               HTML
             end
 
@@ -678,10 +700,10 @@ describe Agents::WebsiteAgent do
           'url' => "http://xkcd.com",
           'mode' => "on_change",
           'extract' => {
-            'num_links' => {'css' => "#comicLinks", 'value' => "count(./a)"}
+            'num_links' => { 'css' => "#comicLinks", 'value' => "count(./a)" }
           }
         }
-        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel = Agents::WebsiteAgent.new(name: "xkcd", options: rel_site)
         rel.user = users(:bob)
         rel.save!
         rel.check
@@ -697,15 +719,36 @@ describe Agents::WebsiteAgent do
           'url' => "http://xkcd.com",
           'mode' => "on_change",
           'extract' => {
-            'slogan' => {'css' => "#slogan", 'value' => ".//text()"}
+            'slogan' => { 'css' => "#slogan", 'value' => ".//text()" }
           }
         }
-        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel = Agents::WebsiteAgent.new(name: "xkcd", options: rel_site)
         rel.user = users(:bob)
         rel.save!
         rel.check
         event = Event.last
         expect(event.payload['slogan']).to eq("A webcomic of romance, sarcasm, math, &amp; language.")
+      end
+
+      it "should return an array if XPath returns many nodes and the raw option is specified" do
+        rel_site = {
+          'name' => "XKCD",
+          'expected_update_period_in_days' => 2,
+          'type' => "html",
+          'url' => "http://xkcd.com",
+          'mode' => "on_change",
+          'extract' => {
+            'slogan' => { 'css' => "#slogan", 'value' => ".//text()", 'raw' => true },
+            'slogan_length' => { 'css' => "#slogan", 'value' => "string-length(.)", 'raw' => true },
+          }
+        }
+        rel = Agents::WebsiteAgent.new(name: "xkcd", options: rel_site)
+        rel.user = users(:bob)
+        rel.save!
+        rel.check
+        event = Event.last
+        expect(event.payload['slogan']).to eq(["A webcomic of romance,", " sarcasm, math, &amp; language."])
+        expect(event.payload['slogan_length']).to eq(49)
       end
 
       it "should return a string value returned by XPath" do
@@ -716,15 +759,17 @@ describe Agents::WebsiteAgent do
           'url' => "http://xkcd.com",
           'mode' => "on_change",
           'extract' => {
-            'slogan' => {'css' => "#slogan", 'value' => "string(.)"}
+            'slogan' => { 'css' => "#slogan", 'value' => "string(.)" },
+            'slogan_length' => { 'css' => "#slogan", 'value' => "string-length(.)" },
           }
         }
-        rel = Agents::WebsiteAgent.new(:name => "xkcd", :options => rel_site)
+        rel = Agents::WebsiteAgent.new(name: "xkcd", options: rel_site)
         rel.user = users(:bob)
         rel.save!
         rel.check
         event = Event.last
         expect(event.payload['slogan']).to eq("A webcomic of romance, sarcasm, math, & language.")
+        expect(event.payload['slogan_length']).to eq("49")
       end
 
       it "should interpolate _response_" do
@@ -754,14 +799,15 @@ describe Agents::WebsiteAgent do
         @checker.check
 
         expect(@checker.event_keys).to contain_exactly('url', 'title', 'summary')
-        expect(@checker.event_description.scan(/"(\w+)": "\.\.\."/).flatten).to contain_exactly('url', 'title', 'summary')
+        expect(@checker.event_description.scan(/"(\w+)": "\.\.\."/).flatten).to contain_exactly('url', 'title',
+                                                                                                'summary')
 
         event = Event.last
         expect(event.payload).to eq({
-                                      'title' => 'EVOLVING',
-                                      'url' => 'http://imgs.xkcd.com/comics/evolving.png',
-                                      'summary' => 'Evolving: Biologists play r...',
-                                    })
+          'title' => 'EVOLVING',
+          'url' => 'http://imgs.xkcd.com/comics/evolving.png',
+          'summary' => 'Evolving: Biologists play r...',
+        })
       end
 
       describe "XML" do
@@ -781,7 +827,7 @@ describe Agents::WebsiteAgent do
               'title' => { 'xpath' => '/feed/entry', 'value' => 'normalize-space(./title)' },
               'url' => { 'xpath' => '/feed/entry', 'value' => './link[1]/@href' },
               'thumbnail' => { 'xpath' => '/feed/entry', 'value' => './thumbnail/@url' },
-              'page_title': { 'xpath': '/feed/title', 'value': 'string(.)', 'repeat' => true }
+              'page_title' => { 'xpath' => '/feed/title', 'value' => 'string(.)', 'repeat' => true }
             }
           }, keep_events_for: 2.days)
           @checker.user = users(:bob)
@@ -884,7 +930,7 @@ describe Agents::WebsiteAgent do
             'url' => 'http://example.com/cdata_rss.atom',
             'mode' => 'on_change',
             'extract' => {
-              'author' => { 'xpath' => '/feed/entry/author/name', 'value' => 'string(.)'},
+              'author' => { 'xpath' => '/feed/entry/author/name', 'value' => 'string(.)' },
               'title' => { 'xpath' => '/feed/entry/title', 'value' => 'string(.)' },
               'content' => { 'xpath' => '/feed/entry/content', 'value' => 'string(.)' },
             }
@@ -902,7 +948,6 @@ describe Agents::WebsiteAgent do
           expect(event.payload['title']).to eq('Help: Rainmeter Skins • Test if Today is Between 2 Dates')
           expect(event.payload['content']).to start_with('Can I ')
         end
-
       end
 
       describe "JSON" do
@@ -913,7 +958,7 @@ describe Agents::WebsiteAgent do
               'title' => "hello!"
             }
           }
-          stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
+          stub_request(:any, /json-site/).to_return(body: json.to_json, status: 200)
           site = {
             'name' => "Some JSON Response",
             'expected_update_period_in_days' => "2",
@@ -921,11 +966,11 @@ describe Agents::WebsiteAgent do
             'url' => "http://json-site.com",
             'mode' => 'on_change',
             'extract' => {
-              'version' => {'path' => "response.version"},
-              'title' => {'path' => "response.title"}
+              'version' => { 'path' => "response.version" },
+              'title' => { 'path' => "response.title" }
             }
           }
-          checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+          checker = Agents::WebsiteAgent.new(name: "Weather Site", options: site)
           checker.user = users(:bob)
           checker.save!
 
@@ -943,12 +988,12 @@ describe Agents::WebsiteAgent do
             'response' => {
               'status' => 'ok',
               'data' => [
-                {'title' => "first", 'version' => 2},
-                {'title' => "second", 'version' => 2.5}
+                { 'title' => "first", 'version' => 2 },
+                { 'title' => "second", 'version' => 2.5 }
               ]
             }
           }
-          stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
+          stub_request(:any, /json-site/).to_return(body: json.to_json, status: 200)
           site = {
             'name' => "Some JSON Response",
             'expected_update_period_in_days' => "2",
@@ -961,7 +1006,7 @@ describe Agents::WebsiteAgent do
               'status' => { 'path' => "response.status", 'repeat' => true },
             }
           }
-          checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+          checker = Agents::WebsiteAgent.new(name: "Weather Site", options: site)
           checker.user = users(:bob)
           checker.save!
 
@@ -986,7 +1031,7 @@ describe Agents::WebsiteAgent do
               'title' => "hello!"
             }
           }
-          stub_request(:any, /json-site/).to_return(:body => json.to_json, :status => 200)
+          stub_request(:any, /json-site/).to_return(body: json.to_json, status: 200)
           site = {
             'name' => "Some JSON Response",
             'expected_update_period_in_days' => "2",
@@ -994,7 +1039,7 @@ describe Agents::WebsiteAgent do
             'url' => "http://json-site.com",
             'mode' => 'on_change'
           }
-          checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+          checker = Agents::WebsiteAgent.new(name: "Weather Site", options: site)
           checker.user = users(:bob)
           checker.save!
 
@@ -1009,10 +1054,10 @@ describe Agents::WebsiteAgent do
 
       describe "text parsing" do
         before do
-          stub_request(:any, /text-site/).to_return(body: <<-EOF, status: 200)
-VERSION 1
-water: wet
-fire: hot
+          stub_request(:any, /text-site/).to_return(body: <<~EOF, status: 200)
+            VERSION 1
+            water: wet
+            fire: hot
           EOF
           site = {
             'name' => 'Some Text Response',
@@ -1101,7 +1146,8 @@ fire: hot
           stub2 = stub_request(:any, 'http://google.org/?url=http%3A%2F%2Ffoo.com')
 
           @checker.options = @valid_options.merge(
-            'url_from_event' => ['http://example.org/?url={{url | uri_escape}}', 'http://google.org/?url={{url | uri_escape}}']
+            'url_from_event' => ['http://example.org/?url={{url | uri_escape}}',
+                                 'http://google.org/?url={{url | uri_escape}}']
           )
           @checker.receive([@event])
 
@@ -1110,7 +1156,8 @@ fire: hot
         end
 
         it "should interpolate values from incoming event payload" do
-          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")),
+                                              status: 200)
 
           expect {
             @valid_options['url_from_event'] = '{{ url }}'
@@ -1171,9 +1218,11 @@ fire: hot
         end
 
         it 'returns an array of found nodes when the array extract_option is true' do
-          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")),
+                                              status: 200)
 
-          @checker.options['extract']['nav_links'] = {'css' => '#topLeft li', 'value' => 'normalize-space(.)', 'array' => 'true'}
+          @checker.options['extract']['nav_links'] =
+            { 'css' => '#topLeft li', 'value' => 'normalize-space(.)', 'single_array' => 'true' }
           expect {
             @checker.receive([@event])
           }.to change { Event.count }.by(1)
@@ -1181,8 +1230,9 @@ fire: hot
         end
 
         it "should set the inbound_event when logging errors" do
-          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
-           @valid_options['extract'] = {
+          stub_request(:any, /foo/).to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")),
+                                              status: 200)
+          @valid_options['extract'] = {
             'url' => { 'css' => "div", 'value' => "@src" },
             'title' => { 'css' => "#comic img", 'value' => "@alt" },
           }
@@ -1232,7 +1282,8 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200 })
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world',
+                                                         'type' => 'application/json', 'status' => 200 })
           end
 
           it "should support merge mode" do
@@ -1241,7 +1292,8 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200))
+            expect(@checker.events.last.payload).to eq(@event.payload.merge('value' => 'world',
+                                                                            'url' => 'http://example.com/world', 'type' => 'application/json', 'status' => 200))
           end
 
           it "should convert headers and status in the event data properly" do
@@ -1250,7 +1302,8 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => 'application/rss+xml', 'status' => 201 })
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world',
+                                                         'type' => 'application/rss+xml', 'status' => 201 })
           end
 
           it "should ignore inconvertible headers and status in the event data" do
@@ -1259,7 +1312,8 @@ fire: hot
             expect {
               @checker.receive([@event])
             }.to change { Event.count }.by(1)
-            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world', 'type' => '', 'status' => nil })
+            expect(@checker.events.last.payload).to eq({ 'value' => 'world', 'url' => 'http://example.com/world',
+                                                         'type' => '', 'status' => nil })
           end
 
           it "should output an error when nothing can be found at the path" do
@@ -1269,7 +1323,7 @@ fire: hot
 
             expect {
               @checker.receive([@event])
-            }.to_not change { Event.count }
+            }.to_not(change { Event.count })
 
             expect(@checker.logs.last.message).to match(/No data was found in the Event payload using the template {{ some_object\.mistake }}/)
           end
@@ -1279,7 +1333,7 @@ fire: hot
 
             expect {
               @checker.receive([@event])
-            }.to_not change { Event.count }
+            }.to_not(change { Event.count })
 
             expect(@checker.logs.last.message).to match(/Error when handling event data:/)
           end
@@ -1333,28 +1387,28 @@ fire: hot
         },
         'basic_auth' => "user:pass"
       }
-      @checker = Agents::WebsiteAgent.new(:name => "auth", :options => @valid_options)
+      @checker = Agents::WebsiteAgent.new(name: "auth", options: @valid_options)
       @checker.user = users(:bob)
       @checker.save!
 
-      stub_request(:any, "www.example.com").
-        with(basic_auth: ['user', 'pass']).
-        to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
+      stub_request(:any, "www.example.com")
+        .with(basic_auth: ['user', 'pass'])
+        .to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
     end
 
     describe "#check" do
       it "should check for changes" do
         expect { @checker.check }.to change { Event.count }.by(1)
-        expect { @checker.check }.not_to change { Event.count }
+        expect { @checker.check }.not_to(change { Event.count })
       end
     end
   end
 
   describe "checking with headers" do
     before do
-      stub_request(:any, /example/).
-        with(headers: { 'foo' => 'bar' }).
-        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), :status => 200)
+      stub_request(:any, /example/)
+        .with(headers: { 'foo' => 'bar' })
+        .to_return(body: File.read(Rails.root.join("spec/data_fixtures/xkcd.html")), status: 200)
       @valid_options = {
         'name' => "XKCD",
         'expected_update_period_in_days' => "2",
@@ -1366,7 +1420,7 @@ fire: hot
           'url' => { 'css' => "#comic img", 'value' => "@src" },
         }
       }
-      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)
+      @checker = Agents::WebsiteAgent.new(name: "ua", options: @valid_options)
       @checker.user = users(:bob)
       @checker.save!
     end
@@ -1380,8 +1434,8 @@ fire: hot
 
   describe "checking urls" do
     before do
-      stub_request(:any, /example/).
-        to_return(:body => File.read(Rails.root.join("spec/data_fixtures/urlTest.html")), :status => 200)
+      stub_request(:any, /example/)
+        .to_return(body: File.read(Rails.root.join("spec/data_fixtures/urlTest.html")), status: 200)
       @valid_options = {
         'name' => "Url Test",
         'expected_update_period_in_days' => "2",
@@ -1395,7 +1449,7 @@ fire: hot
           'url' => '{{ url | to_uri }}',
         }
       }
-      @checker = Agents::WebsiteAgent.new(:name => "ua", :options => @valid_options)
+      @checker = Agents::WebsiteAgent.new(name: "ua", options: @valid_options)
       @checker.user = users(:bob)
       @checker.save!
     end

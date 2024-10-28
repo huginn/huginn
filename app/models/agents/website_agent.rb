@@ -62,7 +62,9 @@ module Agents
 
       Beware that when parsing an XML document (i.e. `type` is `xml`) using `xpath` expressions, all namespaces are stripped from the document unless the top-level option `use_namespaces` is set to `true`.
 
-      For extraction with `array` set to true, all matches will be extracted into an array. This is useful when extracting list elements or multiple parts of a website that can only be matched with the same selector.
+      For extraction with `raw` set to true, each value will be returned as is without any conversion instead of stringifying them.  This is useful when you want to extract a number, a boolean value, or an array of strings.
+
+      For extraction with `single_array` set to true, all matches will be extracted into an array. This is useful when extracting list elements or multiple parts of a website that can only be matched with the same selector.
 
       # Scraping JSON
 
@@ -295,6 +297,15 @@ module Agents
           case extraction_type
           when 'html', 'xml'
             extract.each do |name, details|
+              details.each do |name,|
+                case name
+                when 'css', 'xpath', 'value', 'repeat', 'hidden', 'raw', 'single_array'
+                  # ok
+                else
+                  errors.add(:base, "Unknown key #{name.inspect} in extraction details")
+                end
+              end
+
               case details['css']
               when String
                 # ok
@@ -627,22 +638,63 @@ module Agents
         else
           raise '"css" or "xpath" is required for HTML or XML extraction'
         end
+
         log "Extracting #{extraction_type} at #{xpath || css}"
+
+        expr = extraction_details['value'] || '.'
+
+        handle_float = ->(value) {
+          case
+          when value.nan?
+            'NaN'
+          when value.infinite?
+            if value > 0
+              'Infinity'
+            else
+              '-Infinity'
+            end
+          when value.to_i == value
+            # Node#xpath() returns any numeric value as float;
+            # convert it to integer as appropriate.
+            value.to_i
+          else
+            value
+          end
+        }
+        jsonify =
+          if boolify(extraction_details['raw'])
+            ->(value) {
+              case value
+              when nil, true, false, String, Integer
+                value
+              when Float
+                handle_float.call(value)
+              when Nokogiri::XML::NodeSet
+                value.map(&jsonify)
+              else
+                value.to_s
+              end
+            }
+          else
+            ->(value) {
+              case value
+              when Float
+                handle_float.call(value).to_s
+              else
+                value.to_s
+              end
+            }
+          end
+
         case nodes
         when Nokogiri::XML::NodeSet
-          stringified_nodes = nodes.map do |node|
-            case value = node.xpath(extraction_details['value'] || '.')
-            when Float
-              # Node#xpath() returns any numeric value as float;
-              # convert it to integer as appropriate.
-              value = value.to_i if value.to_i == value
-            end
-            value.to_s
-          end
-          if boolify(extraction_details['array'])
-            values << stringified_nodes
+          node_values = nodes.map { |node|
+            jsonify.call(node.xpath(expr))
+          }
+          if boolify(extraction_details['single_array'])
+            values << node_values
           else
-            stringified_nodes.each { |n| values << n }
+            node_values.each { |value| values << value }
           end
         else
           raise "The result of HTML/XML extraction was not a NodeSet"

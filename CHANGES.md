@@ -2,6 +2,10 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Oct 27, 2024   | WebsiteAgent can output raw XPath values by enabling the `raw` option, effectively obsoleting the `array` option which is now called `single_array`. [#3457](https://github.com/huginn/huginn/pull/3457) |
+| Oct 26, 2024   | Fix huginn_agent gems for the Zeitwerk loader. [#3451](https://github.com/huginn/huginn/pull/3451) |
+| Oct 26, 2024   | LiquidOutputAgent supports a new option `line_break_is_lf`. [#3456](https://github.com/huginn/huginn/pull/3456) |
+| Oct 26, 2024   | LiquidOutputAgent supports ETag. [#3455](https://github.com/huginn/huginn/pull/3455) |
 | May 01, 2024   | Web requesting agents can handle invalid characters by replacing them with U+FFFD. [#3336](https://github.com/huginn/huginn/pull/3336) |
 | May 01, 2024   | Allow setting ActionMailer read and open timeouts. [#3361](https://github.com/huginn/huginn/pull/3361) |
 | May 01, 2024   | Add support for `ttl` and `monospace` to PushoverAgent. [#3389](https://github.com/huginn/huginn/pull/3389) |
