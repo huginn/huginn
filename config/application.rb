@@ -60,5 +60,7 @@ module Huginn
     config.action_view.sanitized_allowed_attributes = %w[href src width height alt cite datetime title class name xml:lang abbr border cellspacing cellpadding valign style]
 
     config.active_record.yaml_column_permitted_classes = [Symbol, Date, Time]
+
+    ActiveSupport::XmlMini.backend = 'Nokogiri'
   end
 end
