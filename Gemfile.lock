@@ -737,8 +737,6 @@ GEM
     rubyzip (2.3.2)
     rufus-scheduler (3.9.2)
       fugit (~> 1.1, >= 1.11.1)
-    sass-rails (6.0.0)
-      sassc-rails (~> 2.1, >= 2.1.1)
     sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
@@ -939,7 +937,7 @@ DEPENDENCIES
   rubocop-performance
   rubocop-rspec
   rufus-scheduler (~> 3.9, >= 3.9.2)
-  sass-rails (>= 6.0)
+  sassc-rails
   select2-rails
   selenium-webdriver
   shoulda-matchers

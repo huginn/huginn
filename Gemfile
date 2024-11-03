@@ -123,7 +123,7 @@ gem 'omniauth'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.10'
 gem 'rails-html-sanitizer', '~> 1.6'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
-gem 'sass-rails', '>= 6.0'
+gem 'sassc-rails'
 gem 'select2-rails'
 gem 'spectrum-rails'
 gem 'sprockets'
