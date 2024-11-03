@@ -1,14 +1,12 @@
 module ApplicationHelper
   def icon_tag(name, options = {})
-    if dom_class = options[:class]
-      dom_class = ' ' << dom_class
-    end
+    dom_class = options[:class]
 
     case name
     when /\Aglyphicon-/
-      "<span class='glyphicon #{name}#{dom_class}'></span>".html_safe
+      "<span class='glyphicon #{name}#{' ' if dom_class}#{dom_class}'></span>".html_safe
     when /\Afa-/
-      "<i class='fa #{name}#{dom_class}'></i>".html_safe
+      "<i class='#{'fa-solid ' unless /(?:\A| )fa-(?:solid|brands)(?: |\z)/.match?(dom_class)}#{name}#{' ' if dom_class}#{dom_class}'></i>".html_safe
     else
       raise "Unrecognized icon name: #{name}"
     end
@@ -56,7 +54,7 @@ module ApplicationHelper
   def omniauth_provider_icon(provider)
     case provider.to_sym
     when :twitter, :tumblr, :github, :dropbox, :google
-      icon_tag("fa-#{provider}")
+      icon_tag("fa-#{provider}", class: 'fa-brands')
     else
       icon_tag("fa-lock")
     end
