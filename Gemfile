@@ -38,7 +38,7 @@ gem 'net-ftp'
 gem 'net-ftp-list'                # FtpsiteAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
-gem 'twilio-ruby', '~> 7.2.2'    # TwilioAgent
+gem 'twilio-ruby', '~> 7.3.5'     # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -74,11 +74,11 @@ gem 'omniauth-evernote'
 gem 'listen', '~> 3.9.0', require: false
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.148.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.169.0'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
-gem 'omniauth-google-oauth2', '>= 0.8.2'
+gem 'omniauth-google-oauth2', '~> 1.0.1'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
@@ -106,7 +106,7 @@ gem 'foreman', '~> 0.88.1', github: 'ddollar/foreman'
 gem 'geokit', '~> 1.14'
 gem 'geokit-rails', '~> 2.5'
 gem 'httmultiparty', '~> 0.3.16'
-gem 'httparty', '~> 0.21'
+gem 'httparty', '~> 0.22'
 gem 'huginn_agent'
 gem 'jquery-rails', '~> 4.6'
 gem 'json', '~> 2.7', '>= 2.7.5'
