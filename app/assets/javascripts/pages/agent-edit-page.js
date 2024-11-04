@@ -1,13 +1,6 @@
 (function () {
   let formatAgentForSelect = undefined;
   const Cls = (this.AgentEditPage = class AgentEditPage {
-    static initClass() {
-      formatAgentForSelect = function (agent) {
-        const originalOption = agent.element;
-        const description = agent.element[0].title;
-        return "<strong>" + agent.text + "</strong><br/>" + description;
-      };
-    }
     constructor() {
       this.invokeDryRun = this.invokeDryRun.bind(this);
       $("#agent_source_ids").on("change", this.showEventDescriptions);
@@ -76,8 +69,15 @@
         // Update the dropdown to match agent description as well as agent name
         $("select#agent_type").select2({
           width: "resolve",
-          formatResult: formatAgentForSelect,
-          escapeMarkup: (m) => m,
+          templateResult: (agent) => {
+            if (!agent.element || !agent.title) return agent.text;
+
+            return [
+              ...$(document.createElement('strong')).text(agent.text),
+              document.createElement('br'),
+              ...$.parseHTML(agent.title),
+            ];
+          },
           matcher: (params, data) => {
             const term = params.term;
             if (term == null) return data;
@@ -333,7 +333,6 @@
       return Utils.handleDryRunButton(e.currentTarget);
     }
   });
-  Cls.initClass();
   return Cls;
 })();
 

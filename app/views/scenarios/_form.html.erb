@@ -1,4 +1,4 @@
-<%= form_for(@scenario, :method => @scenario.new_record? ? "POST" : "PUT") do |f| %>
+<%= form_for(@scenario, method: @scenario.new_record? ? "POST" : "PUT") do |f| %>
   <% if @scenario.errors.any? %>
     <div class="row well">
       <h2><%= pluralize(@scenario.errors.count, "error") %> prohibited this Scenario from being saved:</h2>
@@ -12,19 +12,19 @@
     <div class="col-md-4">
       <div class="form-group">
         <%= f.label :name %>
-        <%= f.text_field :name, :class => 'form-control', :placeholder => "Name your Scenario" %>
+        <%= f.text_field :name, class: 'form-control', placeholder: "Name your Scenario" %>
       </div>
     </div>
     <div class="col-md-2">
       <div class="form-group">
         <%= f.label :tag_bg_color, "Tag Background Color" %>
-        <%= f.color_field :tag_bg_color, :class => 'form-control', :value => @scenario.tag_bg_color || default_scenario_bg_color %>
+        <%= f.color_field :tag_bg_color, class: 'form-control', value: @scenario.tag_bg_color || default_scenario_bg_color %>
       </div>
     </div>
     <div class="col-md-2">
       <div class="form-group">
         <%= f.label :tag_fg_color, "Tag Foreground Color" %>
-        <%= f.color_field :tag_fg_color, :class => 'form-control', :value => @scenario.tag_fg_color || default_scenario_fg_color %>
+        <%= f.color_field :tag_fg_color, class: 'form-control', value: @scenario.tag_fg_color || default_scenario_fg_color %>
       </div>
     </div>
   </div>
@@ -33,7 +33,7 @@
     <div class="col-md-8">
       <div class="form-group">
         <%= f.label :description, "Optional Description" %>
-        <%= f.text_area :description, :rows => 10, :class => 'form-control', :placeholder => "Optionally describe what this Scenario will do.  If this will be public, you should also include some contact information." %>
+        <%= f.text_area :description, rows: 10, class: 'form-control', placeholder: "Optionally describe what this Scenario will do.  If this will be public, you should also include some contact information." %>
       </div>
 
       <div class="checkbox">
@@ -52,7 +52,7 @@
         <div>
           <%= f.label :icon %>
           <%= f.select(:icon, options_for_select(Scenario.icons, @scenario.icon), {},
-            {:style => "font-family:'FontAwesome', Arial;", :class => 'select2-fountawesome-icon'}) %>
+              class: 'select2-fontawesome-icon') %>
         </div>
       </div>
     </div>
@@ -64,8 +64,8 @@
         <div>
           <%= f.label :agents %>
           <%= f.select(:agent_ids,
-                       options_for_select(current_user.agents.pluck(:name, :id), @scenario.agent_ids),
-                       {}, { :multiple => true, :size => 5, :class => 'select2-linked-tags form-control', data: {url_prefix: '/agents'} }) %>
+                       options_for_select(current_user.agents.pluck(:name, :id), @scenario.agent_ids), {},
+                       multiple: true, size: 5, class: 'select2-linked-tags form-control', data: {url_prefix: '/agents'}) %>
         </div>
       </div>
     </div>
@@ -74,7 +74,7 @@
   <div class="row">
     <div class="col-md-12">
       <div class='form-actions' style='clear: both'>
-        <%= f.submit "Save Scenario", :class => "btn btn-primary" %>
+        <%= f.submit "Save Scenario", class: "btn btn-primary" %>
       </div>
     </div>
   </div>

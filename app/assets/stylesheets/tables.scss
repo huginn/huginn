@@ -1,4 +1,6 @@
 // Sortable table headers
+@import "font-awesome";
+
 .table th a.selected {
   position: relative;
   text-decoration: underline;
@@ -8,15 +10,16 @@
     position: absolute;
     top: 0;
     right: -1em;
-    font-family: FontAwesome;
+    @extend %fa-icon;
+    @extend .fa-solid;
   }
 
   &.asc:after {
-    content: '\f0de'; //fa-sort-asc
+    content: fa-content($fa-var-sort-asc);
   }
 
   &.desc:after {
-    content: '\f0dd'; //fa-sort-desc
+    content: fa-content($fa-var-sort-desc);
   }
 }
 
