@@ -6,8 +6,8 @@ module JsonSerializedField
   module ClassMethods
     def json_serialize(*fields)
       fields.each do |field|
-        class_eval <<-CODE
-          serialize :#{field}, JsonWithIndifferentAccess
+        class_eval <<-CODE, __FILE__, __LINE__ + 1
+          serialize :#{field}, coder: JsonWithIndifferentAccess
 
           validate :#{field}_has_no_errors
 

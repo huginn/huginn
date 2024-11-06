@@ -15,9 +15,7 @@ RUN apt-get update && \
       libfreetype6-dev \
       libfontconfig1 \
       libfontconfig1-dev curl && \
-    apt-get -y clean && \
-    curl -Ls https://bitbucket.org/ariya/phantomjs/downloads/${PHANTOM_JS}.tar.bz2 \
-      | tar jxvf - --strip-components=2 -C /usr/local/bin/ ${PHANTOM_JS}/bin/phantomjs
+    apt-get -y clean
 
 RUN export LC_ALL=en_US.UTF-8 ON_HEROKU=true && \
     bundle config set --local path vendor/bundle && \

@@ -29,13 +29,13 @@ end
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
-gem 'pirate_weather_forecast_ruby'  # WeatherAgent
-gem 'hipchat', '~> 1.6.0'         # HipchatAgent
+gem 'hipchat', '~> 1.6.0' # HipchatAgent
 gem 'hypdf', bitbucket: 'knu/hypdf_gem', branch: 'uploadio_namespace' # PDFInfoAgent
-gem 'mini_racer'                  # JavaScriptAgent
-gem 'mqtt'                        # MQTTAgent
+gem 'mini_racer' # JavaScriptAgent
+gem 'mqtt' # MQTTAgent
 gem 'net-ftp'
-gem 'net-ftp-list'                # FtpsiteAgent
+gem 'net-ftp-list' # FtpsiteAgent
+gem 'pirate_weather_forecast_ruby' # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
 gem 'twilio-ruby', '~> 7.3.5'     # TwilioAgent
@@ -116,10 +116,11 @@ gem 'kramdown'
 gem 'liquid', '~> 5.5', '>= 5.5.1'
 gem 'loofah', '~> 2.23', '>= 2.23.1'
 gem 'mail', '>= 2.8.1'
-gem 'mini_magick', ">= 5.0.1"
+gem 'mini_magick', '>= 5.0.1'
 gem 'multi_xml'
-gem "nokogiri", ">= 1.16.7"
+gem 'nokogiri', '>= 1.16.7'
 gem 'omniauth'
+gem 'puma'
 gem 'rails', '~> 7.2.2'
 gem 'rails-html-sanitizer', '~> 1.6'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
@@ -158,7 +159,6 @@ group :development do
   group :test do
     gem 'capybara'
     gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', require: false
-    gem 'puma'
     gem 'rails-controller-testing'
     gem 'rr', require: false
     gem 'rspec'
@@ -175,24 +175,19 @@ group :development do
   end
 end
 
-group :production do
-  gem 'unicorn'
-  gem 'unicorn-rails'
-end
-
 # Platform requirements.
 require 'rbconfig'
 gem 'ffi', '>= 1.16.3'	# required by typhoeus; 1.9.4 has fixes for *BSD.
 gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
+gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw]
 # BSD systems require rb-kqueue for "listen" to avoid polling for changes.
 gem 'rb-kqueue', '>= 0.2.8', require: /bsd|dragonfly/i === RbConfig::CONFIG['target_os']
 
 on_heroku = ENV['ON_HEROKU'] ||
-  ENV['HEROKU_POSTGRESQL_ROSE_URL'] ||
-  ENV['HEROKU_POSTGRESQL_GOLD_URL'] ||
-  File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
+            ENV['HEROKU_POSTGRESQL_ROSE_URL'] ||
+            ENV['HEROKU_POSTGRESQL_GOLD_URL'] ||
+            File.read(File.join(File.dirname(__FILE__), 'Procfile')) =~ /intended for Heroku/
 
 ENV['DATABASE_ADAPTER'] ||=
   if on_heroku
@@ -206,9 +201,9 @@ if_true(ENV['DATABASE_ADAPTER'].strip == 'postgresql') do
 end
 
 if_true(ENV['DATABASE_ADAPTER'].strip == 'mysql2') do
-  gem 'mysql2', "~> 0.5", ">= 0.5.6"
+  gem 'mysql2', '~> 0.5', '>= 0.5.6'
 end
 
 GemfileHelper.parse_each_agent_gem(ENV['ADDITIONAL_GEMS']) do |args|
-  gem *args
+  gem(*args)
 end
