@@ -861,7 +861,7 @@ DEPENDENCIES
   binding_of_caller
   bootsnap
   bootstrap-kaminari-views (~> 0.0.5)
-  bundler (>= 2.5.22)
+  bundler (>= 2.5.23)
   capistrano
   capistrano-bundler
   capistrano-rails
@@ -881,7 +881,7 @@ DEPENDENCIES
   faraday (~> 1.10, >= 1.10.4)
   faraday_middleware
   feedjira (~> 3.2, >= 3.2.3)
-  ffi (>= 1.16.3)
+  ffi (>= 1.17.0)
   font-awesome-sass (~> 6.5.2)
   foreman (~> 0.88.1)!
   geokit (~> 1.14)
@@ -974,4 +974,4 @@ RUBY VERSION
    ruby 3.2.4p170
 
 BUNDLED WITH
-   2.5.22
+   2.5.23

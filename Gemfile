@@ -90,7 +90,7 @@ end
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'bundler', '>= 2.5.22'
+gem 'bundler', '>= 2.5.23'
 gem 'coffee-rails', '~> 5'
 gem 'daemons', '~> 1.4.1'
 gem 'delayed_job'
@@ -182,7 +182,7 @@ end
 
 # Platform requirements.
 require 'rbconfig'
-gem 'ffi', '>= 1.16.3'	# required by typhoeus; 1.9.4 has fixes for *BSD.
+gem 'ffi', '>= 1.17.0'	# required by typhoeus; 1.9.4 has fixes for *BSD.
 gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
