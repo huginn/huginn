@@ -167,7 +167,7 @@ module Agents
 
       Set `disable_ssl_verification` to `true` to disable ssl verification.
 
-      Set `unzip` to `gzip` to inflate the resource using gzip.
+      Set `unzip` to `gzip` to inflate the resource using gzip or to `deflate` to inflate using deflate.
 
       Set `http_success_codes` to an array of status codes (e.g., `[404, 422]`) to treat HTTP response codes beyond 200 as successes.
 

@@ -312,6 +312,35 @@ describe Agents::WebsiteAgent do
         expect(event.payload['version']).to eq(2)
       end
 
+      it 'should use deflate when specified in unzip option' do
+        json = {
+          'response' => {
+            'version' => 2,
+            'title' => "hello!"
+          }
+        }
+        zipped = Zlib::Deflate.deflate(json.to_json)
+        stub_request(:any, /deflate/).to_return(body: zipped, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://deflate.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'version' => { 'path' => 'response.version' },
+          },
+          'unzip' => 'deflate',
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        expect(event.payload['version']).to eq(2)
+      end
+
       it 'should either avoid or support a raw deflate stream (#1018)' do
         stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /\A(?!.*deflate)/ })
           .to_return(body: 'hello',

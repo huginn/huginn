@@ -48,6 +48,7 @@ module Agents
           * `basic_auth` - Specify HTTP basic auth parameters: `"username:password"`, or `["username", "password"]`.
           * `disable_ssl_verification` - Set to `true` to disable ssl verification.
           * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
+          * `unzip` - set to `gzip` to inflate the resource using gzip or to `deflate` to inflate using deflate.
 
         #{receiving_file_handling_agent_description}
 
