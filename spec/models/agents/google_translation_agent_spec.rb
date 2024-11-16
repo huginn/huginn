@@ -7,7 +7,7 @@ describe Agents::GoogleTranslationAgent, :vcr do
       options: {
         to: "sv",
         from: "en",
-        google_api_key: 'some_api_key',
+        google_api_key: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         expected_receive_period_in_days: 1,
         content: {
           text: "{{message}}",
