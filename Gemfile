@@ -47,7 +47,7 @@ gem 'weibo_2', github: 'albertsun/weibo_2', branch: 'master'
 
 # GoogleCalendarPublishAgent and GoogleTranslateAgent
 gem 'google-api-client', '~> 0.53'
-gem 'google-cloud-translate', '~> 2.3', require: 'google/cloud/translate'
+gem 'google-cloud-translate', '~> 3.6', '>= 3.6.1', require: 'google/cloud/translate'
 
 # Twitter Agents
 gem 'omniauth-twitter'
