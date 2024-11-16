@@ -1,6 +1,7 @@
 module Agents
   class GoogleTranslationAgent < Agent
     cannot_be_scheduled!
+    can_dry_run!
 
     gem_dependency_check do
       require 'google/cloud/translate/v2'
