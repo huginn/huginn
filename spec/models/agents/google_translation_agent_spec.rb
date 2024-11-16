@@ -79,5 +79,14 @@ describe Agents::GoogleTranslationAgent, :vcr do
       @checker.options[:to] = ""
       expect(@checker).not_to be_valid
     end
+
+    it "should validate the value of 'mode' key" do
+      @checker.options[:mode] = "clean"
+      expect(@checker).to be_valid
+      @checker.options[:mode] = "merge"
+      expect(@checker).to be_valid
+      @checker.options[:mode] = "clear"
+      expect(@checker).not_to be_valid
+    end
   end
 end

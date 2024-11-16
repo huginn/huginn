@@ -28,6 +28,8 @@ module Agents
       Specify an object in `content` field using [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) expressions, which will be evaluated for each incoming event, and then translated to become the payload of the new event.
       You can specify a nested object of any levels containing arrays and objects, and all string values except for object keys will be recursively translated.
 
+      Set `mode` to `merge` if you want to merge each translated content with the original event payload.  The default behavior (`clean`) is to emit events with only translated contents.
+
       `expected_receive_period_in_days` is the maximum number of days you would allow to pass between events.
     MD
 
@@ -35,13 +37,14 @@ module Agents
 
     def default_options
       {
-        'to' => "sv",
+        'mode' => 'clean',
+        'to' => 'sv',
         'from' => 'en',
         'google_api_key' => '',
         'expected_receive_period_in_days' => 1,
         'content' => {
           'text' => "{{message}}",
-          'moretext' => "{{another message}}"
+          'moretext' => "{{another_message}}"
         }
       }
     end
@@ -54,14 +57,26 @@ module Agents
       unless options['google_api_key'].present? && options['to'].present? && options['content'].present? && options['expected_receive_period_in_days'].present?
         errors.add :base, "google_api_key, to, content and expected_receive_period_in_days are all required"
       end
+
+      case options['mode'].presence
+      when nil, /\A(?:clean|merge)\z|\{/
+        # ok
+      else
+        errors.add(:base, "mode must be 'clean' or 'merge'")
+      end
     end
 
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          translated_event = translate(interpolated['content'])
+          translated_content = translate(interpolated['content'])
 
-          create_event payload: translated_event
+          case interpolated['mode']
+          when 'merge'
+            create_event payload: event.payload.merge(translated_content)
+          else
+            create_event payload: translated_content
+          end
         end
       end
     end
