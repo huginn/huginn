@@ -516,7 +516,7 @@ GEM
       rake
     mini_magick (5.0.1)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.7)
+    mini_portile2 (2.8.8)
     mini_racer (0.6.3)
       libv8-node (~> 16.10.0.0)
     minitest (5.25.1)
@@ -804,7 +804,7 @@ GEM
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
-    twilio-ruby (7.3.5)
+    twilio-ruby (7.3.6)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
@@ -955,7 +955,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client (~> 0.8.6)!
-  twilio-ruby (~> 7.3.5)
+  twilio-ruby (~> 7.3.6)
   twitter!
   twitter-stream!
   typhoeus (~> 1.4.1)

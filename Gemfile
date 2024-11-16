@@ -38,7 +38,7 @@ gem 'net-ftp'
 gem 'net-ftp-list'                # FtpsiteAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
-gem 'twilio-ruby', '~> 7.3.5'     # TwilioAgent
+gem 'twilio-ruby', '~> 7.3.6'     # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
