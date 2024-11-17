@@ -5,6 +5,18 @@ GIT
     capybara-select-2 (0.5.1)
 
 GIT
+  remote: https://github.com/IFTTT/tumblr_client.git
+  revision: 690ac56bdbfebf34c89b066c94f513236d139d9c
+  specs:
+    tumblr_client (0.8.6)
+      faraday (~> 2.0)
+      faraday-multipart
+      json
+      mime-types
+      oauth
+      simple_oauth
+
+GIT
   remote: https://github.com/albertsun/weibo_2.git
   revision: ac38d04434747c4b88e86c5337cd436d00c34349
   branch: master
@@ -71,18 +83,6 @@ GIT
       multipart-post (~> 2.0)
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
-
-GIT
-  remote: https://github.com/tumblr/tumblr_client.git
-  revision: a72b7f4636cb0ea75cb65ce90df902c3cb7d96b7
-  specs:
-    tumblr_client (0.8.6)
-      faraday (~> 1.0)
-      faraday_middleware (~> 1.0)
-      json
-      mime-types
-      oauth
-      simple_oauth
 
 GIT
   remote: https://knu@bitbucket.org/knu/hypdf_gem.git
@@ -275,31 +275,22 @@ GEM
       evernote-thrift
       oauth (>= 0.4.1)
     execjs (2.9.1)
-    faraday (1.10.4)
-      faraday-em_http (~> 1.0)
-      faraday-em_synchrony (~> 1.0)
-      faraday-excon (~> 1.1)
-      faraday-httpclient (~> 1.0)
-      faraday-multipart (~> 1.0)
-      faraday-net_http (~> 1.0)
-      faraday-net_http_persistent (~> 1.0)
-      faraday-patron (~> 1.0)
-      faraday-rack (~> 1.0)
-      faraday-retry (~> 1.0)
-      ruby2_keywords (>= 0.0.4)
-    faraday-em_http (1.0.0)
-    faraday-em_synchrony (1.0.0)
-    faraday-excon (1.1.0)
-    faraday-httpclient (1.0.1)
+    faraday (2.12.1)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
+    faraday-gzip (3.0.2)
+      faraday (>= 2.0, < 3)
+      zlib (~> 3.0)
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
-    faraday-net_http (1.0.2)
-    faraday-net_http_persistent (1.2.0)
-    faraday-patron (1.0.0)
-    faraday-rack (1.0.0)
-    faraday-retry (1.0.3)
-    faraday_middleware (1.2.0)
-      faraday (~> 1.0)
+    faraday-net_http (3.4.0)
+      net-http (>= 0.5.0)
+    faraday-typhoeus (1.1.0)
+      faraday (~> 2.0)
+      typhoeus (~> 1.4)
     feedjira (3.2.3)
       loofah (>= 2.3.1, < 3)
       sax-machine (>= 1.0, < 2)
@@ -378,13 +369,13 @@ GEM
       grpc (~> 1.41)
     googleapis-common-protos-types (1.16.0)
       google-protobuf (>= 3.18, < 5.a)
-    googleauth (0.17.1)
-      faraday (>= 0.17.3, < 2.0)
+    googleauth (1.11.2)
+      faraday (>= 1.0, < 3.a)
+      google-cloud-env (~> 2.1)
       jwt (>= 1.4, < 3.0)
-      memoist (~> 0.16)
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
-      signet (~> 0.15)
+      signet (>= 0.16, < 2.a)
     grpc (1.67.0)
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
@@ -507,7 +498,6 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.2)
-    memoist (0.16.2)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
     method_source (1.1.0)
@@ -536,6 +526,8 @@ GEM
       net-protocol
       time
     net-ftp-list (3.3.0)
+    net-http (0.5.0)
+      uri
     net-imap (0.5.0)
       date
       net-protocol
@@ -739,7 +731,6 @@ GEM
       rubocop-capybara (~> 2.17)
       rubocop-factory_bot (~> 2.22)
     ruby-progressbar (1.13.0)
-    ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
     rufus-scheduler (3.9.2)
       fugit (~> 1.1, >= 1.11.1)
@@ -827,6 +818,7 @@ GEM
     unicorn-rails (2.2.1)
       rack
       unicorn
+    uri (1.0.2)
     vcr (6.1.0)
     version_gem (1.1.4)
     warden (1.2.9)
@@ -848,6 +840,7 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.1)
+    zlib (3.2.0)
 
 PLATFORMS
   aarch64-linux
@@ -870,18 +863,20 @@ DEPENDENCIES
   capybara
   capybara-select-2!
   coffee-rails (~> 5)
-  daemons (~> 1.4.1)
+  daemons
   delayed_job
   delayed_job_active_record
   devise (~> 4.9, >= 4.9.4)
   dotenv!
   dropbox-api!
-  em-http-request (~> 1.1.7)
+  em-http-request
   erector!
   evernote_oauth
   execjs
-  faraday (~> 1.10, >= 1.10.4)
-  faraday_middleware
+  faraday
+  faraday-follow_redirects
+  faraday-gzip
+  faraday-typhoeus
   feedjira (~> 3.2, >= 3.2.3)
   ffi (>= 1.17.0)
   font-awesome-sass (~> 6.5.2)
@@ -956,14 +951,14 @@ DEPENDENCIES
   spring-watcher-listen
   sprockets
   terser
-  tumblr_client (~> 0.8.6)!
+  tumblr_client!
   twilio-ruby (~> 7.3.6)
   twitter!
   twitter-stream!
-  typhoeus (~> 1.4.1)
+  typhoeus
   tzinfo (>= 2.0.6)
   tzinfo-data
-  uglifier (~> 4.2.1)
+  uglifier
   unicorn
   unicorn-rails
   vcr
