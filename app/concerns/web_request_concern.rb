@@ -1,5 +1,4 @@
 require 'faraday'
-require 'faraday_middleware'
 
 module WebRequestConcern
   module DoNotEncoder
@@ -134,8 +133,10 @@ module WebRequestConcern
       builder.proxy = interpolated['proxy'].presence
 
       unless boolify(interpolated['disable_redirect_follow'])
-        builder.use FaradayMiddleware::FollowRedirects
+        require 'faraday/follow_redirects'
+        builder.response :follow_redirects
       end
+
       builder.request :multipart
       builder.request :url_encoded
 
@@ -146,14 +147,14 @@ module WebRequestConcern
       builder.options.timeout = (Delayed::Worker.max_run_time.seconds - 2).to_i
 
       if userinfo = basic_auth_credentials
-        builder.request :basic_auth, *userinfo
+        builder.request :authorization, :basic, *userinfo
       end
 
-      builder.use FaradayMiddleware::Gzip
+      builder.request :gzip
 
       case backend = faraday_backend
-      when :typhoeus
-        require 'typhoeus/adapters/faraday'
+      when :typhoeus, :httpclient, :em_http
+        require "faraday/#{backend}"
       end
       builder.adapter backend
     }

@@ -55,9 +55,8 @@ gem 'twitter', github: 'sferik/twitter' # Must to be loaded before cantino-twitt
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 
 # Tumblr Agents
-# until merge of https://github.com/tumblr/tumblr_client/pull/61
 gem 'omniauth-tumblr'
-gem 'tumblr_client', '~> 0.8.6', github: 'tumblr/tumblr_client'
+gem 'tumblr_client', github: 'IFTTT/tumblr_client'
 
 # Dropbox Agents
 gem 'dropbox-api', github: 'dsander/dropbox-api', ref: '86cb7b5a1254dc5b054de7263835713c4c1018c7'
@@ -92,14 +91,18 @@ gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
 gem 'bundler', '>= 2.5.23'
 gem 'coffee-rails', '~> 5'
-gem 'daemons', '~> 1.4.1'
+gem 'daemons'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'devise', '~> 4.9', '>= 4.9.4'
-gem 'em-http-request', '~> 1.1.7'
+gem 'em-http-request'
 gem 'execjs'
-gem 'faraday', '~> 1.10', '>= 1.10.4'
-gem 'faraday_middleware'
+gem 'faraday'
+# gem 'faraday-em_http'
+gem 'faraday-follow_redirects'
+gem 'faraday-gzip'
+# gem 'faraday-httpclient'
+gem 'faraday-typhoeus'
 gem 'feedjira', '~> 3.2', '>= 3.2.3'
 gem 'font-awesome-sass', '~> 6.5.2'
 gem 'foreman', '~> 0.88.1', github: 'ddollar/foreman'
@@ -128,8 +131,8 @@ gem 'select2-rails'
 gem 'spectrum-rails'
 gem 'sprockets'
 gem 'terser'
-gem 'typhoeus', '~> 1.4.1'
-gem 'uglifier', '~> 4.2.1'
+gem 'typhoeus'
+gem 'uglifier'
 
 group :development do
   gem 'better_errors'

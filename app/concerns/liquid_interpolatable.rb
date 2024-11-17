@@ -179,8 +179,7 @@ module LiquidInterpolatable
 
       http = Faraday.new do |builder|
         builder.adapter :net_http
-        # builder.use FaradayMiddleware::FollowRedirects, limit: limit
-        # ...does not handle non-HTTP URLs.
+        # The follow_redirects middleware does not handle non-HTTP URLs.
       end
 
       limit.times do

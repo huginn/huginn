@@ -159,12 +159,12 @@ shared_examples_for WebRequestConcern do
 
     describe "redirect follow" do
       it "should use FollowRedirects by default" do
-        expect(agent.faraday.builder.handlers).to include(FaradayMiddleware::FollowRedirects)
+        expect(agent.faraday.builder.handlers).to include(Faraday::FollowRedirects::Middleware)
       end
 
       it "should not use FollowRedirects when disabled" do
         agent.options['disable_redirect_follow'] = true
-        expect(agent.faraday.builder.handlers).not_to include(FaradayMiddleware::FollowRedirects)
+        expect(agent.faraday.builder.handlers).not_to include(Faraday::FollowRedirects::Middleware)
       end
     end
   end
