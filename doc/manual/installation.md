@@ -72,15 +72,14 @@ Remove the old Ruby versions if present:
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.4.tar.xz | tar xJ
-    cd ruby-3.2.4
+    curl -L --progress-bar https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.6.tar.xz | tar xJ
+    cd ruby-3.2.6
     ./configure --disable-install-rdoc
     make -j`nproc`
     sudo make install
 
-Update rubygems and install foreman:
+Install foreman:
 
-    sudo gem update --system --no-document
     sudo gem install foreman --no-document
 
 ## 3. System Users

@@ -62,8 +62,8 @@ Upgrade when required:
 
 ```
 mkdir /tmp/ruby && cd /tmp/ruby
-curl -L --progress https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.4.tar.xz | tar xJ
-cd ruby-3.2.4
+curl -L --progress https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.6.tar.xz | tar xJ
+cd ruby-3.2.6
 ./configure --disable-install-rdoc
 make -j`nproc`
 sudo make install
@@ -71,15 +71,6 @@ sudo gem install rake bundler foreman --no-document
 ```
 
 ### 5. Install gems, migrate and precompile assets
-
-Ensure you have rubygems 2.7.0+ installed:
-
-```
-gem -v
-
-# Update rubygems if the version is too old
-sudo gem update --system --no-document
-```
 
 ```
 cd /home/huginn/huginn
