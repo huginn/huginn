@@ -25,9 +25,12 @@ module WebRequestConcern
       @app.call(env).on_complete do |env|
         body = env[:body]
 
-        case @unzip
-        when 'gzip'.freeze
-          body.replace(ActiveSupport::Gzip.decompress(body))
+        if @unzip == 'gzip'
+          begin
+            body.replace(ActiveSupport::Gzip.decompress(body))
+          rescue Zlib::GzipFile::Error => e
+            log e.message
+          end
         end
 
         case
