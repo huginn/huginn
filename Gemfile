@@ -134,6 +134,11 @@ gem 'terser'
 gem 'typhoeus'
 gem 'uglifier'
 
+group :development, :test do
+  gem 'debug'
+  gem 'rspec-rails'
+end
+
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
@@ -168,7 +173,6 @@ group :development do
     gem 'rspec-collection_matchers'
     gem 'rspec-html-matchers'
     gem 'rspec-mocks'
-    gem 'rspec-rails'
     gem 'selenium-webdriver'
     gem 'shoulda-matchers'
     gem 'simplecov', require: false
