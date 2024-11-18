@@ -2,6 +2,8 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Nov 17, 2024   | Enhance GoogleTranslationAgent by adding support for "merge" mode and translation of any nested object with a single call of Cloud Translation API. [#3466](https://github.com/huginn/huginn/pull/3466) |
+| Nov 04, 2024   | Restore usability the Agent type picker and Scenario icon picker partially broken for a long time.<br>Update Font-Awesome icons to version 6. [#3459](https://github.com/huginn/huginn/pull/3459) |
 | Oct 27, 2024   | WebsiteAgent can output raw XPath values by enabling the `raw` option, effectively obsoleting the `array` option which is now called `single_array`. [#3457](https://github.com/huginn/huginn/pull/3457) |
 | Oct 26, 2024   | Fix huginn_agent gems for the Zeitwerk loader. [#3451](https://github.com/huginn/huginn/pull/3451) |
 | Oct 26, 2024   | LiquidOutputAgent supports a new option `line_break_is_lf`. [#3456](https://github.com/huginn/huginn/pull/3456) |

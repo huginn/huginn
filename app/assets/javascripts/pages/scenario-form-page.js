@@ -4,16 +4,19 @@ this.ScenarioFormPage = class ScenarioFormPage {
   }
 
   format(icon) {
-    const originalOption = icon.element;
-    return (
-      '<i class="fa ' + $(originalOption).data("icon") + '"></i> ' + icon.text
-    );
+    if (!icon.element) return icon.text;
+
+    return [
+      ...$(document.createElement('i')).addClass(`fa-solid ${icon.element.dataset.icon}`),
+      document.createTextNode(` ${icon.text}`),
+    ];
   }
 
   enabledSelect2() {
-    return $(".select2-fountawesome-icon").select2({
+    return $(".select2-fontawesome-icon").select2({
       width: "100%",
-      formatResult: this.format,
+      templateResult: this.format,
+      templateSelection: this.format,
     });
   }
 };

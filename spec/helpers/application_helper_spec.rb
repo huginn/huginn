@@ -17,13 +17,19 @@ describe ApplicationHelper do
     it 'returns a FontAwesome icon element' do
       icon = icon_tag('fa-copy')
       expect(icon).to be_html_safe
-      expect(Nokogiri(icon).at('i.fa.fa-copy')).to be_a Nokogiri::XML::Element
+      expect(Nokogiri(icon).at('i.fa-solid.fa-copy')).to be_a Nokogiri::XML::Element
     end
 
-    it 'returns a FontAwesome icon element' do
+    it 'returns a FontAwesome icon element with an additional class' do
       icon = icon_tag('fa-copy', class: 'text-info')
       expect(icon).to be_html_safe
-      expect(Nokogiri(icon).at('i.fa.fa-copy.text-info')).to be_a Nokogiri::XML::Element
+      expect(Nokogiri(icon).at('i.fa-solid.fa-copy.text-info')).to be_a Nokogiri::XML::Element
+    end
+
+    it 'returns a FontAwesome brand icon element' do
+      icon = icon_tag('fa-github', class: 'fa-brands')
+      expect(icon).to be_html_safe
+      expect(Nokogiri(icon).at('i.fa-brands.fa-github')).to be_a Nokogiri::XML::Element
     end
   end
 
@@ -142,21 +148,21 @@ describe ApplicationHelper do
     it 'returns a correct icon tag for Twitter' do
       icon = omniauth_provider_icon(:twitter)
       expect(icon).to be_html_safe
-      elem = Nokogiri(icon).at('i.fa.fa-twitter')
+      elem = Nokogiri(icon).at('i.fa-brands.fa-twitter')
       expect(elem).to be_a Nokogiri::XML::Element
     end
 
     it 'returns a correct icon tag for GitHub' do
       icon = omniauth_provider_icon(:github)
       expect(icon).to be_html_safe
-      elem = Nokogiri(icon).at('i.fa.fa-github')
+      elem = Nokogiri(icon).at('i.fa-brands.fa-github')
       expect(elem).to be_a Nokogiri::XML::Element
     end
 
     it 'returns a correct icon tag for other services' do
       icon = omniauth_provider_icon(:evernote)
       expect(icon).to be_html_safe
-      elem = Nokogiri(icon).at('i.fa.fa-lock')
+      elem = Nokogiri(icon).at('i.fa-solid.fa-lock')
       expect(elem).to be_a Nokogiri::XML::Element
     end
   end

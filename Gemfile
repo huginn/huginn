@@ -37,8 +37,8 @@ gem 'mqtt'                        # MQTTAgent
 gem 'net-ftp'
 gem 'net-ftp-list'                # FtpsiteAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'slack-notifier', '~> 1.5.1'  # SlackAgent
-gem 'twilio-ruby', '~> 7.2.2'    # TwilioAgent
+gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
+gem 'twilio-ruby', '~> 7.3.6'     # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -47,7 +47,7 @@ gem 'weibo_2', github: 'albertsun/weibo_2', branch: 'master'
 
 # GoogleCalendarPublishAgent and GoogleTranslateAgent
 gem 'google-api-client', '~> 0.53'
-gem 'google-cloud-translate', '~> 2.3', require: 'google/cloud/translate'
+gem 'google-cloud-translate-v2'
 
 # Twitter Agents
 gem 'omniauth-twitter'
@@ -55,9 +55,8 @@ gem 'twitter', github: 'sferik/twitter' # Must to be loaded before cantino-twitt
 gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 
 # Tumblr Agents
-# until merge of https://github.com/tumblr/tumblr_client/pull/61
 gem 'omniauth-tumblr'
-gem 'tumblr_client', '~> 0.8.6', github: 'tumblr/tumblr_client'
+gem 'tumblr_client', github: 'IFTTT/tumblr_client'
 
 # Dropbox Agents
 gem 'dropbox-api', github: 'dsander/dropbox-api', ref: '86cb7b5a1254dc5b054de7263835713c4c1018c7'
@@ -74,11 +73,11 @@ gem 'omniauth-evernote'
 gem 'listen', '~> 3.9.0', require: false
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.148.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.171.0'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
-gem 'omniauth-google-oauth2', '>= 0.8.2'
+gem 'omniauth-google-oauth2', '~> 1.0.1'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
@@ -90,31 +89,35 @@ end
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'bundler', '>= 2.5.22'
+gem 'bundler', '>= 2.5.23'
 gem 'coffee-rails', '~> 5'
-gem 'daemons', '~> 1.4.1'
+gem 'daemons'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'devise', '~> 4.9', '>= 4.9.4'
-gem 'em-http-request', '~> 1.1.7'
+gem 'em-http-request'
 gem 'execjs'
-gem 'faraday', '~> 1.10', '>= 1.10.4'
-gem 'faraday_middleware'
+gem 'faraday'
+# gem 'faraday-em_http'
+gem 'faraday-follow_redirects'
+gem 'faraday-gzip'
+# gem 'faraday-httpclient'
+gem 'faraday-typhoeus'
 gem 'feedjira', '~> 3.2', '>= 3.2.3'
-gem 'font-awesome-sass', '~> 4.7.0'
+gem 'font-awesome-sass', '~> 6.5.2'
 gem 'foreman', '~> 0.88.1', github: 'ddollar/foreman'
 gem 'geokit', '~> 1.14'
 gem 'geokit-rails', '~> 2.5'
 gem 'httmultiparty', '~> 0.3.16'
-gem 'httparty', '~> 0.21'
+gem 'httparty', '~> 0.22'
 gem 'huginn_agent'
 gem 'jquery-rails', '~> 4.6'
-gem 'json', '~> 2.7', '>= 2.7.4'
+gem 'json', '~> 2.8', '>= 2.8.2'
 gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
 gem 'liquid', '~> 5.5', '>= 5.5.1'
-gem 'loofah', '~> 2.22'
+gem 'loofah', '~> 2.23', '>= 2.23.1'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', ">= 5.0.1"
 gem 'multi_xml'
@@ -123,13 +126,18 @@ gem 'omniauth'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.10'
 gem 'rails-html-sanitizer', '~> 1.6'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
-gem 'sass-rails', '>= 6.0'
+gem 'sassc-rails'
 gem 'select2-rails'
 gem 'spectrum-rails'
 gem 'sprockets'
 gem 'terser'
-gem 'typhoeus', '~> 1.4.1'
-gem 'uglifier', '~> 4.2.1'
+gem 'typhoeus'
+gem 'uglifier'
+
+group :development, :test do
+  gem 'debug'
+  gem 'rspec-rails'
+end
 
 group :development do
   gem 'better_errors'
@@ -137,7 +145,7 @@ group :development do
   gem 'guard'
   gem 'guard-livereload'
   gem 'guard-rspec'
-  gem 'letter_opener_web', '~> 2.0'
+  gem 'letter_opener_web', '~> 3.0'
   gem 'rack-livereload'
   gem 'web-console', '>= 4.2.1'
 
@@ -165,7 +173,6 @@ group :development do
     gem 'rspec-collection_matchers'
     gem 'rspec-html-matchers'
     gem 'rspec-mocks'
-    gem 'rspec-rails'
     gem 'selenium-webdriver'
     gem 'shoulda-matchers'
     gem 'simplecov', require: false
@@ -182,7 +189,7 @@ end
 
 # Platform requirements.
 require 'rbconfig'
-gem 'ffi', '>= 1.16.3'	# required by typhoeus; 1.9.4 has fixes for *BSD.
+gem 'ffi', '>= 1.17.0'	# required by typhoeus; 1.9.4 has fixes for *BSD.
 gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]

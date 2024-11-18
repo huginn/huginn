@@ -24,7 +24,7 @@
 
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span></a>
-            <%= render 'agents/action_menu', :agent => @agent, :return_to => "show" %>
+            <%= render 'agents/action_menu', agent: @agent, return_to: "show" %>
           </li>
         </ul>
       </div>
@@ -47,7 +47,7 @@
                 <h2>
                   <%= @agent.name %> Logs
                   <small>
-                    <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
+                    <%= image_tag "spinner-arrows.gif", class: "spinner" %>
                     <span class="glyphicon glyphicon-refresh action-icon refresh"></span>
                     <span class="glyphicon glyphicon-trash action-icon clear"></span>
                   </small>
@@ -173,8 +173,8 @@
             <% if @agent.memory.present? %>
               <p id="memory" data-agent-id="<%= @agent.id %>">
                 <b>Memory:</b>
-                <i class="fa fa-spinner fa-pulse spinner"></i>
-                <i class="fa fa-trash action-icon clear"></i>
+                <i class="fa-solid fa-spinner fa-spin-pulse spinner"></i>
+                <i class="fa-solid fa-trash action-icon clear"></i>
                 <a id="toggle-memory" href="#">Show</a>
                 <pre class="memory hidden"><%= Utils.pretty_jsonify @agent.memory || {} %></pre>
               </p>

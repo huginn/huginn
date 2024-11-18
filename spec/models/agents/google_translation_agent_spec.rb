@@ -7,7 +7,7 @@ describe Agents::GoogleTranslationAgent, :vcr do
       options: {
         to: "sv",
         from: "en",
-        google_api_key: 'some_api_key',
+        google_api_key: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         expected_receive_period_in_days: 1,
         content: {
           text: "{{message}}",
@@ -77,6 +77,15 @@ describe Agents::GoogleTranslationAgent, :vcr do
 
     it "should validate presence of 'to' key" do
       @checker.options[:to] = ""
+      expect(@checker).not_to be_valid
+    end
+
+    it "should validate the value of 'mode' key" do
+      @checker.options[:mode] = "clean"
+      expect(@checker).to be_valid
+      @checker.options[:mode] = "merge"
+      expect(@checker).to be_valid
+      @checker.options[:mode] = "clear"
       expect(@checker).not_to be_valid
     end
   end

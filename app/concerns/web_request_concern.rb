@@ -1,5 +1,4 @@
 require 'faraday'
-require 'faraday_middleware'
 
 module WebRequestConcern
   module DoNotEncoder
@@ -26,9 +25,12 @@ module WebRequestConcern
       @app.call(env).on_complete do |env|
         body = env[:body]
 
-        case @unzip
-        when 'gzip'.freeze
-          body.replace(ActiveSupport::Gzip.decompress(body))
+        if @unzip == 'gzip'
+          begin
+            body.replace(ActiveSupport::Gzip.decompress(body))
+          rescue Zlib::GzipFile::Error => e
+            log e.message
+          end
         end
 
         case
@@ -134,8 +136,10 @@ module WebRequestConcern
       builder.proxy = interpolated['proxy'].presence
 
       unless boolify(interpolated['disable_redirect_follow'])
-        builder.use FaradayMiddleware::FollowRedirects
+        require 'faraday/follow_redirects'
+        builder.response :follow_redirects
       end
+
       builder.request :multipart
       builder.request :url_encoded
 
@@ -146,16 +150,19 @@ module WebRequestConcern
       builder.options.timeout = (Delayed::Worker.max_run_time.seconds - 2).to_i
 
       if userinfo = basic_auth_credentials
-        builder.request :basic_auth, *userinfo
+        builder.request :authorization, :basic, *userinfo
       end
 
-      builder.use FaradayMiddleware::Gzip
+      builder.request :gzip
 
       case backend = faraday_backend
       when :typhoeus
-        require 'typhoeus/adapters/faraday'
+        require "faraday/#{backend}"
+        builder.adapter backend, accept_encoding: nil
+      when :httpclient, :em_http
+        require "faraday/#{backend}"
+        builder.adapter backend
       end
-      builder.adapter backend
     }
   end
 
@@ -176,7 +183,14 @@ module WebRequestConcern
   end
 
   def faraday_backend
-    ENV.fetch('FARADAY_HTTP_BACKEND', 'typhoeus').to_sym
+    ENV.fetch('FARADAY_HTTP_BACKEND') {
+      case interpolated['backend']
+      in 'typhoeus' | 'net_http' | 'httpclient' | 'em_http' => backend
+        backend
+      else
+        'typhoeus'
+      end
+    }.to_sym
   end
 
   def user_agent
