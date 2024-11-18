@@ -25,9 +25,12 @@ module WebRequestConcern
       @app.call(env).on_complete do |env|
         body = env[:body]
 
-        case @unzip
-        when 'gzip'.freeze
-          body.replace(ActiveSupport::Gzip.decompress(body))
+        if @unzip == 'gzip'
+          begin
+            body.replace(ActiveSupport::Gzip.decompress(body))
+          rescue Zlib::GzipFile::Error => e
+            log e.message
+          end
         end
 
         case
@@ -153,10 +156,13 @@ module WebRequestConcern
       builder.request :gzip
 
       case backend = faraday_backend
-      when :typhoeus, :httpclient, :em_http
+      when :typhoeus
         require "faraday/#{backend}"
+        builder.adapter backend, accept_encoding: nil
+      when :httpclient, :em_http
+        require "faraday/#{backend}"
+        builder.adapter backend
       end
-      builder.adapter backend
     }
   end
 
@@ -177,7 +183,14 @@ module WebRequestConcern
   end
 
   def faraday_backend
-    ENV.fetch('FARADAY_HTTP_BACKEND', 'typhoeus').to_sym
+    ENV.fetch('FARADAY_HTTP_BACKEND') {
+      case interpolated['backend']
+      in 'typhoeus' | 'net_http' | 'httpclient' | 'em_http' => backend
+        backend
+      else
+        'typhoeus'
+      end
+    }.to_sym
   end
 
   def user_agent
