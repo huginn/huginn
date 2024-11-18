@@ -156,10 +156,13 @@ module WebRequestConcern
       builder.request :gzip
 
       case backend = faraday_backend
-      when :typhoeus, :httpclient, :em_http
+      when :typhoeus
         require "faraday/#{backend}"
+        builder.adapter backend, accept_encoding: nil
+      when :httpclient, :em_http
+        require "faraday/#{backend}"
+        builder.adapter backend
       end
-      builder.adapter backend
     }
   end
 
