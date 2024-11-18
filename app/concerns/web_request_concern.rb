@@ -180,7 +180,14 @@ module WebRequestConcern
   end
 
   def faraday_backend
-    ENV.fetch('FARADAY_HTTP_BACKEND', 'typhoeus').to_sym
+    ENV.fetch('FARADAY_HTTP_BACKEND') {
+      case interpolated['backend']
+      in 'typhoeus' | 'net_http' | 'httpclient' | 'em_http' => backend
+        backend
+      else
+        'typhoeus'
+      end
+    }.to_sym
   end
 
   def user_agent
