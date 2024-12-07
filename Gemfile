@@ -38,7 +38,7 @@ gem 'net-ftp'
 gem 'net-ftp-list'                # FtpsiteAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
-gem 'twilio-ruby', '~> 7.3.6'     # TwilioAgent
+gem 'twilio-ruby', '~> 7.3.7'     # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -121,10 +121,10 @@ gem 'loofah', '~> 2.23', '>= 2.23.1'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', ">= 5.0.1"
 gem 'multi_xml'
-gem "nokogiri", ">= 1.16.7"
+gem "nokogiri", ">= 1.16.8"
 gem 'omniauth'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.10'
-gem 'rails-html-sanitizer', '~> 1.6'
+gem 'rails-html-sanitizer', '~> 1.6', '>= 1.6.1'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
 gem 'sassc-rails'
 gem 'select2-rails'

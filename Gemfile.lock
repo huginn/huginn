@@ -493,7 +493,7 @@ GEM
     llhttp-ffi (0.4.0)
       ffi-compiler (~> 1.0)
       rake (~> 13.0)
-    logger (1.6.1)
+    logger (1.6.2)
     loofah (2.23.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -811,7 +811,7 @@ GEM
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
-    twilio-ruby (7.3.6)
+    twilio-ruby (7.3.7)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
@@ -927,7 +927,7 @@ DEPENDENCIES
   mysql2 (~> 0.5, >= 0.5.6)
   net-ftp
   net-ftp-list
-  nokogiri (>= 1.16.7)
+  nokogiri (>= 1.16.8)
   omniauth
   omniauth-dropbox-oauth2!
   omniauth-evernote
@@ -940,7 +940,7 @@ DEPENDENCIES
   rack-livereload
   rails (~> 6.1.7, >= 6.1.7.10)
   rails-controller-testing
-  rails-html-sanitizer (~> 1.6)
+  rails-html-sanitizer (~> 1.6, >= 1.6.1)
   rb-kqueue (>= 0.2.8)
   rr
   rspec
@@ -967,7 +967,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client!
-  twilio-ruby (~> 7.3.6)
+  twilio-ruby (~> 7.3.7)
   twitter!
   twitter-stream!
   typhoeus
