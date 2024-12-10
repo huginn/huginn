@@ -73,11 +73,11 @@ gem 'omniauth-evernote'
 gem 'listen', '~> 3.9.0', require: false
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.171.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.176.0'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
-gem 'omniauth-google-oauth2', '~> 1.0.1'
+gem 'omniauth-google-oauth2', '~> 1.2.0'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
@@ -112,7 +112,7 @@ gem 'httmultiparty', '~> 0.3.16'
 gem 'httparty', '~> 0.22'
 gem 'huginn_agent'
 gem 'jquery-rails', '~> 4.6'
-gem 'json', '~> 2.8', '>= 2.8.2'
+gem 'json', '~> 2.9'
 gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
@@ -121,7 +121,7 @@ gem 'loofah', '~> 2.23', '>= 2.23.1'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', ">= 5.0.1"
 gem 'multi_xml'
-gem "nokogiri", ">= 1.16.7"
+gem "nokogiri", ">= 1.17.1"
 gem 'omniauth'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.10'
 gem 'rails-html-sanitizer', '~> 1.6'
