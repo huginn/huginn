@@ -1,4 +1,12 @@
 GIT
+  remote: https://knu@bitbucket.org/knu/hypdf_gem.git
+  revision: e11df6bd71356c9211e5001d729f3e92bfd6e19e
+  branch: uploadio_namespace
+  specs:
+    hypdf (1.0.19)
+      httparty (> 0.16.0, < 1.0)
+
+GIT
   remote: https://github.com/Hirurg103/capybara_select2.git
   revision: 48e2c458c2827cf2af2b0a287b30468fa8d761bf
   specs:
@@ -83,14 +91,6 @@ GIT
       multipart-post (~> 2.0)
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
-
-GIT
-  remote: https://knu@bitbucket.org/knu/hypdf_gem.git
-  revision: e11df6bd71356c9211e5001d729f3e92bfd6e19e
-  branch: uploadio_namespace
-  specs:
-    hypdf (1.0.19)
-      httparty (> 0.16.0, < 1.0)
 
 PATH
   remote: vendor/gems/dotenv-3.1.0
@@ -957,4 +957,4 @@ RUBY VERSION
    ruby 3.2.4p170
 
 BUNDLED WITH
-   2.5.23
+   2.6.2
