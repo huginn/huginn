@@ -38,7 +38,7 @@ gem 'net-ftp-list' # FtpsiteAgent
 gem 'pirate_weather_forecast_ruby' # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
-gem 'twilio-ruby', '~> 7.3.6'     # TwilioAgent
+gem 'twilio-ruby', '~> 7.4.0'     # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -73,7 +73,7 @@ gem 'omniauth-evernote'
 gem 'listen', '~> 3.9.0', require: false
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.171.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.176.1'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
@@ -89,7 +89,7 @@ end
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'bundler', '>= 2.5.23'
+gem 'bundler', '>= 2.6.2'
 gem 'coffee-rails', '~> 5'
 gem 'daemons'
 gem 'delayed_job'
@@ -104,7 +104,7 @@ gem 'faraday-gzip'
 # gem 'faraday-httpclient'
 gem 'faraday-typhoeus'
 gem 'feedjira', '~> 3.2', '>= 3.2.3'
-gem 'font-awesome-sass', '~> 6.5.2'
+gem 'font-awesome-sass', '~> 6.7.2'
 gem 'foreman', '~> 0.88.1', github: 'ddollar/foreman'
 gem 'geokit', '~> 1.14'
 gem 'geokit-rails', '~> 2.5'
@@ -112,16 +112,16 @@ gem 'httmultiparty', '~> 0.3.16'
 gem 'httparty', '~> 0.22'
 gem 'huginn_agent'
 gem 'jquery-rails', '~> 4.6'
-gem 'json', '~> 2.8', '>= 2.8.2'
+gem 'json', '~> 2.9', '>= 2.9.1'
 gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
-gem 'liquid', '~> 5.5', '>= 5.5.1'
+gem 'liquid', '~> 5.6'
 gem 'loofah', '~> 2.23', '>= 2.23.1'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', '>= 5.0.1'
 gem 'multi_xml'
-gem 'nokogiri', '>= 1.16.7'
+gem 'nokogiri', '>= 1.18.1'
 gem 'omniauth'
 gem 'rails', '~> 7.0.1'
 gem 'rails-html-sanitizer', '~> 1.6', '>= 1.6.2'
