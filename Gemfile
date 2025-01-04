@@ -73,7 +73,7 @@ gem 'omniauth-evernote'
 gem 'listen', '~> 3.9.0', require: false
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.176.1'
+gem 'aws-sdk-s3', '~> 1', '>= 1.177.0'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
@@ -117,7 +117,7 @@ gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
 gem 'liquid', '~> 5.6'
-gem 'loofah', '~> 2.23', '>= 2.23.1'
+gem 'loofah', '~> 2.24'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', '>= 5.0.1'
 gem 'multi_xml'
