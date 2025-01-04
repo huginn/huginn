@@ -303,7 +303,8 @@ GEM
     feedjira (3.2.3)
       loofah (>= 2.3.1, < 3)
       sax-machine (>= 1.0, < 2)
-    ffi (1.17.0)
+    ffi (1.17.1-x86_64-darwin)
+    ffi (1.17.1-x86_64-linux-gnu)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -866,7 +867,7 @@ DEPENDENCIES
   faraday-gzip
   faraday-typhoeus
   feedjira (~> 3.2, >= 3.2.3)
-  ffi (>= 1.17.0)
+  ffi (>= 1.17.1)
   font-awesome-sass (~> 6.7.2)
   foreman (~> 0.88.1)!
   geokit (~> 1.14)
