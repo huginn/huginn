@@ -112,7 +112,8 @@ class HuginnScheduler < LongRunnable::Worker
   }
 
   def setup
-    tzinfo_friendly_timezone = ActiveSupport::TimeZone::MAPPING[ENV['TIMEZONE'].presence || "Pacific Time (US & Canada)"]
+    Time.zone = ENV['TIMEZONE'].presence || 'Pacific Time (US & Canada)'
+    tzinfo_friendly_timezone = Time.zone.tzinfo.identifier
 
     # Schedule event propagation.
     every '1m' do
