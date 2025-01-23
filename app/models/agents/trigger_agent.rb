@@ -28,7 +28,7 @@ module Agents
 
       The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.  Note that regex patterns are matched case insensitively.  If you want case sensitive matching, prefix your pattern with `(?-i)`.
 
-      In any `type` including regex Liquid variables can be used normally. To search for just a word matching the concatenation of `foo` and variable `bar` would use `value` of `foo{{bar}}`. Note that note that starting/ending delimiters like `/` or `|` are not required for regex.
+      In any `type` including regex Liquid variables can be used normally. To search for just a word matching the concatenation of `foo` and variable `bar` would use `value` of `foo{{bar}}`. Note that starting/ending delimiters like `/` or `|` are not required for regex.
 
       The `value` can be a single value or an array of values. In the case of an array, all items must be strings, and if one or more values match, then the rule matches. Note: avoid using `field!=value` with arrays, you should use `not in` instead.
 
