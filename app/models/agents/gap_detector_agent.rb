@@ -8,6 +8,9 @@ module Agents
       The `value_path` value is a [JSONPath](http://goessner.net/articles/JsonPath/) to a value of interest. If either
       this value is empty, or no Events are received, during `window_duration_in_days`, an Event will be created with
       a payload of `message`.
+    
+      `alert_on_every_run` will create an event on every run when the `window_duration_in_days` has elapsed since the last event.
+
     MD
 
     event_description <<~MD
@@ -32,7 +35,8 @@ module Agents
     def default_options
       {
         'window_duration_in_days' => "2",
-        'message' => "No data has been received!"
+        'message' => "No data has been received!",
+        'alert_on_every_run' => false
       }
     end
 
@@ -56,7 +60,7 @@ module Agents
     def check
       window = interpolated['window_duration_in_days'].to_f.days.ago
       if memory['newest_event_created_at'].present? && Time.at(memory['newest_event_created_at']) < window
-        unless memory['alerted_at']
+        if !memory['alerted_at'] || (interpolated['alert_on_every_run'].present? && boolify(interpolated['alert_on_every_run']))
           memory['alerted_at'] = Time.now.to_i
           create_event payload: {
             message: interpolated['message'],
