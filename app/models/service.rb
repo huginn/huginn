@@ -1,5 +1,5 @@
 class Service < ActiveRecord::Base
-  serialize :options, Hash
+  serialize :options, type: Hash
 
   belongs_to :user, inverse_of: :services
   has_many :agents, inverse_of: :service
@@ -8,8 +8,8 @@ class Service < ActiveRecord::Base
 
   before_destroy :disable_agents
 
-  scope :available_to_user, lambda { |user| where("services.user_id = ? or services.global = true", user.id) }
-  scope :by_name, lambda { |dir = 'desc'| order("services.name #{dir}") }
+  scope :available_to_user, ->(user) { where('services.user_id = ? or services.global = true', user.id) }
+  scope :by_name, ->(dir = 'desc') { order("services.name #{dir}") }
 
   def disable_agents(conditions = {})
     agents.where.not(conditions[:where_not] || {}).each do |agent|
@@ -20,15 +20,15 @@ class Service < ActiveRecord::Base
   end
 
   def toggle_availability!
-    disable_agents(where_not: { user_id: self.user_id }) if global
-    self.global = !self.global
-    self.save!
+    disable_agents(where_not: { user_id: }) if global
+    self.global = !global
+    save!
   end
 
   def prepare_request
-    if expires_at && Time.now > expires_at
-      refresh_token!
-    end
+    return unless expires_at && Time.now > expires_at
+
+    refresh_token!
   end
 
   def refresh_token_parameters
