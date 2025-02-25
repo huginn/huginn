@@ -93,21 +93,21 @@
     },
     {
       "type": "Agents::WebsiteAgent",
-      "name": "iTunes Trailer Source",
+      "name": "FilmJabber Trailer Source",
       "disabled": false,
-      "guid": "e9afa65457d0a736b9ec20a8dd452fc8",
+      "guid": "e88caf57d7f1c565d8d4bf5fc04572ec",
       "options": {
-        "url": "https://trailers.apple.com/trailers/home/rss/newtrailers.rss",
+        "url": "https://www.filmjabber.com/rss/rss-trailers.php",
         "mode": "on_change",
         "type": "xml",
         "expected_update_period_in_days": 5,
         "extract": {
           "title": {
-            "css": "item title",
+            "xpath": "/rss/channel/item/title",
             "value": "string(.)"
           },
           "url": {
-            "css": "item link",
+            "xpath": "/rss/channel/item/link",
             "value": "string(.)"
           }
         }
