@@ -35,6 +35,9 @@ Really want a fix or feature? Want to solve some community issues and earn some 
 
 Have an awesome idea but not feeling quite up to contributing yet? Head over to our [Official 'suggest an agent' thread ](https://github.com/huginn/huginn/issues/353) and tell us!
 
+#### Huginn is part of **Libre-Friends**  
+Huginn is a proud member of [Libre-Friends](https://libre-friends.silexlabs.org/), an initiative where libre projects support each other. If you maintain a libre project, consider joining and collaborating with others to build a stronger ecosystem!
+
 ## Examples
 
 Please checkout the [Huginn Introductory Screencast](http://vimeo.com/61976251)!
