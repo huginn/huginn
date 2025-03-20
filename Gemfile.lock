@@ -171,24 +171,26 @@ GEM
     airbrussh (1.4.1)
       sshkit (>= 1.6.1, != 1.7.0)
     ast (2.4.2)
-    aws-eventstream (1.3.0)
-    aws-partitions (1.1031.0)
-    aws-sdk-core (3.214.1)
+    aws-eventstream (1.3.2)
+    aws-partitions (1.1070.0)
+    aws-sdk-core (3.220.1)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
+      base64
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-kms (1.96.0)
-      aws-sdk-core (~> 3, >= 3.210.0)
+    aws-sdk-kms (1.99.0)
+      aws-sdk-core (~> 3, >= 3.216.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.177.0)
-      aws-sdk-core (~> 3, >= 3.210.0)
+    aws-sdk-s3 (1.182.0)
+      aws-sdk-core (~> 3, >= 3.216.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
-    aws-sigv4 (1.10.1)
+    aws-sigv4 (1.11.0)
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.2.0)
     bcrypt (3.1.20)
+    benchmark (0.4.0)
     better_errors (2.10.0)
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
@@ -435,7 +437,7 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (2.9.1)
+    json (2.10.2)
     jsonpath (1.1.5)
       multi_json
     jwt (2.10.1)
@@ -467,16 +469,16 @@ GEM
       rexml
     libv8-node (16.10.0.0-x86_64-darwin)
     libv8-node (16.10.0.0-x86_64-linux)
-    liquid (5.6.0)
+    liquid (5.8.2)
       bigdecimal
-      strscan
+      strscan (>= 3.1.1)
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     llhttp-ffi (0.4.0)
       ffi-compiler (~> 1.0)
       rake (~> 13.0)
-    logger (1.6.4)
+    logger (1.6.6)
     loofah (2.24.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -497,7 +499,9 @@ GEM
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
-    mini_magick (5.0.1)
+    mini_magick (5.2.0)
+      benchmark
+      logger
     mini_mime (1.1.5)
     mini_racer (0.6.3)
       libv8-node (~> 16.10.0.0)
@@ -531,9 +535,9 @@ GEM
     net-ssh (7.1.0)
     netrc (0.11.0)
     nio4r (2.7.4)
-    nokogiri (1.18.4-x86_64-darwin)
+    nokogiri (1.18.5-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.18.4-x86_64-linux-gnu)
+    nokogiri (1.18.5-x86_64-linux-gnu)
       racc (~> 1.4)
     notiffany (0.1.3)
       nenv (~> 0.1)
@@ -577,6 +581,7 @@ GEM
       rack
     orm_adapter (0.5.0)
     os (1.1.4)
+    ostruct (0.6.1)
     parallel (1.23.0)
     parser (3.2.2.1)
       ast (~> 2.4.1)
@@ -787,10 +792,12 @@ GEM
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
-    twilio-ruby (7.4.0)
+    twilio-ruby (7.5.1)
+      benchmark
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
+      ostruct
     typhoeus (1.4.1)
       ethon (>= 0.9.0)
     tzinfo (2.0.6)
@@ -808,7 +815,7 @@ GEM
     unicorn-rails (2.2.1)
       rack
       unicorn
-    uri (1.0.2)
+    uri (1.0.3)
     vcr (6.1.0)
     version_gem (1.1.4)
     warden (1.2.9)
@@ -838,7 +845,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap
-  aws-sdk-s3 (~> 1, >= 1.177.0)
+  aws-sdk-s3 (~> 1, >= 1.182.0)
   better_errors
   binding_of_caller
   bootsnap
@@ -884,16 +891,16 @@ DEPENDENCIES
   huginn_agent
   hypdf!
   jquery-rails (~> 4.6)
-  json (~> 2.9, >= 2.9.1)
+  json (~> 2.10, >= 2.10.2)
   jsonpath (~> 1.1, >= 1.1.5)
   kaminari (~> 1.2, >= 1.2.2)
   kramdown
   letter_opener_web (~> 3.0)
-  liquid (~> 5.6)
+  liquid (~> 5.8, >= 5.8.2)
   listen (~> 3.9.0)
   loofah (~> 2.24)
   mail (>= 2.8.1)
-  mini_magick (>= 5.0.1)
+  mini_magick (>= 5.2.0)
   mini_racer
   mqtt
   multi_xml
@@ -940,7 +947,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client!
-  twilio-ruby (~> 7.4.0)
+  twilio-ruby (~> 7.5.1)
   twitter!
   twitter-stream!
   typhoeus
