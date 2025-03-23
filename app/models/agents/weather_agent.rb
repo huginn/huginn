@@ -60,7 +60,7 @@ module Agents
 
     def default_options
       {
-        'api_key' => 'your-key',
+        'api_key' => ENV['PIRATE_WEATHER_API_KEY'],
         'location' => '37.779329,-122.41915',
         'which_day' => '1',
         'expected_update_period_in_days' => '2',
