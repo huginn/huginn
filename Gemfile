@@ -38,7 +38,7 @@ gem 'net-ftp-list' # FtpsiteAgent
 gem 'pirate_weather_forecast_ruby' # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
-gem 'twilio-ruby', '~> 7.4.0'     # TwilioAgent
+gem 'twilio-ruby', '~> 7.5.1'     # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -73,7 +73,7 @@ gem 'omniauth-evernote'
 gem 'listen', '~> 3.9.0', require: false
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.177.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.182.0'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
@@ -109,17 +109,17 @@ gem 'foreman', '~> 0.88.1', github: 'ddollar/foreman'
 gem 'geokit', '~> 1.14'
 gem 'geokit-rails', '~> 2.5'
 gem 'httmultiparty', '~> 0.3.16'
-gem 'httparty', '~> 0.22'
+gem 'httparty', '~> 0.23', '>= 0.23.1'
 gem 'huginn_agent'
 gem 'jquery-rails', '~> 4.6'
-gem 'json', '~> 2.9', '>= 2.9.1'
+gem 'json', '~> 2.10', '>= 2.10.2'
 gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
-gem 'liquid', '~> 5.6'
+gem 'liquid', '~> 5.8', '>= 5.8.2'
 gem 'loofah', '~> 2.24'
 gem 'mail', '>= 2.8.1'
-gem 'mini_magick', '>= 5.0.1'
+gem 'mini_magick', '>= 5.2.0'
 gem 'multi_xml'
 gem 'nokogiri', '>= 1.18.4'
 gem 'omniauth'
