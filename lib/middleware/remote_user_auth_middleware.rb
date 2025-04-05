@@ -32,7 +32,7 @@ class RemoteUserAuthMiddleware
           u.requires_no_invitation_code!
 
           # needed for devise validations
-          u.password = SecureRandom.urlsafe_base64(24 + rand(8))
+          u.password = SecureRandom.urlsafe_base64(32)
           u.email = env['HTTP_' + @email_header_name] || "#{username}@remoteuser.auth"
           u.admin = !!@admin_group && env['HTTP_' + @groups_header_name].split(",").include?(@admin_group)
         end
