@@ -27,7 +27,7 @@ class RemoteUserAuthMiddleware
     begin
       username = env['HTTP_' + @user_header_name]
       # do nothing if no remote-user is presented
-      if username
+      if not username.blank?
         user = User.find_or_create_by!(username: username) do |u|
           u.requires_no_invitation_code!
 
