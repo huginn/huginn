@@ -12,7 +12,7 @@ class RemoteUserAuthMiddleware
   # This middleware can also be configured to detect headers containing the
   # user's email, and comma separated group membership (along with a group name
   # that signifies the created user should be an admin) during the user
-  # creation phase.
+  # creation phase. By default, users are created without admin permissions.
   #
   def initialize(app, user_header_name = nil, email_header_name = nil, groups_header_name = nil, admin_group = nil, warden_scope = :user)
     @app = app
