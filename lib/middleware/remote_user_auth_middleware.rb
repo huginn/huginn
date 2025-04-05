@@ -8,7 +8,7 @@ class RemoteUserAuthMiddleware
   # if the header specified by user_header_name is provided in the
   # request, treat the value of that header as a username, and log in as that
   # user, creating if necessary.
-  # 
+  #
   # This middleware can also be configured to detect headers containing the
   # user's email, and comma separated group membership (along with a group name
   # that signifies the created user should be an admin) during the user
@@ -34,7 +34,9 @@ class RemoteUserAuthMiddleware
           # needed for devise validations
           u.password = SecureRandom.urlsafe_base64(32)
           u.email = env['HTTP_' + @email_header_name] || "#{username}@remoteuser.auth"
-          u.admin = !!@admin_group && env['HTTP_' + @groups_header_name].split(",").include?(@admin_group)
+          # we may want this configurable in the future
+          group_delimeter = ","
+          u.admin = !!@admin_group && env['HTTP_' + @groups_header_name].split(group_delimeter).include?(@admin_group)
         end
 
         warden = env['warden']
