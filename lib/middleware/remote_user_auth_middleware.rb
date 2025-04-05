@@ -40,8 +40,8 @@ class RemoteUserAuthMiddleware
         end
 
         warden = env['warden']
-        # perform login unless user is already logged in
-        unless warden.user(@warden_scope) == user
+        # perform login unless this user is already logged in, or user is nil
+        unless !user || warden.user(@warden_scope) == user
           warden.set_user(user, { :scope => @warden_scope })
         end
       end
