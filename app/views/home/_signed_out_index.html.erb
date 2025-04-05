@@ -7,7 +7,10 @@
       <p>Huginn monitors the world and acts on your behalf.</p>
 
       <%= link_to "Login", new_user_session_path, :class => "btn btn-large" %>
-      <%= link_to "Signup", new_user_registration_path, :class => "btn btn-primary btn-large" %>
+
+      <%- if global_devise_mapping.registerable? && controller_name != 'registrations' %>
+        <%= link_to "Signup", new_user_registration_path, :class => "btn btn-primary btn-large" %>
+      <% end -%>
     </div>
     
     <div class="col-md-3 col-md-offset-1">

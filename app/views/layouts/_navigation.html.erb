@@ -75,7 +75,9 @@
           <% if user_signed_in? %>
             <%= link_to 'Account', edit_user_registration_path, :tabindex => "-1" %>
           <% else %>
-            <%= link_to 'Sign up', new_user_registration_path, :tabindex => "-1" %>
+            <%- if global_devise_mapping.registerable? && controller_name != 'registrations' %>
+              <%= link_to 'Sign up', new_user_registration_path, :tabindex => "-1" %>
+             <% end -%> 
           <% end %>
         </li>
         <% if user_signed_in? && current_user.admin %>
