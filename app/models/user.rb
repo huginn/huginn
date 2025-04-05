@@ -1,8 +1,9 @@
 # Huginn is designed to be a multi-User system.  Users have many Agents (and Events created by those Agents).
 class User < ActiveRecord::Base
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable,
+  devise :database_authenticatable, :rememberable, :trackable,
          :validatable, :lockable, :omniauthable,
+         *(:registerable if ENV['ALLOW_SIGN_UP'] == 'true'),
+         *(:recoverable if ENV['ALLOW_PASSWORD_RESET'] == 'true'),
          *(:confirmable if ENV['REQUIRE_CONFIRMED_EMAIL'] == 'true')
 
   INVITATION_CODES = [ENV['INVITATION_CODE'] || 'try-huginn']
@@ -16,22 +17,22 @@ class User < ActiveRecord::Base
             uniqueness: { case_sensitive: false },
             format: {
               with: /\A[a-zA-Z0-9_-]{3,190}\Z/,
-              message: "can only contain letters, numbers, underscores, and dashes, and must be between 3 and 190 characters in length."
+              message: 'can only contain letters, numbers, underscores, and dashes, and must be between 3 and 190 characters in length.'
             }
   validates :invitation_code,
             inclusion: {
               in: INVITATION_CODES,
-              message: "is not valid",
+              message: 'is not valid'
             },
-            if: -> {
+            if: lambda {
               !requires_no_invitation_code? && User.using_invitation_code?
             },
             on: :create
 
   has_many :user_credentials, dependent: :destroy, inverse_of: :user
-  has_many :events, -> { order("events.created_at desc") }, dependent: :delete_all, inverse_of: :user
-  has_many :agents, -> { order("agents.created_at desc") }, dependent: :destroy, inverse_of: :user
-  has_many :logs, through: :agents, class_name: "AgentLog"
+  has_many :events, -> { order('events.created_at desc') }, dependent: :delete_all, inverse_of: :user
+  has_many :agents, -> { order('agents.created_at desc') }, dependent: :destroy, inverse_of: :user
+  has_many :logs, through: :agents, class_name: 'AgentLog'
   has_many :scenarios, inverse_of: :user, dependent: :destroy
   has_many :services, -> { by_name('asc') }, dependent: :destroy
 
@@ -43,7 +44,7 @@ class User < ActiveRecord::Base
   def self.find_first_by_auth_conditions(warden_conditions)
     conditions = warden_conditions.dup
     if login = conditions.delete(:login)
-      where(conditions).where(["lower(username) = :value OR lower(email) = :value", { value: login.downcase }]).first
+      where(conditions).where(['lower(username) = :value OR lower(email) = :value', { value: login.downcase }]).first
     else
       where(conditions).first
     end

@@ -119,4 +119,8 @@ module ApplicationHelper
   def user_omniauth_authorize_path(provider)
     send "user_#{provider}_omniauth_authorize_path"
   end
+
+  def global_devise_mapping
+    Devise.mappings[:user]
+  end
 end
