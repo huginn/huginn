@@ -9,7 +9,7 @@
 # #receive_web_request is called. For example, one of your Agent's options could be :secret and you could compare this
 # value to params[:secret] whenever #receive_web_request is called on your Agent, rejecting invalid requests.
 #
-# Your Agent's #receive_web_request method should return an Array of json_or_string_response, status_code, 
+# Your Agent's #receive_web_request method should return an Array of json_or_string_response, status_code,
 # optional mime type, and optional hash of custom response headers.  For example:
 #   [{status: "success"}, 200]
 # or
@@ -30,27 +30,27 @@ class WebRequestsController < ApplicationController
         content, status, content_type, headers = agent.trigger_web_request(request)
 
         if headers.present?
-          headers.each do |k,v|
+          headers.each do |k, v|
             response.headers[k] = v
           end
         end
 
-        status = status || 200
+        status ||= 200
 
-        if status.to_s.in?(["301", "302"])
-          redirect_to content, status: status
+        if status.to_s.in?(%w[301 302])
+          redirect_to(content, allow_other_host: true, status:)
         elsif content.is_a?(String)
-          render plain: content, :status => status, :content_type => content_type || 'text/plain'
+          render plain: content, status:, content_type: content_type || 'text/plain'
         elsif content.is_a?(Hash)
-          render :json => content, :status => status
+          render(json: content, status:)
         else
           head(status)
         end
       else
-        render plain: "agent not found", :status => 404
+        render plain: 'agent not found', status: 404
       end
     else
-      render plain: "user not found", :status => 404
+      render plain: 'user not found', status: 404
     end
   end
 
@@ -58,14 +58,12 @@ class WebRequestsController < ApplicationController
   def update_location
     if user = User.find_by_id(params[:user_id])
       secret = params[:secret]
-      user.agents.of_type(Agents::UserLocationAgent).each { |agent|
-        if agent.options[:secret] == secret
-          agent.trigger_web_request(request)
-        end
-      }
-      render plain: "ok"
+      user.agents.of_type(Agents::UserLocationAgent).each do |agent|
+        agent.trigger_web_request(request) if agent.options[:secret] == secret
+      end
+      render plain: 'ok'
     else
-      render plain: "user not found", :status => :not_found
+      render plain: 'user not found', status: :not_found
     end
   end
 end

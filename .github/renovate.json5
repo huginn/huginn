@@ -16,6 +16,7 @@
       groupName: "minor updated gems",
       matchDatasources: ["rubygems"],
       matchUpdateTypes: ["minor"],
+      matchPackageNames: ["!rails", "!omniauth-google-oauth2"],
     },
     {
       matchDatasources: ["rubygems"],

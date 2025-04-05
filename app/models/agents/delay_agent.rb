@@ -71,41 +71,55 @@ module Agents
     end
 
     def receive(incoming_events)
-      incoming_events.each do |event|
-        event_ids = memory['event_ids'] || []
-        event_ids << event.id
-        if event_ids.length > interpolated['max_events'].to_i
-          if options['keep'] == 'newest'
-            event_ids.shift
-          else
-            event_ids.pop
+      save!
+
+      with_lock do
+        incoming_events.each do |event|
+          event_ids = memory['event_ids'] || []
+          event_ids << event.id
+          if event_ids.length > interpolated['max_events'].to_i
+            if options['keep'] == 'newest'
+              event_ids.shift
+            else
+              event_ids.pop
+            end
           end
+          memory['event_ids'] = event_ids
         end
-        memory['event_ids'] = event_ids
+      end
+    end
+
+    private def extract_emitted_events!
+      save!
+
+      with_lock do
+        emitted_events = received_events.where(id: memory['event_ids']).reorder(:id).to_a
+
+        if interpolated[SortableEvents::EVENTS_ORDER_KEY].present?
+          emitted_events = sort_events(emitted_events)
+        end
+
+        max_emitted_events = interpolated['max_emitted_events'].presence&.to_i
+
+        if max_emitted_events&.< emitted_events.length
+          emitted_events[max_emitted_events..] = []
+        end
+
+        memory['event_ids'] -= emitted_events.map(&:id)
+        save!
+
+        emitted_events
       end
     end
 
     def check
       return if memory['event_ids'].blank?
 
-      events = received_events.where(id: memory['event_ids']).reorder(:id).to_a
-
-      if interpolated[SortableEvents::EVENTS_ORDER_KEY].present?
-        events = sort_events(events)
-      end
-
-      max_emitted_events = interpolated['max_emitted_events'].presence&.to_i
-
-      if max_emitted_events&.< events.length
-        events[max_emitted_events..] = []
-      end
-
       interval = (options['emit_interval'].presence&.to_f || 0).clamp(0..)
 
-      events.each_with_index do |event, i|
+      extract_emitted_events!.each_with_index do |event, i|
         sleep interval unless i.zero?
         create_event payload: event.payload
-        memory['event_ids'].delete(event.id)
       end
     end
   end

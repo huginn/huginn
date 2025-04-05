@@ -150,7 +150,7 @@ class Agent < ActiveRecord::Base
     end
   end
 
-  def reload
+  def reload(...)
     @credential_cache = {}
     super
   end

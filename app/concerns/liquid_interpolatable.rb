@@ -245,7 +245,7 @@ module LiquidInterpolatable
 
     def regex_extract(input, regex, index = 0)
       input.to_s[Regexp.new(regex), index]
-    rescue Index
+    rescue IndexError
       nil
     end
 
