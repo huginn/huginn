@@ -122,6 +122,10 @@ Create a user for Huginn do not type the `mysql>`, this is part of the prompt. C
 
     mysql> CREATE USER 'huginn'@'localhost' IDENTIFIED BY '$password';
 
+Create a database for Huginn to use
+
+    mysql> CREATE DATABASE 'huginn_production';
+    
 Ensure you can use the InnoDB engine which is necessary to support long indexes
 
     mysql> SET default_storage_engine=INNODB;
