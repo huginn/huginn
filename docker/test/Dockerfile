@@ -22,7 +22,7 @@ RUN apt-get update && \
 RUN export LC_ALL=en_US.UTF-8 ON_HEROKU=true && \
     bundle config set --local path vendor/bundle && \
     bundle config set --local without 'test development' && \
-    bundle install -j 4
+    bundle install
 
 COPY docker/test/scripts/test_env /scripts/
 ENTRYPOINT ["/scripts/test_env"]

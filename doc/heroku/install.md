@@ -98,7 +98,7 @@ Initializing repository, done.
 -----> Compiling Ruby/Rails
 -----> Using Ruby version: ruby-2.0.0
 -----> Installing dependencies using 1.6.3
-       Running: bundle install --without development:test --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment
+       Running: bundle install --without development:test --path vendor/bundle --binstubs vendor/bundle/bin --deployment
        Fetching source index from https://rubygems.org/
        Fetching git://github.com/cantino/twitter-stream.git
        Installing i18n 0.6.9

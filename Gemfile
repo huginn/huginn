@@ -79,17 +79,10 @@ gem 'aws-sdk-s3', '~> 1', '>= 1.177.0'
 gem 'gmail_xoauth' # support for Gmail using OAuth
 gem 'omniauth-google-oauth2', '~> 1.0.1'
 
-# Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
-# Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
-unless Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.5.0')
-  warn "Bundler >=1.5.0 is required.  Please upgrade bundler with 'gem install bundler'"
-  exit 1
-end
-
+# Common gems
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'bundler', '>= 2.6.2'
 gem 'coffee-rails', '~> 5'
 gem 'daemons'
 gem 'delayed_job'
@@ -192,7 +185,7 @@ require 'rbconfig'
 gem 'ffi', '>= 1.17.0'	# required by typhoeus; 1.9.4 has fixes for *BSD.
 gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
-gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw]
+gem 'tzinfo-data', platforms: %i[windows]
 # BSD systems require rb-kqueue for "listen" to avoid polling for changes.
 gem 'rb-kqueue', '>= 0.2.8', require: /bsd|dragonfly/i === RbConfig::CONFIG['target_os']
 

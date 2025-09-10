@@ -31,7 +31,7 @@ RUN git init && \
     bundle config set --local path vendor/bundle && \
     bundle config set --local without 'test development'
 
-RUN APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle install -j 4
+RUN APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle install
 
 COPY --chown="$UID:0" ./ /app/
 

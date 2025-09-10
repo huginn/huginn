@@ -849,7 +849,6 @@ DEPENDENCIES
   binding_of_caller
   bootsnap
   bootstrap-kaminari-views (~> 0.0.5)
-  bundler (>= 2.6.2)
   capistrano
   capistrano-bundler
   capistrano-rails

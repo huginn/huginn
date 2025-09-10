@@ -11,6 +11,6 @@ unset no_proxy
 
 bundle config set --local path vendor/bundle
 bundle config set --local without 'test development'
-bundle install -j 4
+bundle install
 bundle exec rake db:create db:migrate
 bundle exec "$@"

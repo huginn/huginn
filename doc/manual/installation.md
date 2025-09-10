@@ -260,8 +260,6 @@ Change the Unicorn config if needed, the [requirements.md](./requirements.md#uni
 
 ### Install Gems
 
-**Note:** As of bundler 1.5.2, you can invoke `bundle install -jN` (where `N` the number of your processor cores) and enjoy parallel gem installation with measurable difference in completion time (~60% faster). Check the number of your cores with `nproc`. For more information check this [post](http://robots.thoughtbot.com/parallel-gem-installing-using-bundler). First make sure you have bundler >= 1.5.2 (run `bundle -v`) as it addresses some [issues](https://devcenter.heroku.com/changelog-items/411) that were [fixed](https://github.com/bundler/bundler/pull/2817) in 1.5.2.
-
     sudo -u huginn -H bundle install --deployment --without development test
 
 ### Initialize Database
