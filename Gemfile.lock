@@ -47,9 +47,10 @@ GIT
 
 GIT
   remote: https://github.com/ddollar/foreman.git
-  revision: 3a262714030a83a59388a48ffdb2e93cdac12388
+  revision: f65ddba83932bd4670e014389d6e27ea1e20b469
   specs:
-    foreman (0.88.1)
+    foreman (0.90.0)
+      thor (~> 1.4)
 
 GIT
   remote: https://github.com/dsander/dropbox-api.git
@@ -787,7 +788,7 @@ GEM
     strscan (3.1.2)
     terser (1.1.15)
       execjs (>= 0.3.0, < 3)
-    thor (1.3.2)
+    thor (1.4.0)
     thread_safe (0.3.6)
     tilt (2.1.0)
     time (0.2.2)
@@ -878,7 +879,7 @@ DEPENDENCIES
   feedjira (~> 3.2, >= 3.2.3)
   ffi (>= 1.17.0)
   font-awesome-sass (~> 6.7.2)
-  foreman (~> 0.88.1)!
+  foreman (~> 0.90.0)!
   geokit (~> 1.14)
   geokit-rails (~> 2.5)
   gmail_xoauth
