@@ -294,7 +294,8 @@ GEM
     faraday-typhoeus (1.1.0)
       faraday (~> 2.0)
       typhoeus (~> 1.4)
-    feedjira (3.2.3)
+    feedjira (4.0.1)
+      logger (>= 1.0, < 2)
       loofah (>= 2.3.1, < 3)
       sax-machine (>= 1.0, < 2)
     ffi (1.17.0)
@@ -480,7 +481,7 @@ GEM
       ffi-compiler (~> 1.0)
       rake (~> 13.0)
     logger (1.6.4)
-    loofah (2.24.0)
+    loofah (2.24.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     lumberjack (1.2.8)
@@ -870,7 +871,7 @@ DEPENDENCIES
   faraday-follow_redirects
   faraday-gzip
   faraday-typhoeus
-  feedjira (~> 3.2, >= 3.2.3)
+  feedjira (~> 4.0, >= 4.0.1)
   ffi (>= 1.17.0)
   font-awesome-sass (~> 6.7.2)
   foreman (~> 0.90.0)
