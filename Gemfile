@@ -110,7 +110,7 @@ gem 'jsonpath', '~> 1.1', '>= 1.1.5'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
 gem 'liquid', '~> 5.6'
-gem 'loofah', '~> 2.24'
+gem 'loofah', '~> 2.24', '>= 2.24.1'
 gem 'mail', '>= 2.8.1'
 gem 'mini_magick', '>= 5.0.1'
 gem 'multi_xml'
@@ -182,7 +182,7 @@ end
 
 # Platform requirements.
 require 'rbconfig'
-gem 'ffi', '>= 1.17.0'	# required by typhoeus; 1.9.4 has fixes for *BSD.
+gem 'ffi', '>= 1.17.2'	# required by typhoeus; 1.9.4 has fixes for *BSD.
 gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: %i[windows]
