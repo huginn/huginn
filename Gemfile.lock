@@ -165,29 +165,32 @@ GEM
     airbrussh (1.4.1)
       sshkit (>= 1.6.1, != 1.7.0)
     ast (2.4.2)
-    aws-eventstream (1.3.0)
-    aws-partitions (1.1031.0)
-    aws-sdk-core (3.214.1)
+    aws-eventstream (1.4.0)
+    aws-partitions (1.1169.0)
+    aws-sdk-core (3.233.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
+      base64
+      bigdecimal
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-kms (1.96.0)
-      aws-sdk-core (~> 3, >= 3.210.0)
+      logger
+    aws-sdk-kms (1.113.0)
+      aws-sdk-core (~> 3, >= 3.231.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.177.0)
-      aws-sdk-core (~> 3, >= 3.210.0)
+    aws-sdk-s3 (1.199.1)
+      aws-sdk-core (~> 3, >= 3.231.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
-    aws-sigv4 (1.10.1)
+    aws-sigv4 (1.12.1)
       aws-eventstream (~> 1, >= 1.0.2)
-    base64 (0.2.0)
+    base64 (0.3.0)
     bcrypt (3.1.20)
     better_errors (2.10.0)
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
       rouge (>= 1.0.0)
-    bigdecimal (3.2.3)
+    bigdecimal (3.3.0)
     bindex (0.8.1)
     binding_of_caller (1.0.0)
       debug_inspector (>= 0.0.1)
@@ -232,7 +235,7 @@ GEM
     crack (0.4.5)
       rexml
     crass (1.0.6)
-    csv (3.3.0)
+    csv (3.3.5)
     daemons (1.4.1)
     date (3.4.1)
     debug (1.9.2)
@@ -278,7 +281,7 @@ GEM
       evernote-thrift
       oauth (>= 0.4.1)
     execjs (2.9.1)
-    faraday (2.12.2)
+    faraday (2.14.0)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -289,7 +292,7 @@ GEM
       zlib (~> 3.0)
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
-    faraday-net_http (3.4.0)
+    faraday-net_http (3.4.1)
       net-http (>= 0.5.0)
     faraday-typhoeus (1.1.0)
       faraday (~> 2.0)
@@ -420,7 +423,7 @@ GEM
       domain_name (~> 0.5)
     http-form_data (2.3.0)
     http_parser.rb (0.6.0)
-    httparty (0.22.0)
+    httparty (0.23.2)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -438,10 +441,10 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (2.9.1)
+    json (2.15.1)
     jsonpath (1.1.5)
       multi_json
-    jwt (2.10.1)
+    jwt (2.10.2)
       base64
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
@@ -480,7 +483,7 @@ GEM
     llhttp-ffi (0.4.0)
       ffi-compiler (~> 1.0)
       rake (~> 13.0)
-    logger (1.6.4)
+    logger (1.7.0)
     loofah (2.24.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -501,7 +504,8 @@ GEM
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
-    mini_magick (5.0.1)
+    mini_magick (5.3.1)
+      logger
     mini_mime (1.1.5)
     mini_racer (0.6.3)
       libv8-node (~> 16.10.0.0)
@@ -509,7 +513,7 @@ GEM
     mqtt (0.6.0)
     msgpack (1.7.2)
     multi_json (1.15.0)
-    multi_xml (0.7.1)
+    multi_xml (0.7.2)
       bigdecimal (~> 3.1)
     multipart-post (2.4.1)
     mysql2 (0.5.6)
@@ -535,11 +539,11 @@ GEM
     net-ssh (7.1.0)
     netrc (0.11.0)
     nio4r (2.7.4)
-    nokogiri (1.18.9-arm64-darwin)
+    nokogiri (1.18.10-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.18.9-x86_64-darwin)
+    nokogiri (1.18.10-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.18.9-x86_64-linux-gnu)
+    nokogiri (1.18.10-x86_64-linux-gnu)
       racc (~> 1.4)
     notiffany (0.1.3)
       nenv (~> 0.1)
@@ -586,7 +590,9 @@ GEM
     parallel (1.23.0)
     parser (3.2.2.1)
       ast (~> 2.4.1)
-    pg (1.5.9)
+    pg (1.6.2-arm64-darwin)
+    pg (1.6.2-x86_64-darwin)
+    pg (1.6.2-x86_64-linux)
     pirate_weather_forecast_ruby (0.1.0)
       faraday
       hashie
@@ -756,7 +762,7 @@ GEM
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
-    simplecov-lcov (0.8.0)
+    simplecov-lcov (0.9.0)
     simplecov_json_formatter (0.1.4)
     slack-notifier (2.4.0)
     snaky_hash (2.0.1)
@@ -781,7 +787,7 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     stringio (3.1.2)
-    strscan (3.1.2)
+    strscan (3.1.5)
     terser (1.1.15)
       execjs (>= 0.3.0, < 3)
     thor (1.4.0)
@@ -793,9 +799,9 @@ GEM
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
-    twilio-ruby (7.4.0)
+    twilio-ruby (7.8.3)
       faraday (>= 0.9, < 3.0)
-      jwt (>= 1.5, < 3.0)
+      jwt (>= 1.5, < 4.0)
       nokogiri (>= 1.6, < 2.0)
     typhoeus (1.4.1)
       ethon (>= 0.9.0)
@@ -814,7 +820,7 @@ GEM
     unicorn-rails (2.2.1)
       rack
       unicorn
-    uri (1.0.2)
+    uri (1.0.4)
     vcr (6.1.0)
     version_gem (1.1.4)
     warden (1.2.9)
@@ -845,7 +851,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap
-  aws-sdk-s3 (~> 1, >= 1.177.0)
+  aws-sdk-s3 (~> 1, >= 1.199.1)
   better_errors
   binding_of_caller
   bootsnap
@@ -886,20 +892,20 @@ DEPENDENCIES
   haversine
   hipchat (~> 1.6.0)
   httmultiparty (~> 0.3.16)
-  httparty (~> 0.22)
+  httparty (~> 0.23, >= 0.23.2)
   huginn_agent
   hypdf!
   jquery-rails (~> 4.6)
-  json (~> 2.9, >= 2.9.1)
+  json (~> 2.15, >= 2.15.1)
   jsonpath (~> 1.1, >= 1.1.5)
   kaminari (~> 1.2, >= 1.2.2)
   kramdown
   letter_opener_web (~> 3.0)
-  liquid (~> 5.6)
+  liquid (~> 5.6, = 5.6.0)
   listen (~> 3.9.0)
   loofah (~> 2.24)
   mail (>= 2.8.1)
-  mini_magick (>= 5.0.1)
+  mini_magick (>= 5.3.1)
   mini_racer
   mqtt
   multi_xml
@@ -913,7 +919,7 @@ DEPENDENCIES
   omniauth-google-oauth2 (~> 1.0.1)
   omniauth-tumblr
   omniauth-twitter
-  pg (~> 1.5, >= 1.5.9)
+  pg (~> 1.6, >= 1.6.2)
   pirate_weather_forecast_ruby
   puma
   rack-livereload
@@ -937,7 +943,7 @@ DEPENDENCIES
   selenium-webdriver
   shoulda-matchers
   simplecov
-  simplecov-lcov (~> 0.8.0)
+  simplecov-lcov (~> 0.9.0)
   slack-notifier (~> 2.4.0)
   spectrum-rails
   spring
@@ -946,7 +952,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client!
-  twilio-ruby (~> 7.4.0)
+  twilio-ruby (~> 7.8.3)
   twitter!
   twitter-stream!
   typhoeus
