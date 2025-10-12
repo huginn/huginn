@@ -301,7 +301,9 @@ GEM
       logger (>= 1.0, < 2)
       loofah (>= 2.3.1, < 3)
       sax-machine (>= 1.0, < 2)
-    ffi (1.17.0)
+    ffi (1.17.2-arm64-darwin)
+    ffi (1.17.2-x86_64-darwin)
+    ffi (1.17.2-x86_64-linux-gnu)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -516,7 +518,8 @@ GEM
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
     multipart-post (2.4.1)
-    mysql2 (0.5.6)
+    mysql2 (0.5.7)
+      bigdecimal
     naught (1.1.0)
     nenv (0.3.0)
     net-ftp (0.2.0)
@@ -878,7 +881,7 @@ DEPENDENCIES
   faraday-gzip
   faraday-typhoeus
   feedjira (~> 4.0, >= 4.0.1)
-  ffi (>= 1.17.0)
+  ffi (>= 1.17.2)
   font-awesome-sass (~> 6.7.2)
   foreman (~> 0.90.0)
   geokit (~> 1.14)
@@ -903,16 +906,16 @@ DEPENDENCIES
   letter_opener_web (~> 3.0)
   liquid (~> 5.6, = 5.6.0)
   listen (~> 3.9.0)
-  loofah (~> 2.24)
+  loofah (~> 2.24, >= 2.24.1)
   mail (>= 2.8.1)
   mini_magick (>= 5.3.1)
   mini_racer
   mqtt
   multi_xml
-  mysql2 (~> 0.5, >= 0.5.6)
+  mysql2 (~> 0.5, >= 0.5.7)
   net-ftp
   net-ftp-list
-  nokogiri (>= 1.18.4)
+  nokogiri (>= 1.18.10)
   omniauth
   omniauth-dropbox-oauth2!
   omniauth-evernote
