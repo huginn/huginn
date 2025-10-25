@@ -230,7 +230,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.3.4)
+    concurrent-ruby (1.3.5)
     cookiejar (0.3.4)
     crack (0.4.5)
       rexml
@@ -432,18 +432,18 @@ GEM
     httpclient (2.8.3)
     huginn_agent (0.6.1)
       thor
-    i18n (1.14.6)
+    i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
     irb (1.14.1)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    jquery-rails (4.6.0)
+    jquery-rails (4.6.1)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (2.15.1)
+    json (2.15.2)
     jsonpath (1.1.5)
       multi_json
     jwt (2.10.2)
@@ -511,7 +511,7 @@ GEM
     mini_mime (1.1.5)
     mini_racer (0.19.0)
       libv8-node (~> 24.1.0.0)
-    minitest (5.25.4)
+    minitest (5.25.5)
     mqtt (0.6.0)
     msgpack (1.7.2)
     multi_json (1.15.0)
@@ -611,7 +611,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (2.2.10)
+    rack (2.2.20)
     rack-livereload (0.5.1)
       rack
     rack-protection (3.2.0)
@@ -802,7 +802,7 @@ GEM
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
-    twilio-ruby (7.8.3)
+    twilio-ruby (7.8.4)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 4.0)
       nokogiri (>= 1.6, < 2.0)
@@ -844,7 +844,7 @@ GEM
     xmpp4r (0.5.6)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.7.1)
+    zeitwerk (2.7.3)
     zlib (3.2.0)
 
 PLATFORMS
@@ -898,8 +898,8 @@ DEPENDENCIES
   httparty (~> 0.23, >= 0.23.2)
   huginn_agent
   hypdf!
-  jquery-rails (~> 4.6)
-  json (~> 2.15, >= 2.15.1)
+  jquery-rails (~> 4.6, >= 4.6.1)
+  json (~> 2.15, >= 2.15.2)
   jsonpath (~> 1.1, >= 1.1.5)
   kaminari (~> 1.2, >= 1.2.2)
   kramdown
@@ -955,7 +955,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client!
-  twilio-ruby (~> 7.8.3)
+  twilio-ruby (~> 7.8.4)
   twitter!
   twitter-stream!
   typhoeus
