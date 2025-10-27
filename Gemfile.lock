@@ -906,6 +906,7 @@ DEPENDENCIES
   letter_opener_web (~> 3.0)
   liquid (~> 5.6, = 5.6.0)
   listen (~> 3.9.0)
+  logger
   loofah (~> 2.24, >= 2.24.1)
   mail (>= 2.8.1)
   mini_magick (>= 5.3.1)
