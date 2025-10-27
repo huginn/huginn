@@ -36,8 +36,8 @@ describe Agents::EmailAgent do
       expect(ActionMailer::Base.deliveries.count).to eq(2)
       expect(ActionMailer::Base.deliveries.last.to).to eq(["bob@example.com"])
       expect(ActionMailer::Base.deliveries.last.subject).to eq("something interesting")
-      expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to eq("Event\r\n  data: Something else you should know about")
-      expect(get_message_part(ActionMailer::Base.deliveries.first, /plain/).strip).to eq("hi!\r\n  data: Something you should know about")
+      expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to eq("Event\n  data: Something else you should know about")
+      expect(get_message_part(ActionMailer::Base.deliveries.first, /plain/).strip).to eq("hi!\n  data: Something you should know about")
     end
 
     it "logs and re-raises any mailer errors" do

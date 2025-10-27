@@ -65,7 +65,7 @@ describe Agents::EmailDigestAgent do
 
       expect(ActionMailer::Base.deliveries.last.to).to eq(["bob@example.com"])
       expect(ActionMailer::Base.deliveries.last.subject).to eq("something interesting")
-      expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to eq("Event\r\n  data: Something you should know about\r\n\r\nFoo\r\n  bar: 2\r\n  url: http://google.com\r\n\r\nhi\r\n  woah: there\r\n\r\nEvent\r\n  test: 2")
+      expect(get_message_part(ActionMailer::Base.deliveries.last, /plain/).strip).to eq("Event\n  data: Something you should know about\n\nFoo\n  bar: 2\n  url: http://google.com\n\nhi\n  woah: there\n\nEvent\n  test: 2")
       expect(@checker.reload.memory[:events]).to be_empty
     end
 
