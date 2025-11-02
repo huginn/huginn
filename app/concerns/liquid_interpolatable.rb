@@ -405,7 +405,7 @@ module LiquidInterpolatable
       }
     end
   end
-  Liquid::Template.register_filter(LiquidInterpolatable::Filters)
+  Liquid::Environment.default.register_filter(LiquidInterpolatable::Filters)
 
   module Tags
     class Credential < Liquid::Tag
@@ -431,9 +431,9 @@ module LiquidInterpolatable
       end
     end
   end
-  Liquid::Template.register_tag('credential', LiquidInterpolatable::Tags::Credential)
-  Liquid::Template.register_tag('line_break', LiquidInterpolatable::Tags::LineBreak)
-  Liquid::Template.register_tag('uuidv4', LiquidInterpolatable::Tags::Uuidv4)
+  Liquid::Environment.default.register_tag('credential', LiquidInterpolatable::Tags::Credential)
+  Liquid::Environment.default.register_tag('line_break', LiquidInterpolatable::Tags::LineBreak)
+  Liquid::Environment.default.register_tag('uuidv4', LiquidInterpolatable::Tags::Uuidv4)
 
   module Blocks
     # Replace every occurrence of a given regex pattern in the first
@@ -530,6 +530,6 @@ module LiquidInterpolatable
       end
     end
   end
-  Liquid::Template.register_tag('regex_replace',       LiquidInterpolatable::Blocks::RegexReplace)
-  Liquid::Template.register_tag('regex_replace_first', LiquidInterpolatable::Blocks::RegexReplace)
+  Liquid::Environment.default.register_tag('regex_replace',       LiquidInterpolatable::Blocks::RegexReplace)
+  Liquid::Environment.default.register_tag('regex_replace_first', LiquidInterpolatable::Blocks::RegexReplace)
 end
