@@ -55,7 +55,8 @@ describe Agents::ChangeDetectorAgent do
     it "isnt when event created outside :expected_update_period_in_days" do
       @checker.options[:expected_update_period_in_days] = 2
 
-      travel 49.hours do
+      # Add more than 1 hour to 2 days to avoid DST boundary issues
+      travel 50.hours do
         expect(@checker).not_to be_working
       end
     end
