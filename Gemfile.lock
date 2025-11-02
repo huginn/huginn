@@ -799,11 +799,11 @@ GEM
     tilt (2.1.0)
     time (0.2.2)
       date
-    timeout (0.4.3)
+    timeout (0.4.4)
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
-    twilio-ruby (7.8.4)
+    twilio-ruby (7.8.5)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 4.0)
       nokogiri (>= 1.6, < 2.0)
@@ -910,7 +910,7 @@ DEPENDENCIES
   listen (~> 3.9.0)
   logger
   loofah (~> 2.24, >= 2.24.1)
-  mail (>= 2.8.1)
+  mail (>= 2.9.0)
   mini_magick (>= 5.3.1)
   mini_racer
   mqtt
@@ -958,7 +958,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client!
-  twilio-ruby (~> 7.8.4)
+  twilio-ruby (~> 7.8.5)
   twitter!
   twitter-stream!
   typhoeus
