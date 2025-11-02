@@ -117,7 +117,7 @@ gem 'mini_magick', '>= 5.3.1'
 gem 'multi_xml'
 gem 'nokogiri', '>= 1.18.10'
 gem 'omniauth'
-gem 'rails', '~> 7.0.1'
+gem 'rails', '~> 7.2.3'
 gem 'rails-html-sanitizer', '~> 1.6', '>= 1.6.2'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
 gem 'sassc-rails'
