@@ -77,7 +77,7 @@ gem 'aws-sdk-s3', '~> 1', '>= 1.199.1'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
-gem 'omniauth-google-oauth2', '~> 1.0.1'
+gem 'omniauth-google-oauth2', '~> 1.2.1'
 
 # Common gems
 gem 'ace-rails-ap'
