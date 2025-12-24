@@ -18,7 +18,10 @@ module AssignableTypes
     def load_types_in(module_name, my_name = module_name.singularize)
       const_set(:MODULE_NAME, module_name)
       const_set(:BASE_CLASS_NAME, my_name)
-      const_set(:TYPES, Dir[Rails.root.join("app", "models", module_name.underscore, "*.rb")].map { |path| module_name + "::" + File.basename(path, ".rb").camelize })
+      types = module_name.constantize.constants
+        .select {|t| t.to_s.include?(my_name)}
+        .map {|t| "#{module_name}::#{t}"}
+      const_set(:TYPES, types)
     end
 
     def types
