@@ -71,6 +71,15 @@ GIT
       omniauth-oauth2 (>= 1.6.0)
 
 GIT
+  remote: https://github.com/jnunemaker/httparty.git
+  revision: ddfbc8ddfca03d4f4026b01763ee906071ca558b
+  specs:
+    httparty (0.23.2)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
+
+GIT
   remote: https://github.com/sferik/twitter.git
   revision: 5fc9b15371b0936a4b331103b588c860f46170fd
   specs:
@@ -190,7 +199,7 @@ GEM
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
       rouge (>= 1.0.0)
-    bigdecimal (3.3.0)
+    bigdecimal (3.3.1)
     bindex (0.8.1)
     binding_of_caller (1.0.0)
       debug_inspector (>= 0.0.1)
@@ -425,10 +434,6 @@ GEM
       domain_name (~> 0.5)
     http-form_data (2.3.0)
     http_parser.rb (0.6.0)
-    httparty (0.23.2)
-      csv
-      mini_mime (>= 1.0.0)
-      multi_xml (>= 0.5.2)
     httpclient (2.8.3)
     huginn_agent (0.6.1)
       thor
@@ -897,7 +902,7 @@ DEPENDENCIES
   haversine
   hipchat (~> 1.6.0)
   httmultiparty (~> 0.3.16)
-  httparty (~> 0.23, >= 0.23.2)
+  httparty!
   huginn_agent
   hypdf!
   jquery-rails (~> 4.6, >= 4.6.1)
