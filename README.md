@@ -31,8 +31,6 @@ Join us in our [Gitter room](https://gitter.im/huginn/huginn) to discuss the pro
 
 Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, [add new Agents](https://github.com/huginn/huginn/wiki/Creating-a-new-agent), write [documentation and tutorials](https://github.com/huginn/huginn/wiki), or try tackling [issues tagged with #"help wanted"](https://github.com/huginn/huginn/issues?direction=desc&labels=help+wanted&page=1&sort=created&state=open).  Please fork, add specs, and send pull requests!
 
-Really want a fix or feature? Want to solve some community issues and earn some extra coffee money? Take a look at the [current bounties on Bountysource](https://www.bountysource.com/trackers/282580-huginn).
-
 Have an awesome idea but not feeling quite up to contributing yet? Head over to our [Official 'suggest an agent' thread ](https://github.com/huginn/huginn/issues/353) and tell us!
 
 ## Examples
@@ -152,4 +150,4 @@ Huginn is provided under the MIT License.
 
 Huginn was originally created by [@cantino](https://github.com/cantino) in 2013. Since then, many people's dedicated contributions have made it what it is today.
 
-[![Build Status](https://travis-ci.org/huginn/huginn.svg)](https://travis-ci.org/huginn/huginn) [![Coverage Status](https://coveralls.io/repos/huginn/huginn/badge.svg)](https://coveralls.io/r/huginn/huginn) [![Dependency Status](https://gemnasium.com/huginn/huginn.svg)](https://gemnasium.com/huginn/huginn) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=282580)](https://www.bountysource.com/trackers/282580-huginn?utm_source=282580&utm_medium=shield&utm_campaign=TRACKER_BADGE)
+[![Build Status](https://travis-ci.org/huginn/huginn.svg)](https://travis-ci.org/huginn/huginn) [![Coverage Status](https://coveralls.io/repos/huginn/huginn/badge.svg)](https://coveralls.io/r/huginn/huginn) [![Dependency Status](https://gemnasium.com/huginn/huginn.svg)](https://gemnasium.com/huginn/huginn)
