@@ -13,6 +13,9 @@ require 'action_view/railtie'
 require 'sprockets/railtie'
 require 'rails/test_unit/railtie'
 
+require_relative '../lib/middleware/remote_user_auth_middleware'
+
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -63,6 +66,15 @@ module Huginn
 
     config.after_initialize do
       config.active_record.yaml_column_permitted_classes = [Symbol, Date, Time]
+    end
+
+    if %w[t true y yes 1].include? ENV['ALLOW_REMOTE_USER_HEADER_LOGIN'].to_s.downcase
+      config.middleware.use(::RemoteUserAuthMiddleware, ENV['REMOTE_USER_HEADER_USERNAME'].presence,
+                                                        ENV['REMOTE_USER_HEADER_EMAIL'].presence,
+                                                        ENV['REMOTE_USER_HEADER_GROUPS'].presence,
+                                                        ENV['REMOTE_USER_HEADER_ADMIN_GROUP'].presence)
+
+
     end
 
     ActiveSupport::XmlMini.backend = 'Nokogiri'
