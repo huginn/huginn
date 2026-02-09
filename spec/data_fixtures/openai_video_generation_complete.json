@@ -1,0 +1,11 @@
+{
+  "id": "gen-video-abc123",
+  "status": "complete",
+  "model": "sora",
+  "prompt": "A cat playing piano in a jazz club",
+  "data": [
+    {
+      "url": "https://oaidalleapiprodscus.blob.core.windows.net/sample-video.mp4"
+    }
+  ]
+}
