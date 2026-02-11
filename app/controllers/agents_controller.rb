@@ -280,7 +280,7 @@ class AgentsController < ApplicationController
       return
     end
 
-    @agent.update!(template: true)
+    @agent.update!(template: true, source_ids: [], receiver_ids: [])
     @agent.events.delete_all
     @agent.logs.delete_all
     @agent.update!(memory: {})

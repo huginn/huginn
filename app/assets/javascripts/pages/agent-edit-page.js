@@ -209,10 +209,9 @@
       $("#agent-spinner").fadeIn();
       if (!firstTime) {
         $(".model-errors").hide();
+        // Only clear template_id when user manually changes type (not on first load)
+        $("#agent_template_id").val('');
       }
-
-      // Clear template_id when selecting a regular type
-      $("#agent_template_id").val('');
 
       return $.getJSON("/agents/type_details", { type }, (json) => {
           if (json.can_be_scheduled) {

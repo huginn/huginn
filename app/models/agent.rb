@@ -281,6 +281,7 @@ class Agent < ActiveRecord::Base
     if template?
       self.disabled = true
       self.schedule = 'never' if can_be_scheduled?
+      self.template_id = nil # Templates cannot be derived from other templates
     end
   end
 

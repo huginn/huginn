@@ -56,6 +56,29 @@ describe 'Template feature' do
         expect(agent.schedule).to eq('never')
       end
 
+      it 'clears template_id when converting to template' do
+        source_template = user.agents.create!(
+          name: 'Source Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
+        )
+        # Create a derived agent with template_id
+        derived = user.agents.create!(
+          name: 'Derived Agent',
+          type: 'Agents::WeatherAgent',
+          template_id: source_template.id,
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
+        )
+        expect(derived.template_id).to eq(source_template.id)
+
+        # Now convert the derived agent to a template
+        derived.update!(template: true)
+        derived.reload
+        expect(derived.template?).to be true
+        expect(derived.template_id).to be_nil  # template_id should be cleared
+      end
+
       it 'does not affect non-template agents' do
         agent = agents(:bob_weather_agent)
         expect(agent.disabled).to be false
@@ -247,6 +270,31 @@ describe 'Template feature' do
         agent.reload
         expect(agent.events_count).to eq(0)
         expect(agent.memory).to eq({})
+      end
+
+      it 'clears sources and receivers' do
+        source_agent = agents(:bob_weather_agent)
+        receiver_agent = agents(:bob_rain_notifier_agent)
+        agent = user.agents.create!(
+          name: 'Agent With Links',
+          type: 'Agents::TriggerAgent',
+          source_ids: [source_agent.id],
+          receiver_ids: [receiver_agent.id],
+          options: {
+            'expected_receive_period_in_days' => 2,
+            'rules' => [{ 'type' => 'field==value', 'value' => 'test', 'path' => 'name' }],
+            'message' => 'Triggered!',
+            'keep_event' => 'true'
+          }
+        )
+        expect(agent.sources).to include(source_agent)
+        expect(agent.receivers).to include(receiver_agent)
+
+        post :convert_to_template, params: { id: agent.to_param }
+        agent.reload
+        expect(agent.template?).to be true
+        expect(agent.sources).to be_empty
+        expect(agent.receivers).to be_empty
       end
 
       it 'does not re-convert an already-template agent' do
