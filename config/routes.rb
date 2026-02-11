@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       post :reemit_events
       delete :remove_events
       delete :memory, action: :destroy_memory
+      post :convert_to_template
     end
 
     collection do
@@ -14,6 +15,8 @@ Rails.application.routes.draw do
       post :propagate
       get :type_details
       get :event_descriptions
+      get :templates
+      get :template_details
       post :validate
       post :complete
       delete :undefined, action: :destroy_undefined

@@ -101,13 +101,119 @@
       if (type === "Agent") {
         $(".agent-settings").hide();
         return $(".description").hide();
-      } else {
+      }
+
+      // Check if this is a template selection (value like "template_123")
+      const templateMatch = type && type.match(/^template_(\d+)$/);
+      if (templateMatch) {
+        const templateId = templateMatch[1];
         $(".agent-settings").show();
         $("#agent-spinner").fadeIn();
         if (!firstTime) {
           $(".model-errors").hide();
         }
-        return $.getJSON("/agents/type_details", { type }, (json) => {
+        return $.getJSON("/agents/template_details", { id: templateId }, (json) => {
+          // Set the hidden template_id
+          $("#agent_template_id").val(json.template_id);
+
+          // Set the actual agent type back to the real type so the form submits correctly
+          if (json.type) {
+            // Temporarily unbind change handler to avoid re-triggering
+            $("#agent_type").off("change");
+            $("#agent_type").val(json.type).trigger('change.select2');
+            $("#agent_type").on("change", () => this.handleTypeChange(false));
+          }
+
+          // Pre-fill form fields
+          if (json.template_name) {
+            $("#agent_name").val(json.template_name);
+          }
+
+          if (json.can_be_scheduled) {
+            this.showSchedule(json.schedule || json.default_schedule);
+          } else {
+            this.hideSchedule();
+          }
+
+          if (json.can_receive_events) {
+            this.showLinks();
+          } else {
+            this.hideLinks();
+          }
+
+          if (json.can_control_other_agents) {
+            this.showControlLinks();
+          } else {
+            this.hideControlLinks();
+          }
+
+          if (json.can_create_events) {
+            this.showEventCreation();
+          } else {
+            this.hideEventCreation();
+          }
+
+          if (json.keep_events_for != null) {
+            $("#agent_keep_events_for").val(json.keep_events_for);
+          }
+
+          if (json.propagate_immediately != null) {
+            $("#agent_propagate_immediately").prop('checked', json.propagate_immediately);
+          }
+
+          // Pre-fill scenario_ids
+          if (json.scenario_ids && json.scenario_ids.length > 0) {
+            $("#agent_scenario_ids").val(json.scenario_ids).trigger('change');
+          }
+
+          // Pre-fill controller_ids
+          if (json.controller_ids && json.controller_ids.length > 0) {
+            $("#agent_controller_ids").val(json.controller_ids).trigger('change');
+          }
+
+          // Pre-fill control_target_ids
+          if (json.control_target_ids && json.control_target_ids.length > 0) {
+            $("#agent_control_target_ids").val(json.control_target_ids).trigger('change');
+          }
+
+          if (json.description_html != null) {
+            $(".description").show().html(json.description_html);
+          }
+
+          if (json.oauthable != null) {
+            $(".oauthable-form").html(json.oauthable);
+          }
+          if (json.form_options != null) {
+            $(".agent-options").html(json.form_options);
+          }
+
+          // Set options in the JSON editor
+          if (json.options != null) {
+            const optionsJson = JSON.stringify(json.options, null, 2);
+            $("textarea.live-json-editor").val(optionsJson);
+          }
+
+          window.jsonEditor = setupJsonEditor()[0];
+
+          this.enableDryRunButton();
+          this.buildAce();
+
+          window.initializeFormCompletable();
+
+          return $("#agent-spinner").stop(true, true).fadeOut();
+        });
+      }
+
+      // Normal agent type selection
+      $(".agent-settings").show();
+      $("#agent-spinner").fadeIn();
+      if (!firstTime) {
+        $(".model-errors").hide();
+        // Only clear template_id when user manually changes type (not on first load)
+        $("#agent_template_id").val('');
+      }
+
+      return $.getJSON("/agents/type_details", { type }, (json) => {
           if (json.can_be_scheduled) {
             if (firstTime) {
               this.showSchedule();
@@ -157,7 +263,6 @@
 
           return $("#agent-spinner").stop(true, true).fadeOut();
         });
-      }
     }
 
     hideSchedule() {

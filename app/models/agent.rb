@@ -51,12 +51,15 @@ class Agent < ActiveRecord::Base
   after_initialize :set_default_schedule
   before_validation :set_default_schedule
   before_validation :unschedule_if_cannot_schedule
+  before_validation :enforce_template_constraints
   before_save :unschedule_if_cannot_schedule
   before_create :set_last_checked_event_id
   after_save :possibly_update_event_expirations
 
   belongs_to :user, inverse_of: :agents
   belongs_to :service, inverse_of: :agents, optional: true
+  belongs_to :source_template, class_name: 'Agent', foreign_key: 'template_id', optional: true
+  has_many :derived_agents, class_name: 'Agent', foreign_key: 'template_id', dependent: :nullify
   has_many :events, -> { order("events.id desc") }, dependent: :delete_all, inverse_of: :agent
   has_one  :most_recent_event, -> { order("events.id desc") }, inverse_of: :agent, class_name: "Event"
   has_many :logs, -> { order("agent_logs.id desc") }, dependent: :delete_all, inverse_of: :agent, class_name: "AgentLog"
@@ -78,6 +81,8 @@ class Agent < ActiveRecord::Base
 
   scope :active,   -> { where(disabled: false, deactivated: false) }
   scope :inactive, -> { where(disabled: true).or(where(deactivated: true)) }
+  scope :templates, -> { where(template: true) }
+  scope :non_templates, -> { where(template: false) }
 
   scope :of_type, ->(type) {
     case type
@@ -90,6 +95,10 @@ class Agent < ActiveRecord::Base
 
   def short_type
     type.demodulize
+  end
+
+  def template?
+    !!template
   end
 
   def check
@@ -190,7 +199,7 @@ class Agent < ActiveRecord::Base
   end
 
   def unavailable?
-    disabled? || dependencies_missing?
+    disabled? || template? || dependencies_missing?
   end
 
   def dependencies_missing?
@@ -268,6 +277,14 @@ class Agent < ActiveRecord::Base
     self.schedule = nil if cannot_be_scheduled?
   end
 
+  def enforce_template_constraints
+    if template?
+      self.disabled = true
+      self.schedule = 'never' if can_be_scheduled?
+      self.template_id = nil # Templates cannot be derived from other templates
+    end
+  end
+
   def set_last_checked_event_id
     if can_receive_events? && newest_event_id = Event.maximum(:id)
       self.last_checked_event_id = newest_event_id
@@ -326,6 +343,24 @@ class Agent < ActiveRecord::Base
           name = '%s (%d)' % [original.name, i]
           unless exists?(name:)
             clone.name = name
+            break
+          end
+        end
+      }
+    end
+
+    # Build a new agent from a template, copying all configuration except
+    # source_ids and receiver_ids. The new agent records its lineage via template_id.
+    def build_from_template(template)
+      new(template.slice(
+        :type, :options, :service_id, :schedule, :controller_ids, :control_target_ids,
+        :keep_events_for, :propagate_immediately, :scenario_ids
+      ).merge(template_id: template.id, disabled: false)) { |agent|
+        # Give it a unique name based on the template name
+        2.step do |i|
+          name = '%s (%d)' % [template.name, i]
+          unless exists?(name:)
+            agent.name = name
             break
           end
         end
@@ -404,7 +439,7 @@ class Agent < ActiveRecord::Base
           .joins("JOIN links ON (links.receiver_id = agents.id)")
           .joins("JOIN agents AS sources ON (links.source_id = sources.id)")
           .joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)")
-          .where("NOT agents.disabled AND NOT agents.deactivated AND (agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id)")
+          .where("NOT agents.disabled AND NOT agents.deactivated AND NOT agents.template AND (agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id)")
         if options[:only_receivers].present?
           scope = scope.where("agents.id in (?)", options[:only_receivers])
         end
@@ -466,7 +501,7 @@ class Agent < ActiveRecord::Base
     def bulk_check(schedule)
       raise "Call #bulk_check on the appropriate subclass of Agent" if self == Agent
 
-      where("NOT disabled AND NOT deactivated AND schedule = ?", schedule).pluck("agents.id").each do |agent_id|
+      where("NOT disabled AND NOT deactivated AND NOT template AND schedule = ?", schedule).pluck("agents.id").each do |agent_id|
         async_check(agent_id)
       end
     end
