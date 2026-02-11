@@ -186,7 +186,8 @@ describe Agents::OpenaiLlmAgent do
       @checker.check
 
       event = Event.last
-      expect(event.payload).not_to have_key('message')
+      # message is always present as it's the LLM response content
+      expect(event.payload['message']).to include('San Francisco')
       expect(event.payload['finish_reason']).to eq('stop')
     end
   end
