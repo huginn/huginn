@@ -199,7 +199,7 @@ class Agent < ActiveRecord::Base
   end
 
   def unavailable?
-    disabled? || dependencies_missing?
+    disabled? || template? || dependencies_missing?
   end
 
   def dependencies_missing?

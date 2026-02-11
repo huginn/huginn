@@ -17,7 +17,7 @@
           <%= nav_link icon_tag('glyphicon-plus') + " New Agent", new_agent_path %>
           <%= nav_link icon_tag('glyphicon-refresh') + " Run event propagation", propagate_agents_path, method: 'post' %>
           <%= nav_link icon_tag('glyphicon-random') + " View Diagram", diagram_path %>
-          <%= nav_link icon_tag('glyphicon-duplicate') + " View Templates", templates_agents_path %>
+          <%= nav_link icon_tag('fa-t', class: 'fa-bold') + " View Templates", templates_agents_path %>
         </ul>
       <% end %>
       <%= nav_link "Scenarios", scenarios_path %>

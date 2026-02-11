@@ -48,7 +48,7 @@
   <% else %>
     <li>
       <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent-convert-template#{agent.id}" do %>
-        <%= icon_tag('glyphicon-duplicate') %> Convert to Template
+        <%= icon_tag('fa-t', class: 'fa-bold') %> Convert to Template
       <% end %>
     </li>
   <% end %>
