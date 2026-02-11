@@ -41,7 +41,7 @@ describe Agents::OpenaiVideoGenerationAgent do
 
       @event = Event.new
       @event.agent = agents(:jane_weather_agent)
-      @event.payload = { 'prompt' => 'A dog surfing on a wave' }
+      @event.payload = { 'prompt' => 'A dog surfing on a wave', 'request_id' => 'req-99' }
       @event.save!
     end
 
@@ -50,9 +50,16 @@ describe Agents::OpenaiVideoGenerationAgent do
         expect(@checker).to be_valid
       end
 
-      it 'requires api_key' do
+      it 'requires api_key when ENV is not set' do
         @checker.options['api_key'] = nil
+        stub_const('ENV', ENV.to_h.except('OPENAI_API_KEY'))
         expect(@checker).not_to be_valid
+      end
+
+      it 'accepts missing api_key when ENV is set' do
+        @checker.options['api_key'] = nil
+        stub_const('ENV', ENV.to_h.merge('OPENAI_API_KEY' => 'env-key'))
+        expect(@checker).to be_valid
       end
 
       it 'requires model' do
@@ -68,6 +75,16 @@ describe Agents::OpenaiVideoGenerationAgent do
       it 'validates mode values' do
         @checker.options['mode'] = 'invalid'
         expect(@checker).not_to be_valid
+      end
+
+      it 'validates output_mode values' do
+        @checker.options['output_mode'] = 'invalid'
+        expect(@checker).not_to be_valid
+      end
+
+      it 'accepts valid output_mode values' do
+        @checker.options['output_mode'] = 'merge'
+        expect(@checker).to be_valid
       end
     end
 
@@ -99,6 +116,25 @@ describe Agents::OpenaiVideoGenerationAgent do
 
         expect(WebMock).to have_requested(:post, 'https://api.openai.com/v1/videos/generations')
           .with(headers: { 'Authorization' => 'Bearer test-api-key' })
+      end
+    end
+
+    describe 'output_mode merge' do
+      before do
+        @checker.options['output_mode'] = 'merge'
+        @checker.options['prompt'] = '{{ prompt }}'
+        @checker.save!
+      end
+
+      it 'merges original event payload into the emitted event' do
+        @checker.receive([@event])
+
+        event = Event.last
+        # Original payload field preserved
+        expect(event.payload['request_id']).to eq('req-99')
+        # Submit fields present
+        expect(event.payload['generation_id']).to eq('gen-video-abc123')
+        expect(event.payload['status']).to eq('pending')
       end
     end
   end
@@ -150,6 +186,30 @@ describe Agents::OpenaiVideoGenerationAgent do
 
         result = Event.last
         expect(result.payload['status']).to eq('complete')
+      end
+    end
+
+    describe 'output_mode merge in poll mode' do
+      before do
+        @checker.options['output_mode'] = 'merge'
+        @checker.options['generation_id'] = '{{ generation_id }}'
+        @checker.save!
+      end
+
+      it 'merges original event payload into the poll result' do
+        event = Event.new
+        event.agent = agents(:jane_weather_agent)
+        event.payload = { 'generation_id' => 'gen-video-abc123', 'original_prompt' => 'test' }
+        event.save!
+
+        @checker.receive([event])
+
+        result = Event.last
+        # Original payload field preserved
+        expect(result.payload['original_prompt']).to eq('test')
+        # Poll result fields present
+        expect(result.payload['status']).to eq('complete')
+        expect(result.payload['video_url']).to include('sample-video.mp4')
       end
     end
   end
