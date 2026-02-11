@@ -5,15 +5,16 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y gnupg
 
+# MySQL 8.0 APT repository for Ubuntu Jammy (supports amd64 and arm64)
 mkdir -m700 $HOME/.gnupg
 gpg --no-default-keyring --keyring /usr/share/keyrings/mysql-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 5072E1F5 3A79BD29 B7B3B788A8D3785C 40976EAF437D05B5
-echo "deb [signed-by=/usr/share/keyrings/mysql-keyring.gpg] http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7" > /etc/apt/sources.list.d/mysql.list
+echo "deb [signed-by=/usr/share/keyrings/mysql-keyring.gpg] http://repo.mysql.com/apt/ubuntu/ jammy mysql-8.0" > /etc/apt/sources.list.d/mysql.list
 apt-get update
 
 apt-get install -y --allow-downgrades python3-pip mysql-server supervisor \
-                   mysql-server=5.7.42-1ubuntu18.04 mysql-client=5.7.42-1ubuntu18.04 libmysqlclient-dev=5.7.42-1ubuntu18.04 && \
+                   mysql-client libmysqlclient-dev && \
 apt-get -y clean
-pip install git+https://github.com/coderanger/supervisor-stdout
+pip3 install git+https://github.com/coderanger/supervisor-stdout
 rm -rf /var/lib/apt/lists/*
 rm -rf /usr/share/doc/
 rm -rf /usr/share/man/
