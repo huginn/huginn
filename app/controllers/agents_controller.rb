@@ -6,7 +6,7 @@ class AgentsController < ApplicationController
   def index
     set_table_sort sorts: %w[name created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
 
-    @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
+    @agents = current_user.agents.non_templates.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
 
     if show_only_enabled_agents?
       @agents = @agents.where(disabled: false)
@@ -40,6 +40,15 @@ class AgentsController < ApplicationController
 
   def run
     @agent = current_user.agents.find(params[:id])
+
+    if @agent.template?
+      respond_to do |format|
+        format.html { redirect_back "Templates cannot be run." }
+        format.json { head :unprocessable_entity }
+      end
+      return
+    end
+
     Agent.async_check(@agent.id)
 
     respond_to do |format|
@@ -132,7 +141,10 @@ class AgentsController < ApplicationController
   def new
     agents = current_user.agents
 
-    if id = params[:id]
+    if template_id = params[:template_id]
+      template = agents.templates.find(template_id)
+      @agent = agents.build_from_template(template)
+    elsif id = params[:id]
       @agent = agents.build_clone(agents.find(id))
     else
       @agent = agents.build
@@ -218,6 +230,64 @@ class AgentsController < ApplicationController
     build_agent
 
     render json: @agent.complete_option(params[:attribute])
+  end
+
+  def templates
+    set_table_sort sorts: %w[name created_at], default: { created_at: :desc }
+
+    @templates = current_user.agents.templates.preload(:scenarios, :derived_agents).reorder(table_sort).page(params[:page])
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @templates }
+    end
+  end
+
+  def template_details
+    template = current_user.agents.templates.find(params[:id])
+    @agent = Agent.build_for_type(template.type, current_user, {})
+    initialize_presenter
+
+    render json: {
+      can_be_scheduled: @agent.can_be_scheduled?,
+      default_schedule: template.schedule || @agent.default_schedule,
+      can_receive_events: @agent.can_receive_events?,
+      can_create_events: @agent.can_create_events?,
+      can_control_other_agents: @agent.can_control_other_agents?,
+      can_dry_run: @agent.can_dry_run?,
+      options: template.options || @agent.default_options,
+      description_html: @agent.html_description,
+      template_description: template.description,
+      template_name: template.name,
+      template_id: template.id,
+      keep_events_for: template.keep_events_for,
+      propagate_immediately: template.propagate_immediately,
+      schedule: template.schedule,
+      scenario_ids: template.scenario_ids,
+      controller_ids: template.controller_ids,
+      control_target_ids: template.control_target_ids,
+      oauthable: render_to_string(partial: 'oauth_dropdown', locals: { agent: @agent }),
+      form_options: render_to_string(partial: 'options', locals: { agent: @agent })
+    }
+  end
+
+  def convert_to_template
+    @agent = current_user.agents.find(params[:id])
+
+    if @agent.template?
+      redirect_back "Agent '#{@agent.name}' is already a template."
+      return
+    end
+
+    @agent.update!(template: true)
+    @agent.events.delete_all
+    @agent.logs.delete_all
+    @agent.update!(memory: {})
+
+    respond_to do |format|
+      format.html { redirect_to agent_path(@agent), notice: "'#{@agent.name}' has been converted to a template." }
+      format.json { render json: @agent, status: :ok }
+    end
   end
 
   def destroy_undefined
