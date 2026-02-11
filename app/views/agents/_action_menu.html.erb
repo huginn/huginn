@@ -72,11 +72,7 @@
           <%= icon_tag('glyphicon-refresh') %> Re-emit all events
         <% end %>
       </li>
-    <% end %>
 
-    <li class="divider"></li>
-
-    <% if agent.can_create_events? && agent.events_count > 0 %>
       <li>
         <%= link_to icon_tag('glyphicon-trash', class: 'color-danger') + ' Delete all events', remove_events_agent_path(agent, return: return_to), method: :delete, data: {confirm: 'Are you sure you want to delete ALL emitted events for this Agent?'}, tabindex: "-1" %>
       </li>
