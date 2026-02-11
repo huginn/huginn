@@ -10,7 +10,7 @@ describe 'Template feature' do
           name: 'My Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
       end
 
@@ -50,7 +50,7 @@ describe 'Template feature' do
           template: true,
           disabled: false,
           schedule: 'midnight',
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
         expect(agent.disabled).to be true
         expect(agent.schedule).to eq('never')
@@ -69,16 +69,16 @@ describe 'Template feature' do
           name: 'Weather Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'abc123', 'location' => '94103' },
+          options: { 'api_key' => 'abc123', 'location' => '37.7749,-122.4194' },
           keep_events_for: 86400,
-          description: 'A weather template'
+          template_description: 'A weather template'
         )
       end
 
       it 'creates a new agent based on the template' do
         agent = user.agents.build_from_template(@template)
         expect(agent.type).to eq('Agents::WeatherAgent')
-        expect(agent.options).to eq({ 'api_key' => 'abc123', 'location' => '94103' })
+        expect(agent.options).to eq({ 'api_key' => 'abc123', 'location' => '37.7749,-122.4194' })
         expect(agent.template_id).to eq(@template.id)
         expect(agent.disabled).to be false
         expect(agent.template).not_to be true
@@ -107,13 +107,13 @@ describe 'Template feature' do
           name: 'Source Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
         @derived = user.agents.create!(
           name: 'Derived Agent',
           type: 'Agents::WeatherAgent',
           template_id: @template.id,
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
       end
 
@@ -138,7 +138,7 @@ describe 'Template feature' do
           type: 'Agents::WeatherAgent',
           template: true,
           schedule: 'midnight',
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
       end
 
@@ -149,7 +149,7 @@ describe 'Template feature' do
     end
   end
 
-  describe AgentsController, 'template actions' do
+  describe AgentsController, 'template actions', type: :controller do
     let(:user) { users(:bob) }
 
     before do
@@ -162,7 +162,7 @@ describe 'Template feature' do
           name: 'Index Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
       end
 
@@ -178,7 +178,7 @@ describe 'Template feature' do
           name: 'Templates Index',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
       end
 
@@ -195,13 +195,15 @@ describe 'Template feature' do
     end
 
     describe 'GET template_details' do
+      render_views
+
       before do
         @template = user.agents.create!(
           name: 'Details Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          description: 'My template description',
-          options: { 'api_key' => 'test123', 'location' => '94103' }
+          template_description: 'My template description',
+          options: { 'api_key' => 'test123', 'location' => '37.7749,-122.4194' }
         )
       end
 
@@ -212,7 +214,7 @@ describe 'Template feature' do
         expect(json['template_name']).to eq('Details Template')
         expect(json['template_description']).to eq('My template description')
         expect(json['template_id']).to eq(@template.id)
-        expect(json['options']).to eq({ 'api_key' => 'test123', 'location' => '94103' })
+        expect(json['options']).to eq({ 'api_key' => 'test123', 'location' => '37.7749,-122.4194' })
       end
 
       it "cannot access another user's templates" do
@@ -220,7 +222,7 @@ describe 'Template feature' do
           name: 'Jane Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
         expect {
           get :template_details, params: { id: jane_template.id }
@@ -252,7 +254,7 @@ describe 'Template feature' do
           name: 'Already Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
         post :convert_to_template, params: { id: template.to_param }
         expect(flash[:notice]).to include('already a template')
@@ -271,7 +273,7 @@ describe 'Template feature' do
           name: 'No Run Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
         post :run, params: { id: template.to_param }
         expect(flash[:notice]).to include('cannot be run')
@@ -284,7 +286,7 @@ describe 'Template feature' do
           name: 'New From Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'from_template', 'location' => '12345' }
+          options: { 'api_key' => 'from_template', 'location' => '37.7771,-122.4196' }
         )
       end
 
@@ -293,7 +295,7 @@ describe 'Template feature' do
         agent = assigns(:agent)
         expect(agent.type).to eq('Agents::WeatherAgent')
         expect(agent.template_id).to eq(@template.id)
-        expect(agent.options).to eq({ 'api_key' => 'from_template', 'location' => '12345' })
+        expect(agent.options).to eq({ 'api_key' => 'from_template', 'location' => '37.7771,-122.4196' })
         expect(agent.template).not_to be true
       end
 
@@ -302,7 +304,7 @@ describe 'Template feature' do
           name: 'Jane Template',
           type: 'Agents::WeatherAgent',
           template: true,
-          options: { 'api_key' => 'test', 'location' => '12345' }
+          options: { 'api_key' => 'test', 'location' => '37.7771,-122.4196' }
         )
         expect {
           get :new, params: { template_id: jane_template.id }

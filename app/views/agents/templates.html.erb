@@ -28,7 +28,7 @@
                   <span class='text-muted'><%= template.short_type.titleize %></span>
                 </td>
                 <td>
-                  <%= truncate(template.description || '', length: 80) %>
+                  <%= truncate(template.template_description || '', length: 80) %>
                 </td>
                 <td>
                   <%= template.derived_agents.count %>

@@ -71,7 +71,7 @@ class ApplicationController < ActionController::Base
   def agent_params
     return {} unless params[:agent]
     @agent_params ||= begin
-      params[:agent].permit([:memory, :name, :type, :schedule, :disabled, :keep_events_for, :propagate_immediately, :drop_pending_events, :service_id, :template_id, :template, :description,
+      params[:agent].permit([:memory, :name, :type, :schedule, :disabled, :keep_events_for, :propagate_immediately, :drop_pending_events, :service_id, :template_id, :template, :template_description,
                               source_ids: [], receiver_ids: [], scenario_ids: [], controller_ids: [], control_target_ids: []] + agent_params_options)
     end
   end

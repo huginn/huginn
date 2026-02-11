@@ -258,7 +258,7 @@ class AgentsController < ApplicationController
       can_dry_run: @agent.can_dry_run?,
       options: template.options || @agent.default_options,
       description_html: @agent.html_description,
-      template_description: template.description,
+      template_description: template.template_description,
       template_name: template.name,
       template_id: template.id,
       keep_events_for: template.keep_events_for,

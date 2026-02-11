@@ -81,10 +81,10 @@
               <%= @agent.short_type.titleize %>
             </p>
 
-            <% if @agent.template? && @agent.description.present? %>
+            <% if @agent.template? && @agent.template_description.present? %>
               <p>
                 <b>Description:</b>
-                <%= @agent.description %>
+                <%= @agent.template_description %>
               </p>
             <% end %>
 
