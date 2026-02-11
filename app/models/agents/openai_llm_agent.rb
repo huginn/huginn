@@ -13,8 +13,8 @@ module Agents
 
       ### Configuration
 
-      * `api_key` - Your API key (use `{% credential openai_api_key %}` to reference a stored credential).
-      * `base_url` - The API base URL. Defaults to `https://api.openai.com/v1`. Set to `http://localhost:11434/v1` for Ollama, etc.
+      * `api_key` - Your API key (use `{% credential openai_api_key %}`). Falls back to the `OPENAI_API_KEY` environment variable.
+      * `base_url` - The API base URL. Defaults to `https://api.openai.com/v1`. Falls back to the `OPENAI_BASE_URL` environment variable. Set to `http://localhost:11434/v1` for Ollama, etc.
       * `organization` - (Optional) OpenAI organization ID.
       * `model` - The model to use (e.g. `gpt-4o`, `gpt-4o-mini`, `llama3`).
       * `system_message` - (Optional) A system prompt to set the assistant's behavior.
@@ -25,11 +25,15 @@ module Agents
       * `frequency_penalty` - (Optional) Penalize repeated tokens. Between -2.0 and 2.0.
       * `presence_penalty` - (Optional) Penalize tokens based on presence. Between -2.0 and 2.0.
       * `response_format` - (Optional) Set to `json_object` to force JSON output.
+      * `request_timeout` - (Optional) Timeout in seconds for API requests. Default: 60. Max: 600.
+      * `output_mode` - (Optional) Set to `merge` to merge the original event payload into the emitted event. Default: `clean`.
       * `expected_receive_period_in_days` - How often you expect events to arrive.
 
       ### Event Handling
 
       When receiving events, the `user_message` field is interpolated with the incoming event's payload, allowing you to use Liquid tags like `{{ message }}` or `{{ content }}`.
+
+      When `output_mode` is set to `merge`, the emitted event will contain the original incoming event's payload with the LLM response fields merged on top.
     MD
 
     event_description <<~MD
@@ -46,21 +50,9 @@ module Agents
             },
             "full_response": { ... }
           }
-    MD
 
-    form_configurable :api_key
-    form_configurable :base_url
-    form_configurable :organization
-    form_configurable :model
-    form_configurable :system_message, type: :string, ace: true
-    form_configurable :user_message, type: :string, ace: true
-    form_configurable :temperature
-    form_configurable :max_tokens
-    form_configurable :top_p
-    form_configurable :frequency_penalty
-    form_configurable :presence_penalty
-    form_configurable :response_format, type: :array, values: %w[text json_object]
-    form_configurable :expected_receive_period_in_days
+      Original event contents will be merged when `output_mode` is set to `merge`.
+    MD
 
     def default_options
       {
@@ -76,19 +68,10 @@ module Agents
         'frequency_penalty' => '',
         'presence_penalty' => '',
         'response_format' => 'text',
+        'output_mode' => 'clean',
+        'request_timeout' => '60',
         'expected_receive_period_in_days' => '1'
       }
-    end
-
-    def working?
-      return false unless openai_working?
-
-      if interpolated['expected_receive_period_in_days'].present?
-        return false unless last_receive_at &&
-          last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago
-      end
-
-      true
     end
 
     def validate_options
@@ -110,7 +93,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          perform_completion
+          perform_completion(event)
         end
       end
     end
@@ -121,7 +104,7 @@ module Agents
 
     private
 
-    def perform_completion
+    def perform_completion(event = nil)
       body = build_request_body
       response = openai_request(:post, '/chat/completions', body)
 
@@ -130,13 +113,13 @@ module Agents
       choice = response.dig('choices', 0)
       return error("No choices returned from API") unless choice
 
-      create_event payload: {
+      create_event payload: openai_base_payload(event).merge(
         'message' => choice.dig('message', 'content'),
         'finish_reason' => choice['finish_reason'],
         'model' => response['model'],
         'usage' => response['usage'],
         'full_response' => response
-      }
+      )
     end
 
     def build_request_body

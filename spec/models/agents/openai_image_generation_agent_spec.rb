@@ -20,7 +20,7 @@ describe Agents::OpenaiImageGenerationAgent do
 
     @event = Event.new
     @event.agent = agents(:jane_weather_agent)
-    @event.payload = { 'prompt' => 'A cat wearing a top hat' }
+    @event.payload = { 'prompt' => 'A cat wearing a top hat', 'source' => 'user_request' }
     @event.save!
 
     @response_body = File.read(Rails.root.join('spec/data_fixtures/openai_image_generation.json'))
@@ -34,9 +34,16 @@ describe Agents::OpenaiImageGenerationAgent do
       expect(@checker).to be_valid
     end
 
-    it 'requires api_key' do
+    it 'requires api_key when ENV is not set' do
       @checker.options['api_key'] = nil
+      stub_const('ENV', ENV.to_h.except('OPENAI_API_KEY'))
       expect(@checker).not_to be_valid
+    end
+
+    it 'accepts missing api_key when ENV is set' do
+      @checker.options['api_key'] = nil
+      stub_const('ENV', ENV.to_h.merge('OPENAI_API_KEY' => 'env-key'))
+      expect(@checker).to be_valid
     end
 
     it 'requires model' do
@@ -62,6 +69,16 @@ describe Agents::OpenaiImageGenerationAgent do
     it 'validates response_format values' do
       @checker.options['response_format'] = 'invalid'
       expect(@checker).not_to be_valid
+    end
+
+    it 'validates output_mode values' do
+      @checker.options['output_mode'] = 'invalid'
+      expect(@checker).not_to be_valid
+    end
+
+    it 'accepts valid output_mode values' do
+      @checker.options['output_mode'] = 'merge'
+      expect(@checker).to be_valid
     end
   end
 
@@ -108,6 +125,33 @@ describe Agents::OpenaiImageGenerationAgent do
 
       expect(WebMock).to have_requested(:post, 'https://api.openai.com/v1/images/generations')
         .with(headers: { 'Authorization' => 'Bearer test-api-key' })
+    end
+  end
+
+  describe 'output_mode merge' do
+    before do
+      @checker.options['output_mode'] = 'merge'
+      @checker.options['prompt'] = '{{ prompt }}'
+      @checker.save!
+    end
+
+    it 'merges original event payload into the emitted event' do
+      @checker.receive([@event])
+
+      event = Event.last
+      # Original payload field preserved
+      expect(event.payload['source']).to eq('user_request')
+      # Image generation fields present
+      expect(event.payload['image_url']).to include('blob.core.windows.net')
+      expect(event.payload['model']).to eq('dall-e-3')
+    end
+
+    it 'does not merge when called via check (no incoming event)' do
+      @checker.check
+
+      event = Event.last
+      expect(event.payload).not_to have_key('source')
+      expect(event.payload['image_url']).to include('blob.core.windows.net')
     end
   end
 

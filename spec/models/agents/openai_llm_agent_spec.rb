@@ -31,9 +31,16 @@ describe Agents::OpenaiLlmAgent do
       expect(@checker).to be_valid
     end
 
-    it 'requires api_key' do
+    it 'requires api_key when ENV is not set' do
       @checker.options['api_key'] = nil
+      stub_const('ENV', ENV.to_h.except('OPENAI_API_KEY'))
       expect(@checker).not_to be_valid
+    end
+
+    it 'accepts missing api_key when ENV is set' do
+      @checker.options['api_key'] = nil
+      stub_const('ENV', ENV.to_h.merge('OPENAI_API_KEY' => 'env-key'))
+      expect(@checker).to be_valid
     end
 
     it 'requires model' do
@@ -59,6 +66,19 @@ describe Agents::OpenaiLlmAgent do
     it 'validates max_tokens is positive' do
       @checker.options['max_tokens'] = '0'
       expect(@checker).not_to be_valid
+    end
+
+    it 'validates output_mode values' do
+      @checker.options['output_mode'] = 'invalid'
+      expect(@checker).not_to be_valid
+    end
+
+    it 'accepts valid output_mode values' do
+      @checker.options['output_mode'] = 'merge'
+      expect(@checker).to be_valid
+
+      @checker.options['output_mode'] = 'clean'
+      expect(@checker).to be_valid
     end
   end
 
@@ -141,6 +161,33 @@ describe Agents::OpenaiLlmAgent do
           body = JSON.parse(req.body)
           body['response_format'] == { 'type' => 'json_object' }
         }
+    end
+  end
+
+  describe 'output_mode merge' do
+    before do
+      @checker.options['output_mode'] = 'merge'
+      @checker.save!
+    end
+
+    it 'merges original event payload into the emitted event' do
+      @checker.receive([@event])
+
+      event = Event.last
+      # Original payload field preserved
+      expect(event.payload['message']).to include('San Francisco')
+      # LLM response fields present
+      expect(event.payload['finish_reason']).to eq('stop')
+      expect(event.payload['model']).to eq('gpt-4o-mini')
+    end
+
+    it 'does not merge when called via check (no incoming event)' do
+      @checker.options['user_message'] = 'Hello'
+      @checker.check
+
+      event = Event.last
+      expect(event.payload).not_to have_key('message')
+      expect(event.payload['finish_reason']).to eq('stop')
     end
   end
 

@@ -33,7 +33,7 @@ describe Agents::OpenaiSpeechAgent do
 
       @event = Event.new
       @event.agent = agents(:jane_weather_agent)
-      @event.payload = { 'audio_url' => 'https://example.com/audio.wav' }
+      @event.payload = { 'audio_url' => 'https://example.com/audio.wav', 'source' => 'podcast' }
       @event.save!
 
       stub_request(:post, 'https://api.openai.com/v1/audio/transcriptions')
@@ -45,9 +45,16 @@ describe Agents::OpenaiSpeechAgent do
         expect(@checker).to be_valid
       end
 
-      it 'requires api_key' do
+      it 'requires api_key when ENV is not set' do
         @checker.options['api_key'] = nil
+        stub_const('ENV', ENV.to_h.except('OPENAI_API_KEY'))
         expect(@checker).not_to be_valid
+      end
+
+      it 'accepts missing api_key when ENV is set' do
+        @checker.options['api_key'] = nil
+        stub_const('ENV', ENV.to_h.merge('OPENAI_API_KEY' => 'env-key'))
+        expect(@checker).to be_valid
       end
 
       it 'requires model' do
@@ -57,6 +64,11 @@ describe Agents::OpenaiSpeechAgent do
 
       it 'validates mode' do
         @checker.options['mode'] = 'invalid'
+        expect(@checker).not_to be_valid
+      end
+
+      it 'validates output_mode values' do
+        @checker.options['output_mode'] = 'invalid'
         expect(@checker).not_to be_valid
       end
     end
@@ -81,6 +93,24 @@ describe Agents::OpenaiSpeechAgent do
         expect {
           @checker.receive([@event])
         }.to change { Event.count }.by(1)
+      end
+    end
+
+    describe 'output_mode merge' do
+      before do
+        @checker.options['output_mode'] = 'merge'
+        @checker.options['audio_url'] = '{{ audio_url }}'
+        @checker.save!
+      end
+
+      it 'merges original event payload into the emitted event' do
+        @checker.receive([@event])
+
+        event = Event.last
+        # Original payload field preserved
+        expect(event.payload['source']).to eq('podcast')
+        # Transcription fields present
+        expect(event.payload['text']).to eq('The quick brown fox jumped over the lazy dog.')
       end
     end
   end
@@ -119,7 +149,7 @@ describe Agents::OpenaiSpeechAgent do
 
       @event = Event.new
       @event.agent = agents(:jane_weather_agent)
-      @event.payload = { 'text' => 'Hello, how are you?' }
+      @event.payload = { 'text' => 'Hello, how are you?', 'request_id' => 'req-42' }
       @event.save!
 
       stub_request(:post, 'https://api.openai.com/v1/audio/speech')
@@ -164,6 +194,25 @@ describe Agents::OpenaiSpeechAgent do
         expect {
           @checker.receive([@event])
         }.to change { Event.count }.by(1)
+      end
+    end
+
+    describe 'output_mode merge' do
+      before do
+        @checker.options['output_mode'] = 'merge'
+        @checker.options['input_text'] = '{{ text }}'
+        @checker.save!
+      end
+
+      it 'merges original event payload into the emitted event' do
+        @checker.receive([@event])
+
+        event = Event.last
+        # Original payload field preserved
+        expect(event.payload['request_id']).to eq('req-42')
+        # TTS fields present
+        expect(event.payload['audio_base64']).to be_present
+        expect(event.payload['voice']).to eq('alloy')
       end
     end
   end

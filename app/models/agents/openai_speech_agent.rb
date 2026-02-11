@@ -24,8 +24,8 @@ module Agents
 
       ### Configuration
 
-      * `api_key` - Your API key (use `{% credential openai_api_key %}` to reference a stored credential).
-      * `base_url` - The API base URL. Defaults to `https://api.openai.com/v1`.
+      * `api_key` - Your API key (use `{% credential openai_api_key %}`). Falls back to the `OPENAI_API_KEY` environment variable.
+      * `base_url` - The API base URL. Defaults to `https://api.openai.com/v1`. Falls back to the `OPENAI_BASE_URL` environment variable.
       * `organization` - (Optional) OpenAI organization ID.
       * `mode` - One of `transcribe`, `translate`, or `speak`.
       * `model` - The model to use. For transcription/translation: `whisper-1`. For TTS: `tts-1` or `tts-1-hd`.
@@ -34,7 +34,11 @@ module Agents
       * `voice` - (For speak) The voice to use: `alloy`, `echo`, `fable`, `onyx`, `nova`, or `shimmer`.
       * `response_format` - (Optional) For transcription: `json`, `text`, `srt`, `verbose_json`, or `vtt`. For TTS: `mp3`, `opus`, `aac`, `flac`, or `pcm`.
       * `language` - (Optional, transcribe only) ISO-639-1 language code to improve accuracy.
+      * `request_timeout` - (Optional) Timeout in seconds for API requests. Default: 60. Max: 600.
+      * `output_mode` - (Optional) Set to `merge` to merge the original event payload into the emitted event. Default: `clean`.
       * `expected_receive_period_in_days` - How often you expect events to arrive.
+
+      When `output_mode` is set to `merge`, the emitted event will contain the original incoming event's payload with the speech/transcription fields merged on top.
     MD
 
     event_description <<~MD
@@ -56,19 +60,9 @@ module Agents
             "voice": "alloy",
             "input_text": "The original text"
           }
-    MD
 
-    form_configurable :api_key
-    form_configurable :base_url
-    form_configurable :organization
-    form_configurable :mode, type: :array, values: %w[transcribe translate speak]
-    form_configurable :model
-    form_configurable :audio_url
-    form_configurable :input_text, type: :string, ace: true
-    form_configurable :voice, type: :array, values: %w[alloy echo fable onyx nova shimmer]
-    form_configurable :response_format, type: :array, values: %w[json text srt verbose_json vtt mp3 opus aac flac pcm]
-    form_configurable :language
-    form_configurable :expected_receive_period_in_days
+      Original event contents will be merged when `output_mode` is set to `merge`.
+    MD
 
     def default_options
       {
@@ -82,19 +76,10 @@ module Agents
         'voice' => 'alloy',
         'response_format' => 'json',
         'language' => '',
+        'output_mode' => 'clean',
+        'request_timeout' => '60',
         'expected_receive_period_in_days' => '1'
       }
-    end
-
-    def working?
-      return false unless openai_working?
-
-      if interpolated['expected_receive_period_in_days'].present?
-        return false unless last_receive_at &&
-          last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago
-      end
-
-      true
     end
 
     def validate_options
@@ -121,7 +106,7 @@ module Agents
           when 'translate'
             perform_translation(event)
           when 'speak'
-            perform_speech
+            perform_speech(event)
           end
         end
       end
@@ -154,12 +139,12 @@ module Agents
       response = openai_multipart_request('/audio/transcriptions', form_data)
       return if handle_openai_error(response)
 
-      create_event payload: {
+      create_event payload: openai_base_payload(event).merge(
         'text' => response['text'],
         'language' => response['language'],
         'duration' => response['duration'],
         'full_response' => response
-      }
+      )
     end
 
     def perform_translation(event = nil)
@@ -175,15 +160,15 @@ module Agents
       response = openai_multipart_request('/audio/translations', form_data)
       return if handle_openai_error(response)
 
-      create_event payload: {
+      create_event payload: openai_base_payload(event).merge(
         'text' => response['text'],
         'language' => 'en',
         'duration' => response['duration'],
         'full_response' => response
-      }
+      )
     end
 
-    def perform_speech
+    def perform_speech(event = nil)
       body = {
         'model' => interpolated['model'],
         'input' => interpolated['input_text'],
@@ -191,8 +176,8 @@ module Agents
       }
       body['response_format'] = interpolated['response_format'] if interpolated['response_format'].present?
 
-      url = "#{openai_base_url}/audio/speech"
-      response = faraday.run_request(:post, url, body.to_json, openai_headers)
+      response = openai_raw_request(:post, '/audio/speech', body)
+      return if response.nil?
 
       if response.status >= 400
         begin
@@ -207,13 +192,13 @@ module Agents
       content_type = response.headers['content-type'] || 'audio/mpeg'
       audio_base64 = Base64.strict_encode64(response.body)
 
-      create_event payload: {
+      create_event payload: openai_base_payload(event).merge(
         'audio_base64' => audio_base64,
         'content_type' => content_type,
         'model' => interpolated['model'],
         'voice' => interpolated['voice'],
         'input_text' => interpolated['input_text']
-      }
+      )
     end
 
     def fetch_audio(event = nil)
@@ -229,7 +214,7 @@ module Agents
         return nil
       end
 
-      response = faraday.get(audio_url)
+      response = openai_raw_connection.get(audio_url)
       if response.status >= 400
         error("Failed to fetch audio from #{audio_url}: HTTP #{response.status}")
         return nil

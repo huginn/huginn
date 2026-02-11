@@ -13,8 +13,8 @@ module Agents
 
       ### Configuration
 
-      * `api_key` - Your API key (use `{% credential openai_api_key %}` to reference a stored credential).
-      * `base_url` - The API base URL. Defaults to `https://api.openai.com/v1`.
+      * `api_key` - Your API key (use `{% credential openai_api_key %}`). Falls back to the `OPENAI_API_KEY` environment variable.
+      * `base_url` - The API base URL. Defaults to `https://api.openai.com/v1`. Falls back to the `OPENAI_BASE_URL` environment variable.
       * `organization` - (Optional) OpenAI organization ID.
       * `model` - The model to use (e.g. `dall-e-3`, `dall-e-2`).
       * `prompt` - The text prompt describing the image to generate. Supports [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid).
@@ -23,7 +23,11 @@ module Agents
       * `quality` - (DALL-E 3 only) `standard` or `hd`.
       * `style` - (DALL-E 3 only) `vivid` or `natural`.
       * `response_format` - `url` (returns a temporary URL) or `b64_json` (returns base64-encoded image).
+      * `request_timeout` - (Optional) Timeout in seconds for API requests. Default: 60. Max: 600.
+      * `output_mode` - (Optional) Set to `merge` to merge the original event payload into each emitted event. Default: `clean`.
       * `expected_receive_period_in_days` - How often you expect events to arrive.
+
+      When `output_mode` is set to `merge`, each emitted event will contain the original incoming event's payload with the image generation fields merged on top.
     MD
 
     event_description <<~MD
@@ -48,19 +52,9 @@ module Agents
             "size": "1024x1024",
             "index": 0
           }
-    MD
 
-    form_configurable :api_key
-    form_configurable :base_url
-    form_configurable :organization
-    form_configurable :model
-    form_configurable :prompt, type: :string, ace: true
-    form_configurable :n
-    form_configurable :size, type: :array, values: %w[256x256 512x512 1024x1024 1792x1024 1024x1792]
-    form_configurable :quality, type: :array, values: %w[standard hd]
-    form_configurable :style, type: :array, values: %w[vivid natural]
-    form_configurable :response_format, type: :array, values: %w[url b64_json]
-    form_configurable :expected_receive_period_in_days
+      Original event contents will be merged when `output_mode` is set to `merge`.
+    MD
 
     def default_options
       {
@@ -74,19 +68,10 @@ module Agents
         'quality' => 'standard',
         'style' => 'vivid',
         'response_format' => 'url',
+        'output_mode' => 'clean',
+        'request_timeout' => '60',
         'expected_receive_period_in_days' => '1'
       }
-    end
-
-    def working?
-      return false unless openai_working?
-
-      if interpolated['expected_receive_period_in_days'].present?
-        return false unless last_receive_at &&
-          last_receive_at > interpolated['expected_receive_period_in_days'].to_i.days.ago
-      end
-
-      true
     end
 
     def validate_options
@@ -111,7 +96,7 @@ module Agents
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          perform_generation
+          perform_generation(event)
         end
       end
     end
@@ -122,7 +107,7 @@ module Agents
 
     private
 
-    def perform_generation
+    def perform_generation(event = nil)
       body = {
         'model' => interpolated['model'],
         'prompt' => interpolated['prompt']
@@ -140,6 +125,8 @@ module Agents
       data = response['data']
       return error("No images returned from API") unless data&.any?
 
+      base = openai_base_payload(event)
+
       data.each_with_index do |image, index|
         payload = {
           'prompt' => interpolated['prompt'],
@@ -155,7 +142,7 @@ module Agents
           payload['image_base64'] = image['b64_json']
         end
 
-        create_event payload: payload
+        create_event payload: base.merge(payload)
       end
     end
   end
