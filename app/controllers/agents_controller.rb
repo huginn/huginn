@@ -249,6 +249,7 @@ class AgentsController < ApplicationController
     initialize_presenter
 
     render json: {
+      type: template.type,
       can_be_scheduled: @agent.can_be_scheduled?,
       default_schedule: template.schedule || @agent.default_schedule,
       can_receive_events: @agent.can_receive_events?,

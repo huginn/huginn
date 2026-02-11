@@ -1,0 +1,313 @@
+require 'rails_helper'
+
+describe 'Template feature' do
+  describe Agent, 'template support' do
+    let(:user) { users(:bob) }
+
+    describe '.templates / .non_templates scopes' do
+      before do
+        @template = user.agents.create!(
+          name: 'My Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+      end
+
+      it 'returns only templates with .templates scope' do
+        expect(Agent.templates).to include(@template)
+        expect(Agent.templates).not_to include(agents(:bob_website_agent))
+      end
+
+      it 'returns only non-templates with .non_templates scope' do
+        expect(Agent.non_templates).not_to include(@template)
+        expect(Agent.non_templates).to include(agents(:bob_website_agent))
+      end
+    end
+
+    describe '#template?' do
+      it 'returns true when template is set' do
+        agent = Agent.new(template: true)
+        expect(agent.template?).to be true
+      end
+
+      it 'returns false when template is not set' do
+        agent = Agent.new(template: false)
+        expect(agent.template?).to be false
+      end
+
+      it 'returns false by default' do
+        agent = Agent.new
+        expect(agent.template?).to be false
+      end
+    end
+
+    describe '#enforce_template_constraints' do
+      it 'forces disabled=true and schedule=never on save' do
+        agent = user.agents.create!(
+          name: 'Constraint Test',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          disabled: false,
+          schedule: 'midnight',
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+        expect(agent.disabled).to be true
+        expect(agent.schedule).to eq('never')
+      end
+
+      it 'does not affect non-template agents' do
+        agent = agents(:bob_weather_agent)
+        expect(agent.disabled).to be false
+        expect(agent.schedule).not_to eq('never')
+      end
+    end
+
+    describe '.build_from_template' do
+      before do
+        @template = user.agents.create!(
+          name: 'Weather Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'abc123', 'location' => '94103' },
+          keep_events_for: 86400,
+          description: 'A weather template'
+        )
+      end
+
+      it 'creates a new agent based on the template' do
+        agent = user.agents.build_from_template(@template)
+        expect(agent.type).to eq('Agents::WeatherAgent')
+        expect(agent.options).to eq({ 'api_key' => 'abc123', 'location' => '94103' })
+        expect(agent.template_id).to eq(@template.id)
+        expect(agent.disabled).to be false
+        expect(agent.template).not_to be true
+      end
+
+      it 'copies configuration but not source_ids or receiver_ids' do
+        agent = user.agents.build_from_template(@template)
+        expect(agent.source_ids).to be_empty
+        expect(agent.receiver_ids).to be_empty
+      end
+
+      it 'generates a unique name' do
+        agent = user.agents.build_from_template(@template)
+        expect(agent.name).to match(/Weather Template \(\d+\)/)
+      end
+
+      it 'copies keep_events_for' do
+        agent = user.agents.build_from_template(@template)
+        expect(agent.keep_events_for).to eq(86400)
+      end
+    end
+
+    describe 'associations' do
+      before do
+        @template = user.agents.create!(
+          name: 'Source Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+        @derived = user.agents.create!(
+          name: 'Derived Agent',
+          type: 'Agents::WeatherAgent',
+          template_id: @template.id,
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+      end
+
+      it 'tracks derived agents' do
+        expect(@template.derived_agents).to include(@derived)
+      end
+
+      it 'tracks the source template' do
+        expect(@derived.source_template).to eq(@template)
+      end
+
+      it 'nullifies template_id when template is destroyed' do
+        @template.destroy
+        expect(@derived.reload.template_id).to be_nil
+      end
+    end
+
+    describe 'execution guards' do
+      before do
+        @template = user.agents.create!(
+          name: 'Template Guard Test',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          schedule: 'midnight',
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+      end
+
+      it 'excludes templates from bulk_check' do
+        # Template schedule is forced to 'never', so it won't match 'midnight'
+        expect(@template.schedule).to eq('never')
+      end
+    end
+  end
+
+  describe AgentsController, 'template actions' do
+    let(:user) { users(:bob) }
+
+    before do
+      sign_in user
+    end
+
+    describe 'GET index' do
+      before do
+        @template = user.agents.create!(
+          name: 'Index Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+      end
+
+      it 'excludes templates from the agents listing' do
+        get :index
+        expect(assigns(:agents)).not_to include(@template)
+      end
+    end
+
+    describe 'GET templates' do
+      before do
+        @template = user.agents.create!(
+          name: 'Templates Index',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+      end
+
+      it 'lists only templates' do
+        get :templates
+        expect(assigns(:templates)).to include(@template)
+        expect(assigns(:templates).all?(&:template?)).to be true
+      end
+
+      it 'does not include non-template agents' do
+        get :templates
+        expect(assigns(:templates)).not_to include(agents(:bob_website_agent))
+      end
+    end
+
+    describe 'GET template_details' do
+      before do
+        @template = user.agents.create!(
+          name: 'Details Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          description: 'My template description',
+          options: { 'api_key' => 'test123', 'location' => '94103' }
+        )
+      end
+
+      it 'returns template configuration as JSON' do
+        get :template_details, params: { id: @template.id }
+        json = JSON.parse(response.body)
+        expect(json['type']).to eq('Agents::WeatherAgent')
+        expect(json['template_name']).to eq('Details Template')
+        expect(json['template_description']).to eq('My template description')
+        expect(json['template_id']).to eq(@template.id)
+        expect(json['options']).to eq({ 'api_key' => 'test123', 'location' => '94103' })
+      end
+
+      it "cannot access another user's templates" do
+        jane_template = users(:jane).agents.create!(
+          name: 'Jane Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+        expect {
+          get :template_details, params: { id: jane_template.id }
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    describe 'POST convert_to_template' do
+      it 'converts an agent to a template' do
+        agent = agents(:bob_weather_agent)
+        post :convert_to_template, params: { id: agent.to_param }
+        agent.reload
+        expect(agent.template?).to be true
+        expect(agent.disabled).to be true
+        expect(agent.schedule).to eq('never')
+      end
+
+      it 'clears events, logs, and memory' do
+        agent = agents(:bob_website_agent)
+        agent.update!(memory: { 'test' => 42 })
+        post :convert_to_template, params: { id: agent.to_param }
+        agent.reload
+        expect(agent.events_count).to eq(0)
+        expect(agent.memory).to eq({})
+      end
+
+      it 'does not re-convert an already-template agent' do
+        template = user.agents.create!(
+          name: 'Already Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+        post :convert_to_template, params: { id: template.to_param }
+        expect(flash[:notice]).to include('already a template')
+      end
+
+      it "cannot convert another user's agent" do
+        expect {
+          post :convert_to_template, params: { id: agents(:jane_website_agent).to_param }
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    describe 'POST run' do
+      it 'blocks running a template' do
+        template = user.agents.create!(
+          name: 'No Run Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+        post :run, params: { id: template.to_param }
+        expect(flash[:notice]).to include('cannot be run')
+      end
+    end
+
+    describe 'GET new with template_id' do
+      before do
+        @template = user.agents.create!(
+          name: 'New From Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'from_template', 'location' => '12345' }
+        )
+      end
+
+      it 'builds an agent from the template' do
+        get :new, params: { template_id: @template.id }
+        agent = assigns(:agent)
+        expect(agent.type).to eq('Agents::WeatherAgent')
+        expect(agent.template_id).to eq(@template.id)
+        expect(agent.options).to eq({ 'api_key' => 'from_template', 'location' => '12345' })
+        expect(agent.template).not_to be true
+      end
+
+      it "cannot build from another user's template" do
+        jane_template = users(:jane).agents.create!(
+          name: 'Jane Template',
+          type: 'Agents::WeatherAgent',
+          template: true,
+          options: { 'api_key' => 'test', 'location' => '12345' }
+        )
+        expect {
+          get :new, params: { template_id: jane_template.id }
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
+end

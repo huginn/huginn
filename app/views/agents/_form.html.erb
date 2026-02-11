@@ -16,6 +16,7 @@
              html: { class: 'agent-form' }) do |f| %>
 
   <%= hidden_field_tag :return, params[:return] %>
+  <%= f.hidden_field :template_id, id: 'agent_template_id' %>
 
   <div class="row">
     <div class="col-md-6">

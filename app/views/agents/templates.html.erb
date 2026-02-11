@@ -1,0 +1,64 @@
+<% content_for :title, "Templates" -%>
+
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2>Your Templates</h2>
+      </div>
+
+      <% if @templates.any? %>
+        <div class='table-responsive'>
+          <table class='table table-striped'>
+            <tr>
+              <th><%= sortable_column 'name', 'asc' %></th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Derived Agents</th>
+              <th><%= sortable_column 'created_at', 'desc', name: 'Created' %></th>
+              <th></th>
+            </tr>
+
+            <% @templates.each do |template| %>
+              <tr>
+                <td>
+                  <%= link_to template.name, agent_path(template, return: request.path) %>
+                </td>
+                <td>
+                  <span class='text-muted'><%= template.short_type.titleize %></span>
+                </td>
+                <td>
+                  <%= truncate(template.description || '', length: 80) %>
+                </td>
+                <td>
+                  <%= template.derived_agents.count %>
+                </td>
+                <td>
+                  <%= time_ago_in_words template.created_at %> ago
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                      <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
+                    </button>
+                    <%= render 'agents/action_menu', agent: template, return_to: request.path %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+
+        <%= paginate @templates, :theme => 'twitter-bootstrap-3' %>
+      <% else %>
+        <p class='text-muted'>You don't have any templates yet. You can convert an existing agent to a template from its action menu.</p>
+      <% end %>
+
+      <br/>
+
+      <div class="btn-group">
+        <%= link_to icon_tag('glyphicon-chevron-left') + ' Back to Agents', agents_path, class: "btn btn-default" %>
+      </div>
+    </div>
+  </div>
+</div>

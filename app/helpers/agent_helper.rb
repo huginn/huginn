@@ -90,10 +90,25 @@ module AgentHelper
   end
 
   def agent_type_select_options
-    Rails.cache.fetch('agent_type_select_options') do
+    options = Rails.cache.fetch('agent_type_select_options') do
       types = Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name, User.new(id: 0), {}).html_description.lines.first.strip)}] }
       types.sort_by! { |t| t[0] }
       [['Select an Agent Type', 'Agent', {title: ''}]] + types
+    end
+
+    if current_user
+      templates = current_user.agents.templates
+      if templates.any?
+        template_options = templates.map do |t|
+          ["[Template] #{t.name}", "template_#{t.id}", {title: h(t.description.presence || "Template based on #{t.short_type.titleize}")}]
+        end
+        template_options.sort_by! { |t| t[0] }
+        options + template_options
+      else
+        options
+      end
+    else
+      options
     end
   end
 

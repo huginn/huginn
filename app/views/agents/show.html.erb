@@ -4,7 +4,7 @@
   <div class='row'>
     <div class='col-md-2'>
         <ul class="nav nav-pills nav-stacked" id="show-tabs">
-          <li><%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, filtered_agent_return_link || agents_path %></li>
+          <li><%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, filtered_agent_return_link || (@agent.template? ? templates_agents_path : agents_path) %></li>
 
           <% if agent_show_view(@agent).present? %>
             <li class='active'><a href="#summary" data-toggle="tab"><span class='glyphicon glyphicon-picture'></span> Summary</a></li>
@@ -14,12 +14,14 @@
             <li class='active'><a href="#details" data-toggle="tab"><span class='glyphicon glyphicon-indent-left'></span> Details</a></li>
           <% end %>
 
-          <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><span class='glyphicon glyphicon-list-alt'></span> Logs</a></li>
+          <% unless @agent.template? %>
+            <li><a href="#logs" data-toggle="tab" data-agent-id="<%= @agent.id %>" class='<%= @agent.recent_error_logs? ? 'recent-errors' : '' %>'><span class='glyphicon glyphicon-list-alt'></span> Logs</a></li>
 
-          <% if @agent.can_create_events? && @agent.events_count > 0 %>
-            <li><%= link_to icon_tag('glyphicon-random') + ' Events'.html_safe, agent_events_path(@agent, return: request.fullpath) %></li>
-          <% else %>
-            <li class='disabled'><a><span class='glyphicon glyphicon-random'></span> Events</a></li>
+            <% if @agent.can_create_events? && @agent.events_count > 0 %>
+              <li><%= link_to icon_tag('glyphicon-random') + ' Events'.html_safe, agent_events_path(@agent, return: request.fullpath) %></li>
+            <% else %>
+              <li class='disabled'><a><span class='glyphicon glyphicon-random'></span> Events</a></li>
+            <% end %>
           <% end %>
 
           <li class="dropdown">
@@ -41,35 +43,50 @@
             <% end %>
           </div>
 
-          <div class="tab-pane" id="logs" data-agent-id="<%= @agent.id %>">
-            <div class='row'>
-              <div class='col-md-12'>
-                <h2>
-                  <%= @agent.name %> Logs
-                  <small>
-                    <%= image_tag "spinner-arrows.gif", class: "spinner" %>
-                    <span class="glyphicon glyphicon-refresh action-icon refresh"></span>
-                    <span class="glyphicon glyphicon-trash action-icon clear"></span>
-                  </small>
-                </h2>
+          <% unless @agent.template? %>
+            <div class="tab-pane" id="logs" data-agent-id="<%= @agent.id %>">
+              <div class='row'>
+                <div class='col-md-12'>
+                  <h2>
+                    <%= @agent.name %> Logs
+                    <small>
+                      <%= image_tag "spinner-arrows.gif", class: "spinner" %>
+                      <span class="glyphicon glyphicon-refresh action-icon refresh"></span>
+                      <span class="glyphicon glyphicon-trash action-icon clear"></span>
+                    </small>
+                  </h2>
+                </div>
               </div>
-            </div>
-            <div class='row'>
-              <div class='col-md-12'>
-                <div class='logs'>
-                  Just a moment...
+              <div class='row'>
+                <div class='col-md-12'>
+                  <div class='logs'>
+                    Just a moment...
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          <% end %>
 
           <div class="tab-pane <%= agent_show_view(@agent).present? ? "" : "active" %>" id="details">
             <h2><%= @agent.name %> Details</h2>
+
+            <% if @agent.template? %>
+              <p>
+                <span class="label label-info">Template</span>
+              </p>
+            <% end %>
 
             <p>
               <b>Type:</b>
               <%= @agent.short_type.titleize %>
             </p>
+
+            <% if @agent.template? && @agent.description.present? %>
+              <p>
+                <b>Description:</b>
+                <%= @agent.description %>
+              </p>
+            <% end %>
 
             <% if @agent.can_be_scheduled? %>
               <p>
@@ -77,10 +94,12 @@
                 <%= agent_schedule(@agent) %>
               </p>
 
-              <p>
-                <b>Last checked:</b>
-                <%= @agent.last_check_at ? time_ago_in_words(@agent.last_check_at) + " ago" : "never" %>
-              </p>
+              <% unless @agent.template? %>
+                <p>
+                  <b>Last checked:</b>
+                  <%= @agent.last_check_at ? time_ago_in_words(@agent.last_check_at) + " ago" : "never" %>
+                </p>
+              <% end %>
             <% end %>
 
             <% if (agents = @agent.controllers).length > 0 %>
@@ -90,30 +109,32 @@
               </p>
             <% end %>
 
-            <% if @agent.can_create_events? %>
-              <p>
-                <b>Keep events:</b>
-                <%= (Agent::EVENT_RETENTION_SCHEDULES.detect {|s| s.last == @agent.keep_events_for } || [@agent.keep_events_for]).first %>
-              </p>
+            <% unless @agent.template? %>
+              <% if @agent.can_create_events? %>
+                <p>
+                  <b>Keep events:</b>
+                  <%= (Agent::EVENT_RETENTION_SCHEDULES.detect {|s| s.last == @agent.keep_events_for } || [@agent.keep_events_for]).first %>
+                </p>
 
-              <p>
-                <b>Last event created:</b>
-                <%= @agent.last_event_at ? time_ago_in_words(@agent.last_event_at) + " ago" : "never" %>
-              </p>
-            <% end %>
+                <p>
+                  <b>Last event created:</b>
+                  <%= @agent.last_event_at ? time_ago_in_words(@agent.last_event_at) + " ago" : "never" %>
+                </p>
+              <% end %>
 
-            <% if @agent.can_receive_events? %>
-              <p>
-                <b>Last received event:</b>
-                <%= @agent.last_receive_at ? time_ago_in_words(@agent.last_receive_at) + " ago" : "never" %>
-              </p>
-            <% end %>
+              <% if @agent.can_receive_events? %>
+                <p>
+                  <b>Last received event:</b>
+                  <%= @agent.last_receive_at ? time_ago_in_words(@agent.last_receive_at) + " ago" : "never" %>
+                </p>
+              <% end %>
 
-            <% if @agent.can_create_events? %>
-              <p>
-                <b>Events created:</b>
-                <%= link_to @agent.events_count, agent_events_path(@agent) %>
-              </p>
+              <% if @agent.can_create_events? %>
+                <p>
+                  <b>Events created:</b>
+                  <%= link_to @agent.events_count, agent_events_path(@agent) %>
+                </p>
+              <% end %>
             <% end %>
 
             <% if @agent.try(:oauthable?) %>
@@ -161,27 +182,47 @@
               </p>
             <% end %>
 
-            <p>
-              <b>Working:</b>
-              <%= working @agent %>
-            </p>
+            <% unless @agent.template? %>
+              <p>
+                <b>Working:</b>
+                <%= working @agent %>
+              </p>
+            <% end %>
 
             <p>
               <b>Options:</b>
               <pre><%= Utils.pretty_jsonify @agent.options || {} %></pre>
             </p>
-            <% if @agent.memory.present? %>
-              <p id="memory" data-agent-id="<%= @agent.id %>">
-                <b>Memory:</b>
-                <i class="fa-solid fa-spinner fa-spin-pulse spinner"></i>
-                <i class="fa-solid fa-trash action-icon clear"></i>
-                <a id="toggle-memory" href="#">Show</a>
-                <pre class="memory hidden"><%= Utils.pretty_jsonify @agent.memory || {} %></pre>
+
+            <% if @agent.template? %>
+              <% derived = @agent.derived_agents %>
+              <p>
+                <b>Derived Agents (<%= derived.count %>):</b>
               </p>
+              <% if derived.any? %>
+                <ul>
+                  <% derived.each do |derived_agent| %>
+                    <li><%= link_to derived_agent.name, agent_path(derived_agent) %> <span class='text-muted'>(<%= derived_agent.short_type.titleize %>)</span></li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <p class='text-muted'>No agents have been created from this template yet.</p>
+              <% end %>
+            <% end %>
+
+            <% unless @agent.template? %>
+              <% if @agent.memory.present? %>
+                <p id="memory" data-agent-id="<%= @agent.id %>">
+                  <b>Memory:</b>
+                  <i class="fa-solid fa-spinner fa-spin-pulse spinner"></i>
+                  <i class="fa-solid fa-trash action-icon clear"></i>
+                  <a id="toggle-memory" href="#">Show</a>
+                  <pre class="memory hidden"><%= Utils.pretty_jsonify @agent.memory || {} %></pre>
+                </p>
+              <% end %>
             <% end %>
           </div>
         </div>
       </div>
   </div>
 </div>
-
