@@ -226,12 +226,14 @@ describe Agents::OpenaiVideoGenerationAgent do
 
     describe '#receive' do
       it 'submits and stores pending generation in memory' do
+        input_event = Event.new.tap { |e|
+          e.agent = agents(:jane_weather_agent)
+          e.payload = { 'prompt' => 'A cat playing piano' }
+          e.save!
+        }
+
         expect {
-          @checker.receive([Event.new.tap { |e|
-            e.agent = agents(:jane_weather_agent)
-            e.payload = { 'prompt' => 'A cat playing piano' }
-            e.save!
-          }])
+          @checker.receive([input_event])
         }.to change { Event.count }.by(1)
 
         @checker.reload
