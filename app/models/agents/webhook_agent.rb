@@ -34,7 +34,7 @@ module Agents
         * `code` - The response code to the request. Defaults to '201'. If the code is '301' or '302' the request will automatically be redirected to the url defined in "response".
         * `recaptcha_secret` - Setting this to a reCAPTCHA "secret" key makes your agent verify incoming requests with reCAPTCHA.  Don't forget to embed a reCAPTCHA snippet including your "site" key in the originating form(s).
         * `recaptcha_send_remote_addr` - Set this to true if your server is properly configured to set REMOTE_ADDR to the IP address of each visitor (instead of that of a proxy server).
-        * `score_threshold` - Setting this when using reCAPTCHA v3 to define the treshold when a submission is verified. Defaults to 0.5
+        * `score_threshold` - Setting this when using reCAPTCHA v3 to define the threshold when a submission is verified. Defaults to 0.5
       MD
     end
 
