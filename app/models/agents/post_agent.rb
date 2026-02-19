@@ -9,6 +9,7 @@ module Agents
     MIME_RE = /\A\w+\/.+\z/
 
     can_dry_run!
+    emits_file_pointer!
     no_bulk_receive!
     default_schedule "never"
 
@@ -31,6 +32,8 @@ module Agents
         If `emit_events` is set to `true`, the server response will be emitted as an Event.  The "body" value of the Event is the response body.  If the `parse_body` option is set to `true` and the content type of the response is JSON, it is parsed to a JSON object.  Otherwise it is raw text.  A raw HTML/XML text can be fed to a WebsiteAgent for parsing (using its `data_from_event` and `type` options).
         The Event will also have a "headers" hash and a "status" integer value.
 
+        If `emit_file_pointer` is set to `true`, instead of emitting raw text, a file pointer is used instead for the server response.
+
         If `output_mode` is set to `merge`, the emitted Event will be merged into the original contents of the received Event.
 
         Set `event_headers` to a list of header names, either in an array of string or in a comma-separated string, to include only some of the header values.
@@ -50,6 +53,8 @@ module Agents
           * `user_agent` - A custom User-Agent name (default: "Faraday v#{Faraday::VERSION}").
 
         #{receiving_file_handling_agent_description}
+
+        #{emitting_file_handling_agent_description}
 
         When receiving a `file_pointer` the request will be sent with multipart encoding (`multipart/form-data`) and `content_type` is ignored. `upload_key` can be used to specify the parameter in which the file will be sent, it defaults to `file`.
       MD
@@ -130,6 +135,10 @@ module Agents
         errors.add(:base, "if provided, emit_events must be true or false")
       end
 
+      if options.has_key?('emit_file_pointer') && boolify(options['emit_events']).nil?
+        errors.add(:base, "if provided, emit_file_pointer must be true or false")
+      end
+
       validate_event_headers_options!
 
       unless %w[post get put delete patch].include?(method)
@@ -176,6 +185,10 @@ module Agents
       handle interpolated['payload'].presence || {}, headers
     end
 
+    def get_io(file_pointer)
+      StringIO.new(Base64.decode64(file_pointer))
+    end
+
     private
 
     def handle(data, event = Event.new, headers)
@@ -219,12 +232,21 @@ module Agents
 
       if boolify(interpolated['emit_events'])
         new_event = interpolated['output_mode'].to_s == 'merge' ? event.payload.dup : {}
-        create_event payload: new_event.merge(
-          body: response.body,
-          status: response.status
+        new_event = new_event.merge(
+          status: response.status,
         ).merge(
           event_headers_payload(response.headers)
         )
+
+        if boolify(interpolated['emit_file_pointer'])
+          new_event = new_event.merge(
+              get_file_pointer(Base64.encode64(response.body))
+            )
+        else
+          new_event = new_event.merge(body: response.body)
+        end
+
+        create_event payload: new_event
       end
     end
 
