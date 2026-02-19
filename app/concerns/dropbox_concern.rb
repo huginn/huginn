@@ -10,7 +10,7 @@ module DropboxConcern
   def dropbox
     Dropbox::API::Config.app_key = consumer_key
     Dropbox::API::Config.app_secret = consumer_secret
-    Dropbox::API::Config.mode = 'dropbox'
+    Dropbox::API::Config.mode = ENV["USE_APP_FOLDER"] ? 'sandbox' : 'dropbox'
     Dropbox::API::Client.new(token: oauth_token, secret: oauth_token_secret)
   end
 
