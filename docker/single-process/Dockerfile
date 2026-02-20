@@ -1,4 +1,4 @@
-FROM rubylang/ruby:3.2-jammy
+FROM rubylang/ruby:4.0-jammy
 
 COPY docker/scripts/prepare /scripts/
 RUN /scripts/prepare
