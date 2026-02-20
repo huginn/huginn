@@ -2,11 +2,11 @@ version: '2'
 
 services:
   mysqldata:
-    image: mysql:5.7
+    image: mysql:9.6
     command: /bin/true
 
   mysql:
-    image: mysql:5.7
+    image: mysql:9.6
     restart: always
     env_file:
       - ../mysql.env
