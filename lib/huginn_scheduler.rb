@@ -203,9 +203,14 @@ class HuginnScheduler < LongRunnable::Worker
 
   def with_mutex
     mutex.synchronize do
-      ActiveRecord::Base.connection_pool.with_connection do
-        yield
-      end
+      begin
+			  ActiveRecord::Base.connection_pool.with_connection do
+				  yield
+			  end
+		  rescue ActiveRecord::StatementInvalid => e
+			  puts 'ActiveRecord Force Reconnect (scheduler)'
+			  ActiveRecord::Base.connection.reconnect! 
+		  end
     end
   end
 end
