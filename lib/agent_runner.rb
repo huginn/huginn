@@ -116,8 +116,9 @@ class AgentRunner
   end
 end
 
-require 'agents/twitter_stream_agent'
-require 'agents/jabber_agent'
-require 'agents/local_file_agent'
+# Load long-running agents so LongRunnable can register them.
+Agents::TwitterStreamAgent
+Agents::JabberAgent
+Agents::LocalFileAgent
 require 'huginn_scheduler'
 require 'delayed_job_worker'
