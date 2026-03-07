@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'inheritance_tracking'
 
 describe InheritanceTracking do
   class Class1
