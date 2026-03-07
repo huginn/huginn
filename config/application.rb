@@ -29,6 +29,8 @@ module Huginn
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
 
+    config.add_autoload_paths_to_load_path = false
+
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W[#{config.root}/lib #{config.root}/app/presenters #{config.root}/app/jobs]
 
