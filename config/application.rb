@@ -1,6 +1,7 @@
 require_relative 'boot'
 
 require 'rails'
+require 'securerandom'
 
 require 'active_model/railtie'
 require 'active_job/railtie'
@@ -30,6 +31,19 @@ module Huginn
     # in config/environments, which are processed later.
 
     config.add_autoload_paths_to_load_path = false
+    config.secret_key_base =
+      ENV['APP_SECRET_TOKEN'].presence ||
+      ENV['SECRET_KEY_BASE'].presence ||
+      if Rails.env.development? || Rails.env.test?
+        local_secret_path = config.root.join('tmp/local_secret.txt')
+        if local_secret_path.exist?
+          local_secret_path.binread
+        else
+          generated_secret = SecureRandom.hex(64)
+          local_secret_path.binwrite(generated_secret)
+          generated_secret
+        end
+      end
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W[#{config.root}/lib #{config.root}/app/presenters #{config.root}/app/jobs]
