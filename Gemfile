@@ -31,7 +31,7 @@ end
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
 gem 'hipchat', '~> 1.6.0' # HipchatAgent
 gem 'hypdf', bitbucket: 'knu/hypdf_gem', branch: 'uploadio_namespace' # PDFInfoAgent
-gem 'mini_racer' # JavaScriptAgent
+gem 'mini_racer', github: 'knu/mini_racer', branch: 'fix/darwin_build' # JavaScriptAgent
 gem 'mqtt' # MQTTAgent
 gem 'net-ftp'
 gem 'net-ftp-list' # FtpsiteAgent
