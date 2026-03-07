@@ -1,12 +1,4 @@
 GIT
-  remote: https://knu@bitbucket.org/knu/hypdf_gem.git
-  revision: e11df6bd71356c9211e5001d729f3e92bfd6e19e
-  branch: uploadio_namespace
-  specs:
-    hypdf (1.0.19)
-      httparty (> 0.16.0, < 1.0)
-
-GIT
   remote: https://github.com/Hirurg103/capybara_select2.git
   revision: 48e2c458c2827cf2af2b0a287b30468fa8d761bf
   specs:
@@ -111,6 +103,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    Ascii85 (2.0.1)
     ace-rails-ap (4.5)
     actioncable (7.0.8.7)
       actionpack (= 7.0.8.7)
@@ -179,6 +172,7 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    afm (1.0.0)
     airbrussh (1.4.1)
       sshkit (>= 1.6.1, != 1.7.0)
     ast (2.4.2)
@@ -423,6 +417,7 @@ GEM
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.0.1)
+    hashery (2.1.2)
     hashie (3.5.7)
     haversine (0.3.2)
     hipchat (1.6.0)
@@ -606,6 +601,12 @@ GEM
     parallel (1.23.0)
     parser (3.2.2.1)
       ast (~> 2.4.1)
+    pdf-reader (2.15.1)
+      Ascii85 (>= 1.0, < 3.0, != 2.0.0)
+      afm (>= 0.2.1, < 2)
+      hashery (~> 2.0)
+      ruby-rc4
+      ttfunk
     pg (1.6.3-arm64-darwin)
     pg (1.6.3-x86_64-darwin)
     pg (1.6.3-x86_64-linux)
@@ -747,6 +748,7 @@ GEM
       rubocop-capybara (~> 2.17)
       rubocop-factory_bot (~> 2.22)
     ruby-progressbar (1.13.0)
+    ruby-rc4 (0.1.5)
     rubyzip (2.3.2)
     rufus-scheduler (3.9.2)
       fugit (~> 1.1, >= 1.11.1)
@@ -815,6 +817,8 @@ GEM
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
+    ttfunk (1.8.0)
+      bigdecimal (~> 3.1)
     twilio-ruby (7.8.5)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 4.0)
@@ -912,7 +916,6 @@ DEPENDENCIES
   httmultiparty (~> 0.3.16)
   httparty!
   huginn_agent
-  hypdf!
   jquery-rails (~> 4.6, >= 4.6.1)
   json (~> 2.15, >= 2.15.2)
   jsonpath (~> 1.1, >= 1.1.5)
@@ -938,6 +941,7 @@ DEPENDENCIES
   omniauth-google-oauth2 (~> 1.0.1)
   omniauth-tumblr
   omniauth-twitter
+  pdf-reader
   pg (~> 1.6, >= 1.6.3)
   pirate_weather_forecast_ruby
   puma

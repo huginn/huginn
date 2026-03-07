@@ -1,21 +1,26 @@
-require 'open-uri'
-require 'hypdf'
-
 module Agents
   class PdfInfoAgent < Agent
-    gem_dependency_check { defined?(HyPDF) }
+    include WebRequestConcern
+
+    gem_dependency_check { defined?(PDF::Reader) }
 
     cannot_be_scheduled!
     no_bulk_receive!
 
     description <<~MD
-      The PDF Info Agent returns the metadata contained within a given PDF file, using HyPDF.
+      The PDF Info Agent returns the metadata contained within a given PDF file, using the pdf-reader gem.
 
-      #{'## Include the `hypdf` gem in your `Gemfile` to use PDFInfo Agents.' if dependencies_missing?}
+      #{'## Include the `pdf-reader` gem in your `Gemfile` to use PDFInfo Agents.' if dependencies_missing?}
 
-      In order for this agent to work, you need to have [HyPDF](https://devcenter.heroku.com/articles/hypdf) running and configured.
+      It works by acting on events that contain a key `url` in their payload, and extracts PDF metadata from them.
 
-      It works by acting on events that contain a key `url` in their payload, and runs the [pdfinfo](https://devcenter.heroku.com/articles/hypdf#pdfinfo) command on them.
+      Options:
+
+      * `basic_auth` - Specify HTTP basic auth parameters: `"username:password"`, or `["username", "password"]`.
+      * `disable_ssl_verification` - Set to `true` to disable ssl verification.
+      * `user_agent` - A custom User-Agent name.
+      * `headers` - A hash of headers to send with the request.
+      * `proxy` - A proxy URL to use for the request.
     MD
 
     event_description do
@@ -25,15 +30,11 @@ module Agents
           "Author" => "Aaron Sumner",
           "Creator" => "LaTeX with hyperref package",
           "Producer" => "xdvipdfmx (0.7.8)",
-          "CreationDate" => "Fri Aug  2 05",
-          "32" => "50 2013",
-          "Tagged" => "no",
+          "CreationDate" => "Fri Aug  2 05:32:50 2013",
           "Pages" => "150",
-          "Encrypted" => "no",
-          "Page size" => "612 x 792 pts (letter)",
-          "Optimized" => "no",
+          "Page size" => "612.0 x 792.0 pts",
           "PDF version" => "1.5",
-          "url": "your url"
+          "url" => "your url",
         })
     end
 
@@ -45,11 +46,14 @@ module Agents
       {}
     end
 
+    def validate_options
+      validate_web_request_options!
+    end
+
     def receive(incoming_events)
       incoming_events.each do |event|
         interpolate_with(event) do
-          url_to_scrape = event.payload['url']
-          check_url(url_to_scrape, event.payload) if url_to_scrape =~ /^https?:\/\//i
+          check_url(event.payload["url"], event.payload)
         end
       end
     end
@@ -58,10 +62,48 @@ module Agents
       return unless in_url.present?
 
       Array(in_url).each do |url|
+        uri = URI(url) rescue nil
+        unless uri.is_a?(URI::HTTP)
+          error "Unsupported URL: #{url}"
+          next
+        end
+
         log "Fetching #{url}"
-        info = HyPDF.pdfinfo(open(url))
+        response = faraday.get(url)
+        reader = PDF::Reader.new(StringIO.new(response.body))
+
+        info = reader.info.to_h { |key, value|
+          [key.to_s, decode_pdf_date(value) || value]
+        }
+        info["Pages"] = reader.page_count.to_s
+        if (page = reader.pages.first)
+          info["Page size"] = "#{page.width} x #{page.height} pts"
+        end
+        info["PDF version"] = reader.pdf_version.to_s
+
         create_event payload: info.merge(payload)
       end
+    end
+
+    private
+
+    # Decode a PDF date string (D:YYYYMMDDHHmmSSOHH'mm') into a
+    # human-readable format.  Returns nil if the string is not a PDF date.
+    def decode_pdf_date(str)
+      return unless str.is_a?(String) && /\AD:\d{4}/.match?(str)
+
+      date = str.gsub(/\AD:|'/, "")
+      fmt = case date
+            when /\A\d{14}[-+Z]/ then "%Y%m%d%H%M%S%z"
+            when /\A\d{14}\z/    then "%Y%m%d%H%M%S"
+            when /\A\d{12}\z/    then "%Y%m%d%H%M"
+            when /\A\d{8}\z/     then "%Y%m%d"
+            when /\A\d{4}\z/     then "%Y"
+            end or return
+
+      Time.strptime(date, fmt).strftime("%c")
+    rescue ArgumentError
+      nil
     end
   end
 end
