@@ -83,7 +83,7 @@ describe Agents::PeakDetectorAgent do
       event = Event.new(payload: {count: ["not working"]})
       expect {
         @agent.receive([event])
-      }.to raise_error(NoMethodError, /undefined method `to_f'/)
+      }.to raise_error(NoMethodError, /undefined method 'to_f'/)
     end
   end
 
