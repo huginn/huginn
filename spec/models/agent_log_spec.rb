@@ -93,7 +93,7 @@ describe AgentLog do
 
     it "accepts objects as well as strings" do
       log = AgentLog.log_for_agent(agents(:jane_website_agent), events(:bob_website_agent_event).payload)
-      expect(log.message).to include('"title"=>"foo"')
+      expect(log.message).to include('"title" => "foo"')
     end
   end
 
