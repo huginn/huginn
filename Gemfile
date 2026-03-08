@@ -118,7 +118,7 @@ gem 'multi_xml'
 gem 'nokogiri', '>= 1.18.10'
 gem 'omniauth'
 gem 'ostruct'
-gem 'rails', '~> 7.2.0'
+gem 'rails', '~> 8.0.0'
 gem 'rails-html-sanitizer', '~> 1.6', '>= 1.6.2'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
 gem 'sassc-rails'
