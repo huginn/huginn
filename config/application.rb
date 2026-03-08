@@ -23,14 +23,13 @@ module Huginn
     Dotenv.overload File.expand_path('../spec/env.test', __dir__) if Rails.env.test?
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.0
+    config.load_defaults 7.1
 
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
 
-    config.add_autoload_paths_to_load_path = false
     config.secret_key_base =
       ENV['APP_SECRET_TOKEN'].presence ||
       ENV['SECRET_KEY_BASE'].presence ||
