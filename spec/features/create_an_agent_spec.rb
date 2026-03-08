@@ -172,7 +172,6 @@ describe "Creating a new agent", js: true do
 
     it "does not send previously configured receivers when the current agent does not support them" do
       select_agent_type("Website Agent scrapes")
-      sleep 0.5
       select2("ZKCD", from: 'Receivers')
       select_agent_type("Email Agent")
       fill_in(:agent_name, with: "No receivers")

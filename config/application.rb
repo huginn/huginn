@@ -1,6 +1,7 @@
 require_relative 'boot'
 
 require 'rails'
+require 'securerandom'
 
 require 'active_model/railtie'
 require 'active_job/railtie'
@@ -22,12 +23,26 @@ module Huginn
     Dotenv.overload File.expand_path('../spec/env.test', __dir__) if Rails.env.test?
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.0
+    config.load_defaults 7.1
 
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
+
+    config.secret_key_base =
+      ENV['APP_SECRET_TOKEN'].presence ||
+      ENV['SECRET_KEY_BASE'].presence ||
+      if Rails.env.development? || Rails.env.test?
+        local_secret_path = config.root.join('tmp/local_secret.txt')
+        if local_secret_path.exist?
+          local_secret_path.binread
+        else
+          generated_secret = SecureRandom.hex(64)
+          local_secret_path.binwrite(generated_secret)
+          generated_secret
+        end
+      end
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W[#{config.root}/lib #{config.root}/app/presenters #{config.root}/app/jobs]

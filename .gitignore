@@ -18,12 +18,16 @@ pickle-email-*.html
 .idea/
 .DS_Store
 .env
+.env.*
+!.env.example
 deployment/tmp
 deployment/cookbooks
 .vagrant
 .*un~
+.mise.toml
 .ruby-gemset
 .ruby-version
+.tool-versions
 manifest.yml
 config/unicorn.rb
 db/schema.rb

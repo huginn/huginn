@@ -1,5 +1,5 @@
 class Service < ActiveRecord::Base
-  serialize :options, Hash
+  serialize :options, coder: YAML, type: Hash
 
   belongs_to :user, inverse_of: :services
   has_many :agents, inverse_of: :service
