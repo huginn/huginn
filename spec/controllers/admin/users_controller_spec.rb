@@ -5,7 +5,7 @@ describe Admin::UsersController do
     context 'with valid user params' do
       it 'imports the default scenario for the new user' do
         expect(DefaultScenarioImporter).to receive(:import).with(kind_of(User))
-        sign_in users(:jane)
+        sign_in users(:jane), scope: :user
         post :create, params: {:user => {username: 'jdoe', email: 'jdoe@example.com',
                                          password: 's3cr3t55', password_confirmation: 's3cr3t55', admin: false }}
       end
@@ -14,7 +14,7 @@ describe Admin::UsersController do
     context 'with invalid user params' do
       it 'does not import the default scenario' do
         allow(DefaultScenarioImporter).to receive(:import).with(kind_of(User)) { fail "Should not attempt import" }
-        sign_in users(:jane)
+        sign_in users(:jane), scope: :user
         post :create, params: {:user => {username: 'user'}}
       end
     end
@@ -22,7 +22,7 @@ describe Admin::UsersController do
 
   describe 'GET #switch_to_user' do
     it "switches to another user" do
-      sign_in users(:jane)
+      sign_in users(:jane), scope: :user
 
       get :switch_to_user, params: {:id => users(:bob).id}
       expect(response).to redirect_to(agents_path)
@@ -30,7 +30,7 @@ describe Admin::UsersController do
     end
 
     it "does not switch if not admin" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
 
       get :switch_to_user, params: {:id => users(:jane).id}
       expect(response).to redirect_to(root_path)
@@ -39,7 +39,7 @@ describe Admin::UsersController do
 
   describe 'GET #switch_back' do
     it "switches to another user and back" do
-      sign_in users(:jane)
+      sign_in users(:jane), scope: :user
 
       get :switch_to_user, params: {:id => users(:bob).id}
       expect(response).to redirect_to(agents_path)
@@ -51,7 +51,7 @@ describe Admin::UsersController do
     end
 
     it "does not switch_back without having switched" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       get :switch_back
       expect(response).to redirect_to(root_path)
     end

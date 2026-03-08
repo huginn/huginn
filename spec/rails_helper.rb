@@ -39,6 +39,7 @@ end
 
 RSpec.configure do |config|
   config.mock_with :rspec
+  config.before(:suite) { Rails.application.reload_routes_unless_loaded }
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [config.file_fixture_path = "#{::Rails.root}/spec/fixtures"]

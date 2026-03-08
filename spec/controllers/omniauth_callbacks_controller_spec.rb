@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe OmniauthCallbacksController do
   before do
-    sign_in users(:bob)
+    sign_in users(:bob), scope: :user
     OmniAuth.config.test_mode = true
     request.env["devise.mapping"] = Devise.mappings[:user]
   end

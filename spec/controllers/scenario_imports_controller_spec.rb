@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe ScenarioImportsController do
   before do
-    sign_in users(:bob)
+    sign_in users(:bob), scope: :user
   end
 
   describe "GET new" do
@@ -23,4 +23,3 @@ describe ScenarioImportsController do
     end
   end
 end
-

@@ -9,7 +9,7 @@ describe UserCredentialsController do
   end
 
   before do
-    sign_in users(:bob)
+    sign_in users(:bob), scope: :user
     @file = fixture_file_upload('user_credentials.json')
   end
 

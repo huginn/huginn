@@ -8,13 +8,13 @@ describe EventsController do
 
   describe "GET index" do
     it "only returns Events created by Agents of the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       get :index
       expect(assigns(:events).all? {|i| expect(i.user).to eq(users(:bob)) }).to be_truthy
     end
 
     it "can filter by Agent" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       get :index, params: {:agent_id => agents(:bob_website_agent)}
       expect(assigns(:events).length).to eq(agents(:bob_website_agent).events.length)
       expect(assigns(:events).all? {|i| expect(i.agent).to eq(agents(:bob_website_agent)) }).to be_truthy
@@ -27,7 +27,7 @@ describe EventsController do
 
   describe "GET show" do
     it "only shows Events for the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       get :show, params: {:id => events(:bob_website_agent_event).to_param}
       expect(assigns(:event)).to eq(events(:bob_website_agent_event))
 
@@ -40,7 +40,7 @@ describe EventsController do
   describe "POST reemit" do
     before do
       request.env["HTTP_REFERER"] = "/events"
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
     end
 
     it "clones and re-emits events" do
@@ -61,7 +61,7 @@ describe EventsController do
 
   describe "DELETE destroy" do
     it "only deletes events for the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       expect {
         delete :destroy, params: {:id => events(:bob_website_agent_event).to_param}
       }.to change { Event.count }.by(-1)
