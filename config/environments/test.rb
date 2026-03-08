@@ -42,7 +42,6 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :test
 
   config.action_mailer.raise_delivery_errors = true
-  config.active_job.queue_adapter = :test
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
