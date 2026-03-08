@@ -870,9 +870,6 @@ GEM
     unicorn (6.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
-    unicorn-rails (2.2.1)
-      rack
-      unicorn
     uri (1.0.4)
     vcr (6.1.0)
     version_gem (1.1.4)
@@ -1016,7 +1013,6 @@ DEPENDENCIES
   tzinfo-data
   uglifier
   unicorn
-  unicorn-rails
   vcr
   web-console (>= 4.2.1)
   webmock
