@@ -104,7 +104,7 @@ describe WebRequestsController do
     @agent.options['status'] = 302
     @agent.save
     post :handle_request, params: {:user_id => users(:bob).to_param, :agent_id => @agent.id, :secret => "my_secret"}, format: :json
-    expect(response).to redirect_to('success')
+    expect(response).to redirect_to("http://test.host/users/#{users(:bob).to_param}/web_requests/#{@agent.id}/success")
   end
 
   it "should fail on incorrect users" do

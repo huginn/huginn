@@ -38,7 +38,7 @@ class WebRequestsController < ApplicationController
         status ||= 200
 
         if status.to_s.in?(%w[301 302])
-          redirect_to(content, allow_other_host: true, status:)
+          redirect_to(normalize_redirect_target(content), allow_other_host: true, status:)
         elsif content.is_a?(String)
           render plain: content, status:, content_type: content_type || 'text/plain'
         elsif content.is_a?(Hash)
@@ -65,5 +65,11 @@ class WebRequestsController < ApplicationController
     else
       render plain: 'user not found', status: :not_found
     end
+  end
+
+  private
+
+  def normalize_redirect_target(target)
+    URI(request.original_url).merge(target.to_s).to_s
   end
 end
