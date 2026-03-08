@@ -12,7 +12,7 @@ describe AgentsController do
 
   describe "GET index" do
     it "only returns Agents for the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       get :index
       expect(assigns(:agents).all? {|i| expect(i.user).to eq(users(:bob)) }).to be_truthy
     end
@@ -20,7 +20,7 @@ describe AgentsController do
     it "should not show disabled agents if the cookie is set" do
       @request.cookies["huginn_view_only_enabled_agents"] = "true"
 
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       get :index
       expect(assigns(:agents).map(&:disabled).uniq).to eq([false])
     end
@@ -28,14 +28,14 @@ describe AgentsController do
 
   describe "POST handle_details_post" do
     it "passes control to handle_details_post on the agent" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       post :handle_details_post, params: {:id => agents(:bob_manual_event_agent).to_param, :payload => { :foo => "bar" }.to_json}
       expect(JSON.parse(response.body)).to eq({ "success" => true })
       expect(agents(:bob_manual_event_agent).events.last.payload).to eq({ 'foo' => "bar" })
     end
 
     it "can only be accessed by the Agent's owner" do
-      sign_in users(:jane)
+      sign_in users(:jane), scope: :user
       expect {
         post :handle_details_post, params: {:id => agents(:bob_manual_event_agent).to_param, :payload => { :foo => :bar }.to_json}
       }.to raise_error(ActiveRecord::RecordNotFound)
@@ -44,13 +44,13 @@ describe AgentsController do
 
   describe "POST run" do
     it "triggers Agent.async_check with the Agent's ID" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       expect(Agent).to receive(:async_check).with(agents(:bob_manual_event_agent).id)
       post :run, params: {:id => agents(:bob_manual_event_agent).to_param}
     end
 
     it "can only be accessed by the Agent's owner" do
-      sign_in users(:jane)
+      sign_in users(:jane), scope: :user
       expect {
         post :run, params: {:id => agents(:bob_manual_event_agent).to_param}
       }.to raise_error(ActiveRecord::RecordNotFound)
@@ -63,7 +63,7 @@ describe AgentsController do
 
     it "enqueues an AgentReemitJob" do
       expect(AgentReemitJob).to receive(:perform_later).with(agent, agent.most_recent_event.id, false)
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       post :reemit_events, params: params
     end
 
@@ -72,7 +72,7 @@ describe AgentsController do
 
       it "does not enqueue an AgentReemitJob" do
         expect(AgentReemitJob).not_to receive(:perform_later)
-        sign_in users(:bob)
+        sign_in users(:bob), scope: :user
         post :reemit_events, params: params
       end
     end
@@ -80,13 +80,13 @@ describe AgentsController do
     context "when delete_old_events passed" do
       it "enqueues an AgentReemitJob with delete_old_events set to true" do
         expect(AgentReemitJob).to receive(:perform_later).with(agent, agent.most_recent_event.id, true)
-        sign_in users(:bob)
+        sign_in users(:bob), scope: :user
         post :reemit_events, params: params.merge('delete_old_events' => '1')
       end
     end
 
     it "can only be accessed by the Agent's owner" do
-      sign_in users(:jane)
+      sign_in users(:jane), scope: :user
       expect {
         post :reemit_events, params: {:id => agents(:bob_website_agent).to_param}
       }.to raise_error(ActiveRecord::RecordNotFound)
@@ -95,7 +95,7 @@ describe AgentsController do
 
   describe "POST remove_events" do
     it "deletes all events created by the given Agent" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       agent_event = events(:bob_website_agent_event).id
       other_event = events(:jane_website_agent_event).id
       post :remove_events, params: {:id => agents(:bob_website_agent).to_param}
@@ -104,7 +104,7 @@ describe AgentsController do
     end
 
     it "can only be accessed by the Agent's owner" do
-      sign_in users(:jane)
+      sign_in users(:jane), scope: :user
       expect {
         post :remove_events, params: {:id => agents(:bob_website_agent).to_param}
       }.to raise_error(ActiveRecord::RecordNotFound)
@@ -113,14 +113,14 @@ describe AgentsController do
 
   describe "PUT toggle_visibility" do
     it "should set the cookie" do
-      sign_in users(:jane)
+      sign_in users(:jane), scope: :user
       put :toggle_visibility
       expect(response.cookies["huginn_view_only_enabled_agents"]).to eq("true")
     end
 
     it "should delete the cookie" do
       @request.cookies["huginn_view_only_enabled_agents"] = "true"
-      sign_in users(:jane)
+      sign_in users(:jane), scope: :user
       put :toggle_visibility
       expect(response.cookies["huginn_view_only_enabled_agents"]).to be_nil
     end
@@ -128,7 +128,7 @@ describe AgentsController do
 
   describe "POST propagate" do
     before(:each) do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
     end
 
     it "runs event propagation for all Agents" do
@@ -145,7 +145,7 @@ describe AgentsController do
 
   describe "GET show" do
     it "only shows Agents for the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       get :show, params: {:id => agents(:bob_website_agent).to_param}
       expect(assigns(:agent)).to eq(agents(:bob_website_agent))
 
@@ -158,13 +158,13 @@ describe AgentsController do
   describe "GET new" do
     describe "with :id" do
       it "opens a clone of a given Agent" do
-        sign_in users(:bob)
+        sign_in users(:bob), scope: :user
         get :new, params: {:id => agents(:bob_website_agent).to_param}
         expect(assigns(:agent).attributes).to eq(users(:bob).agents.build_clone(agents(:bob_website_agent)).attributes)
       end
 
       it "only allows the current user to clone his own Agent" do
-        sign_in users(:bob)
+        sign_in users(:bob), scope: :user
 
         expect {
           get :new, params: {:id => agents(:jane_website_agent).to_param}
@@ -174,13 +174,13 @@ describe AgentsController do
 
     describe "with a scenario_id" do
       it 'populates the assigned agent with the scenario' do
-        sign_in users(:bob)
+        sign_in users(:bob), scope: :user
         get :new, params: {:scenario_id => scenarios(:bob_weather).id}
         expect(assigns(:agent).scenario_ids).to eq([scenarios(:bob_weather).id])
       end
 
       it "does not see other user's scenarios" do
-        sign_in users(:bob)
+        sign_in users(:bob), scope: :user
         get :new, params: {:scenario_id => scenarios(:jane_weather).id}
         expect(assigns(:agent).scenario_ids).to eq([])
       end
@@ -189,7 +189,7 @@ describe AgentsController do
 
   describe "GET edit" do
     it "only shows Agents for the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       get :edit, params: {:id => agents(:bob_website_agent).to_param}
       expect(assigns(:agent)).to eq(agents(:bob_website_agent))
 
@@ -201,20 +201,20 @@ describe AgentsController do
 
   describe "POST create" do
     it "errors on bad types" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       expect {
         post :create, params: {:agent => valid_attributes(:type => "Agents::ThisIsFake")}
       }.not_to change { users(:bob).agents.count }
       expect(assigns(:agent)).to be_a(Agent)
       expect(assigns(:agent)).to have(1).error_on(:type)
 
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       expect {
         post :create, params: {:agent => valid_attributes(:type => "Object")}
       }.not_to change { users(:bob).agents.count }
       expect(assigns(:agent)).to be_a(Agent)
       expect(assigns(:agent)).to have(1).error_on(:type)
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
 
       expect {
         post :create, params: {:agent => valid_attributes(:type => "Agent")}
@@ -230,7 +230,7 @@ describe AgentsController do
     end
 
     it "creates Agents for the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       expect {
         expect {
           post :create, params: {:agent => valid_attributes}
@@ -240,7 +240,7 @@ describe AgentsController do
     end
 
     it "creates Agents and accepts specifing a target agent" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       attributes = valid_attributes(service_id: 1)
       attributes[:receiver_ids] = attributes[:source_ids]
       expect {
@@ -252,7 +252,7 @@ describe AgentsController do
     end
 
     it "shows errors" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       expect {
         post :create, params: {:agent => valid_attributes(:name => "")}
       }.not_to change { users(:bob).agents.count }
@@ -261,7 +261,7 @@ describe AgentsController do
     end
 
     it "will not accept Agent sources owned by other users" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       expect {
         expect {
           post :create, params: {:agent => valid_attributes(:source_ids => [agents(:jane_weather_agent).id])}
@@ -272,14 +272,14 @@ describe AgentsController do
 
   describe "PUT update" do
     it "does not allow changing types" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       post :update, params: {:id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:type => "Agents::WeatherAgent")}
       expect(assigns(:agent)).to have(1).errors_on(:type)
       expect(response).to render_template("edit")
     end
 
     it "updates attributes on Agents for the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       post :update, params: {:id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:name => "New name")}
       expect(response).to redirect_to(agents_path)
       expect(agents(:bob_website_agent).reload.name).to eq("New name")
@@ -290,7 +290,7 @@ describe AgentsController do
     end
 
     it "accepts JSON requests" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       post :update, params: {:id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:name => "New name")}, :format => :json
       expect(agents(:bob_website_agent).reload.name).to eq("New name")
       expect(JSON.parse(response.body)['name']).to eq("New name")
@@ -298,7 +298,7 @@ describe AgentsController do
     end
 
     it "will not accept Agent sources owned by other users" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       post :update, params: {:id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:source_ids => [agents(:jane_weather_agent).id])}
       expect(assigns(:agent)).to have(1).errors_on(:sources)
     end
@@ -325,7 +325,7 @@ describe AgentsController do
 
     describe "redirecting back" do
       before do
-        sign_in users(:bob)
+        sign_in users(:bob), scope: :user
       end
 
       it "can redirect back to the show path" do
@@ -356,7 +356,7 @@ describe AgentsController do
     end
 
     it "updates last_checked_event_id when drop_pending_events is given" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       agent = agents(:bob_website_agent)
       agent.disabled = true
       agent.last_checked_event_id = nil
@@ -370,7 +370,7 @@ describe AgentsController do
 
   describe "PUT leave_scenario" do
     it "removes an Agent from the given Scenario for the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
 
       expect(agents(:bob_weather_agent).scenarios).to include(scenarios(:bob_weather))
       put :leave_scenario, params: {:id => agents(:bob_weather_agent).to_param, :scenario_id => scenarios(:bob_weather).to_param}
@@ -386,7 +386,7 @@ describe AgentsController do
 
   describe "DELETE destroy" do
     it "destroys only Agents owned by the current user" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       expect {
         delete :destroy, params: {:id => agents(:bob_website_agent).to_param}
       }.to change(Agent, :count).by(-1)
@@ -397,14 +397,14 @@ describe AgentsController do
     end
 
     it "redirects correctly when the Agent is deleted from the Agent itself" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
 
       delete :destroy, params: {:id => agents(:bob_website_agent).to_param}
       expect(response).to redirect_to agents_path
     end
 
     it "redirects correctly when the Agent is deleted from a Scenario" do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
 
       delete :destroy, params: {:id => agents(:bob_weather_agent).to_param, :return => scenario_path(scenarios(:bob_weather)).to_param}
       expect(response).to redirect_to scenario_path(scenarios(:bob_weather))
@@ -414,7 +414,7 @@ describe AgentsController do
   describe "#form_configurable actions" do
     before(:each) do
       @params = {attribute: 'auth_token', agent: valid_attributes(:type => "Agents::HipchatAgent", options: {auth_token: '12345'})}
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
     end
     describe "POST validate" do
 
@@ -449,7 +449,7 @@ describe AgentsController do
     it "clears memory of the agent" do
       agent = agents(:bob_website_agent)
       agent.update!(memory: { "test" => 42 })
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       delete :destroy_memory, params: {id: agent.to_param}
       expect(agent.reload.memory).to eq({})
     end
@@ -457,7 +457,7 @@ describe AgentsController do
     it "does not clear memory of an agent not owned by the current user" do
       agent = agents(:jane_website_agent)
       agent.update!(memory: { "test" => 42 })
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       expect {
         delete :destroy_memory, params: {id: agent.to_param}
       }.to raise_error(ActiveRecord::RecordNotFound)
@@ -467,7 +467,7 @@ describe AgentsController do
 
   describe 'DELETE undefined' do
     it 'removes an undefined agent from the database' do
-      sign_in users(:bob)
+      sign_in users(:bob), scope: :user
       agent = agents(:bob_website_agent)
       agent.update_attribute(:type, 'Agents::UndefinedAgent')
       agent2 = agents(:jane_website_agent)

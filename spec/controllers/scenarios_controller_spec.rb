@@ -6,7 +6,7 @@ describe ScenariosController do
   end
 
   before do
-    sign_in users(:bob)
+    sign_in users(:bob), scope: :user
   end
 
   describe "GET index" do
