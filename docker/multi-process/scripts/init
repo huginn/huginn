@@ -17,5 +17,9 @@ fi
 
 sed -i -e "s/\${IP-0.0.0.0}/$IP/" -e "s/\${PORT-3000}/$PORT/" /app/Procfile
 
+if [ "$RAILS_ENV" = "production" ]; then
+  sed -i -e 's%^web: .*%web: bundle exec unicorn -c config/unicorn.rb%' /app/Procfile
+fi
+
 # start supervisord
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
