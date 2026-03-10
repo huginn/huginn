@@ -27,11 +27,16 @@ $minimal_apt_get_install build-essential checkinstall git-core \
   zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev \
   libncurses5-dev libffi-dev libxml2-dev libxslt-dev curl libcurl4-openssl-dev libicu-dev \
   graphviz libmysqlclient-dev libpq-dev libsqlite3-dev \
-  locales tzdata shared-mime-info iputils-ping jq
+  locales tzdata shared-mime-info iputils-ping
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 gem update --system --no-document
 gem update bundler --conservative --no-document
+
+# Install the latest jq for JqAgent
+JQ_ARCH=$(dpkg --print-architecture | sed 's/amd64/linux-amd64/;s/arm64/linux-arm64/')
+curl -fsSL -o /usr/local/bin/jq "https://github.com/stedolan/jq/releases/latest/download/jq-${JQ_ARCH}"
+chmod +x /usr/local/bin/jq
 
 apt-get purge -y python3* rsyslog rsync manpages
 apt-get -y clean
