@@ -39,7 +39,7 @@ module OpenaiConcern
   # JSON-parsing request — used for most OpenAI API calls.
   def openai_request(method, path, body = nil)
     url = "#{openai_base_url}#{path}"
-    conn = build_openai_connection(parse_json: true)
+    conn = build_openai_connection
     response = conn.run_request(method, url, body&.to_json, openai_headers)
     response.body
   rescue Faraday::TimeoutError => e
@@ -48,13 +48,13 @@ module OpenaiConcern
   end
 
   # Multipart form request — used for file uploads (e.g. Whisper audio).
-  # parse_json controls whether the response body is decoded as JSON.  Pass
-  # false when the API may return a plain-text response (e.g. response_format
-  # "text" or "srt") so the raw string is returned instead.
-  def openai_multipart_request(path, form_data, parse_json: true)
+  # The :json middleware is always active; Faraday only parses when the
+  # response Content-Type contains "json", so plain-text formats (text,
+  # srt, vtt) are returned as raw strings automatically.
+  def openai_multipart_request(path, form_data)
     url = "#{openai_base_url}#{path}"
     multipart_headers = openai_headers.except('Content-Type')
-    conn = build_openai_connection(parse_json:, multipart: true)
+    conn = build_openai_connection(multipart: true)
 
     response = conn.post(url) do |req|
       req.headers = multipart_headers
@@ -67,11 +67,12 @@ module OpenaiConcern
     { 'error' => { 'message' => "Request timed out after #{openai_timeout}s" } }
   end
 
-  # Raw request (no JSON parsing) — used for binary responses like TTS audio
-  # and for fetching external resources (e.g. audio files by URL).
+  # Raw request — used for binary responses like TTS audio where we need
+  # access to the raw Faraday response object (status, headers, body).
+  # The :json middleware is still active but won't fire for non-JSON content types.
   def openai_raw_request(method, path, body = nil)
     url = "#{openai_base_url}#{path}"
-    conn = build_openai_connection(parse_json: false)
+    conn = build_openai_connection
     conn.run_request(method, url, body&.to_json, openai_headers)
   rescue Faraday::TimeoutError => e
     error("OpenAI API request timed out after #{openai_timeout}s: #{e.message}. Increase `request_timeout`.")
@@ -79,9 +80,9 @@ module OpenaiConcern
   end
 
   # Raw Faraday connection for fetching external resources (e.g. audio URLs).
-  # Does not add JSON parsing or OpenAI auth headers — callers set their own.
+  # Does not add OpenAI auth headers — callers set their own.
   def openai_raw_connection
-    build_openai_connection(parse_json: false)
+    build_openai_connection
   end
 
   private
@@ -89,10 +90,13 @@ module OpenaiConcern
   # Builds a Faraday connection with shared SSL, timeout, proxy, user-agent,
   # and adapter configuration.  All OpenAI request helpers delegate here.
   #
+  # The :json response middleware is always enabled; Faraday only decodes
+  # the body when the response Content-Type contains "json", so binary or
+  # plain-text responses are passed through unchanged.
+  #
   # Options:
-  #   parse_json: true  — add `builder.response :json` middleware
-  #   multipart:  true  — add multipart + url_encoded request middleware
-  def build_openai_connection(parse_json: true, multipart: false)
+  #   multipart: true  — add multipart + url_encoded request middleware
+  def build_openai_connection(multipart: false)
     Faraday.new(
       ssl: { verify: !boolify(options['disable_ssl_verification']) },
       request: {
@@ -100,7 +104,7 @@ module OpenaiConcern
         open_timeout: [openai_timeout, 60].min
       }
     ) do |builder|
-      builder.response :json if parse_json
+      builder.response :json
 
       builder.headers[:user_agent] = user_agent
       builder.proxy = interpolated['proxy'].presence
