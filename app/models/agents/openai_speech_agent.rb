@@ -82,16 +82,34 @@ module Agents
       }
     end
 
+    TRANSCRIPTION_FORMATS = %w[json text srt verbose_json vtt].freeze
+    TTS_FORMATS           = %w[mp3 opus aac flac pcm].freeze
+
     def validate_options
       validate_openai_options!
 
       errors.add(:base, "model is required") unless options['model'].present?
 
-      unless %w[transcribe translate speak].include?(options['mode'])
+      mode = options['mode'].to_s
+      unless %w[transcribe translate speak].include?(mode)
         errors.add(:base, "mode must be 'transcribe', 'translate', or 'speak'")
       end
 
-      if options['mode'] == 'speak'
+      if options['response_format'].present? && !options['response_format'].to_s.include?('{{')
+        fmt = options['response_format'].to_s
+        case mode
+        when 'transcribe', 'translate'
+          unless TRANSCRIPTION_FORMATS.include?(fmt)
+            errors.add(:base, "response_format for #{mode} must be one of: #{TRANSCRIPTION_FORMATS.join(', ')}")
+          end
+        when 'speak'
+          unless TTS_FORMATS.include?(fmt)
+            errors.add(:base, "response_format for speak must be one of: #{TTS_FORMATS.join(', ')}")
+          end
+        end
+      end
+
+      if mode == 'speak'
         errors.add(:base, "input_text is required for speak mode") unless options['input_text'].present?
         errors.add(:base, "voice is required for speak mode") unless options['voice'].present?
       end
@@ -129,43 +147,61 @@ module Agents
       audio_data = fetch_audio(event)
       return unless audio_data
 
+      fmt = interpolated['response_format'].presence || 'json'
+      json_response = %w[json verbose_json].include?(fmt)
+
       form_data = {
         'file' => audio_data,
         'model' => interpolated['model']
       }
       form_data['language'] = interpolated['language'] if interpolated['language'].present?
-      form_data['response_format'] = interpolated['response_format'] if interpolated['response_format'].present?
+      form_data['response_format'] = fmt
 
-      response = openai_multipart_request('/audio/transcriptions', form_data)
-      return if handle_openai_error(response)
+      response = openai_multipart_request('/audio/transcriptions', form_data, parse_json: json_response)
+      return if json_response && handle_openai_error(response)
 
-      create_event payload: openai_base_payload(event).merge(
-        'text' => response['text'],
-        'language' => response['language'],
-        'duration' => response['duration'],
-        'full_response' => response
-      )
+      if json_response
+        create_event payload: openai_base_payload(event).merge(
+          'text' => response['text'],
+          'language' => response['language'],
+          'duration' => response['duration'],
+          'full_response' => response
+        )
+      else
+        create_event payload: openai_base_payload(event).merge(
+          fmt => response
+        )
+      end
     end
 
     def perform_translation(event = nil)
       audio_data = fetch_audio(event)
       return unless audio_data
 
+      fmt = interpolated['response_format'].presence || 'json'
+      json_response = %w[json verbose_json].include?(fmt)
+
       form_data = {
         'file' => audio_data,
         'model' => interpolated['model']
       }
-      form_data['response_format'] = interpolated['response_format'] if interpolated['response_format'].present?
+      form_data['response_format'] = fmt
 
-      response = openai_multipart_request('/audio/translations', form_data)
-      return if handle_openai_error(response)
+      response = openai_multipart_request('/audio/translations', form_data, parse_json: json_response)
+      return if json_response && handle_openai_error(response)
 
-      create_event payload: openai_base_payload(event).merge(
-        'text' => response['text'],
-        'language' => 'en',
-        'duration' => response['duration'],
-        'full_response' => response
-      )
+      if json_response
+        create_event payload: openai_base_payload(event).merge(
+          'text' => response['text'],
+          'language' => 'en',
+          'duration' => response['duration'],
+          'full_response' => response
+        )
+      else
+        create_event payload: openai_base_payload(event).merge(
+          fmt => response
+        )
+      end
     end
 
     def perform_speech(event = nil)
@@ -204,7 +240,7 @@ module Agents
     def fetch_audio(event = nil)
       if event && has_file_pointer?(event)
         io = get_io(event)
-        filename = event.payload.dig('file_pointer', 'file') || 'audio.wav'
+        filename = File.basename(event.payload.dig('file_pointer', 'file') || 'audio.wav')
         return Faraday::UploadIO.new(io, MIME::Types.type_for(filename).first&.content_type || 'audio/wav', filename)
       end
 

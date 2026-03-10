@@ -48,23 +48,23 @@ module OpenaiConcern
   end
 
   # Multipart form request — used for file uploads (e.g. Whisper audio).
-  def openai_multipart_request(path, form_data)
+  # parse_json controls whether the response body is decoded as JSON.  Pass
+  # false when the API may return a plain-text response (e.g. response_format
+  # "text" or "srt") so the raw string is returned instead.
+  def openai_multipart_request(path, form_data, parse_json: true)
     url = "#{openai_base_url}#{path}"
     multipart_headers = openai_headers.except('Content-Type')
-    conn = build_openai_connection(parse_json: false, multipart: true)
+    conn = build_openai_connection(parse_json:, multipart: true)
 
     response = conn.post(url) do |req|
       req.headers = multipart_headers
       req.body = form_data
     end
 
-    JSON.parse(response.body)
+    response.body
   rescue Faraday::TimeoutError => e
     error("OpenAI API multipart request timed out after #{openai_timeout}s: #{e.message}. Increase `request_timeout` for large files.")
     { 'error' => { 'message' => "Request timed out after #{openai_timeout}s" } }
-  rescue JSON::ParserError => e
-    error("Failed to parse response: #{e.message}")
-    { 'error' => { 'message' => "Invalid JSON response: #{response&.body&.truncate(500)}" } }
   end
 
   # Raw request (no JSON parsing) — used for binary responses like TTS audio

@@ -20,7 +20,7 @@ module Agents
 
       * `submit` - Submit a video generation request and emit an event with the generation ID for later polling.
       * `poll` - Check on a previously submitted generation using its ID and emit the result when complete.
-      * `submit_and_poll` - Submit the request and automatically poll until completion (uses agent memory to track status). The agent will re-check on its next scheduled run or when it receives the same event again.
+      * `submit_and_poll` - Submit the request and automatically poll until completion (uses agent memory to track status). On scheduled runs the agent will check on previously submitted generations (it does not re-submit).
 
       ### Configuration
 
