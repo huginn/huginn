@@ -148,7 +148,6 @@ module Agents
       return unless audio_data
 
       fmt = interpolated['response_format'].presence || 'json'
-      json_response = %w[json verbose_json].include?(fmt)
 
       form_data = {
         'file' => audio_data,
@@ -157,10 +156,10 @@ module Agents
       form_data['language'] = interpolated['language'] if interpolated['language'].present?
       form_data['response_format'] = fmt
 
-      response = openai_multipart_request('/audio/transcriptions', form_data, parse_json: json_response)
-      return if json_response && handle_openai_error(response)
+      response = openai_multipart_request('/audio/transcriptions', form_data)
+      return if response.is_a?(Hash) && handle_openai_error(response)
 
-      if json_response
+      if response.is_a?(Hash)
         create_event payload: openai_base_payload(event).merge(
           'text' => response['text'],
           'language' => response['language'],
@@ -179,7 +178,6 @@ module Agents
       return unless audio_data
 
       fmt = interpolated['response_format'].presence || 'json'
-      json_response = %w[json verbose_json].include?(fmt)
 
       form_data = {
         'file' => audio_data,
@@ -187,10 +185,10 @@ module Agents
       }
       form_data['response_format'] = fmt
 
-      response = openai_multipart_request('/audio/translations', form_data, parse_json: json_response)
-      return if json_response && handle_openai_error(response)
+      response = openai_multipart_request('/audio/translations', form_data)
+      return if response.is_a?(Hash) && handle_openai_error(response)
 
-      if json_response
+      if response.is_a?(Hash)
         create_event payload: openai_base_payload(event).merge(
           'text' => response['text'],
           'language' => 'en',
