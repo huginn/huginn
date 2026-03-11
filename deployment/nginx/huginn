@@ -10,7 +10,7 @@
 ## See installation.md#using-https for additional HTTPS configuration details.
 
 upstream huginn {
-  server unix:/home/huginn/huginn/tmp/sockets/unicorn.socket fail_timeout=0;
+  server unix:/home/huginn/huginn/tmp/sockets/puma.sock fail_timeout=0;
 }
 
 ## Normal HTTP host
@@ -35,7 +35,7 @@ server {
   }
 
   ## If a file, which is not found in the root folder is requested,
-  ## then the proxy passes the request to the upsteam (huginn unicorn).
+  ## then the proxy passes the request to the upstream Puma app.
   location @huginn {
     ## If you use HTTPS make sure you disable gzip compression
     ## to be safe against BREACH attack.

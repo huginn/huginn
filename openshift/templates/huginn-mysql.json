@@ -331,7 +331,7 @@
                             "value": "1"
                         }, {
                             "name": "WORKER_CMD",
-                            "value": "unicorn -c ./deployment/heroku/unicorn.rb --listen 0.0.0.0:8080"
+                            "value": "puma -C ./deployment/heroku/puma.rb"
                         }],
                         "resources": {
                             "limits": {
