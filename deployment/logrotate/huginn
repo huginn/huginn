@@ -11,10 +11,10 @@
   delaycompress
 
   # note the lack of the evil "copytruncate" option in this
-  # config.  Unicorn supports the USR1 signal and we send it
-  # as our "lastaction" action:
+  # config.  Puma supports the HUP signal for reopening logs
+  # configured via stdout_redirect, so we send it here:
   lastaction
-    pid=/home/huginn/huginn/tmp/pids/unicorn.pid
-    if test -s $pid; then kill -USR1 "$(cat $pid)"; fi
+    pid=/home/huginn/huginn/tmp/pids/puma.pid
+    if test -s $pid; then kill -HUP "$(cat $pid)"; fi
   endscript
 }

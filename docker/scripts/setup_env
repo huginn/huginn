@@ -137,11 +137,4 @@ bundle config set --local path vendor/bundle
 bundle config set --local without 'test development'
 bundle install
 
-# Configure the unicorn server
-sed -r config/unicorn.rb.example \
-    -e "s/^ *listen .+/listen '$IP:$PORT'/" \
-    -e 's;^ *stderr_path .+;stderr_path "/dev/stderr";' \
-    -e 's;^ *stdout_path .+;stdout_path "/dev/stdout";' \
-    -e '/^ *pid .+/d' > config/unicorn.rb
-
 mkdir -p tmp/pids tmp/cache tmp/sockets log
