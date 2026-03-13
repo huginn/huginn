@@ -10,15 +10,9 @@ fi
 
 source /scripts/setup_env
 
-# Fixup the Procfile and prepare the PORT
+# Fix up the Procfile.
 if [ -n "${DO_NOT_RUN_JOBS}" ]; then
   sed -i -e 's/^jobs:/#jobs:/' /app/Procfile
-fi
-
-sed -i -e "s/\${IP-0.0.0.0}/$IP/" -e "s/\${PORT-3000}/$PORT/" /app/Procfile
-
-if [ "$RAILS_ENV" = "production" ]; then
-  sed -i -e 's%^web: .*%web: bundle exec unicorn -c config/unicorn.rb%' /app/Procfile
 fi
 
 # start supervisord

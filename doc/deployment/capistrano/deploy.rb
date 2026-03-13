@@ -1,6 +1,6 @@
 # This is an example Capistrano deployment script for Huginn.  It
 # assumes you're running on an Ubuntu box and want to use Foreman,
-# Upstart, and Unicorn.
+# Upstart, and Puma.
 
 default_run_options[:pty] = true
 

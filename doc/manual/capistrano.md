@@ -35,13 +35,11 @@ If you want to deploy a different branch, pass it as environment variable:
 
 ### Changes to remote .env and Procfile
 
-If you want to change the `.env`, `Procfile` or `config/unicorn.rb` of your installation you still need to do it on your server, do not forget to export the init scripts after your are done:
+If you want to change the `.env` or `Procfile` of your installation you still need to do it on your server.  Do not forget to export the init scripts after you are done:
 
     cd /home/huginn/huginn
     # Whichever you want to change
     sudo -u huginn -H editor Procfile
     sudo -u huginn -H editor .env
-    sudo -u huginn -H editor config/unicorn.rb
     # Export init scripts and restart huginn
     sudo rake production:export
-

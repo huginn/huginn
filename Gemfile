@@ -118,6 +118,7 @@ gem 'multi_xml'
 gem 'nokogiri', '>= 1.18.10'
 gem 'omniauth'
 gem 'ostruct'
+gem 'puma'
 gem 'rails', '~> 8.1.0'
 gem 'rails-html-sanitizer', '~> 1.6', '>= 1.6.2'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
@@ -161,7 +162,6 @@ group :development do
   group :test do
     gem 'capybara'
     gem 'capybara-select-2', github: 'Hirurg103/capybara_select2', require: false
-    gem 'puma'
     gem 'rails-controller-testing'
     gem 'rr', require: false
     gem 'rspec'
@@ -175,10 +175,6 @@ group :development do
     gem 'vcr'
     gem 'webmock'
   end
-end
-
-group :production do
-  gem 'unicorn'
 end
 
 # Platform requirements.
