@@ -58,6 +58,8 @@ For most instances we recommend using: CPU cores = Puma workers.
 
 Huginn keeps Puma single-threaded by default.  Increase `WEB_CONCURRENCY` first, and only raise `RAILS_MAX_THREADS` after auditing thread safety.
 
+If you run Puma with multiple workers, you can also set `PUMA_FORK_WORKER_AFTER_REQUESTS` to enable Puma's experimental [`fork_worker`](https://puma.io/puma/file.fork_worker.html) mode and periodically refork each worker after a given number of requests.  Leave it unset to disable this behavior.
+
 If you have a 512MB machine we recommend configuring only one Puma worker and using the threaded background worker to prevent excessive swapping.
 
 

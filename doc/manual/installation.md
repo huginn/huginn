@@ -248,6 +248,7 @@ Review `config/puma.rb` if needed.  The [requirements.md](./requirements.md#puma
     # decrease the worker amount to 1
     sudo -u huginn -H editor config/puma.rb
 
+You can also tune Puma through `.env`.  `WEB_CONCURRENCY` controls the number of workers, `RAILS_MAX_THREADS` controls the thread count per worker, and `PUMA_FORK_WORKER_AFTER_REQUESTS` enables Puma's experimental [`fork_worker`](https://puma.io/puma/file.fork_worker.html) mode to periodically refork Puma workers after a given number of requests when running with multiple workers.
 
 **Important Note:** Make sure `.env` matches your setup.  If you customize `config/puma.rb`, keep that change in your deployed branch as well.
 
