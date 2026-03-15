@@ -105,7 +105,7 @@ GEM
   specs:
     Ascii85 (2.0.1)
     ace-rails-ap (4.5)
-    action_text-trix (2.1.16)
+    action_text-trix (2.1.17)
       railties
     actioncable (8.1.2)
       actionpack (= 8.1.2)
@@ -850,7 +850,7 @@ GEM
     tilt (2.1.0)
     time (0.4.2)
       date
-    timeout (0.6.0)
+    timeout (0.6.1)
     trailblazer-option (0.1.2)
     treetop (1.6.12)
       polyglot (~> 0.3)
@@ -959,7 +959,7 @@ DEPENDENCIES
   liquid (~> 5.6, = 5.6.0)
   listen (~> 3.9.0)
   logger
-  loofah (~> 2.24, >= 2.24.1)
+  loofah (~> 2.25)
   mail (>= 2.9.0)
   mini_magick (>= 5.3.1)
   mini_racer!
@@ -981,9 +981,9 @@ DEPENDENCIES
   pirate_weather_forecast_ruby
   puma
   rack-livereload
-  rails (~> 8.1.0)
+  rails (~> 8.1.2)
   rails-controller-testing
-  rails-html-sanitizer (~> 1.6, >= 1.6.2)
+  rails-html-sanitizer (~> 1.7)
   rb-kqueue (>= 0.2.8)
   rr
   rspec
