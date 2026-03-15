@@ -24,7 +24,7 @@ if [[ -z "${DO_NOT_SEED}" && -z "$1" ]]; then
 fi
 
 if [ -z "$1" ]; then
-  exec bundle exec unicorn -c config/unicorn.rb
+  exec bundle exec puma -C config/puma.rb
 else
   exec bundle exec rails runner "$@" RAILS_ENV=${RAILS_ENV}
 fi

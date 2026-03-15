@@ -31,15 +31,9 @@ if [ -z "${DO_NOT_SEED}" ]; then
     set -e
 fi
 
-# Configure the unicorn server
-mv config/unicorn.rb.example config/unicorn.rb
-sed -ri 's/^listen .*$/listen ENV["PORT"]/' config/unicorn.rb
-sed -ri 's/^stderr_path.*$//' config/unicorn.rb
-sed -ri 's/^stdout_path.*$//' config/unicorn.rb
-
 export RACK_ENV=${RACK_ENV:-"production"}
 
-WORKER_CMD="${WORKER_CMD:-"unicorn -c ./deployment/heroku/unicorn.rb --listen 0.0.0.0:8080"}"
+WORKER_CMD="${WORKER_CMD:-"puma -C ./deployment/heroku/puma.rb"}"
 
 echo "---> Executing command: ${WORKER_CMD}"
 exec bundle exec ${WORKER_CMD}

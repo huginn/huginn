@@ -46,17 +46,21 @@ With less memory you need to manually adjust the `Gemfile` and Huginn can respon
 
 - 256MB RAM + 0.5GB of swap is the absolute minimum but we strongly **advise against** this amount of memory. See the Wiki page about running Huginn on [systems with low memory](https://github.com/huginn/huginn/wiki/Running-Huginn-on-minimal-systems-with-low-RAM-&-CPU-e.g.-Raspberry-Pi)
 - 0.5GB RAM + 0.5GB swap will work relatively well with SSD drives, but can feel a bit slow due to swapping
-- 1GB RAM + 1GB swap will work with two unicorn workers and the threaded background worker
-- **2GB RAM** is the **recommended** memory size, it will support 2 unicorn workers and both the threaded and the old separate workers
+- 1GB RAM + 1GB swap will work with two Puma workers and the threaded background worker
+- **2GB RAM** is the **recommended** memory size, it will support 2 Puma workers and both the threaded and the old separate workers
 - for each 300MB of additional RAM you can run one extra DelayedJob worker
 
-## Unicorn Workers
+## Puma Workers
 
-It's possible to increase the amount of unicorn workers and this will usually help for to reduce the response time of the applications and increase the ability to handle parallel requests.
+It's possible to increase the amount of Puma workers and this will usually help reduce the response time of the application and increase the ability to handle parallel requests.
 
-For most instances we recommend using: CPU cores = unicorn workers.
+For most instances we recommend using: CPU cores = Puma workers.
 
-If you have a 512MB machine we recommend to configure only one Unicorn worker and use the threaded background worker to prevent excessive swapping.
+Huginn keeps Puma single-threaded by default.  Increase `WEB_CONCURRENCY` first, and only raise `RAILS_MAX_THREADS` after auditing thread safety.
+
+If you run Puma with multiple workers, you can also set `PUMA_FORK_WORKER_AFTER_REQUESTS` to enable Puma's experimental [`fork_worker`](https://puma.io/puma/file.fork_worker.html) mode and periodically refork each worker after a given number of requests.  Leave it unset to disable this behavior.
+
+If you have a 512MB machine we recommend configuring only one Puma worker and using the threaded background worker to prevent excessive swapping.
 
 
 ## DelayedJob Workers

@@ -201,9 +201,6 @@ You should now be greeted by the `psql` interactive client and be connected to t
     sudo chmod -R u+rwX tmp/
     sudo -u huginn -H chmod o-rwx .env
 
-    # Copy the example Unicorn config
-    sudo -u huginn -H cp config/unicorn.rb.example config/unicorn.rb
-
 ### Configure it
 
     # Update Huginn config file and follow the instructions
@@ -244,19 +241,20 @@ If you are using a local PostgreSQL server the database configuration should loo
 
     RAILS_ENV=production
 
-Change the Unicorn config if needed, the [requirements.md](./requirements.md#unicorn-workers) has a section explaining the suggested amount of unicorn workers:
+Review `config/puma.rb` if needed.  The [requirements.md](./requirements.md#puma-workers) has a section explaining the suggested amount of Puma workers:
 
     # Increase the amount of workers if you expect to have a high load instance.
-    # 2 are enough for most use cases, if the server has less then 2GB of RAM
+    # 2 are enough for most use cases, if the server has less than 2GB of RAM
     # decrease the worker amount to 1
-    sudo -u huginn -H editor config/unicorn.rb
+    sudo -u huginn -H editor config/puma.rb
 
+You can also tune Puma through `.env`.  `WEB_CONCURRENCY` controls the number of workers, `RAILS_MAX_THREADS` controls the thread count per worker, and `PUMA_FORK_WORKER_AFTER_REQUESTS` enables Puma's experimental [`fork_worker`](https://puma.io/puma/file.fork_worker.html) mode to periodically refork Puma workers after a given number of requests when running with multiple workers.
 
-**Important Note:** Make sure to edit both `.env` and `unicorn.rb` to match your setup.
+**Important Note:** Make sure `.env` matches your setup.  If you customize `config/puma.rb`, keep that change in your deployed branch as well.
 
 **Note:** If you want to use HTTPS, which is what we recommend, see [Using HTTPS](#using-https) for the additional steps.
 
-**Note:** For configuration changes after finishing the initial installation you have to re-export (see [Install Init Script](https://github.com/huginn/huginn/blob/master/doc/manual/installation.md#install-init-script)) the init script every time you change `.env`, `unicorn.rb` or your `Procfile`!
+**Note:** For configuration changes after finishing the initial installation you have to re-export (see [Install Init Script](https://github.com/huginn/huginn/blob/master/doc/manual/installation.md#install-init-script)) the init script every time you change `.env` or your `Procfile`.  If you change `config/puma.rb`, re-export as well.
 
 ### Install Gems
 
@@ -283,21 +281,15 @@ When done you see `See the Huginn Wiki for more Agent examples!  https://github.
 
 ### Install Init Script
 
-Huginn uses [foreman](http://ddollar.github.io/foreman/) to generate the init scripts based on a `Procfile`
+Huginn uses [foreman](http://ddollar.github.io/foreman/) to generate the init scripts based on a `Procfile`.
 
-Edit the [`Procfile`](https://github.com/huginn/huginn/blob/master/Procfile) and choose one of the suggested versions for production
+For the default threaded worker setup, the checked-in [`Procfile`](https://github.com/huginn/huginn/blob/master/Procfile) already works in production once `RAILS_ENV=production` is set.
+
+Edit the `Procfile` only if you want to switch to one of the alternate process layouts:
 
     sudo -u huginn -H editor Procfile
 
-Comment out (disable) [these two lines](https://github.com/huginn/huginn/blob/master/Procfile#L6-L7)
-
-    web: bundle exec rails server -p ${PORT-3000} -b ${IP-0.0.0.0}
-    jobs: bundle exec rails runner bin/threaded.rb
-
-Enable (remove the comment) [from these lines](https://github.com/huginn/huginn/blob/master/Procfile#L24-L25) or [those](https://github.com/huginn/huginn/blob/master/Procfile#L28-L31)
-
-    # web: bundle exec unicorn -c config/unicorn.rb
-    # jobs: bundle exec rails runner bin/threaded.rb
+For example, you can enable the separate worker layout by uncommenting the corresponding `schedule`, `twitter` and `dj` lines.
 
 **Note:** Ensure you have no leading spaces before `web:` or `jobs:` in your `Procfile` file.
 
@@ -308,7 +300,7 @@ Export the init scripts:
 
     sudo bundle exec rake production:export
 
-**Note:** You have to re-export the init script every time you change the configuration in `.env` or your `Procfile`!
+**Note:** You have to re-export the init script every time you change the configuration in `.env` or your `Procfile`.  If you change `config/puma.rb`, re-export as well.
 
 ### Setup Logrotate
 
@@ -425,18 +417,18 @@ This file should be empty, it is the first place to look because `nginx` is the 
 
 Common problems:
 
-* `connect() to unix:/home/huginn/huginn/tmp/sockets/unicorn.socket failed`: The Unicorn application server is not running, ensure you uncommented one of the example configuration below the `PRODUCTION` label in your [Procfile](#install-init-script) and the unicorn config file (`/home/huginn/huginn/config/unicorn.rb`) exists.
+* `connect() to unix:/home/huginn/huginn/tmp/sockets/puma.sock failed`: The Puma application server is not running.  Ensure the `web:` process is enabled in your [Procfile](#install-init-script) and that `/home/huginn/huginn/config/puma.rb` exists.
 * `138 open() "/home/huginn/huginn/public/..." failed (13: Permission denied)`: The `/home/huginn/huginn/public` directory needs to be readable by the nginx user (which is per default `www-data`)
 
 
-#### Unicorn log `/home/huginn/huginn/log/unicorn.log`
+#### Puma logs `/home/huginn/huginn/log/stdout.log` and `/home/huginn/huginn/log/stderr.log`
 
 Should only contain HTTP request log entries like: `10.0.2.2 - - [18/Aug/2015:21:15:12 +0000] "GET / HTTP/1.0" 200 - 0.0110`
 
 If you see ruby exception backtraces or other error messages the problem could be one of the following:
 
-* The configuration file `/home/huginn/huginn/config/unicorn.rb` does not exist
-* Gem dependencies where not [installed](#install-gems)
+* The configuration file `/home/huginn/huginn/config/puma.rb` does not exist
+* Gem dependencies were not [installed](#install-gems)
 
 #### Rails Application log `/home/huginn/huginn/log/production.log`
 

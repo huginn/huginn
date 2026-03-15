@@ -487,7 +487,6 @@ GEM
       activerecord
       kaminari-core (= 1.2.2)
     kaminari-core (1.2.2)
-    kgio (2.11.4)
     kramdown (2.4.0)
       rexml
     launchy (3.0.1)
@@ -649,7 +648,7 @@ GEM
       date
       stringio
     public_suffix (7.0.5)
-    puma (6.4.3)
+    puma (7.2.0)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
@@ -702,7 +701,6 @@ GEM
       tsort (>= 0.2)
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
-    raindrops (0.20.1)
     rake (13.3.1)
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
@@ -874,9 +872,6 @@ GEM
       unf_ext
     unf_ext (0.0.8.2)
     unicode-display_width (2.4.2)
-    unicorn (6.1.0)
-      kgio (~> 2.6)
-      raindrops (~> 0.7)
     uri (1.1.1)
     useragent (0.16.11)
     vcr (6.1.0)
@@ -1022,7 +1017,6 @@ DEPENDENCIES
   tzinfo (>= 2.0.6)
   tzinfo-data
   uglifier
-  unicorn
   vcr
   web-console (>= 4.2.1)
   webmock
@@ -1033,4 +1027,4 @@ RUBY VERSION
   ruby 3.4.8
 
 BUNDLED WITH
-  4.0.7
+  4.0.8
