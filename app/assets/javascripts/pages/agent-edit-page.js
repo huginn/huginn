@@ -103,6 +103,7 @@
         return $(".description").hide();
       } else {
         $(".agent-settings").show();
+        $("form.agent-form").addClass("type-changing");
         $("#agent-spinner").fadeIn();
         if (!firstTime) {
           $(".model-errors").hide();
@@ -155,6 +156,7 @@
 
           window.initializeFormCompletable();
 
+          $("form.agent-form").removeClass("type-changing");
           return $("#agent-spinner").stop(true, true).fadeOut();
         });
       }
