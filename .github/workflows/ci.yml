@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -77,6 +80,9 @@ jobs:
     name: docker-build-${{ matrix.docker_image }}-${{ matrix.arch }}
     needs: run-tests
     runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -141,6 +147,8 @@ jobs:
     if: github.event_name == 'push' && github.ref_name == 'master'
     needs: build-docker-images
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -198,6 +206,9 @@ jobs:
     if: github.event_name == 'push' && github.ref_name == 'master'
     needs: push-docker-images
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v6
 
