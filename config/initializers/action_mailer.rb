@@ -12,8 +12,12 @@ ActionMailer::Base.smtp_settings = {}.tap { |config|
     config[:password] = ENV['SMTP_PASSWORD'].presence
   end
 
-  config[:enable_starttls_auto] = ENV['SMTP_ENABLE_STARTTLS_AUTO'] == 'true'
-  config[:ssl] = ENV['SMTP_SSL'] == 'true'
+  # :tls and :enable_starttls are mutually exclusive in net-smtp 0.5+
+  if ENV['SMTP_SSL'] == 'true'
+    config[:tls] = true
+  elsif ENV['SMTP_ENABLE_STARTTLS_AUTO'] == 'true'
+    config[:enable_starttls] = true
+  end
   config[:openssl_verify_mode] = ENV['SMTP_OPENSSL_VERIFY_MODE'].presence
   config[:ca_path] = ENV['SMTP_OPENSSL_CA_PATH'].presence
   config[:ca_file] = ENV['SMTP_OPENSSL_CA_FILE'].presence
