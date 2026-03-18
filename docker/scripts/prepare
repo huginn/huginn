@@ -43,7 +43,7 @@ rm -rf /usr/share/locale/
 rm -rf /var/log/*
 
 # Install the latest jq for JqAgent
-curl -fsSL -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/latest/download/jq-linux64
+curl -fsSL -o /usr/local/bin/jq "https://github.com/jqlang/jq/releases/latest/download/jq-linux-$(dpkg --print-architecture)"
 chmod +x /usr/local/bin/jq
 
 mkdir -p /app
