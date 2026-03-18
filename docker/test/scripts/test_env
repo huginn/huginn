@@ -1,16 +1,19 @@
 #!/bin/bash
 set -e
 
-[ -e '/app/.env' ] && { echo 'Existing .env detected. Please rename it temporarily before running the test container.' >&2; exit 1; }
-
-/scripts/setup_env
-source /app/.env
+export BUNDLE_APP_CONFIG=/tmp/.bundle
+export SCHEMA=/tmp/db-schema.rb
+export XDG_CACHE_HOME=/tmp/.cache
+export XDG_CONFIG_HOME=/tmp/.config
 
 export RAILS_ENV=test
 unset no_proxy
 
-bundle config set --local path vendor/bundle
-bundle config set --local without 'test development'
+bundle_subdir="docker-$(. /etc/os-release; printf '%s' "${VERSION_CODENAME:-${VERSION_ID:-${ID:-linux}}}")"
+export BUNDLE_PATH="/app/vendor/bundle/$bundle_subdir"
+
+bundle config set --local path "$BUNDLE_PATH"
+bundle config set --local without 'development'
 bundle install
 bundle exec rake db:create db:migrate
-bundle exec "$@"
+exec "$@"
