@@ -144,10 +144,11 @@ module DotHelper
     draw(agents:,
          agent_id: ->(agent) { 'a%d' % agent.id },
          agent_label: ->(agent) {
-           agent.name.gsub(/(.{20}\S*)\s+/) {
+           name = agent.name.gsub(/(.{20}\S*)\s+/) {
              # Fold after every 20+ characters
              $1 + "\n"
            }
+           agent.template? ? "[T] #{name}" : name
          },
          agent_url: ->(agent) { agent_path(agent.id) },
          rich:) {

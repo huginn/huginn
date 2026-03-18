@@ -1,14 +1,16 @@
 <ul class="dropdown-menu" role="menu">
-  <% if agent.can_be_scheduled? %>
-    <li>
-      <%= link_to icon_tag('glyphicon-refresh', class: 'color-success') + ' Run', run_agent_path(agent, return: return_to), method: :post, tabindex: "-1" %>
-    </li>
-  <% end %>
+  <% unless agent.template? %>
+    <% if agent.can_be_scheduled? %>
+      <li>
+        <%= link_to icon_tag('glyphicon-refresh', class: 'color-success') + ' Run', run_agent_path(agent, return: return_to), method: :post, tabindex: "-1" %>
+      </li>
+    <% end %>
 
-  <% if agent.can_dry_run? %>
-    <li>
-      <%= link_to icon_tag('glyphicon-refresh') + ' Dry Run', '#', 'data-action-url' => agent_dry_runs_path(agent), 'data-with-event-mode' => agent_dry_run_with_event_mode(agent), tabindex: "-1", onclick: "Utils.handleDryRunButton(this)" %>
-    </li>
+    <% if agent.can_dry_run? %>
+      <li>
+        <%= link_to icon_tag('glyphicon-refresh') + ' Dry Run', '#', 'data-action-url' => agent_dry_runs_path(agent), 'data-with-event-mode' => agent_dry_run_with_event_mode(agent), tabindex: "-1", onclick: "Utils.handleDryRunButton(this)" %>
+      </li>
+    <% end %>
   <% end %>
 
   <li>
@@ -21,19 +23,35 @@
     <%= link_to icon_tag('glyphicon-pencil') + ' Edit agent'.html_safe, edit_agent_path(agent, return: return_to) %>
   </li>
 
-  <li>
-    <%= link_to icon_tag('fa-copy') + ' Clone agent'.html_safe, new_agent_path(id: agent), tabindex: "-1" %>
-  </li>
+  <% unless agent.template? %>
+    <li>
+      <%= link_to icon_tag('fa-copy') + ' Clone agent'.html_safe, new_agent_path(id: agent), tabindex: "-1" %>
+    </li>
 
-  <li>
-    <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent-enable-disable#{agent.id}" do %>
-      <% if agent.disabled? %>
-        <%= icon_tag('glyphicon-play') %> Enable agent
-      <% else %>
-        <%= icon_tag('glyphicon-pause') %> Disable agent
+    <li>
+      <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent-enable-disable#{agent.id}" do %>
+        <% if agent.disabled? %>
+          <%= icon_tag('glyphicon-play') %> Enable agent
+        <% else %>
+          <%= icon_tag('glyphicon-pause') %> Disable agent
+        <% end %>
       <% end %>
-    <% end %>
-  </li>
+    </li>
+  <% end %>
+
+  <% if agent.template? %>
+    <li class="divider"></li>
+
+    <li>
+      <%= link_to icon_tag('glyphicon-plus') + ' Create Agent from Template', new_agent_path(template_id: agent), tabindex: "-1" %>
+    </li>
+  <% else %>
+    <li>
+      <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent-convert-template#{agent.id}" do %>
+        <%= icon_tag('fa-t', class: 'fa-bold') %> Convert to Template
+      <% end %>
+    </li>
+  <% end %>
 
   <% if agent.scenarios.length > 0 %>
     <li class="divider"></li>
@@ -45,80 +63,105 @@
     <% end %>
   <% end %>
 
-  <% if agent.can_create_events? && agent.events_count > 0 %>
-    <li class="divider"></li>
+  <% unless agent.template? %>
+    <% if agent.can_create_events? && agent.events_count > 0 %>
+      <li class="divider"></li>
 
-    <li>
-      <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent-reemit-events#{agent.id}" do %>
-        <%= icon_tag('glyphicon-refresh') %> Re-emit all events
-      <% end %>
-    </li>
+      <li>
+        <%= link_to '#', 'data-toggle' => 'modal', 'data-target' => "#confirm-agent-reemit-events#{agent.id}" do %>
+          <%= icon_tag('glyphicon-refresh') %> Re-emit all events
+        <% end %>
+      </li>
+
+      <li>
+        <%= link_to icon_tag('glyphicon-trash', class: 'color-danger') + ' Delete all events', remove_events_agent_path(agent, return: return_to), method: :delete, data: {confirm: 'Are you sure you want to delete ALL emitted events for this Agent?'}, tabindex: "-1" %>
+      </li>
+    <% end %>
   <% end %>
 
   <li class="divider"></li>
 
-  <% if agent.can_create_events? && agent.events_count > 0 %>
-    <li>
-      <%= link_to icon_tag('glyphicon-trash', class: 'color-danger') + ' Delete all events', remove_events_agent_path(agent, return: return_to), method: :delete, data: {confirm: 'Are you sure you want to delete ALL emitted events for this Agent?'}, tabindex: "-1" %>
-    </li>
-  <% end %>
-
   <li>
-    <%= link_to icon_tag('glyphicon-remove', class: 'color-danger') + ' Delete agent', agent_path(agent, return: return_to), method: :delete, data: { confirm: 'Are you sure that you want to permanently delete this Agent?' }, tabindex: "-1" %>
+    <%= link_to icon_tag('glyphicon-remove', class: 'color-danger') + " Delete #{agent.template? ? 'template' : 'agent'}", agent_path(agent, return: return_to), method: :delete, data: { confirm: "Are you sure that you want to permanently delete this #{agent.template? ? 'Template' : 'Agent'}?" }, tabindex: "-1" %>
   </li>
 </ul>
 
-<div id="confirm-agent-enable-disable<%= agent.id %>" class="confirm-agent modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title">Confirm</h4>
-      </div>
-      <div class="modal-body">
-        <p><% if agent.disabled? %>Enable<% else %>Disable<% end %> &quot;<%= agent.name %>&quot;?</p>
-      </div>
-      <div class="modal-footer">
-        <%= form_for(agent, as: :agent, url: agent_path(agent, return: return_to), method: 'PUT') do |f| %>
-          <% if agent.disabled && agent.can_receive_events? %>
-            <div class="form-group">
-              <%= f.check_box :drop_pending_events %>
-              <%= f.label :drop_pending_events, 'Drop pending events' %>
-              <span class="glyphicon glyphicon-question-sign hover-help" data-content="As soon as you enable this agent, it starts to receive pending events that have not been processed while it was disabled.  To prevent that from happening, you can check this option."></span>
-            </div>
+<% unless agent.template? %>
+  <div id="confirm-agent-enable-disable<%= agent.id %>" class="confirm-agent modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title">Confirm</h4>
+        </div>
+        <div class="modal-body">
+          <p><% if agent.disabled? %>Enable<% else %>Disable<% end %> &quot;<%= agent.name %>&quot;?</p>
+        </div>
+        <div class="modal-footer">
+          <%= form_for(agent, as: :agent, url: agent_path(agent, return: return_to), method: 'PUT') do |f| %>
+            <% if agent.disabled && agent.can_receive_events? %>
+              <div class="form-group">
+                <%= f.check_box :drop_pending_events %>
+                <%= f.label :drop_pending_events, 'Drop pending events' %>
+                <span class="glyphicon glyphicon-question-sign hover-help" data-content="As soon as you enable this agent, it starts to receive pending events that have not been processed while it was disabled.  To prevent that from happening, you can check this option."></span>
+              </div>
+            <% end %>
+            <%= f.hidden_field :disabled, value: (!agent.disabled).to_s %>
+            <%= f.button 'No', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
+            <%= f.submit 'Yes', class: 'btn btn-primary' %>
           <% end %>
-          <%= f.hidden_field :disabled, value: (!agent.disabled).to_s %>
-          <%= f.button 'No', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
-          <%= f.submit 'Yes', class: 'btn btn-primary' %>
-        <% end %>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div id="confirm-agent-reemit-events<%= agent.id %>" class="confirm-agent modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title">Confirm</h4>
-      </div>
-      <div class="modal-body">
-        <p>Re-emit all events for &quot;<%= agent.name %>&quot;?</p>
-      </div>
-      <div class="modal-footer">
-        <%= form_for(agent, as: :agent, url: reemit_events_agent_path(agent, return: return_to), method: 'POST') do |f| %>
-          <% if agent.can_create_events? && agent.events_count > 0 %>
-            <div class="form-group">
-              <%= check_box_tag :delete_old_events %>
-              <%= label_tag :delete_old_events, 'Delete old events' %>
-              <span class="glyphicon glyphicon-question-sign hover-help" data-content="If this is checked, the original copies of the events will be deleted once they are re-emitted."></span>
-            </div>
+  <div id="confirm-agent-reemit-events<%= agent.id %>" class="confirm-agent modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title">Confirm</h4>
+        </div>
+        <div class="modal-body">
+          <p>Re-emit all events for &quot;<%= agent.name %>&quot;?</p>
+        </div>
+        <div class="modal-footer">
+          <%= form_for(agent, as: :agent, url: reemit_events_agent_path(agent, return: return_to), method: 'POST') do |f| %>
+            <% if agent.can_create_events? && agent.events_count > 0 %>
+              <div class="form-group">
+                <%= check_box_tag :delete_old_events %>
+                <%= label_tag :delete_old_events, 'Delete old events' %>
+                <span class="glyphicon glyphicon-question-sign hover-help" data-content="If this is checked, the original copies of the events will be deleted once they are re-emitted."></span>
+              </div>
+            <% end %>
+            <%= f.button 'Cancel', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
+            <%= f.submit 'Re-emit all events', class: 'btn btn-primary' %>
           <% end %>
-          <%= f.button 'Cancel', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
-          <%= f.submit 'Re-emit all events', class: 'btn btn-primary' %>
-        <% end %>
+        </div>
       </div>
     </div>
   </div>
-</div>
+<% end %>
+
+<% unless agent.template? %>
+  <div id="confirm-agent-convert-template<%= agent.id %>" class="confirm-agent modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmAgentLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title">Convert to Template</h4>
+        </div>
+        <div class="modal-body">
+          <p>Convert &quot;<%= agent.name %>&quot; to a template?</p>
+          <p class="text-warning"><small>This will disable the agent, clear its events, logs, and memory. This action cannot be undone.</small></p>
+        </div>
+        <div class="modal-footer">
+          <%= form_for(agent, as: :agent, url: convert_to_template_agent_path(agent), method: 'POST') do |f| %>
+            <%= f.button 'Cancel', class: 'btn btn-default', 'data-dismiss' => 'modal' %>
+            <%= f.submit 'Convert', class: 'btn btn-primary' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
