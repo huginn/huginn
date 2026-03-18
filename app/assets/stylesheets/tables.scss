@@ -1,5 +1,4 @@
 // Sortable table headers
-@import "font-awesome";
 
 .table th a.selected {
   position: relative;
@@ -10,16 +9,18 @@
     position: absolute;
     top: 0;
     right: -1em;
-    @extend %fa-icon;
-    @extend .fa-solid;
+    font-family: "Font Awesome 7 Free";
+    font-weight: 900;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
   }
 
   &.asc:after {
-    content: fa-content($fa-var-sort-asc);
+    content: "\f0de";  // fa-sort-up (was fa-sort-asc)
   }
 
   &.desc:after {
-    content: fa-content($fa-var-sort-desc);
+    content: "\f0dd";  // fa-sort-down (was fa-sort-desc)
   }
 }
 
@@ -45,4 +46,3 @@ table.events {
     font-family: monospace;
   }
 }
-

@@ -11,6 +11,7 @@ db/*.sqlite3
 public/system/*
 coverage
 spec/tmp/*
+node_modules
 .travis.yml
 
 # Copied from .gitignore
