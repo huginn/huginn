@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -73,54 +76,161 @@ jobs:
         with:
           fail-on-error: false
 
-  ghcr-build-docker-images:
-    name: ghcr-docker-build-${{ matrix.docker_image }}
+  build-docker-images:
+    name: docker-build-${{ matrix.docker_image }}-${{ matrix.arch }}
     needs: run-tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
         docker_image:
           - huginn/huginn
           - huginn/huginn-single-process
+        arch:
+          - amd64
+          - arm64
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
     env:
       DOCKER_IMAGE: ghcr.io/${{ matrix.docker_image }}
       DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
-      DOCKER_USER: ${{ github.actor }}
-      DOCKER_PASS: ${{ secrets.GITHUB_TOKEN }}
-      REGISTRY: ghcr.io
     steps:
       - uses: actions/checkout@v6
 
-      - name: Build a docker image
-        run: |
-          if [ "$GITHUB_EVENT_NAME" = push -a "$GITHUB_REF_NAME" = master ]; then
-            ./build_docker_image.sh --push
-          else
-            ./build_docker_image.sh
-          fi
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-  build-docker-images:
-    name: docker-build-${{ matrix.docker_image }}
-    needs: run-tests
+      - name: Log in to GHCR
+        if: github.event_name == 'push' && github.ref_name == 'master'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ env.DOCKERFILE }}
+          platforms: linux/${{ matrix.arch }}
+          push: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+          outputs: ${{ github.event_name == 'push' && github.ref_name == 'master' && format('type=image,name={0},push-by-digest=true,name-canonical=true', env.DOCKER_IMAGE) || '' }}
+          cache-from: type=gha,scope=${{ matrix.docker_image }}-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.docker_image }}-${{ matrix.arch }}
+
+      - name: Export digest
+        if: github.event_name == 'push' && github.ref_name == 'master'
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        if: github.event_name == 'push' && github.ref_name == 'master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.docker_image }}-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  push-docker-images:
+    name: docker-push-${{ matrix.docker_image }}
+    if: github.event_name == 'push' && github.ref_name == 'master'
+    needs: build-docker-images
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     strategy:
       fail-fast: false
       matrix:
         docker_image:
           - huginn/huginn
           - huginn/huginn-single-process
-    env:
-      DOCKER_IMAGE: ${{ matrix.docker_image }}
-      DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
-      DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
-      BUILD_ARGS: --build-arg OUTDATED_DOCKER_REGISTRY=true
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-${{ matrix.docker_image }}-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create manifest list and push to GHCR
+        working-directory: /tmp/digests
+        env:
+          DOCKER_IMAGE: ghcr.io/${{ matrix.docker_image }}
+        run: |
+          docker buildx imagetools create \
+            -t "$DOCKER_IMAGE" \
+            -t "$DOCKER_IMAGE:$GITHUB_SHA" \
+            $(printf "$DOCKER_IMAGE@sha256:%s " *)
+
+      - name: Push to DockerHub with OUTDATED_DOCKER_REGISTRY flag
+        env:
+          GHCR_IMAGE: ghcr.io/${{ matrix.docker_image }}
+          DOCKERHUB_IMAGE: ${{ matrix.docker_image }}
+        run: |
+          printf 'FROM %s\nENV OUTDATED_DOCKER_REGISTRY=true\n' "$GHCR_IMAGE" | \
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t "$DOCKERHUB_IMAGE" \
+            -t "$DOCKERHUB_IMAGE:$GITHUB_SHA" \
+            --push -
+
+  build-test-image:
+    name: docker-build-huginn/huginn-test
+    if: github.event_name == 'push' && github.ref_name == 'master'
+    needs: push-docker-images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v6
 
-      - name: Build a docker image
-        run: |
-          if [ "$GITHUB_EVENT_NAME" = push -a "$GITHUB_REF_NAME" = master ]; then
-            ./build_docker_image.sh --push
-          fi
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push test image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/test/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/huginn/huginn-test
+            ghcr.io/huginn/huginn-test:${{ github.sha }}
+          cache-from: type=gha,scope=huginn/huginn-test-amd64
+          cache-to: type=gha,mode=max,scope=huginn/huginn-test-amd64

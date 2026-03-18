@@ -2,17 +2,27 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
+ARCH=$(dpkg --print-architecture)
+
 apt-get update
 apt-get install -y gnupg
 
-mkdir -m700 $HOME/.gnupg
-gpg --no-default-keyring --keyring /usr/share/keyrings/mysql-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 5072E1F5 3A79BD29 B7B3B788A8D3785C 40976EAF437D05B5
-echo "deb [signed-by=/usr/share/keyrings/mysql-keyring.gpg] http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7" > /etc/apt/sources.list.d/mysql.list
-apt-get update
+if [ "$ARCH" = "amd64" ]; then
+  # MySQL 5.7 from Oracle repo (amd64 only)
+  mkdir -m700 $HOME/.gnupg
+  gpg --no-default-keyring --keyring /usr/share/keyrings/mysql-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 5072E1F5 3A79BD29 B7B3B788A8D3785C 40976EAF437D05B5
+  echo "deb [signed-by=/usr/share/keyrings/mysql-keyring.gpg] http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7" > /etc/apt/sources.list.d/mysql.list
+  apt-get update
 
-apt-get install -y --allow-downgrades python3-pip mysql-server supervisor \
-                   mysql-server=5.7.42-1ubuntu18.04 mysql-client=5.7.42-1ubuntu18.04 libmysqlclient-dev=5.7.42-1ubuntu18.04 && \
-apt-get -y clean
+  apt-get install -y --allow-downgrades python3-pip mysql-server supervisor \
+                     mysql-server=5.7.42-1ubuntu18.04 mysql-client=5.7.42-1ubuntu18.04 libmysqlclient-dev=5.7.42-1ubuntu18.04 && \
+  apt-get -y clean
+else
+  # MySQL 8.0 from Ubuntu repo (arm64 and others)
+  apt-get install -y python3-pip mysql-server supervisor && \
+  apt-get -y clean
+fi
+
 pip install git+https://github.com/coderanger/supervisor-stdout
 rm -rf /var/lib/apt/lists/*
 rm -rf /usr/share/doc/
@@ -23,14 +33,30 @@ rm -rf /var/log/*
 mkdir -p /var/log/supervisor /var/log/mysql
 chgrp -R 0 /etc/supervisor /var/lib/mysql /var/log/supervisor /var/log/mysql
 chmod -R g=u /etc/supervisor /var/lib/mysql /var/log/supervisor /var/log/mysql
-sed -r -i /etc/mysql/mysql.conf.d/mysqld.cnf \
+
+# MySQL config directory varies by version
+if [ -d /etc/mysql/mysql.conf.d ]; then
+  MYSQLD_CNF=/etc/mysql/mysql.conf.d/mysqld.cnf
+else
+  MYSQLD_CNF=/etc/mysql/conf.d/mysqld.cnf
+fi
+
+sed -r -i "$MYSQLD_CNF" \
     -e 's#/var/run/mysqld/mysqld.sock#/app/tmp/sockets/mysqld.sock#' \
     -e 's#/var/run/mysqld/mysqld.pid#/app/tmp/pids/mysqld.pid#'
-echo "user=1001" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-cat >> /etc/mysql/conf.d/mysql.cnf << EOF
+echo "user=1001" >> "$MYSQLD_CNF"
+
+# Determine the client config file
+if [ -f /etc/mysql/conf.d/mysql.cnf ]; then
+  MYSQL_CNF=/etc/mysql/conf.d/mysql.cnf
+else
+  MYSQL_CNF=/etc/mysql/conf.d/client.cnf
+  touch "$MYSQL_CNF"
+fi
+
+cat >> "$MYSQL_CNF" << EOF
 [client]
 socket   = /app/tmp/sockets/mysqld.sock
 [mysql_upgrade]
 socket   = /app/tmp/sockets/mysqld.sock
-find /etc/mysql/
 EOF
