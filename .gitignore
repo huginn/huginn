@@ -31,4 +31,5 @@ deployment/cookbooks
 manifest.yml
 db/schema.rb
 .local/
+/node_modules
 spec/examples.txt

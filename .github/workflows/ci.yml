@@ -65,6 +65,9 @@ jobs:
           bundler: latest
           bundler-cache: true
 
+      - name: Install npm packages
+        run: npm install
+
       - name: Set up database
         run: bundle exec rake db:create db:migrate
 

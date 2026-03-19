@@ -334,8 +334,6 @@ GEM
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
-    font-awesome-sass (6.7.2)
-      sassc (~> 2.0)
     foreman (0.90.0)
       thor (~> 1.4)
     formatador (1.1.0)
@@ -935,7 +933,6 @@ DEPENDENCIES
   faraday-typhoeus
   feedjira (~> 4.0, >= 4.0.1)
   ffi (>= 1.17.3)
-  font-awesome-sass (~> 6.7.2)
   foreman (~> 0.90.0)
   geokit (~> 1.14)
   geokit-rails (~> 2.5)

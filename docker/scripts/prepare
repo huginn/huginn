@@ -42,6 +42,11 @@ rm -rf /usr/share/man/
 rm -rf /usr/share/locale/
 rm -rf /var/log/*
 
+# Install Node.js (LTS) for Font Awesome npm package
+curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+$minimal_apt_get_install nodejs
+npm config set update-notifier false
+
 # Install the latest jq for JqAgent
 curl -fsSL -o /usr/local/bin/jq "https://github.com/jqlang/jq/releases/latest/download/jq-linux-$(dpkg --print-architecture)"
 chmod +x /usr/local/bin/jq

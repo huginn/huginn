@@ -32,6 +32,8 @@ RUN APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle instal
 
 COPY --chown="$UID:0" ./ /app/
 
+RUN npm install --production
+
 RUN APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle exec bootsnap precompile --gemfile app/ lib/ config/
 RUN APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle exec rake assets:clean assets:precompile
 
