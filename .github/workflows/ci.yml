@@ -102,6 +102,7 @@ jobs:
             runner: ubuntu-24.04-arm
     env:
       DOCKER_IMAGE: ghcr.io/${{ matrix.docker_image }}
+      DOCKER_ARTIFACT_BASENAME: ${{ matrix.docker_image == 'huginn/huginn' && 'huginn' || 'huginn-single-process' }}
       DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
     steps:
       - uses: actions/checkout@v6
@@ -140,7 +141,7 @@ jobs:
         if: github.event_name == 'push' && github.ref_name == 'master'
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.docker_image }}-${{ matrix.arch }}
+          name: digests-${{ env.DOCKER_ARTIFACT_BASENAME }}__${{ matrix.arch }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -158,12 +159,14 @@ jobs:
         docker_image:
           - huginn/huginn
           - huginn/huginn-single-process
+    env:
+      DOCKER_ARTIFACT_BASENAME: ${{ matrix.docker_image == 'huginn/huginn' && 'huginn' || 'huginn-single-process' }}
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
           path: /tmp/digests
-          pattern: digests-${{ matrix.docker_image }}-*
+          pattern: digests-${{ env.DOCKER_ARTIFACT_BASENAME }}__*
           merge-multiple: true
 
       - name: Set up Docker Buildx
