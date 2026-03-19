@@ -41,10 +41,15 @@ else
   MYSQLD_CNF=/etc/mysql/conf.d/mysqld.cnf
 fi
 
-sed -r -i "$MYSQLD_CNF" \
-    -e 's#/var/run/mysqld/mysqld.sock#/app/tmp/sockets/mysqld.sock#' \
-    -e 's#/var/run/mysqld/mysqld.pid#/app/tmp/pids/mysqld.pid#'
-echo "user=1001" >> "$MYSQLD_CNF"
+cat >> "$MYSQLD_CNF" << EOF
+socket = /app/tmp/sockets/mysqld.sock
+pid-file = /app/tmp/pids/mysqld.pid
+user = 1001
+EOF
+
+if mysqld --verbose --help 2>/dev/null | grep -q -- '--mysqlx-socket'; then
+  echo "mysqlx-socket = /app/tmp/sockets/mysqlx.sock" >> "$MYSQLD_CNF"
+fi
 
 # Determine the client config file
 if [ -f /etc/mysql/conf.d/mysql.cnf ]; then
