@@ -11,7 +11,7 @@ module Agents
     description <<~MD
       The Google Calendar Publish Agent creates events on your Google Calendar.
 
-      #{'## Include `google-api-client` in your Gemfile to use this Agent!' if dependencies_missing?}
+      #{'## Include `google-apis-calendar_v3` in your Gemfile to use this Agent!' if dependencies_missing?}
 
       This agent relies on service accounts, rather than oauth.
 
@@ -28,7 +28,7 @@ module Agents
       <pre><code>{
         "type": "service_account",
         "project_id": "huginn-123123",
-        "private_key_id": "6d6b476fc6ccdb31e0f171991e5528bb396ffbe4",
+        "private_key_id": "1234567890abcdef1234567890abcdef12345678",
         "private_key": "-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----\\n",
         "client_email": "huginn-calendar@huginn-123123.iam.gserviceaccount.com",
         "client_id": "123123...123123",
