@@ -120,7 +120,7 @@ module Agents
       body['response_format'] = interpolated['response_format'] if interpolated['response_format'].present?
 
       response = openai_request(:post, '/images/generations', body)
-      return if handle_openai_error(response)
+      return unless response
 
       data = response['data']
       return error("No images returned from API") unless data&.any?

@@ -149,7 +149,7 @@ module Agents
     def perform_submit(event = nil)
       body = build_generation_body
       response = openai_request(:post, endpoint_path, body)
-      return if handle_openai_error(response)
+      return unless response
 
       gen_id = response['id'] || response['generation_id']
       status = response['status'] || 'pending'
@@ -167,7 +167,7 @@ module Agents
       return error("No generation_id provided") unless gen_id.present?
 
       response = openai_request(:get, "#{endpoint_path}/#{gen_id}")
-      return if handle_openai_error(response)
+      return unless response
 
       status = response['status'] || 'unknown'
       payload = {
@@ -196,7 +196,7 @@ module Agents
 
       body = build_generation_body
       response = openai_request(:post, endpoint_path, body)
-      return if handle_openai_error(response)
+      return unless response
 
       gen_id = response['id'] || response['generation_id']
       status = response['status'] || 'pending'
@@ -252,8 +252,7 @@ module Agents
 
         response = openai_request(:get, "#{endpoint_path}/#{gen_id}")
 
-        if response['error']
-          handle_openai_error(response)
+        unless response
           still_pending << gen
           next
         end

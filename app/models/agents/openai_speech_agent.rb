@@ -157,7 +157,7 @@ module Agents
       form_data['response_format'] = fmt
 
       response = openai_multipart_request('/audio/transcriptions', form_data)
-      return if response.is_a?(Hash) && handle_openai_error(response)
+      return unless response
 
       if response.is_a?(Hash)
         create_event payload: openai_base_payload(event).merge(
@@ -186,7 +186,7 @@ module Agents
       form_data['response_format'] = fmt
 
       response = openai_multipart_request('/audio/translations', form_data)
-      return if response.is_a?(Hash) && handle_openai_error(response)
+      return unless response
 
       if response.is_a?(Hash)
         create_event payload: openai_base_payload(event).merge(
@@ -211,17 +211,7 @@ module Agents
       body['response_format'] = interpolated['response_format'] if interpolated['response_format'].present?
 
       response = openai_raw_request(:post, '/audio/speech', body)
-      return if response.nil?
-
-      if response.status >= 400
-        begin
-          error_body = JSON.parse(response.body)
-          return if handle_openai_error(error_body)
-        rescue JSON::ParserError
-          error("TTS API error (HTTP #{response.status}): #{response.body.truncate(500)}")
-          return
-        end
-      end
+      return unless response
 
       content_type = response.headers['content-type'] || 'audio/mpeg'
       audio_base64 = Base64.strict_encode64(response.body)
@@ -249,7 +239,7 @@ module Agents
       end
 
       response = openai_raw_connection.get(audio_url)
-      if response.status >= 400
+      unless response.success?
         error("Failed to fetch audio from #{audio_url}: HTTP #{response.status}")
         return nil
       end

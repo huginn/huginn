@@ -37,20 +37,25 @@ module OpenaiConcern
   end
 
   # JSON-parsing request — used for most OpenAI API calls.
+  # Returns the parsed response body on success, or nil on failure
+  # (after logging the error via handle_openai_error).
   def openai_request(method, path, body = nil)
     url = "#{openai_base_url}#{path}"
     conn = build_openai_connection
     response = conn.run_request(method, url, body&.to_json, openai_headers)
+    return nil if handle_openai_error(response)
+
     response.body
   rescue Faraday::TimeoutError => e
     error("OpenAI API request timed out after #{openai_timeout}s: #{e.message}. Increase `request_timeout` for large inputs.")
-    { 'error' => { 'message' => "Request timed out after #{openai_timeout}s" } }
+    nil
   end
 
   # Multipart form request — used for file uploads (e.g. Whisper audio).
   # The :json middleware is always active; Faraday only parses when the
   # response Content-Type contains "json", so plain-text formats (text,
   # srt, vtt) are returned as raw strings automatically.
+  # Returns the parsed response body on success, or nil on failure.
   def openai_multipart_request(path, form_data)
     url = "#{openai_base_url}#{path}"
     multipart_headers = openai_headers.except('Content-Type')
@@ -61,19 +66,25 @@ module OpenaiConcern
       req.body = form_data
     end
 
+    return nil if handle_openai_error(response)
+
     response.body
   rescue Faraday::TimeoutError => e
     error("OpenAI API multipart request timed out after #{openai_timeout}s: #{e.message}. Increase `request_timeout` for large files.")
-    { 'error' => { 'message' => "Request timed out after #{openai_timeout}s" } }
+    nil
   end
 
   # Raw request — used for binary responses like TTS audio where we need
   # access to the raw Faraday response object (status, headers, body).
   # The :json middleware is still active but won't fire for non-JSON content types.
+  # Returns the Faraday response on success, or nil on failure.
   def openai_raw_request(method, path, body = nil)
     url = "#{openai_base_url}#{path}"
     conn = build_openai_connection
-    conn.run_request(method, url, body&.to_json, openai_headers)
+    response = conn.run_request(method, url, body&.to_json, openai_headers)
+    return nil if handle_openai_error(response)
+
+    response
   rescue Faraday::TimeoutError => e
     error("OpenAI API request timed out after #{openai_timeout}s: #{e.message}. Increase `request_timeout`.")
     nil
@@ -186,13 +197,23 @@ module OpenaiConcern
     true
   end
 
+  # Inspects a Faraday response for errors.  Returns true (and logs the
+  # error) when the request failed, false otherwise.  Handles non-Hash
+  # bodies defensively — Faraday's :json middleware always decodes JSON
+  # responses, so the body may be a Hash, Array, String, or nil.
   def handle_openai_error(response)
-    if response['error']
-      error_msg = response['error']['message'] || response['error'].to_s
-      error("OpenAI API error: #{error_msg}")
-      true
+    return false if response.success?
+
+    body = response.body
+
+    if body.is_a?(Hash) && body['error']
+      err = body['error']
+      error_msg = err.is_a?(Hash) ? (err['message'] || err.to_s) : err.to_s
+      error("OpenAI API error (HTTP #{response.status}): #{error_msg}")
     else
-      false
+      error("OpenAI API error (HTTP #{response.status}): #{body.to_s.truncate(500)}")
     end
+
+    true
   end
 end

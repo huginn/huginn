@@ -107,8 +107,7 @@ module Agents
     def perform_completion(event = nil)
       body = build_request_body
       response = openai_request(:post, '/chat/completions', body)
-
-      return if handle_openai_error(response)
+      return unless response
 
       choice = response.dig('choices', 0)
       return error("No choices returned from API") unless choice
