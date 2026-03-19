@@ -14,7 +14,7 @@ module Agents
     description <<~MD
       The Translation Agent will attempt to translate text between natural languages.
 
-      #{'## Include `google-api-client` in your Gemfile to use this Agent!' if dependencies_missing?}
+      #{'## Include `google-cloud-translate-v2` in your Gemfile to use this Agent!' if dependencies_missing?}
 
       Services are provided using Google Translate. You can [sign up](https://cloud.google.com/translate/) to get `google_api_key` which is required to use this agent.
       The service is **not free**.
