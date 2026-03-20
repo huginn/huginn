@@ -52,13 +52,15 @@ describe Agents::OpenaiVideoGenerationAgent do
 
       it 'requires api_key when ENV is not set' do
         @checker.options['api_key'] = nil
-        stub_const('ENV', ENV.to_h.except('OPENAI_API_KEY'))
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('OPENAI_API_KEY') { nil }
         expect(@checker).not_to be_valid
       end
 
       it 'accepts missing api_key when ENV is set' do
         @checker.options['api_key'] = nil
-        stub_const('ENV', ENV.to_h.merge('OPENAI_API_KEY' => 'env-key'))
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('OPENAI_API_KEY') { 'env-key' }
         expect(@checker).to be_valid
       end
 
