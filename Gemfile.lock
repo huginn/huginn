@@ -743,6 +743,8 @@ GEM
       rspec-expectations (~> 3.13)
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
+    rspec-retry (0.6.2)
+      rspec-core (> 3.3)
     rspec-support (3.13.7)
     rturk (2.12.1)
       erector
@@ -978,6 +980,7 @@ DEPENDENCIES
   rspec-html-matchers
   rspec-mocks
   rspec-rails
+  rspec-retry
   rturk (~> 2.12.1)
   rubocop
   rubocop-performance

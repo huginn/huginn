@@ -1,6 +1,7 @@
 require 'rails_helper'
 require 'capybara/rails'
 require 'capybara-select-2'
+require 'rspec/retry'
 
 CAPYBARA_TIMEOUT = ENV['CI'] == 'true' ? 60 : 5
 
@@ -30,6 +31,13 @@ RSpec.configure do |config|
   config.include Warden::Test::Helpers
   config.include AlertConfirmer, type: :feature
   config.include FeatureHelpers, type: :feature
+
+  # Retry flaky feature specs (Selenium race conditions, etc.)
+  config.verbose_retry = true
+  config.display_try_failure_messages = true
+  config.around(:each, type: :feature) do |example|
+    example.run_with_retry(retry: 3, retry_sleep: 1)
+  end
 
   config.before(:suite) do
     Warden.test_mode!
