@@ -498,9 +498,9 @@ GEM
     libv8-node (24.12.0.1-arm64-darwin)
     libv8-node (24.12.0.1-x86_64-darwin)
     libv8-node (24.12.0.1-x86_64-linux)
-    liquid (5.6.0)
+    liquid (5.12.0)
       bigdecimal
-      strscan
+      strscan (>= 3.1.1)
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -957,7 +957,7 @@ DEPENDENCIES
   kaminari (~> 1.2, >= 1.2.2)
   kramdown
   letter_opener_web (~> 3.0)
-  liquid (~> 5.6, = 5.6.0)
+  liquid (~> 5.12)
   listen (~> 3.9.0)
   logger
   loofah (~> 2.25)
