@@ -5,14 +5,15 @@ module OpenaiConcern
     include WebRequestConcern
   end
 
-  OPENAI_BASE_URL = 'https://api.openai.com/v1'.freeze
+  OPENAI_BASE_URI = URI('https://api.openai.com/v1/').freeze
   DEFAULT_OPENAI_TIMEOUT = 60 # seconds
 
-  def openai_base_url
+  def openai_base_uri
     url = interpolated['base_url'].presence ||
-          ENV['OPENAI_BASE_URL'].presence ||
-          OPENAI_BASE_URL
-    url.chomp('/')
+          ENV['OPENAI_BASE_URL'].presence
+    return OPENAI_BASE_URI unless url
+
+    URI(url.sub(%r{/?\z}, "/"))
   end
 
   def openai_api_key
@@ -39,7 +40,7 @@ module OpenaiConcern
   # Returns the parsed response body on success, or nil on failure
   # (after logging the error via handle_openai_error).
   def openai_request(method, path, body = nil)
-    url = "#{openai_base_url}#{path}"
+    url = openai_base_uri + path
     conn = build_openai_connection
     response = conn.run_request(method, url, body, openai_headers)
     return nil if handle_openai_error(response)
@@ -56,7 +57,7 @@ module OpenaiConcern
   # (text, srt, vtt) are returned as raw strings automatically.
   # Returns the parsed response body on success, or nil on failure.
   def openai_multipart_request(path, form_data)
-    url = "#{openai_base_url}#{path}"
+    url = openai_base_uri + path
     conn = build_openai_connection(multipart: true)
 
     response = conn.post(url) do |req|
@@ -77,7 +78,7 @@ module OpenaiConcern
   # The :json middleware is still active but won't fire for non-JSON content types.
   # Returns the Faraday response on success, or nil on failure.
   def openai_raw_request(method, path, body = nil)
-    url = "#{openai_base_url}#{path}"
+    url = openai_base_uri + path
     conn = build_openai_connection
     response = conn.run_request(method, url, body, openai_headers)
     return nil if handle_openai_error(response)

@@ -119,7 +119,7 @@ module Agents
       body['style'] = interpolated['style'] if interpolated['style'].present?
       body['response_format'] = interpolated['response_format'] if interpolated['response_format'].present?
 
-      response = openai_request(:post, '/images/generations', body)
+      response = openai_request(:post, 'images/generations', body)
       return unless response
 
       data = response['data']
