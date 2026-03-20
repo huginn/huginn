@@ -27,7 +27,6 @@ module OpenaiConcern
 
   def openai_headers
     headers = {
-      'Content-Type' => 'application/json',
       'Authorization' => "Bearer #{openai_api_key}"
     }
     if interpolated['organization'].present?
@@ -42,7 +41,7 @@ module OpenaiConcern
   def openai_request(method, path, body = nil)
     url = "#{openai_base_url}#{path}"
     conn = build_openai_connection
-    response = conn.run_request(method, url, body&.to_json, openai_headers)
+    response = conn.run_request(method, url, body, openai_headers)
     return nil if handle_openai_error(response)
 
     response.body
@@ -52,17 +51,16 @@ module OpenaiConcern
   end
 
   # Multipart form request — used for file uploads (e.g. Whisper audio).
-  # The :json middleware is always active; Faraday only parses when the
-  # response Content-Type contains "json", so plain-text formats (text,
-  # srt, vtt) are returned as raw strings automatically.
+  # The :json response middleware is always active; Faraday only parses
+  # when the response Content-Type contains "json", so plain-text formats
+  # (text, srt, vtt) are returned as raw strings automatically.
   # Returns the parsed response body on success, or nil on failure.
   def openai_multipart_request(path, form_data)
     url = "#{openai_base_url}#{path}"
-    multipart_headers = openai_headers.except('Content-Type')
     conn = build_openai_connection(multipart: true)
 
     response = conn.post(url) do |req|
-      req.headers = multipart_headers
+      req.headers.update(openai_headers)
       req.body = form_data
     end
 
@@ -81,7 +79,7 @@ module OpenaiConcern
   def openai_raw_request(method, path, body = nil)
     url = "#{openai_base_url}#{path}"
     conn = build_openai_connection
-    response = conn.run_request(method, url, body&.to_json, openai_headers)
+    response = conn.run_request(method, url, body, openai_headers)
     return nil if handle_openai_error(response)
 
     response
@@ -101,12 +99,12 @@ module OpenaiConcern
   # Builds a Faraday connection with shared SSL, timeout, proxy, user-agent,
   # and adapter configuration.  All OpenAI request helpers delegate here.
   #
-  # The :json response middleware is always enabled; Faraday only decodes
-  # the body when the response Content-Type contains "json", so binary or
-  # plain-text responses are passed through unchanged.
+  # The :json request middleware auto-serializes Hash/Array bodies and sets
+  # Content-Type to application/json.  The :json response middleware decodes
+  # JSON response bodies; non-JSON responses are passed through unchanged.
   #
   # Options:
-  #   multipart: true  — add multipart + url_encoded request middleware
+  #   multipart: true  — use multipart + url_encoded instead of :json request
   def build_openai_connection(multipart: false)
     Faraday.new(
       ssl: { verify: !boolify(options['disable_ssl_verification']) },
@@ -128,6 +126,8 @@ module OpenaiConcern
       if multipart
         builder.request :multipart
         builder.request :url_encoded
+      else
+        builder.request :json
       end
 
       builder.request :gzip
