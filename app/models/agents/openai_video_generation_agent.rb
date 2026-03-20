@@ -91,7 +91,7 @@ module Agents
         'size' => '1920x1080',
         'duration' => '',
         'n' => '1',
-        'endpoint_path' => '/videos/generations',
+        'endpoint_path' => 'videos/generations',
         'output_mode' => 'clean',
         'request_timeout' => '60',
         'expected_receive_period_in_days' => '1'
@@ -111,6 +111,14 @@ module Agents
         errors.add(:base, "generation_id is required for poll mode") unless options['generation_id'].present?
       else
         errors.add(:base, "prompt is required for submit modes") unless options['prompt'].present?
+      end
+
+      if options['endpoint_path'].present? && !options['endpoint_path'].to_s.include?('{{')
+        begin
+          endpoint_uri
+        rescue => e
+          errors.add(:base, e.message)
+        end
       end
     end
 
@@ -142,13 +150,20 @@ module Agents
 
     private
 
-    def endpoint_path
-      interpolated['endpoint_path'].presence || '/videos/generations'
+    def endpoint_uri(subpath = nil)
+      base = openai_base_uri
+      path = (interpolated['endpoint_path'].presence || 'videos/generations').delete_prefix('/')
+      path = "#{path}/#{subpath}" if subpath
+      uri = base + path
+      unless uri.to_s.start_with?(base.to_s)
+        raise "endpoint_path must not navigate outside the base URL"
+      end
+      uri
     end
 
     def perform_submit(event = nil)
       body = build_generation_body
-      response = openai_request(:post, endpoint_path, body)
+      response = openai_request(:post, endpoint_uri, body)
       return unless response
 
       gen_id = response['id'] || response['generation_id']
@@ -166,7 +181,7 @@ module Agents
     def perform_poll(gen_id, event = nil)
       return error("No generation_id provided") unless gen_id.present?
 
-      response = openai_request(:get, "#{endpoint_path}/#{gen_id}")
+      response = openai_request(:get, endpoint_uri(gen_id))
       return unless response
 
       status = response['status'] || 'unknown'
@@ -195,7 +210,7 @@ module Agents
       end
 
       body = build_generation_body
-      response = openai_request(:post, endpoint_path, body)
+      response = openai_request(:post, endpoint_uri, body)
       return unless response
 
       gen_id = response['id'] || response['generation_id']
@@ -250,7 +265,7 @@ module Agents
           next
         end
 
-        response = openai_request(:get, "#{endpoint_path}/#{gen_id}")
+        response = openai_request(:get, endpoint_uri(gen_id))
 
         unless response
           still_pending << gen

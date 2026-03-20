@@ -156,7 +156,7 @@ module Agents
       form_data['language'] = interpolated['language'] if interpolated['language'].present?
       form_data['response_format'] = fmt
 
-      response = openai_multipart_request('/audio/transcriptions', form_data)
+      response = openai_multipart_request('audio/transcriptions', form_data)
       return unless response
 
       if response.is_a?(Hash)
@@ -185,7 +185,7 @@ module Agents
       }
       form_data['response_format'] = fmt
 
-      response = openai_multipart_request('/audio/translations', form_data)
+      response = openai_multipart_request('audio/translations', form_data)
       return unless response
 
       if response.is_a?(Hash)
@@ -210,7 +210,7 @@ module Agents
       }
       body['response_format'] = interpolated['response_format'] if interpolated['response_format'].present?
 
-      response = openai_raw_request(:post, '/audio/speech', body)
+      response = openai_raw_request(:post, 'audio/speech', body)
       return unless response
 
       content_type = response.headers['content-type'] || 'audio/mpeg'

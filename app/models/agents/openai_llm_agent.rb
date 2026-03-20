@@ -106,7 +106,7 @@ module Agents
 
     def perform_completion(event = nil)
       body = build_request_body
-      response = openai_request(:post, '/chat/completions', body)
+      response = openai_request(:post, 'chat/completions', body)
       return unless response
 
       choice = response.dig('choices', 0)
