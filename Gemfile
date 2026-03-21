@@ -39,7 +39,7 @@ gem 'net-ftp-list' # FtpsiteAgent
 gem 'pirate_weather_forecast_ruby' # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
-gem 'twilio-ruby', '~> 7.8.5'     # TwilioAgent
+gem 'twilio-ruby', '~> 7.10.3'     # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -71,10 +71,10 @@ gem 'evernote_oauth'
 gem 'omniauth-evernote'
 
 # LocalFileAgent (watch functionality)
-gem 'listen', '~> 3.9.0', require: false
+gem 'listen', '~> 3.10.0', require: false
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.199.1'
+gem 'aws-sdk-s3', '~> 1', '>= 1.217.0'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
@@ -142,7 +142,7 @@ group :development do
   gem 'guard-rspec'
   gem 'letter_opener_web', '~> 3.0'
   gem 'rack-livereload'
-  gem 'web-console', '>= 4.2.1'
+  gem 'web-console', '>= 4.3.0'
 
   gem 'capistrano'
   gem 'capistrano-bundler'

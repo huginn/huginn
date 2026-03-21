@@ -186,8 +186,8 @@ GEM
       sshkit (>= 1.6.1, != 1.7.0)
     ast (2.4.2)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1200.0)
-    aws-sdk-core (3.240.0)
+    aws-partitions (1.1229.0)
+    aws-sdk-core (3.244.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -195,11 +195,11 @@ GEM
       bigdecimal
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kms (1.118.0)
-      aws-sdk-core (~> 3, >= 3.239.1)
+    aws-sdk-kms (1.123.0)
+      aws-sdk-core (~> 3, >= 3.244.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.209.0)
-      aws-sdk-core (~> 3, >= 3.234.0)
+    aws-sdk-s3 (1.217.0)
+      aws-sdk-core (~> 3, >= 3.244.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
@@ -498,7 +498,8 @@ GEM
     liquid (5.12.0)
       bigdecimal
       strscan (>= 3.1.1)
-    listen (3.9.0)
+    listen (3.10.0)
+      logger
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     llhttp-ffi (0.4.0)
@@ -855,7 +856,7 @@ GEM
     tsort (0.2.0)
     ttfunk (1.8.0)
       bigdecimal (~> 3.1)
-    twilio-ruby (7.8.5)
+    twilio-ruby (7.10.3)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 4.0)
       nokogiri (>= 1.6, < 2.0)
@@ -876,11 +877,10 @@ GEM
     version_gem (1.1.4)
     warden (1.2.9)
       rack (>= 2.0.9)
-    web-console (4.2.1)
-      actionview (>= 6.0.0)
-      activemodel (>= 6.0.0)
+    web-console (4.3.0)
+      actionview (>= 8.0.0)
       bindex (>= 0.4.0)
-      railties (>= 6.0.0)
+      railties (>= 8.0.0)
     webmock (3.26.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -906,7 +906,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap
-  aws-sdk-s3 (~> 1, >= 1.199.1)
+  aws-sdk-s3 (~> 1, >= 1.217.0)
   better_errors
   binding_of_caller
   bootsnap
@@ -955,7 +955,7 @@ DEPENDENCIES
   kramdown
   letter_opener_web (~> 3.0)
   liquid (~> 5.12)
-  listen (~> 3.9.0)
+  listen (~> 3.10.0)
   logger
   loofah (~> 2.25, >= 2.25.1)
   mail (>= 2.9.0)
@@ -1009,7 +1009,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client!
-  twilio-ruby (~> 7.8.5)
+  twilio-ruby (~> 7.10.3)
   twitter!
   twitter-stream!
   typhoeus
@@ -1017,7 +1017,7 @@ DEPENDENCIES
   tzinfo-data
   uglifier
   vcr
-  web-console (>= 4.2.1)
+  web-console (>= 4.3.0)
   webmock
   weibo_2!
   xmpp4r (~> 0.5.6)
