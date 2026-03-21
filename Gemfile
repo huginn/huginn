@@ -28,6 +28,7 @@ end
 
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
+gem 'coffee-script' # JavaScriptAgent; only if you want to use CoffeeScript
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
 gem 'hipchat', '~> 1.6.0' # HipchatAgent
 gem 'pdf-reader' # PDFInfoAgent
@@ -83,7 +84,6 @@ gem 'omniauth-google-oauth2', '~> 1.0.1'
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
 gem 'bootstrap-kaminari-views', '~> 0.0.5'
-gem 'coffee-rails', '~> 5'
 gem 'daemons'
 gem 'delayed_job'
 gem 'delayed_job_active_record'

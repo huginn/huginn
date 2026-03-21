@@ -38,7 +38,10 @@ module Agents
       * `this.unescapeHtml(htmlToUnescape)`
     MD
 
-    form_configurable :language, type: :array, values: %w[JavaScript CoffeeScript]
+    LANGUAGES = %w[JavaScript]
+    LANGUAGES << 'CoffeeScript' if defined?(CoffeeScript)
+
+    form_configurable :language, type: :array, values: LANGUAGES
     form_configurable :code, type: :text, ace: true
     form_configurable :expected_receive_period_in_days
     form_configurable :expected_update_period_in_days
@@ -52,8 +55,9 @@ module Agents
         errors.add(:base, "The 'code' option is required") unless options['code'].present?
       end
 
-      if interpolated['language'].present? && !interpolated['language'].downcase.in?(%w[javascript coffeescript])
-        errors.add(:base, "The 'language' must be JavaScript or CoffeeScript")
+      language = interpolated['language'].presence || LANGUAGES.first
+      unless LANGUAGES.include?(language)
+        errors.add(:base, "The 'language' must be #{LANGUAGES.to_sentence(two_words_connector: ' or ', last_word_connector: ', or ')}")
       end
     end
 
@@ -136,7 +140,9 @@ module Agents
       context.attach("getKeyValueStores", -> { kvs })
       context.eval("Object.defineProperty(Agent, 'kvs', { get: getKeyValueStores })")
 
-      if (options['language'] || '').downcase == 'coffeescript'
+      if options['language'] == 'CoffeeScript'
+        raise "CoffeeScript is not available. Install the 'coffee-script' gem to use CoffeeScript." unless defined?(CoffeeScript)
+
         context.eval(CoffeeScript.compile(code))
       else
         context.eval(code)

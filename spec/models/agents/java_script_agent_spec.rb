@@ -32,7 +32,7 @@ describe Agents::JavaScriptAgent do
       @agent.options['language'] = 'foo'
       expect(@agent).not_to be_valid
 
-      %w[javascript JavaScript coffeescript CoffeeScript].each do |valid_language|
+      Agents::JavaScriptAgent::LANGUAGES.each do |valid_language|
         @agent.options['language'] = valid_language
         expect(@agent).to be_valid
       end
@@ -376,7 +376,7 @@ describe Agents::JavaScriptAgent do
       end
     end
 
-    describe "using CoffeeScript" do
+    describe "using CoffeeScript", if: defined?(CoffeeScript) do
       it "will accept a 'language' of 'CoffeeScript'" do
         @agent.options['code'] = 'Agent.check = -> this.log("hello from coffeescript")'
         @agent.options['language'] = 'CoffeeScript'
