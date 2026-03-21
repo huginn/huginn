@@ -2,6 +2,21 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Mar 21, 2026   | CoffeeScript support in JavaScriptAgent is now optional.  The `coffee-script` gem is still included by default but will be removed in a future release. [#3584](https://github.com/huginn/huginn/pull/3584) |
+| Mar 20, 2026   | Add OpenAI ChatCompletion and Image agents for interacting with OpenAI-compatible APIs. [#3560](https://github.com/huginn/huginn/pull/3560) |
+| Mar 20, 2026   | Upgrade Liquid to 5.12. [#3583](https://github.com/huginn/huginn/pull/3583) |
+| Mar 19, 2026   | Replace deprecated `google-api-client` with `google-apis-calendar_v3` in GoogleCalendarPublishAgent. [#3579](https://github.com/huginn/huginn/pull/3579) |
+| Mar 19, 2026   | Add multi-arch (amd64 + arm64) Docker build. [#3577](https://github.com/huginn/huginn/pull/3577) |
+| Mar 19, 2026   | Upgrade Font Awesome to 7. [#3578](https://github.com/huginn/huginn/pull/3578) |
+| Mar 18, 2026   | Fix SMTP TLS configuration for net-smtp 0.5+. [#3576](https://github.com/huginn/huginn/pull/3576) |
+| Mar 15, 2026   | Replace Unicorn with single-threaded Puma. [#3573](https://github.com/huginn/huginn/pull/3573) |
+| Mar 08, 2026   | Upgrade to Ruby 3.4 and Rails 8.1.  Enable YJIT and Bootsnap precompile in production. [#3567](https://github.com/huginn/huginn/pull/3567) [#3569](https://github.com/huginn/huginn/pull/3569) |
+| Mar 08, 2026   | Replace HyPDF with pdf-reader in PdfInfoAgent. [#3564](https://github.com/huginn/huginn/pull/3564) |
+| Mar 23, 2025   | Fix default scenario iTunes URL. [#3492](https://github.com/huginn/huginn/pull/3492) |
+| Jan 14, 2025   | Fix missing Rails timezone identifiers. [#3485](https://github.com/huginn/huginn/pull/3485) |
+| Dec 31, 2024   | Fix race condition in DelayAgent. [#3478](https://github.com/huginn/huginn/pull/3478) |
+| Nov 19, 2024   | Allow the GET method for OmniAuth. [#3469](https://github.com/huginn/huginn/pull/3469) |
+| Nov 19, 2024   | Conditionally enable faraday-gzip depending on the Faraday backend. [#3468](https://github.com/huginn/huginn/pull/3468) |
 | Nov 17, 2024   | Enhance GoogleTranslationAgent by adding support for "merge" mode and translation of any nested object with a single call of Cloud Translation API. [#3466](https://github.com/huginn/huginn/pull/3466) |
 | Nov 04, 2024   | Restore usability the Agent type picker and Scenario icon picker partially broken for a long time.<br>Update Font-Awesome icons to version 6. [#3459](https://github.com/huginn/huginn/pull/3459) |
 | Oct 27, 2024   | WebsiteAgent can output raw XPath values by enabling the `raw` option, effectively obsoleting the `array` option which is now called `single_array`. [#3457](https://github.com/huginn/huginn/pull/3457) |
