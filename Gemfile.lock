@@ -205,7 +205,7 @@ GEM
     aws-sigv4 (1.12.1)
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
-    bcrypt (3.1.21)
+    bcrypt (3.1.22)
     benchmark (0.5.0)
     better_errors (2.10.0)
       erubi (>= 1.0.0)
@@ -921,7 +921,7 @@ DEPENDENCIES
   debug
   delayed_job
   delayed_job_active_record
-  devise (~> 5.0, >= 5.0.2)
+  devise (~> 5.0, >= 5.0.3)
   dotenv!
   dropbox-api!
   em-http-request
@@ -957,7 +957,7 @@ DEPENDENCIES
   liquid (~> 5.12)
   listen (~> 3.9.0)
   logger
-  loofah (~> 2.25)
+  loofah (~> 2.25, >= 2.25.1)
   mail (>= 2.9.0)
   mini_magick (>= 5.3.1)
   mini_racer!
@@ -966,7 +966,7 @@ DEPENDENCIES
   mysql2 (~> 0.5, >= 0.5.7)
   net-ftp
   net-ftp-list
-  nokogiri (>= 1.18.10)
+  nokogiri (>= 1.19.2)
   omniauth
   omniauth-dropbox-oauth2!
   omniauth-evernote
