@@ -1,6 +1,7 @@
 module Agents
   class EvernoteAgent < Agent
     include EvernoteConcern
+    favicon_class 'fa-brands fa-evernote'
 
     description <<~MD
       The Evernote Agent connects with a user's Evernote note store.

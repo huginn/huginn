@@ -5,6 +5,7 @@ module Agents
 
     cannot_be_scheduled!
     consumes_file_pointer!
+    favicon_class 'fa-solid fa-file-csv'
 
     def default_options
       {

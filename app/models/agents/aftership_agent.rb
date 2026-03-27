@@ -5,6 +5,7 @@ module Agents
     cannot_receive_events!
 
     default_schedule "every_10m"
+    favicon_class 'fa-solid fa-truck'
 
     description <<~MD
       The Aftership agent allows you to track your shipment from aftership and emit them into events.

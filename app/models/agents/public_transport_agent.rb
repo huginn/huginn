@@ -5,6 +5,7 @@ module Agents
     cannot_receive_events!
 
     default_schedule "every_2m"
+    favicon_class 'fa-solid fa-bus'
 
     description <<~MD
       The Public Transport Request Agent generates Events based on NextBus GPS transit predictions.
