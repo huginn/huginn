@@ -1,0 +1,81 @@
+<% content_for :title, @remix.title -%>
+
+<% content_for :head do %>
+  <script src="https://cdn.jsdelivr.net/npm/marked@14/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+<% end %>
+
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2><%= icon_tag('fa-wand-magic-sparkles') %> <%= @remix.title %></h2>
+      </div>
+
+      <div class="remix-chat-container"
+           data-remix-id="<%= @remix.id %>"
+           data-stream-url="<%= stream_message_remix_path(@remix) %>"
+           data-processing="<%= @remix.processing? %>"
+           data-status-url="<%= status_remix_path(@remix, format: :json) %>"
+           data-csrf-token="<%= form_authenticity_token %>">
+
+        <div class="remix-messages" id="messages">
+          <% if @messages.where(role: ['user', 'assistant']).empty? %>
+            <div class="well" id="welcome-message">
+              <h4>Hi! I'm Remix, your Huginn assistant.</h4>
+              <p>I can help you:</p>
+              <ul>
+                <li>Create and configure agents</li>
+                <li>Debug issues and analyze events</li>
+                <li>Set up scenarios and workflows</li>
+                <li>Optimize your automation flows</li>
+              </ul>
+              <p><strong>Try asking me something like:</strong></p>
+              <ul>
+                <li>"Create a website monitoring agent for example.com"</li>
+                <li>"Why isn't my weather agent working?"</li>
+                <li>"Show me my flow diagram"</li>
+                <li>"Plan a scenario to track HN and notify me on Slack"</li>
+              </ul>
+            </div>
+          <% else %>
+            <% @messages.each do |message| %>
+              <%= render 'message', message: message %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div class="remix-status-bar" id="status-bar">
+          <div class="remix-status-inner">
+            <span class="remix-status-spinner"></span>
+            <span class="remix-status-text" id="status-text"></span>
+            <span class="remix-status-elapsed" id="status-elapsed"></span>
+          </div>
+        </div>
+
+        <div class="remix-input-area">
+          <div class="form-group">
+            <textarea class="form-control" rows="3" id="message-input"
+                placeholder="Ask me to create agents, debug issues, or modify your workflows..."
+                required></textarea>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-primary" id="send-button">Send</button>
+            <button class="btn btn-danger" id="stop-button" style="display:none;">Stop</button>
+            <small class="text-muted" style="margin-left: 10px;">
+              Ctrl+Enter or Cmd+Enter to send
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <br/>
+
+      <div class="btn-group">
+        <%= link_to icon_tag('glyphicon-chevron-left') + ' Back'.html_safe, remixes_path, class: "btn btn-default" %>
+        <%= link_to icon_tag('glyphicon-trash') + ' Delete'.html_safe, remix_path(@remix), method: :delete,
+            data: { confirm: 'Delete this conversation?' }, class: "btn btn-default" %>
+      </div>
+    </div>
+  </div>
+</div>
