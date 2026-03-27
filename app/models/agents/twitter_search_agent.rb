@@ -4,6 +4,7 @@ module Agents
 
     can_dry_run!
     cannot_receive_events!
+    favicon_class 'fa-brands fa-x-twitter'
 
     description <<~MD
       The Twitter Search Agent performs and emits the results of a specified Twitter search.

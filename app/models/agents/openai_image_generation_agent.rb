@@ -5,6 +5,7 @@ module Agents
     can_dry_run!
     no_bulk_receive!
     default_schedule "never"
+    favicon_class 'fa-solid fa-robot'
 
     description <<~MD
       The OpenAI Image Generation Agent generates images using any OpenAI-compatible image generation API (DALL-E 2, DALL-E 3, or compatible services).

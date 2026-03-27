@@ -5,6 +5,7 @@ module Agents
     cannot_be_scheduled!
 
     gem_dependency_check { defined?(Haversine) }
+    favicon_class 'fa-solid fa-location-dot'
 
     description do
       <<~MD

@@ -8,6 +8,7 @@ module Agents
     can_dry_run!
     no_bulk_receive!
     default_schedule "never"
+    favicon_class 'fa-solid fa-robot'
 
     description <<~MD
       The OpenAI Speech Agent provides both **speech-to-text** (Whisper) and **text-to-speech** (TTS) capabilities using any OpenAI-compatible API.

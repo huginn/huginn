@@ -7,6 +7,7 @@ module Agents
     no_bulk_receive!
 
     gem_dependency_check { defined?(HipChat) }
+    favicon_class 'fa-solid fa-comments'
 
     description <<~MD
       The Hipchat Agent sends messages to a Hipchat Room
