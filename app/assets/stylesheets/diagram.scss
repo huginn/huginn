@@ -21,6 +21,20 @@
         color: white !important;
         z-index: 2;
       }
+
+      .agent-diagram-favicon {
+        position: absolute;
+        display: none;
+        z-index: 2;
+        font-size: 14px;
+        color: #555;
+        line-height: 1;
+
+        img.agent-favicon {
+          width: 16px;
+          height: 16px;
+        }
+      }
     }
   }
 }
