@@ -4,6 +4,7 @@ module Agents
 
     cannot_be_scheduled!
     cannot_create_events!
+    favicon_class 'fa-solid fa-rss'
 
     description do
       <<~MD

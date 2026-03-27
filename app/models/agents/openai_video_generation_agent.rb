@@ -8,6 +8,7 @@ module Agents
 
     MAX_PENDING_GENERATIONS = 50
     PENDING_GENERATION_TTL = 24.hours
+    favicon_class 'fa-solid fa-robot'
 
     description <<~MD
       The OpenAI Video Generation Agent generates videos using any OpenAI-compatible video generation API (e.g. Sora or compatible services).

@@ -3,6 +3,7 @@ module Agents
     include FormConfigurable
 
     default_schedule "6am"
+    favicon_class 'fa-solid fa-layer-group'
 
     description <<~MD
       The Digest Agent collects any Events sent to it and emits them as a single event.

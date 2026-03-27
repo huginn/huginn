@@ -4,6 +4,7 @@ module Agents
 
     can_dry_run!
     cannot_receive_events!
+    favicon_class 'fa-brands fa-x-twitter'
 
     description <<~MD
       The Twitter User Agent either follows the timeline of a specific Twitter user or follows your own home timeline including both your tweets and tweets from people whom you are following.

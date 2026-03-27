@@ -3,6 +3,7 @@ module Agents
     include FormConfigurable
 
     default_schedule 'every_12h'
+    favicon_class 'fa-solid fa-hourglass-half'
 
     description <<~MD
       The DelayAgent stores received Events and emits copies of them on a schedule. Use this as a buffer or queue of Events.

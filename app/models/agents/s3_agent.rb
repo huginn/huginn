@@ -9,6 +9,7 @@ module Agents
     default_schedule 'every_1h'
 
     gem_dependency_check { defined?(Aws::S3) }
+    favicon_class 'fa-brands fa-aws'
 
     description do
       <<~MD
