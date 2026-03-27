@@ -1,0 +1,443 @@
+// Remix Chat Interface Styles
+
+.remix-chat-container {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fafafa;
+  margin-bottom: 15px;
+
+  .remix-messages {
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 15px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+
+    .well {
+      margin-bottom: 0;
+    }
+  }
+
+  .remix-input-area {
+    padding: 15px;
+    background: #f5f5f5;
+
+    .form-group {
+      margin-bottom: 10px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      max-height: 200px;
+    }
+  }
+}
+
+// --- Message bubbles ---
+
+.remix-message {
+  margin-bottom: 15px;
+  padding: 12px 15px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &.remix-message-user {
+    background: #e8f4fc;
+    border-color: #c5e3f6;
+    margin-left: 50px;
+  }
+
+  &.remix-message-assistant {
+    background: #fff;
+    border-color: #ddd;
+    margin-right: 50px;
+  }
+
+  &.remix-message-tool {
+    background: #fcf8e3;
+    border-color: #faebcc;
+    font-size: 0.9em;
+    margin-right: 30px;
+    margin-left: 30px;
+
+    pre {
+      margin: 10px 0 0 0;
+      padding: 10px;
+      background: #fff;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    details {
+      cursor: pointer;
+
+      summary {
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 10px;
+
+        &:hover {
+          color: #333;
+        }
+      }
+    }
+
+    .tool-result {
+      padding: 8px 12px;
+      border-radius: 4px;
+
+      &.success {
+        background: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #d6e9c6;
+      }
+
+      .result-icon {
+        margin-right: 5px;
+      }
+    }
+
+    .alert {
+      margin-bottom: 0;
+    }
+  }
+
+  &.remix-message-error {
+    margin: 15px 0;
+    padding: 0;
+    border: none;
+
+    .alert {
+      margin-bottom: 0;
+    }
+  }
+
+  .remix-message-header {
+    margin-bottom: 8px;
+    font-size: 0.85em;
+    color: #777;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    strong {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #555;
+    }
+
+    .timestamp {
+      font-size: 0.9em;
+      color: #999;
+    }
+  }
+
+  .remix-message-content {
+    color: #333;
+    line-height: 1.6;
+
+    p {
+      margin: 0 0 10px 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+  }
+
+  .tool-calls {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #ddd;
+
+    .tool-call {
+      font-size: 0.9em;
+      color: #666;
+      padding: 3px 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+
+  .confirmation-buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+}
+
+// --- Status bar ---
+
+.remix-status-bar {
+  display: none;
+  border-bottom: 1px solid #ddd;
+  background: #f0f7ff;
+  padding: 8px 15px;
+  font-size: 0.85em;
+  color: #4a7da8;
+  transition: opacity 0.2s ease;
+
+  &.active {
+    display: block;
+  }
+
+  .remix-status-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .remix-status-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #a8cce0;
+    border-top-color: #4a7da8;
+    border-radius: 50%;
+    animation: remix-spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  .remix-status-text {
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .remix-status-elapsed {
+    color: #8ab4cc;
+    font-variant-numeric: tabular-nums;
+    min-width: 30px;
+    text-align: right;
+  }
+}
+
+// --- System notes ---
+
+.remix-system-note {
+  text-align: center;
+  color: #999;
+  font-size: 0.85em;
+  padding: 8px 0;
+  font-style: italic;
+}
+
+// --- Thinking indicator (bouncing dots) ---
+
+.remix-thinking-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #aaa;
+    animation: remix-bounce 1.4s ease-in-out infinite;
+
+    &:nth-child(1) { animation-delay: 0s; }
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+@keyframes remix-bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+// --- Streaming spinner ---
+
+.tool-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ccc;
+  border-top-color: #666;
+  border-radius: 50%;
+  animation: remix-spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.tool-spinner-text {
+  color: #999;
+  &::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #ccc;
+    border-top-color: #666;
+    border-radius: 50%;
+    animation: remix-spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+}
+
+@keyframes remix-spin {
+  to { transform: rotate(360deg); }
+}
+
+// --- Markdown content styles ---
+
+.md-content {
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    line-height: 1.3;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h1 { font-size: 1.4em; }
+  h2 { font-size: 1.25em; }
+  h3 { font-size: 1.1em; }
+  h4 { font-size: 1em; }
+
+  ul, ol {
+    padding-left: 24px;
+    margin-bottom: 10px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  blockquote {
+    border-left: 4px solid #ddd;
+    padding: 4px 16px;
+    margin: 10px 0;
+    color: #666;
+  }
+
+  pre {
+    background: #f6f8fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 4px;
+    padding: 12px;
+    overflow-x: auto;
+    margin: 10px 0;
+
+    code {
+      background: none;
+      padding: 0;
+      border-radius: 0;
+      font-size: 0.9em;
+    }
+  }
+
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  table {
+    border-collapse: collapse;
+    margin: 10px 0;
+    width: 100%;
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #f5f5f5;
+      font-weight: 600;
+    }
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 16px 0;
+  }
+
+  a {
+    color: #337ab7;
+    text-decoration: underline;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// --- Responsive adjustments ---
+
+@media (max-width: 768px) {
+  .remix-message {
+    &.remix-message-user,
+    &.remix-message-assistant {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    &.remix-message-tool {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  .remix-chat-container {
+    .remix-messages {
+      max-height: 400px;
+    }
+
+    .remix-input-area {
+      textarea {
+        min-height: 60px;
+      }
+    }
+  }
+}
