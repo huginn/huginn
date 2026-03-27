@@ -10,6 +10,7 @@ module Agents
     default_schedule "never"
 
     gem_dependency_check { defined?(MiniRacer) }
+    favicon_class 'fa-solid fa-code'
 
     description <<~MD
       The JavaScript Agent allows you to write code in JavaScript that can create and receive events.  If other Agents aren't meeting your needs, try this one!
@@ -115,39 +116,45 @@ module Agents
 
     private
 
+    JS_TIMEOUT_MS  = 30_000       # 30 seconds max execution time
+    JS_MAX_MEMORY  = 64_000_000   # 64 MB max V8 heap
+
     def execute_js(js_function, incoming_events = [])
       js_function = js_function == "check" ? "check" : "receive"
-      context = MiniRacer::Context.new
-      context.eval(setup_javascript)
+      context = MiniRacer::Context.new(timeout: JS_TIMEOUT_MS, max_memory: JS_MAX_MEMORY)
 
-      context.attach("doCreateEvent", ->(y) { create_event(payload: clean_nans(JSON.parse(y))).payload.to_json })
-      context.attach("getIncomingEvents", -> { incoming_events.to_json })
-      context.attach("getOptions", -> { interpolated.to_json })
-      context.attach("doLog", ->(x) { log x; nil })
-      context.attach("doError", ->(x) { error x; nil })
-      context.attach("getMemory", -> { memory.to_json })
-      context.attach("setMemoryKey", ->(x, y) { memory[x] = clean_nans(y) })
-      context.attach("setMemory", ->(x) { memory.replace(clean_nans(x)) })
-      context.attach("deleteKey", ->(x) { memory.delete(x).to_json })
-      context.attach("escapeHtml", ->(x) { CGI.escapeHTML(x) })
-      context.attach("unescapeHtml", ->(x) { CGI.unescapeHTML(x) })
-      context.attach('getCredential', ->(k) { credential(k); })
-      context.attach('setCredential', ->(k, v) { set_credential(k, v) })
+      begin
+        context.eval(setup_javascript)
 
-      kvs = Agents::KeyValueStoreAgent.merge(controllers).find_each.to_h { |kvs|
-        [kvs.options[:variable], kvs.memory.as_json]
-      }
-      context.attach("getKeyValueStores", -> { kvs })
-      context.eval("Object.defineProperty(Agent, 'kvs', { get: getKeyValueStores })")
+        context.attach("doCreateEvent", ->(y) { create_event(payload: clean_nans(JSON.parse(y))).payload.to_json })
+        context.attach("getIncomingEvents", -> { incoming_events.to_json })
+        context.attach("getOptions", -> { interpolated.to_json })
+        context.attach("doLog", ->(x) { log x; nil })
+        context.attach("doError", ->(x) { error x; nil })
+        context.attach("getMemory", -> { memory.to_json })
+        context.attach("setMemoryKey", ->(x, y) { memory[x] = clean_nans(y) })
+        context.attach("setMemory", ->(x) { memory.replace(clean_nans(x)) })
+        context.attach("deleteKey", ->(x) { memory.delete(x).to_json })
+        context.attach("escapeHtml", ->(x) { CGI.escapeHTML(x) })
+        context.attach("unescapeHtml", ->(x) { CGI.unescapeHTML(x) })
+        context.attach('getCredential', ->(k) { credential(k); })
+        context.attach('setCredential', ->(k, v) { set_credential(k, v) })
 
-      if options['language'] == 'CoffeeScript'
-        raise "CoffeeScript is not available. Install the 'coffee-script' gem to use CoffeeScript." unless defined?(CoffeeScript)
+        kvs = Agents::KeyValueStoreAgent.merge(controllers).find_each.to_h { |kvs|
+          [kvs.options[:variable], kvs.memory.as_json]
+        }
+        context.attach("getKeyValueStores", -> { kvs })
+        context.eval("Object.defineProperty(Agent, 'kvs', { get: getKeyValueStores })")
 
-        context.eval(CoffeeScript.compile(code))
-      else
-        context.eval(code)
+        if (options['language'] || '').downcase == 'coffeescript'
+          context.eval(CoffeeScript.compile(code))
+        else
+          context.eval(code)
+        end
+        context.eval("Agent.#{js_function}();")
+      ensure
+        context.dispose
       end
-      context.eval("Agent.#{js_function}();")
     end
 
     def code
@@ -238,6 +245,10 @@ module Agents
 
     def log_errors
       yield
+    rescue MiniRacer::ScriptTerminatedError
+      error "JavaScript error: execution timed out (limit: #{JS_TIMEOUT_MS / 1000}s)"
+    rescue MiniRacer::V8OutOfMemoryError
+      error "JavaScript error: out of memory (limit: #{JS_MAX_MEMORY / 1_000_000}MB)"
     rescue MiniRacer::Error => e
       error "JavaScript error: #{e.message}"
     end
