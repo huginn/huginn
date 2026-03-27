@@ -54,6 +54,7 @@ class Agent < ActiveRecord::Base
   before_save :unschedule_if_cannot_schedule
   before_create :set_last_checked_event_id
   after_save :possibly_update_event_expirations
+  before_save :resolve_favicon_url
 
   belongs_to :user, inverse_of: :agents
   belongs_to :service, inverse_of: :agents, optional: true
@@ -278,6 +279,35 @@ class Agent < ActiveRecord::Base
     update_event_expirations! if saved_change_to_keep_events_for?
   end
 
+  def resolve_favicon_url
+    url_option_key = self.class.favicon_url_option
+    return unless url_option_key
+
+    # Only re-resolve when options change or favicon_url is nil
+    return if favicon_url.present? && !will_save_change_to_attribute?('options')
+
+    raw_url = options[url_option_key]
+    raw_url = raw_url.first if raw_url.is_a?(Array)
+    raw_url = raw_url.to_s.strip
+
+    if raw_url.present?
+      begin
+        domain = URI.parse(raw_url).host
+        if domain.present?
+          self.favicon_url = "https://www.google.com/s2/favicons?domain=#{domain}&sz=16"
+        else
+          self.favicon_url = 'none'
+        end
+      rescue URI::InvalidURIError
+        self.favicon_url = 'none'
+      end
+    else
+      self.favicon_url = 'none'
+    end
+  end
+
+
+
   # Validation Methods
 
   private
@@ -383,6 +413,26 @@ class Agent < ActiveRecord::Base
 
     def no_bulk_receive?
       !!@no_bulk_receive
+    end
+
+    # Class-level favicon: a hardcoded FontAwesome icon class string.
+    # Example: favicon_class 'fa-brands fa-slack'
+    def favicon_class(value = nil)
+      if value
+        @favicon_class = value
+      else
+        @favicon_class
+      end
+    end
+
+    # Class-level: the options key that contains a URL to derive a favicon from.
+    # Example: favicon_url_option 'url'
+    def favicon_url_option(value = nil)
+      if value
+        @favicon_url_option = value
+      else
+        @favicon_url_option
+      end
     end
 
     def gem_dependency_check

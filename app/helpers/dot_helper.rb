@@ -224,6 +224,36 @@ module DotHelper
         agent_id = (node.xpath('./xmlns:title/text()', svg.namespaces).to_s[/\d+/] or next).to_i
         agent = agents.find { |a| a.id == agent_id }
 
+        # Add favicon overlay
+        favicon_class = agent.class.favicon_class
+        favicon_url = agent.favicon_url if agent.class.favicon_url_option
+        if favicon_class || (favicon_url.present? && favicon_url != 'none')
+          overlay << Nokogiri::XML::Node.new('span', doc) { |fav|
+            fav['id'] = fav_id = 'f%d' % agent_id
+            fav['class'] = 'agent-diagram-favicon'
+            node['data-favicon-id'] = fav_id
+
+            if favicon_class
+              # Render FA icon
+              parts = favicon_class.split(' ')
+              fav << Nokogiri::XML::Node.new('i', doc) { |i|
+                if parts.length == 2 && parts[0].start_with?('fa-')
+                  i['class'] = "#{parts[0]} #{parts[1]}"
+                else
+                  i['class'] = "fa-solid #{parts[0]}"
+                end
+              }
+            elsif favicon_url.present? && favicon_url != 'none'
+              fav << Nokogiri::XML::Node.new('img', doc) { |img|
+                img['src'] = favicon_url
+                img['width'] = '16'
+                img['height'] = '16'
+                img['class'] = 'agent-favicon'
+              }
+            end
+          }
+        end
+
         count = agent.events_count
         next unless count && count > 0
 
