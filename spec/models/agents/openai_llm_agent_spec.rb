@@ -205,6 +205,44 @@ describe Agents::OpenaiLlmAgent do
     end
   end
 
+  describe 'skipping empty user_message' do
+    before do
+      @empty_event = Event.new
+      @empty_event.agent = agents(:jane_weather_agent)
+      @empty_event.payload = { 'something_else' => 'value' }
+      @empty_event.save!
+    end
+
+    it 'does not make an API call when interpolated user_message is blank' do
+      expect {
+        @checker.receive([@empty_event])
+      }.not_to change { Event.count }
+
+      expect(WebMock).not_to have_requested(:post, 'https://api.openai.com/v1/chat/completions')
+    end
+
+    it 'forwards the event payload in merge mode even without generation' do
+      @checker.options['output_mode'] = 'merge'
+      @checker.save!
+
+      expect {
+        @checker.receive([@empty_event])
+      }.to change { Event.count }.by(1)
+
+      event = Event.last
+      expect(event.payload['something_else']).to eq('value')
+      expect(event.payload).not_to have_key('finish_reason')
+
+      expect(WebMock).not_to have_requested(:post, 'https://api.openai.com/v1/chat/completions')
+    end
+
+    it 'still processes events with a non-empty user_message' do
+      expect {
+        @checker.receive([@event])
+      }.to change { Event.count }.by(1)
+    end
+  end
+
   describe 'error handling' do
     it 'handles API errors gracefully' do
       error_response = { 'error' => { 'message' => 'Rate limit exceeded' } }.to_json
