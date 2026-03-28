@@ -15,7 +15,8 @@ module Agents
 
       To authenticate you need to set the `auth_token`, you can get one at your Hipchat Group Admin page which you can find here:
 
-      `https://`yoursubdomain`.hipchat.com/admin/api`
+      `https://`yoursubdomain`.hipchat.com/admin/api` or
+      `https://`yoursubdomain`.`yourdomain`.com/admin/api` for on-prem HipChat Servers.
 
       Change the `room_name` to the name of the room you want to send notifications to.
 
@@ -30,6 +31,7 @@ module Agents
 
     def default_options
       {
+        'server_url' => '',
         'auth_token' => '',
         'room_name' => '',
         'username' => "Huginn",
@@ -40,6 +42,7 @@ module Agents
       }
     end
 
+    form_configurable :server_url
     form_configurable :auth_token, roles: :validatable
     form_configurable :room_name, roles: :completable
     form_configurable :username
@@ -86,7 +89,10 @@ module Agents
     private
 
     def client
-      @client ||= HipChat::Client.new(interpolated[:auth_token].presence || credential('hipchat_auth_token'))
+      options = {}
+      options[:server_url] = interpolated[:server_url] if interpolated[:server_url].present?
+      options[:api_version] = interpolated[:api_version] if interpolated[:api_version].present?
+      @client ||= HipChat::Client.new(interpolated[:auth_token].presence || credential('hipchat_auth_token'), options)
     end
   end
 end
