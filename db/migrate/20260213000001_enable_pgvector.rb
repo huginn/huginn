@@ -1,4 +1,6 @@
 class EnablePgvector < ActiveRecord::Migration[7.0]
+  self.disable_ddl_transaction!
+
   def up
     return unless postgresql?
 
