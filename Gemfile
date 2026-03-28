@@ -39,7 +39,7 @@ gem 'net-ftp-list' # FtpsiteAgent
 gem 'pirate_weather_forecast_ruby' # WeatherAgent
 gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
 gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
-gem 'twilio-ruby', '~> 7.10.3'     # TwilioAgent
+gem 'twilio-ruby', '~> 7.10.4'     # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
 # Weibo Agents
@@ -118,7 +118,7 @@ gem 'nokogiri', '>= 1.19.2'
 gem 'omniauth'
 gem 'ostruct'
 gem 'puma'
-gem 'rails', '~> 8.1.2'
+gem 'rails', '~> 8.1.3'
 gem 'rails-html-sanitizer', '~> 1.7'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
 gem 'sassc-rails'
@@ -179,7 +179,7 @@ end
 
 # Platform requirements.
 require 'rbconfig'
-gem 'ffi', '>= 1.17.3'	# required by typhoeus; 1.9.4 has fixes for *BSD.
+gem 'ffi', '>= 1.17.4'	# required by typhoeus; 1.9.4 has fixes for *BSD.
 gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: %i[windows]
