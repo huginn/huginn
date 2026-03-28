@@ -132,7 +132,6 @@ gem 'multi_xml'
 gem 'nokogiri', '>= 1.19.4'
 gem 'omniauth'
 gem 'ostruct'
-gem 'puma'
 gem 'rails', '~> 8.1.3'
 gem 'rails-html-sanitizer', '~> 1.7'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
