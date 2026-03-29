@@ -47,7 +47,10 @@ require 'dotenv'
 Dotenv.load
 ```
 
-By default, `load` will look for a file called `.env` in the current working directory. Pass in multiple files and they will be loaded in order. The first value set for a variable will win.
+By default, `load` will look for a file called `.env` in the current working directory.
+Pass in multiple files and they will be loaded in order.
+The first value set for a variable will win.
+Existing environment variables will not be overwritten unless you set `overwrite: true`.
 
 ```ruby
 require 'dotenv'
@@ -84,7 +87,7 @@ You can use the `dotenv` executable load `.env` before launching your applicatio
 $ dotenv ./script.rb
 ```
 
-The `dotenv` executable also accepts the flag `-f`. Its value should be a comma-separated list of configuration files, in the order of most important to least. All of the files must exist. There _must_ be a space between the flag and its value.
+The `dotenv` executable also accepts the flag `-f`. Its value should be a comma-separated list of configuration files, in the order of the most important to the least important. All of the files must exist. There _must_ be a space between the flag and its value.
 
 ```console
 $ dotenv -f ".env.local,.env" ./script.rb
@@ -180,7 +183,7 @@ end
 Available options:
 
 * `Dotenv::Rails.files` - list of files to be loaded, in order of precedence.
-* `Dotenv::Rails.overwrite` - Overwrite exiting `ENV` variables with contents of `.env*` files
+* `Dotenv::Rails.overwrite` - Overwrite existing `ENV` variables with contents of `.env*` files
 * `Dotenv::Rails.logger` - The logger to use for dotenv's logging. Defaults to `Rails.logger`
 * `Dotenv::Rails.autorestore` - Enable or disable [autorestore](#autorestore-in-tests)
 
@@ -213,7 +216,7 @@ DATABASE_URL="postgres://$(whoami)@localhost/my_database"
 
 ### Variable Substitution
 
-You need to add the value of another variable in one of your variables? You can reference the variable with `${VAR}` or often just `$VAR` in unqoted or double-quoted values.
+You need to add the value of another variable in one of your variables? You can reference the variable with `${VAR}` or often just `$VAR` in unquoted or double-quoted values.
 
 ```shell
 DATABASE_URL="postgres://${USER}@localhost/my_database"
@@ -276,7 +279,7 @@ You can use the `-t` or `--template` flag on the dotenv cli to create a template
 ```console
 $ dotenv -t .env
 ```
-A template will be created in your working directory named `{FINAME}.template`. So in the above example, it would create a `.env.template` file.
+A template will be created in your working directory named `{FILENAME}.template`. So in the above example, it would create a `.env.template` file.
 
 The template will contain all the environment variables in your `.env` file but with their values set to the variable names.
 
@@ -313,6 +316,9 @@ Personally, I prefer to commit the `.env` file with development-only settings. T
 ### Why is it not overwriting existing `ENV` variables?
 
 By default, it **won't** overwrite existing environment variables as dotenv assumes the deployment environment has more knowledge about configuration than the application does. To overwrite existing environment variables you can use `Dotenv.load files, overwrite: true`.
+
+To warn when a value was not overwritten (e.g. to make users aware of this gotcha),
+use `Dotenv.load files, overwrite: :warn`.
 
 You can also use the `-o` or `--overwrite` flag on the dotenv cli to overwrite existing `ENV` variables.
 

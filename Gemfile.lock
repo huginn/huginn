@@ -76,9 +76,9 @@ GIT
       simple_oauth (~> 0.3.0)
 
 PATH
-  remote: vendor/gems/dotenv-3.1.0
+  remote: vendor/gems/dotenv-3.2.0
   specs:
-    dotenv (3.1.0)
+    dotenv (3.2.0)
 
 GEM
   remote: https://rubygems.org/

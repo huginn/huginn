@@ -10,14 +10,11 @@ require "dotenv/log_subscriber"
 Dotenv.instrumenter = ActiveSupport::Notifications
 
 # Watch all loaded env files with Spring
-begin
-  require "spring/commands"
-  ActiveSupport::Notifications.subscribe("load.dotenv") do |*args|
+ActiveSupport::Notifications.subscribe("load.dotenv") do |*args|
+  if defined?(Spring) && Spring.respond_to?(:watch)
     event = ActiveSupport::Notifications::Event.new(*args)
     Spring.watch event.payload[:env].filename if Rails.application
   end
-rescue LoadError, ArgumentError
-  # Spring is not available
 end
 
 module Dotenv
@@ -26,7 +23,7 @@ module Dotenv
     delegate :files, :files=, :overwrite, :overwrite=, :autorestore, :autorestore=, :logger, to: "config.dotenv"
 
     def initialize
-      super()
+      super
       config.dotenv = ActiveSupport::OrderedOptions.new.update(
         # Rails.logger is not available yet, so we'll save log messages and replay them when it is
         logger: Dotenv::ReplayLogger.new,

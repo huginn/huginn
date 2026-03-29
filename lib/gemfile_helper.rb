@@ -12,7 +12,7 @@ class GemfileHelper
 
     def load_dotenv
       root = Pathname.new(__dir__).parent
-      dotenv_dir = (root / 'vendor/gems').glob('dotenv-[0-9]*').last
+      dotenv_dir = vendored_dotenv_dir(root)
 
       yield dotenv_dir.to_s if block_given?
 
@@ -47,6 +47,12 @@ class GemfileHelper
     end
 
     private
+
+    def vendored_dotenv_dir(root = Pathname.new(__dir__).parent)
+      (root / 'vendor/gems').glob('dotenv-[0-9]*').max_by { |path|
+        Gem::Version.new(path.basename.to_s.delete_prefix('dotenv-'))
+      }
+    end
 
     def parse_gem_args(args)
       return nil unless args

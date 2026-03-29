@@ -1,3 +1,4 @@
+require "dotenv/version"
 require "dotenv/parser"
 require "dotenv/environment"
 require "dotenv/missing_keys"
@@ -54,7 +55,7 @@ module Dotenv
       begin
         env = Environment.new(File.expand_path(filename), overwrite: overwrite)
         env = block.call(env) if block
-      rescue Errno::ENOENT
+      rescue Errno::ENOENT, Errno::EISDIR
         raise unless ignore
       end
 
@@ -74,6 +75,9 @@ module Dotenv
   # @param env [Hash] Hash of keys and values to restore, defaults to the last saved state
   # @param safe [Boolean] Is it safe to modify `ENV`? Defaults to `true` in the main thread, otherwise raises an error.
   def restore(env = @diff&.a, safe: Thread.current == Thread.main)
+    # No previously saved or provided state to restore
+    return unless env
+
     diff = Dotenv::Diff.new(b: env)
     return unless diff.any?
 
@@ -90,13 +94,21 @@ module Dotenv
   # Update `ENV` with the given hash of keys and values
   #
   # @param env [Hash] Hash of keys and values to set in `ENV`
-  # @param overwrite [Boolean] Overwrite existing `ENV` values
+  # @param overwrite [Boolean|:warn] Overwrite existing `ENV` values
   def update(env = {}, overwrite: false)
     instrument(:update) do |payload|
       diff = payload[:diff] = Dotenv::Diff.new do
         ENV.update(env.transform_keys(&:to_s)) do |key, old_value, new_value|
           # This block is called when a key exists. Return the new value if overwrite is true.
-          overwrite ? new_value : old_value
+          case overwrite
+          when :warn
+            # not printing the value since that could be a secret
+            warn "Warning: dotenv not overwriting ENV[#{key.inspect}]"
+            old_value
+          when true then new_value
+          when false then old_value
+          else raise ArgumentError, "Invalid value for overwrite: #{overwrite.inspect}"
+          end
         end
       end
       diff.env

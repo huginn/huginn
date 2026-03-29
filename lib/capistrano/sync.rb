@@ -93,7 +93,8 @@ namespace :sync do
   # Used by database_config and remote_database_config to parse database configs that depend on .env files.  Depends on the dotenv-rails gem.
   class EnvLoader
     def initialize(data)
-      @env = Dotenv::Parser.call(data)
+      # Ignore shell ENV leakage so Capistrano sync always reflects the .env file.
+      @env = Dotenv::Parser.call(data, overwrite: true)
     end
 
     def with_loaded_env
