@@ -131,14 +131,7 @@ group :development, :test do
 end
 
 group :development do
-  gem 'better_errors'
-  gem 'binding_of_caller'
-  gem 'guard'
-  gem 'guard-livereload'
-  gem 'guard-rspec'
   gem 'letter_opener_web'
-  gem 'rack-livereload'
-  gem 'web-console', '>= 4.3.0'
 
   gem 'capistrano'
   gem 'capistrano-bundler'
