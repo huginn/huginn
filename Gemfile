@@ -42,10 +42,6 @@ gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
 gem 'twilio-ruby', '~> 7.10.4'     # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
-# Weibo Agents
-# FIXME needs to loosen omniauth dependency, add rest-client
-gem 'weibo_2', github: 'albertsun/weibo_2', branch: 'master'
-
 # GoogleCalendarPublishAgent
 gem 'google-apis-calendar_v3'
 gem 'google-cloud-translate-v2'
@@ -60,8 +56,9 @@ gem 'omniauth-tumblr'
 gem 'tumblr_client', github: 'IFTTT/tumblr_client'
 
 # Dropbox Agents
-gem 'dropbox-api', github: 'dsander/dropbox-api', ref: '86cb7b5a1254dc5b054de7263835713c4c1018c7'
-gem 'omniauth-dropbox-oauth2', github: 'huginn/omniauth-dropbox-oauth2'
+# GitHub main includes the omniauth-oauth2 compatibility we need.
+# Switch back to the RubyGems release once those changes are published there.
+gem 'omniauth-dropbox2', github: 'icoretech/omniauth-dropbox2'
 
 # UserLocationAgent
 gem 'haversine'
@@ -78,7 +75,7 @@ gem 'aws-sdk-s3', '~> 1', '>= 1.217.0'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
-gem 'omniauth-google-oauth2', '~> 1.0.1'
+gem 'omniauth-google-oauth2', '~> 1.2.2'
 
 # Common gems
 gem 'ace-rails-ap'

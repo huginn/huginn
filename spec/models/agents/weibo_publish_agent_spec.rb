@@ -4,10 +4,7 @@ require 'rails_helper'
 describe Agents::WeiboPublishAgent do
   before do
     @opts = {
-      :uid => "1234567",
       :expected_update_period_in_days => "2",
-      :app_key => "---",
-      :app_secret => "---",
       :access_token => "---",
       :message_path => "text",
       :pic_path => "pic"
@@ -89,6 +86,20 @@ describe Agents::WeiboPublishAgent do
       Agents::WeiboPublishAgent.async_receive(@checker.id, [event.id])
       expect(@sent_messages.count).to eq(0)
       expect(@sent_pictures.count).to eq(1)
+      expect(@checker.events.count).to eq(1)
+    end
+
+    it 'should not treat file urls as valid images' do
+      event = Event.new
+      event.agent = agents(:bob_weather_agent)
+      event.payload = {:text => 'whatever', :pic => 'file:///etc/passwd'}
+      event.save!
+
+      expect(@checker.send(:valid_image?, 'file:///etc/passwd')).to be(false)
+
+      Agents::WeiboPublishAgent.async_receive(@checker.id, [event.id])
+      expect(@sent_messages.count).to eq(1)
+      expect(@sent_pictures.count).to eq(0)
       expect(@checker.events.count).to eq(1)
     end
   end

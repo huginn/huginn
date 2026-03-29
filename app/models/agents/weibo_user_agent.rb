@@ -7,9 +7,7 @@ module Agents
     description <<~MD
       The Weibo User Agent follows the timeline of a specified Weibo user. It uses this endpoint: http://open.weibo.com/wiki/2/statuses/user_timeline/en
 
-      #{'## Include `weibo_2` in your Gemfile to use this Agent!' if dependencies_missing?}
-
-      You must first set up a Weibo app and generate an `acess_token` to authenticate with. Provide that, along with the `app_key` and `app_secret` for your Weibo app in the options.
+      You must first set up a Weibo app and generate an `access_token` to authenticate with.
 
       Specify the `uid` of the Weibo user whose timeline you want to watch.
 
@@ -83,26 +81,19 @@ module Agents
       {
         'uid' => "",
         'access_token' => "---",
-        'app_key' => "---",
-        'app_secret' => "---",
         'expected_update_period_in_days' => "2"
       }
     end
 
     def check
-      since_id = memory['since_id'] || nil
-      opts = { uid: interpolated['uid'].to_i }
-      opts.merge! since_id: since_id unless since_id.nil?
+      params = { uid: interpolated["uid"].to_i }
+      params[:since_id] = memory["since_id"] if memory["since_id"].present?
 
-      # http://open.weibo.com/wiki/2/statuses/user_timeline/en
-      resp = weibo_client.statuses.user_timeline opts
-      if resp[:statuses]
+      statuses = Array(weibo_client.statuses.user_timeline(params)[:statuses])
 
-        resp[:statuses].each do |status|
-          memory['since_id'] = status.id if !memory['since_id'] || (status.id > memory['since_id'])
-
-          create_event payload: status.as_json
-        end
+      statuses.each do |status|
+        memory["since_id"] = [memory["since_id"], status.id].compact.max
+        create_event payload: status.as_json
       end
 
       save!

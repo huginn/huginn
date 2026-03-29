@@ -137,7 +137,7 @@ describe Agents::PostAgent do
         'key' => 'it said: {{ someotherkey.somekey }}'
       }
       @checker.receive([@event])
-      expect(@sent_requests[:post].first.data).to eq({ 'key' => 'it said: value' }.to_query)
+      expect(Rack::Utils.parse_nested_query(@sent_requests[:post].first.data)).to eq('key' => 'it said: value')
     end
 
     it "interpolates when receiving a payload" do

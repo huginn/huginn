@@ -51,21 +51,15 @@ describe Agents::DropboxWatchAgent do
   describe '#check' do
 
     let(:first_result) do
-      Dropbox::API::Object.convert(
-        [
-          { 'path_display' => '1.json', 'rev' => '1', 'server_modified' => '01-01-01' },
-          { 'path_display' => 'sub_dir_1', '.tag' => 'folder' }
-        ],
-        nil
-      )
+      [
+        { 'path' => '1.json', 'rev' => '1', 'modified' => '01-01-01' }
+      ]
     end
 
     before(:each) do
-      allow(Dropbox::API::Client).to receive(:new) do
-        instance_double(Dropbox::API::Client).tap { |api|
-          allow(api).to receive(:ls).with('/my/dropbox/dir') { first_result }
-        }
-      end
+      allow(DropboxApiClient).to receive(:new).and_return(
+        instance_double(DropboxApiClient, ls: first_result)
+      )
     end
 
     it 'saves the directory listing in its memory' do
@@ -86,23 +80,17 @@ describe Agents::DropboxWatchAgent do
     context 'subsequent calls' do
 
       let(:second_result) do
-        Dropbox::API::Object.convert(
-          [
-            { 'path_display' => '2.json', 'rev' => '1', 'server_modified' => '02-02-02' },
-            { 'path_display' => 'sub_dir_2', '.tag' => 'folder' }
-          ],
-          nil
-        )
+        [
+          { 'path' => '2.json', 'rev' => '1', 'modified' => '02-02-02' }
+        ]
       end
 
       before(:each) do
         @agent.memory = { 'contents' => 'not_empty' }
 
-        allow(Dropbox::API::Client).to receive(:new) do
-          instance_double(Dropbox::API::Client).tap { |api|
-            allow(api).to receive(:ls).with('/my/dropbox/dir') { second_result }
-          }
-        end
+        allow(DropboxApiClient).to receive(:new).and_return(
+          instance_double(DropboxApiClient, ls: second_result)
+        )
       end
 
       it 'sends an event upon a different directory listing' do

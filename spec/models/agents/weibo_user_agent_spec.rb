@@ -4,13 +4,15 @@ require 'rails_helper'
 describe Agents::WeiboUserAgent do
   before do
     # intercept the twitter API request for @tectonic's user profile
-    stub_request(:any, /api.weibo.com/).to_return(:body => File.read(Rails.root.join("spec/data_fixtures/one_weibo.json")), :status => 200)
+    stub_request(:any, /\Ahttps:\/\/api\.weibo\.com\//).to_return(
+      :body => File.read(Rails.root.join("spec/data_fixtures/one_weibo.json")),
+      :status => 200,
+      :headers => { "Content-Type" => "application/json" }
+    )
   
     @opts = {
       :uid => "123456",
       :expected_update_period_in_days => "2",
-      :app_key => "asdfe",
-      :app_secret => "asdfe",
       :access_token => "asdfe"
     }
 
