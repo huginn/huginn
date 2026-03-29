@@ -29,17 +29,17 @@ end
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
-gem 'hipchat', '~> 1.6.0' # HipchatAgent
+gem 'hipchat' # HipchatAgent
 gem 'pdf-reader' # PDFInfoAgent
 gem 'mini_racer', github: 'knu/mini_racer', branch: 'fix/darwin_build' # JavaScriptAgent
 gem 'mqtt' # MQTTAgent
 gem 'net-ftp'
 gem 'net-ftp-list' # FtpsiteAgent
 gem 'pirate_weather_forecast_ruby' # WeatherAgent
-gem 'rturk', '~> 2.12.1'          # HumanTaskAgent
-gem 'slack-notifier', '~> 2.4.0'  # SlackAgent
-gem 'twilio-ruby', '~> 7.10.4'     # TwilioAgent
-gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
+gem 'rturk'                       # HumanTaskAgent
+gem 'slack-notifier'              # SlackAgent
+gem 'twilio-ruby'                 # TwilioAgent
+gem 'xmpp4r'                      # JabberAgent
 
 # GoogleCalendarPublishAgent
 gem 'google-apis-calendar_v3'
@@ -67,7 +67,7 @@ gem 'evernote_oauth'
 gem 'omniauth-evernote'
 
 # LocalFileAgent (watch functionality)
-gem 'listen', '~> 3.10.0', require: false
+gem 'listen', require: false
 
 # S3Agent
 gem 'aws-sdk-s3', '~> 1', '>= 1.217.0'
@@ -79,7 +79,7 @@ gem 'omniauth-google-oauth2', '~> 1.2.2'
 # Common gems
 gem 'ace-rails-ap'
 gem 'bootsnap', require: false
-gem 'bootstrap-kaminari-views', '~> 0.0.5'
+gem 'bootstrap-kaminari-views'
 gem 'daemons'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
@@ -93,15 +93,15 @@ gem 'faraday-gzip'
 # gem 'faraday-httpclient'
 gem 'faraday-typhoeus'
 gem 'feedjira', '~> 4.0', '>= 4.0.1'
-gem 'foreman', '~> 0.90.0'
-gem 'geokit', '~> 1.14'
-gem 'geokit-rails', '~> 2.5'
-gem 'httmultiparty', '~> 0.3.16'
+gem 'foreman'
+gem 'geokit'
+gem 'geokit-rails'
+gem 'httmultiparty'
 gem 'httparty', github: 'jnunemaker/httparty'
 gem 'huginn_agent'
-gem 'jquery-rails', '~> 4.6', '>= 4.6.1'
+gem 'jquery-rails'
 gem 'json'
-gem 'jsonpath', '~> 1.1', '>= 1.1.5'
+gem 'jsonpath'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
 gem 'liquid', '~> 5.12'
@@ -136,7 +136,7 @@ group :development do
   gem 'guard'
   gem 'guard-livereload'
   gem 'guard-rspec'
-  gem 'letter_opener_web', '~> 3.0'
+  gem 'letter_opener_web'
   gem 'rack-livereload'
   gem 'web-console', '>= 4.3.0'
 
@@ -167,7 +167,7 @@ group :development do
     gem 'selenium-webdriver'
     gem 'shoulda-matchers'
     gem 'simplecov', require: false
-    gem 'simplecov-lcov', '~> 0.9.0', require: false
+    gem 'simplecov-lcov', require: false
     gem 'vcr'
     gem 'webmock'
   end
