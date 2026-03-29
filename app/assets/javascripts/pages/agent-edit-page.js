@@ -291,19 +291,8 @@
               editor.setTheme("ace/theme/" + theme);
             }
 
-            if ((mode = $("[name='agent[options][language]']").val())) {
-              switch (mode) {
-                case "JavaScript":
-                  return session.setMode("ace/mode/javascript");
-                case "CoffeeScript":
-                  return session.setMode("ace/mode/coffee");
-                default:
-                  return session.setMode("ace/mode/" + mode);
-              }
-            }
           };
 
-          $("[name='agent[options][language]']").on("change", setSyntax);
           setSyntax();
 
           return session.setValue($source.val());

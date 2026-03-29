@@ -19,7 +19,7 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Send digest email with things that you care about at specific times during the day
 * Track counts of high frequency events and send an SMS within moments when they spike, such as the term "san francisco emergency"
 * Send and receive WebHooks
-* Run custom JavaScript or CoffeeScript functions
+* Run custom JavaScript functions
 * Track your location over time
 * Create Amazon Mechanical Turk workflows as the inputs, or outputs, of agents (the Amazon Turk Agent is called the "HumanTaskAgent"). For example: "Once a day, ask 5 people for a funny cat photo; send the results to 5 more people to be rated; send the top-rated photo to 5 people for a funny caption; send to 5 final people to rate for funniest caption; finally, post the best captioned photo on my blog."
 
