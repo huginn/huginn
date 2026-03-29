@@ -376,15 +376,11 @@ describe Agents::JavaScriptAgent do
       end
     end
 
-    describe "using CoffeeScript", if: defined?(CoffeeScript) do
-      it "will accept a 'language' of 'CoffeeScript'" do
-        @agent.options['code'] = 'Agent.check = -> this.log("hello from coffeescript")'
+    describe "unsupported languages" do
+      it "rejects CoffeeScript" do
         @agent.options['language'] = 'CoffeeScript'
-        @agent.save!
-        expect {
-          @agent.check
-        }.not_to raise_error
-        expect(AgentLog.last.message).to eq("hello from coffeescript")
+
+        expect(@agent).not_to be_valid
       end
     end
 

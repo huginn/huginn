@@ -295,8 +295,6 @@
               switch (mode) {
                 case "JavaScript":
                   return session.setMode("ace/mode/javascript");
-                case "CoffeeScript":
-                  return session.setMode("ace/mode/coffee");
                 default:
                   return session.setMode("ace/mode/" + mode);
               }

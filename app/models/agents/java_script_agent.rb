@@ -38,8 +38,7 @@ module Agents
       * `this.unescapeHtml(htmlToUnescape)`
     MD
 
-    LANGUAGES = %w[JavaScript]
-    LANGUAGES << 'CoffeeScript' if defined?(CoffeeScript)
+    LANGUAGES = %w[JavaScript].freeze
 
     form_configurable :language, type: :array, values: LANGUAGES
     form_configurable :code, type: :text, ace: true
@@ -140,13 +139,7 @@ module Agents
       context.attach("getKeyValueStores", -> { kvs })
       context.eval("Object.defineProperty(Agent, 'kvs', { get: getKeyValueStores })")
 
-      if options['language'] == 'CoffeeScript'
-        raise "CoffeeScript is not available. Install the 'coffee-script' gem to use CoffeeScript." unless defined?(CoffeeScript)
-
-        context.eval(CoffeeScript.compile(code))
-      else
-        context.eval(code)
-      end
+      context.eval(code)
       context.eval("Agent.#{js_function}();")
     end
 

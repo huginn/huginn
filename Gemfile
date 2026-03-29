@@ -28,7 +28,6 @@ end
 
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
-gem 'coffee-script' # JavaScriptAgent; only if you want to use CoffeeScript
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
 gem 'hipchat', '~> 1.6.0' # HipchatAgent
 gem 'pdf-reader' # PDFInfoAgent
