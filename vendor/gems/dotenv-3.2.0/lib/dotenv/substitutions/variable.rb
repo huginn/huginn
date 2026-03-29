@@ -12,29 +12,23 @@ module Dotenv
         VARIABLE = /
           (\\)?         # is it escaped with a backslash?
           (\$)          # literal $
-          (?!\()        # shouldnt be followed by paranthesis
+          (?!\()        # shouldn't be followed by parenthesis
           \{?           # allow brace wrapping
           ([A-Z0-9_]+)? # optional alpha nums
           \}?           # closing brace
         /xi
 
-        def call(value, env, overwrite: false)
-          combined_env = overwrite ? ENV.to_h.merge(env) : env.merge(ENV)
+        def call(value, env)
           value.gsub(VARIABLE) do |variable|
             match = $LAST_MATCH_INFO
-            substitute(match, variable, combined_env)
-          end
-        end
 
-        private
-
-        def substitute(match, variable, env)
-          if match[1] == "\\"
-            variable[1..]
-          elsif match[3]
-            env.fetch(match[3], "")
-          else
-            variable
+            if match[1] == "\\"
+              variable[1..]
+            elsif match[3]
+              env[match[3]] || ENV[match[3]] || ""
+            else
+              variable
+            end
           end
         end
       end

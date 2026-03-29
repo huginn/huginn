@@ -24,7 +24,7 @@ module Dotenv
     def update(event)
       diff = event.payload[:diff]
       changed = diff.env.keys.map { |key| color_var(key) }
-      debug "Set #{changed.to_sentence}" if diff.any?
+      debug "Set #{changed.join(", ")}" if diff.any?
     end
 
     def save(event)
@@ -39,8 +39,8 @@ module Dotenv
 
       if removed.any? || restored.any?
         info "Restored snapshot of #{color_env_constant}"
-        debug "Unset #{removed.to_sentence}" if removed.any?
-        debug "Restored #{restored.to_sentence}" if restored.any?
+        debug "Unset #{removed.join(", ")}" if removed.any?
+        debug "Restored #{restored.join(", ")}" if restored.any?
       end
     end
 

@@ -50,7 +50,10 @@ module Dotenv
     private
 
     def snapshot
-      ENV.to_h.freeze
+      # `dup` should not be required here, but some people use `stub_const` to replace ENV with
+      # a `Hash`. This ensures that we get a frozen copy of that instead of freezing the original.
+      # https://github.com/bkeepers/dotenv/issues/482
+      ENV.to_h.dup.freeze
     end
   end
 end
