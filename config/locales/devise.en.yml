@@ -31,7 +31,6 @@ en:
       tumblr: "Tumblr"
       github: "GitHub"
       dropbox: "Dropbox"
-      dropbox_oauth2: "Dropbox"
       evernote: "Evernote"
       google: "Google"
     passwords:

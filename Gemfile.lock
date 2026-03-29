@@ -17,17 +17,6 @@ GIT
       simple_oauth
 
 GIT
-  remote: https://github.com/albertsun/weibo_2.git
-  revision: ac38d04434747c4b88e86c5337cd436d00c34349
-  branch: master
-  specs:
-    weibo_2 (0.1.7)
-      hashie (~> 3)
-      multi_json (~> 1)
-      oauth2 (~> 1)
-      rest-client (>= 2.0)
-
-GIT
   remote: https://github.com/cantino/twitter-stream.git
   revision: a80822d579509802124d4e219bb771eb663efdb7
   branch: huginn
@@ -38,16 +27,6 @@ GIT
       simple_oauth (~> 0.3.0)
 
 GIT
-  remote: https://github.com/dsander/dropbox-api.git
-  revision: 86cb7b5a1254dc5b054de7263835713c4c1018c7
-  ref: 86cb7b5a1254dc5b054de7263835713c4c1018c7
-  specs:
-    dropbox-api (0.5.0)
-      hashie (~> 3.5.6)
-      multi_json (~> 1.10)
-      oauth2 (~> 1.0)
-
-GIT
   remote: https://github.com/dsander/erector.git
   revision: 821c2fa9174b56cc39e203883d83b18b60912a36
   branch: rails6
@@ -56,11 +35,12 @@ GIT
       treetop (>= 1.2.3)
 
 GIT
-  remote: https://github.com/huginn/omniauth-dropbox-oauth2.git
-  revision: 9468fb33af0af2bad880dcfb42236fde474017a2
+  remote: https://github.com/icoretech/omniauth-dropbox2.git
+  revision: 2971448b78d66ba9db3e29c4e4be9c7a6b688019
   specs:
-    omniauth-dropbox-oauth2 (0.3.0)
-      omniauth-oauth2 (>= 1.6.0)
+    omniauth-dropbox2 (2.0.4)
+      cgi (>= 0.3.6)
+      omniauth-oauth2 (>= 1.8, < 2.0)
 
 GIT
   remote: https://github.com/jnunemaker/httparty.git
@@ -241,6 +221,7 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
+    cgi (0.5.1)
     childprocess (5.1.0)
       logger (~> 1.5)
     coderay (1.1.3)
@@ -536,9 +517,9 @@ GEM
     mqtt (0.7.0)
       logger
     msgpack (1.7.2)
-    multi_json (1.15.0)
-    multi_xml (0.7.2)
-      bigdecimal (~> 3.1)
+    multi_json (1.19.1)
+    multi_xml (0.8.1)
+      bigdecimal (>= 3.1, < 5)
     multipart-post (2.4.1)
     mutex_m (0.3.0)
     mysql2 (0.5.7)
@@ -582,31 +563,34 @@ GEM
       version_gem (~> 1.1)
     oauth-tty (1.0.5)
       version_gem (~> 1.1, >= 1.1.1)
-    oauth2 (1.4.11)
-      faraday (>= 0.17.3, < 3.0)
-      jwt (>= 1.0, < 3.0)
-      multi_json (~> 1.3)
+    oauth2 (2.0.18)
+      faraday (>= 0.17.3, < 4.0)
+      jwt (>= 1.0, < 4.0)
+      logger (~> 1.2)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 4)
-    omniauth (2.1.2)
+      snaky_hash (~> 2.0, >= 2.0.3)
+      version_gem (~> 1.1, >= 1.1.9)
+    omniauth (2.1.4)
       hashie (>= 3.4.6)
+      logger
       rack (>= 2.2.3)
       rack-protection
     omniauth-evernote (1.2.1)
       evernote-thrift
       multi_json (~> 1.0)
       omniauth-oauth (~> 1.0)
-    omniauth-google-oauth2 (1.0.1)
-      jwt (>= 2.0)
-      oauth2 (~> 1.1)
+    omniauth-google-oauth2 (1.2.2)
+      jwt (>= 2.9.2)
+      oauth2 (~> 2.0)
       omniauth (~> 2.0)
-      omniauth-oauth2 (~> 1.7.1)
+      omniauth-oauth2 (~> 1.8)
     omniauth-oauth (1.2.0)
       oauth
       omniauth (>= 1.0, < 3)
-    omniauth-oauth2 (1.7.3)
-      oauth2 (>= 1.4, < 3)
-      omniauth (>= 1.9, < 3)
+    omniauth-oauth2 (1.9.0)
+      oauth2 (>= 2.0.2, < 3)
+      omniauth (~> 2.0)
     omniauth-tumblr (1.2)
       multi_json
       omniauth-oauth (~> 1.0)
@@ -819,9 +803,9 @@ GEM
     simplecov-lcov (0.9.0)
     simplecov_json_formatter (0.1.4)
     slack-notifier (2.4.0)
-    snaky_hash (2.0.1)
-      hashie
-      version_gem (~> 1.1, >= 1.1.1)
+    snaky_hash (2.0.3)
+      hashie (>= 0.1.0, < 6)
+      version_gem (>= 1.1.8, < 3)
     spectrum-rails (1.8.1)
       railties (>= 3.1)
     spring (4.2.1)
@@ -874,7 +858,7 @@ GEM
     uri (1.1.1)
     useragent (0.16.11)
     vcr (6.1.0)
-    version_gem (1.1.4)
+    version_gem (1.1.9)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.3.0)
@@ -923,7 +907,6 @@ DEPENDENCIES
   delayed_job_active_record
   devise (~> 5.0, >= 5.0.3)
   dotenv!
-  dropbox-api!
   em-http-request
   erector!
   evernote_oauth
@@ -968,9 +951,9 @@ DEPENDENCIES
   net-ftp-list
   nokogiri (>= 1.19.2)
   omniauth
-  omniauth-dropbox-oauth2!
+  omniauth-dropbox2!
   omniauth-evernote
-  omniauth-google-oauth2 (~> 1.0.1)
+  omniauth-google-oauth2 (~> 1.2.2)
   omniauth-tumblr
   omniauth-twitter
   ostruct
@@ -1019,7 +1002,6 @@ DEPENDENCIES
   vcr
   web-console (>= 4.3.0)
   webmock
-  weibo_2!
   xmpp4r (~> 0.5.6)
 
 RUBY VERSION

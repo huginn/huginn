@@ -8,7 +8,21 @@ module Agents
     description <<~MD
       The Dropbox Watch Agent watches the given `dir_to_watch` and emits events with the detected changes.
 
-      #{'## Include the `dropbox-api` and `omniauth-dropbox` gems in your `Gemfile` and set `DROPBOX_OAUTH_KEY` and `DROPBOX_OAUTH_SECRET` in your environment to use Dropbox Agents.' if dependencies_missing?}
+      #{'## Set `DROPBOX_OAUTH_KEY` and `DROPBOX_OAUTH_SECRET` in your environment to use Dropbox Agents.' if dependencies_missing?}
+
+      In the Dropbox App Console, enable the following permissions before authorizing the service for this agent:
+
+      - `account_info.read` to authorize the Dropbox service
+      - `files.metadata.read` to list files in `dir_to_watch`
+
+      If you also use the _DropboxFileUrlAgent_, additionally enable:
+
+      - `files.content.read` for temporary links
+      - `sharing.read` and `sharing.write` for permanent links
+
+      If you want to watch paths outside your app folder, choose `Full Dropbox` under "Choose the type of access you need" when creating the Dropbox app.
+
+      If you change these permissions, remove the existing Dropbox service from Huginn and authorize it again so the new scopes are included in the access token.
     MD
 
     event_description <<~MD
@@ -43,7 +57,7 @@ module Agents
     end
 
     def check
-      current_contents = ls(interpolated['dir_to_watch'])
+      current_contents = dropbox.ls(interpolated['dir_to_watch'])
       diff = DropboxDirDiff.new(previous_contents, current_contents)
       create_event(payload: diff.to_hash) unless previous_contents.nil? || diff.empty?
 
@@ -51,12 +65,6 @@ module Agents
     end
 
     private
-
-    def ls(dir_to_watch)
-      dropbox.ls(dir_to_watch)
-        .select { |entry| entry.respond_to?(:rev) }
-        .map { |file| { 'path' => file.path, 'rev' => file.rev, 'modified' => file.server_modified } }
-    end
 
     def previous_contents
       self.memory['contents']

@@ -9,7 +9,21 @@ module Agents
     description <<~MD
       The _DropboxFileUrlAgent_ is used to work with Dropbox. It takes a file path (or multiple files paths) and emits events with either [temporary links](https://www.dropbox.com/developers/core/docs#media) or [permanent links](https://www.dropbox.com/developers/core/docs#shares).
 
-      #{'## Include the `dropbox-api` and `omniauth-dropbox` gems in your `Gemfile` and set `DROPBOX_OAUTH_KEY` and `DROPBOX_OAUTH_SECRET` in your environment to use Dropbox Agents.' if dependencies_missing?}
+      #{'## Set `DROPBOX_OAUTH_KEY` and `DROPBOX_OAUTH_SECRET` in your environment to use Dropbox Agents.' if dependencies_missing?}
+
+      In the Dropbox App Console, enable the following permissions before authorizing the service for this agent:
+
+      - `account_info.read` to authorize the Dropbox service
+      - `files.content.read` when `link_type` is `'temporary'`
+      - `sharing.read` and `sharing.write` when `link_type` is `'permanent'`
+
+      If you also use the _DropboxWatchAgent_, additionally enable:
+
+      - `files.metadata.read` to watch a directory for changes
+
+      If you want to create links for paths outside your app folder, choose `Full Dropbox` under "Choose the type of access you need" when creating the Dropbox app.
+
+      If you change these permissions, remove the existing Dropbox service from Huginn and authorize it again so the new scopes are included in the access token.
 
       The incoming event payload needs to have a `paths` key, with a comma-separated list of files you want the URL for. For example:
 
@@ -85,22 +99,10 @@ module Agents
     def receive(events)
       events.flat_map { |e| e.payload['paths'].split(',').map(&:strip) }
         .each do |path|
-          create_event payload: (options['link_type'] == 'permanent' ? permanent_url_for(path) : temporary_url_for(path))
+          create_event payload: (
+            options['link_type'] == 'permanent' ? dropbox.permanent_url_for(path) : dropbox.temporary_url_for(path)
+          )
         end
-    end
-
-    private
-
-    def temporary_url_for(path)
-      dropbox.find(path).direct_url.response.tap do |response|
-        response['url'] = response.delete('link')
-      end
-    end
-
-    def permanent_url_for(path)
-      dropbox.find(path).share_url.response.tap do |response|
-        response['url'].gsub!('?dl=0', '?dl=1')
-      end
     end
   end
 end

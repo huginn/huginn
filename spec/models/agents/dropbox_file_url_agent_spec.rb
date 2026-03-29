@@ -36,18 +36,21 @@ describe Agents::DropboxFileUrlAgent do
     end
 
     context 'with temporary urls' do
-      let(:first_dropbox_url_payload)  { Dropbox::API::Object.new({ 'link' => 'http://dropbox.com/first/path/url' }, nil) }
-      let(:second_dropbox_url_payload) { Dropbox::API::Object.new({ 'link' => 'http://dropbox.com/second/path/url' }, nil) }
-      let(:third_dropbox_url_payload)  { Dropbox::API::Object.new({ 'link' => 'http://dropbox.com/third/path/url' }, nil) }
+      let(:first_dropbox_url_payload)  { { 'url' => 'http://dropbox.com/first/path/url' } }
+      let(:second_dropbox_url_payload) { { 'url' => 'http://dropbox.com/second/path/url' } }
+      let(:third_dropbox_url_payload)  { { 'url' => 'http://dropbox.com/third/path/url' } }
 
       before(:each) do
-        allow(Dropbox::API::Client).to receive(:new) do
-          instance_double(Dropbox::API::Client).tap { |api|
-            allow(api).to receive(:find).with('/first/path')  { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:direct_url) { first_dropbox_url_payload } } }
-            allow(api).to receive(:find).with('/second/path') { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:direct_url) { second_dropbox_url_payload } } }
-            allow(api).to receive(:find).with('/third/path')  { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:direct_url) { third_dropbox_url_payload } } }
-          }
-        end
+        allow(DropboxApiClient).to receive(:new).and_return(
+          instance_double(
+            DropboxApiClient,
+            temporary_url_for: nil
+          ).tap do |client|
+            allow(client).to receive(:temporary_url_for).with('/first/path').and_return(first_dropbox_url_payload)
+            allow(client).to receive(:temporary_url_for).with('/second/path').and_return(second_dropbox_url_payload)
+            allow(client).to receive(:temporary_url_for).with('/third/path').and_return(third_dropbox_url_payload)
+          end
+        )
       end
 
       context 'with a single path' do
@@ -55,7 +58,7 @@ describe Agents::DropboxFileUrlAgent do
 
         it 'creates one event with the temporary dropbox link' do
           expect { @agent.receive([@event]) }.to change(Event, :count).by(1)
-          expect(Event.last.payload).to eq({ 'url' => 'http://dropbox.com/first/path/url' })
+          expect(Event.last.payload).to eq(first_dropbox_url_payload)
         end
       end
 
@@ -74,7 +77,7 @@ describe Agents::DropboxFileUrlAgent do
 
     context 'with permanent urls' do
       def response_for(url)
-        Dropbox::API::Object.new({'url' => "https://www.dropbox.com/s/#{url}?dl=0"}, nil)
+        { 'url' => "https://www.dropbox.com/s/#{url}?dl=1" }
       end
 
       let(:first_dropbox_url_payload)  { response_for('/first/path') }
@@ -82,28 +85,31 @@ describe Agents::DropboxFileUrlAgent do
       let(:third_dropbox_url_payload)  { response_for('/third/path') }
 
       before(:each) do
-        allow(Dropbox::API::Client).to receive(:new) do
-          instance_double(Dropbox::API::Client).tap { |api|
-            allow(api).to receive(:find).with('/first/path')  { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:share_url) { first_dropbox_url_payload } } }
-            allow(api).to receive(:find).with('/second/path') { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:share_url) { second_dropbox_url_payload } } }
-            allow(api).to receive(:find).with('/third/path')  { Dropbox::API::File.new({}, nil).tap { |file| allow(file).to receive(:share_url) { third_dropbox_url_payload } } }
-          }
-        end
+        allow(DropboxApiClient).to receive(:new).and_return(
+          instance_double(
+            DropboxApiClient,
+            permanent_url_for: nil
+          ).tap do |client|
+            allow(client).to receive(:permanent_url_for).with('/first/path').and_return(first_dropbox_url_payload)
+            allow(client).to receive(:permanent_url_for).with('/second/path').and_return(second_dropbox_url_payload)
+            allow(client).to receive(:permanent_url_for).with('/third/path').and_return(third_dropbox_url_payload)
+          end
+        )
         @agent.options['link_type'] = 'permanent'
       end
 
       it 'creates one event with a single path' do
         expect { @agent.receive([event(paths: '/first/path')]) }.to change(Event, :count).by(1)
-        expect(Event.last.payload).to eq(first_dropbox_url_payload.response)
+        expect(Event.last.payload).to eq(first_dropbox_url_payload)
       end
 
       it 'creates one event with the permanent dropbox link for each path' do
         event = event(paths: '/first/path, /second/path, /third/path')
         expect { @agent.receive([event]) }.to change(Event, :count).by(3)
         last_events = Event.last(3)
-        expect(last_events[0].payload).to eq(first_dropbox_url_payload.response)
-        expect(last_events[1].payload).to eq(second_dropbox_url_payload.response)
-        expect(last_events[2].payload).to eq(third_dropbox_url_payload.response)
+        expect(last_events[0].payload).to eq(first_dropbox_url_payload)
+        expect(last_events[1].payload).to eq(second_dropbox_url_payload)
+        expect(last_events[2].payload).to eq(third_dropbox_url_payload)
       end
     end
   end
