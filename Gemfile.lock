@@ -44,9 +44,9 @@ GIT
 
 GIT
   remote: https://github.com/jnunemaker/httparty.git
-  revision: ddfbc8ddfca03d4f4026b01763ee906071ca558b
+  revision: 2daba91bf3f61de2676a2e906f4d3181ebadea83
   specs:
-    httparty (0.23.2)
+    httparty (0.24.2)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -187,14 +187,7 @@ GEM
     base64 (0.3.0)
     bcrypt (3.1.22)
     benchmark (0.5.0)
-    better_errors (2.10.0)
-      erubi (>= 1.0.0)
-      rack (>= 0.9.0)
-      rouge (>= 1.0.0)
     bigdecimal (3.3.1)
-    bindex (0.8.1)
-    binding_of_caller (1.0.0)
-      debug_inspector (>= 0.0.1)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
     bootstrap-kaminari-views (0.0.5)
@@ -224,7 +217,6 @@ GEM
     cgi (0.5.1)
     childprocess (5.1.0)
       logger (~> 1.5)
-    coderay (1.1.3)
     concurrent-ruby (1.3.6)
     connection_pool (3.0.2)
     cookiejar (0.3.4)
@@ -238,7 +230,6 @@ GEM
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
-    debug_inspector (1.1.0)
     declarative (0.0.20)
     delayed_job (4.2.0)
       activesupport (>= 3.0, < 9.0)
@@ -255,8 +246,7 @@ GEM
       warden (~> 1.2.3)
     diff-lcs (1.6.2)
     docile (1.4.0)
-    domain_name (0.5.20190701)
-      unf (>= 0.0.5, < 1.0.0)
+    domain_name (0.6.20240107)
     drb (2.2.3)
     em-http-request (1.1.7)
       addressable (>= 2.3.4)
@@ -266,9 +256,6 @@ GEM
       http_parser.rb (>= 0.6.0)
     em-socksify (0.3.2)
       eventmachine (>= 1.0.0.beta.4)
-    em-websocket (0.5.3)
-      eventmachine (>= 0.12.9)
-      http_parser.rb (~> 0)
     equalizer (0.0.11)
     erb (6.0.2)
     erubi (1.13.1)
@@ -311,7 +298,6 @@ GEM
       rake
     foreman (0.90.0)
       thor (~> 1.4)
-    formatador (1.1.0)
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
@@ -345,6 +331,7 @@ GEM
       googleapis-common-protos (>= 1.3.10, < 2.a)
       googleapis-common-protos-types (>= 1.0.5, < 2.a)
       googleauth (>= 0.16.2, < 2.a)
+    google-logging-utils (0.2.0)
     google-protobuf (4.32.0-aarch64-linux-gnu)
       bigdecimal
       rake (>= 13)
@@ -363,10 +350,11 @@ GEM
       grpc (~> 1.41)
     googleapis-common-protos-types (1.21.0)
       google-protobuf (~> 4.26)
-    googleauth (1.11.2)
+    googleauth (1.16.2)
       faraday (>= 1.0, < 3.a)
-      google-cloud-env (~> 2.1)
-      jwt (>= 1.4, < 3.0)
+      google-cloud-env (~> 2.2)
+      google-logging-utils (~> 0.1)
+      jwt (>= 1.4, < 4.0)
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
@@ -382,25 +370,6 @@ GEM
     grpc (1.74.1-x86_64-linux-gnu)
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
-    guard (2.18.0)
-      formatador (>= 0.2.4)
-      listen (>= 2.7, < 4.0)
-      lumberjack (>= 1.0.12, < 2.0)
-      nenv (~> 0.1)
-      notiffany (~> 0.0)
-      pry (>= 0.13.0)
-      shellany (~> 0.0)
-      thor (>= 0.18.1)
-    guard-compat (1.2.1)
-    guard-livereload (2.5.2)
-      em-websocket (~> 0.5)
-      guard (~> 2.8)
-      guard-compat (~> 1.0)
-      multi_json (~> 1.8)
-    guard-rspec (4.7.3)
-      guard (~> 2.1)
-      guard-compat (~> 1.1)
-      rspec (>= 2.99.0, < 4.0)
     hashdiff (1.2.1)
     hashery (2.1.2)
     hashie (3.5.7)
@@ -418,7 +387,7 @@ GEM
       http-form_data (~> 2.2)
       llhttp-ffi (~> 0.4.0)
     http-accept (1.7.0)
-    http-cookie (1.0.5)
+    http-cookie (1.1.0)
       domain_name (~> 0.5)
     http-form_data (2.3.0)
     http_parser.rb (0.6.0)
@@ -442,7 +411,7 @@ GEM
     json (2.19.3)
     jsonpath (1.1.5)
       multi_json
-    jwt (2.10.2)
+    jwt (3.1.2)
       base64
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
@@ -458,9 +427,10 @@ GEM
     kaminari-core (1.2.2)
     kramdown (2.4.0)
       rexml
-    launchy (3.0.1)
+    launchy (3.1.1)
       addressable (~> 2.8)
       childprocess (~> 5.0)
+      logger (~> 1.6)
     letter_opener (1.10.0)
       launchy (>= 2.2, < 4)
     letter_opener_web (3.0.0)
@@ -486,7 +456,6 @@ GEM
     loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    lumberjack (1.2.8)
     mail (2.9.0)
       logger
       mini_mime (>= 0.1.1)
@@ -497,10 +466,10 @@ GEM
     matrix (0.4.3)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
-    method_source (1.1.0)
-    mime-types (3.4.1)
-      mime-types-data (~> 3.2015)
-    mime-types-data (3.2023.0218.1)
+    mime-types (3.7.0)
+      logger
+      mime-types-data (~> 3.2025, >= 3.2025.0507)
+    mime-types-data (3.2026.0317)
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
@@ -521,7 +490,6 @@ GEM
     mysql2 (0.5.7)
       bigdecimal
     naught (1.1.0)
-    nenv (0.3.0)
     net-ftp (0.3.9)
       net-protocol
       time
@@ -550,9 +518,6 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.2-x86_64-linux-gnu)
       racc (~> 1.4)
-    notiffany (0.1.3)
-      nenv (~> 0.1)
-      shellany (~> 0.0)
     oauth (1.1.0)
       oauth-tty (~> 1.0, >= 1.0.1)
       snaky_hash (~> 2.0)
@@ -618,9 +583,6 @@ GEM
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
-    pry (0.14.2)
-      coderay (~> 1.1)
-      method_source (~> 1.0)
     psych (5.3.1)
       date
       stringio
@@ -630,8 +592,6 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.5)
-    rack-livereload (0.5.1)
-      rack
     rack-protection (4.2.1)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
@@ -705,7 +665,6 @@ GEM
       netrc (~> 0.8)
     retriable (3.1.2)
     rexml (3.4.4)
-    rouge (4.1.1)
     rr (3.1.0)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -782,13 +741,12 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    shellany (0.0.1)
     shoulda-matchers (5.3.0)
       activesupport (>= 5.2.0)
-    signet (0.17.0)
+    signet (0.21.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
-      jwt (>= 1.5, < 3.0)
+      jwt (>= 1.5, < 4.0)
       multi_json (~> 1.10)
     simple_oauth (0.3.1)
     simplecov (0.22.0)
@@ -831,7 +789,7 @@ GEM
       date
     timeout (0.6.1)
     trailblazer-option (0.1.2)
-    treetop (1.6.12)
+    treetop (1.6.18)
       polyglot (~> 0.3)
     tsort (0.2.0)
     ttfunk (1.8.0)
@@ -847,9 +805,6 @@ GEM
     uber (0.1.0)
     uglifier (4.2.1)
       execjs (>= 0.3.0, < 3)
-    unf (0.1.4)
-      unf_ext
-    unf_ext (0.0.8.2)
     unicode-display_width (2.4.2)
     uri (1.1.1)
     useragent (0.16.11)
@@ -857,10 +812,6 @@ GEM
     version_gem (1.1.9)
     warden (1.2.9)
       rack (>= 2.0.9)
-    web-console (4.3.0)
-      actionview (>= 8.0.0)
-      bindex (>= 0.4.0)
-      railties (>= 8.0.0)
     webmock (3.26.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -887,10 +838,8 @@ PLATFORMS
 DEPENDENCIES
   ace-rails-ap
   aws-sdk-s3 (~> 1, >= 1.217.0)
-  better_errors
-  binding_of_caller
   bootsnap
-  bootstrap-kaminari-views (~> 0.0.5)
+  bootstrap-kaminari-views
   capistrano
   capistrano-bundler
   capistrano-rails
@@ -912,28 +861,25 @@ DEPENDENCIES
   faraday-typhoeus
   feedjira (~> 4.0, >= 4.0.1)
   ffi (>= 1.17.4)
-  foreman (~> 0.90.0)
-  geokit (~> 1.14)
-  geokit-rails (~> 2.5)
+  foreman
+  geokit
+  geokit-rails
   gmail_xoauth
   google-apis-calendar_v3
   google-cloud-translate-v2
-  guard
-  guard-livereload
-  guard-rspec
   haversine
-  hipchat (~> 1.6.0)
-  httmultiparty (~> 0.3.16)
+  hipchat
+  httmultiparty
   httparty!
   huginn_agent
-  jquery-rails (~> 4.6, >= 4.6.1)
+  jquery-rails
   json
-  jsonpath (~> 1.1, >= 1.1.5)
+  jsonpath
   kaminari (~> 1.2, >= 1.2.2)
   kramdown
-  letter_opener_web (~> 3.0)
+  letter_opener_web
   liquid (~> 5.12)
-  listen (~> 3.10.0)
+  listen
   logger
   loofah (~> 2.25, >= 2.25.1)
   mail (>= 2.9.0)
@@ -956,7 +902,6 @@ DEPENDENCIES
   pg (~> 1.6, >= 1.6.3)
   pirate_weather_forecast_ruby
   puma
-  rack-livereload
   rails (~> 8.1.3)
   rails-controller-testing
   rails-html-sanitizer (~> 1.7)
@@ -968,7 +913,7 @@ DEPENDENCIES
   rspec-mocks
   rspec-rails
   rspec-retry
-  rturk (~> 2.12.1)
+  rturk
   rubocop
   rubocop-performance
   rubocop-rspec
@@ -978,8 +923,8 @@ DEPENDENCIES
   selenium-webdriver
   shoulda-matchers
   simplecov
-  simplecov-lcov (~> 0.9.0)
-  slack-notifier (~> 2.4.0)
+  simplecov-lcov
+  slack-notifier
   spectrum-rails
   spring
   spring-commands-rspec
@@ -987,7 +932,7 @@ DEPENDENCIES
   sprockets
   terser
   tumblr_client!
-  twilio-ruby (~> 7.10.4)
+  twilio-ruby
   twitter!
   twitter-stream!
   typhoeus
@@ -995,9 +940,8 @@ DEPENDENCIES
   tzinfo-data
   uglifier
   vcr
-  web-console (>= 4.3.0)
   webmock
-  xmpp4r (~> 0.5.6)
+  xmpp4r
 
 RUBY VERSION
   ruby 3.4.8
