@@ -38,12 +38,11 @@ module Agents
       * `this.unescapeHtml(htmlToUnescape)`
     MD
 
-    LANGUAGES = %w[JavaScript].freeze
-
-    form_configurable :language, type: :array, values: LANGUAGES
-    form_configurable :code, type: :text, ace: true
+    form_configurable :code, type: :text, ace: { mode: 'javascript' }
     form_configurable :expected_receive_period_in_days
     form_configurable :expected_update_period_in_days
+
+    before_validation { self.options['language'] = 'JavaScript' }
 
     def validate_options
       cred_name = credential_referenced_by_code
@@ -54,10 +53,6 @@ module Agents
         errors.add(:base, "The 'code' option is required") unless options['code'].present?
       end
 
-      language = interpolated['language'].presence || LANGUAGES.first
-      unless LANGUAGES.include?(language)
-        errors.add(:base, "The 'language' must be #{LANGUAGES.to_sentence(two_words_connector: ' or ', last_word_connector: ', or ')}")
-      end
     end
 
     def working?

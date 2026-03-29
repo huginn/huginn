@@ -23,21 +23,6 @@ describe Agents::JavaScriptAgent do
       expect(@agent).not_to be_valid
     end
 
-    it "checks for a valid 'language', but allows nil" do
-      expect(@agent).to be_valid
-      @agent.options['language'] = ''
-      expect(@agent).to be_valid
-      @agent.options.delete('language')
-      expect(@agent).to be_valid
-      @agent.options['language'] = 'foo'
-      expect(@agent).not_to be_valid
-
-      Agents::JavaScriptAgent::LANGUAGES.each do |valid_language|
-        @agent.options['language'] = valid_language
-        expect(@agent).to be_valid
-      end
-    end
-
     it "accepts a credential, but it must exist" do
       expect(@agent).to be_valid
       @agent.options['code'] = 'credential:foo'
@@ -373,14 +358,6 @@ describe Agents::JavaScriptAgent do
             expect(@agent.memory['callCount']).to eq(21)
           }.not_to(change { AgentLog.count })
         }.not_to(change { Event.count })
-      end
-    end
-
-    describe "unsupported languages" do
-      it "rejects CoffeeScript" do
-        @agent.options['language'] = 'CoffeeScript'
-
-        expect(@agent).not_to be_valid
       end
     end
 
