@@ -1,6 +1,7 @@
 module Agents
   class ChangeDetectorAgent < Agent
     cannot_be_scheduled!
+    favicon_class 'fa-solid fa-magnifying-glass'
 
     description <<~MD
       The Change Detector Agent receives a stream of events and emits a new event when a property of the received event changes.

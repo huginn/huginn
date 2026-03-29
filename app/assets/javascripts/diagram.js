@@ -3,7 +3,10 @@
 $(function () {
   const svg = document.querySelector(".agent-diagram svg.diagram");
   const overlay = document.querySelector(".agent-diagram .overlay");
+  if (!svg || !overlay) return;
+
   $(overlay).width($(svg).width()).height($(svg).height());
+
   const getTopLeft = function (node) {
     const bbox = node.getBBox();
     const point = svg.createSVGPoint();
@@ -11,7 +14,33 @@ $(function () {
     point.y = bbox.y;
     return point.matrixTransform(node.getCTM());
   };
-  return $(svg)
+
+  const getBottomLeft = function (node) {
+    const bbox = node.getBBox();
+    const point = svg.createSVGPoint();
+    point.x = bbox.x;
+    point.y = bbox.y;
+    return point.matrixTransform(node.getCTM());
+  };
+
+  // Position favicon overlays at top-left of each node
+  $(svg)
+    .find("g.node[data-favicon-id]")
+    .each(function () {
+      const bl = getBottomLeft(this);
+      $("#" + this.getAttribute("data-favicon-id"), overlay).each(function () {
+        const fav = $(this);
+        fav
+          .css({
+            left: bl.x - fav.outerWidth() * (1 / 3),
+            top: bl.y - fav.outerHeight() * (1 / 3),
+          })
+          .show();
+      });
+    });
+
+  // Position badge overlays at top-right of each node
+  $(svg)
     .find("g.node[data-badge-id]")
     .each(function () {
       const tl = getTopLeft(this);

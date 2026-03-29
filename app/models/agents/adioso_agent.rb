@@ -3,6 +3,7 @@ module Agents
     cannot_receive_events!
 
     default_schedule "every_1d"
+    favicon_class 'fa-solid fa-plane'
 
     description <<~MD
       The Adioso Agent will tell you the minimum airline prices between a pair of cities, and within a certain period of time.

@@ -2,6 +2,7 @@ module Agents
   class EventFormattingAgent < Agent
     cannot_be_scheduled!
     can_dry_run!
+    favicon_class 'fa-solid fa-wand-magic-sparkles'
 
     description <<~MD
       The Event Formatting Agent allows you to format incoming Events, adding new fields as needed.

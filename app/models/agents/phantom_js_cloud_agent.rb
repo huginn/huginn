@@ -10,6 +10,7 @@ module Agents
     can_dry_run!
 
     default_schedule 'every_12h'
+    favicon_url_option 'url'
 
     description <<~MD
       This Agent generates [PhantomJs Cloud](https://phantomjscloud.com/) URLs that can be used to render JavaScript-heavy webpages for content extraction.

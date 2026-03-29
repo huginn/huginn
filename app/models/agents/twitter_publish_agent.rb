@@ -3,6 +3,7 @@ module Agents
     include TwitterConcern
 
     cannot_be_scheduled!
+    favicon_class 'fa-brands fa-x-twitter'
 
     description <<~MD
       The Twitter Publish Agent publishes tweets from the events it receives.

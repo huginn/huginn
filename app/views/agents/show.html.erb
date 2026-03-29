@@ -68,7 +68,7 @@
 
             <p>
               <b>Type:</b>
-              <%= @agent.short_type.titleize %>
+              <%= agent_favicon(@agent) %> <%= @agent.short_type.titleize %>
             </p>
 
             <% if @agent.can_be_scheduled? %>

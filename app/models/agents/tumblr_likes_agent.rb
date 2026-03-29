@@ -3,6 +3,7 @@ module Agents
     include TumblrConcern
 
     gem_dependency_check { defined?(Tumblr::Client) }
+    favicon_class 'fa-brands fa-tumblr'
 
     description <<~MD
       The Tumblr Likes Agent checks for liked Tumblr posts from a specific blog.

@@ -3,6 +3,7 @@ module Agents
     default_schedule "every_10m"
 
     gem_dependency_check { defined?(RTurk) }
+    favicon_class 'fa-solid fa-users'
 
     description <<~MD
       The Human Task Agent is used to create Human Intelligence Tasks (HITs) on Mechanical Turk.

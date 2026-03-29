@@ -31,8 +31,10 @@ end
 gem 'coffee-script' # JavaScriptAgent; only if you want to use CoffeeScript
 gem 'erector', github: 'dsander/erector', branch: 'rails6'
 gem 'hipchat', '~> 1.6.0' # HipchatAgent
-gem 'pdf-reader' # PDFInfoAgent
-gem 'mini_racer', github: 'knu/mini_racer', branch: 'fix/darwin_build' # JavaScriptAgent
+gem 'hypdf', bitbucket: 'knu/hypdf_gem', branch: 'uploadio_namespace' # PDFInfoAgent
+gem 'mini_racer' # JavaScriptAgent
+gem 'neighbor'   # pgvector ActiveRecord integration for docset embeddings
+gem 'sqlite3', '~> 2.0' # Reading Dash docset SQLite indexes
 gem 'mqtt' # MQTTAgent
 gem 'net-ftp'
 gem 'net-ftp-list' # FtpsiteAgent
@@ -114,7 +116,6 @@ gem 'multi_xml'
 gem 'nokogiri', '>= 1.19.2'
 gem 'omniauth'
 gem 'ostruct'
-gem 'puma'
 gem 'rails', '~> 8.1.3'
 gem 'rails-html-sanitizer', '~> 1.7'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
@@ -125,6 +126,7 @@ gem 'sprockets'
 gem 'terser'
 gem 'typhoeus'
 gem 'uglifier'
+gem 'puma', '~> 6.4'  # Multi-threaded server, required for ActionController::Live SSE streaming
 
 group :development, :test do
   gem 'debug'

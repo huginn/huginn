@@ -9,6 +9,7 @@ module Agents
     no_bulk_receive!
 
     gem_dependency_check { defined?(Slack) }
+    favicon_class 'fa-brands fa-slack'
 
     description <<~MD
       The Slack Agent lets you receive events and send notifications to [Slack](https://slack.com/).

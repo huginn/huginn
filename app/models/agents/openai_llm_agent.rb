@@ -5,6 +5,7 @@ module Agents
     can_dry_run!
     no_bulk_receive!
     default_schedule "never"
+    favicon_class 'fa-solid fa-robot'
 
     description <<~MD
       The OpenAI LLM Agent sends chat completion requests to any OpenAI-compatible API and emits the response as an event.
@@ -105,6 +106,13 @@ module Agents
     private
 
     def perform_completion(event = nil)
+      if interpolated['user_message'].blank?
+        if event && interpolated['output_mode'].to_s == 'merge'
+          create_event payload: event.payload.dup
+        end
+        return
+      end
+
       body = build_request_body
       response = openai_request(:post, 'chat/completions', body)
       return unless response

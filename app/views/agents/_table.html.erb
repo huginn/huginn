@@ -21,7 +21,7 @@
         <td class='<%= "agent-unavailable" if agent.unavailable? %>'>
           <%= link_to agent.name, agent_path(agent, return: (defined?(return_to) && return_to) || request.path) %>
           <br/>
-          <span class='text-muted'><%= agent.short_type.titleize %></span>
+          <span class='text-muted'><%= agent_favicon(agent) %> <%= agent.short_type.titleize %></span>
           <% if agent.scenarios.present? %>
             <span>
               <%= scenario_links(agent) %>

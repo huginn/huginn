@@ -4,6 +4,7 @@ module Agents
 
     cannot_be_scheduled!
     can_dry_run!
+    favicon_class 'fa-solid fa-code'
 
     description <<~MD
       The JSON Parse Agent parses a JSON string and emits the data in a new event or merge with with the original event.

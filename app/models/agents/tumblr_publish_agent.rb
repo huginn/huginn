@@ -5,6 +5,7 @@ module Agents
     cannot_be_scheduled!
 
     gem_dependency_check { defined?(Tumblr::Client) }
+    favicon_class 'fa-brands fa-tumblr'
 
     description <<~MD
       The Tumblr Publish Agent publishes Tumblr posts from the events it receives.
