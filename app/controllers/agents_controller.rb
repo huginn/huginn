@@ -7,6 +7,8 @@ class AgentsController < ApplicationController
     set_table_sort sorts: %w[name created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
 
     @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
+    @service = current_user.services.find(params[:service_id]) if params[:service_id].present?
+    @agents = @agents.where(service: @service) if @service
 
     if show_only_enabled_agents?
       @agents = @agents.where(disabled: false)

@@ -7,6 +7,7 @@ class ServicesController < ApplicationController
     set_table_sort sorts: %w[provider name global], default: { provider: :asc }
 
     @services = current_user.services.reorder(table_sort).page(params[:page])
+    @service_agent_counts = current_user.agents.reorder(nil).where(service_id: @services.map(&:id)).group(:service_id).count
 
     respond_to do |format|
       format.html
