@@ -29,14 +29,6 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 ActiveRecord::Migration.maintain_test_schema!
 
-# Mix in shoulda matchers
-Shoulda::Matchers.configure do |config|
-  config.integrate do |with|
-    with.test_framework :rspec
-    with.library :rails
-  end
-end
-
 RSpec.configure do |config|
   config.mock_with :rspec
   config.before(:suite) { Rails.application.reload_routes_unless_loaded }
