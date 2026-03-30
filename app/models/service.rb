@@ -41,9 +41,17 @@ class Service < ActiveRecord::Base
   end
 
   def refresh_token!
-    response = HTTParty.post(endpoint, query: refresh_token_parameters)
-    data = JSON.parse(response.body)
-    update(expires_at: Time.now + data['expires_in'], token: data['access_token'],
+    response =
+      if provider == "threads"
+        self.class.threads_connection.get("refresh_access_token", {
+          grant_type: "th_refresh_token",
+          access_token: token
+        })
+      else
+        self.class.oauth_connection.post(endpoint.to_s, refresh_token_parameters)
+      end
+    data = response.body
+    update(expires_at: Time.current + data['expires_in'].to_i, token: data['access_token'],
            refresh_token: data['refresh_token'].presence || refresh_token)
   end
 
@@ -62,14 +70,15 @@ class Service < ActiveRecord::Base
 
   def self.initialize_or_update_via_omniauth(omniauth)
     options = get_options(omniauth)
+    credentials = get_credentials(omniauth)
 
     find_or_initialize_by(provider: omniauth['provider'], uid: omniauth['uid'].to_s).tap do |service|
       service.attributes = {
-        token: omniauth['credentials']['token'],
-        secret: omniauth['credentials']['secret'],
+        token: credentials[:token],
+        secret: credentials[:secret],
         name: options[:name],
-        refresh_token: omniauth['credentials']['refresh_token'],
-        expires_at: omniauth['credentials']['expires_at'] && Time.at(omniauth['credentials']['expires_at']),
+        refresh_token: credentials[:refresh_token],
+        expires_at: credentials[:expires_at],
         options:
       }
     end
@@ -83,8 +92,34 @@ class Service < ActiveRecord::Base
     option_providers.fetch(omniauth['provider'], option_providers['default']).call(omniauth)
   end
 
+  def self.register_credentials_provider(provider_name, &block)
+    credential_providers[provider_name] = block
+  end
+
+  def self.get_credentials(omniauth)
+    credential_providers.fetch(omniauth['provider'], credential_providers['default']).call(omniauth)
+  end
+
+  def self.oauth_connection
+    @oauth_connection ||= Faraday.new do |builder|
+      builder.request :url_encoded
+      builder.response :json
+      builder.adapter Faraday.default_adapter
+    end
+  end
+
+  def self.threads_connection
+    @threads_connection ||= Faraday.new(url: "https://graph.threads.net") do |builder|
+      builder.request :url_encoded
+      builder.response :json
+      builder.adapter Faraday.default_adapter
+    end
+  end
+
   @@option_providers = HashWithIndifferentAccess.new
   cattr_reader :option_providers
+  @@credential_providers = HashWithIndifferentAccess.new
+  cattr_reader :credential_providers
 
   register_options_provider('default') do |omniauth|
     { name: omniauth['info']['nickname'] || omniauth['info']['name'] }
@@ -95,5 +130,47 @@ class Service < ActiveRecord::Base
       email: omniauth['info']['email'],
       name: "#{omniauth['info']['name']} <#{omniauth['info']['email']}>"
     }
+  end
+
+  register_options_provider('threads') do |omniauth|
+    raw_info = omniauth.dig('extra', 'raw_info') || {}
+    username = omniauth.dig('info', 'nickname').presence || raw_info['username'].presence || omniauth['uid']
+
+    {
+      user_id: raw_info['id'] || omniauth['uid'],
+      username:,
+      name: username
+    }
+  end
+
+  register_credentials_provider('default') do |omniauth|
+    {
+      token: omniauth.dig('credentials', 'token'),
+      secret: omniauth.dig('credentials', 'secret'),
+      refresh_token: omniauth.dig('credentials', 'refresh_token'),
+      expires_at: omniauth.dig('credentials', 'expires_at') && Time.at(omniauth['credentials']['expires_at'])
+    }
+  end
+
+  register_credentials_provider('threads') do |omniauth|
+    credentials = credential_providers['default'].call(omniauth)
+    token = credentials[:token]
+    secret = (config = Devise.omniauth_configs[:threads]) && config.args[1]
+
+    if token.present? && secret.present?
+      response = threads_connection.get("access_token", {
+        grant_type: "th_exchange_token",
+        client_secret: secret,
+        access_token: token
+      })
+      data = response.body
+
+      if response.success? && data['access_token'].present?
+        credentials[:token] = data['access_token']
+        credentials[:expires_at] = Time.current + data['expires_in'].to_i
+      end
+    end
+
+    credentials
   end
 end

@@ -75,12 +75,43 @@ describe Service do
     end
 
     it "should update the token" do
-      stub_request(:post, "https://oauth2.googleapis.com/token?client_id=googleclientid&client_secret=googleclientsecret&grant_type=refresh_token&refresh_token=refreshtokentest").
-        to_return(:status => 200, :body => '{"expires_in":1209600,"access_token": "NEWTOKEN"}', :headers => {})
+      stub_request(:post, "https://oauth2.googleapis.com/token")
+        .with(body: {
+          "client_id" => "googleclientid",
+          "client_secret" => "googleclientsecret",
+          "grant_type" => "refresh_token",
+          "refresh_token" => "refreshtokentest"
+        }).
+        to_return(:status => 200, :body => '{"expires_in":1209600,"access_token": "NEWTOKEN"}',
+                  :headers => { "Content-Type" => "application/json" })
       @service.provider = 'google'
       @service.refresh_token = 'refreshtokentest'
       @service.refresh_token!
       expect(@service.token).to eq('NEWTOKEN')
+    end
+
+    it "should refresh a Threads long-lived token" do
+      stub_request(:get, "https://graph.threads.net/refresh_access_token")
+        .with(query: {
+          "grant_type" => "th_refresh_token",
+          "access_token" => "old-long-lived-token"
+        })
+        .to_return(
+          status: 200,
+          body: {
+            access_token: "new-long-lived-token",
+            token_type: "bearer",
+            expires_in: 5_183_944
+          }.to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      @service.provider = "threads"
+      @service.token = "old-long-lived-token"
+      @service.refresh_token!
+
+      expect(@service.token).to eq("new-long-lived-token")
+      expect(@service.expires_at).to be > Time.current
     end
   end
 
@@ -110,6 +141,39 @@ describe Service do
       expect(service.name).to eq('dsander')
       expect(service.uid).to eq('12345')
       expect(service.token).to eq('agithubtoken')
+    end
+
+    it "should exchange a Threads token for a long-lived token" do
+      stub_request(:get, "https://graph.threads.net/access_token")
+        .with(query: {
+          "grant_type" => "th_exchange_token",
+          "client_secret" => "threadsappsecret",
+          "access_token" => "short-lived-threads-token"
+        })
+        .to_return(
+          status: 200,
+          body: {
+            access_token: "long-lived-threads-token",
+            token_type: "bearer",
+            expires_in: 5_183_944
+          }.to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      threads = JSON.parse(File.read(Rails.root.join("spec/data_fixtures/services/threads.json")))
+
+      expect {
+        service = @user.services.initialize_or_update_via_omniauth(threads)
+        service.save!
+      }.to change { @user.services.count }.by(1)
+
+      service = @user.services.find_by!(provider: "threads", uid: "3141592653")
+      expect(service.provider).to eq("threads")
+      expect(service.name).to eq("threads-user")
+      expect(service.uid).to eq("3141592653")
+      expect(service.token).to eq("long-lived-threads-token")
+      expect(service.options[:user_id]).to eq("3141592653")
+      expect(service.options[:username]).to eq("threads-user")
     end
   end
 

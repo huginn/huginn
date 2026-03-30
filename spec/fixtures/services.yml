@@ -24,3 +24,10 @@ twitter:
   expires_at: <%= Time.parse("2015-01-01 00:00:00") %>
   options: <%= { user_id: 12345 }.to_yaml.inspect %>
   user: bob
+threads:
+  token: long-lived-threads-token
+  provider: threads
+  name: threads-user
+  expires_at: <%= 30.days.from_now %>
+  options: <%= { user_id: "3141592653", username: "threads-user" }.to_yaml.inspect %>
+  user: bob
