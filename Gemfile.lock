@@ -282,7 +282,7 @@ GEM
       multipart-post (~> 2)
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
-    faraday-typhoeus (1.1.0)
+    faraday-typhoeus (2.0.0)
       faraday (~> 2.0)
       typhoeus (~> 1.4)
     feedjira (4.0.1)
