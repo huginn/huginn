@@ -47,7 +47,7 @@ when (2..)
     ActiveRecord::Base.connection_handler.clear_all_connections!
   end
 
-  on_worker_boot do
+  before_worker_boot do
     ActiveRecord::Base.establish_connection
   end
 end
