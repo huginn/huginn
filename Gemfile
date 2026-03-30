@@ -158,7 +158,6 @@ group :development do
     gem 'rspec-mocks'
     gem 'rspec-retry'
     gem 'selenium-webdriver'
-    gem 'shoulda-matchers'
     gem 'simplecov', require: false
     gem 'simplecov-lcov', require: false
     gem 'vcr'
