@@ -1,0 +1,32 @@
+{
+  "data": [
+    {
+      "id": "1002",
+      "media_product_type": "THREADS",
+      "media_type": "TEXT_POST",
+      "permalink": "https://www.threads.net/@threads-user/post/def",
+      "owner": {
+        "id": "3141592653"
+      },
+      "username": "threads-user",
+      "text": "Second post",
+      "timestamp": "2024-01-02T12:00:00+0000",
+      "shortcode": "def",
+      "is_quote_post": false
+    },
+    {
+      "id": "1001",
+      "media_product_type": "THREADS",
+      "media_type": "TEXT_POST",
+      "permalink": "https://www.threads.net/@threads-user/post/abc",
+      "owner": {
+        "id": "3141592653"
+      },
+      "username": "threads-user",
+      "text": "First post",
+      "timestamp": "2024-01-01T12:00:00+0000",
+      "shortcode": "abc",
+      "is_quote_post": false
+    }
+  ]
+}

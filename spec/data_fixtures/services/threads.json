@@ -1,0 +1,20 @@
+{
+  "provider": "threads",
+  "uid": "3141592653",
+  "info": {
+    "nickname": "threads-user",
+    "name": "threads-user"
+  },
+  "credentials": {
+    "token": "short-lived-threads-token",
+    "expires": true,
+    "expires_at": 1735689600
+  },
+  "extra": {
+    "raw_info": {
+      "id": "3141592653",
+      "username": "threads-user",
+      "name": "threads-user"
+    }
+  }
+}

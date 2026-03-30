@@ -53,7 +53,7 @@ module ApplicationHelper
 
   def omniauth_provider_icon(provider)
     case provider.to_sym
-    when :twitter, :tumblr, :github, :dropbox, :google
+    when :twitter, :tumblr, :github, :dropbox, :google, :threads
       icon_tag("fa-#{provider}", class: 'fa-brands')
     else
       icon_tag("fa-lock")

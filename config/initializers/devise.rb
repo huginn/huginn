@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'utils'
+require Rails.root.join("lib/omniauth/strategies/threads").to_s
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
@@ -294,6 +295,12 @@ Devise.setup do |config|
       access_type: 'offline',
       prompt: 'consent'
     }
+  end
+
+  if defined?(OmniAuth::Strategies::Threads) &&
+     (key = ENV["THREADS_APP_ID"]).present? &&
+     (secret = ENV["THREADS_APP_SECRET"]).present?
+    config.omniauth :threads, key, secret, scope: "threads_basic,threads_content_publish"
   end
 
   # ==> Warden configuration
