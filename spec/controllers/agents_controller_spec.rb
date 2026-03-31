@@ -17,6 +17,22 @@ describe AgentsController do
       expect(assigns(:agents).all? {|i| expect(i.user).to eq(users(:bob)) }).to be_truthy
     end
 
+    it "filters agents by service_id" do
+      sign_in users(:bob), scope: :user
+      get :index, params: { service_id: services(:generic).id }, format: :json
+
+      expect(assigns(:service)).to eq(services(:generic))
+      expect(assigns(:agents)).to match_array([agents(:bob_twitter_user_agent)])
+    end
+
+    it "does not allow filtering by another user's service" do
+      sign_in users(:bob), scope: :user
+
+      expect {
+        get :index, params: { service_id: services(:global).id }
+      }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
     it "should not show disabled agents if the cookie is set" do
       @request.cookies["huginn_view_only_enabled_agents"] = "true"
 

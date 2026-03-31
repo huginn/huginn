@@ -22,27 +22,73 @@
         <table class='table table-striped events'>
           <tr>
             <th><%= sortable_column 'provider', 'asc' %></th>
-            <th><%= sortable_column 'name', 'asc' %></th>
-            <th><%= sortable_column 'global', name: 'Global?' %></th>
+            <th><%= sortable_column 'name', 'asc', name: 'User Name' %></th>
+            <th>
+              <%= sortable_column 'global', name: 'Global?' %>
+              <span class="glyphicon glyphicon-question-sign hover-help" data-content="Private services are available only to you.  Global services are available to all users."></span>
+            </th>
             <th></th>
           </tr>
 
         <% @services.each do |service| %>
+          <% agents_count = @service_agent_counts.fetch(service.id, 0) %>
           <tr>
-            <td><%= omniauth_provider_name(service.provider) %></td>
-            <td><%= service.name %></td>
-            <td><%= yes_no(service.global) %></td>
             <td>
-              <div class="btn-group btn-group-xs">
-                <% if service.global %>
-                  <%= link_to 'Make private', toggle_availability_service_path(service), method: :post, data: { confirm: 'Are you sure you want to remove access to your data on this service for other users?'}, class: "btn btn-default" %>
-                <% else %>
-                   <%= link_to 'Make global', toggle_availability_service_path(service), method: :post, data: { confirm: 'Are you sure you want to grant every user on this system access to your data on this service?'}, class: "btn btn-default" %>
-                <% end %>
-                <% if Devise.omniauth_providers.include?(service.provider.to_sym) %>
-                  <%= link_to 'Reauthorize', send("user_#{service.provider}_omniauth_authorize_path", origin: "reauthorize_service:#{service.id}"), class: "btn btn-default" %>
-                <% end %>
-                <%= link_to 'Delete', service_path(service), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default btn-danger" %>
+              <%= omniauth_provider_icon(service.provider) %>
+              <%= omniauth_provider_name(service.provider) %>
+            </td>
+            <td><%= service.name %></td>
+            <td>
+              <% toggle_confirmation =
+                   if service.global
+                     "Are you sure you want to remove access to your data on this service for other users?"
+                   else
+                     "Are you sure you want to grant every user on this system access to your data on this service?"
+                   end %>
+              <%= link_to toggle_availability_service_path(service),
+                          method: :post,
+                          data: { confirm: toggle_confirmation },
+                          class: ["service-visibility-toggle", ("is-on" if service.global)].compact.join(" "),
+                          title: service.global ? "Global" : "Private",
+                          "aria-label": "#{service.global ? "Global" : "Private"} service visibility" do %>
+                <span class="service-visibility-toggle-track">
+                  <span class="service-visibility-toggle-thumb"></span>
+                </span>
+              <% end %>
+            </td>
+            <td>
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                  <span class="glyphicon glyphicon-th-list"></span> Actions <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                  <% if agents_count.positive? %>
+                    <li>
+                      <%= link_to icon_tag('glyphicon-cog') + " List Agents (#{agents_count})".html_safe, agents_path(service_id: service.id) %>
+                    </li>
+                  <% else %>
+                    <li class="disabled">
+                      <a><%= icon_tag('glyphicon-cog') %> List Agents (0)</a>
+                    </li>
+                  <% end %>
+                  <% if Devise.omniauth_providers.include?(service.provider.to_sym) %>
+                    <li>
+                      <%= link_to icon_tag('glyphicon-refresh') + ' Reauthorize'.html_safe,
+                                  send("user_#{service.provider}_omniauth_authorize_path", origin: "reauthorize_service:#{service.id}") %>
+                    </li>
+                  <% else %>
+                    <li class="disabled">
+                      <a><%= icon_tag('glyphicon-refresh') %> Reauthorize</a>
+                    </li>
+                  <% end %>
+                  <li class="divider"></li>
+                  <li>
+                    <%= link_to icon_tag('glyphicon-trash', class: 'color-danger') + ' Delete'.html_safe,
+                                service_path(service),
+                                method: :delete,
+                                data: { confirm: 'Are you sure?' } %>
+                  </li>
+                </ul>
               </div>
             </td>
           </tr>

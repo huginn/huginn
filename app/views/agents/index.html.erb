@@ -5,6 +5,12 @@
     <div class='col-md-12'>
       <div class="page-header">
         <h2><%= session[:original_admin_user_id].present? ? "#{current_user.username}’s Agents" : 'Your Agents' %></h2>
+        <% if @service %>
+          <p class="text-muted">
+            Filtered by service:
+            <%= service_label(@service) %>
+          </p>
+        <% end %>
       </div>
 
       <%= render 'agents/table' %>
