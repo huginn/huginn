@@ -1,7 +1,6 @@
 development:
   adapter: <%= ENV['DATABASE_ADAPTER'].presence || "mysql2" %>
   encoding: <%= ENV['DATABASE_ENCODING'].presence || "utf8" %>
-  reconnect: <%= ENV['DATABASE_RECONNECT'].presence || "true" %>
   database: <%= ENV['DATABASE_NAME'].presence || "huginn_development" %>
   pool: <%= ENV['DATABASE_POOL'].presence || "20" %>
   username: <%= ENV['DATABASE_USERNAME'].presence || "root" %>
@@ -17,7 +16,6 @@ development:
 test:
   adapter: <%= ENV['DATABASE_ADAPTER'].presence || "mysql2" %>
   encoding: <%= ENV['DATABASE_ENCODING'].presence || "utf8" %>
-  reconnect: <%= ENV['DATABASE_RECONNECT'].presence || "true" %>
   database: <%= ENV['TEST_DATABASE_NAME'].presence || "huginn_test" %>
   pool: <%= ENV['DATABASE_POOL'].presence || "5" %>
   username: <%= ENV['DATABASE_USERNAME'].presence || "root" %>
@@ -30,7 +28,6 @@ test:
 production:
   adapter: <%= ENV['DATABASE_ADAPTER'].presence || "mysql2" %>
   encoding: <%= ENV['DATABASE_ENCODING'].presence || "utf8" %>
-  reconnect: <%= ENV['DATABASE_RECONNECT'].presence || "true" %>
   database: <%= ENV['DATABASE_NAME'].presence || "huginn_production" %>
   pool: <%= ENV['DATABASE_POOL'].presence || "20" %>
   username: <%= ENV['DATABASE_USERNAME'].presence || "root" %>

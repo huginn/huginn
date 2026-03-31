@@ -209,7 +209,6 @@ You should now be greeted by the `psql` interactive client and be connected to t
 If you are using a local MySQL server the database configuration should look like this (use the password of the huginn MySQL user you created earlier):
 
     DATABASE_ADAPTER=mysql2
-    DATABASE_RECONNECT=true
     DATABASE_NAME=huginn_production
     DATABASE_POOL=20
     DATABASE_USERNAME=huginn
@@ -227,7 +226,6 @@ If you are using a local MySQL server the database configuration should look lik
 If you are using a local PostgreSQL server the database configuration should look like this (use the password of the huginn PostgreSQL user you created earlier):
 
     DATABASE_ADAPTER=postgresql
-    DATABASE_RECONNECT=true
     DATABASE_NAME=huginn_production
     DATABASE_POOL=20
     DATABASE_USERNAME=huginn
