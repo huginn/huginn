@@ -48,6 +48,10 @@ describe Agents::LocalFileAgent do
       expect(@checker).to be_valid
       @checker.options['watch'] = 'false'
       expect(@checker).to be_valid
+      @checker.options['watch'] = true
+      expect(@checker).to be_valid
+      @checker.options['watch'] = false
+      expect(@checker).to be_valid
       @checker.options['watch'] = 'test'
       expect(@checker).not_to be_valid
     end
@@ -56,6 +60,10 @@ describe Agents::LocalFileAgent do
       @checker.options['append'] = 'true'
       expect(@checker).to be_valid
       @checker.options['append'] = 'false'
+      expect(@checker).to be_valid
+      @checker.options['append'] = true
+      expect(@checker).to be_valid
+      @checker.options['append'] = false
       expect(@checker).to be_valid
       @checker.options['append'] = 'test'
       expect(@checker).not_to be_valid

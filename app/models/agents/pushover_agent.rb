@@ -51,9 +51,9 @@ module Agents
         'retry' => '{{ retry }}',
         'expire' => '{{ expire }}',
         'ttl' => '{{ ttl }}',
-        'html' => 'false',
-        'monospace' => 'false',
-        'expected_receive_period_in_days' => '1'
+        'html' => false,
+        'monospace' => false,
+        'expected_receive_period_in_days' => 1
       }
     end
 

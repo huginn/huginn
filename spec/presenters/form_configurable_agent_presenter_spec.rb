@@ -100,4 +100,22 @@ describe FormConfigurableAgentPresenter do
       )
     )
   end
+
+  it "preserves false and zero option values" do
+    agent = FormConfigurableAgentPresenterAgent.new(options: { 'number' => 0, 'boolean' => false })
+    presenter = FormConfigurableAgentPresenter.new(agent, ActionController::Base.new.view_context)
+
+    expect(presenter.option_field_for(:number)).to include('value="0"')
+    expect(presenter.option_field_for(:boolean)).to(
+      have_tag(
+        'input',
+        with: {
+          name: 'agent[options][boolean_radio]',
+          type: 'radio',
+          value: 'false',
+          checked: 'checked'
+        }
+      )
+    )
+  end
 end

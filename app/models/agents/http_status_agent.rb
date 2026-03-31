@@ -45,7 +45,7 @@ module Agents
     def default_options
       {
         'url' => "http://google.com",
-        'disable_redirect_follow' => "true",
+        'disable_redirect_follow' => true,
       }
     end
 
@@ -77,7 +77,7 @@ module Agents
       measured_result = TimeTracker.track { ping(url) }
 
       current_status = measured_result.result ? measured_result.status.to_s : ''
-      return if options['changes_only'] == 'true' && current_status == memory['last_status'].to_s
+      return if boolify(interpolated['changes_only']) && current_status == memory['last_status'].to_s
 
       payload = { 'url' => url, 'response_received' => false, 'elapsed_time' => measured_result.elapsed_time }
 

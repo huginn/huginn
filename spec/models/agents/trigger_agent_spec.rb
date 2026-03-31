@@ -44,11 +44,23 @@ describe Agents::TriggerAgent do
       expect(@checker).to be_valid
     end
 
+    it "should also accept a boolean keep_event value" do
+      @checker.options['keep_event'] = true
+      @checker.options['message'] = ''
+      expect(@checker).to be_valid
+    end
+
     it "if present, 'keep_event' must equal true or false" do
       @checker.options['keep_event'] = 'true'
       expect(@checker).to be_valid
 
       @checker.options['keep_event'] = 'false'
+      expect(@checker).to be_valid
+
+      @checker.options['keep_event'] = true
+      expect(@checker).to be_valid
+
+      @checker.options['keep_event'] = false
       expect(@checker).to be_valid
 
       @checker.options['keep_event'] = ''

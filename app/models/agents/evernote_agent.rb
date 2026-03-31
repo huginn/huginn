@@ -93,9 +93,9 @@ module Agents
 
     def default_options
       {
-        "expected_update_period_in_days" => "2",
+        "expected_update_period_in_days" => 2,
         "mode" => "update",
-        "include_xhtml_content" => "false",
+        "include_xhtml_content" => false,
         "note" => {
           "title" => "{{title}}",
           "content" => "{{content}}",
@@ -125,7 +125,7 @@ module Agents
     end
 
     def include_xhtml_content?
-      options[:include_xhtml_content] == "true"
+      boolify(interpolated[:include_xhtml_content])
     end
 
     def receive(incoming_events)

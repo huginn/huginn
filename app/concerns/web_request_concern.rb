@@ -73,7 +73,7 @@ module WebRequestConcern
       errors.add(:base, "proxy must be a string") unless options['proxy'].is_a?(String)
     end
 
-    if options['disable_ssl_verification'].present? && boolify(options['disable_ssl_verification']).nil?
+    if option_provided?(options['disable_ssl_verification']) && boolify(options['disable_ssl_verification']).nil?
       errors.add(:base, "if provided, disable_ssl_verification must be true or false")
     end
 

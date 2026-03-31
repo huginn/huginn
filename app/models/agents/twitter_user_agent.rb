@@ -40,10 +40,10 @@ module Agents
     def default_options
       {
         'username' => 'tectonic',
-        'include_retweets' => 'true',
-        'exclude_replies' => 'false',
-        'expected_update_period_in_days' => '2',
-        'choose_home_time_line' => 'false'
+        'include_retweets' => true,
+        'exclude_replies' => false,
+        'expected_update_period_in_days' => 2,
+        'choose_home_time_line' => false
       }
     end
 
@@ -56,7 +56,7 @@ module Agents
         errors.add(:base, "username is required")
       end
 
-      if options[:include_retweets].present? && !%w[true false].include?(options[:include_retweets].to_s)
+      if option_provided?(options[:include_retweets]) && boolify(options[:include_retweets]).nil?
         errors.add(:base, "include_retweets must be a boolean value (true/false)")
       end
 

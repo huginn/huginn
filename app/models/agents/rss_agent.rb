@@ -43,8 +43,8 @@ module Agents
 
     def default_options
       {
-        'expected_update_period_in_days' => "5",
-        'clean' => 'false',
+        'expected_update_period_in_days' => 5,
+        'clean' => false,
         'url' => "https://github.com/huginn/huginn/commits/master.atom"
       }
     end

@@ -80,7 +80,7 @@ module Agents
             "link" => "{{url}}"
           }
         },
-        "ns_media" => "true"
+        "ns_media" => true
       }
     end
 
