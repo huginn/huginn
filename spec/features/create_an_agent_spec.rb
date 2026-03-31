@@ -102,18 +102,20 @@ describe "Creating a new agent", js: true do
   end
 
   it "creates an alert if a new agent with invalid json is submitted" do
+    invalid_json = <<~JSON
+      {
+        "expected_receive_period_in_days": "2"
+        "keep_event": "false"
+      }
+    JSON
+
     visit "/"
     page.find("a", text: "Agents").hover
     click_on("New Agent")
 
     select_agent_type("Trigger Agent")
     fill_in(:agent_name, with: "Test Trigger Agent")
-    click_on("Toggle View")
-
-    fill_in(:agent_options, with: '{
-      "expected_receive_period_in_days": "2"
-      "keep_event": "false"
-    }')
+    page.execute_script("document.getElementById('agent_options').value = #{invalid_json.to_json}")
     expect(get_alert_text_from {
              click_on "Save"
            }).to have_text("Sorry, there appears to be an error in your JSON input. Please fix it before continuing.")

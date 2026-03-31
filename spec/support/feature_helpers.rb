@@ -6,7 +6,7 @@ module FeatureHelpers
     expect(page).to have_no_css("form.agent-form.type-changing")
 
     # Wait for all parts of the Agent form to load:
-    expect(page).to have_css("div.function_buttons") # Options editor
+    expect(page).to have_css(".json-editor-shell") # Options editor
     expect(page).to have_css(".well.description > p") # Markdown description
   end
 end

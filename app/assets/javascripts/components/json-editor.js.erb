@@ -1,22 +1,341 @@
-window.setupJsonEditor = function ($editors) {
-  if ($editors == null) {
-    $editors = $(".live-json-editor");
-  }
-  JSONEditor.prototype.ADD_IMG = "<%= image_path 'json-editor/add.png' %>";
-  JSONEditor.prototype.DELETE_IMG = "<%= image_path 'json-editor/delete.png' %>";
-  const editors = [];
-  $editors.each(function () {
-    const $editor = $(this);
-    const jsonEditor = new JSONEditor(
-      $editor,
-      $editor.data("width") || 400,
-      $editor.data("height") || 500
-    );
-    jsonEditor.doTruncation(true);
-    jsonEditor.showFunctionButtons();
-    return editors.push(jsonEditor);
-  });
-  return editors;
-};
+(function () {
+  function whenJsonEditorReady() {
+    if (typeof window.createVanillaJSONEditor === "function") {
+      return Promise.resolve(window.createVanillaJSONEditor);
+    }
 
-$(() => (window.jsonEditor = setupJsonEditor()[0]));
+    if (window.vanillaJsonEditorReadyPromise == null) {
+      window.vanillaJsonEditorReadyPromise = new Promise((resolve) => {
+        window.addEventListener(
+          "vanilla-jsoneditor:ready",
+          () => resolve(window.createVanillaJSONEditor),
+          { once: true }
+        );
+      });
+    }
+
+    return window.vanillaJsonEditorReadyPromise;
+  }
+
+  function normalizedValue(value) {
+    return typeof value === "string" ? value.trim() : "";
+  }
+
+  function contentToTextareaValue(content) {
+    if (content == null) {
+      return "";
+    }
+
+    if (content.json !== undefined) {
+      return JSON.stringify(content.json, null, 2);
+    }
+
+    return content.text || "";
+  }
+
+  function textContent(text) {
+    return { text: text == null ? "" : String(text) };
+  }
+
+  function jsonContent(json) {
+    return { json };
+  }
+
+  function tryParseJson(text) {
+    try {
+      return JSON.parse(text);
+    } catch (_error) {
+      return undefined;
+    }
+  }
+
+  class PlainJsonEditor {
+    constructor($source) {
+      this.$source = $source;
+      this.content = this.initialContent($source.val());
+      this.status = this.content.text !== undefined ? "Invalid JSON" : "Valid JSON";
+    }
+
+    setValue(value) {
+      this.$source.val(value);
+    }
+
+    initialContent(value) {
+      const text = normalizedValue(value);
+      if (text === "") {
+        return jsonContent({});
+      }
+
+      const parsed = tryParseJson(text);
+      return parsed === undefined ? textContent(value) : jsonContent(parsed);
+    }
+
+    currentJson() {
+      if (this.content.json !== undefined) {
+        return this.content.json;
+      }
+
+      return tryParseJson(this.content.text);
+    }
+
+    updateContent(content) {
+      this.content = content;
+      this.setValue(contentToTextareaValue(content));
+      this.status = content.text !== undefined ? "Invalid JSON" : "Valid JSON";
+    }
+
+    rebuild() {
+      if (this.json === undefined) {
+        return;
+      }
+
+      const nextContent =
+        typeof this.json === "string"
+          ? this.initialContent(this.json)
+          : jsonContent(this.json);
+
+      this.updateContent(nextContent);
+    }
+  }
+
+  class VanillaJsonEditor extends PlainJsonEditor {
+    constructor($source) {
+      super($source);
+      this.mode = this.content.text !== undefined ? "text" : "tree";
+      this.pendingMode = this.mode;
+      this.$shell = null;
+      this.$toolbar = null;
+      this.$status = null;
+      this.$host = null;
+      this.$treeButton = null;
+      this.$textButton = null;
+      this.$formatButton = null;
+      this.editor = null;
+
+      whenJsonEditorReady().then((createJSONEditor) => this.mount(createJSONEditor));
+    }
+
+    mount(createJSONEditor) {
+      if (this.editor) {
+        return;
+      }
+
+      this.$shell = $(document.createElement("div")).addClass("json-editor-shell");
+      this.$toolbar = $(document.createElement("div")).addClass("json-editor-toolbar");
+      this.$status = $(document.createElement("span")).addClass("json-editor-status");
+      this.$host = $(document.createElement("div")).addClass("json-editor-host");
+      this.$treeButton = $(document.createElement("button"));
+      this.$textButton = $(document.createElement("button"));
+      this.$formatButton = $(document.createElement("button"));
+      const $buttons = $(document.createElement("div")).addClass("json-editor-actions");
+
+      this.$treeButton
+        .attr({ type: "button" })
+        .addClass("btn btn-default btn-xs json-editor-mode")
+        .text("Tree")
+        .on("click", () => this.setMode("tree"));
+
+      this.$textButton
+        .attr({ type: "button" })
+        .addClass("btn btn-default btn-xs json-editor-mode")
+        .text("Text")
+        .on("click", () => this.setMode("text"));
+
+      this.$formatButton
+        .attr({ type: "button" })
+        .addClass("btn btn-default btn-xs")
+        .text("Format")
+        .on("click", () => this.format());
+
+      $buttons.append(this.$treeButton, this.$textButton, this.$formatButton);
+      this.$toolbar.append(this.$status, $buttons);
+      this.$host.height(this.editorHeight());
+      this.$shell.append(this.$toolbar, this.$host);
+
+      this.$source.after(this.$shell).hide();
+      this.editor = createJSONEditor({
+        target: this.$host[0],
+        props: {
+          content: this.contentForMode(this.content, this.mode),
+          mode: this.mode,
+          indentation: 2,
+          tabSize: 2,
+          mainMenuBar: false,
+          navigationBar: false,
+          statusBar: false,
+          askToFormat: false,
+          onChange: (updatedContent, _previousContent, status) => {
+            this.content = updatedContent;
+            this.status = status.contentErrors ? "Invalid JSON" : "Valid JSON";
+            this.syncSource();
+            this.updateStatus();
+          },
+          onChangeMode: (mode) => {
+            this.mode = mode;
+            this.updateModeButtons();
+          },
+        },
+      });
+
+      this.syncSource();
+      this.updateModeButtons();
+      this.updateStatus();
+      this.rebuild();
+    }
+
+    editorHeight() {
+      const explicitHeight = Number(this.$source.data("height"));
+      if (explicitHeight > 0) {
+        return explicitHeight;
+      }
+
+      const rows = Number(this.$source.attr("rows")) || 12;
+      return Math.max(rows * 20, 200);
+    }
+
+    contentForMode(content, mode) {
+      if (mode === "text") {
+        return content.text !== undefined
+          ? content
+          : textContent(JSON.stringify(content.json, null, 2));
+      }
+
+      if (content.json !== undefined) {
+        return content;
+      }
+
+      const parsed = tryParseJson(content.text);
+      return parsed === undefined ? jsonContent({}) : jsonContent(parsed);
+    }
+
+    syncSource() {
+      this.setValue(contentToTextareaValue(this.content));
+    }
+
+    updateStatus() {
+      if (this.$status == null) {
+        return;
+      }
+
+      const invalid = this.status === "Invalid JSON";
+      this.$shell.toggleClass("has-error", invalid);
+      this.$status.toggleClass("is-error", invalid).text(this.status);
+    }
+
+    updateModeButtons() {
+      if (this.$treeButton == null || this.$textButton == null) {
+        return;
+      }
+
+      this.$treeButton.toggleClass("active", this.mode === "tree");
+      this.$textButton.toggleClass("active", this.mode === "text");
+    }
+
+    setMode(mode) {
+      this.pendingMode = mode;
+      if (!this.editor) {
+        return;
+      }
+
+      let nextContent = this.content;
+      if (mode === "tree" && nextContent.text !== undefined) {
+        const parsed = tryParseJson(nextContent.text);
+        if (parsed === undefined) {
+          this.status = "Invalid JSON";
+          this.updateStatus();
+          return;
+        }
+        nextContent = jsonContent(parsed);
+      }
+
+      this.content = nextContent;
+      this.mode = mode;
+      this.editor.updateProps({
+        content: this.contentForMode(nextContent, mode),
+        mode,
+      });
+      this.syncSource();
+      this.updateModeButtons();
+      this.updateStatus();
+    }
+
+    format() {
+      const json = this.currentJson();
+      if (json === undefined) {
+        this.status = "Invalid JSON";
+        this.updateStatus();
+        return;
+      }
+
+      const nextContent = this.mode === "text"
+        ? textContent(JSON.stringify(json, null, 2))
+        : jsonContent(json);
+
+      this.content = nextContent;
+      this.status = "Valid JSON";
+      if (this.editor) {
+        this.editor.updateProps({
+          content: nextContent,
+          mode: this.mode,
+        });
+      }
+      this.syncSource();
+      this.updateStatus();
+    }
+
+    rebuild() {
+      if (this.json === undefined) {
+        return;
+      }
+
+      const nextContent =
+        typeof this.json === "string"
+          ? this.initialContent(this.json)
+          : jsonContent(this.json);
+
+      try {
+        this.content = nextContent;
+        this.status = nextContent.text !== undefined ? "Invalid JSON" : "Valid JSON";
+        if (this.editor) {
+          const mode = nextContent.text !== undefined ? "text" : this.pendingMode;
+          this.mode = mode;
+          this.editor.updateProps({
+            content: this.contentForMode(nextContent, mode),
+            mode,
+          });
+          this.updateModeButtons();
+        }
+        this.syncSource();
+        this.updateStatus();
+      } catch (_error) {
+        this.status = "Invalid JSON";
+        this.updateStatus();
+      }
+    }
+  }
+
+  window.setupJsonEditor = function ($editors) {
+    if ($editors == null) {
+      $editors = $(".live-json-editor, .payload-editor");
+    }
+
+    const editors = [];
+    $editors.each(function () {
+      const $editor = $(this);
+      let instance = $editor.data("json-editor-instance");
+
+      if (!instance) {
+        instance = new VanillaJsonEditor($editor);
+        $editor.data("json-editor-instance", instance);
+      }
+
+      editors.push(instance);
+    });
+
+    return editors;
+  };
+
+  $(() => {
+    window.jsonEditor = window.setupJsonEditor()[0];
+  });
+})();
