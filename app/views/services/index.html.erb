@@ -39,6 +39,9 @@
                 <% else %>
                    <%= link_to 'Make global', toggle_availability_service_path(service), method: :post, data: { confirm: 'Are you sure you want to grant every user on this system access to your data on this service?'}, class: "btn btn-default" %>
                 <% end %>
+                <% if Devise.omniauth_providers.include?(service.provider.to_sym) %>
+                  <%= link_to 'Reauthorize', send("user_#{service.provider}_omniauth_authorize_path", origin: "reauthorize_service:#{service.id}"), class: "btn btn-default" %>
+                <% end %>
                 <%= link_to 'Delete', service_path(service), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-default btn-danger" %>
               </div>
             </td>
@@ -51,4 +54,3 @@
     </div>
   </div>
 </div>
-

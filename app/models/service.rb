@@ -69,19 +69,24 @@ class Service < ActiveRecord::Base
   end
 
   def self.initialize_or_update_via_omniauth(omniauth)
-    options = get_options(omniauth)
-    credentials = get_credentials(omniauth)
-
     find_or_initialize_by(provider: omniauth['provider'], uid: omniauth['uid'].to_s).tap do |service|
-      service.attributes = {
-        token: credentials[:token],
-        secret: credentials[:secret],
-        name: options[:name],
-        refresh_token: credentials[:refresh_token],
-        expires_at: credentials[:expires_at],
-        options:
-      }
+      service.assign_via_omniauth(omniauth)
     end
+  end
+
+  def assign_via_omniauth(omniauth)
+    options = self.class.get_options(omniauth)
+    credentials = self.class.get_credentials(omniauth)
+
+    self.provider = omniauth["provider"]
+    self.uid = omniauth["uid"].to_s
+    self.token = credentials[:token]
+    self.secret = credentials[:secret]
+    self.name = options[:name]
+    self.refresh_token = credentials[:refresh_token]
+    self.expires_at = credentials[:expires_at]
+    self.options = options
+    self
   end
 
   def self.register_options_provider(provider_name, &block)

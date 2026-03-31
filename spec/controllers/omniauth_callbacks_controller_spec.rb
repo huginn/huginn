@@ -44,5 +44,41 @@ describe OmniauthCallbacksController do
       expect(service.token).to eq("long-lived-threads-token")
       expect(service.options[:username]).to eq("threads-user")
     end
+
+    it "should reauthorize an existing service in place" do
+      threads = JSON.parse(File.read(Rails.root.join("spec/data_fixtures/services/threads.json")))
+      service = services(:threads)
+      service.update!(token: "old-token", uid: "old-uid")
+
+      stub_request(:get, "https://graph.threads.net/access_token")
+        .with(query: {
+          "grant_type" => "th_exchange_token",
+          "client_secret" => "threadsappsecret",
+          "access_token" => "short-lived-threads-token"
+        })
+        .to_return(
+          status: 200,
+          body: {
+            access_token: "long-lived-threads-token",
+            token_type: "bearer",
+            expires_in: 5_183_944
+          }.to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      request.env["omniauth.origin"] = "reauthorize_service:#{service.id}"
+      request.env["omniauth.auth"] = threads
+
+      expect {
+        get :threads
+      }.not_to change { users(:bob).services.count }
+
+      service.reload
+      expect(service.uid).to eq("3141592653")
+      expect(service.token).to eq("long-lived-threads-token")
+      expect(service.name).to eq("threads-user")
+      expect(service.options[:username]).to eq("threads-user")
+      expect(flash[:notice]).to eq("The service was successfully reauthorized.")
+    end
   end
 end
