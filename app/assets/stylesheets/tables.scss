@@ -46,3 +46,10 @@ table.events {
     font-family: monospace;
   }
 }
+
+.table.table-row-middle > tbody > tr {
+  > td,
+  > th {
+    vertical-align: middle;
+  }
+}
