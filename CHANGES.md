@@ -2,6 +2,11 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Apr 01, 2026   | Replace the JSON editor with vanilla-jsoneditor.  Agent option values now support typed JSON (numbers, booleans, arrays, objects) in addition to strings. [#3609](https://github.com/huginn/huginn/pull/3609) |
+| Mar 31, 2026   | Add Threads service and agents (ThreadsPublishAgent and ThreadsStreamAgent). [#3605](https://github.com/huginn/huginn/pull/3605) |
+| Mar 31, 2026   | Add service reauthorization flow and improve Services UI. [#3606](https://github.com/huginn/huginn/pull/3606) [#3607](https://github.com/huginn/huginn/pull/3607) |
+| Mar 29, 2026   | Remove CoffeeScript support from JavaScriptAgent.  Existing CoffeeScript agents are automatically migrated to JavaScript. [#3595](https://github.com/huginn/huginn/pull/3595) |
+| Mar 29, 2026   | Refresh Dropbox and Weibo integrations. [#3594](https://github.com/huginn/huginn/pull/3594) |
 | Mar 21, 2026   | CoffeeScript support in JavaScriptAgent is now optional.  The `coffee-script` gem is still included by default but will be removed in a future release. [#3584](https://github.com/huginn/huginn/pull/3584) |
 | Mar 20, 2026   | Add OpenAI ChatCompletion and Image agents for interacting with OpenAI-compatible APIs. [#3560](https://github.com/huginn/huginn/pull/3560) |
 | Mar 20, 2026   | Upgrade Liquid to 5.12. [#3583](https://github.com/huginn/huginn/pull/3583) |
