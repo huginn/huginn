@@ -1,6 +1,7 @@
 {
   "private": true,
   "dependencies": {
-    "@fortawesome/fontawesome-free": "7.2.0"
+    "@fortawesome/fontawesome-free": "7.2.0",
+    "vanilla-jsoneditor": "^3.12.0"
   }
 }

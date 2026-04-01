@@ -258,7 +258,7 @@ module Agents
 
     if defined?(RTurk)
       def take_majority?
-        interpolated['combination_mode'] == "take_majority" || interpolated['take_majority'] == "true"
+        interpolated['combination_mode'] == "take_majority" || boolify(interpolated['take_majority'])
       end
 
       def create_poll?

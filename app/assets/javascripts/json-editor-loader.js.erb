@@ -1,0 +1,4 @@
+import { createJSONEditor } from "<%= asset_path('standalone.js') %>";
+
+window.createVanillaJSONEditor = createJSONEditor;
+window.dispatchEvent(new CustomEvent("vanilla-jsoneditor:ready"));

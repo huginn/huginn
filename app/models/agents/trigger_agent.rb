@@ -70,12 +70,10 @@ module Agents
       end
 
       errors.add(:base,
-                 "message is required unless 'keep_event' is 'true'") unless options['message'].present? || keep_event?
+                 "message is required unless keep_event is true") unless options['message'].present? || keep_event?
 
       errors.add(:base,
-                 "keep_event, when present, must be 'true' or 'false'") unless options['keep_event'].blank? || %w[
-                   true false
-                 ].include?(options['keep_event'])
+                 "keep_event, when present, must be a boolean value") unless !option_provided?(options['keep_event']) || !boolify(options['keep_event']).nil?
 
       if options['must_match'].present?
         if options['must_match'].to_i < 1
@@ -88,8 +86,8 @@ module Agents
 
     def default_options
       {
-        'expected_receive_period_in_days' => "2",
-        'keep_event' => 'false',
+        'expected_receive_period_in_days' => 2,
+        'keep_event' => false,
         'rules' => [{
           'type' => "regex",
           'value' => "foo\\d+bar",

@@ -1,3 +1,5 @@
+<% load_json_editor! if agent.can_dry_run? %>
+
 <ul class="dropdown-menu" role="menu">
   <% if agent.can_be_scheduled? %>
     <li>

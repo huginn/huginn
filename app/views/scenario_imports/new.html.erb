@@ -1,4 +1,5 @@
 <% content_for :title, "Import Scenario" -%>
+<% load_json_editor! if @scenario_import.step_two? %>
 
 <div class='container scenario-import'>
   <div class="row">

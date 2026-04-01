@@ -30,16 +30,24 @@ module Agents
         'sender_cell' => 'xxxxxxxxxx',
         'receiver_cell' => 'xxxxxxxxxx',
         'server_url' => 'http://somename.com:3000',
-        'receive_text' => 'true',
-        'receive_call' => 'false',
-        'expected_receive_period_in_days' => '1'
+        'receive_text' => true,
+        'receive_call' => false,
+        'expected_receive_period_in_days' => 1
       }
     end
 
     def validate_options
-      unless options['account_sid'].present? && options['auth_token'].present? && options['sender_cell'].present? && options['receiver_cell'].present? && options['expected_receive_period_in_days'].present? && options['receive_call'].present? && options['receive_text'].present?
+      unless options['account_sid'].present? && options['auth_token'].present? && options['sender_cell'].present? &&
+          options['receiver_cell'].present? && options['expected_receive_period_in_days'].present? &&
+          option_provided?(options['receive_call']) && option_provided?(options['receive_text'])
         errors.add(:base,
                    'account_sid, auth_token, sender_cell, receiver_cell, receive_text, receive_call and expected_receive_period_in_days are all required')
+      end
+
+      %w[receive_call receive_text].each do |key|
+        if option_provided?(options[key]) && boolify(options[key]).nil?
+          errors.add(:base, "#{key} must be a boolean value")
+        end
       end
     end
 

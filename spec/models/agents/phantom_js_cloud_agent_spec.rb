@@ -100,14 +100,14 @@ describe Agents::PhantomJsCloudAgent do
     end
 
     it "should set wait interval to zero" do
-      @checker.options['wait_interval'] = '0'
+      @checker.options['wait_interval'] = 0
 
       expect {
         @checker.check
       }.to change { @checker.events.count }.by(1)
 
       item,* = @checker.events.last(1)
-      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%2C%22wait_interval%22%3A%220%22%7D%7D")
+      expect(item.payload['url']).to eq("https://phantomjscloud.com/api/browser/v2/1234567890/?request=%7B%22url%22%3A%22http%3A%2F%2Fxkcd.com%22%2C%22renderType%22%3A%22html%22%2C%22requestSettings%22%3A%7B%22userAgent%22%3A%22Huginn%20-%20https%3A%2F%2Fgithub.com%2Fhuginn%2Fhuginn%22%2C%22wait_interval%22%3A0%7D%7D")
     end
 
     it "should set user agent to BlackBerry" do

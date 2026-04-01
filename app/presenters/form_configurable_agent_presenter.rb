@@ -15,7 +15,12 @@ class FormConfigurableAgentPresenter < Decorator
 
   def option_field_for(attribute)
     data = @agent.form_configurable_fields[attribute]
-    value = @agent.options[attribute.to_s] || @agent.default_options[attribute.to_s]
+    value =
+      if @agent.options.has_key?(attribute.to_s)
+        @agent.options[attribute.to_s]
+      else
+        @agent.default_options[attribute.to_s]
+      end
     html_options = data.fetch(:html_options, {}).deep_merge({
       role: (data[:roles] + ['form-configurable']).join(' '),
       data: { attribute: },

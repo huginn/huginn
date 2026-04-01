@@ -65,7 +65,7 @@ module Agents
         'mode' => 'read',
         'access_key_id' => '',
         'access_key_secret' => '',
-        'watch' => 'true',
+        'watch' => true,
         'bucket' => "",
         'data' => '{{ data }}'
       }
@@ -76,7 +76,7 @@ module Agents
     form_configurable :access_key_secret, roles: :validatable
     form_configurable :region, type: :array,
                                values: %w[us-east-1 us-west-1 us-west-2 eu-west-1 eu-central-1 ap-southeast-1 ap-southeast-2 ap-northeast-1 ap-northeast-2 sa-east-1]
-    form_configurable :watch, type: :array, values: %w[true false]
+    form_configurable :watch, type: :boolean
     form_configurable :bucket, roles: :completable
     form_configurable :filename
     form_configurable :data
@@ -94,7 +94,7 @@ module Agents
 
       case interpolated['mode']
       when 'read'
-        if options['watch'].blank? || ![true, false].include?(boolify(options['watch']))
+        if !option_provided?(options['watch']) || ![true, false].include?(boolify(options['watch']))
           errors.add(:base, "The 'watch' option is required and must be set to 'true' or 'false'")
         end
       when 'write'

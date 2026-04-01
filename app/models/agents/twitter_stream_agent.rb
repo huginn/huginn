@@ -49,7 +49,7 @@ module Agents
         errors.add(:base, "expected_update_period_in_days, generate, and filters are required fields")
       end
 
-      if options[:include_retweets].present? && boolify(options[:include_retweets]).nil?
+      if option_provided?(options[:include_retweets]) && boolify(options[:include_retweets]).nil?
         errors.add(:base, "include_retweets must be a boolean value")
       end
     end
@@ -62,7 +62,7 @@ module Agents
       {
         'filters' => %w[keyword1 keyword2],
         'include_retweets' => false,
-        'expected_update_period_in_days' => "2",
+        'expected_update_period_in_days' => 2,
         'generate' => "events"
       }
     end

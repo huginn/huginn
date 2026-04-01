@@ -34,6 +34,10 @@ describe Agents::S3Agent do
       expect(@checker).to be_valid
       @checker.options['watch'] = 'false'
       expect(@checker).to be_valid
+      @checker.options['watch'] = true
+      expect(@checker).to be_valid
+      @checker.options['watch'] = false
+      expect(@checker).to be_valid
       @checker.options['watch'] = 'test'
       expect(@checker).not_to be_valid
     end

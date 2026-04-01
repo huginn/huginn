@@ -307,6 +307,10 @@ class Agent < ActiveRecord::Base
     end
   end
 
+  def option_provided?(option_value)
+    !(option_value != false && option_value.blank?)
+  end
+
   def is_positive_integer?(value)
     Integer(value) >= 0
   rescue StandardError

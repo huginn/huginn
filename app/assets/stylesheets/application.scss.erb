@@ -10,7 +10,6 @@
  *
  *= require select2
  *= require select2-bootstrap
- *= require jquery.json-editor
  *= require rickshaw
  *= require spectrum
  *= require fontawesome
@@ -214,12 +213,71 @@ span.not-applicable:after {
 
 // JSON Editor
 
-.live-json-editor {
-  font-family: "Courier New", Courier, monospace;
+.json-editor-shell {
+  border: 1px solid #ccd3db;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.json-editor blockquote {
-  font-size: 14px;
+.json-editor-shell:focus-within {
+  border-color: #66afe9;
+  box-shadow: 0 0 0 3px rgba(102, 175, 233, 0.15);
+}
+
+.json-editor-shell.has-error {
+  border-color: #d9534f;
+  box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.12);
+}
+
+.json-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e7ebf0;
+  background: linear-gradient(180deg, #fbfcfd 0%, #f4f7fa 100%);
+}
+
+.json-editor-status {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #5f6b7a;
+}
+
+.json-editor-status.is-error {
+  color: #d9534f;
+}
+
+.json-editor-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.json-editor-mode.active {
+  color: #fff;
+  background: #5bc0de;
+  border-color: #46b8da;
+}
+
+.json-editor-host {
+  width: 100%;
+  min-height: 200px;
+}
+
+.json-editor-host .jse-main {
+  height: 100%;
+  border: 0;
+  box-shadow: none;
+}
+
+.json-editor-host .cm-editor,
+.json-editor-host .cm-scroller,
+.json-editor-host .jse-contents {
+  min-height: inherit;
 }
 
 // Position tweaks

@@ -63,15 +63,15 @@ module Agents
     def default_options
       {
         'mode' => 'read',
-        'watch' => 'true',
-        'append' => 'false',
+        'watch' => true,
+        'append' => false,
         'path' => "",
         'data' => '{{ data }}'
       }
     end
 
     form_configurable :mode, type: :array, values: %w[read write]
-    form_configurable :watch, type: :array, values: %w[true false]
+    form_configurable :watch, type: :boolean
     form_configurable :path, type: :string
     form_configurable :append, type: :boolean
     form_configurable :data, type: :string
@@ -80,10 +80,10 @@ module Agents
       if options['mode'].blank? || !['read', 'write'].include?(options['mode'])
         errors.add(:base, "The 'mode' option is required and must be set to 'read' or 'write'")
       end
-      if options['watch'].blank? || ![true, false].include?(boolify(options['watch']))
+      if !option_provided?(options['watch']) || ![true, false].include?(boolify(options['watch']))
         errors.add(:base, "The 'watch' option is required and must be set to 'true' or 'false'")
       end
-      if options['append'].blank? || ![true, false].include?(boolify(options['append']))
+      if !option_provided?(options['append']) || ![true, false].include?(boolify(options['append']))
         errors.add(:base, "The 'append' option is required and must be set to 'true' or 'false'")
       end
       if options['path'].blank?

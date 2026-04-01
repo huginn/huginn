@@ -53,7 +53,7 @@ module Agents
         'output_as_json' => false,
         'ignore_images' => false,
         'user_agent' => self.class.default_user_agent,
-        'wait_interval' => '1000'
+        'wait_interval' => 1000
       }
     end
 
@@ -89,7 +89,7 @@ module Agents
     end
 
     def wait_interval
-      interpolated['wait_interval'].presence || default_options['wait_interval']
+      (interpolated['wait_interval'].presence || default_options['wait_interval']).to_i
     end
 
     def page_request_settings

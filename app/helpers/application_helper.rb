@@ -89,6 +89,12 @@ module ApplicationHelper
     end
   end
 
+  def load_json_editor!
+    unless content_for?(:json_editor_script)
+      content_for :json_editor_script, javascript_include_tag('json-editor-loader', type: 'module')
+    end
+  end
+
   def highlighted?(id)
     @highlighted_ranges ||=
       case value = params[:hl].presence

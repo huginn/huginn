@@ -44,9 +44,7 @@ describe "Dry running an Agent", js: true do
 
       open_dry_run_modal(agent)
       find('.dry-run-event-sample').click
-      within(:css, '.modal .builder') do
-        expect(page).to have_text('http://xkcd.com/')
-      end
+      expect(find("textarea.payload-editor", visible: :all).value).to include('http://xkcd.com/')
       click_on("Dry Run")
       expect(page).to have_text('Biologists play reverse')
       expect(page).to have_selector(:css, 'li[role="presentation"].active a[href="#tabEvents"]')
@@ -60,9 +58,7 @@ describe "Dry running an Agent", js: true do
 
       open_dry_run_modal(formatting_agent)
       find('.dry-run-event-sample').click
-      within(:css, '.modal .builder') do
-        expect(page).to have_text('Line 1\nLine 2\nLine 3')
-      end
+      expect(find("textarea.payload-editor", visible: :all).value).to include('Line 1\nLine 2\nLine 3')
       click_on("Dry Run")
       expect(page).to have_text('Line 1,Line 2,Line 3')
       expect(page).to have_selector(:css, 'li[role="presentation"].active a[href="#tabEvents"]')

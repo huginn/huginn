@@ -32,4 +32,5 @@ manifest.yml
 db/schema.rb
 .local/
 /node_modules
+/.tmp/
 spec/examples.txt

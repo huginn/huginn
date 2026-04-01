@@ -1,3 +1,5 @@
+require 'csv'
+
 module Agents
   class CsvAgent < Agent
     include FormConfigurable
@@ -12,7 +14,7 @@ module Agents
         'separator' => ',',
         'use_fields' => '',
         'output' => 'event_per_row',
-        'with_header' => 'true',
+        'with_header' => true,
         'data_path' => '$.data',
         'data_key' => 'data'
       }
@@ -94,7 +96,7 @@ module Agents
     form_configurable :data_path, type: :string
 
     def validate_options
-      if options['with_header'].blank? || ![true, false].include?(boolify(options['with_header']))
+      if !option_provided?(options['with_header']) || ![true, false].include?(boolify(options['with_header']))
         errors.add(:base, "The 'with_header' options is required and must be set to 'true' or 'false'")
       end
       if options['mode'] == 'serialize' && options['data_path'].blank?

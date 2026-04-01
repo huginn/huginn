@@ -132,7 +132,7 @@ module Agents
       end
 
       %w[ssl mark_as_read delete include_raw_mail].each { |key|
-        if options[key].present? && boolify(options[key]).nil?
+        if option_provided?(options[key]) && boolify(options[key]).nil?
           errors.add(:base, '%s must be a boolean value' % key)
         end
       }

@@ -91,6 +91,12 @@ describe Agents::TwilioAgent do
       expect(@checker).to be_valid
     end
 
+    it "accepts boolean receive flags" do
+      @checker.options[:receive_text] = false
+      @checker.options[:receive_call] = true
+      expect(@checker).to be_valid
+    end
+
     it "should validate presence of of account_sid" do
       @checker.options[:account_sid] = ""
       expect(@checker).not_to be_valid
