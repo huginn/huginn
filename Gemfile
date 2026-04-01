@@ -55,9 +55,7 @@ gem 'omniauth-tumblr'
 gem 'tumblr_client', github: 'IFTTT/tumblr_client'
 
 # Dropbox Agents
-# GitHub main includes the omniauth-oauth2 compatibility we need.
-# Switch back to the RubyGems release once those changes are published there.
-gem 'omniauth-dropbox2', github: 'icoretech/omniauth-dropbox2'
+gem 'omniauth-dropbox2', '>= 2.0.5'
 
 # UserLocationAgent
 gem 'haversine'

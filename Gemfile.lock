@@ -35,14 +35,6 @@ GIT
       treetop (>= 1.2.3)
 
 GIT
-  remote: https://github.com/icoretech/omniauth-dropbox2.git
-  revision: 2971448b78d66ba9db3e29c4e4be9c7a6b688019
-  specs:
-    omniauth-dropbox2 (2.0.4)
-      cgi (>= 0.3.6)
-      omniauth-oauth2 (>= 1.8, < 2.0)
-
-GIT
   remote: https://github.com/jnunemaker/httparty.git
   revision: 2daba91bf3f61de2676a2e906f4d3181ebadea83
   specs:
@@ -333,9 +325,6 @@ GEM
       googleapis-common-protos-types (>= 1.0.5, < 2.a)
       googleauth (>= 0.16.2, < 2.a)
     google-logging-utils (0.2.0)
-    google-protobuf (4.32.0)
-      bigdecimal
-      rake (>= 13)
     google-protobuf (4.32.0-aarch64-linux-gnu)
       bigdecimal
       rake (>= 13)
@@ -362,9 +351,6 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
-    grpc (1.74.1)
-      google-protobuf (>= 3.25, < 5.0)
-      googleapis-common-protos-types (~> 1.0)
     grpc (1.74.1-aarch64-linux-gnu)
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
@@ -546,6 +532,9 @@ GEM
       logger
       rack (>= 2.2.3)
       rack-protection
+    omniauth-dropbox2 (2.0.5)
+      cgi (>= 0.3.6)
+      omniauth-oauth2 (>= 1.8, < 2.0)
     omniauth-evernote (1.2.1)
       evernote-thrift
       multi_json (~> 1.0)
@@ -901,7 +890,7 @@ DEPENDENCIES
   net-ftp-list
   nokogiri (>= 1.19.2)
   omniauth
-  omniauth-dropbox2!
+  omniauth-dropbox2 (>= 2.0.5)
   omniauth-evernote
   omniauth-google-oauth2 (~> 1.2.2)
   omniauth-tumblr
