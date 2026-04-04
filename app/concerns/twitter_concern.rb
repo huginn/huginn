@@ -98,7 +98,7 @@ module TwitterConcern
       if ENV['TWITTER_OAUTH_KEY'].blank? || ENV['TWITTER_OAUTH_SECRET'].blank?
         "## Set TWITTER_OAUTH_KEY and TWITTER_OAUTH_SECRET in your environment to use Twitter Agents."
       elsif !defined?(Twitter) || !Devise.omniauth_providers.include?(:twitter)
-        "## Include the `twitter`, `omniauth-twitter`, and `cantino-twitter-stream` gems in your Gemfile to use Twitter Agents."
+        "## Include the `twitter` and `omniauth-twitter` gems in your Gemfile to use Twitter Agents."
       end
     end
 
