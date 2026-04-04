@@ -1,15 +1,21 @@
+# frozen_string_literal: true
+
 module Agents
   class TumblrPublishAgent < Agent
     include TumblrConcern
 
     cannot_be_scheduled!
 
-    gem_dependency_check { defined?(Tumblr::Client) }
+    gem_dependency_check do
+      Devise.omniauth_providers.include?(:tumblr) &&
+        ENV["TUMBLR_OAUTH_KEY"].present? &&
+        ENV["TUMBLR_OAUTH_SECRET"].present?
+    end
 
     description <<~MD
       The Tumblr Publish Agent publishes Tumblr posts from the events it receives.
 
-      #{'## Include `tumblr_client` and `omniauth-tumblr` in your Gemfile to use this Agent!' if dependencies_missing?}
+      #{tumblr_dependencies_missing if dependencies_missing?}
 
       To be able to use this Agent you need to authenticate with Tumblr in the [Services](/services) section first.
 
@@ -108,15 +114,15 @@ module Agents
         options = interpolated(event)['options']
         begin
           post = publish_post(blog_name, post_type, options)
-          if !post.has_key?('id')
+          if !post.key?(:id)
             log("Failed to create #{post_type} post on #{blog_name}: #{post.to_json}, options: #{options.to_json}")
             return
           end
-          expanded_post = get_post(blog_name, post["id"])
+          expanded_post = get_post(blog_name, post[:id])
           create_event payload: {
             'success' => true,
             'published_post' => "[" + blog_name + "] " + post_type,
-            'post_id' => post["id"],
+            'post_id' => post[:id],
             'agent_id' => event.agent_id,
             'event_id' => event.id,
             'post' => expanded_post
@@ -176,7 +182,7 @@ module Agents
 
     def get_post(blog_name, id)
       obj = tumblr.posts(blog_name, { id: })
-      obj["posts"].first
+      obj[:posts].first
     end
   end
 end

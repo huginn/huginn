@@ -1,13 +1,19 @@
+# frozen_string_literal: true
+
 module Agents
   class TumblrLikesAgent < Agent
     include TumblrConcern
 
-    gem_dependency_check { defined?(Tumblr::Client) }
+    gem_dependency_check do
+      Devise.omniauth_providers.include?(:tumblr) &&
+        ENV["TUMBLR_OAUTH_KEY"].present? &&
+        ENV["TUMBLR_OAUTH_SECRET"].present?
+    end
 
     description <<~MD
       The Tumblr Likes Agent checks for liked Tumblr posts from a specific blog.
 
-      #{'## Include `tumblr_client` and `omniauth-tumblr` in your Gemfile to use this Agent!' if dependencies_missing?}
+      #{tumblr_dependencies_missing if dependencies_missing?}
 
       To be able to use this Agent you need to authenticate with Tumblr in the [Services](/services) section first.
 
@@ -45,18 +51,18 @@ module Agents
       # Request Likes of blog_name after the last stored timestamp (or default of 0)
       liked = tumblr.blog_likes(options['blog_name'], after: memory[:last_liked])
 
-      if liked['liked_posts']
+      if liked[:liked_posts]
         # Loop over all liked posts which came back from Tumblr, add to memory, and create events.
-        liked['liked_posts'].each do |post|
-          next if memory[:ids].include?(post['id'])
+        liked[:liked_posts].each do |post|
+          next if memory[:ids].include?(post[:id])
 
-          memory[:ids].push(post['id'])
-          memory[:last_liked] = post['liked_timestamp'] if post['liked_timestamp'] > memory[:last_liked]
+          memory[:ids].push(post[:id])
+          memory[:last_liked] = post[:liked_timestamp] if post[:liked_timestamp] > memory[:last_liked]
           create_event(payload: post)
         end
-      elsif liked['status'] && liked['msg']
+      elsif liked[:status] && liked[:msg]
         # If there was a problem fetching likes (like 403 Forbidden or 404 Not Found) create an error message.
-        error "Error finding liked posts for #{options['blog_name']}: #{liked['status']} #{liked['msg']}"
+        error "Error finding liked posts for #{options['blog_name']}: #{liked[:status]} #{liked[:msg]}"
       end
 
       # Store only the last 50 (maximum the API will return) IDs in memory to prevent performance issues.

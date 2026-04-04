@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'utils'
+require Rails.root.join("lib/omniauth/strategies/tumblr").to_s
 require Rails.root.join("lib/omniauth/strategies/threads").to_s
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.

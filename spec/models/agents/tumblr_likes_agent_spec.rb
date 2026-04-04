@@ -5,9 +5,9 @@ describe Agents::TumblrLikesAgent do
     allow_any_instance_of(Agents::TumblrLikesAgent).to receive(:tumblr) {
       double.tap { |obj|
         allow(obj).to receive(:blog_likes).with('wendys.tumblr.com', after: 0) {
-          JSON.parse File.read(Rails.root.join('spec/data_fixtures/tumblr_likes.json'))
+          JSON.parse(File.read(Rails.root.join('spec/data_fixtures/tumblr_likes.json')), symbolize_names: true)
         }
-        allow(obj).to receive(:blog_likes).with('notfound.tumblr.com', after: 0) { { 'status' => 404, 'msg' => 'Not Found' } }
+        allow(obj).to receive(:blog_likes).with('notfound.tumblr.com', after: 0) { { status: 404, msg: 'Not Found' } }
       }
     }
   end

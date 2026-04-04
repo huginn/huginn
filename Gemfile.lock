@@ -5,18 +5,6 @@ GIT
     capybara-select-2 (0.5.1)
 
 GIT
-  remote: https://github.com/IFTTT/tumblr_client.git
-  revision: 690ac56bdbfebf34c89b066c94f513236d139d9c
-  specs:
-    tumblr_client (0.8.6)
-      faraday (~> 2.0)
-      faraday-multipart
-      json
-      mime-types
-      oauth
-      simple_oauth
-
-GIT
   remote: https://github.com/dsander/erector.git
   revision: 821c2fa9174b56cc39e203883d83b18b60912a36
   branch: rails6
@@ -236,8 +224,8 @@ GEM
     faraday-gzip (3.1.0)
       faraday (>= 2.0, < 3)
       zlib (~> 3.0)
-    faraday-multipart (1.0.4)
-      multipart-post (~> 2)
+    faraday-multipart (1.2.0)
+      multipart-post (~> 2.0)
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
     faraday-typhoeus (2.0.0)
@@ -504,15 +492,13 @@ GEM
       oauth2 (~> 2.0)
       omniauth (~> 2.0)
       omniauth-oauth2 (~> 1.8)
-    omniauth-oauth (1.2.0)
+    omniauth-oauth (1.2.1)
       oauth
       omniauth (>= 1.0, < 3)
+      rack (>= 1.6.2, < 4)
     omniauth-oauth2 (1.9.0)
       oauth2 (>= 2.0.2, < 3)
       omniauth (~> 2.0)
-    omniauth-tumblr (1.2)
-      multi_json
-      omniauth-oauth (~> 1.0)
     omniauth-twitter (1.4.0)
       omniauth-oauth (~> 1.1)
       rack
@@ -826,6 +812,7 @@ DEPENDENCIES
   faraday
   faraday-follow_redirects
   faraday-gzip
+  faraday-multipart
   faraday-typhoeus
   feedjira (~> 4.0, >= 4.0.1)
   ffi (>= 1.17.4)
@@ -863,7 +850,7 @@ DEPENDENCIES
   omniauth-dropbox2 (>= 2.0.5)
   omniauth-evernote
   omniauth-google-oauth2 (~> 1.2.2)
-  omniauth-tumblr
+  omniauth-oauth (~> 1.2, >= 1.2.1)
   omniauth-twitter
   ostruct
   pdf-reader
@@ -889,6 +876,7 @@ DEPENDENCIES
   sassc-rails
   select2-rails
   selenium-webdriver
+  simple_oauth
   simplecov
   simplecov-lcov
   slack-notifier
@@ -898,7 +886,6 @@ DEPENDENCIES
   spring-watcher-listen
   sprockets
   terser
-  tumblr_client!
   twilio-ruby
   twitter (~> 8.3)
   typhoeus
