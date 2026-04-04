@@ -17,16 +17,6 @@ GIT
       simple_oauth
 
 GIT
-  remote: https://github.com/cantino/twitter-stream.git
-  revision: a80822d579509802124d4e219bb771eb663efdb7
-  branch: huginn
-  specs:
-    twitter-stream (0.1.15)
-      eventmachine (>= 1.0.7)
-      http_parser.rb (~> 0.6.0)
-      simple_oauth (~> 0.3.0)
-
-GIT
   remote: https://github.com/dsander/erector.git
   revision: 821c2fa9174b56cc39e203883d83b18b60912a36
   branch: rails6
@@ -41,22 +31,6 @@ GIT
   specs:
     mini_racer (0.20.0)
       libv8-node (~> 24.12.0.1)
-
-GIT
-  remote: https://github.com/sferik/twitter.git
-  revision: 5fc9b15371b0936a4b331103b588c860f46170fd
-  specs:
-    twitter (8.0.0)
-      addressable (~> 2.3)
-      buftok (~> 0.3.0)
-      equalizer (~> 0.0.11)
-      http (~> 5.1)
-      http-form_data (~> 2.3)
-      llhttp-ffi (~> 0.4.0)
-      memoizable (~> 0.4.0)
-      multipart-post (~> 2.0)
-      naught (~> 1.0)
-      simple_oauth (~> 0.3.0)
 
 PATH
   remote: vendor/gems/dotenv-3.2.0
@@ -176,7 +150,7 @@ GEM
     bootstrap-kaminari-views (0.0.5)
       kaminari (>= 0.13)
       rails (>= 3.1)
-    buftok (0.3.0)
+    buftok (1.0.1)
     builder (3.3.0)
     capistrano (3.20.0)
       airbrussh (>= 1.0.0)
@@ -239,7 +213,7 @@ GEM
       http_parser.rb (>= 0.6.0)
     em-socksify (0.3.2)
       eventmachine (>= 1.0.0.beta.4)
-    equalizer (0.0.11)
+    equalizer (1.0.0)
     erb (6.0.2)
     erubi (1.13.1)
     et-orbi (1.2.11)
@@ -277,9 +251,6 @@ GEM
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
-    ffi-compiler (1.0.1)
-      ffi (>= 1.0.0)
-      rake
     foreman (0.90.0)
       thor (~> 1.4)
     fugit (1.11.1)
@@ -365,15 +336,12 @@ GEM
       httparty (>= 0.7.3)
       mimemagic
       multipart-post
-    http (5.1.1)
-      addressable (~> 2.8)
+    http (6.0.2)
       http-cookie (~> 1.0)
-      http-form_data (~> 2.2)
-      llhttp-ffi (~> 0.4.0)
+      llhttp (~> 0.6.1)
     http-accept (1.7.0)
     http-cookie (1.1.0)
       domain_name (~> 0.5)
-    http-form_data (2.3.0)
     http_parser.rb (0.6.0)
     httparty (0.24.2)
       csv
@@ -439,9 +407,7 @@ GEM
       logger
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    llhttp-ffi (0.4.0)
-      ffi-compiler (~> 1.0)
-      rake (~> 13.0)
+    llhttp (0.6.1)
     logger (1.7.0)
     loofah (2.25.1)
       crass (~> 1.0.2)
@@ -454,8 +420,7 @@ GEM
       net-smtp
     marcel (1.1.0)
     matrix (0.4.3)
-    memoizable (0.4.2)
-      thread_safe (~> 0.3, >= 0.3.1)
+    memoizable (0.5.1)
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
@@ -479,7 +444,7 @@ GEM
     mutex_m (0.3.0)
     mysql2 (0.5.7)
       bigdecimal
-    naught (1.1.0)
+    naught (2.3.0)
     net-ftp (0.3.9)
       net-protocol
       time
@@ -740,7 +705,9 @@ GEM
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 4.0)
       multi_json (~> 1.10)
-    simple_oauth (0.3.1)
+    simple_oauth (0.4.0)
+      base64
+      cgi
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -776,7 +743,6 @@ GEM
     terser (1.2.7)
       execjs (>= 0.3.0, < 3)
     thor (1.5.0)
-    thread_safe (0.3.6)
     tilt (2.1.0)
     time (0.4.2)
       date
@@ -791,6 +757,15 @@ GEM
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 4.0)
       nokogiri (>= 1.6, < 2.0)
+    twitter (8.3.0)
+      base64 (~> 0.3.0)
+      buftok (~> 1.0)
+      equalizer (~> 1.0)
+      http (~> 6.0)
+      memoizable (~> 0.5.1)
+      naught (~> 2.3)
+      simple_oauth (~> 0.4.0)
+      uri (~> 1.1)
     typhoeus (1.6.0)
       ethon (>= 0.18.0)
     tzinfo (2.0.6)
@@ -925,8 +900,7 @@ DEPENDENCIES
   terser
   tumblr_client!
   twilio-ruby
-  twitter!
-  twitter-stream!
+  twitter (~> 8.3)
   typhoeus
   tzinfo (>= 2.0.6)
   tzinfo-data

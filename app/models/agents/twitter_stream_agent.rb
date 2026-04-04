@@ -154,29 +154,57 @@ module Agents
 
     class Worker < LongRunnable::Worker
       RELOAD_TIMEOUT = 60.minutes
+      NO_DATA_TIMEOUT = 90.seconds
+      NO_DATA_CHECK_INTERVAL = 5.seconds
+      RETRIES_MAX = 10
+      MAX_RECONNECT_SLEEP = 60.seconds
       DUPLICATE_DETECTION_LENGTH = 1000
       SEPARATOR = /[^\w-]+/
 
+      def backoff_strategy(type)
+        case type
+        in :network
+          Enumerator.produce(0.25) { [it + 0.25, 16].min }
+        in :application
+          Enumerator.produce(10) { [it * 2, 320].min }
+        end
+      end
+
       def setup
-        require 'twitter/json_stream'
         @filter_to_agent_map = @config[:filter_to_agent_map]
+        @stopping = false
+        @client = nil
+        @active_at = nil
+        reset_reconnect_state!
       end
 
       def run
         @recent_tweets = []
-        EventMachine.run do
-          EventMachine.add_periodic_timer(RELOAD_TIMEOUT) do
-            restart!
-          end
+        schedule_in(RELOAD_TIMEOUT) { restart! } if scheduler
+        every(NO_DATA_CHECK_INTERVAL) { restart_if_stale! } if scheduler
+
+        loop do
+          break if @stopping
+
           stream!(@filter_to_agent_map.keys, @agent) do |status|
+            @active_at = Time.now
             handle_status(status)
           end
+
+          break if @stopping
+
+          handle_reconnect!(:network, "Twitter stream disconnected")
+        rescue StandardError => e
+          break if @stopping
+
+          warn " --> Twitter error: #{e.class}: #{e.message} at #{Time.now} <--"
+          handle_reconnect!(:application)
         end
-        Thread.stop
       end
 
       def stop
-        EventMachine.stop_event_loop if EventMachine.reactor_running?
+        @stopping = true
+        @client&.close
         terminate_thread!
       end
 
@@ -184,48 +212,71 @@ module Agents
 
       def stream!(filters, agent, &block)
         track = filters.map(&:downcase).uniq.join(",")
+        @active_at = Time.now
+        @client = streaming_client(agent)
 
-        path =
-          if track.present?
-            "/1.1/statuses/filter.json?#{{ track: }.to_param}"
-          else
-            "/1.1/statuses/sample.json"
-          end
-
-        stream = Twitter::JSONStream.connect(
-          path:,
-          ssl: true,
-          oauth: {
-            consumer_key: agent.twitter_consumer_key,
-            consumer_secret: agent.twitter_consumer_secret,
-            access_key: agent.twitter_oauth_token,
-            access_secret: agent.twitter_oauth_token_secret
-          }
-        )
-
-        stream.each_item(&block)
-
-        stream.on_error do |message|
-          warn " --> Twitter error: #{message} at #{Time.now} <--"
-          warn " --> Sleeping for 15 seconds"
-          sleep 15
-          restart!
+        if track.present?
+          @client.filter(track:, &block)
+        else
+          @client.sample(&block)
         end
+      ensure
+        @client = nil
+      end
 
-        stream.on_no_data do |_message|
-          warn " --> Got no data for awhile; trying to reconnect at #{Time.now} <--"
-          restart!
-        end
-
-        stream.on_max_reconnects do |_timeout, _retries|
-          warn " --> Oops, tried too many times! at #{Time.now} <--"
-          sleep 60
-          restart!
+      def streaming_client(agent)
+        Twitter::Streaming::Client.new do |config|
+          config.consumer_key = agent.twitter_consumer_key
+          config.consumer_secret = agent.twitter_consumer_secret
+          config.access_token = agent.twitter_oauth_token
+          config.access_token_secret = agent.twitter_oauth_token_secret
         end
       end
 
+      def restart_if_stale!
+        return if @stopping || @active_at.nil?
+        return if Time.now - @active_at <= NO_DATA_TIMEOUT
+
+        warn " --> Got no data for awhile; trying to reconnect at #{Time.now} <--"
+        restart!
+      end
+
+      def handle_reconnect!(type, message = nil)
+        timeout = reconnect_timeout(type)
+
+        if timeout
+          warn " --> #{message}; reconnecting in #{timeout} seconds at #{Time.now} <--" if message
+          warn " --> Sleeping for #{timeout} seconds"
+          sleep timeout
+        else
+          warn " --> Oops, tried too many times! at #{Time.now} <--"
+          sleep MAX_RECONNECT_SLEEP
+          reset_reconnect_state!
+        end
+      end
+
+      def reconnect_timeout(type)
+        reset_backoff_strategy!(type) if @backoff_type != type
+        @reconnect_retries += 1
+        return @backoff.next if @reconnect_retries <= RETRIES_MAX
+
+        nil
+      end
+
+      def reset_backoff_strategy!(type)
+        @backoff_type = type
+        @backoff = backoff_strategy(type)
+      end
+
+      def reset_reconnect_state!
+        @backoff_type = nil
+        @backoff = nil
+        @reconnect_retries = 0
+      end
+
       def handle_status(status)
-        status = JSON.parse(status, symbolize_names: true) if status.is_a?(String)
+        return unless status.is_a?(Twitter::Tweet)
+
         status = TwitterConcern.format_tweet(status)
 
         return unless status && status[:text] && !status.has_key?(:delete)
