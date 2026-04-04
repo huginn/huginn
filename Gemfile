@@ -50,8 +50,8 @@ gem 'omniauth-twitter'
 gem 'twitter', '~> 8.3'
 
 # Tumblr Agents
-gem 'omniauth-tumblr'
-gem 'tumblr_client', github: 'IFTTT/tumblr_client'
+gem 'omniauth-oauth', '~> 1.2', '>= 1.2.1'
+gem 'simple_oauth'
 
 # Dropbox Agents
 gem 'omniauth-dropbox2', '>= 2.0.5'
@@ -88,6 +88,7 @@ gem 'faraday'
 gem 'faraday-follow_redirects'
 gem 'faraday-gzip'
 # gem 'faraday-httpclient'
+gem 'faraday-multipart'
 gem 'faraday-typhoeus'
 gem 'feedjira', '~> 4.0', '>= 4.0.1'
 gem 'foreman'
