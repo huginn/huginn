@@ -35,15 +35,6 @@ GIT
       treetop (>= 1.2.3)
 
 GIT
-  remote: https://github.com/jnunemaker/httparty.git
-  revision: 2daba91bf3f61de2676a2e906f4d3181ebadea83
-  specs:
-    httparty (0.24.2)
-      csv
-      mini_mime (>= 1.0.0)
-      multi_xml (>= 0.5.2)
-
-GIT
   remote: https://github.com/knu/mini_racer.git
   revision: 172396ba66144124e3af676e1b8f02f393dfdfdc
   branch: fix/darwin_build
@@ -384,6 +375,10 @@ GEM
       domain_name (~> 0.5)
     http-form_data (2.3.0)
     http_parser.rb (0.6.0)
+    httparty (0.24.2)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
     httpclient (2.9.0)
       mutex_m
     huginn_agent (0.6.1)
@@ -868,7 +863,7 @@ DEPENDENCIES
   haversine
   hipchat
   httmultiparty
-  httparty!
+  httparty (>= 0.24.2)
   huginn_agent
   jquery-rails
   json
