@@ -214,7 +214,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    execjs (2.10.0)
+    execjs (2.10.1)
     faraday (2.14.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
