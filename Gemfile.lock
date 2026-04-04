@@ -1,10 +1,4 @@
 GIT
-  remote: https://github.com/Hirurg103/capybara_select2.git
-  revision: 48e2c458c2827cf2af2b0a287b30468fa8d761bf
-  specs:
-    capybara-select-2 (0.5.1)
-
-GIT
   remote: https://github.com/dsander/erector.git
   revision: 821c2fa9174b56cc39e203883d83b18b60912a36
   branch: rails6
@@ -159,6 +153,7 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
+    capybara-select-2 (0.5.1)
     cgi (0.5.1)
     childprocess (5.1.0)
       logger (~> 1.5)
@@ -807,7 +802,7 @@ DEPENDENCIES
   capistrano-bundler
   capistrano-rails
   capybara
-  capybara-select-2!
+  capybara-select-2
   daemons
   debug
   delayed_job
