@@ -63,6 +63,18 @@ describe Event do
     end
   end
 
+  describe "payload serialization" do
+    it "returns payload with indifferent access after reload" do
+      event = events(:bob_website_agent_event)
+
+      event.update!(payload: { "hi" => 2 })
+
+      expect(event.reload.payload).to be_a(ActiveSupport::HashWithIndifferentAccess)
+      expect(event.payload[:hi]).to eq(2)
+      expect(event.payload["hi"]).to eq(2)
+    end
+  end
+
   describe ".cleanup_expired!" do
     it "removes any Events whose expired_at date is non-null and in the past, updating Agent counter caches" do
       half_hour_event = agents(:jane_weather_agent).create_event expires_at: 20.minutes.from_now
