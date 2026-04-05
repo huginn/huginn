@@ -333,7 +333,7 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    huginn_agent (0.6.1)
+    huginn_agent (0.6.4)
       thor
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
