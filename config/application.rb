@@ -46,6 +46,7 @@ module Huginn
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W[#{config.root}/lib #{config.root}/app/presenters #{config.root}/app/jobs]
+    config.paths["db/migrate"] << config.root.join("db/native_json_migrate").to_s if ENV["NATIVE_JSON_COLUMNS"].present?
 
     # Activate observers that should always be running.
     # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
