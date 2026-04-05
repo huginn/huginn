@@ -23,6 +23,27 @@ module Utils
     end
   end
 
+  def self.normalize_json(value)
+    case value
+    when ActiveSupport::HashWithIndifferentAccess, Hash
+      value.each_with_object({}) { |(key, nested_value), normalized|
+        normalized[key.to_s] = normalize_json(nested_value)
+      }.sort.to_h
+    when Array
+      value.map { |nested_value| normalize_json(nested_value) }
+    else
+      value
+    end
+  end
+
+  def self.stable_json(value)
+    JSON.dump(normalize_json(value))
+  end
+
+  def self.same_json?(left, right)
+    normalize_json(left) == normalize_json(right)
+  end
+
   class << self
     def normalize_uri(uri)
       URI.parse(uri)

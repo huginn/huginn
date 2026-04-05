@@ -110,6 +110,16 @@ describe Utils do
     end
   end
 
+  describe ".same_json?" do
+    it "treats hashes with different key order as equal" do
+      left = { "b" => 2, "a" => { "d" => 4, "c" => 3 } }
+      right = { "a" => { "c" => 3, "d" => 4 }, "b" => 2 }
+
+      expect(Utils.same_json?(left, right)).to be(true)
+      expect(Utils.stable_json(left)).to eq(Utils.stable_json(right))
+    end
+  end
+
   describe "#sort_tuples!" do
     let(:tuples) {
       time = Time.now
