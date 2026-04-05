@@ -1,0 +1,125 @@
+#!/bin/bash -e
+#
+# Cleanly shut down a MySQL 5.7 data directory so MySQL 8.0 can upgrade it.
+# No-op unless the data directory is from MySQL 5.7.
+
+DATADIR="${1:-/var/lib/mysql}"
+MYSQL57_VERSION=5.7.44
+MYSQL57_ARCH=x86_64
+MYSQL57_DIST="mysql-${MYSQL57_VERSION}-linux-glibc2.12-${MYSQL57_ARCH}"
+MYSQL57_URL="https://downloads.mysql.com/archives/get/p/23/file/${MYSQL57_DIST}.tar.gz"
+MYSQL57_RELEASE_KEY=/scripts/mysql-2022-release.asc
+MYSQL57_SIGNATURE="/scripts/${MYSQL57_DIST}.tar.gz.asc"
+ARCH="$(uname -m)"
+
+# Detect the MySQL version from the redo log header.
+REDO_LOG="$DATADIR/ib_logfile0"
+
+if [ ! -f "$REDO_LOG" ]; then
+  exit 0
+fi
+
+mysql_version="$(dd if="$REDO_LOG" bs=1 skip=16 count=32 2>/dev/null | tr -d '\0[:space:]')"
+case "$mysql_version" in
+  MySQL5.7.*)
+    mysql_version="${mysql_version#MySQL}"
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+
+echo "Detected MySQL $mysql_version data directory.  Upgrading to 8.0..."
+
+if [ "$ARCH" != "$MYSQL57_ARCH" ]; then
+  echo "Cannot auto-upgrade MySQL 5.7 data on $ARCH: the official MySQL 5.7 rescue binary is only available for $MYSQL57_ARCH."
+  echo "Start the volume once with an amd64 image to perform the clean shutdown, then retry MySQL 8.0."
+  exit 1
+fi
+
+if [ ! -f "$MYSQL57_RELEASE_KEY" ]; then
+  echo "Bundled MySQL release key is missing: $MYSQL57_RELEASE_KEY"
+  exit 1
+fi
+
+if [ ! -f "$MYSQL57_SIGNATURE" ]; then
+  echo "Bundled MySQL detached signature is missing: $MYSQL57_SIGNATURE"
+  exit 1
+fi
+
+SOCKET="$DATADIR/.upgrade-mysql57.sock"
+mysql57_pid=
+tmpdir=
+
+cleanup() {
+  rm -f "$SOCKET"
+  if [ -n "$mysql57_pid" ] && kill -0 "$mysql57_pid" 2>/dev/null; then
+    kill "$mysql57_pid" 2>/dev/null || true
+    wait "$mysql57_pid" 2>/dev/null || true
+  fi
+  if [ -n "$tmpdir" ]; then
+    rm -rf "$tmpdir"
+  fi
+}
+trap cleanup EXIT
+
+tmpdir="$(mktemp -d)"
+archive="$tmpdir/${MYSQL57_DIST}.tar.gz"
+keyring="$tmpdir/mysql-release.gpg"
+MYSQL57_DIR="$tmpdir/mysql57"
+MYSQL57_ADMIN="$MYSQL57_DIR/bin/mysqladmin"
+
+echo "Downloading MySQL 5.7 rescue binary..."
+curl -fsSLo "$archive" "$MYSQL57_URL"
+
+gpg --dearmor -o "$keyring" "$MYSQL57_RELEASE_KEY"
+gpgv --keyring "$keyring" "$MYSQL57_SIGNATURE" "$archive" >/dev/null 2>&1
+
+mkdir -p "$MYSQL57_DIR"
+tar -xzf "$archive" --strip-components=1 -C "$MYSQL57_DIR" \
+  "${MYSQL57_DIST}/bin/mysqld" \
+  "${MYSQL57_DIST}/bin/mysqladmin" \
+  "${MYSQL57_DIST}/share"
+
+echo "Performing clean shutdown of MySQL 5.7 data..."
+"$MYSQL57_DIR/bin/mysqld" \
+  --no-defaults \
+  --skip-networking \
+  --skip-grant-tables \
+  --user="$(whoami)" \
+  --datadir="$DATADIR" \
+  --lc-messages-dir="$MYSQL57_DIR/share" \
+  --socket="$SOCKET" \
+  --innodb-fast-shutdown=0 &
+mysql57_pid=$!
+
+timeout=60
+while kill -0 "$mysql57_pid" 2>/dev/null; do
+  if "$MYSQL57_ADMIN" --no-defaults --protocol=socket --socket="$SOCKET" ping >/dev/null 2>&1; then
+    break
+  fi
+  (( timeout = timeout - 1 ))
+  if [ $timeout -eq 0 ]; then
+    echo "MySQL 5.7 failed to start for upgrade"
+    kill "$mysql57_pid" 2>/dev/null || true
+    exit 1
+  fi
+  sleep 1
+done
+
+if ! kill -0 "$mysql57_pid" 2>/dev/null; then
+  echo "MySQL 5.7 exited before it became ready for upgrade"
+  exit 1
+fi
+
+if ! "$MYSQL57_ADMIN" --no-defaults --protocol=socket --socket="$SOCKET" shutdown >/dev/null 2>&1; then
+  echo "MySQL 5.7 failed to shut down cleanly for upgrade"
+  kill "$mysql57_pid" 2>/dev/null || true
+  exit 1
+fi
+
+wait "$mysql57_pid"
+mysql57_pid=
+
+echo "MySQL 5.7 data directory has been cleanly shut down."
+echo "MySQL 8.0 will perform automatic upgrade on next start."

@@ -16,6 +16,9 @@ if [ "${START_MYSQL}" = "true" ]; then
     mv -f /tmp/mysql/* /var/lib/mysql/
   fi
 
+  # Upgrade MySQL 5.7 data directory if needed
+  /scripts/upgrade-mysql /var/lib/mysql
+
   echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DATABASE_PASSWORD}';" > /app/tmp/mysql_init.sql
 
   echo "Starting mysql server..."
