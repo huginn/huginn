@@ -528,8 +528,7 @@ module Agents
     def store_payload!(old_events, result)
       case interpolated['mode'].presence
       when 'on_change'
-        result_json = result.to_json
-        if found = old_events.find { |event| event.payload.to_json == result_json }
+        if found = old_events.find { |event| Utils.same_json?(event.payload, result) }
           found.update!(expires_at: new_event_expiration_date)
           false
         else

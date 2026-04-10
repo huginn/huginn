@@ -582,6 +582,27 @@ describe Agent do
         expect(agent.errors_on(:options)).to include("cannot be set to an instance of #{2.class}") # Integer (ruby >=2.4) or Fixnum (ruby <2.4)
       end
 
+      it "returns options with indifferent access after reload" do
+        agent = agents(:bob_weather_agent)
+
+        agent.options["hi"] = 2
+        agent.save!
+
+        expect(agent.reload.options).to be_a(ActiveSupport::HashWithIndifferentAccess)
+        expect(agent.options[:hi]).to eq(2)
+        expect(agent.options["hi"]).to eq(2)
+      end
+
+      it "returns memory with indifferent access after reload" do
+        agent = agents(:bob_weather_agent)
+
+        agent.update!(memory: { "hi" => 2 })
+
+        expect(agent.reload.memory).to be_a(ActiveSupport::HashWithIndifferentAccess)
+        expect(agent.memory[:hi]).to eq(2)
+        expect(agent.memory["hi"]).to eq(2)
+      end
+
       it "should not allow source agents owned by other people" do
         agent = Agents::SomethingSource.new(name: "something")
         agent.user = users(:bob)

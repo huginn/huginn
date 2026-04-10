@@ -189,6 +189,30 @@ describe Agents::WebsiteAgent do
         }.to change { Event.count }.by(1)
       end
 
+      it "treats payloads with different key order as unchanged" do
+        existing_event = @checker.events.create!(
+          user: @checker.user,
+          payload: {
+            'hovertext' => "An unsafe quantity of analogies",
+            'title' => "Angular Momentum",
+            'url' => "//imgs.xkcd.com/comics/angular_momentum.png"
+          },
+          expires_at: 1.day.from_now
+        )
+
+        expect(
+          @checker.send(
+            :store_payload!,
+            [existing_event],
+            {
+              'url' => "//imgs.xkcd.com/comics/angular_momentum.png",
+              'title' => "Angular Momentum",
+              'hovertext' => "An unsafe quantity of analogies"
+            }
+          )
+        ).to be(false)
+      end
+
       it "should log an error if the number of results for a set of extraction patterns differs" do
         @valid_options['extract']['url']['css'] = "div"
         @checker.options = @valid_options

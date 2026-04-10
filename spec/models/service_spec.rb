@@ -177,6 +177,18 @@ describe Service do
     end
   end
 
+  describe "options serialization" do
+    it "returns options with indifferent access after reload" do
+      service = services(:generic)
+
+      service.update!(options: { "user_id" => "abc", "username" => "demo" })
+
+      expect(service.reload.options).to be_a(ActiveSupport::HashWithIndifferentAccess)
+      expect(service.options[:user_id]).to eq("abc")
+      expect(service.options["username"]).to eq("demo")
+    end
+  end
+
   describe 'omniauth options provider registry for non-conforming omniauth responses' do
     describe '.register_options_provider' do
       before do

@@ -54,7 +54,7 @@ module Agents
     private
 
     def handle(opts, event = nil)
-      property = get_hash(options['property'].blank? ? JSON.dump(event.payload) : opts['property'])
+      property = get_hash(options['property'].blank? ? Utils.stable_json(event.payload) : opts['property'])
       if is_unique?(property)
         outbound_event = create_event payload: event.payload
 
