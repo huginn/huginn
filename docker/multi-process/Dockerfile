@@ -49,6 +49,9 @@ COPY ["docker/multi-process/scripts/bootstrap.conf", \
 COPY ["docker/multi-process/scripts/bootstrap.sh", \
       "docker/multi-process/scripts/foreman.sh", \
       "docker/multi-process/scripts/init", \
+      "docker/multi-process/scripts/mysql-5.7.44-linux-glibc2.12-x86_64.tar.gz.asc", \
+      "docker/multi-process/scripts/mysql-2022-release.asc", \
+      "docker/multi-process/scripts/upgrade-mysql", \
       "docker/scripts/setup_env", "/scripts/"]
 CMD ["/scripts/init"]
 
