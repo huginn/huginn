@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   run-tests:
-    name: ${{ matrix.os }} ruby-${{ matrix.ruby }} ${{ matrix.database_adapter }}
+    name: ${{ matrix.os }} ruby-${{ matrix.ruby }} ${{ matrix.database_adapter }} native-json-${{ matrix.native_json_columns }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -26,6 +26,9 @@ jobs:
         database_adapter:
           - mysql2
           - postgresql
+        native_json_columns:
+          - enabled
+          - disabled
         ruby:
           - "3.4"
     env:
@@ -33,6 +36,7 @@ jobs:
       DATABASE_HOST: "127.0.0.1"
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: password
+      NATIVE_JSON_COLUMNS: ${{ matrix.native_json_columns == 'enabled' && '1' || '' }}
     services:
       mysql:
         image: mysql:latest

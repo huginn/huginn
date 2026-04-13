@@ -5,14 +5,14 @@ generic:
   provider: testprovider
   name: test
   expires_at: <%= Time.parse("2015-01-01 00:00:00") %>
-  options: <%= { user_id: 12345 }.to_yaml.inspect %>
+  options: <%= { user_id: 12345 }.to_json.inspect %>
   user: bob
 global:
   token: 1234token
   provider: testprovider
   name: test
   expires_at: <%= Time.parse("2015-01-01 00:00:00") %>
-  options: <%= { user_id: 12345 }.to_yaml.inspect %>
+  options: <%= { user_id: 12345 }.to_json.inspect %>
   user: jane
   global: true
 twitter:
@@ -22,12 +22,12 @@ twitter:
   provider: twitter
   name: test
   expires_at: <%= Time.parse("2015-01-01 00:00:00") %>
-  options: <%= { user_id: 12345 }.to_yaml.inspect %>
+  options: <%= { user_id: 12345 }.to_json.inspect %>
   user: bob
 threads:
   token: long-lived-threads-token
   provider: threads
   name: threads-user
   expires_at: <%= 30.days.from_now %>
-  options: <%= { user_id: "3141592653", username: "threads-user" }.to_yaml.inspect %>
+  options: <%= { user_id: "3141592653", username: "threads-user" }.to_json.inspect %>
   user: bob
