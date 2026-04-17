@@ -1,11 +1,29 @@
 require 'date'
 require 'cgi'
+require 'faraday'
+require 'faraday/follow_redirects'
+require 'faraday/gzip'
+require 'faraday/typhoeus'
 
 module Agents
   class JavaScriptAgent < Agent
     include FormConfigurable
 
     can_dry_run!
+
+    FETCH_USER_AGENT = "Huginn - https://github.com/huginn/huginn".freeze
+    ALLOWED_FETCH_METHODS = %i[get head post put delete patch options].freeze
+
+    class ConditionalFollowRedirects < Faraday::FollowRedirects::Middleware
+      def call(env)
+        case env[:request]&.context
+        in { skip_follow_redirects: true }
+          @app.call(env)
+        else
+          super
+        end
+      end
+    end
 
     default_schedule "never"
 
@@ -36,6 +54,17 @@ module Agents
       * `this.kvs` (whose properties are variables provided by KeyValueStoreAgents)
       * `this.escapeHtml(htmlToEscape)`
       * `this.unescapeHtml(htmlToUnescape)`
+
+      A synchronous subset of the Web `fetch` API is also available as `Agent.fetch(url, options)`.  It blocks until the response is received and returns a Response-like object with the following members:
+
+      * `ok`, `status`, `statusText`, `url`, `redirected`
+      * `headers`: an object whose own properties are the response headers (with lower-cased names), plus `get(name)` and `has(name)` methods for case-insensitive lookup
+      * `text()` returning the response body as a string
+      * `json()` returning the parsed JSON body
+
+      Supported request options are `method` (default `"GET"`), `headers` (a plain object), `body` (a string), `timeout` (in seconds), and `redirect` (`"follow"` or `"manual"`, default `"follow"`).  Network errors throw a `TypeError`; HTTP error statuses do not — check `response.ok` as per the standard.  A default `User-Agent` header is sent when not overridden by the `headers` option.
+
+      To issue multiple requests in parallel, use `Agent.fetchAll(requests, options)`.  Each request may be a URL string or a `[url, options]` pair mirroring the arguments of `Agent.fetch`.  The return value is an array of Response-like objects in the same order as the input.  As with `Agent.fetch`, any network error throws a `TypeError` for the whole batch, while individual HTTP error statuses are reported via each `response.ok`.  The optional second argument accepts `{ concurrency: 8 }` to cap the number of concurrent requests.
     MD
 
     form_configurable :code, type: :text, ace: { mode: 'javascript' }
@@ -127,6 +156,11 @@ module Agents
       context.attach("unescapeHtml", ->(x) { CGI.unescapeHTML(x) })
       context.attach('getCredential', ->(k) { credential(k); })
       context.attach('setCredential', ->(k, v) { set_credential(k, v) })
+      context.attach("doFetch", ->(url, opts) { do_fetch(url, **opts&.deep_symbolize_keys) })
+      context.attach("doFetchAll", ->(pairs, opts) {
+        pairs = pairs&.map { |(url, o)| [url, o.is_a?(Hash) ? o.deep_symbolize_keys : {}] }
+        do_fetch_all(pairs, **opts&.deep_symbolize_keys)
+      })
 
       kvs = Agents::KeyValueStoreAgent.merge(controllers).find_each.to_h { |kvs|
         [kvs.options[:variable], kvs.memory.as_json]
@@ -221,6 +255,57 @@ module Agents
 
         Agent.check = function(){};
         Agent.receive = function(){};
+
+        function buildResponse(result) {
+          var headers = result.headers;
+          return {
+            ok: result.ok,
+            status: result.status,
+            statusText: result.statusText,
+            url: result.url,
+            redirected: result.redirected,
+            headers: Object.assign({}, headers, {
+              get: function(name) {
+                var key = String(name).toLowerCase();
+                return Object.prototype.hasOwnProperty.call(headers, key) ? headers[key] : null;
+              },
+              has: function(name) {
+                return Object.prototype.hasOwnProperty.call(headers, String(name).toLowerCase());
+              }
+            }),
+            text: function() { return result.body; },
+            json: function() { return JSON.parse(result.body); }
+          };
+        }
+
+        Agent.fetch = function(url, options) {
+          var result = doFetch(String(url), options || {});
+          if (result.error) {
+            throw new TypeError(result.error);
+          }
+          return buildResponse(result);
+        }
+
+        Agent.fetchAll = function(requests, options) {
+          if (!Array.isArray(requests)) {
+            throw new TypeError("fetchAll requires an array of requests");
+          }
+          var pairs = requests.map(function(r, i) {
+            if (typeof r === "string") return [r, {}];
+            if (Array.isArray(r)) {
+              if (typeof r[0] !== "string") {
+                throw new TypeError("Request at index " + i + ": first element must be a URL string");
+              }
+              return [r[0], r[1] || {}];
+            }
+            throw new TypeError("Request at index " + i + " must be a URL string or [url, options] array");
+          });
+          var results = doFetchAll(pairs, options || {});
+          if (results.error) {
+            throw new TypeError(results.error);
+          }
+          return results.map(buildResponse);
+        }
       JS
     end
 
@@ -228,6 +313,110 @@ module Agents
       yield
     rescue MiniRacer::Error => e
       error "JavaScript error: #{e.message}"
+    end
+
+    def fetch_client
+      @fetch_client ||= Faraday.new(headers: { "User-Agent" => FETCH_USER_AGENT }) { |b|
+        b.use ConditionalFollowRedirects
+        b.request :gzip
+        b.adapter :typhoeus
+      }
+    end
+
+    def do_fetch(url, **opts)
+      case normalize_fetch_request(url, **opts)
+      in { error: } => result
+        result
+      in req
+        build_fetch_result(req, run_fetch_request(**req))
+      end
+    rescue Faraday::Error => e
+      { error: fetch_error_message(e) }
+    end
+
+    def do_fetch_all(pairs, concurrency: 8, **_rest)
+      return { error: "fetchAll requires an array of requests" } unless pairs.is_a?(Array)
+
+      requests = pairs.map { |(url, opts)| normalize_fetch_request(url, **opts) }
+      if (bad = requests.find { it in { error: } })
+        return bad.slice(:error)
+      end
+
+      concurrency = 8 if concurrency.to_i <= 0
+      manager = Faraday::Adapter::Typhoeus.setup_parallel_manager(max_concurrency: concurrency)
+
+      responses = nil
+      fetch_client.in_parallel(manager) do
+        responses = requests.map { run_fetch_request(**it) }
+      end
+
+      results = requests.zip(responses).map { |req, response| build_fetch_result(req, response) }
+      if (failed = results.find { it in { error: } })
+        return failed.slice(:error)
+      end
+
+      results
+    rescue Faraday::Error => e
+      { error: fetch_error_message(e) }
+    end
+
+    def run_fetch_request(url:, method:, headers:, body:, follow:, timeout:)
+      fetch_client.run_request(method, url, body, headers) { |r|
+        r.options.timeout = timeout if timeout > 0
+        r.options.context = { skip_follow_redirects: true } unless follow
+      }
+    end
+
+    def normalize_fetch_request(url, method: "GET", headers: nil, body: nil, redirect: "follow", timeout: 0, **_rest)
+      url = url.to_s
+      return { error: "fetch requires a URL" } if url.empty?
+
+      begin
+        parsed = URI.parse(url)
+      rescue URI::InvalidURIError => e
+        return { error: "Invalid URL: #{e.message}" }
+      end
+      return { error: "Only http and https URLs are supported" } unless parsed.is_a?(URI::HTTP)
+
+      method = method.to_s.downcase.to_sym
+      return { error: "Unsupported method: #{method}" } unless ALLOWED_FETCH_METHODS.include?(method)
+      return { error: "headers must be an object" } if headers && !headers.is_a?(Hash)
+      return { error: "body must be a string" } if body && !body.is_a?(String)
+
+      {
+        url:, method:, headers:, body:,
+        follow: redirect.to_s != "manual",
+        timeout: timeout.to_i,
+      }
+    end
+
+    def fetch_error_message(e)
+      case e
+      when Faraday::TimeoutError then "Request timed out: #{e.message}"
+      when Faraday::ConnectionFailed then "Connection failed: #{e.message}"
+      when Faraday::SSLError then "SSL error: #{e.message}"
+      else "Request failed: #{e.message}"
+      end
+    end
+
+    def build_fetch_result(req, response)
+      case response.env
+      in { typhoeus_timed_out: true, typhoeus_return_message: msg }
+        { error: "Request timed out: #{msg}" }
+      in { typhoeus_connection_failed: true, typhoeus_return_message: msg }
+        { error: "Connection failed: #{msg}" }
+      in env
+        final_url = env.url.to_s
+        {
+          ok: response.status.between?(200, 299),
+          status: response.status,
+          statusText: Rack::Utils::HTTP_STATUS_CODES[response.status] || "",
+          url: final_url,
+          redirected: final_url != req[:url],
+          headers: response.headers.to_h { |k, v| [k.to_s.downcase, Array(v).join(", ")] },
+          body: response.body.to_s,
+        }
+      end
     end
 
     def clean_nans(input)
