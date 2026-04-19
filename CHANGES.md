@@ -2,6 +2,10 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Apr 13, 2026   | Optionally use native JSON columns for serialized fields on MySQL and PostgreSQL, controlled by the `NATIVE_JSON_COLUMNS` environment variable. [#3612](https://github.com/huginn/huginn/pull/3612) |
+| Apr 10, 2026   | Upgrade MySQL to 8.0 in the amd64 multi-process Docker image. [#3591](https://github.com/huginn/huginn/pull/3591) |
+| Apr 04, 2026   | Rework Tumblr agents by replacing obsolete gems. [#3617](https://github.com/huginn/huginn/pull/3617) |
+| Apr 04, 2026   | Switch TwitterStreamAgent from the unmaintained `twitter-stream` gem to `twitter`, removing the EventMachine dependency. [#3616](https://github.com/huginn/huginn/pull/3616) |
 | Apr 01, 2026   | Replace the JSON editor with vanilla-jsoneditor.  Agent option values now support typed JSON (numbers, booleans, arrays, objects) in addition to strings. [#3609](https://github.com/huginn/huginn/pull/3609) |
 | Mar 31, 2026   | Add Threads service and agents (ThreadsPublishAgent and ThreadsStreamAgent). [#3605](https://github.com/huginn/huginn/pull/3605) |
 | Mar 31, 2026   | Add service reauthorization flow and improve Services UI. [#3606](https://github.com/huginn/huginn/pull/3606) [#3607](https://github.com/huginn/huginn/pull/3607) |
