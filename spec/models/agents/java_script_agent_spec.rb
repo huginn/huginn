@@ -390,6 +390,61 @@ describe Agents::JavaScriptAgent do
     end
   end
 
+  describe "URL and URLSearchParams" do
+    it "exposes the WHATWG URL class" do
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var u = new URL("http://example.com/path?a=1");
+          this.createEvent({
+            href: u.href,
+            host: u.host,
+            pathname: u.pathname,
+            search: u.search,
+            a: u.searchParams.get("a")
+          });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({
+        'href' => 'http://example.com/path?a=1',
+        'host' => 'example.com',
+        'pathname' => '/path',
+        'search' => '?a=1',
+        'a' => '1'
+      })
+    end
+
+    it "resolves relative URLs against a base" do
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          this.createEvent({ url: new URL("/foo", "http://example.com/bar/").toString() });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({ 'url' => 'http://example.com/foo' })
+    end
+
+    it "builds query strings with URLSearchParams" do
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var params = new URLSearchParams();
+          params.append("q", "hello world");
+          params.append("tag", "a");
+          params.append("tag", "b");
+          this.createEvent({ query: params.toString() });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({ 'query' => 'q=hello+world&tag=a&tag=b' })
+    end
+  end
+
   describe "fetch" do
     it "performs a GET request and exposes the standard response fields" do
       stub_request(:get, "http://example.com/").to_return(

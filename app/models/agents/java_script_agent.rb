@@ -13,6 +13,13 @@ module Agents
 
     FETCH_USER_AGENT = "Huginn - https://github.com/huginn/huginn".freeze
     ALLOWED_FETCH_METHODS = %i[get head post put delete patch options].freeze
+    URL_POLYFILL_PATH = Rails.root.join("tmp/build/url-polyfill.js").freeze
+
+    def self.url_polyfill_source
+      @url_polyfill_source ||= File.read(URL_POLYFILL_PATH)
+    rescue Errno::ENOENT
+      raise "URL polyfill not found at #{URL_POLYFILL_PATH}. Run `npm install && npm run build`."
+    end
 
     class ConditionalFollowRedirects < Faraday::FollowRedirects::Middleware
       def call(env)
@@ -65,6 +72,8 @@ module Agents
       Supported request options are `method` (default `"GET"`), `headers` (a plain object), `body` (a string), `timeout` (in seconds), and `redirect` (`"follow"` or `"manual"`, default `"follow"`).  Network errors throw a `TypeError`; HTTP error statuses do not — check `response.ok` as per the standard.  A default `User-Agent` header is sent when not overridden by the `headers` option.
 
       To issue multiple requests in parallel, use `Agent.fetchAll(requests, options)`.  Each request may be a URL string or a `[url, options]` pair mirroring the arguments of `Agent.fetch`.  The return value is an array of Response-like objects in the same order as the input.  As with `Agent.fetch`, any network error throws a `TypeError` for the whole batch, while individual HTTP error statuses are reported via each `response.ok`.  The optional second argument accepts `{ concurrency: 8 }` to cap the number of concurrent requests.
+
+      The WHATWG `URL` and `URLSearchParams` classes are also available as globals.
     MD
 
     form_configurable :code, type: :text, ace: { mode: 'javascript' }
@@ -161,6 +170,7 @@ module Agents
         pairs = pairs&.map { |(url, o)| [url, o.is_a?(Hash) ? o.deep_symbolize_keys : {}] }
         do_fetch_all(pairs, **opts&.deep_symbolize_keys)
       })
+      context.attach("doLoadUrlPolyfill", -> { context.eval(self.class.url_polyfill_source) })
 
       kvs = Agents::KeyValueStoreAgent.merge(controllers).find_each.to_h { |kvs|
         [kvs.options[:variable], kvs.memory.as_json]
@@ -284,7 +294,18 @@ module Agents
             throw new TypeError(result.error);
           }
           return buildResponse(result);
-        }
+        };
+
+        ['URL', 'URLSearchParams'].forEach(function(name) {
+          Object.defineProperty(globalThis, name, {
+            configurable: true,
+            get: function() {
+              ['URL', 'URLSearchParams'].forEach(function(n) { delete globalThis[n]; });
+              doLoadUrlPolyfill();
+              return globalThis[name];
+            }
+          });
+        });
 
         Agent.fetchAll = function(requests, options) {
           if (!Array.isArray(requests)) {
