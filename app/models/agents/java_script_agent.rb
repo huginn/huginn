@@ -73,7 +73,7 @@ module Agents
 
       To issue multiple requests in parallel, use `Agent.fetchAll(requests, options)`.  Each request may be a URL string or a `[url, options]` pair mirroring the arguments of `Agent.fetch`.  The return value is an array of Response-like objects in the same order as the input.  As with `Agent.fetch`, any network error throws a `TypeError` for the whole batch, while individual HTTP error statuses are reported via each `response.ok`.  The optional second argument accepts `{ concurrency: 8 }` to cap the number of concurrent requests.
 
-      The WHATWG `URL` and `URLSearchParams` classes are also available as globals.
+      The WHATWG `URL` and `URLSearchParams` classes are also available as globals.  A `URL` instance may be passed wherever a URL string is accepted, including the first argument of `Agent.fetch` and each element of `Agent.fetchAll`.
     MD
 
     form_configurable :code, type: :text, ace: { mode: 'javascript' }
@@ -288,8 +288,13 @@ module Agents
           };
         }
 
+        function toUrlString(input) {
+          if (input == null) throw new TypeError("URL is required");
+          return String(input);
+        }
+
         Agent.fetch = function(url, options) {
-          var result = doFetch(String(url), options || {});
+          var result = doFetch(toUrlString(url), options || {});
           if (result.error) {
             throw new TypeError(result.error);
           }
@@ -312,14 +317,12 @@ module Agents
             throw new TypeError("fetchAll requires an array of requests");
           }
           var pairs = requests.map(function(r, i) {
-            if (typeof r === "string") return [r, {}];
-            if (Array.isArray(r)) {
-              if (typeof r[0] !== "string") {
-                throw new TypeError("Request at index " + i + ": first element must be a URL string");
-              }
-              return [r[0], r[1] || {}];
+            try {
+              if (Array.isArray(r)) return [toUrlString(r[0]), r[1] || {}];
+              return [toUrlString(r), {}];
+            } catch (e) {
+              throw new TypeError("Request at index " + i + ": " + e.message);
             }
-            throw new TypeError("Request at index " + i + " must be a URL string or [url, options] array");
           });
           var results = doFetchAll(pairs, options || {});
           if (results.error) {

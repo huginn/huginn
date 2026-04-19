@@ -661,6 +661,25 @@ describe Agents::JavaScriptAgent do
         expect(@agent.events.last.payload).to eq({ 'name' => 'TypeError' })
       end
 
+      it "accepts URL objects" do
+        stub_request(:get, "http://example.com/a").to_return(status: 200, body: "A")
+        stub_request(:post, "http://example.com/b").to_return(status: 200, body: "B")
+
+        @agent.options['code'] = <<~JS
+          Agent.check = function() {
+            var results = this.fetchAll([
+              new URL("http://example.com/a"),
+              [new URL("http://example.com/b"), { method: "POST" }]
+            ]);
+            this.createEvent({ bodies: results.map(function(r) { return r.text(); }) });
+          };
+        JS
+        @agent.save!
+        @agent.check
+
+        expect(@agent.events.last.payload).to eq({ 'bodies' => ['A', 'B'] })
+      end
+
       it "rejects invalid urls before performing any request" do
         @agent.options['code'] = <<~JS
           Agent.check = function() {
@@ -676,6 +695,21 @@ describe Agents::JavaScriptAgent do
 
         expect(@agent.events.last.payload['message']).to match(/http and https/)
       end
+    end
+
+    it "accepts a URL object" do
+      stub_request(:get, "http://example.com/path?a=1").to_return(status: 200, body: "ok")
+
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var res = this.fetch(new URL("http://example.com/path?a=1"));
+          this.createEvent({ status: res.status, body: res.text() });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({ 'status' => 200, 'body' => 'ok' })
     end
 
     it "rejects non-http urls" do
