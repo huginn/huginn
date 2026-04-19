@@ -2,6 +2,11 @@
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-free": "7.2.0",
-    "vanilla-jsoneditor": "^3.12.0"
+    "esbuild": "^0.25.0",
+    "vanilla-jsoneditor": "^3.12.0",
+    "whatwg-url-without-unicode": "^8.0.0-3"
+  },
+  "scripts": {
+    "build": "esbuild --bundle --minify --format=iife --target=es2020 --outfile=tmp/build/url-polyfill.js build/url-polyfill-entry.js"
   }
 }

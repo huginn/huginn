@@ -390,6 +390,345 @@ describe Agents::JavaScriptAgent do
     end
   end
 
+  describe "URL and URLSearchParams" do
+    it "exposes the WHATWG URL class" do
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var u = new URL("http://example.com/path?a=1");
+          this.createEvent({
+            href: u.href,
+            host: u.host,
+            pathname: u.pathname,
+            search: u.search,
+            a: u.searchParams.get("a")
+          });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({
+        'href' => 'http://example.com/path?a=1',
+        'host' => 'example.com',
+        'pathname' => '/path',
+        'search' => '?a=1',
+        'a' => '1'
+      })
+    end
+
+    it "resolves relative URLs against a base" do
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          this.createEvent({ url: new URL("/foo", "http://example.com/bar/").toString() });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({ 'url' => 'http://example.com/foo' })
+    end
+
+    it "builds query strings with URLSearchParams" do
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var params = new URLSearchParams();
+          params.append("q", "hello world");
+          params.append("tag", "a");
+          params.append("tag", "b");
+          this.createEvent({ query: params.toString() });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({ 'query' => 'q=hello+world&tag=a&tag=b' })
+    end
+  end
+
+  describe "fetch" do
+    it "performs a GET request and exposes the standard response fields" do
+      stub_request(:get, "http://example.com/").to_return(
+        status: 200,
+        body: '{"hello":"world"}',
+        headers: { "Content-Type" => "application/json; charset=utf-8" }
+      )
+
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var res = this.fetch("http://example.com/");
+          this.createEvent({
+            ok: res.ok,
+            status: res.status,
+            statusText: res.statusText,
+            url: res.url,
+            redirected: res.redirected,
+            contentType: res.headers.get("Content-Type"),
+            unknownHeader: res.headers.get("X-Missing"),
+            json: res.json()
+          });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      payload = @agent.events.last.payload
+      expect(payload['ok']).to eq(true)
+      expect(payload['status']).to eq(200)
+      expect(payload['statusText']).to eq("OK")
+      expect(payload['url']).to eq("http://example.com/")
+      expect(payload['redirected']).to eq(false)
+      expect(payload['contentType']).to eq("application/json; charset=utf-8")
+      expect(payload['unknownHeader']).to be_nil
+      expect(payload['json']).to eq({ 'hello' => 'world' })
+    end
+
+    it "sets ok to false for HTTP error statuses without throwing" do
+      stub_request(:get, "http://example.com/404").to_return(status: 404, body: "not found")
+
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var res = this.fetch("http://example.com/404");
+          this.createEvent({ ok: res.ok, status: res.status, body: res.text() });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({ 'ok' => false, 'status' => 404, 'body' => 'not found' })
+    end
+
+    it "sends the method, headers, and body" do
+      stub_request(:post, "http://example.com/submit")
+        .with(body: '{"x":1}', headers: { 'Content-Type' => 'application/json', 'X-Custom' => 'yes' })
+        .to_return(status: 201, body: "created")
+
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var res = this.fetch("http://example.com/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-Custom": "yes" },
+            body: JSON.stringify({ x: 1 })
+          });
+          this.createEvent({ status: res.status, body: res.text() });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({ 'status' => 201, 'body' => 'created' })
+    end
+
+    it "follows redirects by default and reports the final url" do
+      stub_request(:get, "http://example.com/start").to_return(
+        status: 302, headers: { "Location" => "http://example.com/end" }
+      )
+      stub_request(:get, "http://example.com/end").to_return(status: 200, body: "done")
+
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var res = this.fetch("http://example.com/start");
+          this.createEvent({ url: res.url, redirected: res.redirected, body: res.text() });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({
+        'url' => 'http://example.com/end',
+        'redirected' => true,
+        'body' => 'done'
+      })
+    end
+
+    it "does not follow redirects when redirect is manual" do
+      stub_request(:get, "http://example.com/start").to_return(
+        status: 302, headers: { "Location" => "http://example.com/end" }
+      )
+
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var res = this.fetch("http://example.com/start", { redirect: "manual" });
+          this.createEvent({ status: res.status, location: res.headers.get("Location") });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({
+        'status' => 302,
+        'location' => 'http://example.com/end'
+      })
+    end
+
+    it "throws a TypeError on connection failures" do
+      stub_request(:get, "http://example.com/").to_raise(Faraday::ConnectionFailed.new("boom"))
+
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          try {
+            this.fetch("http://example.com/");
+          } catch (e) {
+            this.createEvent({ name: e.name, message: e.message });
+          }
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      payload = @agent.events.last.payload
+      expect(payload['name']).to eq('TypeError')
+      expect(payload['message']).to match(/Connection failed/)
+    end
+
+    describe "fetchAll" do
+      it "performs multiple requests in parallel and preserves order" do
+        stub_request(:get, "http://example.com/a").to_return(status: 200, body: "A")
+        stub_request(:get, "http://example.com/b").to_return(status: 201, body: "B")
+        stub_request(:post, "http://example.com/c").with(body: "payload").to_return(status: 200, body: "C")
+
+        @agent.options['code'] = <<~JS
+          Agent.check = function() {
+            var results = this.fetchAll([
+              "http://example.com/a",
+              ["http://example.com/b"],
+              ["http://example.com/c", { method: "POST", body: "payload" }]
+            ]);
+            this.createEvent({
+              statuses: results.map(function(r) { return r.status; }),
+              bodies: results.map(function(r) { return r.text(); })
+            });
+          };
+        JS
+        @agent.save!
+        @agent.check
+
+        expect(@agent.events.last.payload).to eq({
+          'statuses' => [200, 201, 200],
+          'bodies' => ['A', 'B', 'C']
+        })
+      end
+
+      it "does not throw on HTTP error statuses" do
+        stub_request(:get, "http://example.com/ok").to_return(status: 200, body: "ok")
+        stub_request(:get, "http://example.com/missing").to_return(status: 404, body: "nope")
+
+        @agent.options['code'] = <<~JS
+          Agent.check = function() {
+            var results = this.fetchAll(["http://example.com/ok", "http://example.com/missing"]);
+            this.createEvent({ oks: results.map(function(r) { return r.ok; }) });
+          };
+        JS
+        @agent.save!
+        @agent.check
+
+        expect(@agent.events.last.payload).to eq({ 'oks' => [true, false] })
+      end
+
+      it "throws a TypeError when any request fails with a network error" do
+        stub_request(:get, "http://example.com/ok").to_return(status: 200, body: "ok")
+        stub_request(:get, "http://example.com/dead").to_raise(Faraday::ConnectionFailed.new("boom"))
+
+        @agent.options['code'] = <<~JS
+          Agent.check = function() {
+            try {
+              this.fetchAll(["http://example.com/ok", "http://example.com/dead"]);
+            } catch (e) {
+              this.createEvent({ name: e.name, message: e.message });
+            }
+          };
+        JS
+        @agent.save!
+        @agent.check
+
+        payload = @agent.events.last.payload
+        expect(payload['name']).to eq('TypeError')
+        expect(payload['message']).to match(/Connection failed/)
+      end
+
+      it "throws a TypeError when given a non-array" do
+        @agent.options['code'] = <<~JS
+          Agent.check = function() {
+            try {
+              this.fetchAll("not an array");
+            } catch (e) {
+              this.createEvent({ name: e.name });
+            }
+          };
+        JS
+        @agent.save!
+        @agent.check
+
+        expect(@agent.events.last.payload).to eq({ 'name' => 'TypeError' })
+      end
+
+      it "accepts URL objects" do
+        stub_request(:get, "http://example.com/a").to_return(status: 200, body: "A")
+        stub_request(:post, "http://example.com/b").to_return(status: 200, body: "B")
+
+        @agent.options['code'] = <<~JS
+          Agent.check = function() {
+            var results = this.fetchAll([
+              new URL("http://example.com/a"),
+              [new URL("http://example.com/b"), { method: "POST" }]
+            ]);
+            this.createEvent({ bodies: results.map(function(r) { return r.text(); }) });
+          };
+        JS
+        @agent.save!
+        @agent.check
+
+        expect(@agent.events.last.payload).to eq({ 'bodies' => ['A', 'B'] })
+      end
+
+      it "rejects invalid urls before performing any request" do
+        @agent.options['code'] = <<~JS
+          Agent.check = function() {
+            try {
+              this.fetchAll(["http://example.com/", "file:///etc/passwd"]);
+            } catch (e) {
+              this.createEvent({ message: e.message });
+            }
+          };
+        JS
+        @agent.save!
+        @agent.check
+
+        expect(@agent.events.last.payload['message']).to match(/http and https/)
+      end
+    end
+
+    it "accepts a URL object" do
+      stub_request(:get, "http://example.com/path?a=1").to_return(status: 200, body: "ok")
+
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          var res = this.fetch(new URL("http://example.com/path?a=1"));
+          this.createEvent({ status: res.status, body: res.text() });
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload).to eq({ 'status' => 200, 'body' => 'ok' })
+    end
+
+    it "rejects non-http urls" do
+      @agent.options['code'] = <<~JS
+        Agent.check = function() {
+          try {
+            this.fetch("file:///etc/passwd");
+          } catch (e) {
+            this.createEvent({ message: e.message });
+          }
+        };
+      JS
+      @agent.save!
+      @agent.check
+
+      expect(@agent.events.last.payload['message']).to match(/http and https/)
+    end
+  end
+
   describe "KVS" do
     before do
       Agents::KeyValueStoreAgent.create!(
