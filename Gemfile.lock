@@ -901,7 +901,7 @@ DEPENDENCIES
   xmpp4r
 
 RUBY VERSION
-  ruby 4.0.3
+  ruby 3.4.9
 
 BUNDLED WITH
   4.0.8
