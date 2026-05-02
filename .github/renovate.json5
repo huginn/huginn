@@ -42,11 +42,10 @@
       description: "Update Ruby versions in Docker base images",
       managerFilePatterns: ["/(^|/)docker/(multi|single)-process/Dockerfile$/"],
       matchStrings: [
-        "FROM rubylang/ruby:(?<currentValue>\\d+\\.\\d+\\.\\d+)-(?<compatibility>\\S+)",
+        "FROM rubylang/ruby:(?<currentValue>\\d+\\.\\d+\\.\\d+-\\S+)",
       ],
       depNameTemplate: "ruby",
       datasourceTemplate: "ruby-version",
-      autoReplaceStringTemplate: "FROM rubylang/ruby:{{{newValue}}}-{{{compatibility}}}",
     },
   ],
   packageRules: [
@@ -54,6 +53,7 @@
       groupName: "Ruby",
       matchDatasources: ["ruby-version"],
       matchPackageNames: ["ruby"],
+      versionCompatibility: "^(?<version>\\d+\\.\\d+\\.\\d+)(?<compatibility>-\\S+)?$",
     },
     {
       matchDatasources: ["docker"],
