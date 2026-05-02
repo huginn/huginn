@@ -40,7 +40,7 @@
       description: "Update Ruby versions in Docker base images",
       managerFilePatterns: ["/(^|/)docker/(multi|single)-process/Dockerfile$/"],
       matchStrings: [
-        "FROM rubylang/ruby:(?<currentValue>\\d+\\.\\d+\\.\\d+-\\S+)",
+        "FROM rubylang/ruby:(?<currentValue>\\d+\\.\\d+\\.\\d+)-\\S+",
       ],
       depNameTemplate: "ruby",
       datasourceTemplate: "ruby-version",
@@ -50,8 +50,7 @@
     {
       groupName: "Ruby",
       matchDatasources: ["ruby-version"],
-      matchPackageNames: ["ruby"],
-      versionCompatibility: "^(?<version>\\d+\\.\\d+\\.\\d+)(?<compatibility>-\\S+)?$",
+      matchPackageNames: ["ruby", "ruby-version"],
     },
     {
       matchDatasources: ["docker"],
