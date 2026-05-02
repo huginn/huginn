@@ -47,7 +47,7 @@ gem 'google-cloud-translate-v2'
 
 # Twitter Agents
 gem 'omniauth-twitter'
-gem 'twitter', '~> 8.3'
+gem 'twitter', '~> 8.3', '>= 8.3.1'
 
 # Tumblr Agents
 gem 'omniauth-oauth', '~> 1.2', '>= 1.2.1'
@@ -108,7 +108,7 @@ gem 'loofah', '~> 2.25', '>= 2.25.1'
 gem 'mail', '>= 2.9.0'
 gem 'mini_magick', '>= 5.3.1'
 gem 'multi_xml'
-gem 'nokogiri', '>= 1.19.2'
+gem 'nokogiri', '>= 1.19.3'
 gem 'omniauth'
 gem 'ostruct'
 gem 'puma'
