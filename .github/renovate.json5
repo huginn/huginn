@@ -13,13 +13,13 @@
   customManagers: [
     {
       customType: "regex",
-      description: "Update Ruby versions in CI and manual install docs",
+      description: "Update Ruby versions in tool versions and manual install docs",
       managerFilePatterns: [
-        "/(^|/)\\.github/workflows/ci\\.yml$/",
+        "/(^|/)\\.tool-versions$/",
         "/(^|/)doc/manual/(installation|update)\\.md$/",
       ],
       matchStrings: [
-        "ruby:\\n\\s+- \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\"",
+        "ruby (?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "Ruby (?<currentValue>\\d+\\.\\d+\\.\\d+) installed",
         "cd ruby-(?<currentValue>\\d+\\.\\d+\\.\\d+)",
       ],

@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   run-tests:
-    name: ${{ matrix.os }} ruby-${{ matrix.ruby }} ${{ matrix.database_adapter }} native-json-${{ matrix.native_json_columns }}
+    name: ${{ matrix.os }} ${{ matrix.database_adapter }} native-json-${{ matrix.native_json_columns }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -29,8 +29,6 @@ jobs:
         native_json_columns:
           - enabled
           - disabled
-        ruby:
-          - "4.0.3"
     env:
       DATABASE_ADAPTER: ${{ matrix.database_adapter }}
       DATABASE_HOST: "127.0.0.1"
@@ -67,7 +65,6 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby }}
           rubygems: latest
           bundler: latest
           bundler-cache: true
