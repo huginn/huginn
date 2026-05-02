@@ -705,7 +705,7 @@ GEM
       version_gem (>= 1.1.8, < 3)
     spectrum-rails (1.8.1)
       railties (>= 3.1)
-    spring (4.4.2)
+    spring (4.5.0)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     spring-watcher-listen (2.1.0)
