@@ -30,7 +30,7 @@ jobs:
           - enabled
           - disabled
         ruby:
-          - "3.4"
+          - "3.4.9"
     env:
       DATABASE_ADAPTER: ${{ matrix.database_adapter }}
       DATABASE_HOST: "127.0.0.1"

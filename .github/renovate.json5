@@ -10,7 +10,56 @@
     enabled: true,
     schedule: ["after 9am and before 1pm on Friday"],
   },
+  customManagers: [
+    {
+      customType: "regex",
+      description: "Update Ruby versions in CI and manual install docs",
+      managerFilePatterns: [
+        "/(^|/)\\.github/workflows/ci\\.yml$/",
+        "/(^|/)doc/manual/(installation|update)\\.md$/",
+      ],
+      matchStrings: [
+        "ruby:\\n\\s+- \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\"",
+        "Ruby (?<currentValue>\\d+\\.\\d+\\.\\d+) installed",
+        "cd ruby-(?<currentValue>\\d+\\.\\d+\\.\\d+)",
+      ],
+      depNameTemplate: "ruby",
+      datasourceTemplate: "ruby-version",
+    },
+    {
+      customType: "regex",
+      description: "Update Ruby source archive URLs in manual install docs",
+      managerFilePatterns: ["/(^|/)doc/manual/(installation|update)\\.md$/"],
+      matchStrings: [
+        "https://cache\\.ruby-lang\\.org/pub/ruby/\\d+\\.\\d+/ruby-(?<currentValue>\\d+\\.\\d+\\.\\d+)\\.tar\\.xz",
+      ],
+      depNameTemplate: "ruby",
+      datasourceTemplate: "ruby-version",
+      autoReplaceStringTemplate: "https://cache.ruby-lang.org/pub/ruby/{{{newMajor}}}.{{{newMinor}}}/ruby-{{{newValue}}}.tar.xz",
+    },
+    {
+      customType: "regex",
+      description: "Update Ruby versions in Docker base images",
+      managerFilePatterns: ["/(^|/)docker/(multi|single)-process/Dockerfile$/"],
+      matchStrings: [
+        "FROM rubylang/ruby:(?<currentValue>\\d+\\.\\d+\\.\\d+)-(?<compatibility>\\S+)",
+      ],
+      depNameTemplate: "ruby",
+      datasourceTemplate: "ruby-version",
+      autoReplaceStringTemplate: "FROM rubylang/ruby:{{{newValue}}}-{{{compatibility}}}",
+    },
+  ],
   packageRules: [
+    {
+      groupName: "Ruby",
+      matchDatasources: ["ruby-version"],
+      matchPackageNames: ["ruby"],
+    },
+    {
+      matchDatasources: ["docker"],
+      matchPackageNames: ["rubylang/ruby"],
+      enabled: false,
+    },
     {
       groupName: "patch updated gems",
       matchDatasources: ["rubygems"],

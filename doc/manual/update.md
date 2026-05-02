@@ -52,7 +52,7 @@ sudo -u huginn -H cp Procfile.bak Procfile
 
 ### 4. Update ruby version
 
-Ensure you have Ruby 3.4 installed:
+Ensure you have Ruby 3.4.9 installed:
 
 ```
 ruby -v
@@ -62,8 +62,8 @@ Upgrade when required:
 
 ```
 mkdir /tmp/ruby && cd /tmp/ruby
-curl -L --progress https://cache.ruby-lang.org/pub/ruby/3.4/ruby-3.4.8.tar.xz | tar xJ
-cd ruby-3.4.8
+curl -L --progress https://cache.ruby-lang.org/pub/ruby/3.4/ruby-3.4.9.tar.xz | tar xJ
+cd ruby-3.4.9
 ./configure --disable-install-rdoc
 make -j`nproc`
 sudo make install
