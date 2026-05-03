@@ -74,9 +74,10 @@ sudo gem install rake bundler foreman --no-document
 
 ```
 cd /home/huginn/huginn
+sudo -u huginn -H npm install
 bundle config set --local deployment 'true'
 bundle config set --local without 'development test'
-sudo -u huginn -H bundle install --deployment --without development test
+sudo -u huginn -H bundle install
 
 # Run database migrations
 sudo -u huginn -H bundle exec rake db:migrate RAILS_ENV=production
