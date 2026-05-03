@@ -82,13 +82,19 @@ Install foreman:
 
     sudo gem install foreman --no-document
 
-## 3. System Users
+## 3. NPM
+
+The NPM package manager is required for some frontend dependencies, such as Font Awesome.
+
+    sudo apt-get install npm
+
+## 4. System Users
 
 Create a user for Huginn:
 
     sudo adduser --disabled-login --gecos 'Huginn' huginn
 
-## 4. Database
+## 5. Database
 
 ### MySQL / MariaDB
 
@@ -173,7 +179,7 @@ Try connecting to the new database with the new user
 
 You should now be greeted by the `psql` interactive client and be connected to the `huginn_production` database. Quit the database session with `\q` or `CTRL-D`
 
-## 5. Huginn
+## 6. Huginn
 
 ### Clone the Source
 
@@ -256,7 +262,9 @@ You can also tune Puma through `.env`.  `WEB_CONCURRENCY` controls the number of
 
 ### Install Gems
 
-    sudo -u huginn -H bundle install --deployment --without development test
+    bundle config set --local deployment 'true'
+    bundle config set --local without 'development test'
+    sudo -u huginn -H bundle install
 
 ### Initialize Database
 
@@ -275,6 +283,7 @@ When done you see `See the Huginn Wiki for more Agent examples!  https://github.
 
 ### Compile Assets
 
+    sudo -u huginn -H npm install
     sudo -u huginn -H bundle exec rake assets:precompile RAILS_ENV=production
 
 ### Install Init Script
@@ -310,7 +319,7 @@ Change the location of the log directory if you have chosen to log to a differen
 
     sudo bundle exec rake production:status
 
-## 6. Nginx
+## 7. Nginx
 
 **Note:** Nginx is the officially supported web server for Huginn. If you cannot or do not want to use Nginx as your web server, the wiki has a page on how to configure [apache](https://github.com/huginn/huginn/wiki/Apache-Huginn-configuration).
 
