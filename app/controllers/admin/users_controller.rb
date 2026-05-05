@@ -1,5 +1,6 @@
 class Admin::UsersController < ApplicationController
   before_action :authenticate_admin!, except: [:switch_back]
+  before_action :authenticate_user!, only: [:switch_back]
 
   before_action :find_user, only: [:edit, :destroy, :update, :deactivate, :activate, :switch_to_user]
 
@@ -25,8 +26,8 @@ class Admin::UsersController < ApplicationController
     respond_to do |format|
       if @user.save
         DefaultScenarioImporter.import(@user)    
-        format.html { redirect_to admin_users_path, notice: "User '#{@user.username}' was successfully created." }
-        format.json { render json: @user, status: :ok, location: admin_users_path(@user) }
+        format.html { redirect_to admin_users_path, notice: 'User was successfully created.' }
+        format.json { render json: @user, status: :ok, location: admin_users_path }
       else
         format.html { render action: 'new' }
         format.json { render json: @user.errors, status: :unprocessable_entity }
@@ -44,7 +45,7 @@ class Admin::UsersController < ApplicationController
     respond_to do |format|
       if @user.save
         format.html { redirect_to admin_users_path, notice: "User '#{@user.username}' was successfully updated." }
-        format.json { render json: @user, status: :ok, location: admin_users_path(@user) }
+        format.json { render json: @user, status: :ok, location: admin_users_path }
       else
         format.html { render action: 'edit' }
         format.json { render json: @user.errors, status: :unprocessable_entity }
@@ -103,11 +104,11 @@ class Admin::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email, :username, :password, :password_confirmation, :admin)
+    params.require(:user).permit(:email, :username, :password, :password_confirmation)
   end
 
   def find_user
-    @user = User.find(params[:id])
+    @user = User.find_by!(id: params[:id])
   end
 
   def resource
