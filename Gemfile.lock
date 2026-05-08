@@ -178,7 +178,7 @@ GEM
     delayed_job_active_record (4.1.11)
       activerecord (>= 3.0, < 9.0)
       delayed_job (>= 3.0, < 5)
-    devise (5.0.3)
+    devise (5.0.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 7.0)
