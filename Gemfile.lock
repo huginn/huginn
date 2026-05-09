@@ -117,7 +117,7 @@ GEM
     aws-sdk-kms (1.124.0)
       aws-sdk-core (~> 3, >= 3.244.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.220.0)
+    aws-sdk-s3 (1.221.0)
       aws-sdk-core (~> 3, >= 3.244.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
@@ -422,7 +422,7 @@ GEM
       logger
     msgpack (1.8.0)
     multi_json (1.20.1)
-    multi_xml (0.8.1)
+    multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
     multipart-post (2.4.1)
     mysql2 (0.5.7)
@@ -795,7 +795,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap
-  aws-sdk-s3 (~> 1, >= 1.220.0)
+  aws-sdk-s3 (~> 1, >= 1.221.0)
   bootsnap
   bootstrap-kaminari-views
   capistrano
