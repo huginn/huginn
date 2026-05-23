@@ -214,9 +214,10 @@ span.not-applicable:after {
 // JSON Editor
 
 .json-editor-shell {
+  display: flex;
+  flex-direction: column;
   border: 1px solid #ccd3db;
   border-radius: 6px;
-  overflow: hidden;
   background: #fff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -239,6 +240,8 @@ span.not-applicable:after {
   padding: 8px 10px;
   border-bottom: 1px solid #e7ebf0;
   background: linear-gradient(180deg, #fbfcfd 0%, #f4f7fa 100%);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
 }
 
 .json-editor-status {
@@ -278,6 +281,57 @@ span.not-applicable:after {
 .json-editor-host .cm-scroller,
 .json-editor-host .jse-contents {
   min-height: inherit;
+}
+
+.json-editor-resize {
+  height: 8px;
+  cursor: ns-resize;
+  background:
+    linear-gradient(180deg, transparent 0%, transparent 2px, #d0d6dd 2px, #d0d6dd 3px, transparent 3px, transparent 5px, #d0d6dd 5px, #d0d6dd 6px, transparent 6px) center no-repeat,
+    linear-gradient(180deg, #fbfcfd 0%, #f4f7fa 100%);
+  background-size: 32px 8px, auto;
+  border-top: 1px solid #e7ebf0;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  user-select: none;
+  touch-action: none;
+}
+
+.json-editor-resize:hover {
+  background-color: #eef2f6;
+}
+
+.json-editor-shell.is-fullscreen {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1050;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.json-editor-shell.is-fullscreen .json-editor-host {
+  flex: 1 1 auto;
+  height: auto !important;
+}
+
+.json-editor-shell.is-fullscreen .json-editor-resize {
+  display: none;
+}
+
+body.json-editor-fullscreen-open {
+  overflow: hidden;
+}
+
+.json-editor-fullscreen-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1040;
 }
 
 // Position tweaks
