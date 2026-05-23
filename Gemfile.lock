@@ -129,7 +129,7 @@ GEM
     bcrypt (3.1.22)
     benchmark (0.5.0)
     bigdecimal (3.3.1)
-    bootsnap (1.24.4)
+    bootsnap (1.24.5)
       msgpack (~> 1.2)
     bootstrap-kaminari-views (0.0.5)
       kaminari (>= 0.13)
@@ -802,7 +802,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap
-  aws-sdk-s3 (~> 1, >= 1.222.0)
+  aws-sdk-s3 (~> 1, >= 1.224.0)
   bootsnap
   bootstrap-kaminari-views
   capistrano
