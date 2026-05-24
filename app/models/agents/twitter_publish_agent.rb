@@ -2,6 +2,7 @@ module Agents
   class TwitterPublishAgent < Agent
     include TwitterConcern
 
+    can_dry_run!
     cannot_be_scheduled!
 
     description <<~MD
