@@ -648,7 +648,7 @@ GEM
       erector
       nokogiri
       rest-client
-    rubocop (1.86.2)
+    rubocop (1.87.0)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -666,9 +666,10 @@ GEM
       lint_roller (~> 1.1)
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.47.1, < 2.0)
-    rubocop-rspec (3.9.0)
+    rubocop-rspec (3.10.2)
       lint_roller (~> 1.1)
-      rubocop (~> 1.81)
+      regexp_parser (>= 2.0)
+      rubocop (~> 1.86, >= 1.86.2)
     ruby-progressbar (1.13.0)
     ruby-rc4 (0.1.5)
     rubyzip (3.3.0)
@@ -712,7 +713,7 @@ GEM
       version_gem (>= 1.1.8, < 3)
     spectrum-rails (1.8.1)
       railties (>= 3.1)
-    spring (4.5.0)
+    spring (4.6.0)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     spring-watcher-listen (2.1.0)
