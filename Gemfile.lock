@@ -119,7 +119,7 @@ GEM
     aws-sdk-kms (1.128.0)
       aws-sdk-core (~> 3, >= 3.248.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.224.0)
+    aws-sdk-s3 (1.225.0)
       aws-sdk-core (~> 3, >= 3.248.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
@@ -250,7 +250,7 @@ GEM
       activesupport (>= 6.1)
     gmail_xoauth (0.4.3)
       oauth (>= 0.3.6)
-    google-apis-calendar_v3 (0.53.0)
+    google-apis-calendar_v3 (0.54.0)
       google-apis-core (>= 0.15.0, < 2.a)
     google-apis-core (1.0.2)
       addressable (~> 2.8, >= 2.8.7)
@@ -803,7 +803,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap
-  aws-sdk-s3 (~> 1, >= 1.224.0)
+  aws-sdk-s3 (~> 1, >= 1.225.0)
   bootsnap
   bootstrap-kaminari-views
   capistrano
