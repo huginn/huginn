@@ -3,6 +3,7 @@
 require 'utils'
 require Rails.root.join("lib/omniauth/strategies/tumblr").to_s
 require Rails.root.join("lib/omniauth/strategies/threads").to_s
+require Rails.root.join("lib/omniauth/strategies/raindrop").to_s
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
@@ -302,6 +303,12 @@ Devise.setup do |config|
      (key = ENV["THREADS_APP_ID"]).present? &&
      (secret = ENV["THREADS_APP_SECRET"]).present?
     config.omniauth :threads, key, secret, scope: "threads_basic,threads_content_publish"
+  end
+
+  if defined?(OmniAuth::Strategies::Raindrop) &&
+     (key = ENV["RAINDROP_CLIENT_ID"]).present? &&
+     (secret = ENV["RAINDROP_CLIENT_SECRET"]).present?
+    config.omniauth :raindrop, key, secret
   end
 
   # ==> Warden configuration

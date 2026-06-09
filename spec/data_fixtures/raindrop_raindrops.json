@@ -1,0 +1,27 @@
+{
+  "result": true,
+  "items": [
+    {
+      "_id": 1002,
+      "link": "https://example.com/two",
+      "title": "Example Two",
+      "created": "2024-01-02T12:00:00.000Z",
+      "lastUpdate": "2024-01-02T12:00:00.000Z",
+      "collection": {
+        "$id": 0
+      },
+      "tags": ["reading"]
+    },
+    {
+      "_id": 1001,
+      "link": "https://example.com/one",
+      "title": "Example One",
+      "created": "2024-01-01T12:00:00.000Z",
+      "lastUpdate": "2024-01-01T12:00:00.000Z",
+      "collection": {
+        "$id": 0
+      },
+      "tags": []
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "provider": "raindrop",
+  "uid": "456",
+  "info": {
+    "name": "raindrop-user",
+    "email": "raindrop@example.com"
+  },
+  "credentials": {
+    "token": "raindrop-access-token",
+    "refresh_token": "raindrop-refresh-token",
+    "expires_at": 1893456000
+  },
+  "extra": {
+    "raw_info": {
+      "_id": 456,
+      "name": "raindrop-user",
+      "email": "raindrop@example.com"
+    }
+  }
+}
