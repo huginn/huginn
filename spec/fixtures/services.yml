@@ -31,3 +31,12 @@ threads:
   expires_at: <%= 30.days.from_now %>
   options: <%= { user_id: "3141592653", username: "threads-user" }.to_json.inspect %>
   user: bob
+raindrop:
+  token: raindrop-access-token
+  refresh_token: raindrop-refresh-token
+  provider: raindrop
+  name: raindrop-user
+  uid: 123
+  expires_at: <%= 30.days.from_now %>
+  options: <%= { user_id: 123, email: "raindrop@example.com" }.to_json.inspect %>
+  user: bob
