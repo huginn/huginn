@@ -16,7 +16,8 @@ module Agents
         'output' => 'event_per_row',
         'with_header' => true,
         'data_path' => '$.data',
-        'data_key' => 'data'
+        'data_key' => 'data',
+        'require_signed_file_pointer' => true
       }
     end
 
@@ -94,6 +95,7 @@ module Agents
     form_configurable :use_fields, type: :string
     form_configurable :output, type: :array, values: %w[event_per_row event_per_file]
     form_configurable :data_path, type: :string
+    form_configurable :require_signed_file_pointer, type: :boolean
 
     def validate_options
       if !option_provided?(options['with_header']) || ![true, false].include?(boolify(options['with_header']))
@@ -102,6 +104,7 @@ module Agents
       if options['mode'] == 'serialize' && options['data_path'].blank?
         errors.add(:base, "When mode is set to serialize data_path has to be present.")
       end
+      validate_require_signed_file_pointer_options!
     end
 
     def working?
@@ -161,7 +164,7 @@ module Agents
     def parse(incoming_events)
       incoming_events.each do |event|
         mo = interpolated(event)
-        next unless io = local_get_io(event)
+        io = local_get_io(event) or next
 
         if mo['output'] == 'event_per_row'
           parse_csv(io, mo) do |payload|
@@ -174,11 +177,8 @@ module Agents
     end
 
     def local_get_io(event)
-      if io = get_io(event)
-        io
-      else
+      get_io(event) or
         Utils.value_at(event.payload, interpolated['data_path'])
-      end
     end
 
     def parse_csv_options(mo)

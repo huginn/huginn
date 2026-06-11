@@ -103,14 +103,14 @@ describe Agents::FtpsiteAgent do
           ])
         }
 
-        expect(Event.last(2).first.payload).to eq({
-          'file_pointer' => { 'file' => 'example-1.1.tar.gz', 'agent_id' => @checker.id },
+        expect_file_pointer_event(Event.last(2).first, {
+          'file' => 'example-1.1.tar.gz',
           'url' => 'ftp://ftp.example.org/pub/releases/example-1.1.tar.gz',
           'filename' => 'example-1.1.tar.gz',
           'timestamp' => '2014-04-01T10:00:00Z',
         })
 
-        expect { @checker.check }.not_to change { Event.count }
+        expect { @checker.check }.not_to(change { Event.count })
 
         allow(@checker).to receive(:each_entry) { |&block|
           block.call("example latest.tar.gz", Time.parse("2014-04-02T10:00:01Z"))
@@ -133,21 +133,21 @@ describe Agents::FtpsiteAgent do
           ])
         }
 
-        expect(Event.last(2).first.payload).to eq({
-          'file_pointer' => { 'file' => 'example-1.2.tar.gz', 'agent_id' => @checker.id },
+        expect_file_pointer_event(Event.last(2).first, {
+          'file' => 'example-1.2.tar.gz',
           'url' => 'ftp://ftp.example.org/pub/releases/example-1.2.tar.gz',
           'filename' => 'example-1.2.tar.gz',
           'timestamp' => '2014-04-02T10:00:00Z',
         })
 
-        expect(Event.last.payload).to eq({
-          'file_pointer' => { 'file' => 'example latest.tar.gz', 'agent_id' => @checker.id },
+        expect_file_pointer_event(Event.last, {
+          'file' => 'example latest.tar.gz',
           'url' => 'ftp://ftp.example.org/pub/releases/example%20latest.tar.gz',
           'filename' => 'example latest.tar.gz',
           'timestamp' => '2014-04-02T10:00:01Z',
         })
 
-        expect { @checker.check }.not_to change { Event.count }
+        expect { @checker.check }.not_to(change { Event.count })
       end
     end
 
@@ -257,5 +257,14 @@ describe Agents::FtpsiteAgent do
         @checker.receive([event])
       end
     end
+  end
+
+  def expect_file_pointer_event(event, payload)
+    expect(event.payload).to include(payload.except('file'))
+    expect(event.payload['file_pointer']).to include(
+      'file' => payload['file'],
+      'agent_id' => @checker.id
+    )
+    expect(event.payload['file_pointer']['signature']).to be_present
   end
 end

@@ -78,7 +78,8 @@ module Agents
         'language' => '',
         'output_mode' => 'clean',
         'request_timeout' => '60',
-        'expected_receive_period_in_days' => '1'
+        'expected_receive_period_in_days' => '1',
+        'require_signed_file_pointer' => true
       }
     end
 
@@ -113,6 +114,7 @@ module Agents
         errors.add(:base, "input_text is required for speak mode") unless options['input_text'].present?
         errors.add(:base, "voice is required for speak mode") unless options['voice'].present?
       end
+      validate_require_signed_file_pointer_options!
     end
 
     def receive(incoming_events)
