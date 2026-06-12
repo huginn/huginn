@@ -98,7 +98,7 @@ describe Agents::S3Agent do
       it "emits an event for every file" do
         expect(@checker).to receive(:get_bucket_contents) { {"test"=>"231232", "test2"=>"4564545"} }
         expect { @checker.check }.to change(Event, :count).by(2)
-        expect(Event.last.payload).to eq({"file_pointer" => {"file"=>"test2", "agent_id"=> @checker.id}})
+        expect_file_pointer_event("test2")
       end
     end
 
@@ -126,20 +126,20 @@ describe Agents::S3Agent do
           contents = {"test"=>"231232"}
           expect(@checker).to receive(:get_bucket_contents) { contents }
           expect { @checker.check }.to change(Event, :count).by(1)
-          expect(Event.last.payload).to eq({"file_pointer" => {"file" => "test2", "agent_id"=> @checker.id}, "event_type" => "removed"})
+          expect_file_pointer_event("test2", "removed")
         end
 
         it "emits events for modified files" do
           contents = {"test"=>"231232", "test2"=>"changed"}
           expect(@checker).to receive(:get_bucket_contents) { contents }
           expect { @checker.check }.to change(Event, :count).by(1)
-          expect(Event.last.payload).to eq({"file_pointer" => {"file" => "test2", "agent_id"=> @checker.id}, "event_type" => "modified"})
+          expect_file_pointer_event("test2", "modified")
         end
         it "emits events for added files" do
           contents = {"test"=>"231232", "test2"=>"4564545", "test3" => "31231231"}
           expect(@checker).to receive(:get_bucket_contents) { contents }
           expect { @checker.check }.to change(Event, :count).by(1)
-          expect(Event.last.payload).to eq({"file_pointer" => {"file" => "test3", "agent_id"=> @checker.id}, "event_type" => "added"})
+          expect_file_pointer_event("test3", "added")
         end
       end
 
@@ -226,5 +226,14 @@ describe Agents::S3Agent do
       event = Event.new(payload: {'data' => 'hello world!'})
       @checker.receive([event])
     end
+  end
+
+  def expect_file_pointer_event(file, event_type = nil)
+    expect(Event.last.payload["file_pointer"]).to include(
+      "file" => file,
+      "agent_id" => @checker.id
+    )
+    expect(Event.last.payload["file_pointer"]["signature"]).to be_present
+    expect(Event.last.payload["event_type"]).to eq(event_type) if event_type
   end
 end

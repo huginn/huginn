@@ -84,7 +84,8 @@ module Agents
         'emit_events' => false,
         'parse_body' => true,
         'no_merge' => true,
-        'output_mode' => 'clean'
+        'output_mode' => 'clean',
+        'require_signed_file_pointer' => true
       }
     end
 
@@ -153,6 +154,7 @@ module Agents
         errors.add(:base, "if provided, headers must be a hash")
       end
 
+      validate_require_signed_file_pointer_options!
       validate_web_request_options!
     end
 
@@ -188,10 +190,11 @@ module Agents
         body = nil
       when 'post', 'put', 'patch'
         params = nil
+        upload_io = get_upload_io(event) if has_file_pointer?(event)
 
         content_type =
-          if has_file_pointer?(event)
-            data[interpolated(event.payload)['upload_key'].presence || 'file'] = get_upload_io(event)
+          if upload_io
+            data[interpolated(event.payload)['upload_key'].presence || 'file'] = upload_io
             nil
           else
             interpolated(event.payload)['content_type']

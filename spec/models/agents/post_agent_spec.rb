@@ -178,9 +178,27 @@ describe Agents::PostAgent do
         /\A--#{qboundary}\r\nContent-Disposition: form-data; name="default"\r\n\r\nvalue\r\n--#{qboundary}\r\nContent-Disposition: form-data; name="file"; filename="local.path"\r\nContent-Length: 8\r\nContent-Type: \r\nContent-Transfer-Encoding: binary\r\n\r\ntestdata\r\n--#{qboundary}--\r\n\z/ === request.body
       }.to_return(status: 200, body: "", headers: {})
       event = Event.new(payload: { file_pointer: { agent_id: 111, file: 'test' } })
-      io_mock = double
       expect(@checker).to receive(:get_io).with(event) { StringIO.new("testdata") }
       @checker.options['no_merge'] = true
+      @checker.receive([event])
+    end
+
+    it 'does not make a multipart request for an unsigned file_pointer when verification is enabled' do
+      WebMock.reset!
+      stub_request(:post, "http://www.example.com/")
+        .with(
+          body: "default=value",
+          headers: {
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'User-Agent' => 'Huginn - https://github.com/huginn/huginn'
+          }
+        )
+        .to_return(status: 200, body: "", headers: {})
+
+      @checker.options['require_signed_file_pointer'] = true
+      @checker.options['no_merge'] = true
+      event = Event.new(payload: { file_pointer: { agent_id: 111, file: 'test' } })
+
       @checker.receive([event])
     end
   end

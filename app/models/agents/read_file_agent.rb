@@ -8,7 +8,8 @@ module Agents
 
     def default_options
       {
-        'data_key' => 'data'
+        'data_key' => 'data',
+        'require_signed_file_pointer' => true
       }
     end
 
@@ -31,11 +32,13 @@ module Agents
     MD
 
     form_configurable :data_key, type: :string
+    form_configurable :require_signed_file_pointer, type: :boolean
 
     def validate_options
       if options['data_key'].blank?
         errors.add(:base, "The 'data_key' options is required.")
       end
+      validate_require_signed_file_pointer_options!
     end
 
     def working?
@@ -44,7 +47,7 @@ module Agents
 
     def receive(incoming_events)
       incoming_events.each do |event|
-        next unless io = get_io(event)
+        io = get_io(event) or next
 
         create_event payload: { interpolated['data_key'] => io.read }
       end
