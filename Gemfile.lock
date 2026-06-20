@@ -831,7 +831,6 @@ DEPENDENCIES
   faraday-multipart
   faraday-typhoeus
   feedjira (~> 4.0, >= 4.0.2)
-  ffi (>= 1.17.4)
   foreman
   geokit
   geokit-rails
