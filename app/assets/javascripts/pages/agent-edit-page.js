@@ -295,6 +295,10 @@
 
           setSyntax();
 
+          session.on("change", function () {
+            $source.val(session.getValue());
+          });
+
           return session.setValue($source.val());
         }
       });
