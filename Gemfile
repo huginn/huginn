@@ -186,7 +186,6 @@ end
 # Platform requirements.
 require 'rbconfig'
 gem 'ffi', '>= 1.17.4'	# required by typhoeus; 1.9.4 has fixes for *BSD.
-gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: %i[windows]
 # BSD systems require rb-kqueue for "listen" to avoid polling for changes.

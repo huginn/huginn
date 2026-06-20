@@ -905,7 +905,6 @@ DEPENDENCIES
   twilio-ruby
   twitter (~> 8.3, >= 8.3.1)
   typhoeus
-  tzinfo (>= 2.0.6)
   tzinfo-data
   uglifier
   vcr
