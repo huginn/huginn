@@ -807,7 +807,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap
-  aws-sdk-s3 (~> 1, >= 1.225.0)
+  aws-sdk-s3 (~> 1, >= 1.226.0)
   bootsnap
   bootstrap-kaminari-views
   capistrano
