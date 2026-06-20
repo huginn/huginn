@@ -28,50 +28,70 @@ end
 
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
-gem 'erector', github: 'dsander/erector', branch: 'rails6'
-gem 'hipchat' # HipchatAgent
-gem 'pdf-reader' # PDFInfoAgent
-gem 'mini_racer', github: 'knu/mini_racer', branch: 'fix/darwin_build' # JavaScriptAgent
-gem 'mqtt' # MQTTAgent
-gem 'net-ftp'
-gem 'net-ftp-list' # FtpsiteAgent
-gem 'pirate_weather_forecast_ruby' # WeatherAgent
-gem 'rturk'                       # HumanTaskAgent
-gem 'slack-notifier'              # SlackAgent
-gem 'twilio-ruby'                 # TwilioAgent
-gem 'xmpp4r'                      # JabberAgent
-
-# GoogleCalendarPublishAgent
-gem 'google-apis-calendar_v3'
-gem 'google-cloud-translate-v2'
-
-# Twitter Agents
-gem 'omniauth-twitter'
-gem 'twitter', '~> 8.3', '>= 8.3.1'
-
-# Tumblr Agents
-gem 'omniauth-oauth', '~> 1.2', '>= 1.2.1'
-gem 'simple_oauth'
 
 # Dropbox Agents
 gem 'omniauth-dropbox2', '>= 2.0.5'
-
-# UserLocationAgent
-gem 'haversine'
 
 # EvernoteAgent
 gem 'evernote_oauth'
 gem 'omniauth-evernote'
 
-# LocalFileAgent (watch functionality)
-gem 'listen', require: false
+# FtpsiteAgent
+gem 'net-ftp'
+gem 'net-ftp-list'
 
-# S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.226.0'
+# GoogleCalendarPublishAgent
+gem 'google-apis-calendar_v3'
+gem 'google-cloud-translate-v2'
+
+# HipchatAgent
+gem 'hipchat'
+
+# HumanTaskAgent
+gem 'rturk'
+gem 'erector', github: 'dsander/erector', branch: 'rails6'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
 gem 'omniauth-google-oauth2', '~> 1.2.2'
+
+# JabberAgent
+gem 'xmpp4r'
+
+# JavaScriptAgent
+gem 'mini_racer', github: 'knu/mini_racer', branch: 'fix/darwin_build'
+
+# LocalFileAgent (watch functionality)
+gem 'listen', require: false
+
+# MQTTAgent
+gem 'mqtt'
+
+# PDFInfoAgent
+gem 'pdf-reader'
+
+# S3Agent
+gem 'aws-sdk-s3', '~> 1', '>= 1.226.0'
+
+# SlackAgent
+gem 'slack-notifier'
+
+# Tumblr Agents
+gem 'omniauth-oauth', '~> 1.2', '>= 1.2.1'
+gem 'simple_oauth'
+
+# TwilioAgent
+gem 'twilio-ruby'
+
+# Twitter Agents
+gem 'omniauth-twitter'
+gem 'twitter', '~> 8.3', '>= 8.3.1'
+
+# UserLocationAgent
+gem 'haversine'
+
+# WeatherAgent
+gem 'pirate_weather_forecast_ruby'
 
 # Common gems
 gem 'ace-rails-ap'
@@ -82,7 +102,6 @@ gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'devise', '~> 5.0', '>= 5.0.4'
 gem 'em-http-request'
-gem 'execjs'
 gem 'faraday'
 # gem 'faraday-em_http'
 gem 'faraday-follow_redirects'
@@ -121,7 +140,6 @@ gem 'spectrum-rails'
 gem 'sprockets'
 gem 'terser'
 gem 'typhoeus'
-gem 'uglifier'
 
 group :development, :test do
   gem 'debug'
@@ -165,8 +183,6 @@ end
 
 # Platform requirements.
 require 'rbconfig'
-gem 'ffi', '>= 1.17.4'	# required by typhoeus; 1.9.4 has fixes for *BSD.
-gem 'tzinfo', '>= 2.0.6'	# required by rails; 1.2.0 has support for *BSD and Solaris.
 # Windows does not have zoneinfo files, so bundle the tzinfo-data gem.
 gem 'tzinfo-data', platforms: %i[windows]
 # BSD systems require rb-kqueue for "listen" to avoid polling for changes.
