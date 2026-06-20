@@ -60,7 +60,7 @@ jobs:
           --health-timeout 5s
           --health-retries 3
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -109,7 +109,7 @@ jobs:
       DOCKER_ARTIFACT_BASENAME: ${{ matrix.docker_image == 'huginn/huginn' && 'huginn' || 'huginn-single-process' }}
       DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -220,7 +220,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
