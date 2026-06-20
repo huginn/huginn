@@ -771,8 +771,6 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uber (0.1.0)
-    uglifier (4.2.1)
-      execjs (>= 0.3.0, < 3)
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
@@ -824,7 +822,6 @@ DEPENDENCIES
   em-http-request
   erector!
   evernote_oauth
-  execjs
   faraday
   faraday-follow_redirects
   faraday-gzip
@@ -905,7 +902,6 @@ DEPENDENCIES
   twitter (~> 8.3, >= 8.3.1)
   typhoeus
   tzinfo-data
-  uglifier
   vcr
   webmock
   xmpp4r
