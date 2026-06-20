@@ -5,6 +5,21 @@ describe "JavaScriptAgent", js: true do
     login_as(users(:bob))
   end
 
+  def set_ace_editor_value(code)
+    expect(page).to have_css(".ace-editor")
+
+    # Wait for buildAce to finish initializing the editor before setting a value.
+    Timeout.timeout(Capybara.default_max_wait_time) do
+      sleep 0.1 until page.evaluate_script(
+        "!!$('.ace-editor').data('ace-editor')"
+      )
+    end
+
+    page.execute_script(<<~JS)
+      $('.ace-editor').data('ace-editor').setValue(#{code.to_json}, 1);
+    JS
+  end
+
   it "creates a JavaScriptAgent with code in the ace editor" do
     visit new_agent_path
     select2("Java Script Agent", search: "Java Script Agent", from: "Type")
@@ -18,10 +33,7 @@ describe "JavaScriptAgent", js: true do
 
     # Enter code via the ace editor
     code = 'Agent.check = function() { this.createEvent({ "message": "hello" }); };'
-    page.execute_script(<<~JS)
-      var editor = document.querySelector('.ace-editor').dataset.aceEditor;
-      ace.edit(document.querySelector('.ace-editor')).getSession().setValue(#{code.to_json});
-    JS
+    set_ace_editor_value(code)
 
     click_on "Save"
 
@@ -47,9 +59,7 @@ describe "JavaScriptAgent", js: true do
     expect(page).to have_css(".ace-editor")
 
     new_code = 'Agent.check = function() { this.log("updated"); };'
-    page.execute_script(<<~JS)
-      ace.edit(document.querySelector('.ace-editor')).getSession().setValue(#{new_code.to_json});
-    JS
+    set_ace_editor_value(new_code)
 
     click_on "Save"
 
