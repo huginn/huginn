@@ -37,8 +37,11 @@ class SwitchToJsonSerialization < ActiveRecord::Migration[4.2]
   end
 
   def data_exists?
-    events = ActiveRecord::Base.connection.select_rows("SELECT count(*) FROM #{ActiveRecord::Base.connection.quote_table_name("events")}").first.first.to_i
-    agents = ActiveRecord::Base.connection.select_rows("SELECT count(*) FROM #{ActiveRecord::Base.connection.quote_table_name("agents")}").first.first.to_i
+    conn = ActiveRecord::Base.connection
+    quoted_events = conn.quote_table_name("events")
+    quoted_agents = conn.quote_table_name("agents")
+    events = conn.select_rows("SELECT count(*) FROM #{quoted_events}").first.first.to_i
+    agents = conn.select_rows("SELECT count(*) FROM #{quoted_agents}").first.first.to_i
     agents + events > 0
   end
 
