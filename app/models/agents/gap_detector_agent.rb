@@ -1,6 +1,7 @@
 module Agents
   class GapDetectorAgent < Agent
     default_schedule "every_10m"
+    favicon_class 'fa-solid fa-chart-line'
 
     description <<~MD
       The Gap Detector Agent will watch for holes or gaps in a stream of incoming Events and generate "no data alerts".

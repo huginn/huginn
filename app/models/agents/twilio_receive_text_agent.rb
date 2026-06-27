@@ -4,6 +4,7 @@ module Agents
     cannot_receive_events!
 
     gem_dependency_check { defined?(Twilio) }
+    favicon_class 'fa-solid fa-phone'
 
     description do
       <<~MD

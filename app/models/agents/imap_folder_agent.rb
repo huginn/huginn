@@ -13,6 +13,7 @@ module Agents
     can_dry_run!
 
     default_schedule "every_30m"
+    favicon_class 'fa-solid fa-envelope'
 
     description <<~MD
       The Imap Folder Agent checks an IMAP server in specified folders and creates Events based on new mails found since the last run. In the first visit to a folder, this agent only checks for the initial status and does not create events.

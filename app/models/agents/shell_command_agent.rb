@@ -4,6 +4,7 @@ module Agents
 
     can_dry_run!
     no_bulk_receive!
+    favicon_class 'fa-solid fa-terminal'
 
     def self.should_run?
       ENV['ENABLE_INSECURE_AGENTS'] == "true"

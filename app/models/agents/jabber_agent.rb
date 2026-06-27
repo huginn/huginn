@@ -6,6 +6,7 @@ module Agents
     cannot_be_scheduled!
 
     gem_dependency_check { defined?(Jabber) }
+    favicon_class 'fa-solid fa-comments'
 
     description <<~MD
       The Jabber Agent will send any events it receives to your Jabber/XMPP IM account.
