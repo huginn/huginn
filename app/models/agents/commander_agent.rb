@@ -18,7 +18,7 @@ module Agents
       * `enable`: Target Agents are enabled (if not) when this agent is triggered.
         * If the option `drop_pending_events` is set to `true`, pending events will be cleared before the agent is enabled.
 
-      * `configure`: Target Agents have their options updated with the contents of `configure_options`.
+      * `configure`: Target Agents have their options updated with the contents of `configure_options`. Set `nested_array_update_mode` to `merge`(default) or `replace` when configuring arrays that are nested within the `configure_options` hash.
 
       Here's a tip: you can use [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) templating to dynamically determine the action type.  For example:
 
