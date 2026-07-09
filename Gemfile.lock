@@ -401,7 +401,7 @@ GEM
     loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mail (2.9.0)
+    mail (2.9.1)
       logger
       mini_mime (>= 0.1.1)
       net-imap
@@ -740,7 +740,7 @@ GEM
       ostruct
     stringio (3.2.0)
     strscan (3.1.8)
-    terser (1.2.7)
+    terser (1.2.8)
       execjs (>= 0.3.0, < 3)
     thor (1.5.0)
     tilt (2.7.0)
@@ -849,7 +849,7 @@ DEPENDENCIES
   listen
   logger
   loofah (~> 2.25, >= 2.25.1)
-  mail (>= 2.9.0)
+  mail (>= 2.9.1)
   mini_magick (>= 5.3.1)
   mini_racer!
   mqtt
