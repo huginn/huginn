@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/dsander/erector.git
   revision: 821c2fa9174b56cc39e203883d83b18b60912a36
-  branch: rails6
+  ref: 821c2fa9174b56cc39e203883d83b18b60912a36
   specs:
     erector (0.10.0)
       treetop (>= 1.2.3)
