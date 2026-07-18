@@ -189,7 +189,6 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.6.2)
-    docile (1.4.1)
     domain_name (0.6.20240107)
     drb (2.2.3)
     em-http-request (1.1.7)
@@ -705,13 +704,8 @@ GEM
     simple_oauth (0.4.1)
       base64
       cgi
-    simplecov (0.22.0)
-      docile (~> 1.1)
-      simplecov-html (~> 0.11)
-      simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.13.2)
+    simplecov (1.0.2)
     simplecov-lcov (0.9.0)
-    simplecov_json_formatter (0.1.4)
     slack-notifier (2.4.0)
     snaky_hash (2.0.6)
       hashie (>= 0.1.0, < 6)
