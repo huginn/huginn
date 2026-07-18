@@ -7,6 +7,7 @@ module Agents
     no_bulk_receive!
 
     gem_dependency_check { defined?(Google) && defined?(Google::Apis::CalendarV3) }
+    favicon_class 'fa-brands fa-google'
 
     description <<~MD
       The Google Calendar Publish Agent creates events on your Google Calendar.

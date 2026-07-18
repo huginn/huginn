@@ -11,6 +11,7 @@ module Agents
     can_dry_run!
     no_bulk_receive!
     default_schedule "never"
+    favicon_url_option 'post_url'
 
     description do
       <<~MD

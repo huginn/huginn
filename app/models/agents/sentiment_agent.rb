@@ -5,6 +5,7 @@ module Agents
     class_attribute :anew
 
     cannot_be_scheduled!
+    favicon_class 'fa-solid fa-face-smile'
 
     description <<~MD
       The Sentiment Agent generates `good-bad` (psychological valence or happiness index), `active-passive` (arousal), and  `strong-weak` (dominance) score. It will output a value between 1 and 9. It will only work on English content.

@@ -4,6 +4,7 @@ module Agents
     include LongRunnable
 
     cannot_receive_events!
+    favicon_class 'fa-brands fa-x-twitter'
 
     description <<~MD
       The Twitter Stream Agent follows the Twitter stream in real time, watching for certain keywords, or filters, that you provide.

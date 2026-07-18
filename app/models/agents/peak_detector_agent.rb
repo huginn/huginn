@@ -3,6 +3,7 @@ module Agents
     cannot_be_scheduled!
 
     DEFAULT_SEARCH_URL = 'https://twitter.com/search?q={q}'
+    favicon_class 'fa-solid fa-chart-line'
 
     description <<~MD
       The Peak Detector Agent will watch for peaks in an event stream.  When a peak is detected, the resulting Event will have a payload message of `message`.  You can include extractions in the message, for example: `I saw a bar of: {{foo.bar}}`, have a look at the [Wiki](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) for details.

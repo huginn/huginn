@@ -8,6 +8,8 @@ module Agents
 
     before_validation :create_device, on: :create
 
+    favicon_class 'fa-solid fa-bell'
+
     API_BASE = 'https://api.pushbullet.com/v2/'
     TYPE_TO_ATTRIBUTES = {
       'note' => [:title, :body],

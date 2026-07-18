@@ -5,6 +5,7 @@ module Agents
     can_control_other_agents!
     cannot_be_scheduled!
     cannot_create_events!
+    favicon_class 'fa-solid fa-database'
 
     description <<~MD
       The Key-Value Store Agent is a data storage that keeps an associative array in its memory.  It receives events to store values and provides the data to other agents as an object via Liquid Templating.
