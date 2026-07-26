@@ -1,5 +1,6 @@
 class Admin::UsersController < ApplicationController
   before_action :authenticate_admin!, except: [:switch_back]
+  before_action :authenticate_user!, only: [:switch_back]
 
   before_action :find_user, only: [:edit, :destroy, :update, :deactivate, :activate, :switch_to_user]
 
@@ -92,8 +93,14 @@ class Admin::UsersController < ApplicationController
 
   def switch_back
     if session[:original_admin_user_id].present?
-      bypass_sign_in(User.find(session[:original_admin_user_id]))
-      session.delete(:original_admin_user_id)
+      admin_user = User.find_by(id: session[:original_admin_user_id])
+      if admin_user&.admin?
+        bypass_sign_in(admin_user)
+        session.delete(:original_admin_user_id)
+      else
+        session.delete(:original_admin_user_id)
+        redirect_to(root_path, alert: 'Invalid switch back attempt.') and return
+      end
     else
       redirect_to(root_path, alert: 'You must be an admin acting as a different user to do that.') and return
     end
