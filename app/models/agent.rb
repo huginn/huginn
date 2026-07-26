@@ -182,9 +182,12 @@ class Agent < ActiveRecord::Base
         else
           receive_web_request(params, request.method_symbol.to_s, request.format.to_s)
         end
-      handled_request.tap do
-        self.last_web_request_at = Time.now
-        save!
+      handled_request.tap do |response|
+        status_code = response.is_a?(Array) && response[1] ? response[1].to_i : 200
+        if status_code < 400
+          self.last_web_request_at = Time.now
+          save!
+        end
       end
     end
   end
