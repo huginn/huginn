@@ -121,6 +121,35 @@ describe "Creating a new agent", js: true do
            }).to have_text("Sorry, there appears to be an error in your JSON input. Please fix it before continuing.")
   end
 
+  it "opens the Agent picker and prioritizes name matches" do
+    visit new_agent_path
+
+    expect(page).to have_css(".select2-container--open")
+
+    result_order = page.evaluate_script(<<~JS)
+      (() => {
+        const { matcher, sorter } = $("#agent_type").data("select2").options.options;
+        const agents = [
+          { text: "Alpha Agent", title: "find first", element: { index: 1 } },
+          { text: "A Find Agent", title: "", element: { index: 2 } },
+          { text: "Beta Agent", title: "later find", element: { index: 3 } },
+          { text: "Find Agent", title: "", element: { index: 4 } },
+        ];
+        const matches = agents
+          .map((agent) => matcher({ term: "find" }, agent))
+          .filter(Boolean);
+        return sorter(matches).map(({ text }) => text);
+      })()
+    JS
+
+    expect(result_order).to eq([
+      "Find Agent",
+      "A Find Agent",
+      "Alpha Agent",
+      "Beta Agent",
+    ])
+  end
+
   context "displaying the correct information" do
     before(:each) do
       visit new_agent_path
