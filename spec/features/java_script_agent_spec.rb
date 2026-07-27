@@ -22,7 +22,7 @@ describe "JavaScriptAgent", js: true do
 
   it "creates a JavaScriptAgent with code in the ace editor" do
     visit new_agent_path
-    select2("Java Script Agent", search: "Java Script Agent", from: "Type")
+    select_agent_type("Java Script Agent", editor: ".ace-editor")
     expect(page).to have_no_css("form.agent-form.type-changing")
     expect(page).to have_css(".ace-editor")
     fill_in(:agent_name, with: "My JS Agent")
