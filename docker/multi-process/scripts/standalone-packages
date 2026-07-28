@@ -29,6 +29,9 @@ cat >> "$MYSQLD_CNF" << EOF
 socket = /app/tmp/sockets/mysqld.sock
 pid-file = /app/tmp/pids/mysqld.pid
 user = 1001
+# Sorting rows that contain JSON columns (NATIVE_JSON_COLUMNS) can exceed the
+# 256K default and fail with "Out of sort memory" (ER 1038) on MySQL 8.
+sort_buffer_size = 4M
 EOF
 
 if mysqld --verbose --help 2>/dev/null | grep -q -- '--mysqlx-socket'; then
