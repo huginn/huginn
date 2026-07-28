@@ -66,33 +66,34 @@ module Agents
 
     def check
       raindrops = fetch_raindrops
-      latest_created_at = nil
-      latest_ids = Set.new
 
-      sorted_raindrops = raindrops.sort_by do |raindrop|
+      sorted_raindrops = raindrops.sort_by { |raindrop|
         [parse_timestamp(raindrop[:created]) || Time.at(0), raindrop[:_id].to_s]
-      end
+      }
+
+      latest_created_at = parse_timestamp(memory["since"])
+      latest_ids = since_ids
 
       sorted_raindrops.each do |raindrop|
         created_at = parse_timestamp(raindrop[:created])
         next unless created_at
-        next if already_seen?(raindrop, created_at)
 
-        create_event payload: raindrop
+        id = raindrop[:_id].to_s
+        seen = latest_ids.include?(id) || (latest_created_at && created_at < latest_created_at)
 
-        case
-        when latest_created_at.nil? || created_at > latest_created_at
+        if latest_created_at.nil? || created_at > latest_created_at
           latest_created_at = created_at
-          latest_ids.clear
-          latest_ids.add(raindrop[:_id].to_s)
-        when created_at == latest_created_at
-          latest_ids.add(raindrop[:_id].to_s)
+          latest_ids = Set[id]
+        elsif created_at == latest_created_at
+          latest_ids.add(id)
         end
+
+        create_event payload: raindrop unless seen
       end
 
       return unless latest_created_at
 
-      memory["since"] = latest_created_at.iso8601
+      memory["since"] = latest_created_at.iso8601(3)
       memory["since_ids"] = latest_ids.to_a
       save!
     end
@@ -113,14 +114,6 @@ module Agents
       interpolated["limit"].presence || default_options["limit"]
     end
 
-    def already_seen?(raindrop, created_at)
-      since = parse_timestamp(memory["since"])
-      return false unless since
-      return true if created_at < since
-
-      created_at == since && since_ids.include?(raindrop[:_id].to_s)
-    end
-
     def parse_timestamp(value)
       Time.zone.parse(value) if value.present?
     rescue StandardError
@@ -128,7 +121,7 @@ module Agents
     end
 
     def since_ids
-      @since_ids ||= Set.new(Array(memory["since_ids"]))
+      Set.new(Array(memory["since_ids"]))
     end
   end
 end
