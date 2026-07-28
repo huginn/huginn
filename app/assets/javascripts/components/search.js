@@ -26,19 +26,58 @@ $(function () {
     }
   });
 
-  // substring matcher for typeahead
-  const substringMatcher = function (strings) {
-    let findMatches;
-    return (findMatches = function (query, callback) {
+  const substringMatcher = function (items) {
+    return function (query, callback) {
+      const term = query.trim().toUpperCase();
       const matches = [];
-      const substrRegex = new RegExp(query, "i");
-      $.each(strings, function (i, str) {
-        if (substrRegex.test(str)) {
-          return matches.push({ value: str });
+      $.each(items, function (index, item) {
+        const namePosition = item.value.toUpperCase().indexOf(term);
+        if (namePosition >= 0) {
+          matches.push({
+            ...item,
+            sortKey: [1, namePosition, index],
+          });
+          return;
+        }
+
+        const typePosition = (item.agentType || "")
+          .toUpperCase()
+          .indexOf(term);
+        if (typePosition >= 0) {
+          matches.push({
+            ...item,
+            sortKey: [2, typePosition, index],
+          });
         }
       });
+
+      matches.sort(function (left, right) {
+        for (let index = 0; index < left.sortKey.length; index += 1) {
+          const difference = left.sortKey[index] - right.sortKey[index];
+          if (difference !== 0) return difference;
+        }
+        return 0;
+      });
+
       return callback(matches.slice(0, 6));
-    });
+    };
+  };
+
+  const suggestionTemplate = function (item) {
+    const suggestion = document.createElement("p");
+    const name = document.createElement("span");
+    name.className = "agent-search-name";
+    name.appendChild(document.createTextNode(item.value));
+    suggestion.appendChild(name);
+
+    if (item.agentType) {
+      const type = document.createElement("small");
+      type.className = "agent-search-type";
+      type.appendChild(document.createTextNode(item.agentType));
+      suggestion.appendChild(type);
+    }
+
+    return suggestion;
   };
 
   return $agentNavigate.typeahead(
@@ -46,6 +85,10 @@ $(function () {
       minLength: 1,
       highlight: true,
     },
-    { source: substringMatcher(window.agentNames) }
+    {
+      displayKey: "value",
+      source: substringMatcher(window.agentSearchItems),
+      templates: { suggestion: suggestionTemplate },
+    }
   );
 });
