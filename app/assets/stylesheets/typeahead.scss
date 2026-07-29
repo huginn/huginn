@@ -47,3 +47,12 @@
 .tt-suggestion p {
   margin: 0;
 }
+
+.agent-search-type {
+  display: block;
+  color: #777;
+}
+
+.tt-suggestion.tt-cursor .agent-search-type {
+  color: inherit;
+}
