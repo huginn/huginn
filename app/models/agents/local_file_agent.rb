@@ -7,6 +7,7 @@ module Agents
     emits_file_pointer!
 
     default_schedule 'every_1h'
+    favicon_class 'fa-solid fa-folder'
 
     def self.should_run?
       ENV['ENABLE_INSECURE_AGENTS'] == "true"

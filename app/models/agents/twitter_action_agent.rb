@@ -3,6 +3,7 @@ module Agents
     include TwitterConcern
 
     cannot_be_scheduled!
+    favicon_class 'fa-brands fa-x-twitter'
 
     description <<~MD
       The Twitter Action Agent is able to retweet or favorite tweets from the events it receives.

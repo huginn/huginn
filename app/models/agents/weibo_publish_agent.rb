@@ -5,6 +5,7 @@ module Agents
     include WeiboConcern
 
     cannot_be_scheduled!
+    favicon_class 'fa-brands fa-weibo'
 
     description <<~MD
       The Weibo Publish Agent publishes posts from the events it receives.

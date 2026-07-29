@@ -1,5 +1,37 @@
 module AgentHelper
 
+  # Returns HTML for an agent's favicon (FA icon or external image), or nil if none.
+  def agent_favicon(agent, size: 16)
+    klass = agent.class.favicon_class
+    if klass
+      # FontAwesome icon — parse family and icon name
+      parts = klass.split(' ')
+      if parts.length == 2 && parts[0].start_with?('fa-')
+        icon_tag(parts[1], class: parts[0])
+      else
+        icon_tag(parts[0])
+      end
+    else
+      url = agent.favicon_url
+      if url.present? && url != 'none'
+        tag('img', src: url, class: 'agent-favicon', width: size, height: size, alt: '')
+      end
+    end
+  end
+
+  # Returns HTML for a favicon given an agent class (not instance). Used in type selector.
+  def agent_type_favicon(agent_class)
+    klass = agent_class.favicon_class
+    if klass
+      parts = klass.split(' ')
+      if parts.length == 2 && parts[0].start_with?('fa-')
+        icon_tag(parts[1], class: parts[0])
+      else
+        icon_tag(parts[0])
+      end
+    end
+  end
+
   def agent_show_view(agent)
     path = File.join('agents', 'agent_views', @agent.short_type.underscore, 'show')
     return self.controller.template_exists?(path, [], true) ? path : nil
@@ -66,11 +98,13 @@ module AgentHelper
   end
 
   def agent_type_icon(agent, agents)
+    favicon = agent_favicon(agent)
+
     receiver_count = links_counter_cache(agents)[:links_as_receiver][agent.id] || 0
     control_count  = links_counter_cache(agents)[:control_links_as_controller][agent.id] || 0
     source_count   = links_counter_cache(agents)[:links_as_source][agent.id] || 0
 
-    if control_count > 0 && receiver_count > 0
+    topology_icon = if control_count > 0 && receiver_count > 0
       content_tag('span') do
         concat icon_tag('glyphicon-arrow-right')
         concat tag('br')
@@ -87,13 +121,43 @@ module AgentHelper
     else
       icon_tag('glyphicon-unchecked')
     end
+
+    if favicon
+      content_tag('span', class: 'agent-icon-group') do
+        concat favicon
+        concat ' '.html_safe
+        concat topology_icon
+      end
+    else
+      topology_icon
+    end
   end
 
   def agent_type_select_options
-    Rails.cache.fetch('agent_type_select_options') do
-      types = Agent.types.map {|type| [agent_type_to_human(type.name), type, {title: h(Agent.build_for_type(type.name, User.new(id: 0), {}).html_description.lines.first.strip)}] }
+    options = Rails.cache.fetch('agent_type_select_options_v3') do
+      types = Agent.types.map {|type|
+        agent_instance = Agent.build_for_type(type.name, User.new(id: 0), {})
+        favicon_css = type.favicon_class
+        label = agent_type_to_human(type.name)
+        [label, type, {title: h(agent_instance.html_description.lines.first.strip), data: { favicon_class: favicon_css }.compact}]
+      }
       types.sort_by! { |t| t[0] }
-      [['Select an Agent Type', 'Agent', {title: ''}]] + types
+      [['Select an Agent Type', 'Agent', {title: '', data: {}}]] + types
+    end
+
+    if current_user
+      templates = current_user.agents.templates
+      if templates.any?
+        template_options = templates.map do |t|
+          ["[Template] #{t.name}", "template_#{t.id}", {title: h(t.template_description.presence || "Template based on #{t.short_type.titleize}")}]
+        end
+        template_options.sort_by! { |t| t[0] }
+        options + template_options
+      else
+        options
+      end
+    else
+      options
     end
   end
 

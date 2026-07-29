@@ -2,6 +2,7 @@ module Agents
   class DeDuplicationAgent < Agent
     include FormConfigurable
     cannot_be_scheduled!
+    favicon_class 'fa-solid fa-filter'
 
     description <<~MD
       The De-duplication Agent receives a stream of events and remits the event if it is not a duplicate.

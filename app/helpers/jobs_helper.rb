@@ -35,6 +35,11 @@ module JobsHelper
       'Run Event cleanup'
     when 'AgentPropagateJob'
       'Run Event propagation'
+    when 'ToolExecutionJob'
+      "Remix tool: #{data['arguments'][0]}"
+    when 'OpenapiInstallJob'
+      docset = ::Docset.find_by(id: data['arguments'][0])
+      docset ? "OpenAPI install: #{docset.name}" : "OpenAPI install (Docset ##{data['arguments'][0]})"
     else
       false
     end
