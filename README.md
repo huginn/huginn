@@ -101,11 +101,6 @@ Our general intention is to encourage complex and specific Agents to be written 
 
 Please see [the Huginn Wiki](https://github.com/huginn/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
 
-### Cloudzy
-
-[One-click Huginn deployment on Cloudzy](https://cloudzy.com/marketplace/huginn/) lets you launch Huginn on a preconfigured VPS without setting up the server from scratch.
-
-
 ### Heroku
 
 Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup. Read the [documentation](https://github.com/huginn/huginn/blob/master/doc/heroku/install.md) while you are waiting and be sure to click 'View it' after launch!) Huginn launches only on a paid subscription plan for Heroku. For non-experimental use, we strongly recommend Heroku's 1GB paid plan or our Docker container.
