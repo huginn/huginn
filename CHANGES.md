@@ -2,6 +2,19 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Jul 29, 2026   | Improve Agent navigation search by matching Agent types and showing them in suggestions. [#3705](https://github.com/huginn/huginn/pull/3705) |
+| Jul 29, 2026   | Raise MySQL `sort_buffer_size` for migrations involving native JSON columns. [#3704](https://github.com/huginn/huginn/pull/3704) |
+| Jul 28, 2026   | Fix duplicate events in RaindropBookmarksAgent. [#3703](https://github.com/huginn/huginn/pull/3703) |
+| Jul 27, 2026   | Improve Agent type picker search and show Agent descriptions in the results. [#3702](https://github.com/huginn/huginn/pull/3702) |
+| Jun 20, 2026   | Prevent JavaScriptAgent code edits from occasionally being lost when saving. |
+| Jun 12, 2026   | Sign file pointers emitted by file-handling agents and optionally reject unsigned pointers when consuming them.  New file-consuming agents require signed pointers by default. [#3669](https://github.com/huginn/huginn/pull/3669) |
+| Jun 09, 2026   | Refresh Threads access tokens automatically before they expire. [#3667](https://github.com/huginn/huginn/pull/3667) |
+| Jun 09, 2026   | Add Raindrop service and agents for watching and publishing bookmarks. [#3668](https://github.com/huginn/huginn/pull/3668) |
+| May 24, 2026   | Improve the JSON editor with content-aware sizing, vertical resizing, and fullscreen mode. [#3641](https://github.com/huginn/huginn/issues/3641) |
+| May 23, 2026   | Remove the obsolete AdiosoAgent. [#3662](https://github.com/huginn/huginn/pull/3662) |
+| May 16, 2026   | Upgrade the Docker Compose development database to MySQL 8.0. |
+| May 10, 2026   | Add `Agent.fetch`, `Agent.fetchAll`, `URL`, and `URLSearchParams` to JavaScriptAgent. [#3626](https://github.com/huginn/huginn/pull/3626) |
+| May 02, 2026   | Upgrade Ruby to 4.0. [#3638](https://github.com/huginn/huginn/pull/3638) |
 | Apr 13, 2026   | Optionally use native JSON columns for serialized fields on MySQL and PostgreSQL, controlled by the `NATIVE_JSON_COLUMNS` environment variable. [#3612](https://github.com/huginn/huginn/pull/3612) |
 | Apr 10, 2026   | Upgrade MySQL to 8.0 in the amd64 multi-process Docker image. [#3591](https://github.com/huginn/huginn/pull/3591) |
 | Apr 04, 2026   | Rework Tumblr agents by replacing obsolete gems. [#3617](https://github.com/huginn/huginn/pull/3617) |
