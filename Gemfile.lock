@@ -656,7 +656,7 @@ GEM
       erector
       nokogiri
       rest-client
-    rubocop (1.88.2)
+    rubocop (1.89.0)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
