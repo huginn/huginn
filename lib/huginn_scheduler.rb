@@ -163,8 +163,11 @@ class HuginnScheduler < LongRunnable::Worker
 
   def run_schedule(time)
     with_mutex do
-      puts "Queuing schedule for #{time}"
-      AgentRunScheduleJob.perform_later(time)
+      if AgentRunScheduleJob.perform_later(time)
+        puts "Queued schedule for #{time}"
+      else
+        puts "Skipped schedule for #{time} (already queued)"
+      end
     end
   end
 
