@@ -131,8 +131,8 @@ GEM
     bcrypt (3.1.22)
     benchmark (0.5.0)
     bigdecimal (3.3.1)
-    bootsnap (1.24.6)
-      msgpack (~> 1.2)
+    bootsnap (1.25.0)
+      msgpack (~> 1.5)
     bootstrap-kaminari-views (0.0.5)
       kaminari (>= 0.13)
       rails (>= 3.1)
@@ -519,11 +519,10 @@ GEM
     parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
-    pdf-reader (2.15.1)
+    pdf-reader (2.16.0)
       Ascii85 (>= 1.0, < 3.0, != 2.0.0)
       afm (>= 0.2.1, < 2)
       hashery (~> 2.0)
-      ruby-rc4
       ttfunk
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-arm64-darwin)
@@ -679,7 +678,6 @@ GEM
       regexp_parser (>= 2.0)
       rubocop (~> 1.86, >= 1.86.2)
     ruby-progressbar (1.13.0)
-    ruby-rc4 (0.1.5)
     rubyzip (3.4.1)
     rufus-scheduler (3.9.2)
       fugit (~> 1.1, >= 1.11.1)
@@ -721,8 +719,8 @@ GEM
     spring-watcher-listen (2.1.0)
       listen (>= 2.7, < 4.0)
       spring (>= 4)
-    sprockets (4.2.2)
-      concurrent-ruby (~> 1.0)
+    sprockets (4.3.0)
+      concurrent-ruby (~> 1.1)
       logger
       rack (>= 2.2.4, < 4)
     sprockets-rails (3.5.2)
