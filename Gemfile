@@ -71,7 +71,7 @@ gem 'mqtt'
 gem 'pdf-reader'
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.228.1'
+gem 'aws-sdk-s3', '~> 1', '>= 1.229.0'
 
 # SlackAgent
 gem 'slack-notifier'
