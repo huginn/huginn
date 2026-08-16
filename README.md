@@ -55,29 +55,57 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 The quickest and easiest way to check out Huginn is to use the official Docker image. Have a look at the [documentation](https://github.com/huginn/huginn/blob/master/doc/docker/install.md).
 
-### Local Installation
+### Running Locally
 
-If you just want to play around, you can simply fork this repository, then perform the following steps:
+If you just want to run a local build manually, then perform the following steps:
 
-* Run `git remote add upstream https://github.com/huginn/huginn.git` to add the main repository as a remote for your fork.
-* Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` variable.
-* Make sure that you have MySQL or PostgreSQL installed. (On a Mac, the easiest way is with [Homebrew](http://brew.sh/). If you're going to use PostgreSQL, you'll need to prepend all commands below with `DATABASE_ADAPTER=postgresql`.)
-* Run `bundle` to install dependencies
-* Run `bundle exec rake db:create`, `bundle exec rake db:migrate`, and then `bundle exec rake db:seed` to create a development database with some example Agents.
-* Run `bundle exec foreman start`, visit [http://localhost:3000/][localhost], and login with the username of `admin` and the password of `password`.
-* Setup some Agents!
-* Read the [wiki][wiki] for usage examples and to get started making new Agents.
-* Periodically run `git fetch upstream` and then `git checkout master && git merge upstream/master` to merge in the newest version of Huginn.
+**Note that the recommended Ruby version is 2.7.6**. You must set the version manually from your ruby manager.
 
-Note: By default, email messages are intercepted in the `development` Rails environment, which is what you just setup.  You can view
-them at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener). If you'd like to send real email via SMTP when playing
+1. Clone this repository and enter the project directory.
+
+2. The app depends on environmental variables to start. Make sure to create an `.env` file with our example `.env.example` as a base.
+
+```shell
+cp .env.example .env
+```
+
+3. MySQL is set by default in your `.env` file. If you're planning to use PostgreSQL, then make sure to set the `DATABASE_ADAPTER` variable from your `.env` to `postgresql` along with the DB username and password (if applicable).
+
+```
+DATABASE_ADAPTER=postgresql
+DATABASE_USERNAME=your_db_username_here
+DATABASE_PASSWORD=your_db_password_here
+```
+
+4. And finally, install gem dependencies:
+
+```shell
+  bundle install
+```
+
+  If you get a mimemagic build error, then you're missing a library called `shared-mime-info` in your system. If the host is macOS, you may need to run `brew install shared-mime-info`; if the host is Ubuntu or Debian, you need to run `apt-get install shared-mime-info`.
+
+5. Create the database and run migrations. Don't forget to seed example Agents.
+
+```shell
+  rake db:create && rake db:migrate && rake db:seed
+```
+
+6. Start the server via foreman.
+
+```shell
+  bundle exec foreman start
+```
+
+8. Everything should work. You can visit the app at [http://localhost:3000/](http://localhost:3000/) and login with the username of `admin` and the password of `password`.
+
+**Note**: By default, email messages are intercepted in the Rails `development` environment.  You can view
+them at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener).
+
+   If you'd like to send real email via SMTP when playing
 with Huginn locally, set `SEND_EMAIL_IN_DEVELOPMENT` to `true` in your `.env` file.
 
-If you need more detailed instructions, see the [Novice setup guide][novice-setup-guide].
-
-[localhost]: http://localhost:3000/
-[wiki]: https://github.com/huginn/huginn/wiki
-[novice-setup-guide]: https://github.com/huginn/huginn/wiki/Novice-setup-guide
+   Don't forget to check out the [wiki](https://github.com/huginn/huginn/wiki) for usage examples.
 
 ### Develop
 
