@@ -80,6 +80,9 @@ gem 'slack-notifier'
 gem 'omniauth-oauth', '~> 1.2', '>= 1.2.1'
 gem 'simple_oauth'
 
+# PlivoAgent
+gem 'plivo'
+
 # TwilioAgent
 gem 'twilio-ruby'
 
