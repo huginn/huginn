@@ -175,12 +175,14 @@ module Agents
 
       def callback(*changes)
         AgentRunner.with_connection do
-          changes.zip([:modified, :added, :removed]).each do |files, event_type|
-            files.each do |file|
-              agent.create_event payload: agent.get_file_pointer(file).merge(event_type:)
+          Agent.with_execution_lock(agent.id) do |locked_agent|
+            changes.zip([:modified, :added, :removed]).each do |files, event_type|
+              files.each do |file|
+                locked_agent.create_event payload: locked_agent.get_file_pointer(file).merge(event_type:)
+              end
             end
+            locked_agent.touch(:last_check_at)
           end
-          agent.touch(:last_check_at)
         end
       end
 

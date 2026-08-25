@@ -124,7 +124,9 @@ module Agents
         time, nick, message = normalize_args(event, args)
 
         AgentRunner.with_connection do
-          agent.create_event(payload: { event:, time:, nick:, message: })
+          Agent.with_execution_lock(agent.id) do |locked_agent|
+            locked_agent.create_event(payload: { event:, time:, nick:, message: })
+          end
         end
       end
 

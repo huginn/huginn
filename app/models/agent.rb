@@ -4,6 +4,8 @@ require 'utils'
 # be sub-classed for many different purposes.  Agents can emit Events, as well as receive them and react in many different ways.
 # The basic Agent API is detailed on the Huginn wiki: https://github.com/huginn/huginn/wiki/Creating-a-new-agent
 class Agent < ActiveRecord::Base
+  EXECUTION_LOCK_PREFIX = "huginn:agent:execution:".freeze
+
   include AssignableTypes
   include MarkdownClassAttributes
   include JsonSerializedField
@@ -92,6 +94,19 @@ class Agent < ActiveRecord::Base
     type.demodulize
   end
 
+  def self.with_execution_lock(agent_id)
+    with_advisory_lock!("#{EXECUTION_LOCK_PREFIX}#{agent_id}", disable_query_cache: true) do
+      yield find(agent_id)
+    end
+  end
+
+  def with_execution_lock
+    self.class.with_advisory_lock!("#{EXECUTION_LOCK_PREFIX}#{id}", disable_query_cache: true) do
+      reload
+      yield self
+    end
+  end
+
   def check
     # Implement me in your subclass of Agent.
   end
@@ -168,6 +183,12 @@ class Agent < ActiveRecord::Base
   end
 
   def trigger_web_request(request)
+    with_execution_lock do |agent|
+      agent.send(:perform_web_request, request)
+    end
+  end
+
+  private def perform_web_request(request)
     params = request.params.except(:action, :controller, :agent_id, :user_id, :format)
     if respond_to?(:receive_webhook)
       Rails.logger.warn "DEPRECATED: The .receive_webhook method is deprecated, please switch your Agent to use .receive_web_request."

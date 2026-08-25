@@ -296,7 +296,7 @@ module Agents
           @filter_to_agent_map[filter].each do |agent|
             puts "(#{Time.now}) #{agent.name} received: #{status[:text]}"
             AgentRunner.with_connection do
-              agent.process_tweet(filter, status)
+              Agent.with_execution_lock(agent.id) { |locked_agent| locked_agent.process_tweet(filter, status) }
             end
           end
         end

@@ -167,7 +167,7 @@ describe Agents::TwitterStreamAgent do
 
   describe Agents::TwitterStreamAgent::Worker do
     before(:each) do
-      @mock_agent = double
+      @mock_agent = double(id: @agent.id)
       @config = { agent: @agent, config: { filter_to_agent_map: { 'agent' => [@mock_agent] } } }
       @worker = Agents::TwitterStreamAgent::Worker.new(@config)
       @worker.instance_variable_set(:@recent_tweets, [])
@@ -327,6 +327,7 @@ describe Agents::TwitterStreamAgent do
 
       it "calls the agent to process the tweet" do
         expect(@mock_agent).to receive(:name) { 'mock' }
+        expect(Agent).to receive(:with_execution_lock).with(@agent.id).and_yield(@mock_agent)
         expect(@mock_agent).to receive(:process_tweet).with('agent',
                                                             { text: 'agent', id: 123, id_str: '123', user: { name: 'Mock User' }, expanded_text: 'agent' })
         expect(@worker).to receive(:puts).with(a_string_matching(/received/))

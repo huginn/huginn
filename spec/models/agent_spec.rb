@@ -1,7 +1,46 @@
 require 'rails_helper'
+require 'timeout'
 
 describe Agent do
   it_behaves_like WorkingHelpers
+
+  describe ".with_execution_lock" do
+    it "serializes execution of the same Agent" do
+      agent = agents(:bob_weather_agent)
+      first_entered = Queue.new
+      release_first = Queue.new
+      second_entered = Queue.new
+      holder_connection = Agent.connection_db_config.new_connection
+      holder_connection.pool = Agent.connection_pool
+      lock_name = "#{Agent::EXECUTION_LOCK_PREFIX}#{agent.id}"
+
+      first_thread = Thread.new do
+        holder_connection.with_advisory_lock_if_needed(lock_name, disable_query_cache: true) do
+          first_entered << agent.id
+          release_first.pop
+        end
+      end
+      expect(Timeout.timeout(2) { first_entered.pop }).to eq(agent.id)
+
+      second_thread = Thread.new do
+        Agent.with_execution_lock(agent.id) { |locked_agent| second_entered << locked_agent.id }
+      end
+
+      expect { Timeout.timeout(0.2) { second_entered.pop } }.to raise_error(Timeout::Error)
+      release_first << true
+      expect(Timeout.timeout(2) { second_entered.pop }).to eq(agent.id)
+      [first_thread, second_thread].each(&:value)
+    ensure
+      release_first&.push(true)
+      [first_thread, second_thread].compact.each do |thread|
+        next if thread.join(2)
+
+        thread.kill
+        thread.join
+      end
+      holder_connection&.disconnect!
+    end
+  end
 
   describe '.active/inactive' do
     let(:agent) { agents(:jane_website_agent) }

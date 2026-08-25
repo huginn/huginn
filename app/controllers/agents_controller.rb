@@ -33,7 +33,10 @@ class AgentsController < ApplicationController
   def handle_details_post
     @agent = current_user.agents.find(params[:id])
     if @agent.respond_to?(:handle_details_post)
-      render :json => @agent.handle_details_post(params) || {}
+      result = Agent.with_execution_lock(@agent.id) { |agent|
+        agent.handle_details_post(params)
+      } || {}
+      render json: result
     else
       @agent.error "#handle_details_post called on an instance of #{@agent.class} that does not define it."
       head 500
