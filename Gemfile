@@ -47,10 +47,6 @@ gem 'google-cloud-translate-v2'
 # HipchatAgent
 gem 'hipchat'
 
-# HumanTaskAgent
-gem 'rturk'
-gem 'erector', github: 'dsander/erector', ref: '821c2fa9174b56cc39e203883d83b18b60912a36' # branch: 'rails6'
-
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
 gem 'omniauth-google-oauth2', '~> 1.2.2'

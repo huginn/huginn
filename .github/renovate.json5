@@ -140,7 +140,6 @@
         "rspec-mocks",
         "rspec-rails",
         "rspec-retry",
-        "rturk",
         "rubocop",
         "rubocop-performance",
         "rubocop-rspec",
