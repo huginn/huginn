@@ -97,8 +97,7 @@ class Event < ActiveRecord::Base
 
   def possibly_propagate
     # immediately schedule agents that want immediate updates
-    propagate_ids = agent.receivers.where(propagate_immediately: true).pluck(:id)
-    Agent.receive!(only_receivers: propagate_ids) unless propagate_ids.empty?
+    Agent.where(id: agent.receivers.where(propagate_immediately: true)).receive!
   end
 
   public def to_liquid

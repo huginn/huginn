@@ -105,7 +105,7 @@ class AgentsController < ApplicationController
   def propagate
     respond_to do |format|
       if AgentPropagateJob.can_enqueue?
-        details = Agent.receive! # Eventually this should probably be scoped to the current_user.
+        details = current_user.agents.receive!
         format.html { redirect_back "Queued propagation calls for #{details[:event_count]} event(s) on #{details[:agent_count]} agent(s)" }
         format.json { head :ok }
       else
