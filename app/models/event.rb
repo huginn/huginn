@@ -24,7 +24,7 @@ class Event < ActiveRecord::Base
   }
 
   after_create :update_agent_last_event_at
-  after_create :possibly_propagate
+  after_create_commit :possibly_propagate
 
   scope :expired, lambda {
     where("expires_at IS NOT NULL AND expires_at < ?", Time.now)
@@ -97,7 +97,8 @@ class Event < ActiveRecord::Base
 
   def possibly_propagate
     # immediately schedule agents that want immediate updates
-    Agent.where(id: agent.receivers.where(propagate_immediately: true)).receive!
+    receivers = Agent.where(id: agent.receivers.where(propagate_immediately: true))
+    receivers.receive! if receivers.exists?
   end
 
   public def to_liquid
