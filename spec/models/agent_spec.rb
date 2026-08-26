@@ -332,6 +332,21 @@ describe Agent do
         Agent.receive!
       end
 
+      it "does not propagate for an empty scope" do
+        Agent.async_check(agents(:bob_weather_agent).id)
+        expect(Agent).not_to receive(:async_receive)
+        expect(Agent.none.receive!).to eq(agent_count: 0, event_count: 0)
+      end
+
+      it "only propagates to receivers in the scope" do
+        Agent.async_check(agents(:bob_weather_agent).id)
+        Agent.async_check(agents(:jane_weather_agent).id)
+        expect(Agent).to receive(:async_receive).with(agents(:bob_rain_notifier_agent).id, anything).once
+        expect(Agent).not_to receive(:async_receive).with(agents(:jane_rain_notifier_agent).id, anything)
+
+        users(:bob).agents.receive!
+      end
+
       it "should not propagate to disabled Agents" do
         Agent.async_check(agents(:bob_weather_agent).id)
         agents(:bob_rain_notifier_agent).update_attribute :disabled, true

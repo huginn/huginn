@@ -147,8 +147,11 @@ describe AgentsController do
       sign_in users(:bob), scope: :user
     end
 
-    it "runs event propagation for all Agents" do
-      expect(Agent).to receive(:receive!).and_call_original
+    it "runs event propagation only for the current user's Agents" do
+      expect(Agent).to receive(:receive!).and_wrap_original do |method|
+        expect(Agent.current_scope.ids).to match_array(users(:bob).agents.ids)
+        method.call
+      end
       post :propagate
     end
 

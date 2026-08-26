@@ -419,35 +419,30 @@ class Agent < ActiveRecord::Base
       @gem_dependencies_checked && !@gem_dependencies_met
     end
 
-    # Find all Agents that have received Events since the last execution of this method.  Update those Agents with
-    # their new `last_checked_event_id` and queue each of the Agents to be called with #receive using `async_receive`.
+    # Find all Agents in the current scope that have received Events since the last execution of this method.  Update
+    # those Agents with their new `last_checked_event_id` and queue each of them to be called with #receive using
+    # `async_receive`.
     # This is called by bin/schedule.rb periodically.
-    def receive!(options = {})
+    def receive!
       Agent.transaction do
-        scope = Agent
-          .select("agents.id AS receiver_agent_id, sources.type AS source_agent_type, agents.type AS receiver_agent_type, events.id AS event_id")
+        agents_to_events = Hash.new { |hash, receiver_id| hash[receiver_id] = [] }
+
+        all
           .joins("JOIN links ON (links.receiver_id = agents.id)")
           .joins("JOIN agents AS sources ON (links.source_id = sources.id)")
           .joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)")
           .where("NOT agents.disabled AND NOT agents.deactivated AND (agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id)")
-        if options[:only_receivers].present?
-          scope = scope.where("agents.id in (?)", options[:only_receivers])
-        end
+          .pluck("agents.id", "sources.type", "agents.type", "events.id")
+          .each do |receiver_agent_id, source_agent_type, receiver_agent_type, event_id|
+            begin
+              Object.const_get(source_agent_type)
+              Object.const_get(receiver_agent_type)
+            rescue NameError
+              next
+            end
 
-        sql = scope.to_sql
-
-        agents_to_events = {}
-        Agent.connection.select_rows(sql).each do |receiver_agent_id, source_agent_type, receiver_agent_type, event_id|
-          begin
-            Object.const_get(source_agent_type)
-            Object.const_get(receiver_agent_type)
-          rescue NameError
-            next
+            agents_to_events[receiver_agent_id] << event_id
           end
-
-          agents_to_events[receiver_agent_id.to_i] ||= []
-          agents_to_events[receiver_agent_id.to_i] << event_id
-        end
 
         Agent.where(id: agents_to_events.keys).each do |agent|
           event_ids = agents_to_events[agent.id].uniq
