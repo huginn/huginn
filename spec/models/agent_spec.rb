@@ -548,7 +548,7 @@ describe Agent do
     end
 
     describe "creating agents with propagate_immediately = true" do
-      it "should schedule subagent events immediately" do
+      it "schedules subagent events after the event transaction commits" do
         Event.delete_all
         sender = Agents::SomethingSource.new(name: "Sending Agent")
         sender.user = users(:bob)
@@ -562,10 +562,23 @@ describe Agent do
         receiver.sources << sender
         receiver.save!
 
-        sender.create_event payload: { "message" => "new payload" }
+        Agent.transaction do
+          sender.create_event payload: { "message" => "new payload" }
+          expect(receiver.events.count).to eq(0)
+        end
+
         expect(sender.events.count).to eq(1)
         expect(receiver.events.count).to eq(1)
         # should be true without calling Agent.receive!
+      end
+
+      it "does not scan for propagation without immediate receivers" do
+        sender = Agents::SomethingSource.new(name: "Sending Agent")
+        sender.user = users(:bob)
+        sender.save!
+
+        expect(Agent).not_to receive(:with_advisory_lock!)
+        sender.create_event payload: { "message" => "new payload" }
       end
 
       it "should only schedule receiving agents that are set to propagate_immediately" do
