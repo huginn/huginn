@@ -326,6 +326,41 @@ describe Agent do
                                                 status: 200)
       end
 
+      it "serializes event selection and enqueueing" do
+        first_entered = Queue.new
+        release_first = Queue.new
+        second_finished = Queue.new
+        holder_connection = Agent.connection_db_config.new_connection
+        holder_connection.pool = Agent.connection_pool
+
+        first_thread = Thread.new do
+          holder_connection.with_advisory_lock_if_needed(Agent::PROPAGATION_LOCK_NAME, disable_query_cache: true) do
+            first_entered << true
+            release_first.pop
+          end
+        end
+        expect(Timeout.timeout(2) { first_entered.pop }).to be(true)
+
+        second_thread = Thread.new do
+          Agent.none.receive!
+          second_finished << true
+        end
+
+        expect { Timeout.timeout(0.2) { second_finished.pop } }.to raise_error(Timeout::Error)
+        release_first << true
+        expect(Timeout.timeout(2) { second_finished.pop }).to be(true)
+        [first_thread, second_thread].each(&:value)
+      ensure
+        release_first&.push(true)
+        [first_thread, second_thread].compact.each do |thread|
+          next if thread.join(2)
+
+          thread.kill
+          thread.join
+        end
+        holder_connection&.disconnect!
+      end
+
       it "should use available events" do
         Agent.async_check(agents(:bob_weather_agent).id)
         expect(Agent).to receive(:async_receive).with(agents(:bob_rain_notifier_agent).id, anything).once

@@ -5,6 +5,7 @@ require 'utils'
 # The basic Agent API is detailed on the Huginn wiki: https://github.com/huginn/huginn/wiki/Creating-a-new-agent
 class Agent < ActiveRecord::Base
   EXECUTION_LOCK_PREFIX = "huginn:agent:execution:".freeze
+  PROPAGATION_LOCK_NAME = "huginn:agent:propagation".freeze
 
   include AssignableTypes
   include MarkdownClassAttributes
@@ -424,41 +425,43 @@ class Agent < ActiveRecord::Base
     # `async_receive`.
     # This is called by bin/schedule.rb periodically.
     def receive!
-      Agent.transaction do
-        agents_to_events = Hash.new { |hash, receiver_id| hash[receiver_id] = [] }
+      with_advisory_lock!(PROPAGATION_LOCK_NAME, disable_query_cache: true) do
+        Agent.transaction do
+          agents_to_events = Hash.new { |hash, receiver_id| hash[receiver_id] = [] }
 
-        all
-          .joins("JOIN links ON (links.receiver_id = agents.id)")
-          .joins("JOIN agents AS sources ON (links.source_id = sources.id)")
-          .joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)")
-          .where("NOT agents.disabled AND NOT agents.deactivated AND (agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id)")
-          .pluck("agents.id", "sources.type", "agents.type", "events.id")
-          .each do |receiver_agent_id, source_agent_type, receiver_agent_type, event_id|
-            begin
-              Object.const_get(source_agent_type)
-              Object.const_get(receiver_agent_type)
-            rescue NameError
-              next
+          all
+            .joins("JOIN links ON (links.receiver_id = agents.id)")
+            .joins("JOIN agents AS sources ON (links.source_id = sources.id)")
+            .joins("JOIN events ON (events.agent_id = sources.id AND events.id > links.event_id_at_creation)")
+            .where("NOT agents.disabled AND NOT agents.deactivated AND (agents.last_checked_event_id IS NULL OR events.id > agents.last_checked_event_id)")
+            .pluck("agents.id", "sources.type", "agents.type", "events.id")
+            .each do |receiver_agent_id, source_agent_type, receiver_agent_type, event_id|
+              begin
+                Object.const_get(source_agent_type)
+                Object.const_get(receiver_agent_type)
+              rescue NameError
+                next
+              end
+
+              agents_to_events[receiver_agent_id] << event_id
             end
 
-            agents_to_events[receiver_agent_id] << event_id
+          Agent.where(id: agents_to_events.keys).each do |agent|
+            event_ids = agents_to_events[agent.id].uniq
+            agent.update_attribute :last_checked_event_id, event_ids.max
+
+            if agent.no_bulk_receive?
+              event_ids.each { |event_id| Agent.async_receive(agent.id, [event_id]) }
+            else
+              Agent.async_receive(agent.id, event_ids)
+            end
           end
 
-        Agent.where(id: agents_to_events.keys).each do |agent|
-          event_ids = agents_to_events[agent.id].uniq
-          agent.update_attribute :last_checked_event_id, event_ids.max
-
-          if agent.no_bulk_receive?
-            event_ids.each { |event_id| Agent.async_receive(agent.id, [event_id]) }
-          else
-            Agent.async_receive(agent.id, event_ids)
-          end
+          {
+            agent_count: agents_to_events.keys.length,
+            event_count: agents_to_events.values.flatten.uniq.compact.length
+          }
         end
-
-        {
-          agent_count: agents_to_events.keys.length,
-          event_count: agents_to_events.values.flatten.uniq.compact.length
-        }
       end
     end
 
