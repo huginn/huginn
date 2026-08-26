@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/dsander/erector.git
-  revision: 821c2fa9174b56cc39e203883d83b18b60912a36
-  ref: 821c2fa9174b56cc39e203883d83b18b60912a36
-  specs:
-    erector (0.10.0)
-      treetop (>= 1.2.3)
-
-GIT
   remote: https://github.com/knu/mini_racer.git
   revision: 172396ba66144124e3af676e1b8f02f393dfdfdc
   branch: fix/darwin_build
@@ -330,7 +322,6 @@ GEM
     http (6.0.4)
       http-cookie (~> 1.0)
       llhttp (~> 0.6.1)
-    http-accept (1.7.0)
     http-cookie (1.1.6)
       domain_name (~> 0.5)
     http_parser.rb (0.8.1)
@@ -454,7 +445,6 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     net-ssh (7.3.3)
-    netrc (0.11.0)
     nio4r (2.7.5)
     nokogiri (1.19.4-aarch64-linux-gnu)
       racc (~> 1.4)
@@ -533,7 +523,6 @@ GEM
       faraday
       hashie
       multi_json
-    polyglot (0.3.5)
     pp (0.6.4)
       prettyprint
     prettyprint (0.2.0)
@@ -616,11 +605,6 @@ GEM
     responders (3.2.0)
       actionpack (>= 7.0)
       railties (>= 7.0)
-    rest-client (2.1.0)
-      http-accept (>= 1.7.0, < 2.0)
-      http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 4.0)
-      netrc (~> 0.8)
     retriable (4.2.0)
     rexml (3.4.4)
     rr (3.1.2)
@@ -652,10 +636,6 @@ GEM
     rspec-retry (0.6.2)
       rspec-core (> 3.3)
     rspec-support (3.13.7)
-    rturk (2.12.1)
-      erector
-      nokogiri
-      rest-client
     rubocop (1.90.0)
       json (>= 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -744,8 +724,6 @@ GEM
       date
     timeout (0.6.1)
     trailblazer-option (0.1.2)
-    treetop (1.6.18)
-      polyglot (~> 0.3)
     tsort (0.2.0)
     ttfunk (1.8.0)
       bigdecimal (~> 3.1)
@@ -818,7 +796,6 @@ DEPENDENCIES
   devise (~> 5.0, >= 5.0.4)
   dotenv!
   em-http-request
-  erector!
   evernote_oauth
   faraday
   faraday-follow_redirects
@@ -848,6 +825,7 @@ DEPENDENCIES
   logger
   loofah (~> 2.25, >= 2.25.2)
   mail (>= 2.9.1)
+  mime-types
   mini_magick (>= 5.3.3)
   mini_racer!
   mqtt
@@ -878,7 +856,6 @@ DEPENDENCIES
   rspec-mocks
   rspec-rails
   rspec-retry
-  rturk
   rubocop
   rubocop-performance
   rubocop-rspec
