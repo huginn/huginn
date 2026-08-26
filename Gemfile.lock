@@ -401,6 +401,10 @@ GEM
     marcel (1.2.1)
     matrix (0.4.3)
     memoizable (0.5.1)
+    mime-types (3.7.0)
+      logger
+      mime-types-data (~> 3.2025, >= 3.2025.0507)
+    mime-types-data (3.2026.0701)
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
@@ -821,6 +825,7 @@ DEPENDENCIES
   logger
   loofah (~> 2.25, >= 2.25.2)
   mail (>= 2.9.1)
+  mime-types
   mini_magick (>= 5.3.3)
   mini_racer!
   mqtt
