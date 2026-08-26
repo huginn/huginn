@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Aug 26, 2026   | Move HumanTaskAgent to the optional [huginn_human_task_agent](https://github.com/huginn/huginn_human_task_agent) gem, removing the unmaintained `rturk` and Erector dependencies from core. [#3727](https://github.com/huginn/huginn/pull/3727) |
 | Aug 26, 2026   | Restrict manual event propagation to the current user's Agents and serialize propagation scans to prevent duplicate event delivery. [#3725](https://github.com/huginn/huginn/pull/3725) [#3726](https://github.com/huginn/huginn/pull/3726) |
 | Aug 25, 2026   | Serialize concurrent execution of the same Agent across jobs, web requests, schedules, and runners. [#3724](https://github.com/huginn/huginn/pull/3724) |
 | Aug 13, 2026   | Deduplicate queued periodic Agent runs to prevent jobs from piling up when workers are overloaded. [#3715](https://github.com/huginn/huginn/pull/3715) |
