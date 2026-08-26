@@ -2,6 +2,9 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Aug 26, 2026   | Restrict manual event propagation to the current user's Agents and serialize propagation scans to prevent duplicate event delivery. [#3725](https://github.com/huginn/huginn/pull/3725) [#3726](https://github.com/huginn/huginn/pull/3726) |
+| Aug 25, 2026   | Serialize concurrent execution of the same Agent across jobs, web requests, schedules, and runners. [#3724](https://github.com/huginn/huginn/pull/3724) |
+| Aug 13, 2026   | Deduplicate queued periodic Agent runs to prevent jobs from piling up when workers are overloaded. [#3715](https://github.com/huginn/huginn/pull/3715) |
 | Jul 29, 2026   | Improve Agent navigation search by matching Agent types and showing them in suggestions. [#3705](https://github.com/huginn/huginn/pull/3705) |
 | Jul 29, 2026   | Raise MySQL `sort_buffer_size` for migrations involving native JSON columns. [#3704](https://github.com/huginn/huginn/pull/3704) |
 | Jul 28, 2026   | Fix duplicate events in RaindropBookmarksAgent. [#3703](https://github.com/huginn/huginn/pull/3703) |
