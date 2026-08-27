@@ -21,6 +21,7 @@ describe Service do
 
       service = agent.service
       service.toggle_availability!
+      jane_agent.update!(service: service)
       expect(service.agents.length).to eq(2)
 
       service.toggle_availability!

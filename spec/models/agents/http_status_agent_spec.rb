@@ -17,7 +17,7 @@ describe 'HttpStatusAgent' do
   let(:agent) do
     Agents::HttpStatusAgent.create!(
       name: SecureRandom.uuid,
-      service: services(:generic),
+      service: services(:jane_generic),
       user: users(:jane),
       options: agent_options
     )

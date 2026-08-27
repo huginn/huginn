@@ -161,7 +161,7 @@ jane_twitter_user_agent:
   type: Agents::TwitterUserAgent
   user: jane
   name: "jane tweets agent"
-  service: generic
+  service: jane_generic
   guid: <%= SecureRandom.hex %>
   options: <%= {
       username: 'jane',
