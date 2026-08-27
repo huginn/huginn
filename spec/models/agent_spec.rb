@@ -616,6 +616,29 @@ describe Agent do
     end
 
     describe "validations" do
+      it "allows Services owned by the Agent's user" do
+        agent = agents(:bob_website_agent)
+        agent.service = services(:generic)
+
+        expect(agent).to have(0).errors_on(:service)
+      end
+
+      it "allows global Services owned by another user" do
+        agent = agents(:bob_website_agent)
+        agent.service = services(:global)
+
+        expect(agent).to have(0).errors_on(:service)
+      end
+
+      it "rejects private Services owned by another user" do
+        agent = agents(:bob_website_agent)
+        service = services(:global)
+        service.global = false
+        agent.service = service
+
+        expect(agent).to have(1).error_on(:service)
+      end
+
       it "calls validate_options" do
         agent = Agents::SomethingSource.new(name: "something")
         agent.user = users(:bob)

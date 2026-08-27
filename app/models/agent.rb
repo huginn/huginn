@@ -48,6 +48,7 @@ class Agent < ActiveRecord::Base
   validates :controllers, owned_by: :user_id
   validates :control_targets, owned_by: :user_id
   validates :scenarios, owned_by: :user_id
+  validate :validate_service_ownership
   validate :validate_schedule
   validate :validate_options
 
@@ -305,6 +306,12 @@ class Agent < ActiveRecord::Base
   private
 
   attr_accessor :current_event
+
+  def validate_service_ownership
+    return if service.nil? || service.global? || service.user_id == user_id
+
+    errors.add(:service, "must be owned by you")
+  end
 
   def validate_schedule
     unless cannot_be_scheduled?
