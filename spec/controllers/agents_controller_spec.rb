@@ -270,6 +270,17 @@ describe AgentsController do
       expect(assigns(:agent)).to be_a(Agents::WebsiteAgent)
     end
 
+    it "does not accept private Services owned by other users" do
+      service = services(:global)
+      service.update_column(:global, false)
+      sign_in users(:bob), scope: :user
+
+      expect {
+        post :create, params: { agent: valid_attributes(service_id: service.id) }
+      }.not_to change(Agent, :count)
+      expect(assigns(:agent)).to have(1).error_on(:service)
+    end
+
     it "shows errors" do
       sign_in users(:bob), scope: :user
       expect {
@@ -326,6 +337,18 @@ describe AgentsController do
       sign_in users(:bob)
       post :update, params: {:id => agents(:bob_website_agent).to_param, :agent => valid_attributes(:scenario_ids => [scenarios(:jane_weather).id])}
       expect(assigns(:agent)).to have(1).errors_on(:scenarios)
+    end
+
+    it "does not accept private Services owned by other users" do
+      service = services(:global)
+      service.update_column(:global, false)
+      agent = agents(:bob_website_agent)
+      sign_in users(:bob), scope: :user
+
+      post :update, params: { id: agent.to_param, agent: valid_attributes(service_id: service.id) }
+
+      expect(assigns(:agent)).to have(1).error_on(:service)
+      expect(agent.reload.service_id).to be_nil
     end
 
     it "shows errors" do
