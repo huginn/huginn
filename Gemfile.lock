@@ -1,11 +1,3 @@
-GIT
-  remote: https://github.com/knu/mini_racer.git
-  revision: 172396ba66144124e3af676e1b8f02f393dfdfdc
-  branch: fix/darwin_build
-  specs:
-    mini_racer (0.20.0)
-      libv8-node (~> 24.12.0.1)
-
 PATH
   remote: vendor/gems/dotenv-3.2.0
   specs:
@@ -411,6 +403,8 @@ GEM
     mini_magick (5.3.3)
       logger
     mini_mime (1.1.5)
+    mini_racer (0.22.1)
+      libv8-node (~> 24.12.0.1)
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
@@ -827,7 +821,7 @@ DEPENDENCIES
   mail (>= 2.9.1)
   mime-types
   mini_magick (>= 5.3.3)
-  mini_racer!
+  mini_racer (~> 0.22.1)
   mqtt
   multi_xml
   mysql2 (~> 0.5, >= 0.5.7)

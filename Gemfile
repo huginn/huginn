@@ -55,7 +55,7 @@ gem 'omniauth-google-oauth2', '~> 1.2.2'
 gem 'xmpp4r'
 
 # JavaScriptAgent
-gem 'mini_racer', github: 'knu/mini_racer', branch: 'fix/darwin_build'
+gem 'mini_racer', '~> 0.22.1'
 
 # LocalFileAgent (watch functionality)
 gem 'listen', require: false
