@@ -145,20 +145,7 @@ module AgentHelper
       [['Select an Agent Type', 'Agent', {title: '', data: {}}]] + types
     end
 
-    if current_user
-      templates = current_user.agents.templates
-      if templates.any?
-        template_options = templates.map do |t|
-          ["[Template] #{t.name}", "template_#{t.id}", {title: h(t.template_description.presence || "Template based on #{t.short_type.titleize}")}]
-        end
-        template_options.sort_by! { |t| t[0] }
-        options + template_options
-      else
-        options
-      end
-    else
-      options
-    end
+    options
   end
 
   private

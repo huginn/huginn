@@ -39,12 +39,11 @@ workers workers_count
 preload_app! if workers_count > 0
 
 before_fork do
-    ActiveRecord::Base.connection_handler.clear_all_connections!
-  end
+  ActiveRecord::Base.connection_handler.clear_all_connections!
+end
 
-  before_worker_boot do
-    ActiveRecord::Base.establish_connection
-  end
+before_worker_boot do
+  ActiveRecord::Base.establish_connection
 end
 
 # Allow puma to be restarted by `rails restart` command

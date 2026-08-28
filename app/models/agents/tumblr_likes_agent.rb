@@ -4,7 +4,11 @@ module Agents
   class TumblrLikesAgent < Agent
     include TumblrConcern
 
-gem_dependency_check { defined?(Tumblr::Client) }
+    gem_dependency_check do
+      Devise.omniauth_providers.include?(:tumblr) &&
+        ENV["TUMBLR_OAUTH_KEY"].present? &&
+        ENV["TUMBLR_OAUTH_SECRET"].present?
+    end
     favicon_class 'fa-brands fa-tumblr'
 
     description <<~MD
