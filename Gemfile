@@ -137,7 +137,7 @@ gem 'spectrum-rails'
 gem 'sprockets'
 gem 'terser'
 gem 'typhoeus'
-gem 'with_advisory_lock', '~> 7.5'
+gem 'with_advisory_lock', '~> 7.6'
 
 group :development, :test do
   gem 'debug'

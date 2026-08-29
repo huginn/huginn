@@ -694,7 +694,7 @@ GEM
     spring-watcher-listen (2.1.0)
       listen (>= 2.7, < 4.0)
       spring (>= 4)
-    sprockets (4.4.0)
+    sprockets (4.4.1)
       concurrent-ruby (~> 1.1)
       logger
       rack (>= 2.2.4, < 4)
@@ -873,7 +873,7 @@ DEPENDENCIES
   tzinfo-data
   vcr
   webmock
-  with_advisory_lock (~> 7.5)
+  with_advisory_lock (~> 7.6)
   xmpp4r
 
 RUBY VERSION
