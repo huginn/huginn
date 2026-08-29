@@ -487,6 +487,6 @@ Once in the MySQL shell, run the following command to set the password for the r
 
 After the change has been made, exit the MySQL shell with `\q`. 
 
-For the change to propogate, restart the MySQL server
+For the change to propagate, restart the MySQL server
 
     sudo service mysql restart
