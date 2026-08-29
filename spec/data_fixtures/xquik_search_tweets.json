@@ -1,0 +1,32 @@
+{
+  "tweets": [
+    {
+      "id": "1912345678901234568",
+      "text": "A newer public post about agent workflows.",
+      "createdAt": "2026-08-24T09:00:00.000Z",
+      "likeCount": 14,
+      "retweetCount": 4,
+      "replyCount": 2,
+      "author": {
+        "id": "123456790",
+        "username": "example_researcher",
+        "name": "Example Researcher"
+      }
+    },
+    {
+      "id": "1912345678901234567",
+      "text": "An earlier public post about agent workflows.",
+      "createdAt": "2026-08-24T08:00:00.000Z",
+      "likeCount": 12,
+      "retweetCount": 3,
+      "replyCount": 1,
+      "author": {
+        "id": "123456789",
+        "username": "example_developer",
+        "name": "Example Developer"
+      }
+    }
+  ],
+  "has_next_page": false,
+  "next_cursor": ""
+}
