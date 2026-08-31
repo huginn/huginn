@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
   has_many :logs, through: :agents, class_name: "AgentLog"
   has_many :scenarios, inverse_of: :user, dependent: :destroy
   has_many :services, -> { by_name('asc') }, dependent: :destroy
+  has_many :remix_conversations, dependent: :destroy
 
   def available_services
     Service.available_to_user(self).by_name

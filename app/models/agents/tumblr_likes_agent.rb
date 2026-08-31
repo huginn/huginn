@@ -9,6 +9,7 @@ module Agents
         ENV["TUMBLR_OAUTH_KEY"].present? &&
         ENV["TUMBLR_OAUTH_SECRET"].present?
     end
+    favicon_class 'fa-brands fa-tumblr'
 
     description <<~MD
       The Tumblr Likes Agent checks for liked Tumblr posts from a specific blog.

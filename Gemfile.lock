@@ -418,6 +418,8 @@ GEM
     mysql2 (0.5.7)
       bigdecimal
     naught (2.3.0)
+    neighbor (1.2.0)
+      activerecord (>= 7.2)
     net-ftp (0.3.9)
       net-protocol
       time
@@ -702,6 +704,10 @@ GEM
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
+    sqlite3 (2.9.6-aarch64-linux-gnu)
+    sqlite3 (2.9.6-arm64-darwin)
+    sqlite3 (2.9.6-x86_64-darwin)
+    sqlite3 (2.9.6-x86_64-linux-gnu)
     sshkit (1.25.1)
       base64
       logger
@@ -825,6 +831,7 @@ DEPENDENCIES
   mqtt
   multi_xml
   mysql2 (~> 0.5, >= 0.5.7)
+  neighbor
   net-ftp
   net-ftp-list
   nokogiri (>= 1.19.4)
@@ -866,6 +873,7 @@ DEPENDENCIES
   spring-commands-rspec
   spring-watcher-listen
   sprockets
+  sqlite3 (~> 2.0)
   terser
   twilio-ruby
   twitter (~> 8.3, >= 8.3.1)

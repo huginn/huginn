@@ -9,6 +9,7 @@ module Agents
     gem_dependency_check { defined?(Feedjira) }
 
     DEFAULT_EVENTS_ORDER = [['{{date_published}}', 'time'], ['{{last_updated}}', 'time']]
+    favicon_url_option 'url'
 
     description do
       <<~MD

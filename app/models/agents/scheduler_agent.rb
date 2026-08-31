@@ -11,6 +11,7 @@ module Agents
     @@second_precision_enabled = ENV['ENABLE_SECOND_PRECISION_SCHEDULE'] == 'true'
 
     cattr_reader :second_precision_enabled
+    favicon_class 'fa-solid fa-clock'
 
     description <<~MD
       The Scheduler Agent periodically takes an action on target Agents according to a user-defined schedule.

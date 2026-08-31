@@ -8,6 +8,7 @@ module Agents
     cannot_create_events!
     no_bulk_receive!
     can_dry_run!
+    favicon_class 'fa-brands fa-telegram'
 
     description <<~MD
       The Telegram Agent receives and collects events and sends them via [Telegram](https://telegram.org/).

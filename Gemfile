@@ -28,6 +28,8 @@ end
 
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
+gem 'neighbor'   # pgvector ActiveRecord integration for docset embeddings
+gem 'sqlite3', '~> 2.0' # Reading Dash docset SQLite indexes
 
 # Dropbox Agents
 gem 'omniauth-dropbox2', '>= 2.0.5'
@@ -138,6 +140,7 @@ gem 'sprockets'
 gem 'terser'
 gem 'typhoeus'
 gem 'with_advisory_lock', '~> 7.6'
+
 
 group :development, :test do
   gem 'debug'

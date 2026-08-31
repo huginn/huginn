@@ -9,6 +9,7 @@ module Agents
     include WebRequestConcern
 
     cannot_receive_events!
+    favicon_url_option 'jira_url'
 
     description <<~MD
       The Jira Agent subscribes to Jira issue updates.

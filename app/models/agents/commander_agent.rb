@@ -3,6 +3,7 @@ module Agents
     include AgentControllerConcern
 
     cannot_create_events!
+    favicon_class 'fa-solid fa-tower-broadcast'
 
     description <<~MD
       The Commander Agent is triggered by schedule or an incoming event, and commands other agents ("targets") to run, disable, configure, or enable themselves.

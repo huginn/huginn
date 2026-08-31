@@ -5,6 +5,7 @@ module Agents
 
     cannot_be_scheduled!
     cannot_receive_events!
+    favicon_class 'fa-solid fa-tower-broadcast'
 
     description do
       <<~MD

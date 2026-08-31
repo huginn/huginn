@@ -8,6 +8,7 @@ module Agents
     default_schedule "never"
     cannot_create_events!
     no_bulk_receive!
+    favicon_class 'fa-solid fa-envelope'
 
     description <<~MD
       The Email Agent sends any events it receives via email immediately.

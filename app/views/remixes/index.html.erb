@@ -1,0 +1,56 @@
+<% content_for :title, "Remix" -%>
+
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class="page-header">
+        <h2><%= icon_tag('fa-wand-magic-sparkles') %> Remix Conversations</h2>
+      </div>
+
+      <blockquote>Remix is your AI assistant for managing Huginn agents and workflows. 
+        Create, configure, and debug agents through natural conversation.</blockquote>
+
+      <% if @remixes.any? %>
+        <table class='table table-striped'>
+          <tr>
+            <th>Title</th>
+            <th>Messages</th>
+            <th>Last Updated</th>
+            <th></th>
+          </tr>
+
+          <% @remixes.each do |remix| %>
+            <tr>
+              <td><%= link_to remix.title, remix_path(remix) %></td>
+              <td><%= remix.messages.count %></td>
+              <td title='<%= remix.updated_at %>'><%= time_ago_in_words(remix.updated_at) %> ago</td>
+              <td>
+                <div class="btn-group btn-group-xs" style="float: right">
+                  <%= link_to 'Open', remix_path(remix), class: "btn btn-default" %>
+                  <%= link_to 'Delete', remix_path(remix), method: :delete, 
+                      data: { confirm: 'Delete this conversation?' }, class: "btn btn-default" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+      <% else %>
+        <div class="alert alert-info">
+          <p>No conversations yet. Start a new conversation to:</p>
+          <ul>
+            <li>Create and configure agents</li>
+            <li>Analyze and debug your workflows</li>
+            <li>Set up new scenarios</li>
+            <li>Search and analyze events</li>
+          </ul>
+        </div>
+      <% end %>
+
+      <br/>
+
+      <div class="btn-group">
+        <%= link_to icon_tag('glyphicon-plus') + ' New Conversation'.html_safe, remixes_path, method: :post, class: "btn btn-default" %>
+      </div>
+    </div>
+  </div>
+</div>
