@@ -30,7 +30,7 @@ end
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 
 # Dropbox Agents
-gem 'omniauth-dropbox2', '>= 2.0.5'
+gem 'omniauth-dropbox2', '>= 2.0.6'
 
 # EvernoteAgent
 gem 'evernote_oauth'
@@ -49,7 +49,7 @@ gem 'hipchat'
 
 # ImapFolderAgent
 gem 'gmail_xoauth' # support for Gmail using OAuth
-gem 'omniauth-google-oauth2', '~> 1.2.2'
+gem 'omniauth-google-oauth2', '~> 1.2.3'
 
 # JabberAgent
 gem 'xmpp4r'

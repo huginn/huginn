@@ -474,15 +474,15 @@ GEM
       logger
       rack (>= 2.2.3)
       rack-protection
-    omniauth-dropbox2 (2.0.5)
+    omniauth-dropbox2 (2.0.6)
       cgi (>= 0.3.6)
       omniauth-oauth2 (>= 1.8, < 2.0)
     omniauth-evernote (1.2.1)
       evernote-thrift
       multi_json (~> 1.0)
       omniauth-oauth (~> 1.0)
-    omniauth-google-oauth2 (1.2.2)
-      jwt (>= 2.9.2)
+    omniauth-google-oauth2 (1.2.3)
+      jwt (>= 2.9.2, < 4)
       oauth2 (~> 2.0)
       omniauth (~> 2.0)
       omniauth-oauth2 (~> 1.8)
@@ -829,9 +829,9 @@ DEPENDENCIES
   net-ftp-list
   nokogiri (>= 1.19.4)
   omniauth
-  omniauth-dropbox2 (>= 2.0.5)
+  omniauth-dropbox2 (>= 2.0.6)
   omniauth-evernote
-  omniauth-google-oauth2 (~> 1.2.2)
+  omniauth-google-oauth2 (~> 1.2.3)
   omniauth-oauth (~> 1.2, >= 1.2.1)
   omniauth-twitter
   ostruct
