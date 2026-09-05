@@ -115,7 +115,7 @@ GEM
     bcrypt (3.1.22)
     benchmark (0.5.0)
     bigdecimal (3.3.1)
-    bootsnap (1.25.0)
+    bootsnap (1.26.0)
       msgpack (~> 1.5)
     bootstrap-kaminari-views (0.0.5)
       kaminari (>= 0.13)
@@ -400,7 +400,7 @@ GEM
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
-    mini_magick (5.3.3)
+    mini_magick (5.4.0)
       logger
     mini_mime (1.1.5)
     mini_racer (0.22.1)
@@ -820,7 +820,7 @@ DEPENDENCIES
   loofah (~> 2.25, >= 2.25.2)
   mail (>= 2.9.1)
   mime-types
-  mini_magick (>= 5.3.3)
+  mini_magick (>= 5.4.0)
   mini_racer (~> 0.22.1)
   mqtt
   multi_xml
