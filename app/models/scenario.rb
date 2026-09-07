@@ -12,6 +12,9 @@ class Scenario < ActiveRecord::Base
                       with: /\A#(?:[0-9a-fA-F]{3}){1,2}\z/, allow_nil: true,
                       message: "must be a valid hex color."
 
+  validates_format_of :icon, with: /\A[\w-]*\z/, allow_nil: true,
+                      message: "must be a valid icon name."
+
   validate :agents_are_owned
 
   def destroy_with_mode(mode)

@@ -31,6 +31,13 @@ describe ApplicationHelper do
       expect(icon).to be_html_safe
       expect(Nokogiri(icon).at('i.fa-brands.fa-github')).to be_a Nokogiri::XML::Element
     end
+
+    it 'escapes the icon name' do
+      icon = icon_tag(%q{fa-x'><script>alert(1)</script><i class='})
+      expect(icon).to be_html_safe
+      expect(icon).not_to include('<script')
+      expect(Nokogiri(icon).at('i').text).to be_empty
+    end
   end
 
   describe '#nav_link' do

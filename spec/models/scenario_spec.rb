@@ -44,6 +44,18 @@ describe Scenario do
       expect(new_instance).to be_valid
     end
 
+    it "validates icon is an icon name" do
+      new_instance.icon = "x'><script>alert(1)</script>"
+      expect(new_instance).not_to be_valid
+      new_instance.icon = 'star'
+      expect(new_instance).to be_valid
+    end
+
+    it "allows nil icon" do
+      new_instance.icon = nil
+      expect(new_instance).to be_valid
+    end
+
     it "only allows Agents owned by user" do
       new_instance.agent_ids = [agents(:bob_website_agent).id]
       expect(new_instance).to be_valid
