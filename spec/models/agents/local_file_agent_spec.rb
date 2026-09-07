@@ -151,9 +151,18 @@ describe Agents::LocalFileAgent do
     end
   end
 
-  it "get_io opens the file" do
-    expect(File).to receive(:open).with('test', 'r')
-    @checker.get_io('test')
+  context "#get_io" do
+    it "opens the file" do
+      expect(File).to receive(:open).with('test', 'r')
+      @checker.get_io('test')
+    end
+
+    it "does not open the file when ENABLE_INSECURE_AGENTS is not set to true" do
+      ENV['ENABLE_INSECURE_AGENTS'] = 'false'
+      expect(File).not_to receive(:open)
+      expect { expect(@checker.get_io('test')).to be_nil }.to change(AgentLog, :count).by(1)
+      ENV['ENABLE_INSECURE_AGENTS'] = 'true'
+    end
   end
 
   context "#start_worker?" do

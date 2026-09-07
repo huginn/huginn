@@ -135,6 +135,8 @@ module Agents
     end
 
     def get_io(file)
+      return unless should_run?
+
       File.open(file, 'r')
     end
 
