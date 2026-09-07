@@ -25,6 +25,5 @@ services:
       - INTENTIONALLY_SLEEP=10
     env_file:
       - ../mysql.env
-      - ../secrets.env
     depends_on:
       - mysql

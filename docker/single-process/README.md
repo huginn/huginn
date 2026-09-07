@@ -30,12 +30,15 @@ If your database user does not have the permission to create the Huginn database
 
 This script will run database migrations (rake db:migrate) which should be idempotent.
 
+The Rails secret is taken from the environment variable ``APP_SECRET_TOKEN``.  If it is not set, a random one is generated when the container starts, which invalidates existing sessions whenever the container is recreated.  To keep sessions across restarts, set it to a random value of your own, e.g. the output of ``openssl rand -hex 64``.
+
 It will also seed the database (rake db:seed) unless this is defined:
 
     DO_NOT_SEED
 
-This same seeding initially defines the "admin" user with a default password of "password" as per the standard Huginn documentation.
-You can customize the admin account name with the environment variable ``SEED_USERNAME`` and ``SEED_PASSWORD``.
+This same seeding initially defines the "admin" user as per the standard Huginn documentation.
+You can customize the admin account name and password with the environment variables ``SEED_USERNAME`` and ``SEED_PASSWORD``.
+If ``SEED_PASSWORD`` is not set, a random password is generated and printed once in the container log; note it down.
 
 If you do not wish to have the default 6 agents, you will want to set the above environment variable after your initially deploy, otherwise they will be added automatically the next time a container pointing at the database is spun up.
 

@@ -22,7 +22,6 @@ services:
       - "3000:3000"
     env_file:
       - ../mysql.env
-      - ../secrets.env
     depends_on:
       - mysql
 
@@ -34,7 +33,6 @@ services:
     restart: always
     env_file:
       - ../mysql.env
-      - ../secrets.env
     depends_on:
       - mysql
       - web

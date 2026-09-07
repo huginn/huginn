@@ -21,6 +21,25 @@ describe Seeder do
       expect(User.last).to be_admin
     end
 
+    it 'generates and prints a password when SEED_PASSWORD is not set' do
+      ENV['SEED_PASSWORD'] = nil
+      expect(Seeder).to receive(:puts).with(/generated password: (\S+)/) { |message|
+        password = message[/generated password: (\S+)/, 1]
+        expect(User.last.valid_password?(password)).to be_truthy
+        expect(password).not_to eq('password')
+      }
+      Seeder.seed
+    end
+
+    it 'uses SEED_PASSWORD when set' do
+      ENV['SEED_PASSWORD'] = 'chosen-password'
+      expect(Seeder).not_to receive(:puts).with(/generated password/)
+      Seeder.seed
+      expect(User.last.valid_password?('chosen-password')).to be_truthy
+    ensure
+      ENV['SEED_PASSWORD'] = nil
+    end
+
     it 'can be run multiple times and exit normally' do
       Seeder.seed
       expect(Seeder).to receive(:exit)

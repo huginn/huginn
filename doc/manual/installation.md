@@ -279,12 +279,12 @@ You can also tune Puma through `.env`.  `WEB_CONCURRENCY` controls the number of
     # Migrate to the latest version
     sudo -u huginn -H bundle exec rake db:migrate RAILS_ENV=production
 
-    # Create admin user and example agents using the default admin/password login
-    sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=admin SEED_PASSWORD=password
+    # Create admin user and example agents
+    sudo -u huginn -H bundle exec rake db:seed RAILS_ENV=production SEED_USERNAME=admin SEED_PASSWORD=your-password
 
 When done you see `See the Huginn Wiki for more Agent examples!  https://github.com/huginn/huginn/wiki`
 
-**Note:** This will create an initial user, you can change the username and password by supplying it in environmental variables `SEED_USERNAME` and `SEED_PASSWORD` as seen above. If you don't change the password (and it is set to the default one) please wait with exposing Huginn to the public internet until the installation is done and you've logged into the server and changed your password.
+**Note:** This will create an initial user, you can change the username and password by supplying it in environmental variables `SEED_USERNAME` and `SEED_PASSWORD` as seen above. If you leave out `SEED_PASSWORD`, a random password is generated and printed once by the command; note it down.
 
 ### Compile Assets
 
@@ -370,7 +370,7 @@ You should receive `syntax is okay` and `test is successful` messages. If you re
 Visit YOUR_SERVER in your web browser for your first Huginn login. The setup has created a default admin account for you. You can use it to log in:
 
     admin (or your SEED_USERNAME)
-    password (or your SEED_PASSWORD)
+    your SEED_PASSWORD (or the generated password printed by rake db:seed)
 
 
 **Enjoy!** :sparkles: :star: :fireworks:
