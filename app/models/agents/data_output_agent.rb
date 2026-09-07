@@ -69,7 +69,7 @@ module Agents
 
     def default_options
       {
-        "secrets" => ["a-secret-key"],
+        "secrets" => [SecureRandom.uuid],
         "expected_receive_period_in_days" => 2,
         "template" => {
           "title" => "XKCD comics as a feed",

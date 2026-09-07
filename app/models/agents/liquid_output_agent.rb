@@ -87,7 +87,7 @@ module Agents
         </table>
       EOF
       {
-        "secret" => "a-secret-key",
+        "secret" => SecureRandom.uuid,
         "expected_receive_period_in_days" => 2,
         "mime_type" => 'text/html',
         "mode" => 'Last event in',
