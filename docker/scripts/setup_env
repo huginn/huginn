@@ -66,6 +66,13 @@ HUGINN_PORT=${PORT}
 
 cp -a /app/.env.example /tmp/
 
+# Reject the secret that docker/secrets.env used to ship with, as it is public.
+if [ "$APP_SECRET_TOKEN" = '3bd139f9186b31a85336bb89cd1a1337078921134b2f48e022fd09c234d764d3e19b018b2ab789c6e0e04a1ac9e3365116368049660234c2038dc9990513d49c' ]; then
+    echo 'WARNING: APP_SECRET_TOKEN is set to the publicly known value once shipped in docker/secrets.env; ignoring it.' >&2
+    echo 'Set APP_SECRET_TOKEN to a random value of your own to keep sessions valid across container restarts.' >&2
+    APP_SECRET_TOKEN=
+fi
+
 # Do we have a Rails secret yet?
 # If not, generate one, but persist it for the container's lifetime.
 if [ -z "$APP_SECRET_TOKEN" ] && grep -q ^APP_SECRET_TOKEN=REPLACE_ME_NOW /tmp/.env.example; then

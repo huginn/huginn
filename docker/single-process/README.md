@@ -30,6 +30,8 @@ If your database user does not have the permission to create the Huginn database
 
 This script will run database migrations (rake db:migrate) which should be idempotent.
 
+The Rails secret is taken from the environment variable ``APP_SECRET_TOKEN``.  If it is not set, a random one is generated when the container starts, which invalidates existing sessions whenever the container is recreated.  To keep sessions across restarts, set it to a random value of your own, e.g. the output of ``openssl rand -hex 64``.
+
 It will also seed the database (rake db:seed) unless this is defined:
 
     DO_NOT_SEED

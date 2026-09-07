@@ -20,7 +20,6 @@ services:
       - "3000:3000"
     env_file:
       - ../postgres.env
-      - ../secrets.env
     depends_on:
       - postgres
 
@@ -30,7 +29,6 @@ services:
     restart: always
     env_file:
       - ../postgres.env
-      - ../secrets.env
     depends_on:
       - postgres
       - web
