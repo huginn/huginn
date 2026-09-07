@@ -7,7 +7,6 @@ class Agents::ExampleAgent < Agent
   # Optional
   #   Override this method if you need to group multiple agents based on an API key,
   #   or server they connect to.
-  #   Have a look at the TwitterStreamAgent for an example.
   def self.setup_worker; end
 
   class Worker < LongRunnable::Worker

@@ -10,18 +10,16 @@
   "exported_at": "2017-01-17T19:08:31Z",
   "agents": [
     {
-      "type": "Agents::TwitterStreamAgent",
-      "name": "Twitter Counts",
+      "type": "Agents::TwitterUserAgent",
+      "name": "Huginn Tweets",
       "disabled": false,
       "guid": "03c77bb9ec0fb2415f7c399ba849289d",
       "options": {
-        "filters": [
-          "ruby vulnerability",
-          "rails security",
-          "huginn"
-        ],
+        "username": "huginn",
+        "include_retweets": true,
+        "exclude_replies": false,
         "expected_update_period_in_days": "2",
-        "generate": "counts"
+        "choose_home_time_line": false
       },
       "schedule": "every_10m",
       "keep_events_for": 604800
