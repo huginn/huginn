@@ -117,7 +117,6 @@ class AgentRunner
 end
 
 # Load long-running agents so LongRunnable can register them.
-Agents::TwitterStreamAgent
 Agents::JabberAgent
 Agents::LocalFileAgent
 require 'huginn_scheduler'

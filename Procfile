@@ -9,7 +9,6 @@ jobs: bundle exec rails runner bin/threaded.rb
 # Old version with separate processes (use this if you have issues with the threaded version)
 # web: bundle exec puma -C config/puma.rb
 # schedule: bundle exec rails runner bin/schedule.rb
-# twitter: bundle exec rails runner bin/twitter_stream.rb
 # dj: bundle exec script/delayed_job run
 
 ###############################
@@ -25,7 +24,6 @@ jobs: bundle exec rails runner bin/threaded.rb
 # Old version with separate processes (use this if you have issues with the threaded version)
 # web: bundle exec puma -C config/puma.rb
 # schedule: bundle exec rails runner bin/schedule.rb
-# twitter: bundle exec rails runner bin/twitter_stream.rb
 # dj: bundle exec script/delayed_job run
 
 ###############################
