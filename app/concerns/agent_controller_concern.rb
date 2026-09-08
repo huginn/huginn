@@ -30,6 +30,9 @@ module AgentControllerConcern
         errors.add(:base,
                    "A non-empty hash must be specified in the 'configure_options' option when using the 'configure' action.")
       end
+      if options['nested_array_update_mode'].present? && !%w(replace merge).include?(options['nested_array_update_mode'])
+        errors.add(:base, "The 'nested_array_update_mode' must be equal to 'merge' or 'replace' when provided.")
+      end
     when 'enable', 'disable'
     when nil
       errors.add(:base, "action must be specified")
@@ -74,7 +77,12 @@ module AgentControllerConcern
             log "Agent '#{target.name}' is disabled"
           end
         when 'configure'
-          target.update! options: target.options.deep_merge(interpolated['configure_options'])
+          new_options = if interpolated['nested_array_update_mode'] == 'replace'
+                          target.options.deep_merge(interpolated['configure_options'])
+                        else
+                          target.options.deep_merge(interpolated['configure_options']) { |key, old, new| !(new.kind_of?(Array) && old.kind_of?(Array)) ? new : (old+new).uniq }
+                        end
+          target.update! options: new_options
           log "Agent '#{target.name}' is configured with #{interpolated['configure_options'].inspect}"
         when ''
           log 'No action is performed.'
