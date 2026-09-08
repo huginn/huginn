@@ -157,6 +157,37 @@ shared_examples_for WebRequestConcern do
       expect(agent.faraday.options.params_encoder).to eq(WebRequestConcern::DoNotEncoder)
     end
 
+    describe "proxy" do
+      it "should leave the proxy to the environment when no proxy option is given" do
+        expect(agent.faraday.proxy).to be_nil
+        # A connection given an explicit proxy, even nil, stops consulting http_proxy.
+        expect(agent.faraday.instance_variable_get(:@manual_proxy)).to be_falsey
+      end
+
+      it "should use the proxy option when given" do
+        agent.options['proxy'] = 'http://proxy.example.com:3128'
+        expect(agent).to be_valid
+        expect(agent.faraday.proxy.uri.to_s).to eq('http://proxy.example.com:3128')
+      end
+
+      context "when OUTBOUND_PROXY is set" do
+        before do
+          allow(OutboundProxy).to receive(:url).and_return('http://smokescreen:4750')
+        end
+
+        it "should use the outbound proxy" do
+          expect(agent.faraday.proxy.uri.to_s).to eq('http://smokescreen:4750')
+        end
+
+        it "should refuse a proxy option" do
+          agent.options['proxy'] = 'http://proxy.example.com:3128'
+          expect(agent).not_to be_valid
+          expect(agent.errors[:base]).to include(/proxy cannot be set/)
+          expect(agent.faraday.proxy.uri.to_s).to eq('http://smokescreen:4750')
+        end
+      end
+    end
+
     describe "redirect follow" do
       it "should use FollowRedirects by default" do
         expect(agent.faraday.builder.handlers).to include(Faraday::FollowRedirects::Middleware)
