@@ -198,6 +198,18 @@ describe ScenarioImport do
           expect(scenario_import.scenario.public).to be_falsey
         end
 
+        context "with an invalid scenario attribute" do
+          let(:icon) { "x'><script>alert(1)</script>" }
+
+          it "fails without creating anything" do
+            expect {
+              expect(scenario_import.import).to be_falsey
+            }.not_to change { [users(:bob).scenarios.count, users(:bob).agents.count] }
+
+            expect(scenario_import.errors[:base].join).to include("Icon must be a valid icon name.")
+          end
+        end
+
         it "creates the Agents" do
           expect {
             scenario_import.import
