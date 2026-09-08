@@ -1,0 +1,7 @@
+#!/bin/bash -e
+# Runs the bundled Smokescreen egress proxy on the loopback interface.
+# Extra flags, such as --allow-range for internal services that Agents may
+# reach, come from SMOKESCREEN_OPTS.
+source /tmp/.env
+
+exec smokescreen --listen-ip 127.0.0.1 --listen-port 4750 ${SMOKESCREEN_OPTS}

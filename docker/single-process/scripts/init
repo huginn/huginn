@@ -9,6 +9,11 @@ fi
 
 source /scripts/setup_env
 
+if [ "${ENABLE_SMOKESCREEN}" = "true" ]; then
+  echo "Starting Smokescreen egress proxy..."
+  /scripts/smokescreen &
+fi
+
 if [[ -z "${DO_NOT_CREATE_DATABASE}" && -z "$1" ]]; then
   bundle exec rake db:create RAILS_ENV=${RAILS_ENV}
 fi

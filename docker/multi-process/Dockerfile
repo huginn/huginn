@@ -1,7 +1,19 @@
+# Smokescreen is an egress proxy that refuses connections to private and
+# link-local addresses.  It is started inside the container when
+# ENABLE_SMOKESCREEN=true; see doc/manual/outbound-requests.md.
+# renovate: datasource=git-refs depName=https://github.com/stripe/smokescreen branch=master
+ARG SMOKESCREEN_COMMIT=d4da883a671475551d78da812db547341c8fe6c3
+
+FROM golang:1.27-alpine AS smokescreen
+ARG SMOKESCREEN_COMMIT
+RUN CGO_ENABLED=0 go install "github.com/stripe/smokescreen@${SMOKESCREEN_COMMIT}"
+
 FROM rubylang/ruby:4.0.6-jammy
 
 COPY docker/scripts/prepare /scripts/
 RUN /scripts/prepare
+
+COPY --from=smokescreen /go/bin/smokescreen /usr/local/bin/smokescreen
 
 COPY docker/multi-process/scripts/standalone-packages /scripts/
 RUN /scripts/standalone-packages
@@ -45,14 +57,15 @@ EXPOSE 3000
 COPY docker/multi-process/scripts/supervisord.conf /etc/supervisor/
 COPY ["docker/multi-process/scripts/bootstrap.conf", \
       "docker/multi-process/scripts/foreman.conf", \
-      "docker/multi-process/scripts/mysqld.conf", "/etc/supervisor/conf.d/"]
+      "docker/multi-process/scripts/mysqld.conf", \
+      "docker/multi-process/scripts/smokescreen.conf", "/etc/supervisor/conf.d/"]
 COPY ["docker/multi-process/scripts/bootstrap.sh", \
       "docker/multi-process/scripts/foreman.sh", \
       "docker/multi-process/scripts/init", \
       "docker/multi-process/scripts/mysql-5.7.44-linux-glibc2.12-x86_64.tar.gz.asc", \
       "docker/multi-process/scripts/mysql-2022-release.asc", \
       "docker/multi-process/scripts/upgrade-mysql", \
-      "docker/scripts/setup_env", "/scripts/"]
+      "docker/scripts/setup_env", "docker/scripts/smokescreen", "/scripts/"]
 CMD ["/scripts/init"]
 
 VOLUME /var/lib/mysql

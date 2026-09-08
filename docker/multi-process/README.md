@@ -118,6 +118,10 @@ If you already have a MySQL 5.7 data volume, cleanly shut it down before the fir
 
 Run this while the old MySQL 5.7 container is still available.  The MySQL 8.0 Docker image automatically performs the data dictionary upgrade when it starts with the existing data volume.
 
+## Restricting outbound requests
+
+Both images bundle [Smokescreen](https://github.com/stripe/smokescreen), an egress proxy that refuses connections to private, loopback and link-local addresses.  Set `ENABLE_SMOKESCREEN=true` to start it inside the container and route all outbound HTTP(S) requests made by Agents through it; `OUTBOUND_PROXY` is then set to `http://127.0.0.1:4750` automatically.  Use this on instances where untrusted users can create Agents.  Internal services that Agents legitimately need can be allowed with `SMOKESCREEN_OPTS`, e.g. `SMOKESCREEN_OPTS=--allow-address=intranet.example.com:443`.  See [doc/manual/outbound-requests.md](../../doc/manual/outbound-requests.md) for details and limitations.
+
 ## Environment Variables
 
 Other Huginn [12factored](https://12factor.net/) environment variables of note are generated and put into the .env file as per Huginn documentation. All variables of the [.env.example](https://github.com/huginn/huginn/blob/master/.env.example) can be used to override the defaults which a read from the current `.env.example`.
