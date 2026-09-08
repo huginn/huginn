@@ -2,6 +2,14 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Sep 07, 2026   | Retire TwitterStreamAgent, which has not been able to work since Twitter retired the v1.1 streaming API in 2023.  Existing Agents remain loadable but new ones cannot be created. |
+| Sep 07, 2026   | Sanitize Markdown in Scenario descriptions and validate Scenario icons, fixing a cross-user XSS via Scenario import. [GHSA-x738-j22q-h2jw](https://github.com/huginn/huginn/security/advisories/GHSA-x738-j22q-h2jw) |
+| Sep 07, 2026   | Make LocalFileAgent honor `ENABLE_INSECURE_AGENTS` when opening files named by file pointers, fixing an arbitrary file read by any user.  Rotate `APP_SECRET_TOKEN` and other secrets in `.env` if untrusted users had access. [GHSA-p347-7m45-694r](https://github.com/huginn/huginn/security/advisories/GHSA-p347-7m45-694r) |
+| Sep 07, 2026   | Serve responses of LiquidOutputAgent, DataOutputAgent and other web request handlers with a sandboxing `Content-Security-Policy`, so that user-authored pages cannot act on Huginn as the viewer. [GHSA-p748-5grc-mcf5](https://github.com/huginn/huginn/security/advisories/GHSA-p748-5grc-mcf5) |
+| Sep 07, 2026   | Stop shipping a fixed `APP_SECRET_TOKEN` in the Docker configurations, and generate a random seed password when `SEED_PASSWORD` is unset. |
+| Sep 07, 2026   | Generate random default secrets for DataOutputAgent and LiquidOutputAgent. |
+| Sep 07, 2026   | Enable Devise paranoid mode so that the password reset, unlock and confirmation forms do not reveal whether an account exists. |
+| Aug 27, 2026   | Prevent Agents from being bound to other users' private Services. [GHSA-73v6-mq4f-33gw](https://github.com/huginn/huginn/security/advisories/GHSA-73v6-mq4f-33gw) |
 | Aug 26, 2026   | Move HumanTaskAgent to the optional [huginn_human_task_agent](https://github.com/huginn/huginn_human_task_agent) gem, removing the unmaintained `rturk` and Erector dependencies from core. [#3727](https://github.com/huginn/huginn/pull/3727) |
 | Aug 26, 2026   | Restrict manual event propagation to the current user's Agents and serialize propagation scans to prevent duplicate event delivery. [#3725](https://github.com/huginn/huginn/pull/3725) [#3726](https://github.com/huginn/huginn/pull/3726) |
 | Aug 25, 2026   | Serialize concurrent execution of the same Agent across jobs, web requests, schedules, and runners. [#3724](https://github.com/huginn/huginn/pull/3724) |
