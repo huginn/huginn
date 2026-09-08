@@ -20,6 +20,11 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    # Uncomment to run the bundled Smokescreen egress proxy and route all
+    # outbound HTTP(S) requests through it, so that Agents cannot reach
+    # private or link-local addresses.  See doc/manual/outbound-requests.md.
+    # environment:
+    #   - ENABLE_SMOKESCREEN=true
     env_file:
       - ../mysql.env
     depends_on:
@@ -31,6 +36,11 @@ services:
       dockerfile: docker/single-process/Dockerfile
     command: /scripts/init bin/threaded.rb
     restart: always
+    # Uncomment to run the bundled Smokescreen egress proxy and route all
+    # outbound HTTP(S) requests through it, so that Agents cannot reach
+    # private or link-local addresses.  See doc/manual/outbound-requests.md.
+    # environment:
+    #   - ENABLE_SMOKESCREEN=true
     env_file:
       - ../mysql.env
     depends_on:

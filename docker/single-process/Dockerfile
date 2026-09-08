@@ -1,7 +1,19 @@
+# Smokescreen is an egress proxy that refuses connections to private and
+# link-local addresses.  It is started inside the container when
+# ENABLE_SMOKESCREEN=true; see doc/manual/outbound-requests.md.
+# renovate: datasource=git-refs depName=https://github.com/stripe/smokescreen branch=master
+ARG SMOKESCREEN_COMMIT=d4da883a671475551d78da812db547341c8fe6c3
+
+FROM golang:1.27-alpine AS smokescreen
+ARG SMOKESCREEN_COMMIT
+RUN CGO_ENABLED=0 go install "github.com/stripe/smokescreen@${SMOKESCREEN_COMMIT}"
+
 FROM rubylang/ruby:4.0.6-jammy
 
 COPY docker/scripts/prepare /scripts/
 RUN /scripts/prepare
+
+COPY --from=smokescreen /go/bin/smokescreen /usr/local/bin/smokescreen
 
 WORKDIR /app
 
@@ -39,5 +51,5 @@ RUN APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle exec r
 
 EXPOSE 3000
 
-COPY ["docker/scripts/setup_env", "docker/single-process/scripts/init", "/scripts/"]
+COPY ["docker/scripts/setup_env", "docker/scripts/smokescreen", "docker/single-process/scripts/init", "/scripts/"]
 CMD ["/scripts/init"]

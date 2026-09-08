@@ -89,6 +89,7 @@ fi
 cat >> /tmp/.env.example <<EOF
 ASSET_HOST=
 DEFAULT_SCENARIO_FILE=
+ENABLE_SMOKESCREEN=
 IP=
 RAILS_ENV=
 RAILS_LOG_TO_STDOUT=
@@ -99,6 +100,7 @@ SEED_USERNAME=
 SMTP_OPENSSL_CA_FILE=
 SMTP_OPENSSL_CA_PATH=
 SMTP_OPENSSL_VERIFY_MODE=
+SMOKESCREEN_OPTS=
 START_MYSQL=
 EOF
 
@@ -127,6 +129,13 @@ source /tmp/.env
 if [ "${START_MYSQL}" = "true" ]; then
   echo 'DATABASE_SOCKET=/app/tmp/sockets/mysqld.sock' >> /tmp/.env
   DATABASE_SOCKET='/app/tmp/sockets/mysqld.sock'
+fi
+
+# Route outbound requests through the bundled Smokescreen unless a proxy is
+# configured explicitly.
+if [ "${ENABLE_SMOKESCREEN}" = "true" ] && [ -z "${OUTBOUND_PROXY}" ]; then
+  echo 'OUTBOUND_PROXY=http://127.0.0.1:4750' >> /tmp/.env
+  OUTBOUND_PROXY='http://127.0.0.1:4750'
 fi
 
 [ -e '/app/.env' ] || cp -a /tmp/.env /app/

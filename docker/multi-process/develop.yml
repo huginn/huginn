@@ -23,6 +23,10 @@ services:
     environment:
       # - DATABASE_INITIAL_CONNECT_MAX_RETRIES=5
       - INTENTIONALLY_SLEEP=10
+      # Uncomment to run the bundled Smokescreen egress proxy and route all
+      # outbound HTTP(S) requests through it, so that Agents cannot reach
+      # private or link-local addresses.  See doc/manual/outbound-requests.md.
+      # - ENABLE_SMOKESCREEN=true
     env_file:
       - ../mysql.env
     depends_on:

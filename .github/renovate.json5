@@ -37,6 +37,15 @@
     },
     {
       customType: "regex",
+      description: "Update the Smokescreen commit built into the Docker images",
+      managerFilePatterns: ["/(^|/)docker/(multi|single)-process/Dockerfile$/"],
+      matchStrings: ["ARG SMOKESCREEN_COMMIT=(?<currentDigest>[0-9a-f]{40})"],
+      depNameTemplate: "https://github.com/stripe/smokescreen",
+      datasourceTemplate: "git-refs",
+      currentValueTemplate: "master",
+    },
+    {
+      customType: "regex",
       description: "Update Ruby versions in Docker base images",
       managerFilePatterns: ["/(^|/)docker/(multi|single)-process/Dockerfile$/"],
       matchStrings: [

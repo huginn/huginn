@@ -3,6 +3,11 @@ source /tmp/.env
 
 echo DATABASE_HOST=${DATABASE_HOST}
 
+if [ "${ENABLE_SMOKESCREEN}" = "true" ]; then
+  echo "Starting Smokescreen egress proxy..."
+  supervisorctl start smokescreen >/dev/null
+fi
+
 # start mysql server if ${DATABASE_HOST} is the .env.example default
 if [ "${START_MYSQL}" = "true" ]; then
   if [ "${DATABASE_ADAPTER}" = "postgresql" ]; then

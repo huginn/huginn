@@ -139,6 +139,10 @@ See [private development instructions](https://github.com/huginn/huginn/wiki/Pri
 
 In order to use the WeatherAgent you need an [Weather Data API key from Pirate Weather](https://pirate-weather.apiable.io/products/weather-data). Sign up for one and then change the value of `api_key: your-key` in your seeded WeatherAgent.
 
+#### Restrict outbound requests on shared instances
+
+If people you do not fully trust can create Agents on your instance, route outbound requests through an egress proxy so that Agents cannot reach internal services.  See [doc/manual/outbound-requests.md](doc/manual/outbound-requests.md).
+
 #### Disable SSL
 
 We assume your deployment will run over SSL. This is a very good idea! However, if you wish to turn this off, you'll probably need to edit `config/initializers/devise.rb` and modify the line containing `config.rememberable_options = { :secure => true }`.  You will also need to edit `config/environments/production.rb` and modify the value of `config.force_ssl`.
