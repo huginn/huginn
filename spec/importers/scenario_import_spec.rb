@@ -165,6 +165,23 @@ describe ScenarioImport do
         end
       end
 
+      it "should go through OUTBOUND_PROXY when it is set" do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('OUTBOUND_PROXY').and_return('http://smokescreen:4750')
+        OutboundProxy.configure!
+        stub_request(:get, "http://example.com/scenarios/1/export.json").to_return(:status => 200, :body => valid_data)
+        expect(Faraday).to receive(:new).and_wrap_original { |original, *args, &block|
+          original.call(*args, &block).tap { |connection|
+            expect(connection.proxy.uri.to_s).to eq('http://smokescreen:4750')
+          }
+        }
+        subject.url = "http://example.com/scenarios/1/export.json"
+        expect(subject).to be_valid
+      ensure
+        allow(ENV).to receive(:[]).with('OUTBOUND_PROXY').and_return(nil)
+        OutboundProxy.configure!
+      end
+
       it "should refuse an oversized response" do
         stub_request(:get, "http://example.com/huge.json")
           .to_return(:status => 200, :body => "x" * (ScenarioImport::MAX_FETCH_SIZE + 1))

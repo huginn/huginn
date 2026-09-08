@@ -117,10 +117,11 @@ module OpenaiConcern
       builder.response :json
 
       builder.headers[:user_agent] = user_agent
-      builder.proxy = interpolated['proxy'].presence
+      if (proxy = OutboundProxy.url || interpolated['proxy'].presence)
+        builder.proxy = proxy
+      end
 
       unless boolify(interpolated['disable_redirect_follow'])
-        require 'faraday/follow_redirects'
         builder.response :follow_redirects
       end
 

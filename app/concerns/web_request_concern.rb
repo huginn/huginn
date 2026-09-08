@@ -71,6 +71,9 @@ module WebRequestConcern
 
     if options['proxy'].present?
       errors.add(:base, "proxy must be a string") unless options['proxy'].is_a?(String)
+      if OutboundProxy.enforced?
+        errors.add(:base, "proxy cannot be set because outbound requests of this Huginn instance go through OUTBOUND_PROXY")
+      end
     end
 
     if option_provided?(options['disable_ssl_verification']) && boolify(options['disable_ssl_verification']).nil?
@@ -133,10 +136,11 @@ module WebRequestConcern
 
       builder.headers[:user_agent] = user_agent
 
-      builder.proxy = interpolated['proxy'].presence
+      if (proxy = OutboundProxy.url || interpolated['proxy'].presence)
+        builder.proxy = proxy
+      end
 
       unless boolify(interpolated['disable_redirect_follow'])
-        require 'faraday/follow_redirects'
         builder.response :follow_redirects
       end
 
