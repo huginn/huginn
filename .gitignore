@@ -24,7 +24,8 @@ deployment/tmp
 deployment/cookbooks
 .vagrant
 .*un~
-.mise.toml
+.mise.local.toml
+mise.local.toml
 .ruby-gemset
 .ruby-version
 manifest.yml

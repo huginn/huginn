@@ -3,7 +3,7 @@ name: Bundle install for Renovate Ruby PRs
 on:
   pull_request:
     paths:
-      - ".tool-versions"
+      - "mise.toml"
 
 permissions:
   contents: write
