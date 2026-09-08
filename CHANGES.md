@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Sep 08, 2026   | Add `OUTBOUND_PROXY` to route all outbound HTTP(S) requests, including Scenario imports, through an egress proxy and refuse per-Agent proxies, so that a proxy such as Smokescreen can keep Agents from reaching internal addresses on shared instances.  Agents without a `proxy` option now honor `http_proxy` on the `net_http` backend. |
 | Sep 08, 2026   | Give Scenario imports by URL a timeout and a size limit, follow redirects, and report any fetch failure as a validation error instead of a server error. |
 | Sep 07, 2026   | Retire TwitterStreamAgent, which has not been able to work since Twitter retired the v1.1 streaming API in 2023.  Existing Agents remain loadable but new ones cannot be created. |
 | Sep 07, 2026   | Sanitize Markdown in Scenario descriptions and validate Scenario icons, fixing a cross-user XSS via Scenario import. [GHSA-x738-j22q-h2jw](https://github.com/huginn/huginn/security/advisories/GHSA-x738-j22q-h2jw) |
