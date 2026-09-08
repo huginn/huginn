@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Sep 08, 2026   | Give Scenario imports by URL a timeout and a size limit, follow redirects, and report any fetch failure as a validation error instead of a server error. |
 | Sep 07, 2026   | Retire TwitterStreamAgent, which has not been able to work since Twitter retired the v1.1 streaming API in 2023.  Existing Agents remain loadable but new ones cannot be created. |
 | Sep 07, 2026   | Sanitize Markdown in Scenario descriptions and validate Scenario icons, fixing a cross-user XSS via Scenario import. [GHSA-x738-j22q-h2jw](https://github.com/huginn/huginn/security/advisories/GHSA-x738-j22q-h2jw) |
 | Sep 07, 2026   | Make LocalFileAgent honor `ENABLE_INSECURE_AGENTS` when opening files named by file pointers, fixing an arbitrary file read by any user.  Rotate `APP_SECRET_TOKEN` and other secrets in `.env` if untrusted users had access. [GHSA-p347-7m45-694r](https://github.com/huginn/huginn/security/advisories/GHSA-p347-7m45-694r) |
