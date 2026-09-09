@@ -96,7 +96,9 @@ Create a user for Huginn:
 
 ## 5. Database
 
-### MySQL / MariaDB
+### MariaDB / MySQL
+
+Huginn’s `mysql2` gem works with MariaDB as well as MySQL. On Debian/Ubuntu, if you use MariaDB instead of MySQL, install `mariadb-server`, `mariadb-client`, and `libmariadb-dev` (or `default-libmysqlclient-dev`, which satisfies the same build dependency in many releases). The `mysql` CLI, `mysql_secure_installation`, and SQL examples below are the same.
 
 Install the database packages
 
