@@ -1,0 +1,43 @@
+# 한국어(ko) 지역화 파일입니다. 이 디렉터리에 다른 로케일 파일을 추가할 수 있습니다.
+# 시작점으로 https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale 를 참고하세요.
+
+ko:
+  devise:
+    failure:
+      deactivated_account: "관리자에 의해 계정이 비활성화되었습니다."
+  datetime:
+    distance_in_words:
+      half_a_minute: "30초"
+      less_than_x_seconds:
+        one:   "<1초"
+        other: "<%{count}초"
+      x_seconds:
+        one:   "1초"
+        other: "%{count}초"
+      less_than_x_minutes:
+        one:   "<1분"
+        other: "<%{count}분"
+      x_minutes:
+        one:   "1분"
+        other: "%{count}분"
+      about_x_hours:
+        one:   "~1시간"
+        other: "~%{count}시간"
+      x_days:
+        one:   "1일"
+        other: "%{count}일"
+      about_x_months:
+        one:   "~1개월"
+        other: "~%{count}개월"
+      x_months:
+        one:   "1개월"
+        other: "%{count}개월"
+      about_x_years:
+        one:   "~1년"
+        other: "~%{count}년"
+      over_x_years:
+        one:   ">1년"
+        other: ">%{count}년"
+      almost_x_years:
+        one:   "~1년"
+        other: "~%{count}년"
