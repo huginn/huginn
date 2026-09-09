@@ -5,7 +5,7 @@
 
 This guide is long because it covers many cases and includes all commands you need.
 
-This installation guide was created for and tested on **Debian/Ubuntu** operating systems. Please read [doc/install/requirements.md](./requirements.md) for hardware and operating system requirements.
+This installation guide was created for and tested on **Debian/Ubuntu** operating systems. Please read [the requirements](./requirements.md) for hardware and operating system requirements.
 
 This is the official installation guide to set up a production server. To set up a **development installation** or for many other installation options please see [the getting started section of the readme](https://github.com/huginn/huginn#getting-started).
 
