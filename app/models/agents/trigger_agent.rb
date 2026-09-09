@@ -3,6 +3,8 @@ module Agents
     cannot_be_scheduled!
     can_dry_run!
 
+    favicon_class 'fa-solid fa-bolt'
+
     VALID_COMPARISON_TYPES = %w[
       regex
       !regex

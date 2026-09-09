@@ -6,6 +6,7 @@ module Agents
 
     cannot_be_scheduled!
     no_bulk_receive!
+    favicon_class 'fa-solid fa-file-pdf'
 
     description <<~MD
       The PDF Info Agent returns the metadata contained within a given PDF file, using the pdf-reader gem.

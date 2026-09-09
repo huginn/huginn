@@ -10,6 +10,7 @@ module Agents
     no_bulk_receive!
 
     default_schedule "every_12h"
+    favicon_url_option 'url'
 
     UNIQUENESS_LOOK_BACK = 200
     UNIQUENESS_FACTOR = 3
@@ -171,6 +172,8 @@ module Agents
 
       Set `http_success_codes` to an array of status codes (e.g., `[404, 422]`) to treat HTTP response codes beyond 200 as successes.
 
+      Set `emit_events_on_failure` to `true` to have the Agent emit an event even when fetching or parsing fails.  The emitted event will contain the existing payload (if any) plus an `_error` field with the error message.  This is useful when you want downstream agents to still receive data from earlier stages even if the scraping step fails.  Errors are always logged regardless of this setting.
+
       If a `template` option is given, its value must be a hash, whose key-value pairs are interpolated after extraction for each iteration and merged with the payload.  In the template, keys of extracted data can be interpolated, and some additional variables are also available as explained in the next section.  For example:
 
           "template": {
@@ -262,6 +265,12 @@ module Agents
       if options['uniqueness_look_back'].present?
         errors.add(:base,
                    "Invalid uniqueness_look_back format") unless is_positive_integer?(options['uniqueness_look_back'])
+      end
+
+      if options['emit_events_on_failure'].present?
+        if boolify(options['emit_events_on_failure']).nil?
+          errors.add(:base, "emit_events_on_failure must be true or false")
+        end
       end
 
       validate_web_request_options!
@@ -425,6 +434,9 @@ module Agents
       }
     rescue StandardError => e
       error "Error when fetching url: #{e.message}\n#{e.backtrace.join("\n")}"
+      if boolify(interpolated['emit_events_on_failure'])
+        create_event payload: existing_payload.merge('_error' => e.message, '_url' => url.to_s)
+      end
     end
 
     def default_encoding
@@ -491,6 +503,9 @@ module Agents
             handle_event_data(data, event, existing_payload)
           else
             error "No data was found in the Event payload using the template #{data_from_event}", inbound_event: event
+            if boolify(interpolated['emit_events_on_failure'])
+              create_event payload: existing_payload.merge('_error' => "No data was found in the Event payload using the template #{data_from_event}")
+            end
           end
         else
           url_to_scrape =
@@ -520,6 +535,9 @@ module Agents
       }
     rescue StandardError => e
       error "Error when handling event data: #{e.message}\n#{e.backtrace.join("\n")}"
+      if boolify(interpolated['emit_events_on_failure'])
+        create_event payload: existing_payload.merge('_error' => e.message)
+      end
     end
 
     # This method returns true if the result should be stored as a new event.

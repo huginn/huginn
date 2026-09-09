@@ -2,6 +2,7 @@ module Agents
   class TwitterStreamAgent < Agent
     cannot_be_scheduled!
     cannot_receive_events!
+    favicon_class 'fa-brands fa-x-twitter'
 
     description <<~MD
       **This Agent is no longer functional and cannot be created.**

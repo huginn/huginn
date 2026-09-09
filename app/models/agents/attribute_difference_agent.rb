@@ -1,6 +1,7 @@
 module Agents
   class AttributeDifferenceAgent < Agent
     cannot_be_scheduled!
+    favicon_class 'fa-solid fa-arrow-right-arrow-left'
 
     description <<~MD
       The Attribute Difference Agent receives events and emits a new event with

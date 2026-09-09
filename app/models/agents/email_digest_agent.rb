@@ -7,6 +7,7 @@ module Agents
     default_schedule "5am"
 
     cannot_create_events!
+    favicon_class 'fa-solid fa-envelope'
 
     description <<~MD
       The Email Digest Agent collects any Events sent to it and sends them all via email when scheduled. The number of

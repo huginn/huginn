@@ -5,6 +5,7 @@ module Agents
     cannot_be_scheduled!
     no_bulk_receive!
     can_dry_run!
+    favicon_class 'fa-brands fa-dropbox'
 
     description <<~MD
       The _DropboxFileUrlAgent_ is used to work with Dropbox. It takes a file path (or multiple files paths) and emits events with either [temporary links](https://www.dropbox.com/developers/core/docs#media) or [permanent links](https://www.dropbox.com/developers/core/docs#shares).

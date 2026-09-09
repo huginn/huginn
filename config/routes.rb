@@ -70,6 +70,16 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :remixes do
+    member do
+      post :message
+      post :stream_message
+      post :confirm_action
+      post :cancel_action
+      get :status
+    end
+  end
+
   resources :jobs, :only => [:index, :destroy] do
     member do
       put :run

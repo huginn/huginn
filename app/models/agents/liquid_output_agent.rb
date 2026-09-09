@@ -4,6 +4,7 @@ module Agents
 
     cannot_be_scheduled!
     cannot_create_events!
+    favicon_class 'fa-solid fa-globe'
 
     DATE_UNITS = %w[second seconds minute minutes hour hours day days week weeks month months year years]
 

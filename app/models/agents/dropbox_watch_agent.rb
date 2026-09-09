@@ -4,6 +4,7 @@ module Agents
 
     cannot_receive_events!
     default_schedule "every_1m"
+    favicon_class 'fa-brands fa-dropbox'
 
     description <<~MD
       The Dropbox Watch Agent watches the given `dir_to_watch` and emits events with the detected changes.

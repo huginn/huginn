@@ -7,6 +7,7 @@ module Agents
     no_bulk_receive!
 
     gem_dependency_check { defined?(Twilio) }
+    favicon_class 'fa-solid fa-phone'
 
     description <<~MD
       The Twilio Agent receives and collects events and sends them via text message (up to 160 characters) or gives you a call when scheduled.

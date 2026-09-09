@@ -6,6 +6,7 @@ module Agents
     cannot_receive_events!
 
     gem_dependency_check { defined?(ForecastIO) }
+    favicon_class 'fa-solid fa-cloud-sun'
 
     description <<~MD
       The Weather Agent creates an event for the day's weather at a given `location`.

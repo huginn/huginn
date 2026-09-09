@@ -4,6 +4,7 @@ module Agents
   class JqAgent < Agent
     cannot_be_scheduled!
     can_dry_run!
+    favicon_class 'fa-solid fa-code'
 
     def self.should_run?
       !!jq_version

@@ -4,6 +4,8 @@ module Agents
     can_dry_run!
 
     gem_dependency_check do
+    favicon_class 'fa-brands fa-google'
+
       require 'google/cloud/translate/v2'
     rescue LoadError
       false

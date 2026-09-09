@@ -2,6 +2,7 @@ module Agents
   class ManualEventAgent < Agent
     cannot_be_scheduled!
     cannot_receive_events!
+    favicon_class 'fa-solid fa-hand-pointer'
 
     description <<~MD
       The Manual Event Agent is used to manually create Events for testing or other purposes.

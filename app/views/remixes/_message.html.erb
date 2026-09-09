@@ -1,0 +1,68 @@
+<% return if message.role == 'system' %>
+
+<div class="remix-message remix-message-<%= message.role %>" data-message-id="<%= message.id %>">
+  <div class="remix-message-header">
+    <strong>
+      <% case message.role %>
+      <% when 'user' %>
+        <%= icon_tag('fa-user') %> You
+      <% when 'assistant' %>
+        <%= icon_tag('fa-wand-magic-sparkles') %> Remix
+      <% when 'tool' %>
+        <%= icon_tag('fa-cog') %> Tool: <%= message.tool_name %>
+      <% end %>
+    </strong>
+    <span class="timestamp"><%= message.created_at.strftime('%H:%M') %></span>
+  </div>
+
+  <div class="remix-message-content">
+    <% if message.role == 'tool' %>
+      <% result = JSON.parse(message.content) rescue {} %>
+      <% if result['pending_confirmation'] %>
+        <div class="alert alert-warning">
+          <p><strong>Confirmation Required:</strong> <%= result['message'] %></p>
+          <div class="confirmation-buttons">
+            <%= button_to 'Confirm', confirm_action_remix_path(@remix, tool_call_id: message.tool_call_id),
+                class: 'btn btn-danger btn-sm', data: { confirm: 'Are you sure?' } %>
+            <%= button_to 'Cancel', cancel_action_remix_path(@remix, tool_call_id: message.tool_call_id),
+                class: 'btn btn-default btn-sm' %>
+          </div>
+        </div>
+      <% elsif result['error'] %>
+        <div class="alert alert-danger">
+          <strong>Error:</strong> <%= result['error'] %>
+        </div>
+      <% elsif result['cancelled'] %>
+        <div class="alert alert-info">
+          Operation cancelled.
+        </div>
+      <% elsif result['success'] %>
+        <div class="tool-result success">
+          <span class="result-icon">&#10003;</span>
+          <%= result['message'] %>
+        </div>
+      <% else %>
+        <details>
+          <summary>Tool Result</summary>
+          <pre><code><%= JSON.pretty_generate(result) %></code></pre>
+        </details>
+      <% end %>
+    <% else %>
+      <%# Markdown rendered client-side by remix-page.js %>
+      <div class="md-content" data-raw="<%= h(message.content) %>">
+        <%= simple_format(h(message.content)) %>
+      </div>
+    <% end %>
+
+    <% if message.tool_calls.present? %>
+      <div class="tool-calls">
+        <% message.tool_calls.each do |tc| %>
+          <div class="tool-call">
+            <%= icon_tag('fa-wrench') %>
+            Calling: <code><%= tc['function']['name'] %></code>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

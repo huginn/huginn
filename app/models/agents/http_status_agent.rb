@@ -14,6 +14,7 @@ module Agents
     form_configurable :disable_redirect_follow, type: :boolean
     form_configurable :changes_only, type: :boolean
     form_configurable :headers_to_save
+    favicon_url_option 'url'
 
     description <<~MD
       The HttpStatusAgent will check a url and emit the resulting HTTP status code with the time that it waited for a reply. Additionally, it will optionally emit the value of one or more specified headers.

@@ -9,6 +9,7 @@ module Agents
     gem_dependency_check { defined?(Net::FTP) && defined?(Net::FTP::List) }
 
     emits_file_pointer!
+    favicon_url_option 'url'
 
     description do
       <<~MD

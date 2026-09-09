@@ -3,6 +3,7 @@ module Agents
     include WeiboConcern
 
     cannot_receive_events!
+    favicon_class 'fa-brands fa-weibo'
 
     description <<~MD
       The Weibo User Agent follows the timeline of a specified Weibo user. It uses this endpoint: http://open.weibo.com/wiki/2/statuses/user_timeline/en

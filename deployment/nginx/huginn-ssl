@@ -15,7 +15,11 @@
 ## See installation.md#using-https for additional HTTPS configuration details.
 
 upstream huginn {
-  server unix:/home/huginn/huginn/tmp/sockets/puma.sock fail_timeout=0;
+  ## Puma (default). Start Puma with BIND_UNIX_SOCKET=1 to use this socket.
+  server unix:/home/huginn/huginn/tmp/sockets/puma.socket fail_timeout=0;
+
+  ## Alternatively, if Puma listens on a TCP port:
+  # server 127.0.0.1:3000 fail_timeout=0;
 }
 
 ## Redirects all HTTP traffic to the HTTPS host
@@ -82,13 +86,36 @@ server {
     try_files $uri $uri/index.html $uri.html @huginn;
   }
 
+  ## SSE streaming endpoint for Remix AI assistant.
+  ## Requires proxy_buffering off so chunks are sent to the client immediately.
+  location ~ ^/remixes/\d+/stream_message$ {
+    proxy_buffering         off;
+    proxy_cache             off;
+    proxy_http_version      1.1;
+    proxy_read_timeout      600;
+    proxy_connect_timeout   300;
+    proxy_redirect          off;
+    gzip                    off;
+
+    proxy_set_header    Host                $http_host;
+    proxy_set_header    X-Real-IP           $remote_addr;
+    proxy_set_header    X-Forwarded-Ssl     on;
+    proxy_set_header    X-Forwarded-For     $proxy_add_x_forwarded_for;
+    proxy_set_header    X-Forwarded-Proto   $scheme;
+    proxy_set_header    X-Frame-Options     SAMEORIGIN;
+    proxy_set_header    Connection          "";
+
+    proxy_pass http://huginn;
+  }
+
   ## If a file, which is not found in the root folder is requested,
-  ## then the proxy passes the request to the upstream Puma app.
+  ## then the proxy passes the request to the upstream (huginn puma).
   location @huginn {
     ## If you use HTTPS make sure you disable gzip compression
     ## to be safe against BREACH attack.
     gzip off;
 
+    proxy_http_version      1.1;
     proxy_read_timeout      300;
     proxy_connect_timeout   300;
     proxy_redirect          off;

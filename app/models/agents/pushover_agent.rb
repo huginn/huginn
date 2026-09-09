@@ -6,6 +6,7 @@ module Agents
     no_bulk_receive!
 
     API_URL = 'https://api.pushover.net/1/messages.json'
+    favicon_class 'fa-solid fa-bell'
 
     description <<~MD
       The Pushover Agent receives and collects events and sends them via push notification to a user/group.

@@ -3,6 +3,7 @@ require "json"
 module Agents
   class MqttAgent < Agent
     gem_dependency_check { defined?(MQTT) }
+    favicon_class 'fa-solid fa-microchip'
 
     description <<~MD
       The MQTT Agent allows both publication and subscription to an MQTT topic.
