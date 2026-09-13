@@ -187,3 +187,20 @@ bob_data_output_agent:
         }
       }
     }.to_json.inspect %>
+bob_trigger_agent:
+  type: Agents::TriggerAgent
+  user: bob
+  name: Filter RSS Feed 
+  guid: <%= SecureRandom.hex %>
+  options: <%= {
+    expected_receive_period_in_days: 3,
+    keep_event: "true",
+    message: "unchanged",
+    rules: [
+      {
+        type: "!regex",
+        value: "unchanged",
+        path: "text"
+      }
+    ]
+  }.to_json.inspect %>
