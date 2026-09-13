@@ -5,6 +5,9 @@ require 'utils'
 # The basic Agent API is detailed on the Huginn wiki: https://github.com/huginn/huginn/wiki/Creating-a-new-agent
 class Agent < ActiveRecord::Base
   EXECUTION_LOCK_PREFIX = "huginn:agent:execution:".freeze
+  EXECUTION_LOCK_TIMEOUT = Integer(ENV["AGENT_EXECUTION_LOCK_TIMEOUT"].presence || 30)
+  raise ArgumentError, "AGENT_EXECUTION_LOCK_TIMEOUT must be non-negative" if EXECUTION_LOCK_TIMEOUT.negative?
+
   PROPAGATION_LOCK_NAME = "huginn:agent:propagation".freeze
 
   include AssignableTypes
@@ -97,13 +100,15 @@ class Agent < ActiveRecord::Base
   end
 
   def self.with_execution_lock(agent_id)
-    with_advisory_lock!("#{EXECUTION_LOCK_PREFIX}#{agent_id}", disable_query_cache: true) do
+    with_advisory_lock!("#{EXECUTION_LOCK_PREFIX}#{agent_id}",
+                        timeout_seconds: EXECUTION_LOCK_TIMEOUT, disable_query_cache: true) do
       yield find(agent_id)
     end
   end
 
   def with_execution_lock
-    self.class.with_advisory_lock!("#{EXECUTION_LOCK_PREFIX}#{id}", disable_query_cache: true) do
+    self.class.with_advisory_lock!("#{EXECUTION_LOCK_PREFIX}#{id}",
+                                   timeout_seconds: EXECUTION_LOCK_TIMEOUT, disable_query_cache: true) do
       reload
       yield self
     end

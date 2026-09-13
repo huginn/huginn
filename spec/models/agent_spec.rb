@@ -4,7 +4,52 @@ require 'timeout'
 describe Agent do
   it_behaves_like WorkingHelpers
 
+  shared_examples "a bounded execution lock" do
+    let(:agent) { agents(:bob_weather_agent) }
+
+    it "times out while another connection holds the lock and can acquire it after release" do
+      stub_const("Agent::EXECUTION_LOCK_TIMEOUT", 1)
+      first_entered = Queue.new
+      release_first = Queue.new
+      holder_connection = Agent.connection_db_config.new_connection
+      holder_connection.pool = Agent.connection_pool
+      lock_name = "#{Agent::EXECUTION_LOCK_PREFIX}#{agent.id}"
+
+      first_thread = Thread.new do
+        holder_connection.with_advisory_lock_if_needed(lock_name, timeout_seconds: 0, disable_query_cache: true) do
+          first_entered << true
+          release_first.pop(timeout: 5)
+        end
+      end
+      expect(Timeout.timeout(2) { first_entered.pop }).to be true
+
+      started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      expect {
+        acquire_lock.call { raise "entered a locked Agent" }
+      }.to raise_error(WithAdvisoryLock::FailedToAcquireLock)
+      expect(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at).to be_between(1, 3)
+
+      release_first << true
+      first_thread.value
+      expect(acquire_lock.call(&:id)).to eq(agent.id)
+    ensure
+      release_first&.push(true)
+      first_thread&.join
+      holder_connection&.disconnect!
+    end
+  end
+
+  describe "#with_execution_lock" do
+    it_behaves_like "a bounded execution lock" do
+      let(:acquire_lock) { agent.method(:with_execution_lock) }
+    end
+  end
+
   describe ".with_execution_lock" do
+    it_behaves_like "a bounded execution lock" do
+      let(:acquire_lock) { ->(&block) { Agent.with_execution_lock(agent.id, &block) } }
+    end
+
     it "serializes execution of the same Agent" do
       agent = agents(:bob_weather_agent)
       first_entered = Queue.new
