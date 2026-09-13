@@ -79,7 +79,7 @@ module Agents
       url = Utils.normalize_uri(pic)
       raise ArgumentError, "invalid picture URL" unless url.is_a?(URI::HTTP)
 
-      url.open do |image|
+      url.open(**NetworkTimeout.open_uri_options) do |image|
         weibo_client.statuses.upload text, image, content_type: image.content_type
       end
     end
@@ -91,6 +91,7 @@ module Agents
       return false unless url.is_a?(URI::HTTP)
 
       http = Net::HTTP.new(url.host, url.port)
+      NetworkTimeout.configure_net_http(http)
       http.use_ssl = (url.scheme == "https")
       http.start do |http|
         # images supported #http://open.weibo.com/wiki/2/statuses/upload

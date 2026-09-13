@@ -49,6 +49,12 @@ module TwitterConcern
       config.consumer_secret = twitter_consumer_secret
       config.access_token = twitter_oauth_token
       config.access_token_secret = twitter_oauth_token_secret
+      config.timeouts = {
+        connect: NetworkTimeout.open_timeout,
+        read: NetworkTimeout.timeout,
+        write: NetworkTimeout.timeout,
+        upload: NetworkTimeout.timeout,
+      }
     end
   end
 

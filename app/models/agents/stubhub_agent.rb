@@ -72,7 +72,9 @@ module Agents
 
       def response
         uri = URI(build_url)
-        Net::HTTP.get(uri)
+        http = NetworkTimeout.configure_net_http(Net::HTTP.new(uri.host, uri.port))
+        http.use_ssl = uri.scheme == "https"
+        http.get(uri.request_uri).body
       end
 
       def parse_response

@@ -23,7 +23,7 @@ module OpenaiConcern
 
   def openai_timeout
     timeout = interpolated['request_timeout'].presence
-    timeout ? timeout.to_i : DEFAULT_OPENAI_TIMEOUT
+    NetworkTimeout.timeout(timeout ? timeout.to_i : DEFAULT_OPENAI_TIMEOUT)
   end
 
   def openai_headers
@@ -111,7 +111,7 @@ module OpenaiConcern
       ssl: { verify: !boolify(options['disable_ssl_verification']) },
       request: {
         timeout: openai_timeout,
-        open_timeout: [openai_timeout, 60].min
+        open_timeout: NetworkTimeout.open_timeout(openai_timeout),
       }
     ) do |builder|
       builder.response :json

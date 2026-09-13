@@ -65,7 +65,11 @@ module Agents
     end
 
     def slack_notifier
-      @slack_notifier ||= Slack::Notifier.new(webhook_url, username:)
+      @slack_notifier ||= Slack::Notifier.new(
+        webhook_url,
+        username:,
+        http_options: NetworkTimeout.http_options
+      )
     end
 
     def filter_options(opts)

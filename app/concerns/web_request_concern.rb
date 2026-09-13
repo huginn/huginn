@@ -151,7 +151,10 @@ module WebRequestConcern
         builder.options.params_encoder = DoNotEncoder
       end
 
-      builder.options.timeout = (Delayed::Worker.max_run_time.seconds - 2).to_i
+      builder.options.open_timeout = NetworkTimeout.open_timeout
+      builder.options.timeout = NetworkTimeout.timeout
+      builder.options.read_timeout = NetworkTimeout.timeout
+      builder.options.write_timeout = NetworkTimeout.timeout
 
       if userinfo = basic_auth_credentials
         builder.request :authorization, :basic, *userinfo

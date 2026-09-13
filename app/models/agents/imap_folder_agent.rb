@@ -352,7 +352,7 @@ module Agents
       port = (Integer(port) if port.present?)
 
       log "Connecting to #{host}#{':%d' % port if port}#{' via SSL' if ssl}"
-      Client.open(host, port:, ssl:) { |imap|
+      Client.open(host, port:, ssl:, open_timeout: NetworkTimeout.open_timeout) { |imap|
         log "Logging in as #{username}"
         if service
           imap.authenticate('XOAUTH2', username, password)
@@ -505,6 +505,12 @@ module Agents
         uid_fetch(set, 'RFC822.HEADER').map { |data|
           Message.new(self, data, folder: @folder, uidvalidity: @uidvalidity)
         }
+      end
+
+      private
+
+      def send_command(...)
+        NetworkTimeout.within { super }
       end
     end
 

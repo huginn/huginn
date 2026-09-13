@@ -74,7 +74,12 @@ module Agents
 
     def check
       hydra = Typhoeus::Hydra.new
-      request = Typhoeus::Request.new(check_url, followlocation: true)
+      request = Typhoeus::Request.new(
+        check_url,
+        followlocation: true,
+        connecttimeout: NetworkTimeout.open_timeout,
+        timeout: NetworkTimeout.timeout
+      )
       request.on_success do |response|
         page = Nokogiri::XML response.body
         predictions = page.css("//prediction")

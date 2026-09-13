@@ -94,6 +94,7 @@ module Agents
 
     def mqtt_client
       @client ||= MQTT::Client.new(interpolated['uri']).tap { |c|
+        c.connect_timeout = NetworkTimeout.open_timeout
         if interpolated['ssl']
           c.ssl = interpolated['ssl'].to_sym
           c.ca_file = interpolated['ca_file']

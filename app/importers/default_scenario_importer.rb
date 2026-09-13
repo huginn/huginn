@@ -10,7 +10,12 @@ class DefaultScenarioImporter
     scenario_import.set_user(user)
     scenario_file = ENV['DEFAULT_SCENARIO_FILE'].presence || File.join(Rails.root, "data", "default_scenario.json")
     begin
-      scenario_import.file = open(scenario_file)
+      uri = URI(scenario_file)
+      scenario_import.file = if uri.is_a?(URI::HTTP)
+                               uri.open(**NetworkTimeout.open_uri_options)
+                             else
+                               open(scenario_file)
+                             end
       raise "Import failed" unless scenario_import.valid? && scenario_import.import
     ensure
       scenario_import.file.close

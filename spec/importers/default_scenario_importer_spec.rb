@@ -37,6 +37,18 @@ describe DefaultScenarioImporter do
       expect { DefaultScenarioImporter.seed(user) }.to change(user.agents, :count).by(3)
     end
 
+    it 'applies network timeouts when the scenario file is a URL' do
+      url = "https://example.com/default-scenario.json"
+      body = Rails.root.join("spec/fixtures/test_default_scenario.json").read
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with('DEFAULT_SCENARIO_FILE').and_return(url)
+      stub_request(:get, url).to_return(body:)
+
+      expect(NetworkTimeout).to receive(:open_uri_options).and_call_original
+
+      expect { DefaultScenarioImporter.seed(user) }.to change(user.agents, :count).by(3)
+    end
+
     it 'can not be turned off' do
       allow(ENV).to receive(:[]) { nil }
       allow(ENV).to receive(:[]).with('IMPORT_DEFAULT_SCENARIO_FOR_ALL_USERS') { 'true' }
