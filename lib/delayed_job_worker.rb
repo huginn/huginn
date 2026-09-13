@@ -1,3 +1,4 @@
+# Runs Delayed::Worker inside AgentRunner's background process.
 class DelayedJobWorker < LongRunnable::Worker
   include LongRunnable
 
@@ -7,7 +8,7 @@ class DelayedJobWorker < LongRunnable::Worker
   end
 
   def stop
-    @dj.stop if @dj
+    @dj&.stop
   end
 
   def self.setup_worker

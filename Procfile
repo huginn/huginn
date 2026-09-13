@@ -2,14 +2,14 @@
 #         DEVELOPMENT         #
 ###############################
 
-# Procfile for development using the new threaded worker (scheduler, twitter stream and delayed job)
+# Procfile for development using the threaded worker
 web: bundle exec puma -C config/puma.rb
 jobs: bundle exec rails runner bin/threaded.rb
 
-# Old version with separate processes (use this if you have issues with the threaded version)
+# Separate AgentRunner and delayed_job_master processes
 # web: bundle exec puma -C config/puma.rb
-# schedule: bundle exec rails runner bin/schedule.rb
-# dj: bundle exec script/delayed_job run
+# jobs: bundle exec rails runner bin/agent_runner.rb
+# dj: env DELAYED_JOB_WORKERS=2 bundle exec bin/delayed_job_master -c config/delayed_job_master.rb
 
 ###############################
 #         PRODUCTION          #
@@ -21,26 +21,7 @@ jobs: bundle exec rails runner bin/threaded.rb
 # web: bundle exec puma -C config/puma.rb
 # jobs: bundle exec rails runner bin/threaded.rb
 
-# Old version with separate processes (use this if you have issues with the threaded version)
+# Using separate AgentRunner and delayed_job_master processes
 # web: bundle exec puma -C config/puma.rb
-# schedule: bundle exec rails runner bin/schedule.rb
-# dj: bundle exec script/delayed_job run
-
-###############################
-# Multiple DelayedJob workers #
-###############################
-# Per default Huginn can just run one agent at a time. Using a lot of agents or calling slow
-# external services frequently might require more DelayedJob workers (an indicator for this is
-# a backlog in your 'Job Management' page).
-# Every uncommented line starts an additional DelayedJob worker. This works for development, production
-# and for the threaded and separate worker processes. Keep in mind one worker needs about 300MB of RAM.
-#
-#dj2: bundle exec script/delayed_job -i 2 run
-#dj3: bundle exec script/delayed_job -i 3 run
-#dj4: bundle exec script/delayed_job -i 4 run
-#dj5: bundle exec script/delayed_job -i 5 run
-#dj6: bundle exec script/delayed_job -i 6 run
-#dj7: bundle exec script/delayed_job -i 7 run
-#dj8: bundle exec script/delayed_job -i 8 run
-#dj9: bundle exec script/delayed_job -i 9 run
-#dj10: bundle exec script/delayed_job -i 10 run
+# jobs: bundle exec rails runner bin/agent_runner.rb
+# dj: env DELAYED_JOB_WORKERS=2 bundle exec bin/delayed_job_master -c config/delayed_job_master.rb

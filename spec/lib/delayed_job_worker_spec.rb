@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 describe DelayedJobWorker do
   before do
@@ -22,7 +22,7 @@ describe DelayedJobWorker do
       workers = DelayedJobWorker.setup_worker
       expect(workers).to be_a(Array)
       expect(workers.first).to be_a(DelayedJobWorker)
-      expect(workers.first.id).to eq('DelayedJobWorker')
+      expect(workers.first.id).to eq("DelayedJobWorker")
     end
   end
 end
