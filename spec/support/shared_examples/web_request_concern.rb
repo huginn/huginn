@@ -113,6 +113,13 @@ shared_examples_for WebRequestConcern do
   end
 
   describe "#faraday" do
+    it "bounds connection and request I/O" do
+      expect(agent.faraday.options.open_timeout).to eq(NetworkTimeout.open_timeout)
+      expect(agent.faraday.options.timeout).to eq(NetworkTimeout.timeout)
+      expect(agent.faraday.options.read_timeout).to eq(NetworkTimeout.timeout)
+      expect(agent.faraday.options.write_timeout).to eq(NetworkTimeout.timeout)
+    end
+
     it "should enable SSL verification by default" do
       expect(agent.faraday.ssl.verify).to eq(true)
     end

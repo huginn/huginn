@@ -136,7 +136,10 @@ class ScenarioImport
   end
 
   def fetch_scenario(url)
-    Faraday.new(request: { timeout: FETCH_TIMEOUT, open_timeout: FETCH_TIMEOUT }) { |builder|
+    Faraday.new(request: {
+      timeout: NetworkTimeout.timeout(FETCH_TIMEOUT),
+      open_timeout: NetworkTimeout.open_timeout(FETCH_TIMEOUT),
+    }) { |builder|
       builder.response :follow_redirects
       builder.response :raise_error
       builder.use Faraday::Response::SizeLimit, limit: MAX_FETCH_SIZE

@@ -188,7 +188,11 @@ module Agents
     end
 
     def open_ftp(uri)
-      ftp = Net::FTP.new
+      ftp = Net::FTP.new(
+        open_timeout: NetworkTimeout.open_timeout,
+        read_timeout: NetworkTimeout.timeout,
+        ssl_handshake_timeout: NetworkTimeout.open_timeout
+      )
 
       log "Connecting to #{uri.host}#{':%d' % uri.port if uri.port != uri.default_port}"
       ftp.connect(uri.host, uri.port)

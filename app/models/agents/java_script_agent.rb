@@ -386,7 +386,7 @@ module Agents
 
     def run_fetch_request(url:, method:, headers:, body:, follow:, timeout:)
       fetch_client.run_request(method, url, body, headers) { |r|
-        r.options.timeout = timeout if timeout > 0
+        r.options.timeout = NetworkTimeout.timeout(timeout) if timeout > 0
         r.options.context = { skip_follow_redirects: true } unless follow
       }
     end
