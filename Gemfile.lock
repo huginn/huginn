@@ -166,6 +166,11 @@ GEM
     delayed_job_active_record (4.1.11)
       activerecord (>= 3.0, < 9.0)
       delayed_job (>= 3.0, < 5)
+    delayed_job_master (3.2.0)
+      activesupport (>= 7.0)
+      delayed_job (>= 4.1)
+      get_process_mem
+      logger
     devise (5.0.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -232,6 +237,9 @@ GEM
     geokit-rails (2.5.0)
       geokit (~> 1.5)
       rails (>= 3.0)
+    get_process_mem (1.0.0)
+      bigdecimal (>= 2.0)
+      ffi (~> 1.0)
     globalid (1.4.0)
       activesupport (>= 6.1)
     gmail_xoauth (0.4.3)
@@ -787,6 +795,7 @@ DEPENDENCIES
   debug
   delayed_job
   delayed_job_active_record
+  delayed_job_master (~> 3.2)
   devise (~> 5.0, >= 5.0.4)
   dotenv!
   em-http-request
