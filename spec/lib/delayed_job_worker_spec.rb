@@ -3,17 +3,19 @@ require "rails_helper"
 describe DelayedJobWorker do
   before do
     @djw = DelayedJobWorker.new
+    @worker = instance_double(Delayed::Worker, start: nil, stop: nil)
+    allow(Delayed::Worker).to receive(:new).and_return(@worker)
   end
 
   it "should run" do
-    expect_any_instance_of(Delayed::Worker).to receive(:start)
+    expect(@worker).to receive(:start)
     @djw.run
   end
 
   it "should stop" do
-    expect_any_instance_of(Delayed::Worker).to receive(:start)
+    expect(@worker).to receive(:start)
     @djw.run
-    expect_any_instance_of(Delayed::Worker).to receive(:stop)
+    expect(@worker).to receive(:stop)
     @djw.stop
   end
 

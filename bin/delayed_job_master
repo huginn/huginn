@@ -3,5 +3,6 @@
 
 require File.expand_path("../config/environment", __dir__)
 require "delayed/master"
+require_relative "../lib/delayed_job_watchdog/master"
 
 Delayed::Master.new(ARGV).run
