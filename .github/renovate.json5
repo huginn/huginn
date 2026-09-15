@@ -84,6 +84,12 @@
       matchUpdateTypes: ["minor"],
     },
     {
+      groupName: "patch updated gems",
+      matchDatasources: ["rubygems"],
+      matchPackageNames: ["aws-sdk-s3"],
+      matchUpdateTypes: ["minor"],
+    },
+    {
       matchManagers: ["bundler"],
       postUpdateOptions: ["bundlerConservative"],
     },
