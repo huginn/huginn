@@ -81,7 +81,7 @@ gem 'twilio-ruby'
 
 # Twitter Agents
 gem 'omniauth-twitter'
-gem 'twitter', '~> 8.3', '>= 8.3.1'
+gem 'twitter', '~> 8.3', '>= 8.3.2'
 
 # UserLocationAgent
 gem 'haversine'
