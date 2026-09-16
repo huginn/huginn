@@ -817,7 +817,7 @@ DEPENDENCIES
   httparty (>= 0.24.2)
   huginn_agent
   jquery-rails
-  json
+  json (< 3)
   jsonpath
   kaminari (~> 1.2, >= 1.2.2)
   kramdown

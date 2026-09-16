@@ -114,7 +114,9 @@ gem 'httmultiparty'
 gem 'httparty', '>= 0.24.2'
 gem 'huginn_agent'
 gem 'jquery-rails'
-gem 'json'
+# Pinned until Rails (rails/rails#58601) and httparty (jnunemaker/httparty#846)
+# ship releases that accept json 3's keyword-only options.
+gem 'json', '< 3'
 gem 'jsonpath'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
