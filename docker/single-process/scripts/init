@@ -20,6 +20,13 @@ fi
 
 if [ -z "$1" ]; then
   bundle exec rake db:migrate RAILS_ENV=${RAILS_ENV}
+else
+  # Worker containers do not migrate; wait for the web container to finish
+  # so that the process does not boot against an outdated schema.
+  until bundle exec rake db:abort_if_pending_migrations RAILS_ENV=${RAILS_ENV}; do
+    echo "Waiting for database migrations to complete..."
+    sleep 10
+  done
 fi
 
 if [[ -z "${DO_NOT_SEED}" && -z "$1" ]]; then
