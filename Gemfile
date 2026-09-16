@@ -67,7 +67,7 @@ gem 'mqtt'
 gem 'pdf-reader'
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.229.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.232.0'
 
 # SlackAgent
 gem 'slack-notifier'
@@ -81,7 +81,7 @@ gem 'twilio-ruby'
 
 # Twitter Agents
 gem 'omniauth-twitter'
-gem 'twitter', '~> 8.3', '>= 8.3.1'
+gem 'twitter', '~> 8.3', '>= 8.3.2'
 
 # UserLocationAgent
 gem 'haversine'
