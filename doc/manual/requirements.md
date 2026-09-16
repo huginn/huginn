@@ -27,7 +27,7 @@ Please consider using a virtual machine to run Huginn on Windows.
 
 ## Ruby versions
 
-Huginn requires Ruby (MRI) 2.2 or 2.3.
+Huginn requires Ruby (MRI) 3.4.0 or newer. The current Docker images and manual installation guide use Ruby 4.0.6.
 You will have to use the standard MRI implementation of Ruby.
 We love [JRuby](http://jruby.org/) and [Rubinius](http://rubini.us/) but Huginn needs several Gems that have native extensions.
 

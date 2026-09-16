@@ -102,19 +102,19 @@ To use a separate, non-linked mysql container:
         -e HUGINN_DATABASE_PORT=3306
         ghcr.io/huginn/huginn
 
-The `docker/multi-process` folder also has a `docker-compose.yml` that allows for a sample database formation with a data volume container:
+The `docker/multi-process` folder also has a `develop.yml` Compose file that allows for a sample database setup with a data volume container:
 
     cd docker/multi-process
-    docker-compose up
+    docker-compose -f develop.yml up
 
 If you already have a MySQL 5.7 data volume, cleanly shut it down before the first MySQL 8.0 start:
 
     cd docker/multi-process
-    docker-compose stop web
-    docker-compose exec mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL innodb_fast_shutdown = 0"'
-    docker-compose stop mysql
-    docker-compose pull mysql mysqldata
-    docker-compose up -d
+    docker-compose -f develop.yml stop web
+    docker-compose -f develop.yml exec mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL innodb_fast_shutdown = 0"'
+    docker-compose -f develop.yml stop mysql
+    docker-compose -f develop.yml pull mysql mysqldata
+    docker-compose -f develop.yml up -d
 
 Run this while the old MySQL 5.7 container is still available.  The MySQL 8.0 Docker image automatically performs the data dictionary upgrade when it starts with the existing data volume.
 
