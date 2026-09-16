@@ -149,7 +149,7 @@ module Agents
     end
 
     def feed_link
-      interpolated['template']['link'].presence || "https://#{ENV['DOMAIN']}"
+      interpolated['template']['link'].presence || "http://#{ENV['DOMAIN']}"
     end
 
     def feed_url(options = {})
