@@ -25,7 +25,7 @@ apt-get dist-upgrade -y --no-install-recommends
 $minimal_apt_get_install software-properties-common
 $minimal_apt_get_install build-essential checkinstall git-core \
   zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev \
-  libncurses5-dev libffi-dev libxml2-dev libxslt-dev curl libcurl4-openssl-dev libicu-dev \
+  libncurses-dev libffi-dev libxml2-dev libxslt-dev curl libcurl4-openssl-dev libicu-dev \
   graphviz libmysqlclient-dev libpq-dev libsqlite3-dev \
   locales tzdata shared-mime-info iputils-ping
 locale-gen en_US.UTF-8
