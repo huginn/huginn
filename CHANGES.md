@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Sep 20, 2026   | Upgrade Ruby to 4.0.7 and the Docker images to Ubuntu Noble, fixing a `mini_racer` load error during asset precompilation. [#3753](https://github.com/huginn/huginn/pull/3753) |
 | Sep 16, 2026   | Make the single-process Docker worker container wait for pending migrations, fixing `undefined method 'uniqueness_key='` in workers that started before the web container had migrated. [#3746](https://github.com/huginn/huginn/issues/3746) |
 | Sep 08, 2026   | Bundle [Smokescreen](https://github.com/stripe/smokescreen) in the Docker images.  Set `ENABLE_SMOKESCREEN=true` to route all outbound HTTP(S) requests through it and keep Agents from reaching private or link-local addresses.  See [doc/manual/outbound-requests.md](doc/manual/outbound-requests.md). |
 | Sep 08, 2026   | Add `OUTBOUND_PROXY` to route all outbound HTTP(S) requests, including Scenario imports, through an egress proxy and refuse per-Agent proxies, so that a proxy such as Smokescreen can keep Agents from reaching internal addresses on shared instances.  Agents without a `proxy` option now honor `http_proxy` on the `net_http` backend. |
