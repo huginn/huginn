@@ -381,7 +381,7 @@ GEM
     libv8-node (24.12.0.1-x86_64-darwin)
     libv8-node (24.12.0.1-x86_64-linux)
     lint_roller (1.1.0)
-    liquid (5.13.0)
+    liquid (5.14.0)
       bigdecimal
       strscan (>= 3.1.1)
     listen (3.10.0)
@@ -822,7 +822,7 @@ DEPENDENCIES
   kaminari (~> 1.2, >= 1.2.2)
   kramdown
   letter_opener_web
-  liquid (~> 5.13)
+  liquid (~> 5.14)
   listen
   logger
   loofah (~> 2.25, >= 2.25.2)
