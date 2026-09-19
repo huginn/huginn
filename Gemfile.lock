@@ -782,7 +782,7 @@ PLATFORMS
 
 DEPENDENCIES
   ace-rails-ap
-  aws-sdk-s3 (~> 1, >= 1.232.0)
+  aws-sdk-s3 (~> 1, >= 1.232.1)
   bootsnap
   bootstrap-kaminari-views
   capistrano
@@ -822,7 +822,7 @@ DEPENDENCIES
   kaminari (~> 1.2, >= 1.2.2)
   kramdown
   letter_opener_web
-  liquid (~> 5.13)
+  liquid (~> 5.14)
   listen
   logger
   loofah (~> 2.25, >= 2.25.2)
