@@ -8,7 +8,7 @@ FROM golang:1.27-alpine AS smokescreen
 ARG SMOKESCREEN_COMMIT
 RUN CGO_ENABLED=0 go install "github.com/stripe/smokescreen@${SMOKESCREEN_COMMIT}"
 
-FROM rubylang/ruby:4.0.6-jammy
+FROM rubylang/ruby:4.0.7-jammy
 
 COPY docker/scripts/prepare /scripts/
 RUN /scripts/prepare
