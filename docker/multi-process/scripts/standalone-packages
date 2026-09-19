@@ -7,7 +7,8 @@ apt-get update
 apt-get install -y gnupg python3-pip mysql-server supervisor && \
 apt-get -y clean
 
-pip install git+https://github.com/coderanger/supervisor-stdout
+# Install the plugin for the distribution's Supervisor inside this image.
+pip install --break-system-packages git+https://github.com/coderanger/supervisor-stdout
 rm -rf /var/lib/apt/lists/*
 rm -rf /usr/share/doc/
 rm -rf /usr/share/man/
