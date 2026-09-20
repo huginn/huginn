@@ -26,10 +26,18 @@ class JobsController < ApplicationController
 
   def run
     @job = Delayed::Job.find(params[:id])
-    @job.last_error = nil
+    enqueued = @job.with_lock {
+      next false if running?
+
+      attributes = { run_at: Time.current, last_error: nil }
+      if @job.failed_at?
+        attributes.merge!(attempts: 0, failed_at: nil, locked_at: nil, locked_by: nil)
+      end
+      @job.update!(attributes)
+    }
 
     respond_to do |format|
-      if !running? && @job.update!(run_at: Time.now, failed_at: nil)
+      if enqueued
         format.html { redirect_to jobs_path, notice: "Job enqueued." }
         format.json { render json: @job, status: :ok }
       else
