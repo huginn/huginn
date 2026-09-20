@@ -61,8 +61,18 @@ describe JobsController do
       expect { put :run, params: {id: @failed.id} }.to change { @failed.reload.run_at }
     end
 
+    it "clears a failed job's stale reservation and retry count" do
+      @failed.update!(locked_by: "dead worker", attempts: 5, last_error: "previous worker exited")
+
+      put :run, params: { id: @failed.id }
+
+      expect(@failed.reload).to have_attributes(
+        attempts: 0, failed_at: nil, last_error: nil, locked_at: nil, locked_by: nil
+      )
+    end
+
     it "not queue a running job" do
-      expect { put :run, params: {id: @running.id} }.not_to change { @not_running.reload.run_at }
+      expect { put :run, params: { id: @running.id } }.not_to(change { @running.reload.run_at })
     end
   end
 

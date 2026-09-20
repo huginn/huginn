@@ -4,6 +4,8 @@ require 'utils'
 # be sub-classed for many different purposes.  Agents can emit Events, as well as receive them and react in many different ways.
 # The basic Agent API is detailed on the Huginn wiki: https://github.com/huginn/huginn/wiki/Creating-a-new-agent
 class Agent < ActiveRecord::Base
+  extend DelayedJobWatchdog::LockReporting
+
   EXECUTION_LOCK_PREFIX = "huginn:agent:execution:".freeze
   EXECUTION_LOCK_TIMEOUT = Integer(ENV["AGENT_EXECUTION_LOCK_TIMEOUT"].presence || 30)
   raise ArgumentError, "AGENT_EXECUTION_LOCK_TIMEOUT must be non-negative" if EXECUTION_LOCK_TIMEOUT.negative?

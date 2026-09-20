@@ -10,6 +10,7 @@ add_worker do |worker|
   worker.max_processes Integer(ENV.fetch("DELAYED_JOB_WORKERS", "1"), 10)
   # delayed_job_master supports threads, but Huginn Agents remain process-isolated.
   worker.max_threads 1
+  worker.max_run_time Delayed::Worker.max_run_time
   worker.max_memory Integer(ENV.fetch("DELAYED_JOB_MAX_MEMORY", "512"), 10)
   worker.exit_on_complete true
 end
