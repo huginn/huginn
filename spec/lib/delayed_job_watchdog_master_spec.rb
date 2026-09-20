@@ -97,6 +97,8 @@ describe DelayedJobWatchdog::Master do # rubocop:disable Metrics/BlockLength
   end
 
   it "unwinds a responsive Agent and records cancellation exactly once" do
+    # Allow coverage and other at_exit handlers to finish before asserting a clean exit.
+    allow(ENV).to receive(:fetch).with("DELAYED_JOB_SHUTDOWN_GRACE", "10").and_return("2")
     agent = agents(:bob_weather_agent)
     job = Delayed::Job.enqueue(WatchdogSleepingJob.new(agent.id), queue: queue)
     run_worker
