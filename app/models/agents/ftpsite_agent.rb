@@ -189,6 +189,7 @@ module Agents
 
     def open_ftp(uri)
       ftp = Net::FTP.new(
+        nil,
         open_timeout: NetworkTimeout.open_timeout,
         read_timeout: NetworkTimeout.timeout,
         ssl_handshake_timeout: NetworkTimeout.open_timeout
@@ -221,8 +222,10 @@ module Agents
 
       yield ftp
     ensure
-      log "Closing the connection"
-      ftp.close
+      if ftp
+        log "Closing the connection"
+        ftp.close
+      end
     end
 
     def base_uri

@@ -187,6 +187,22 @@ describe Agents::FtpsiteAgent do
         allow(Net::FTP).to receive(:new) { @ftp_mock }
       end
 
+      it "passes connection options separately from the host" do
+        expect(Net::FTP).to receive(:new).with(nil, anything).and_return(@ftp_mock)
+        expect(@ftp_mock).to receive(:login).with("anonymous", "anonymous@")
+        expect(@ftp_mock).to receive(:chdir).with("pub/releases")
+
+        @checker.open_ftp(@checker.base_uri) do |ftp|
+          expect(ftp).to eq(@ftp_mock)
+        end
+      end
+
+      it "preserves errors raised before the FTP connection is created" do
+        allow(Net::FTP).to receive(:new).and_raise(ArgumentError, "invalid FTP options")
+
+        expect { @checker.open_ftp(@checker.base_uri) }.to raise_error(ArgumentError, "invalid FTP options")
+      end
+
       context 'with_path' do
         before(:each) { expect(@ftp_mock).to receive(:chdir).with('pub/releases') }
 
