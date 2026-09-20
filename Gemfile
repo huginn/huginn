@@ -143,7 +143,8 @@ gem 'typhoeus'
 gem 'with_advisory_lock', '~> 7.6'
 
 group :development, :test do
-  gem 'debug'
+  # debug's fork hook waits for ChromeDriver before Capybara can stop it at exit.
+  gem "debug", require: false
   gem 'rspec-rails'
 end
 

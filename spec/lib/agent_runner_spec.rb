@@ -102,13 +102,12 @@ describe AgentRunner do
 
   context "#set_traps" do
     it "sets traps for INT TERM and QUIT" do
+      %w[INT TERM QUIT].each do |signal|
+        expect(Signal).to receive(:trap).with(signal)
+      end
       agent_runner = AgentRunner.new
-      RR.mock(Signal).trap('INT')
-      RR.mock(Signal).trap('TERM')
-      RR.mock(Signal).trap('QUIT')
-      agent_runner.set_traps
-
-      agent_runner.stop
+    ensure
+      agent_runner&.stop
     end
   end
 end
