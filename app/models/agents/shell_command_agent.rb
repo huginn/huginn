@@ -14,6 +14,8 @@ module Agents
 
       `command` specifies the command (either a shell command line string or an array of command line arguments) to be executed, and `path` will tell ShellCommandAgent in what directory to run this command.  The content of `stdin` will be fed to the command via the standard input.
 
+      For long-running commands, increase the installation-wide `DELAYED_JOB_MAX_RUNTIME` environment variable (in minutes, default: 2) to allow enough time for the entire background job to complete.
+
       `expected_update_period_in_days` is used to determine if the Agent is working.
 
       ShellCommandAgent can also act upon received events. When receiving an event, this Agent's options can interpolate values from the incoming event.

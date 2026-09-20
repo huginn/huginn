@@ -21,6 +21,8 @@ module Agents
 
       The `url` option can be a single url, or an array of urls (for example, for multiple pages with the exact same structure but different content to scrape).
 
+      If fetching and processing all URLs in one background job can exceed the runtime limit, increase the installation-wide `DELAYED_JOB_MAX_RUNTIME` environment variable (in minutes, default: 2).  The limit applies to the whole job, not to each URL.  Individual network request timeouts still apply.
+
       The WebsiteAgent can also scrape based on incoming events.
 
       * Set the `url_from_event` option to a [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) template to generate the url to access based on the Event.  (To fetch the url in the Event's `url` key, for example, set `url_from_event` to `{{ url }}`.)

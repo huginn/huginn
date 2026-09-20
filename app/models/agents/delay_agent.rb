@@ -18,6 +18,8 @@ module Agents
 
       `max_emitted_events` is used to limit the number of the maximum events which should be created. If you omit this DelayAgent will create events for every event stored in the memory.
 
+      If emitting a batch, including all `emit_interval` waits, can exceed the background job runtime limit, increase the installation-wide `DELAYED_JOB_MAX_RUNTIME` environment variable (in minutes, default: 2).  The limit applies to the entire batch, not to each event.  Alternatively, reduce `max_emitted_events` or `emit_interval`.
+
       # Ordering Events
 
       #{description_events_order("events in which buffered events are emitted")}

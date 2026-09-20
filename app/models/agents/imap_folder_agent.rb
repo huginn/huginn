@@ -23,6 +23,8 @@ module Agents
 
       List the names of folders to check in `folders`.
 
+      If checking many folders or processing many messages can exceed the background job runtime limit, increase the installation-wide `DELAYED_JOB_MAX_RUNTIME` environment variable (in minutes, default: 2).  The limit applies to the whole job, not to each folder or message.  Individual network timeouts still apply.
+
       Specify an array of MIME types in 'mime_types' to tell which non-attachment part of a mail among its `text/*` parts should be used as mail body.  The default value is `['text/plain', 'text/enriched', 'text/html']`.
 
       To narrow mails by conditions, build a `conditions` hash with the following keys:
