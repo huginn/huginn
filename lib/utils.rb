@@ -1,4 +1,4 @@
-require 'jsonpath'
+require_relative 'jsonpath_safety'
 require 'cgi'
 require 'uri'
 require 'addressable/uri'
