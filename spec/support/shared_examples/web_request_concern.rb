@@ -7,6 +7,10 @@ shared_examples_for WebRequestConcern do
     _agent
   end
 
+  it_behaves_like AgentProxyConcern do
+    let(:proxy_client) { agent.faraday }
+  end
+
   describe "validations" do
     it "should be valid" do
       expect(agent).to be_valid

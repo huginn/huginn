@@ -26,6 +26,11 @@ describe Agents::OpenaiLlmAgent do
       .to_return(body: @response_body, status: 200, headers: { 'Content-Type' => 'application/json' })
   end
 
+  it_behaves_like AgentProxyConcern do
+    let(:agent) { @checker }
+    let(:proxy_client) { agent.send(:build_openai_connection) }
+  end
+
   describe '#validation' do
     it 'is valid with correct options' do
       expect(@checker).to be_valid

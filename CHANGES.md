@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Sep 20, 2026   | Add opt-in proxy routing so trusted users can guard against unintended internal-resource access from event-derived URLs.  Set `AGENT_PROXY` and the `use_agent_proxy` option to let individual Agents opt in, including JavaScriptAgent's `Agent.fetch` and `Agent.fetchAll`.  The official Docker images also support `START_SMOKESCREEN=true` to start the bundled proxy without forcing its use.  Existing `ENABLE_SMOKESCREEN` and `OUTBOUND_PROXY` enforcement is unchanged.  See [doc/manual/outbound-requests.md](doc/manual/outbound-requests.md). |
 | Sep 20, 2026   | Fix FtpsiteAgent checks failing on Ruby 4 when FTP timeout options were mistaken for the host.  Preserve the original error if FTP initialization fails. |
 | Sep 20, 2026   | Upgrade Ruby to 4.0.7 and the Docker images to Ubuntu Noble, fixing a `mini_racer` load error during asset precompilation. [#3753](https://github.com/huginn/huginn/pull/3753) |
 | Sep 16, 2026   | Make the single-process Docker worker container wait for pending migrations, fixing `undefined method 'uniqueness_key='` in workers that started before the web container had migrated. [#3746](https://github.com/huginn/huginn/issues/3746) |

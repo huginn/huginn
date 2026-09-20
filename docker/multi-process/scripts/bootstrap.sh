@@ -3,7 +3,7 @@ source /tmp/.env
 
 echo DATABASE_HOST=${DATABASE_HOST}
 
-if [ "${ENABLE_SMOKESCREEN}" = "true" ]; then
+if [ "${ENABLE_SMOKESCREEN}" = "true" ] || [ "${START_SMOKESCREEN}" = "true" ]; then
   echo "Starting Smokescreen egress proxy..."
   supervisorctl start smokescreen >/dev/null
 fi

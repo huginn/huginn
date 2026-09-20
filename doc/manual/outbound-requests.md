@@ -29,6 +29,38 @@ Any HTTP proxy that supports `CONNECT` and validates the resolved address works.
 
 When `OUTBOUND_PROXY` is set, Huginn routes every HTTP client it builds through it and refuses the per-Agent `proxy` option, so a user cannot pick a different proxy to get around it.  A malformed value stops Huginn from starting.  Setting `http_proxy` and `https_proxy` in the environment as well catches third-party code that does not go through Huginn's clients; do not set `no_proxy` for internal hosts, since that bypasses the proxy.
 
+## Using a proxy only for selected Agents
+
+Even trusted users may process events containing URLs from external sources.  An Agent that uses such a URL can unintentionally access an internal service or a metadata endpoint.  Opt-in proxy routing lets users protect those Agents with Smokescreen, or another proxy that rejects internal destinations, while retaining direct access for other Agents.
+
+On an instance where all users are trusted, you can run Smokescreen without routing requests through it by default.  In the official Docker images, set `START_SMOKESCREEN=true` and leave `ENABLE_SMOKESCREEN` and `OUTBOUND_PROXY` unset.  This starts the bundled proxy and defaults `AGENT_PROXY` to `http://127.0.0.1:4750` unless you set it yourself.  With Docker Compose, set it on both the `web` and `threaded` services.
+
+Outside Docker, start your proxy separately and set `AGENT_PROXY` to its URL.  Setting `AGENT_PROXY` alone does not route any requests through it.  A malformed URL stops Huginn from starting.
+
+To opt in, add this Agent option:
+
+```json
+{
+  "use_agent_proxy": true
+}
+```
+
+This is supported by Agents using the shared web request options (including WebsiteAgent, PostAgent, RssAgent, HttpStatusAgent and the OpenAI Agents), and by JavaScriptAgent's `Agent.fetch` and `Agent.fetchAll`.  It applies to the Agent's requests, not to individual `fetch` call options.  When neither `OUTBOUND_PROXY` nor `AGENT_PROXY` is set, opting in fails rather than connecting directly.  Proxy connection failures also fail the request without a direct fallback.
+
+Omitting `use_agent_proxy`, or setting it to `false`, preserves normal request behavior.  Existing environment proxy settings such as `http_proxy` may still apply; leave those unset if normal requests should connect directly.  Scenario imports do not opt in to `AGENT_PROXY`.
+
+The existing `proxy` Agent option can still specify a URL directly, but cannot be combined with `use_agent_proxy=true`.
+
+`OUTBOUND_PROXY` always takes precedence, even when `use_agent_proxy=false`, and continues to forbid the `proxy` Agent option.  `ENABLE_SMOKESCREEN=true` retains its existing behavior: it starts Smokescreen and defaults `OUTBOUND_PROXY` to it.  Neither `START_SMOKESCREEN=false` nor any Agent option can disable that enforcement.  Both Docker startup settings also default `AGENT_PROXY` to the bundled proxy, preserving an explicitly configured value.
+
+| Docker configuration | Start Smokescreen | Default request routing |
+| --- | --- | --- |
+| All proxy settings unset | No | Normal connection |
+| `ENABLE_SMOKESCREEN=true` | Yes | Forced through Smokescreen |
+| `START_SMOKESCREEN=true` | Yes | Normal connection; Agents can opt in |
+| `OUTBOUND_PROXY=URL` | No | Forced through the specified proxy |
+| Either startup setting plus `OUTBOUND_PROXY=URL` | Yes | Forced through the specified proxy |
+
 ## What this does not cover
 
 - Agents that speak protocols other than HTTP: FtpsiteAgent, ImapFolderAgent, MqttAgent and JabberAgent connect directly to the host they are configured with.  Restrict them with network rules or by not granting untrusted users access to them.

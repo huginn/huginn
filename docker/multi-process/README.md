@@ -120,7 +120,9 @@ Run this while the old MySQL 5.7 container is still available.  The MySQL 8.0 Do
 
 ## Restricting outbound requests
 
-Both images bundle [Smokescreen](https://github.com/stripe/smokescreen), an egress proxy that refuses connections to private, loopback and link-local addresses.  Set `ENABLE_SMOKESCREEN=true` to start it inside the container and route all outbound HTTP(S) requests made by Agents through it; `OUTBOUND_PROXY` is then set to `http://127.0.0.1:4750` automatically.  Use this on instances where untrusted users can create Agents.  Internal services that Agents legitimately need can be allowed with `SMOKESCREEN_OPTS`, e.g. `SMOKESCREEN_OPTS=--allow-address=intranet.example.com:443`.  See [doc/manual/outbound-requests.md](../../doc/manual/outbound-requests.md) for details and limitations.
+Both images bundle [Smokescreen](https://github.com/stripe/smokescreen), an egress proxy that refuses connections to private, loopback and link-local addresses.  Set `ENABLE_SMOKESCREEN=true` to start it inside the container and route all outbound HTTP(S) requests made by Agents through it; `OUTBOUND_PROXY` is then set to `http://127.0.0.1:4750` automatically unless already configured.  Use this on instances where untrusted users can create Agents.  Internal services that Agents legitimately need can be allowed with `SMOKESCREEN_OPTS`, e.g. `SMOKESCREEN_OPTS=--allow-address=intranet.example.com:443`.  See [doc/manual/outbound-requests.md](../../doc/manual/outbound-requests.md) for details and limitations.
+
+On trusted-user instances, set `START_SMOKESCREEN=true` instead, leaving `ENABLE_SMOKESCREEN` and `OUTBOUND_PROXY` unset, to start Smokescreen without forcing its use.  This defaults `AGENT_PROXY` to `http://127.0.0.1:4750` unless already configured.  Supported Agents can opt in with `"use_agent_proxy": true`; other requests retain their normal routing.  This lets trusted users protect Agents that process event-derived URLs from unintended internal-resource access.  `OUTBOUND_PROXY`, when set, always enforces its proxy regardless of these opt-in settings.
 
 ## Environment Variables
 

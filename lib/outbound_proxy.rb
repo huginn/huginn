@@ -9,16 +9,24 @@ module OutboundProxy
   module_function
 
   def url
-    value = ENV['OUTBOUND_PROXY'].presence or return nil
+    proxy_url("OUTBOUND_PROXY")
+  end
+
+  def agent_url
+    proxy_url("AGENT_PROXY")
+  end
+
+  def proxy_url(variable)
+    value = ENV[variable].presence or return nil
 
     uri = URI.parse(value)
     unless uri.is_a?(URI::HTTP) && uri.host.present?
-      raise ConfigurationError, "OUTBOUND_PROXY must be an http:// or https:// URL: #{value.inspect}"
+      raise ConfigurationError, "#{variable} must be an http:// or https:// URL: #{value.inspect}"
     end
 
     uri.to_s
   rescue URI::InvalidURIError
-    raise ConfigurationError, "OUTBOUND_PROXY must be an http:// or https:// URL: #{value.inspect}"
+    raise ConfigurationError, "#{variable} must be an http:// or https:// URL: #{value.inspect}"
   end
 
   def enforced?
@@ -28,6 +36,7 @@ module OutboundProxy
   # Applies the proxy to clients that do not set one explicitly.
   def configure!
     proxy = url
+    agent_url # Validate the opt-in proxy without applying it globally.
     Faraday.default_connection_options.proxy = proxy
     Typhoeus::Config.proxy = proxy if defined?(Typhoeus)
   end

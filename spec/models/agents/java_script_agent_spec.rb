@@ -446,6 +446,11 @@ describe Agents::JavaScriptAgent do
   end
 
   describe "fetch" do
+    it_behaves_like AgentProxyConcern do
+      let(:agent) { @agent }
+      let(:proxy_client) { agent.send(:fetch_client) }
+    end
+
     it "goes through OUTBOUND_PROXY when it is set" do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with('OUTBOUND_PROXY').and_return('http://smokescreen:4750')

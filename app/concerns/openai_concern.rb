@@ -117,7 +117,7 @@ module OpenaiConcern
       builder.response :json
 
       builder.headers[:user_agent] = user_agent
-      if (proxy = OutboundProxy.url || interpolated['proxy'].presence)
+      if (proxy = request_proxy)
         builder.proxy = proxy
       end
 

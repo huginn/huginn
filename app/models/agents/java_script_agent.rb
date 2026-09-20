@@ -8,6 +8,7 @@ require 'faraday/typhoeus'
 module Agents
   class JavaScriptAgent < Agent
     include FormConfigurable
+    include AgentProxyConcern
 
     can_dry_run!
 
@@ -36,49 +37,63 @@ module Agents
 
     gem_dependency_check { defined?(MiniRacer) }
 
-    description <<~MD
-      The JavaScript Agent allows you to write code in JavaScript that can create and receive events.  If other Agents aren't meeting your needs, try this one!
+    description do
+      proxy_description =
+        if OutboundProxy.enforced?
+          nil
+        elsif OutboundProxy.agent_url
+          "For `Agent.fetch` and `Agent.fetchAll`, set `use_agent_proxy` to `true` to use the configured Agent proxy, or set `proxy` to a proxy URL.  Use only one of these options."
+        else
+          "Set `proxy` to a proxy URL to use for `Agent.fetch` and `Agent.fetchAll`."
+        end
 
-      #{'## Include `mini_racer` in your Gemfile to use this Agent!' if dependencies_missing?}
+      <<~MD
+        The JavaScript Agent allows you to write code in JavaScript that can create and receive events.  If other Agents aren't meeting your needs, try this one!
 
-      You can put code in the `code` option, or put your code in a Credential and reference it from `code` with `credential:<name>` (recommended).
+        #{'## Include `mini_racer` in your Gemfile to use this Agent!' if dependencies_missing?}
 
-      You can implement `Agent.check` and `Agent.receive` as you see fit.  The following methods will be available on Agent in the JavaScript environment:
+        You can put code in the `code` option, or put your code in a Credential and reference it from `code` with `credential:<name>` (recommended).
 
-      * `this.createEvent(payload)`
-      * `this.incomingEvents()` (the returned event objects will each have a `payload` property)
-      * `this.memory()`
-      * `this.memory(key)`
-      * `this.memory(keyToSet, valueToSet)`
-      * `this.setMemory(object)` (replaces the Agent's memory with the provided object)
-      * `this.deleteKey(key)` (deletes a key from memory and returns the value)
-      * `this.credential(name)`
-      * `this.credential(name, valueToSet)`
-      * `this.options()`
-      * `this.options(key)`
-      * `this.log(message)`
-      * `this.error(message)`
-      * `this.kvs` (whose properties are variables provided by KeyValueStoreAgents)
-      * `this.escapeHtml(htmlToEscape)`
-      * `this.unescapeHtml(htmlToUnescape)`
+        You can implement `Agent.check` and `Agent.receive` as you see fit.  The following methods will be available on Agent in the JavaScript environment:
 
-      A synchronous subset of the Web `fetch` API is also available as `Agent.fetch(url, options)`.  It blocks until the response is received and returns a Response-like object with the following members:
+        * `this.createEvent(payload)`
+        * `this.incomingEvents()` (the returned event objects will each have a `payload` property)
+        * `this.memory()`
+        * `this.memory(key)`
+        * `this.memory(keyToSet, valueToSet)`
+        * `this.setMemory(object)` (replaces the Agent's memory with the provided object)
+        * `this.deleteKey(key)` (deletes a key from memory and returns the value)
+        * `this.credential(name)`
+        * `this.credential(name, valueToSet)`
+        * `this.options()`
+        * `this.options(key)`
+        * `this.log(message)`
+        * `this.error(message)`
+        * `this.kvs` (whose properties are variables provided by KeyValueStoreAgents)
+        * `this.escapeHtml(htmlToEscape)`
+        * `this.unescapeHtml(htmlToUnescape)`
 
-      * `ok`, `status`, `statusText`, `url`, `redirected`
-      * `headers`: an object whose own properties are the response headers (with lower-cased names), plus `get(name)` and `has(name)` methods for case-insensitive lookup
-      * `text()` returning the response body as a string
-      * `json()` returning the parsed JSON body
+        A synchronous subset of the Web `fetch` API is also available as `Agent.fetch(url, options)`.  It blocks until the response is received and returns a Response-like object with the following members:
 
-      Supported request options are `method` (default `"GET"`), `headers` (a plain object), `body` (a string), `timeout` (in seconds), and `redirect` (`"follow"` or `"manual"`, default `"follow"`).  Network errors throw a `TypeError`; HTTP error statuses do not — check `response.ok` as per the standard.  A default `User-Agent` header is sent when not overridden by the `headers` option.
+        * `ok`, `status`, `statusText`, `url`, `redirected`
+        * `headers`: an object whose own properties are the response headers (with lower-cased names), plus `get(name)` and `has(name)` methods for case-insensitive lookup
+        * `text()` returning the response body as a string
+        * `json()` returning the parsed JSON body
 
-      To issue multiple requests in parallel, use `Agent.fetchAll(requests, options)`.  Each request may be a URL string or a `[url, options]` pair mirroring the arguments of `Agent.fetch`.  The return value is an array of Response-like objects in the same order as the input.  As with `Agent.fetch`, any network error throws a `TypeError` for the whole batch, while individual HTTP error statuses are reported via each `response.ok`.  The optional second argument accepts `{ concurrency: 8 }` to cap the number of concurrent requests.
+        Supported request options are `method` (default `"GET"`), `headers` (a plain object), `body` (a string), `timeout` (in seconds), and `redirect` (`"follow"` or `"manual"`, default `"follow"`).  Network errors throw a `TypeError`; HTTP error statuses do not — check `response.ok` as per the standard.  A default `User-Agent` header is sent when not overridden by the `headers` option.
 
-      The WHATWG `URL` and `URLSearchParams` classes are also available as globals.  A `URL` instance may be passed wherever a URL string is accepted, including the first argument of `Agent.fetch` and each element of `Agent.fetchAll`.
-    MD
+        To issue multiple requests in parallel, use `Agent.fetchAll(requests, options)`.  Each request may be a URL string or a `[url, options]` pair mirroring the arguments of `Agent.fetch`.  The return value is an array of Response-like objects in the same order as the input.  As with `Agent.fetch`, any network error throws a `TypeError` for the whole batch, while individual HTTP error statuses are reported via each `response.ok`.  The optional second argument accepts `{ concurrency: 8 }` to cap the number of concurrent requests.
+
+        The WHATWG `URL` and `URLSearchParams` classes are also available as globals.  A `URL` instance may be passed wherever a URL string is accepted, including the first argument of `Agent.fetch` and each element of `Agent.fetchAll`.
+
+        #{proxy_description}
+      MD
+    end
 
     form_configurable :code, type: :text, ace: { mode: 'javascript' }
     form_configurable :expected_receive_period_in_days
     form_configurable :expected_update_period_in_days
+    form_configurable :use_agent_proxy, type: :boolean
 
     before_validation { self.options['language'] = 'JavaScript' }
 
@@ -341,6 +356,9 @@ module Agents
 
     def fetch_client
       @fetch_client ||= Faraday.new(headers: { "User-Agent" => FETCH_USER_AGENT }) { |b|
+        if (proxy = request_proxy)
+          b.proxy = proxy
+        end
         b.use ConditionalFollowRedirects
         b.request :gzip
         b.adapter :typhoeus

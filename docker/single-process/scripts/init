@@ -9,7 +9,7 @@ fi
 
 source /scripts/setup_env
 
-if [ "${ENABLE_SMOKESCREEN}" = "true" ]; then
+if [ "${ENABLE_SMOKESCREEN}" = "true" ] || [ "${START_SMOKESCREEN}" = "true" ]; then
   echo "Starting Smokescreen egress proxy..."
   /scripts/smokescreen &
 fi

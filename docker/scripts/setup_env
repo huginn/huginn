@@ -102,6 +102,7 @@ SMTP_OPENSSL_CA_PATH=
 SMTP_OPENSSL_VERIFY_MODE=
 SMOKESCREEN_OPTS=
 START_MYSQL=
+START_SMOKESCREEN=
 EOF
 
 [ -e '/app/.env' ] && cat /app/.env >> /tmp/.env.example
@@ -125,6 +126,11 @@ sed -n -r -e 's/^#?([A-Za-z0-9_]+=.*)/\1/p' /tmp/.env.example | \
   done > /tmp/.env
 
 source /tmp/.env
+
+if { [ "${ENABLE_SMOKESCREEN}" = "true" ] || [ "${START_SMOKESCREEN}" = "true" ]; } && [ -z "${AGENT_PROXY}" ]; then
+  echo 'AGENT_PROXY=http://127.0.0.1:4750' >> /tmp/.env
+  AGENT_PROXY='http://127.0.0.1:4750'
+fi
 
 if [ "${START_MYSQL}" = "true" ]; then
   echo 'DATABASE_SOCKET=/app/tmp/sockets/mysqld.sock' >> /tmp/.env
