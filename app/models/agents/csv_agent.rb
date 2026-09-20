@@ -43,7 +43,7 @@ module Agents
 
         #{receiving_file_handling_agent_description}
 
-        When receiving the CSV data in a regular event use [JSONPath](http://goessner.net/articles/JsonPath/) to select the path in `data_path`. `data_path` is only used when the received event does not contain a 'file pointer'.
+        When receiving the CSV data in a regular event use [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) to select the path in `data_path`. `data_path` is only used when the received event does not contain a 'file pointer'.
 
         ### Serializing
 
@@ -51,7 +51,7 @@ module Agents
 
         Set `with_header` to `true` to include a field header in the CSV.
 
-        Use [JSONPath](http://goessner.net/articles/JsonPath/) in `data_path` to select with part of the received events should be serialized.
+        Use [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) in `data_path` to select with part of the received events should be serialized.
       MD
     end
 

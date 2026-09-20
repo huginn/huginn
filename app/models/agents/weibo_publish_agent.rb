@@ -11,9 +11,9 @@ module Agents
 
       You must first set up a Weibo app and generate an `access_token` for the user that will be used for posting status updates.
 
-      You must also specify a `message_path` parameter: a [JSONPaths](http://goessner.net/articles/JsonPath/) to the value to publish.
+      You must also specify a `message_path` parameter: a [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) to the value to publish.
 
-      You can also specify a `pic_path` parameter: a [JSONPaths](http://goessner.net/articles/JsonPath/) to the picture url to publish along.
+      You can also specify a `pic_path` parameter: a [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) to the picture url to publish along.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
     MD
@@ -30,8 +30,8 @@ module Agents
       {
         'access_token' => "---",
         'expected_update_period_in_days' => "10",
-        'message_path' => "text",
-        'pic_path' => "pic"
+        'message_path' => "$.text",
+        'pic_path' => "$.pic"
       }
     end
 

@@ -22,7 +22,7 @@ module Agents
         * `expected_receive_period_in_days` - How often you expect to receive
           events this way. Used to determine if the agent is working.
         * `payload_path` - JSONPath of the attribute in the POST body to be
-          used as the Event payload.  Set to `.` to return the entire message.
+          used as the Event payload.  Set to `$` to return the entire message.
           If `payload_path` points to an array, Events will be created for each element.
         * `event_headers` - Comma-separated list of HTTP headers your agent will include in the payload.
         * `event_headers_key` - The key to use to store all the headers received
@@ -49,7 +49,7 @@ module Agents
       {
         "secret" => SecureRandom.uuid,
         "expected_receive_period_in_days" => 1,
-        "payload_path" => ".",
+        "payload_path" => "$",
         "event_headers" => "",
         "event_headers_key" => "headers",
         "score_threshold" => 0.5

@@ -86,7 +86,7 @@ jane_rain_notifier_agent:
                  :rules => [{
                    :type => "regex",
                    :value => "rain",
-                   :path => "conditions"
+                   :path => "$.conditions"
                  }],
                  :message => "Just so you know, it looks like '{{conditions}}' tomorrow in {{location}}"
                }.to_json.inspect %>
@@ -101,7 +101,7 @@ bob_rain_notifier_agent:
                  :rules => [{
                    :type => "regex",
                    :value => "rain",
-                   :path => "conditions"
+                   :path => "$.conditions"
                   }],
                  :message => "Just so you know, it looks like '{{conditions}}' tomorrow in {{location}}"
                }.to_json.inspect %>

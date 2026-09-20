@@ -117,7 +117,7 @@ describe Agents::WebsiteAgent do
 
           @checker.options['type'] = 'json'
           @checker.options['extract'] = {
-            'url' => { 'path' => 'bar' },
+            'url' => { 'path' => '$.bar' },
           }
           expect(@checker).to be_valid
         end
@@ -263,7 +263,7 @@ describe Agents::WebsiteAgent do
           'mode' => 'on_change',
           'http_success_codes' => [404],
           'extract' => {
-            'version' => { 'path' => 'response.version' },
+            'version' => { 'path' => '$.response.version' },
           },
           # no unzip option
         }
@@ -294,7 +294,7 @@ describe Agents::WebsiteAgent do
           'url' => "http://gzip.com",
           'mode' => 'on_change',
           'extract' => {
-            'version' => { 'path' => 'response.version' },
+            'version' => { 'path' => '$.response.version' },
           },
           # no unzip option
         }
@@ -323,7 +323,7 @@ describe Agents::WebsiteAgent do
           'url' => "http://gzip.com",
           'mode' => 'on_change',
           'extract' => {
-            'version' => { 'path' => 'response.version' },
+            'version' => { 'path' => '$.response.version' },
           },
           'unzip' => 'gzip',
         }
@@ -429,7 +429,7 @@ describe Agents::WebsiteAgent do
             super().merge(
               'type' => 'json',
               'extract' => {
-                'value' => { 'path' => 'value' }
+                'value' => { 'path' => '$.value' }
               }
             )
           end
@@ -609,7 +609,7 @@ describe Agents::WebsiteAgent do
             super().merge(
               'type' => 'json',
               'extract' => {
-                'value' => { 'path' => 'value' }
+                'value' => { 'path' => '$.value' }
               }
             )
           end
@@ -990,8 +990,8 @@ describe Agents::WebsiteAgent do
             'url' => "http://json-site.com",
             'mode' => 'on_change',
             'extract' => {
-              'version' => { 'path' => "response.version" },
-              'title' => { 'path' => "response.title" }
+              'version' => { 'path' => "$.response.version" },
+              'title' => { 'path' => "$.response.title" }
             }
           }
           checker = Agents::WebsiteAgent.new(name: "Weather Site", options: site)
@@ -1025,9 +1025,9 @@ describe Agents::WebsiteAgent do
             'url' => "http://json-site.com",
             'mode' => 'on_change',
             'extract' => {
-              'title' => { 'path' => "response.data[*].title" },
-              'version' => { 'path' => "response.data[*].version" },
-              'status' => { 'path' => "response.status", 'repeat' => true },
+              'title' => { 'path' => "$.response.data[*].title" },
+              'version' => { 'path' => "$.response.data[*].version" },
+              'status' => { 'path' => "$.response.status", 'repeat' => true },
             }
           }
           checker = Agents::WebsiteAgent.new(name: "Weather Site", options: site)
@@ -1290,8 +1290,8 @@ describe Agents::WebsiteAgent do
               'type' => 'json',
               'data_from_event' => '{{ some_object.some_data }}',
               'extract' => {
-                'value' => { 'path' => 'hello' },
-                'url' => { 'path' => 'href' },
+                'value' => { 'path' => '$.hello' },
+                'url' => { 'path' => '$.href' },
               },
               'template' => {
                 'value' => '{{ value }}',

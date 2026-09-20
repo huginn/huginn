@@ -19,7 +19,7 @@
           {
             "type": "regex",
             "value": "rain|storm",
-            "path": "conditions"
+            "path": "$.conditions"
           }
         ],
         "message": "Just so you know, it looks like '{{conditions}}' tomorrow in {{location}}"

@@ -36,7 +36,7 @@ module Agents
 
     def default_options
       {
-        'path' => '.data.rate',
+        'path' => '$.data.rate',
         'output' => 'rate_diff',
         'method' => 'integer_difference',
         'expected_update_period_in_days' => 1

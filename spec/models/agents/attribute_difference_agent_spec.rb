@@ -14,7 +14,7 @@ describe Agents::AttributeDifferenceAgent do
 
   before do
     @valid_params = {
-      path: 'rate',
+      path: '$.rate',
       output: 'rate_diff',
       method: 'integer_difference',
       expected_update_period_in_days: '1'

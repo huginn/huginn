@@ -31,7 +31,7 @@ describe Utils do
     let(:payload) { { :there => { :world => "WORLD" }, :works => "should work" } }
 
     it "interpolates jsonpath expressions between matching <>'s" do
-      expect(Utils.interpolate_jsonpaths("hello <$.there.world> this <escape works>", payload)).to eq("hello WORLD this should+work")
+      expect(Utils.interpolate_jsonpaths("hello <$.there.world> this <escape $.works>", payload)).to eq("hello WORLD this should+work")
     end
 
     it "optionally supports treating values that start with '$' as raw JSONPath" do
@@ -45,9 +45,9 @@ describe Utils do
       struct = {
         :int => 5,
         :string => "this <escape $.works>",
-        :array => ["<works>", "now", "<$.there.world>"],
+        :array => ["<$.works>", "now", "<$.there.world>"],
         :deep => {
-          :string => "hello <there.world>",
+          :string => "hello <$.there.world>",
           :hello => :world
         }
       }
@@ -66,21 +66,21 @@ describe Utils do
 
   describe "#value_at" do
     it "returns the value at a JSON path" do
-      expect(Utils.value_at({ :foo => { :bar => :baz }}.to_json, "foo.bar")).to eq("baz")
-      expect(Utils.value_at({ :foo => { :bar => { :bing => 2 } }}, "foo.bar.bing")).to eq(2)
-      expect(Utils.value_at({ :foo => { :bar => { :bing => 2 } }}, "foo.bar[?(@.bing == 2)].bing")).to eq(2)
+      expect(Utils.value_at({ :foo => { :bar => :baz }}.to_json, "$.foo.bar")).to eq("baz")
+      expect(Utils.value_at({ :foo => { :bar => { :bing => 2 } }}, "$.foo.bar.bing")).to eq(2)
+      expect(Utils.value_at({ :foo => { :bar => [{ :bing => 2 }] }}, "$.foo.bar[?(@.bing == 2)].bing")).to eq(2)
     end
 
     it "returns nil when the path cannot be followed" do
-      expect(Utils.value_at({ :foo => { :bar => :baz }}, "foo.bing")).to be_nil
+      expect(Utils.value_at({ :foo => { :bar => :baz }}, "$.foo.bing")).to be_nil
     end
   end
 
   describe "#values_at" do
     it "returns arrays of matching values" do
-      expect(Utils.values_at({ :foo => { :bar => :baz }}, "foo.bar")).to eq(%w[baz])
-      expect(Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "foo[*].bar")).to eq(%w[baz bing])
-      expect(Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "foo[*].bar")).to eq(%w[baz bing])
+      expect(Utils.values_at({ :foo => { :bar => :baz }}, "$.foo.bar")).to eq(%w[baz])
+      expect(Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "$.foo[*].bar")).to eq(%w[baz bing])
+      expect(Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "$.foo[*].bar")).to eq(%w[baz bing])
     end
 
     it "should allow escaping" do
