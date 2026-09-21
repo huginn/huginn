@@ -180,21 +180,30 @@ describe JsonpathMigration do # rubocop:disable Metrics/BlockLength
     end
 
     it "also reads and writes JSON through a legacy text attribute" do
-      target_id = agent.id
-      legacy_agent = Class.new(described_class::MigrationAgent) do
-        attribute :options, :text
-        # Other fixtures use the native JSON column's quoted-string format.
-        default_scope { where(id: target_id) }
+      connection = ActiveRecord::Base.connection
+      connection.create_table(:jsonpath_legacy_agents, temporary: true) do |table|
+        table.string :type
+        table.integer :user_id
+        table.text :options
+      end
+      legacy_agent = Class.new(ActiveRecord::Base) do
+        self.table_name = "jsonpath_legacy_agents"
+        self.inheritance_column = nil
       end
       stub_const("JsonpathMigration::MigrationAgent", legacy_agent)
-      agent.update_columns(options: { "rules" => [{ "path" => "title" }], "secret" => "unchanged" })
+      record = legacy_agent.create!(
+        type: "Agents::TriggerAgent", user_id: agent.user_id,
+        options: JSON.generate({ "rules" => [{ "path" => "title" }], "secret" => "unchanged" })
+      )
 
-      expect(legacy_agent.find(agent.id).options).to be_a(String)
+      expect(record.reload.options).to be_a(String)
       migration.run
 
-      expect(JSON.parse(legacy_agent.find(agent.id).options)).to eq({
+      expect(JSON.parse(record.reload.options)).to eq({
         "rules" => [{ "path" => "$.title" }], "secret" => "unchanged",
       })
+    ensure
+      connection.drop_table(:jsonpath_legacy_agents, if_exists: true)
     end
 
     it "groups private review URLs by user and lists each Agent only once" do
@@ -226,7 +235,11 @@ describe JsonpathMigration do # rubocop:disable Metrics/BlockLength
     end
 
     it "stops without exposing options if an Agent cannot store the legacy flag" do
-      described_class::MigrationAgent.find(agent.id).update_columns(options: ["private-value"])
+      options = ["private-value"]
+      unless [:json, :jsonb].include?(described_class::MigrationAgent.type_for_attribute("options").type)
+        options = JSON.generate(options)
+      end
+      described_class::MigrationAgent.find(agent.id).update_columns(options: options)
 
       expect { migration.run }.to raise_error(ActiveRecord::MigrationError, /Agent ##{agent.id} has invalid options/)
       expect(migration).not_to have_received(:say).with(/private-value/)
