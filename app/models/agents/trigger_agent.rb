@@ -16,6 +16,8 @@ module Agents
     ]
 
     description <<~MD
+      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
+
       The Trigger Agent will watch for a specific value in an Event payload.
 
       The `rules` array contains a mixture of strings and hashes.
@@ -24,7 +26,7 @@ module Agents
 
       A hash rule consists of the following keys: `path`, `value`, and `type`.
 
-      The `path` value is a dotted path through a hash in [JSONPaths](http://goessner.net/articles/JsonPath/) syntax. For simple events, this is usually just the name of the field you want, like 'text' for the text key of the event.
+      The `path` value selects a field using [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) syntax.  Start paths with `$`, for example `$.text` for the text key of the event.
 
       The `type` can be one of #{VALID_COMPARISON_TYPES.map { |t| "`#{t}`" }.to_sentence} and compares with the `value`.  Note that regex patterns are matched case insensitively.  If you want case sensitive matching, prefix your pattern with `(?-i)`.
 
@@ -91,7 +93,7 @@ module Agents
         'rules' => [{
           'type' => "regex",
           'value' => "foo\\d+bar",
-          'path' => "topkey.subkey.subkey.goal",
+          'path' => "$.topkey.subkey.subkey.goal",
         }],
         'message' => "Looks like your pattern matched in '{{value}}'!"
       }
@@ -110,7 +112,7 @@ module Agents
             next boolify(rule)
           end
 
-          value_at_path = Utils.value_at(event['payload'], rule['path'])
+          value_at_path = value_at(event['payload'], rule['path'])
           rule_values = rule['value']
           rule_values = [rule_values] unless rule_values.is_a?(Array)
 

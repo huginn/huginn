@@ -25,6 +25,8 @@ module Agents
       <<~MD
         The `CsvAgent` parses or serializes CSV data. When parsing, events can either be emitted for the entire CSV, or one per row.
 
+        JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
+
         Set `mode` to `parse` to parse CSV from incoming event, when set to `serialize` the agent serilizes the data of events to CSV.
 
         ### Universal options
@@ -43,7 +45,7 @@ module Agents
 
         #{receiving_file_handling_agent_description}
 
-        When receiving the CSV data in a regular event use [JSONPath](http://goessner.net/articles/JsonPath/) to select the path in `data_path`. `data_path` is only used when the received event does not contain a 'file pointer'.
+        When receiving the CSV data in a regular event use [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) to select the path in `data_path`. `data_path` is only used when the received event does not contain a 'file pointer'.
 
         ### Serializing
 
@@ -51,7 +53,7 @@ module Agents
 
         Set `with_header` to `true` to include a field header in the CSV.
 
-        Use [JSONPath](http://goessner.net/articles/JsonPath/) in `data_path` to select with part of the received events should be serialized.
+        Use [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) in `data_path` to select with part of the received events should be serialized.
       MD
     end
 
@@ -151,7 +153,7 @@ module Agents
     def rows_from_events(incoming_events, mo)
       [].tap do |rows|
         incoming_events.each do |event|
-          data = Utils.value_at(event.payload, mo['data_path'])
+          data = value_at(event.payload, mo['data_path'])
           if data.is_a?(Array) && (data[0].is_a?(Array) || data[0].is_a?(Hash))
             data.each { |row| rows << row }
           else
@@ -178,7 +180,7 @@ module Agents
 
     def local_get_io(event)
       get_io(event) or
-        Utils.value_at(event.payload, interpolated['data_path'])
+        value_at(event.payload, interpolated['data_path'])
     end
 
     def parse_csv_options(mo)

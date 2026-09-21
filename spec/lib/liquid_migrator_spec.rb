@@ -5,15 +5,21 @@ describe LiquidMigrator do
     it "should work" do
       expect(LiquidMigrator.convert_string("$.data", true)).to eq("{{data}}")
       expect(LiquidMigrator.convert_string("$.data.test", true)).to eq("{{data.test}}")
-      expect(LiquidMigrator.convert_string("$first_title", true)).to eq("{{first_title}}")
+      expect(LiquidMigrator.convert_string("$.first_title", true)).to eq("{{first_title}}")
     end
 
     it "should ignore strings which just contain a JSONPath" do
       expect(LiquidMigrator.convert_string("$.data")).to eq("$.data")
-      expect(LiquidMigrator.convert_string("$first_title")).to eq("$first_title")
+      expect(LiquidMigrator.convert_string("$.first_title")).to eq("$.first_title")
       expect(LiquidMigrator.convert_string(" $.data", true)).to eq(" $.data")
       expect(LiquidMigrator.convert_string("lorem $.data", true)).to eq("lorem $.data")
     end
+
+    it "still migrates legacy paths without a dot after the root" do
+      expect(LiquidMigrator.convert_string("$first_title", true)).to eq("{{first_title}}")
+      expect(LiquidMigrator.convert_string("$first_title")).to eq("$first_title")
+    end
+
     it "should raise an exception when encountering complex JSONPaths" do
       expect { LiquidMigrator.convert_string("$.data.test.*", true) }.
         to raise_error("JSONPath '$.data.test.*' is too complex, please check your migration.")

@@ -62,7 +62,7 @@ describe Agents::GapDetectorAgent do
     end
 
     it 'ignores the event if value_path is present and the value at the path is blank' do
-      agent.options['value_path'] = 'title'
+      agent.options['value_path'] = '$.title'
       agent.receive([events(:bob_website_agent_event)])
       expect(agent.memory['newest_event_created_at']).to eq events(:bob_website_agent_event).created_at.to_i
 

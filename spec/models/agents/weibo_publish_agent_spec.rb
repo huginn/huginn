@@ -6,8 +6,8 @@ describe Agents::WeiboPublishAgent do
     @opts = {
       :expected_update_period_in_days => "2",
       :access_token => "---",
-      :message_path => "text",
-      :pic_path => "pic"
+      :message_path => "$.text",
+      :pic_path => "$.pic"
     }
 
     @checker = Agents::WeiboPublishAgent.new(:name => "Weibo Publisher", :options => @opts)
