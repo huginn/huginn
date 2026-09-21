@@ -7,9 +7,9 @@ module Agents
     cannot_be_scheduled!
 
     description <<~MD
-      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
-
       The Sentiment Agent generates `good-bad` (psychological valence or happiness index), `active-passive` (arousal), and  `strong-weak` (dominance) score. It will output a value between 1 and 9. It will only work on English content.
+
+      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
 
       Make sure the content this agent is analyzing is of sufficient length to get respectable results.
 

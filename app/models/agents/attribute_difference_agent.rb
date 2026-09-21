@@ -3,11 +3,11 @@ module Agents
     cannot_be_scheduled!
 
     description <<~MD
-      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
-
       The Attribute Difference Agent receives events and emits a new event with
       the difference or change of a specific attribute in comparison to the previous
       event received.
+
+      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
 
       `path` specifies the JSON path of the attribute to be used from the event.
 

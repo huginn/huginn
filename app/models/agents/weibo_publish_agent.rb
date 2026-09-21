@@ -7,9 +7,9 @@ module Agents
     cannot_be_scheduled!
 
     description <<~MD
-      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
-
       The Weibo Publish Agent publishes posts from the events it receives.
+
+      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
 
       You must first set up a Weibo app and generate an `access_token` for the user that will be used for posting status updates.
 

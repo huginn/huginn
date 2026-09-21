@@ -16,9 +16,9 @@ module Agents
     ]
 
     description <<~MD
-      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
-
       The Trigger Agent will watch for a specific value in an Event payload.
+
+      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
 
       The `rules` array contains a mixture of strings and hashes.
 

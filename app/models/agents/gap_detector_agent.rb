@@ -3,9 +3,9 @@ module Agents
     default_schedule "every_10m"
 
     description <<~MD
-      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
-
       The Gap Detector Agent will watch for holes or gaps in a stream of incoming Events and generate "no data alerts".
+
+      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
 
       The `value_path` value is a [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) to a value of interest. If either
       this value is empty, or no Events are received, during `window_duration_in_days`, an Event will be created with
