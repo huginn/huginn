@@ -7,6 +7,8 @@ module Agents
     cannot_be_scheduled!
 
     description <<~MD
+      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
+
       The Weibo Publish Agent publishes posts from the events it receives.
 
       You must first set up a Weibo app and generate an `access_token` for the user that will be used for posting status updates.
@@ -38,8 +40,8 @@ module Agents
     def receive(incoming_events)
       # if there are too many, dump a bunch to avoid getting rate limited
       incoming_events.first(20).each do |event|
-        tweet_text = Utils.value_at(event.payload, interpolated(event)['message_path'])
-        pic_url = Utils.value_at(event.payload, interpolated(event)['pic_path'])
+        tweet_text = value_at(event.payload, interpolated(event)['message_path'])
+        pic_url = value_at(event.payload, interpolated(event)['pic_path'])
         if event.agent.type == "Agents::TwitterUserAgent"
           tweet_text = unwrap_tco_urls(tweet_text, event.payload)
         end

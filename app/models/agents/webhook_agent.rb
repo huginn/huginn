@@ -18,6 +18,7 @@ module Agents
 
         Options:
 
+        * `use_legacy_jsonpath` - Set to `true` to retain legacy JSONPath syntax and behavior.  Otherwise, JSONPath expressions use RFC 9535.
         * `secret` - A token that the host will provide for authentication.
         * `expected_receive_period_in_days` - How often you expect to receive
           events this way. Used to determine if the agent is working.
@@ -154,7 +155,7 @@ module Agents
     end
 
     def payload_for(params)
-      Utils.value_at(params, interpolated['payload_path']) || {}
+      value_at(params, interpolated['payload_path']) || {}
     end
   end
 end

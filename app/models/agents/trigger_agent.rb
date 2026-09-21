@@ -16,6 +16,8 @@ module Agents
     ]
 
     description <<~MD
+      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
+
       The Trigger Agent will watch for a specific value in an Event payload.
 
       The `rules` array contains a mixture of strings and hashes.
@@ -110,7 +112,7 @@ module Agents
             next boolify(rule)
           end
 
-          value_at_path = Utils.value_at(event['payload'], rule['path'])
+          value_at_path = value_at(event['payload'], rule['path'])
           rule_values = rule['value']
           rule_values = [rule_values] unless rule_values.is_a?(Array)
 

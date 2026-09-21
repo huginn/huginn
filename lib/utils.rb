@@ -1,4 +1,5 @@
 require_relative 'jsonpath_safety'
+require "janeway"
 require 'cgi'
 require 'uri'
 require 'addressable/uri'
@@ -102,21 +103,22 @@ module Utils
     end
   end
 
-  def self.value_at(data, path)
-    values_at(data, path).first
+  def self.value_at(data, path, legacy: false)
+    values_at(data, path, legacy: legacy).first
   end
 
-  def self.values_at(data, path)
-    if path =~ /\Aescape /
-      path.gsub!(/\Aescape /, '')
-      escape = true
-    else
-      escape = false
-    end
+  def self.values_at(data, path, legacy: false)
+    escape = path.start_with?("escape ")
+    path = path.delete_prefix("escape ")
 
-    result = JsonPath.new(path).on(data.is_a?(String) ? data : data.to_json)
+    json = data.is_a?(String) ? data : data.to_json
+    result = if legacy
+               JsonPath.new(path).on(json)
+             else
+               Janeway.enum_for(path, JSON.parse(json)).search
+             end
     if escape
-      result.map {|r| CGI::escape r }
+      result.map { |r| CGI.escape(r) }
     else
       result
     end

@@ -5,6 +5,8 @@ module Agents
     DEFAULT_SEARCH_URL = 'https://twitter.com/search?q={q}'
 
     description <<~MD
+      JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
+
       The Peak Detector Agent will watch for peaks in an event stream.  When a peak is detected, the resulting Event will have a payload message of `message`.  You can include extractions in the message, for example: `I saw a bar of: {{foo.bar}}`, have a look at the [Wiki](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) for details.
 
       The `value_path` value is a [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) to the value of interest.  `group_by_path` is a JSONPath that will be used to group values, if present.
@@ -136,13 +138,13 @@ module Agents
 
     def group_for(event)
       group_by_path = interpolated['group_by_path'].presence
-      (group_by_path && Utils.value_at(event.payload, group_by_path)) || 'no_group'
+      (group_by_path && value_at(event.payload, group_by_path)) || 'no_group'
     end
 
     def remember(group, event)
       memory['data'] ||= {}
       memory['data'][group] ||= []
-      memory['data'][group] << [Utils.value_at(event.payload, interpolated['value_path']).to_f, event.created_at.to_i]
+      memory['data'][group] << [value_at(event.payload, interpolated['value_path']).to_f, event.created_at.to_i]
       cleanup group
     end
 

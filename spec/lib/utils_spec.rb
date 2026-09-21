@@ -77,6 +77,15 @@ describe Utils do
   end
 
   describe "#values_at" do
+    it "defaults to RFC semantics and allows explicit legacy lookups" do
+      data = [{ "n" => "2" }, { "n" => 2 }]
+      expect(Utils.values_at(data, "$[?(@.n == 2)]")).to eq([data.last])
+      expect(Utils.value_at(data, "$[?(@.n == 2)]")).to eq(data.last)
+      expect(Utils.values_at(data, "$[?(@.n == 2)]", legacy: true)).to eq(data)
+      expect(Utils.value_at(data, "$[?(@.n == 2)]", legacy: true)).to eq(data.first)
+      expect { Utils.values_at({}, "title") }.to raise_error(Janeway::Error)
+    end
+
     it "returns arrays of matching values" do
       expect(Utils.values_at({ :foo => { :bar => :baz }}, "$.foo.bar")).to eq(%w[baz])
       expect(Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "$.foo[*].bar")).to eq(%w[baz bing])

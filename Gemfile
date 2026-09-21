@@ -118,6 +118,7 @@ gem 'jquery-rails'
 # ship releases that accept json 3's keyword-only options.
 gem 'json', '< 3'
 gem 'jsonpath'
+gem "janeway-jsonpath", "~> 1.1", require: "janeway"
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
 gem 'liquid', '~> 5.13'

@@ -25,6 +25,8 @@ module Agents
       <<~MD
         The `CsvAgent` parses or serializes CSV data. When parsing, events can either be emitted for the entire CSV, or one per row.
 
+        JSONPath expressions use RFC 9535.  Set `use_legacy_jsonpath` to `true` to retain legacy JSONPath syntax and behavior.
+
         Set `mode` to `parse` to parse CSV from incoming event, when set to `serialize` the agent serilizes the data of events to CSV.
 
         ### Universal options
@@ -151,7 +153,7 @@ module Agents
     def rows_from_events(incoming_events, mo)
       [].tap do |rows|
         incoming_events.each do |event|
-          data = Utils.value_at(event.payload, mo['data_path'])
+          data = value_at(event.payload, mo['data_path'])
           if data.is_a?(Array) && (data[0].is_a?(Array) || data[0].is_a?(Hash))
             data.each { |row| rows << row }
           else
@@ -178,7 +180,7 @@ module Agents
 
     def local_get_io(event)
       get_io(event) or
-        Utils.value_at(event.payload, interpolated['data_path'])
+        value_at(event.payload, interpolated['data_path'])
     end
 
     def parse_csv_options(mo)

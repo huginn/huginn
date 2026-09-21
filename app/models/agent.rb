@@ -21,6 +21,7 @@ class Agent < ActiveRecord::Base
   include HasGuid
   include DryRunnable
   include SortableEvents
+  include JsonpathEvaluation
 
   markdown_class_attributes :description, :event_description
 
