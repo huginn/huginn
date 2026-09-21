@@ -21,7 +21,7 @@ describe ScenarioImport do
       'rules' => [{
                     'type' => "regex",
                     'value' => "rain|storm",
-                    'path' => "conditions",
+                    'path' => "$.conditions",
                   }],
       'message' => "Looks like rain!"
     }

@@ -53,7 +53,7 @@ describe Agents::CommanderAgent do
               {
                 'type' => 'field<value',
                 'value' => '200.0',
-                'path' => 'price',
+                'path' => '$.price',
               }
             ],
             keep_event: 'true'
@@ -73,7 +73,7 @@ describe Agents::CommanderAgent do
                 {
                   'type' => 'field<value',
                   'value' => "{{price}}",
-                  'path' => 'price',
+                  'path' => '$.price',
                 }
               ]
             }
