@@ -67,7 +67,7 @@ gem 'mqtt'
 gem 'pdf-reader'
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.232.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.232.1'
 
 # SlackAgent
 gem 'slack-notifier'
@@ -121,7 +121,7 @@ gem 'jsonpath'
 gem "janeway-jsonpath", "~> 1.1", require: "janeway"
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
-gem 'liquid', '~> 5.13'
+gem 'liquid', '~> 5.14'
 gem 'logger'
 gem 'loofah', '~> 2.25', '>= 2.25.2'
 gem 'mail', '>= 2.9.1'
