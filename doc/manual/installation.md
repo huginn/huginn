@@ -483,7 +483,9 @@ MySQL installations (>= 5.7.26) on Ubuntu use the UNIX `auth_socket` plugin by d
 
 Once in the MySQL shell, run the following command to set the password for the root user by replacing `new-password` with a password of your choice
 
-    ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'new-password';
+    ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'new-password';
+
+Use this authentication plugin with MySQL 8.0 and 8.4.  MySQL 8.4 disables `mysql_native_password` by default.
 
 After the change has been made, exit the MySQL shell with `\q`. 
 

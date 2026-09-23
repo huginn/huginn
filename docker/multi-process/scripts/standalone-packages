@@ -4,8 +4,50 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
-apt-get install -y gnupg python3-pip mysql-server supervisor && \
-apt-get -y clean
+apt-get install -y gnupg python3-pip supervisor libaio1t64 libnuma1 libncurses6 libtirpc3t64 xz-utils &&
+  apt-get -y clean
+
+# Oracle's APT repository does not provide arm64 packages.  Use the signed
+# generic distribution on both architectures instead.
+MYSQL_VERSION=8.4.11
+case "$(dpkg --print-architecture)" in
+  amd64) mysql_arch=x86_64 ;;
+  arm64) mysql_arch=aarch64 ;;
+  *)
+    echo "Unsupported MySQL architecture" >&2
+    exit 1
+    ;;
+esac
+mysql_dist="mysql-${MYSQL_VERSION}-linux-glibc2.28-${mysql_arch}"
+mysql_url="https://cdn.mysql.com/Downloads/MySQL-8.4/${mysql_dist}.tar.xz"
+mysql_tmp="$(mktemp -d)"
+trap 'rm -rf "$mysql_tmp"' EXIT
+curl -fsSL -o "$mysql_tmp/mysql.tar.xz" "$mysql_url"
+curl -fsSL -o "$mysql_tmp/mysql.tar.xz.asc" "$mysql_url.asc"
+gpg --batch --dearmor -o "$mysql_tmp/mysql.gpg" /scripts/mysql-2025-release.asc
+gpgv --keyring "$mysql_tmp/mysql.gpg" "$mysql_tmp/mysql.tar.xz.asc" "$mysql_tmp/mysql.tar.xz"
+mkdir -p /opt/mysql
+tar -xJf "$mysql_tmp/mysql.tar.xz" --strip-components=1 -C /opt/mysql \
+  --exclude='*/bin/mysqld-debug' --exclude='*/lib/*.a' --exclude='*/lib/plugin/debug' \
+  "$mysql_dist/bin" "$mysql_dist/lib" "$mysql_dist/share" "$mysql_dist/LICENSE" "$mysql_dist/README"
+for program in mysql mysqladmin mysqlbinlog mysqlcheck mysqld mysqld_safe mysqldump mysqlshow; do
+  ln -s "/opt/mysql/bin/$program" "/usr/local/bin/$program"
+done
+# Ubuntu renamed libaio for the time64 transition; MySQL uses the old SONAME.
+multiarch="$(dpkg-architecture -qDEB_HOST_MULTIARCH)"
+ln -s "libaio.so.1t64" "/usr/lib/$multiarch/libaio.so.1"
+mysqld --version
+mkdir -p /etc/mysql/conf.d /etc/mysql/mysql.conf.d /var/lib/mysql
+cat > /etc/my.cnf << 'EOF'
+!includedir /etc/mysql/conf.d/
+!includedir /etc/mysql/mysql.conf.d/
+EOF
+cat > /etc/mysql/mysql.conf.d/mysqld.cnf << 'EOF'
+[mysqld]
+basedir = /opt/mysql
+datadir = /var/lib/mysql
+mysqlx-socket = /app/tmp/sockets/mysqlx.sock
+EOF
 
 # Install the plugin for the distribution's Supervisor inside this image.
 pip install --break-system-packages git+https://github.com/coderanger/supervisor-stdout
@@ -34,10 +76,6 @@ user = 1001
 # 256K default and fail with "Out of sort memory" (ER 1038) on MySQL 8.
 sort_buffer_size = 4M
 EOF
-
-if mysqld --verbose --help 2>/dev/null | grep -q -- '--mysqlx-socket'; then
-  echo "mysqlx-socket = /app/tmp/sockets/mysqlx.sock" >> "$MYSQLD_CNF"
-fi
 
 # Determine the client config file
 if [ -f /etc/mysql/conf.d/mysql.cnf ]; then

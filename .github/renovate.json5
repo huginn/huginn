@@ -13,6 +13,15 @@
   customManagers: [
     {
       customType: "regex",
+      description: "Update the bundled MySQL LTS server",
+      managerFilePatterns: ["/^docker/multi-process/scripts/standalone-packages$/"],
+      matchStrings: ["MYSQL_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      depNameTemplate: "mysql",
+      datasourceTemplate: "docker",
+      versioningTemplate: "semver",
+    },
+    {
+      customType: "regex",
       description: "Update Ruby versions in manual install docs",
       managerFilePatterns: [
         "/(^|/)doc/manual/(installation|update)\\.md$/",
@@ -67,11 +76,10 @@
       enabled: false,
     },
     {
-      // Keep Docker Compose samples aligned with the MySQL server bundled in
-      // the official Ubuntu 22.04-based multi-process image.
+      // Keep Compose, CI, and the bundled server on the same LTS series.
       matchDatasources: ["docker"],
       matchPackageNames: ["mysql"],
-      allowedVersions: "<8.1",
+      allowedVersions: ">=8.4 <8.5",
     },
     {
       groupName: "patch updated gems",
