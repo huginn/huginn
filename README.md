@@ -105,6 +105,16 @@ Please see [the Huginn Wiki](https://github.com/huginn/huginn/wiki#deploying-hug
 
 Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup. Read the [documentation](https://github.com/huginn/huginn/blob/master/doc/heroku/install.md) while you are waiting and be sure to click 'View it' after launch!) Huginn launches only on a paid subscription plan for Heroku. For non-experimental use, we strongly recommend Heroku's 1GB paid plan or our Docker container.
 
+### Easypanel
+
+[Easypanel](https://easypanel.io) is a self-hosted Docker deployment platform, and Huginn has a one-click deployment template there.
+
+[![Deploy on Easypanel](https://easypanel.io/img/deploy-on-easypanel-40.svg)](https://easypanel.io/templates/huginn)
+
+The template bundles Huginn's official all-in-one image with a persistent volume for the MySQL data.
+
+![Huginn running in the Easypanel panel](doc/imgs/easypanel-panel.png)
+
 ### OpenShift
 
 #### OpenShift Online
