@@ -37,7 +37,7 @@ jobs:
       NATIVE_JSON_COLUMNS: ${{ matrix.native_json_columns == 'enabled' && '1' || '' }}
     services:
       mysql:
-        image: mysql:latest
+        image: mysql:8.4
         env:
           MYSQL_ROOT_PASSWORD: password
         ports:

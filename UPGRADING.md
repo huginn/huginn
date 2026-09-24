@@ -88,13 +88,23 @@ Smokescreen rejects internal destinations by default.  Review Agents that legiti
 
 The amd64 multi-process image moved its bundled database to MySQL 8.0 on `master` on 2026-04-10.  Docker Compose database definitions moved to MySQL 8.0 on 2026-05-16.
 
+The updated multi-process image and MySQL Compose definitions use MySQL 8.4 LTS.  The bundled server supports both amd64 and arm64.
+
 This affects installations using the image's bundled database or the supplied MySQL Compose configuration.  Updating a Huginn application image does not upgrade a separately managed database server.  PostgreSQL installations do not need this migration.
 
-For an existing MySQL 5.7 volume, back it up before the first MySQL 8.0 start.  While the old server is still available, stop Huginn's writers, set `innodb_fast_shutdown = 0`, and shut MySQL down cleanly.  Then start MySQL 8.0 against the existing volume and allow the upgrade to complete before starting Huginn.  Follow the commands for your deployment in the [single-process](docker/single-process/README.md#usage) or [multi-process](docker/multi-process/README.md#usage) Docker guide.
+### From MySQL 8.0 to 8.4
 
-The bundled database startup includes a helper for detected MySQL 5.7 data directories.  It downloads and verifies a MySQL 5.7 rescue binary, uses it to perform a clean shutdown, and lets MySQL 8.0 perform the upgrade.  This rescue path requires amd64 and access to the download server; it is not a general migration path for MariaDB or arbitrary older versions.
+Back up the volume, retain the previous image, and run the [MySQL Upgrade Checker](https://dev.mysql.com/doc/mysql-shell/8.4/en/mysql-shell-utilities-upgrade.html) against the running 8.0 server before changing images.  MySQL 8.4 disables `mysql_native_password` by default.  Convert accounts used by Huginn or administrators to `caching_sha2_password` while 8.0 is still available.  The bundled database startup handles the local root account automatically; additional accounts need to be converted separately.
+
+Stop Huginn's web, scheduler, and worker processes, set `innodb_fast_shutdown = 0`, and shut MySQL down cleanly.  Start MySQL 8.4 against the existing volume and allow the upgrade to complete before resuming Huginn.  Follow the commands for your deployment in the [single-process](docker/single-process/README.md#usage) or [multi-process](docker/multi-process/README.md#usage) Docker guide, or the [built-in database upgrade procedure](docker/multi-process/README.md#upgrading-the-built-in-database).
 
 Keep the pre-upgrade backup until the new database and Huginn have been verified.  To roll back, restore that backup with the old database version rather than starting the old server against the upgraded volume.
+
+### From MySQL 5.7
+
+MySQL 5.7 cannot be upgraded directly to 8.4.  Back up the volume, stop Huginn's writers, set `innodb_fast_shutdown = 0` on the running 5.7 server, and shut it down cleanly.  Upgrade to MySQL 8.0 first.  For Compose, temporarily set both `mysql` and `mysqldata` images to `mysql:8.0` and let the server complete that upgrade.  Then follow the 8.0-to-8.4 procedure above, changing both images to `mysql:8.4`.
+
+The new multi-process image refuses detected MySQL 5.7 data before starting the bundled server.  Use the previous Huginn image containing MySQL 8.0 for the intermediate upgrade.  That image's recovery helper downloads and verifies a MySQL 5.7 rescue binary and performs a clean shutdown before starting 8.0.  This recovery step requires amd64 and access to the download server; it is not available on arm64 and is not a general migration path for MariaDB or arbitrary older versions.
 
 ## Opting in to native JSON columns
 

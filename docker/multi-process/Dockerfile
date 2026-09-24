@@ -15,7 +15,7 @@ RUN /scripts/prepare
 
 COPY --from=smokescreen /go/bin/smokescreen /usr/local/bin/smokescreen
 
-COPY docker/multi-process/scripts/standalone-packages /scripts/
+COPY docker/multi-process/scripts/standalone-packages docker/multi-process/scripts/mysql-2025-release.asc /scripts/
 RUN /scripts/standalone-packages
 
 WORKDIR /app
@@ -62,8 +62,6 @@ COPY ["docker/multi-process/scripts/bootstrap.conf", \
 COPY ["docker/multi-process/scripts/bootstrap.sh", \
       "docker/multi-process/scripts/foreman.sh", \
       "docker/multi-process/scripts/init", \
-      "docker/multi-process/scripts/mysql-5.7.44-linux-glibc2.12-x86_64.tar.gz.asc", \
-      "docker/multi-process/scripts/mysql-2022-release.asc", \
       "docker/multi-process/scripts/upgrade-mysql", \
       "docker/scripts/setup_env", "docker/scripts/smokescreen", "/scripts/"]
 CMD ["/scripts/init"]

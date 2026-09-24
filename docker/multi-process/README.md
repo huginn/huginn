@@ -67,7 +67,7 @@ To link to another mysql container, for example:
         -e MYSQL_USER=huginn \
         -e MYSQL_PASSWORD=somethingsecret \
         -e MYSQL_ROOT_PASSWORD=somethingevenmoresecret \
-        mysql
+        mysql:8.4
 
     docker run --rm --name huginn \
         --link huginn_mysql:mysql \
@@ -107,7 +107,7 @@ The `docker/multi-process` folder also has a `develop.yml` Compose file that all
     cd docker/multi-process
     docker-compose -f develop.yml up
 
-If you already have a MySQL 5.7 data volume, cleanly shut it down before the first MySQL 8.0 start:
+The Compose setup uses MySQL 8.4 LTS.  Before upgrading an existing MySQL 8.0 volume, back it up and run the [MySQL Upgrade Checker](https://dev.mysql.com/doc/mysql-shell/8.4/en/mysql-shell-utilities-upgrade.html).  Convert accounts used by Huginn or administrators using `mysql_native_password` to `caching_sha2_password` while 8.0 is still running; MySQL 8.4 disables the old plugin by default.  Then cleanly stop the old server:
 
     cd docker/multi-process
     docker-compose -f develop.yml stop web
@@ -116,7 +116,15 @@ If you already have a MySQL 5.7 data volume, cleanly shut it down before the fir
     docker-compose -f develop.yml pull mysql mysqldata
     docker-compose -f develop.yml up -d
 
-Run this while the old MySQL 5.7 container is still available.  The MySQL 8.0 Docker image automatically performs the data dictionary upgrade when it starts with the existing data volume.
+Run this while the old MySQL 8.0 container is still available.  MySQL 8.4 upgrades the data directory on startup.  To roll back, restore the backup into the previous 8.0 image; do not start 8.0 against an upgraded volume.
+
+MySQL 5.7 volumes must first be upgraded using `mysql:8.0`.  Set both `mysql` and `mysqldata` images to `mysql:8.0`, perform a clean shutdown of 5.7 with `innodb_fast_shutdown = 0`, and start 8.0 to complete that upgrade.  Then follow the 8.0-to-8.4 procedure above.  Never start 8.4 directly against a 5.7 volume.
+
+### Upgrading the built-in database
+
+The built-in server also uses MySQL 8.4 LTS on both amd64 and arm64.  Back up `/var/lib/mysql` and retain the previous Huginn image before upgrading.  Run the upgrade checker against the running 8.0 server, then stop Huginn's workers and web process, set `innodb_fast_shutdown = 0`, and shut down MySQL cleanly before replacing the container.  Startup migrates the local root account to `caching_sha2_password`; migrate any additional accounts before the upgrade.  If rollback is needed, restore the backup and use the previous image.
+
+The new image refuses MySQL 5.7 data before starting the server.  Use the previous Huginn image containing MySQL 8.0 to complete the 5.7-to-8.0 upgrade first, then follow the procedure above.  Run that intermediate recovery step on amd64: the previous image's MySQL 5.7 rescue binary is not available for arm64.
 
 ## Restricting outbound requests
 
