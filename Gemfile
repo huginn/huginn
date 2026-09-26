@@ -67,7 +67,7 @@ gem 'mqtt'
 gem 'pdf-reader'
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.232.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.232.2'
 
 # SlackAgent
 gem 'slack-notifier'
@@ -121,7 +121,7 @@ gem 'jsonpath'
 gem "janeway-jsonpath", "~> 1.1", require: "janeway"
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'kramdown'
-gem 'liquid', '~> 5.13'
+gem 'liquid', '~> 5.14'
 gem 'logger'
 gem 'loofah', '~> 2.25', '>= 2.25.2'
 gem 'mail', '>= 2.9.1'
@@ -132,7 +132,7 @@ gem 'nokogiri', '>= 1.19.4'
 gem 'omniauth'
 gem 'ostruct'
 gem 'puma'
-gem 'rails', '~> 8.1.3', '>= 8.1.3.1'
+gem 'rails', '~> 8.1.4'
 gem 'rails-html-sanitizer', '~> 1.7', '>= 1.7.1'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
 gem 'sassc-rails'
