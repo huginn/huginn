@@ -1,28 +1,28 @@
 <div class="navbar-header">
   <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-    <span class="sr-only">Toggle navigation</span>
+    <span class="sr-only"><%= t('.toggle_navigation') %></span>
     <span class="icon-bar"></span>
     <span class="icon-bar"></span>
     <span class="icon-bar"></span>
   </button>
-  <%= link_to "Huginn", root_path, :class => 'navbar-brand' %>
+  <%= link_to t('.brand'), root_path, :class => 'navbar-brand' %>
 </div>
 
 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
   
   <% if user_signed_in? %>
     <ul class='nav navbar-nav'>
-      <%= nav_link "Agents", agents_path do %>
+      <%= nav_link t('.agents'), agents_path do %>
         <ul class='dropdown-menu' role='menu'>
-          <%= nav_link icon_tag('glyphicon-plus') + " New Agent", new_agent_path %>
-          <%= nav_link icon_tag('glyphicon-refresh') + " Run event propagation", propagate_agents_path, method: 'post' %>
-          <%= nav_link icon_tag('glyphicon-random') + " View Diagram", diagram_path %>
+          <%= nav_link icon_tag('glyphicon-plus') + " #{t('.new_agent')}", new_agent_path %>
+          <%= nav_link icon_tag('glyphicon-refresh') + " #{t('.run_event_propagation')}", propagate_agents_path, method: 'post' %>
+          <%= nav_link icon_tag('glyphicon-random') + " #{t('.view_diagram')}", diagram_path %>
         </ul>
       <% end %>
-      <%= nav_link "Scenarios", scenarios_path %>
-      <%= nav_link "Events", events_path %>
-      <%= nav_link "Credentials", user_credentials_path %>
-      <%= nav_link "Services", services_path %>
+      <%= nav_link t('.scenarios'), scenarios_path %>
+      <%= nav_link t('.events'), events_path %>
+      <%= nav_link t('.credentials'), user_credentials_path %>
+      <%= nav_link t('.services'), services_path %>
     </ul>
   <% end %>
   
@@ -30,7 +30,7 @@
     <% if user_signed_in? %>
       <form class="navbar-form navbar-left" role="search">
         <div class="form-group">
-          <input type="text" class="form-control" id='agent-navigate' autocomplete="off" placeholder="Search">
+          <input type="text" class="form-control" id='agent-navigate' autocomplete="off" placeholder="<%= t('.search') %>">
           <%= image_tag "spinner-arrows.gif", :class => "spinner" %>
         </div>
       </form>
@@ -52,14 +52,14 @@
       </li>
       <li id='event-indicator'>
         <a href="#" class='hidden-sm hidden-xs'>
-          <span class="badge"><%= icon_tag('glyphicon-random', class: 'icon-white') %> <span class='number'>0</span> events</span>
+          <span class="badge"><%= icon_tag('glyphicon-random', class: 'icon-white') %> <span class='number'>0</span> <%= t('.event_count') %></span>
         </a>
       </li>
     <% end %>
     
     <li class="dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        Account
+        <%= t('.account') %>
         <% if user_signed_in? && session[:original_admin_user_id].present? %>
           <span class="label label-warning"><%= current_user.username %></span>
         <% end %>
@@ -68,33 +68,33 @@
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
         <% if user_signed_in? && session[:original_admin_user_id].present? %>
           <li>
-            <%= link_to 'Switch Back to Admin User', switch_back_admin_users_path, tabindex: '-1' %>
+            <%= link_to t('.switch_back_to_admin_user'), switch_back_admin_users_path, tabindex: '-1' %>
           </li>
         <% end %>
         <li>
           <% if user_signed_in? %>
-            <%= link_to 'Account', edit_user_registration_path, :tabindex => "-1" %>
+            <%= link_to t('.account'), edit_user_registration_path, :tabindex => "-1" %>
           <% else %>
-            <%= link_to 'Sign up', new_user_registration_path, :tabindex => "-1" %>
+            <%= link_to t('.sign_up'), new_user_registration_path, :tabindex => "-1" %>
           <% end %>
         </li>
         <% if user_signed_in? && current_user.admin %>
           <li>
-            <%= link_to 'Job Management', jobs_path, :tabindex => '-1' %>
+            <%= link_to t('.job_management'), jobs_path, :tabindex => '-1' %>
           </li>
           <li>
-            <%= link_to 'User Management', admin_users_path, tabindex: '-1' %>
+            <%= link_to t('.user_management'), admin_users_path, tabindex: '-1' %>
           </li>
         <% end %>
         <li>
-          <%= link_to 'About', 'https://github.com/huginn/huginn', :tabindex => "-1" %>
+          <%= link_to t('.about'), 'https://github.com/huginn/huginn', :tabindex => "-1" %>
         </li>
 
         <li>
           <% if user_signed_in? %>
-            <%= link_to 'Logout', destroy_user_session_path, :method => :delete, :tabindex => "-1" %>
+            <%= link_to t('.logout'), destroy_user_session_path, :method => :delete, :tabindex => "-1" %>
           <% else %>
-            <%= link_to 'Login', new_user_session_path, :tabindex => "-1" %>
+            <%= link_to t('.login'), new_user_session_path, :tabindex => "-1" %>
           <% end %>
         </li>
       </ul>
