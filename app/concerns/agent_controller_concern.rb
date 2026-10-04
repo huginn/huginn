@@ -51,8 +51,11 @@ module AgentControllerConcern
           when target.disabled?
             log "Agent run ignored for disabled Agent '#{target.name}'"
           else
-            Agent.async_check(target.id)
-            log "Agent run queued for '#{target.name}'"
+            if Agent.async_check(target.id, deduplicate: true)
+              log "Agent run queued for '#{target.name}'"
+            else
+              log "Agent run skipped for '#{target.name}' (already queued)"
+            end
           end
         when 'enable'
           case

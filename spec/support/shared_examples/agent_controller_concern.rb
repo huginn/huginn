@@ -79,7 +79,7 @@ shared_examples_for AgentControllerConcern do
 
     it "should run targets" do
       control_target_ids = agent.control_targets.map(&:id)
-      allow(Agent).to receive(:async_check).with(anything) { |id|
+      allow(Agent).to receive(:async_check).with(anything, deduplicate: true) { |id|
         control_target_ids.delete(id)
       }
 
@@ -89,7 +89,7 @@ shared_examples_for AgentControllerConcern do
 
     it "should not run disabled targets" do
       control_target_ids = agent.control_targets.map(&:id)
-      allow(Agent).to receive(:async_check).with(anything) { |id|
+      allow(Agent).to receive(:async_check).with(anything, deduplicate: true) { |id|
         control_target_ids.delete(id)
       }
 
