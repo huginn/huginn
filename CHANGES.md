@@ -2,6 +2,10 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Oct 04, 2026   | Upgrade to json 3.0.2, which rejects duplicate object keys and JavaScript-style comments by default.  See the [upgrade guide](UPGRADING.md#stricter-json-parsing-with-json-3) for input and custom Agent compatibility notes. |
+| Oct 04, 2026   | Translate navigation labels through locale keys while preserving the existing English text. [#3763](https://github.com/huginn/huginn/pull/3763) |
+| Oct 04, 2026   | Deduplicate automatic Agent checks from schedules and controller Agents while a check is queued, running, or awaiting retry. [#3767](https://github.com/huginn/huginn/pull/3767) |
+| Sep 24, 2026   | Upgrade the bundled database and Docker Compose MySQL services to MySQL 8.4 LTS, with bundled server support on amd64 and arm64.  See the [upgrade guide](UPGRADING.md#moving-official-images-to-mysql-8) before upgrading an existing database. [#3757](https://github.com/huginn/huginn/pull/3757) |
 | Sep 22, 2026   | Restrict legacy JSONPath method calls to an allowlist, including calls in filters and computed indexes.  Calls outside the allowlist are blocked even when legacy evaluation is enabled. [GHSA-9x7r-mpvj-vj8v](https://github.com/huginn/huginn/security/advisories/GHSA-9x7r-mpvj-vj8v) |
 | Sep 22, 2026   | Use RFC 9535 JSONPath evaluation by default, requiring an explicit `$` root.  Support gradual migration with a per-Agent legacy compatibility flag.  See the [upgrade guide](UPGRADING.md#gradual-migration-to-rfc-9535-jsonpath) for migration details. |
 | Sep 21, 2026   | Supervise stalled `delayed_job_master` workers with a watchdog.  Timed-out workers are asked to unwind, then forcibly terminated after a grace period; abandoned jobs follow the usual failure and retry policy.  Reset failed-job state when an administrator selects "Run now". [#3755](https://github.com/huginn/huginn/pull/3755) |
