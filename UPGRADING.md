@@ -4,6 +4,16 @@ This guide covers changes that may require configuration or data migration when 
 
 Before a database upgrade or column conversion, back up the database and plan a maintenance window with Huginn's web, scheduler, and worker processes stopped.  Keep the previous application version and a restorable database backup together.
 
+## Stricter JSON parsing with json 3
+
+Introduced on `master` on 2026-10-04.
+
+The json 3 parser rejects duplicate object keys and JavaScript-style comments by default.  Agents reading such input may now fail; remove duplicate keys and comments at the source.
+
+This applies regardless of `NATIVE_JSON_COLUMNS` or JSONPath mode.  No database migration is required for this update.
+
+For custom Agents and additional gems, check the [json 3 API changes](https://github.com/ruby/json/blob/v3.0.2/CHANGES.md), including keyword options and removed methods.
+
 ## Gradual migration to RFC 9535 JSONPath
 
 Introduced on `master` on 2026-09-21; included in v2026.09.22.
