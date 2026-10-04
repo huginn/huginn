@@ -519,10 +519,10 @@ GEM
       afm (>= 0.2.1, < 2)
       hashery (~> 2.0)
       ttfunk
-    pg (1.6.3-aarch64-linux)
-    pg (1.6.3-arm64-darwin)
-    pg (1.6.3-x86_64-darwin)
-    pg (1.6.3-x86_64-linux)
+    pg (1.7.0-aarch64-linux)
+    pg (1.7.0-arm64-darwin)
+    pg (1.7.0-x86_64-darwin)
+    pg (1.7.0-x86_64-linux)
     pirate_weather_forecast_ruby (0.1.0)
       faraday
       hashie
@@ -845,7 +845,7 @@ DEPENDENCIES
   omniauth-twitter
   ostruct
   pdf-reader
-  pg (~> 1.6, >= 1.6.3)
+  pg (~> 1.7)
   pirate_weather_forecast_ruby
   puma
   rails (~> 8.1.4)
