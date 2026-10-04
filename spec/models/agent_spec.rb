@@ -121,19 +121,22 @@ describe Agent do
     end
 
     it "should run all Agents with the given schedule" do
-      expect(Agents::WeatherAgent).to receive(:async_check).with(anything).exactly(@weather_agent_count).times
+      expect(Agents::WeatherAgent).to receive(:async_check).with(anything, deduplicate: true)
+        .exactly(@weather_agent_count).times
       Agents::WeatherAgent.bulk_check("midnight")
     end
 
     it "should skip disabled Agents" do
       agents(:bob_weather_agent).update_attribute :disabled, true
-      expect(Agents::WeatherAgent).to receive(:async_check).with(anything).exactly(@weather_agent_count - 1).times
+      expect(Agents::WeatherAgent).to receive(:async_check).with(anything, deduplicate: true)
+        .exactly(@weather_agent_count - 1).times
       Agents::WeatherAgent.bulk_check("midnight")
     end
 
     it "should skip agents of deactivated accounts" do
       agents(:bob_weather_agent).user.deactivate!
-      expect(Agents::WeatherAgent).to receive(:async_check).with(anything).exactly(@weather_agent_count - 1).times
+      expect(Agents::WeatherAgent).to receive(:async_check).with(anything, deduplicate: true)
+        .exactly(@weather_agent_count - 1).times
       Agents::WeatherAgent.bulk_check("midnight")
     end
   end
@@ -147,7 +150,7 @@ describe Agent do
     it "runs agents with the given schedule" do
       weather_agent_ids = [agents(:bob_weather_agent), agents(:jane_weather_agent)].map(&:id)
       expect(Agents::WeatherAgent).to receive(:async_check) { |agent_id| weather_agent_ids.delete(agent_id) }.twice
-      expect(Agents::WebsiteAgent).to receive(:async_check).with(agents(:bob_website_agent).id)
+      expect(Agents::WebsiteAgent).to receive(:async_check).with(agents(:bob_website_agent).id, deduplicate: true)
       Agent.run_schedule("midnight")
       expect(weather_agent_ids).to be_empty
     end

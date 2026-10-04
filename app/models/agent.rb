@@ -505,14 +505,14 @@ class Agent < ActiveRecord::Base
       raise "Call #bulk_check on the appropriate subclass of Agent" if self == Agent
 
       where("NOT disabled AND NOT deactivated AND schedule = ?", schedule).pluck("agents.id").each do |agent_id|
-        async_check(agent_id)
+        async_check(agent_id, deduplicate: true)
       end
     end
 
     # This method will enqueue an AgentCheckJob job. It accepts an Agent id instead of a literal Agent because it is
     # preferable to serialize job with ids, instead of with the full Agents.
-    def async_check(agent_id)
-      AgentCheckJob.perform_later(agent_id)
+    def async_check(agent_id, **options)
+      AgentCheckJob.perform_later(agent_id, **options)
     end
   end
 
