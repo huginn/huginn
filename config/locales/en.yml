@@ -2,6 +2,28 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
+  layouts:
+    navigation:
+      toggle_navigation: "Toggle navigation"
+      brand: "Huginn"
+      agents: "Agents"
+      new_agent: "New Agent"
+      run_event_propagation: "Run event propagation"
+      view_diagram: "View Diagram"
+      scenarios: "Scenarios"
+      events: "Events"
+      credentials: "Credentials"
+      services: "Services"
+      search: "Search"
+      event_count: "events"
+      account: "Account"
+      switch_back_to_admin_user: "Switch Back to Admin User"
+      sign_up: "Sign up"
+      job_management: "Job Management"
+      user_management: "User Management"
+      about: "About"
+      logout: "Logout"
+      login: "Login"
   devise:
     failure:
       deactivated_account: "Your account has been deactivated by an administrator."
