@@ -5,6 +5,17 @@ describe Service do
     @user = users(:bob)
   end
 
+  describe ".by_name" do
+    it "orders by name in the requested direction" do
+      expect(Service.by_name("asc").to_sql).to match(/ORDER BY .*name.* ASC/)
+      expect(Service.by_name.to_sql).to match(/ORDER BY .*name.* DESC/)
+    end
+
+    it "rejects invalid directions" do
+      expect { Service.by_name("desc; DROP TABLE services") }.to raise_error(ArgumentError)
+    end
+  end
+
   describe "#toggle_availability!" do
     it "should toggle the global flag" do
       @service = services(:generic)
