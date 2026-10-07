@@ -13,7 +13,7 @@ class Service < ActiveRecord::Base
   before_destroy :disable_agents
 
   scope :available_to_user, lambda { |user| where("services.user_id = ? or services.global = true", user.id) }
-  scope :by_name, lambda { |dir = 'desc'| order("services.name #{dir}") }
+  scope :by_name, ->(dir = :desc) { order(name: dir) }
 
   def disable_agents(conditions = {})
     agents.where.not(conditions[:where_not] || {}).each do |agent|
