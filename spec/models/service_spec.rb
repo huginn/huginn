@@ -12,7 +12,7 @@ describe Service do
     end
 
     it "rejects invalid directions" do
-      expect { Service.by_name("desc; DROP TABLE services") }.to raise_error(ArgumentError)
+      expect { Service.by_name("desc; DROP TABLE services") }.to raise_error(ActiveRecord::UnknownAttributeReference)
     end
   end
 
