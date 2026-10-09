@@ -27,6 +27,26 @@ describe JobsController do
       get :index
       expect(assigns(:jobs).length).to eq(4)
     end
+
+    it "returns the last page of jobs when page is last" do
+      expect(users(:jane)).to be_admin
+      sign_in users(:jane), scope: :user
+      failed = Delayed::Job.create(failed_at: Time.now)
+      original_per_page = Delayed::Job.default_per_page
+
+      begin
+        Delayed::Job.paginates_per 2
+        get :index, params: { page: 'last' }
+      ensure
+        Delayed::Job.paginates_per original_per_page
+      end
+
+      jobs = assigns(:jobs)
+      expect(jobs.current_page).to eq(jobs.total_pages)
+      expect(jobs.current_page).to be > 1
+      expect(jobs).to include(failed)
+      expect(jobs.last).to eq(failed)
+    end
   end
 
   describe "DELETE destroy" do
