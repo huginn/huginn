@@ -2,7 +2,10 @@ class JobsController < ApplicationController
   before_action :authenticate_admin!
 
   def index
-    @jobs = Delayed::Job.order(Arel.sql("coalesce(failed_at,'1000-01-01'), run_at asc")).page(params[:page])
+    jobs = Delayed::Job.order(Arel.sql("coalesce(failed_at,'1000-01-01'), run_at asc"))
+    page = params[:page]
+    page = jobs.page(1).total_pages if page.to_s == 'last'
+    @jobs = jobs.page(page)
 
     respond_to do |format|
       format.html { render layout: !request.xhr? }

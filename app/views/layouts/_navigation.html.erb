@@ -46,7 +46,7 @@
         <% end %>
       </li>
       <li class='job-indicator' role='recent_failures'>
-        <%= link_to current_user.admin? ? jobs_path : '#', class: 'hidden-sm hidden-xs' do %>
+        <%= link_to current_user.admin? ? jobs_path(page: 'last') : '#', class: 'hidden-sm hidden-xs' do %>
         <span class="badge"><%= icon_tag('glyphicon-exclamation-sign', class: 'icon-white') %> <span class='number'>0</span></span>
         <% end %>
       </li>
