@@ -1,7 +1,7 @@
 module Agents
   class ManualEventAgent < Agent
-    cannot_be_scheduled!
     cannot_receive_events!
+    default_schedule "never"
 
     description <<~MD
       The Manual Event Agent is used to manually create Events for testing or other purposes.
@@ -9,6 +9,8 @@ module Agents
       Connect this Agent to other Agents and create Events using the UI provided on this Agent's Summary page.
 
       You can set the default event payload via the "payload" option.
+
+      This Agent can also run on a schedule and emit the configured payload. If the payload has a top-level `payloads` array and no other top-level keys, one Event is emitted per element.
     MD
 
     event_description do
@@ -18,6 +20,17 @@ module Agents
 
     def default_options
       { "payload" => {} }
+    end
+
+    def check
+      json = interpolate_options(options["payload"].presence || {})
+      if json['payloads'] && (json.keys - ['payloads']).length == 0
+        json['payloads'].each do |payload|
+          create_event(payload:)
+        end
+      else
+        create_event(payload: json)
+      end
     end
 
     def handle_details_post(params)
