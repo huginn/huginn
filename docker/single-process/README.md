@@ -1,14 +1,14 @@
 Docker image for Huginn using the production environment and separate container for every process
 =================================================
 
-This image runs a linkable [Huginn](https://github.com/huginn/huginn) instance.
+This image runs a [Huginn](https://github.com/huginn/huginn) instance that connects to other containers on a Docker network.
 
 It was inspired by the [official docker container for huginn](https://hub.docker.com/r/huginn/huginn)
 
 The scripts/init script generates a .env file containing the variables as passed as per normal Huginn documentation.
 The same environment variables that would be used for Heroku PaaS deployment are used by this script.
 
-The scripts/init script is aware of mysql and postgres linked containers through the environment variables:
+The scripts/init script is aware of mysql and postgres containers on the same Docker network through the environment variables:
 
     MYSQL_PORT_3306_TCP_ADDR
     MYSQL_PORT_3306_TCP_PORT
@@ -17,6 +17,8 @@ and
 
     POSTGRES_PORT_5432_TCP_ADDR
     POSTGRES_PORT_5432_TCP_PORT
+
+Set the `*_TCP_ADDR` variable to the database container name. Docker no longer injects these automatically; the deprecated `--link` flag is not required.
 
 Its recommended to use an image that allows you to create a database via environmental variables at docker run, like `postgresql` or `mysql`, so the db is populated when this script runs.
 
@@ -68,9 +70,12 @@ or if you like to use PostgreSQL:
 
     docker-compose -f postgresql.yml up
 
-Manual startup and linking to a MySQL container:
+Manual startup on a Docker network with a MySQL container:
+
+    docker network create huginn
 
     docker run --name huginn_mysql \
+        --network huginn \
         -e MYSQL_DATABASE=huginn \
         -e MYSQL_USER=huginn \
         -e MYSQL_PASSWORD=somethingsecret \
@@ -78,15 +83,17 @@ Manual startup and linking to a MySQL container:
         mysql:8.4
 
     docker run --rm --name huginn_web \
-        --link huginn_mysql:mysql \
+        --network huginn \
         -p 3000:3000 \
+        -e MYSQL_PORT_3306_TCP_ADDR=huginn_mysql \
         -e DATABASE_NAME=huginn \
         -e DATABASE_USERNAME=huginn \
         -e DATABASE_PASSWORD=somethingsecret \
         ghcr.io/huginn/huginn-single-process
 
     docker run --rm --name huginn_threaded \
-        --link huginn_mysql:mysql \
+        --network huginn \
+        -e MYSQL_PORT_3306_TCP_ADDR=huginn_mysql \
         -e DATABASE_NAME=huginn \
         -e DATABASE_USERNAME=huginn \
         -e DATABASE_PASSWORD=somethingsecret \
@@ -95,7 +102,8 @@ Manual startup and linking to a MySQL container:
 or alternatively:
 
     docker run --rm --name huginn_threaded \
-        --link huginn_mysql:mysql \
+        --network huginn \
+        -e MYSQL_PORT_3306_TCP_ADDR=huginn_mysql \
         -e DATABASE_NAME=huginn \
         -e DATABASE_USERNAME=huginn \
         -e DATABASE_PASSWORD=somethingsecret \

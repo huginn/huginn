@@ -1,7 +1,7 @@
-Huginn for docker with multiple container linkage
-=================================================
+Huginn for docker with multiple containers
+==========================================
 
-This image runs a linkable [Huginn](https://github.com/huginn/huginn) instance.
+This image runs a [Huginn](https://github.com/huginn/huginn) instance that connects to other containers on a Docker network.
 
 There is an automated build repository on docker hub for [huginn/huginn](https://hub.docker.com/r/huginn/huginn).
 
@@ -14,7 +14,7 @@ It is possible to use a separate mysql/mariadb/postgres container for the databa
 
 __NOTE:__ If you do not export the volume, or use a separate database container, you cannot update Huginn without losing your data.
 
-The scripts/init script is aware of mysql and postgres linked containers through the environment variables:
+The scripts/init script is aware of mysql and postgres containers on the same Docker network through the environment variables:
 
     MYSQL_PORT_3306_TCP_ADDR
     MYSQL_PORT_3306_TCP_PORT
@@ -23,6 +23,8 @@ and
 
     POSTGRES_PORT_5432_TCP_ADDR
     POSTGRES_PORT_5432_TCP_PORT
+
+Set the `*_TCP_ADDR` variable to the database container name. Docker no longer injects these automatically; the deprecated `--link` flag is not required.
 
 It is recommended to use an image that allows you to create a database via environmental variables at docker run, so the db is populated when this script runs. The offical images of the mentioned databases all support this.
 
@@ -60,9 +62,12 @@ Use a volume to export the data of the internal mysql server:
 
     docker run --rm -it -p 3000:3000 -v /home/huginn/mysql-data:/var/lib/mysql ghcr.io/huginn/huginn
 
-To link to another mysql container, for example:
+To connect to another mysql container on a Docker network, for example:
+
+    docker network create huginn
 
     docker run --name huginn_mysql \
+        --network huginn \
         -e MYSQL_DATABASE=huginn \
         -e MYSQL_USER=huginn \
         -e MYSQL_PASSWORD=somethingsecret \
@@ -70,28 +75,31 @@ To link to another mysql container, for example:
         mysql:8.4
 
     docker run --rm --name huginn \
-        --link huginn_mysql:mysql \
+        --network huginn \
         -p 3000:3000 \
+        -e MYSQL_PORT_3306_TCP_ADDR=huginn_mysql \
         -e HUGINN_DATABASE_NAME=huginn \
         -e HUGINN_DATABASE_USERNAME=huginn \
         -e HUGINN_DATABASE_PASSWORD=somethingsecret \
         ghcr.io/huginn/huginn
 
-To link to another container named 'postgres':
+To connect to another container named 'huginn_postgres' on the same network:
 
     docker run --name huginn_postgres \
+        --network huginn \
         -e POSTGRES_PASSWORD=mysecretpassword \
         -e POSTGRES_USER=huginn -d postgres
 
     docker run --rm --name huginn \
-        --link huginn_postgres:postgres \
+        --network huginn \
         -p 3000:3000 \
+        -e POSTGRES_PORT_5432_TCP_ADDR=huginn_postgres \
         -e HUGINN_DATABASE_USERNAME=huginn \
         -e HUGINN_DATABASE_PASSWORD=mysecretpassword \
         -e HUGINN_DATABASE_ADAPTER=postgresql \
         ghcr.io/huginn/huginn
 
-To use a separate, non-linked mysql container:
+To use a separate mysql container on another host:
 
     docker run --rm --name huginn \
         -p 3000:3000 \
