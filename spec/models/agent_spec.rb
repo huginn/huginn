@@ -858,6 +858,33 @@ describe Agent do
         agent.keep_events_for = "drop table;"
         expect(agent.keep_events_for).to eq(0)
       end
+
+      describe "DEFAULT_KEEP_EVENTS_FOR" do
+        around do |example|
+          original = ENV['DEFAULT_KEEP_EVENTS_FOR']
+          example.run
+        ensure
+          original.nil? ? ENV.delete('DEFAULT_KEEP_EVENTS_FOR') : ENV['DEFAULT_KEEP_EVENTS_FOR'] = original
+        end
+
+        it "defaults keep_events_for to 0 when DEFAULT_KEEP_EVENTS_FOR is unset" do
+          ENV.delete('DEFAULT_KEEP_EVENTS_FOR')
+          expect(Agents::SomethingSource.new.keep_events_for).to eq(0)
+        end
+
+        it "uses DEFAULT_KEEP_EVENTS_FOR for new agents" do
+          ENV['DEFAULT_KEEP_EVENTS_FOR'] = '86400'
+          expect(Agents::SomethingSource.new.keep_events_for).to eq(1.day.to_i)
+        end
+
+        it "does not change keep_events_for on existing agents" do
+          ENV.delete('DEFAULT_KEEP_EVENTS_FOR')
+          agent = agents(:jane_website_agent)
+          expect(agent.keep_events_for).to eq(0)
+          ENV['DEFAULT_KEEP_EVENTS_FOR'] = '86400'
+          expect(agent.reload.keep_events_for).to eq(0)
+        end
+      end
     end
 
     describe "cleaning up now-expired events" do
