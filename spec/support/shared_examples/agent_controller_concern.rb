@@ -50,6 +50,18 @@ shared_examples_for AgentControllerConcern do
         agent.options['configure_options'] = { 'key' => 'value' }
         expect(agent).to be_valid
       end
+
+      it "should allow 'nested_array_update_mode' to exist in options when the action is 'configure'" do
+        agent.options['action'] = 'configure'
+        agent.options['configure_options'] = { 'key' => 'value' }
+        expect(agent).to be_valid
+        agent.options['nested_array_update_mode'] = 'replace'
+        expect(agent).to be_valid
+        agent.options['nested_array_update_mode'] = 'merge'
+        expect(agent).to be_valid
+        agent.options['nested_array_update_mode'] = 'fail'
+        expect(agent).not_to be_valid
+      end
     end
   end
 
@@ -167,6 +179,47 @@ shared_examples_for AgentControllerConcern do
 
       expect(agent.control_targets.reload).to all(satisfy { |a| a.options['template'] && a.options['template']['item'] && (a.options['template']['item']['title'] == 'changed') })
       expect(agents(:bob_data_output_agent).reload.options).to eq(old_options.deep_merge(agent.options['configure_options']))
+    end
+    it "should merge nested arrays in configured targets" do
+      agent.control_targets << agents(:bob_trigger_agent)
+      agent.options['action'] = 'configure'
+      agent.options['configure_options'] = { 
+          rules: [
+              {
+                  type: "!regex",
+                  value: "changed",
+                  path: "text"
+                }
+            ]
+        }
+      agent.save!
+      old_options = agents(:bob_trigger_agent).options
+      agent.check
+      old_options['rules'] += agent.options['configure_options']['rules']
+      new_options = old_options
+      expect(agent.control_targets.reload).to all(satisfy { |a| a.options['rules'] && a.options['rules'].last['value'] && (a.options['rules'].last['value'] == 'changed') })
+      expect(agents(:bob_trigger_agent).reload.options).to eq(new_options)
+    end
+    it "should replace configured target's nested array when 'nested_array_update_mode' is set to 'replace'" do
+      agent.control_targets << agents(:bob_trigger_agent)
+      agent.options['action'] = 'configure'
+      agent.options['nested_array_update_mode'] = 'replace'
+      agent.options['configure_options'] = { 
+          rules: [
+              {
+                  type: "!regex",
+                  value: "changed",
+                  path: "text"
+                }
+            ]
+        }
+      agent.save!
+      old_options = agents(:bob_trigger_agent).options
+      agent.check
+      old_options['rules'] = agent.options['configure_options']['rules']
+      new_options = old_options
+      expect(agent.control_targets.reload).to all(satisfy { |a| a.options['rules'] && a.options['rules'].last['value'] && (a.options['rules'].last['value'] == 'changed') })
+      expect(agents(:bob_trigger_agent).reload.options).to eq(new_options)
     end
   end
 end
