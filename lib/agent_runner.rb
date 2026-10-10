@@ -58,9 +58,14 @@ class AgentRunner
   end
 
   def self.with_connection
-    ActiveRecord::Base.connection_pool.with_connection do
-      yield
-    end
+    begin
+  	  ActiveRecord::Base.connection_pool.with_connection do
+  			  yield
+  	  end
+  	  rescue ActiveRecord::StatementInvalid => e
+  		  puts 'ActiveRecord Force Reconnect (agent_runner)'
+  		  ActiveRecord::Base.connection.reconnect! 
+  	end
   end
 
   private
