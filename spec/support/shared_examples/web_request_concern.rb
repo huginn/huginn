@@ -67,6 +67,12 @@ shared_examples_for WebRequestConcern do
       expect(agent).not_to be_valid
     end
 
+    it "should validate interpolated basic_auth credentials" do
+      agent.user.user_credentials.create!(credential_name: 'http_basic_auth', credential_value: 'user:pass')
+      agent.options['basic_auth'] = '{% credential http_basic_auth %}'
+      expect(agent).to be_valid
+    end
+
     it "should validate disable_ssl_verification" do
       agent.options['disable_ssl_verification'] = nil
       expect(agent).to be_valid

@@ -79,7 +79,7 @@ module WebRequestConcern
     end
 
     begin
-      basic_auth_credentials(options['basic_auth'])
+      basic_auth_credentials(interpolated['basic_auth'])
     rescue ArgumentError => e
       errors.add(:base, e.message)
     end
