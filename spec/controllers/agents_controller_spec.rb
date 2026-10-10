@@ -40,6 +40,14 @@ describe AgentsController do
       get :index
       expect(assigns(:agents).map(&:disabled).uniq).to eq([false])
     end
+
+    it "filters agents that are not assigned to a scenario" do
+      sign_in users(:bob), scope: :user
+      get :index, params: { without_scenario: 1 }, format: :json
+
+      expect(assigns(:agents)).to include(agents(:bob_website_agent))
+      expect(assigns(:agents)).not_to include(agents(:bob_weather_agent))
+    end
   end
 
   describe "POST handle_details_post" do

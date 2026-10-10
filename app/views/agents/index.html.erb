@@ -11,6 +11,11 @@
             <%= service_label(@service) %>
           </p>
         <% end %>
+        <% if params[:without_scenario].present? %>
+          <p class="text-muted">
+            Showing agents that are not assigned to a scenario.
+          </p>
+        <% end %>
       </div>
 
       <%= render 'agents/table' %>
