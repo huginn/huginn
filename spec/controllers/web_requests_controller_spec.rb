@@ -129,6 +129,16 @@ describe WebRequestsController do
     expect(response).to be_not_found
   end
 
+  it "responds to CORS preflight OPTIONS without requiring a matching secret" do
+    expect {
+      process :handle_request_options, method: :options, params: { user_id: users(:bob).to_param, agent_id: @agent.id, secret: "wrong_secret" }
+    }.not_to change { @agent.reload.last_web_request_at }
+    expect(response).to be_successful
+    expect(response.body).to eq("OK")
+    expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+    expect(response.headers['Access-Control-Allow-Methods']).to eq('POST, PUT, GET, DELETE, OPTIONS')
+  end
+
   describe "legacy update_location endpoint" do
     before do
       @agent = Agent.build_for_type("Agents::UserLocationAgent", users(:bob), name: "something", options: { secret: "my_secret" })
