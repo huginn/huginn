@@ -16,10 +16,8 @@ describe 'Parallel Search MCP scenario' do
     @notification_status = 202
     @session_header = session_id
     @protocol_version = '2025-03-26'
-    stub_request(:post, endpoint).with do |request|
+    stub_request(:post, endpoint).to_return do |request|
       @requests << request
-      true
-    end.to_return do |request|
       rpc = JSON.parse(request.body)
       case rpc['method']
       when 'initialize'
