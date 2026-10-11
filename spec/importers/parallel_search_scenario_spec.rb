@@ -74,7 +74,9 @@ describe 'Parallel Search MCP scenario' do
       'objective' => 'Find official docs', 'search_queries' => [query], 'session_id' => session_id
     })
     @requests.each do |request|
-      expect(request.uri.to_s).to eq(endpoint)
+      expect([request.uri.scheme, request.uri.host, request.uri.port, request.uri.path]).to eq(
+        ['https', 'search.parallel.ai', 443, '/mcp']
+      )
       expect(request.headers['User-Agent']).to eq(user_agent)
       expect(request.headers['Accept']).to eq('application/json, text/event-stream')
       expect(request.headers.keys).not_to include('Authorization', 'X-Api-Key')
