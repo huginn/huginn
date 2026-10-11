@@ -35,6 +35,9 @@ Have an awesome idea but not feeling quite up to contributing yet? Head over to 
 
 ## Examples
 
+* [Search the web and fetch pages with Parallel Search MCP](doc/parallel-search-mcp.md),
+  using an importable scenario with no account or API key.
+
 Please checkout the [Huginn Introductory Screencast](http://vimeo.com/61976251)!
 
 And now, some example screenshots.  Below them are instructions to get you started.
