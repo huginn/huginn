@@ -48,6 +48,8 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ![Browsing the Events your Agents created](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/events.png)
 
+![Logging your location over time](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/my-locations.png)
+
 ![Making a new agent](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/new-agent.png)
 
 ## Getting Started

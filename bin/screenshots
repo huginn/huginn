@@ -6,9 +6,11 @@
 #   bin/screenshots /tmp/shots # writes somewhere else
 #
 # The test database is emptied, seeded with the default scenario, and
-# filled with sample Events and Peak Detector data.  Chrome runs headless
-# through the same Selenium setup as the feature specs.  Graphviz (`dot`)
-# is needed for the event flow diagram, and oxipng is used when installed.
+# filled with sample Events, Peak Detector data, and a location trail.
+# Chrome runs headless through the same Selenium setup as the feature
+# specs.  Graphviz (`dot`) is needed for the event flow diagram, the
+# location map loads OpenStreetMap tiles from the network, and pngquant
+# and oxipng are used when installed.
 
 ENV["RAILS_ENV"] = "test"
 ENV["USE_GRAPHVIZ_DOT"] ||= "dot"
@@ -38,7 +40,7 @@ Capybara.current_driver = :screenshots
 Capybara.default_max_wait_time = 10
 
 class SampleData
-  attr_reader :user, :peak_detector
+  attr_reader :user, :peak_detector, :user_location
 
   def self.build
     new.tap(&:build)
@@ -51,6 +53,7 @@ class SampleData
     agent("SF Weather Agent").update!(options: agent("SF Weather Agent").options.merge("api_key" => "sample-api-key"))
     create_events
     create_peak_detector
+    create_user_location
     touch_agents
   end
 
@@ -176,6 +179,109 @@ class SampleData
     }, 3.days)
   end
 
+  # A User Location Agent with a few days around the San Francisco Bay
+  # Area: stays in town shown as points with accuracy circles, and drives
+  # along the highways shown as heading arrows.
+  def create_user_location
+    @user_location = user.agents.create!(
+      type: "Agents::UserLocationAgent",
+      name: "My Location",
+      options: { "secret" => "screenshots", "max_accuracy" => "", "min_distance" => "", "api_key" => "" },
+    )
+    random = Random.new(7)
+    now = Time.now
+    emit_location = lambda do |lat, lng, age, accuracy, course: nil, speed: nil|
+      payload = {
+        "latitude" => lat.round(6),
+        "longitude" => lng.round(6),
+        "horizontal_accuracy" => accuracy,
+        "vertical_accuracy" => accuracy,
+      }
+      payload.merge!("course" => course.round(1), "speed" => speed.round(2)) if course
+      created_at = now - age
+      @user_location.events.create!(user:, lat:, lng:, created_at:, updated_at: created_at, payload:)
+    end
+
+    # Places visited, with the number of readings taken there.
+    stays = [
+      [37.7879, -122.4074, 40, 36.hours], # San Francisco
+      [37.8715, -122.2730, 8, 30.hours],  # Berkeley
+      [37.8313, -122.2852, 4, 28.hours],  # Emeryville
+      [37.8590, -122.4850, 3, 20.hours],  # Sausalito
+      [37.6540, -122.4080, 5, 14.hours],  # South San Francisco
+      [37.5630, -122.3255, 4, 12.hours],  # San Mateo
+      [37.4852, -122.2364, 4, 10.hours],  # Redwood City
+      [37.4419, -122.1430, 10, 6.hours],  # Palo Alto
+    ]
+    stays.each do |lat, lng, count, age|
+      count.times do |i|
+        emit_location.call(
+          lat + (random.rand - 0.5) * 0.012,
+          lng + (random.rand - 0.5) * 0.012,
+          age - i * 3.minutes,
+          (30 + random.rand * 800).round,
+        )
+      end
+    end
+
+    # Drives along US 101 and across the Bay Bridge, as waypoints taken
+    # from the OSRM route geometry and simplified.
+    drives = [
+      [[
+        [37.8010, -122.4480], [37.8036, -122.4520], [37.8017, -122.4616], [37.8030, -122.4687],
+        [37.8085, -122.4768], [37.8309, -122.4798], [37.8388, -122.4866], [37.8465, -122.4865],
+        [37.8560, -122.4943], [37.8629, -122.5059], [37.8733, -122.5078], [37.8806, -122.5163],
+        [37.9046, -122.5155], [37.9179, -122.5111], [37.9371, -122.5167], [37.9456, -122.5144],
+        [37.9535, -122.5085], [37.9612, -122.5096], [37.9695, -122.5213], [37.9810, -122.5215],
+        [38.0091, -122.5419], [38.0407, -122.5368], [38.0496, -122.5316], [38.0574, -122.5307],
+        [38.0766, -122.5425], [38.0943, -122.5606], [38.1050, -122.5615], [38.1050, -122.5719],
+      ], 16, 22.hours],
+      [[
+        [37.7422, -122.4038], [37.7431, -122.4053], [37.7365, -122.4088], [37.7315, -122.4047],
+        [37.7118, -122.3959], [37.6785, -122.3885], [37.6714, -122.3915], [37.6602, -122.4044],
+        [37.6545, -122.4071], [37.6407, -122.4060], [37.6137, -122.3969], [37.5884, -122.3586],
+        [37.5855, -122.3301], [37.5603, -122.3028], [37.5302, -122.2747], [37.4987, -122.2389],
+        [37.4886, -122.2118], [37.4849, -122.1866], [37.4820, -122.1780], [37.4596, -122.1400],
+        [37.4565, -122.1442], [37.4472, -122.1430],
+      ], 18, 8.hours],
+      [[
+        [37.7879, -122.3901], [37.8125, -122.3625], [37.8179, -122.3532], [37.8275, -122.2944],
+        [37.8266, -122.2863], [37.8284, -122.2804], [37.8277, -122.2846], [37.8313, -122.2852],
+      ], 6, 31.hours],
+    ]
+    drives.each do |waypoints, count, age|
+      along_route(waypoints, count).each_with_index do |(lat, lng, course), i|
+        emit_location.call(
+          lat + (random.rand - 0.5) * 0.002,
+          lng + (random.rand - 0.5) * 0.002,
+          age - i * 2.minutes,
+          (5 + random.rand * 15).round,
+          course: course + (random.rand - 0.5) * 10,
+          speed: 24 + random.rand * 8,
+        )
+      end
+    end
+  end
+
+  # Evenly spaced points along a polyline of [lat, lng] waypoints, each
+  # with the bearing of its segment in degrees.
+  def along_route(waypoints, count)
+    segments = waypoints.each_cons(2).map do |(lat1, lng1), (lat2, lng2)|
+      dlat = lat2 - lat1
+      dlng = (lng2 - lng1) * Math.cos(lat1 * Math::PI / 180)
+      course = (Math.atan2(dlng, dlat) * 180 / Math::PI) % 360
+      [[lat1, lng1], [lat2, lng2], Math.hypot(dlat, dlng), course]
+    end
+    total = segments.sum { |segment| segment[2] }
+    count.times.map do |i|
+      target = total * (i + 0.5) / count
+      segment = segments.find { |seg| (target -= seg[2]).negative? } || segments.last
+      (lat1, lng1), (lat2, lng2), length, course = segment
+      t = 1 + target / length
+      [lat1 + (lat2 - lat1) * t, lng1 + (lng2 - lng1) * t, course]
+    end
+  end
+
   def peak_memory
     random = Random.new(42)
     hours = 14 * 24
@@ -220,7 +326,12 @@ class Shooter
     shoot "diagram"
 
     visit "/events"
-    shoot "events"
+    shoot "events", max_height: 1000
+
+    visit "/agents/#{data.user_location.id}"
+    expect_css ".leaflet-tile-loaded"
+    sleep 2
+    shoot "my-locations", max_height: 1300
 
     visit "/agents/#{data.peak_detector.id}"
     expect_css ".chart-container svg"
@@ -252,10 +363,15 @@ class Shooter
     page.find(selector, match: :first)
   end
 
-  def oxipng?
-    return @oxipng if defined?(@oxipng)
+  # Shrink the PNG with pngquant and oxipng when they are installed.
+  def optimize(path)
+    system("pngquant", "--quality", "65-90", "--speed", "1", "--force", "--output", path, path) if installed?("pngquant")
+    system("oxipng", "--quiet", "--opt", "2", path) if installed?("oxipng")
+  end
 
-    @oxipng = system("oxipng", "--version", out: File::NULL, err: File::NULL)
+  def installed?(command)
+    @installed ||= {}
+    @installed[command] ||= system(command, "--version", out: File::NULL, err: File::NULL)
   end
 
   def shoot(name, max_height: 4000)
@@ -265,7 +381,7 @@ class Shooter
     sleep 0.5
     path = File.join(@output_dir, "#{name}.png")
     page.save_screenshot(path)
-    system("oxipng", "--quiet", "--opt", "2", path) if oxipng?
+    optimize(path)
     puts "#{path} (#{WIDTH * SCALE}x#{height * SCALE})"
   end
 end
