@@ -4,8 +4,13 @@
     "website": "https://github.com/huginn/huginn",
     "repository": "https://github.com/huginn/huginn",
     "logo": "https://raw.githubusercontent.com/huginn/huginn/master/media/huginn-icon-64.png",
+    "buildpacks": [
+        { "url": "https://github.com/cantino/heroku-selectable-procfile.git" },
+        { "url": "https://github.com/heroku/heroku-buildpack-ruby.git" },
+        { "url": "https://github.com/weibeld/heroku-buildpack-graphviz.git" },
+        { "url": "https://github.com/chrismytton/heroku-buildpack-jq.git" }
+    ],
     "env": {
-        "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-multi.git",
         "APP_SECRET_TOKEN": {
             "generator": "secret"
         },
@@ -22,5 +27,5 @@
     },
     "addons": ["heroku-postgresql"],
     "success_url": "/users/sign_up",
-    "stack": "heroku-22"
+    "stack": "heroku-24"
 }
