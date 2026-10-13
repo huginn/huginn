@@ -99,7 +99,7 @@ Our general intention is to encourage complex and specific Agents to be written 
 
 ## Deployment
 
-Please see [the Huginn Wiki](https://github.com/huginn/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.
+Please see [the Huginn Wiki](https://github.com/huginn/huginn/wiki#deploying-huginn) for detailed deployment strategies for different providers.  Hosting providers that sponsor the project are listed in [doc/sponsors.md](doc/sponsors.md).
 
 ### Heroku
 
@@ -146,6 +146,10 @@ If people you do not fully trust can create Agents on your instance, route outbo
 #### Disable SSL
 
 We assume your deployment will run over SSL. This is a very good idea! However, if you wish to turn this off, you'll probably need to edit `config/initializers/devise.rb` and modify the line containing `config.rememberable_options = { :secure => true }`.  You will also need to edit `config/environments/production.rb` and modify the value of `config.force_ssl`.
+
+## Sponsors
+
+Huginn is maintained in the maintainer's spare time.  You can support its development by [sponsoring the maintainer](https://github.com/sponsors/knu).  Company sponsors and sponsored hosting providers are listed in [doc/sponsors.md](doc/sponsors.md), along with the listing policy.
 
 ## License
 

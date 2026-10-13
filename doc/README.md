@@ -18,3 +18,7 @@ Manual installation instructions which will guide through the steps to install H
 
 - [Deploy to Heroku](heroku/install.md)
 - [Update](heroku/update.md) an existing Heroku deployment
+
+### Hosting providers
+
+- [Sponsored hosting providers](sponsors.md) Managed Huginn hosting offered by sponsors, and the listing policy
