@@ -18,9 +18,14 @@ Rails.application.config.assets.paths << fa_path.join("webfonts").to_s
 jsoneditor_path = Rails.root.join("node_modules/vanilla-jsoneditor")
 Rails.application.config.assets.paths << jsoneditor_path.to_s
 
+# Leaflet (from npm), for maps of location Events without a Google Maps key
+Rails.application.config.assets.paths << Rails.root.join("node_modules/leaflet/dist").to_s
+
 Rails.application.config.assets.precompile += %w[
   fa-solid-900.woff2
   fa-regular-400.woff2
   fa-brands-400.woff2
   standalone.js
+  leaflet.js
+  leaflet.css
 ]

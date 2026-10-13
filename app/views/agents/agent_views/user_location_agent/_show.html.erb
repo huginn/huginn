@@ -1,6 +1,5 @@
 <% content_for :head do -%>
-<%= javascript_include_tag "https://maps.googleapis.com/maps/api/js?key=#{@agent.options[:api_key]}" %>
-<%= javascript_include_tag "map_marker" %>
+<%= location_map_head_tags(@agent.options[:api_key]) %>
 <% end -%>
 
 <h3>Recent Event Map</h3>
@@ -10,41 +9,36 @@
   <div id="map_canvas" style="width:800px; height:800px"></div>
 
   <script type="text/javascript">
-    var mapOptions = {
-      center: new google.maps.LatLng(<%= events.first.lat %>, <%= events.first.lng %>),
-      zoom: 15,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-
-    var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+    var locations = <%= Utils.jsonify(events.map(&:location)) %>;
+    var map = LocationMap.create(document.getElementById("map_canvas"), locations[0], 15);
+    map.fitTo(locations);
     var circles = [];
     var points = [];
-    <% events.each do |event| %>
-      var loc = <%= Utils.jsonify(event.location) %>;
+    locations.forEach(function(loc) {
       if (loc.radius > 1) {
-        circles.push(map_marker(map, loc));
+        circles.push(map.addLocation(loc));
       }
       delete loc.radius;
-      points.push(map_marker(map, loc));
-    <% end %>
+      points.push(map.addLocation(loc));
+    });
 
-    function toggleAccuracy(group, map) {
-      for (var i = 0; i < group.length; i++) {
-        group[i].setMap(map);
-      }
+    function toggleAccuracy(group, visible) {
+      group.forEach(function(overlay) {
+        if (visible) {
+          overlay.show();
+        } else {
+          overlay.hide();
+        }
+      });
     }
 
-    toggleAccuracy(circles, null);
+    toggleAccuracy(circles, false);
 
     $(document).ready(function() {
       $("input#toggle").on("click", function() {
-        if($(this).is(":checked")){
-          toggleAccuracy(circles, map);
-          toggleAccuracy(points, null);
-        } else {
-          toggleAccuracy(circles, null);
-          toggleAccuracy(points, map);
-        }
+        var showCircles = $(this).is(":checked");
+        toggleAccuracy(circles, showCircles);
+        toggleAccuracy(points, !showCircles);
       });
       if(circles.length > 0){
         $(".toggle-accuracy").removeClass("hidden");
