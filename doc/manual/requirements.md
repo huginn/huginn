@@ -2,22 +2,9 @@
 
 ## Operating Systems
 
-### Supported Unix distributions by this guide
+The [Docker images](../docker/install.md) are the recommended way to run Huginn.  They are built on Ubuntu 24.04 (Noble) and tested by CI.
 
-- Ubuntu (18.04, 16.04 and 14.04)
-- Debian (Stretch and Jessie)
-
-### Unsupported Unix distributions
-
-- CentOS
-- Red Hat Enterprise Linux
-- OS X
-- Arch Linux
-- Fedora
-- Gentoo
-- FreeBSD
-
-On the above unsupported distributions is still possible to install Huginn, and many people do. Follow the [installation guide](./installation.md) and substitute the `apt` commands with the corresponding package manager commands of your distribution.
+The [installation guide](./installation.md) uses `apt` on Debian and Ubuntu.  It is maintained on a best-effort basis and is not tested on every release, so some package names may differ on your release.  Huginn can also be installed on other Unix systems, such as Fedora, Arch Linux, macOS, and FreeBSD, by substituting the corresponding package manager commands.
 
 ### Non-Unix operating systems such as Windows
 
@@ -27,7 +14,7 @@ Please consider using a virtual machine to run Huginn on Windows.
 
 ## Ruby versions
 
-Huginn requires Ruby (MRI) 3.4.0 or newer. The current Docker images and manual installation guide use Ruby 4.0.6.
+Huginn requires Ruby (MRI) 3.4.0 or newer. The current Docker images and manual installation guide use Ruby 4.0.7.
 You will have to use the standard MRI implementation of Ruby.
 We love [JRuby](http://jruby.org/) and [Rubinius](http://rubini.us/) but Huginn needs several Gems that have native extensions.
 

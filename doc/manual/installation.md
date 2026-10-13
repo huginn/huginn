@@ -5,7 +5,7 @@
 
 This guide is long because it covers many cases and includes all commands you need.
 
-This installation guide was created for and tested on **Debian/Ubuntu** operating systems. Please read [the requirements](./requirements.md) for hardware and operating system requirements.
+This installation guide is written for **Debian/Ubuntu** operating systems and is maintained on a best-effort basis.  Some package names may differ on your release.  Unless you need a source installation, the [Docker images](../docker/install.md) are the recommended way to run Huginn.  Please read [the requirements](./requirements.md) for hardware and operating system requirements.
 
 This is the official installation guide to set up a production server. To set up a **development installation** or for many other installation options please see [the getting started section of the readme](https://github.com/huginn/huginn#getting-started).
 
