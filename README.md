@@ -36,9 +36,7 @@ Have an awesome idea but not feeling quite up to contributing yet?  Head over to
 
 ## Examples
 
-Please check out the [Huginn Introductory Screencast](http://vimeo.com/61976251)!
-
-And now, some example screenshots.  Below them are instructions to get you started.
+Here are some example screenshots.  Below them are instructions to get you started.
 
 ![Example list of agents](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/your-agents.png)
 
