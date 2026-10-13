@@ -68,6 +68,24 @@ or if you like to use PostgreSQL:
 
     docker-compose -f postgresql.yml up
 
+### Upgrading PostgreSQL
+
+The PostgreSQL Compose file used to pin `postgres:9.5` and now uses `postgres:18`.  PostgreSQL cannot start a newer major version on an older data directory, so an existing installation has to be dumped with the old server and restored into the new one.  With the old image still in your copy of `postgresql.yml`:
+
+    cd docker/single-process
+    docker-compose -f postgresql.yml stop web threaded
+    docker-compose -f postgresql.yml exec -T postgres pg_dump -U huginn huginn > huginn.sql
+    docker-compose -f postgresql.yml stop postgres
+    docker-compose -f postgresql.yml rm -v postgres postgresdata
+
+Now change both `postgres` and `postgresdata` images to `postgres:18`, start the new server, and load the dump into the database that the container creates on first start:
+
+    docker-compose -f postgresql.yml up -d postgres
+    docker-compose -f postgresql.yml exec -T postgres psql -U huginn -d huginn < huginn.sql
+    docker-compose -f postgresql.yml up -d
+
+`rm -v` deletes the old data directory, so make sure `huginn.sql` is complete before running it, and keep it until Huginn has been verified against the new server.  To roll back, put `postgres:9.5` back in the file and restore the same dump into it.
+
 Manual startup and linking to a MySQL container:
 
     docker run --name huginn_mysql \

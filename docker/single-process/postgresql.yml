@@ -2,11 +2,11 @@ version: '2'
 
 services:
   postgresdata:
-    image: postgres:9.5
+    image: postgres:18
     command: /bin/true
 
   postgres:
-    image: postgres:9.5
+    image: postgres:18
     restart: always
     env_file:
       - ../postgres.env

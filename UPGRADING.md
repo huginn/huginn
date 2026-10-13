@@ -116,6 +116,14 @@ MySQL 5.7 cannot be upgraded directly to 8.4.  Back up the volume, stop Huginn's
 
 The new multi-process image refuses detected MySQL 5.7 data before starting the bundled server.  Use the previous Huginn image containing MySQL 8.0 for the intermediate upgrade.  That image's recovery helper downloads and verifies a MySQL 5.7 rescue binary and performs a clean shutdown before starting 8.0.  This recovery step requires amd64 and access to the download server; it is not available on arm64 and is not a general migration path for MariaDB or arbitrary older versions.
 
+## Moving the PostgreSQL Compose example to PostgreSQL 18
+
+The supplied `docker/single-process/postgresql.yml` pinned `postgres:9.5`, which reached end of life in 2021.  It now uses `postgres:18`.
+
+This affects only installations started from that Compose file.  A separately managed PostgreSQL server is not touched by updating the Huginn image.  PostgreSQL does not upgrade a data directory in place across major versions: a `postgres:18` container refuses to start on a 9.5 data directory, so the data must be dumped with the old server and restored into the new one.  Until you do that, keep the `postgres` and `postgresdata` images at `postgres:9.5` in your copy of the file.
+
+Follow the [dump and restore procedure](docker/single-process/README.md#upgrading-postgresql) in the single-process Docker guide, and keep the dump until Huginn has been verified against the new server.
+
 ## Opting in to native JSON columns
 
 Introduced on `master` on 2026-04-13.  MySQL sort-buffer guidance and the bundled server setting were added on 2026-07-29.
