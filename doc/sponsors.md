@@ -20,7 +20,7 @@ Community-maintained deployment guides, including other hosting providers, are o
 
 ## Individual sponsors
 
-Thanks to everyone sponsoring at any amount.  Sponsorships support the maintainer's open source work as a whole, not necessarily Huginn alone.  Sponsors whose sponsorship is public are listed here by GitHub login; see the [sponsors page](https://github.com/sponsors/knu) for the current list.
+Thanks to everyone sponsoring at any amount.  Sponsorships support the maintainer's open source work as a whole, including [other projects](https://github.com/knu), not necessarily Huginn alone.  Sponsors whose sponsorship is public are listed here by GitHub login; see the [sponsors page](https://github.com/sponsors/knu) for the current list.
 
 - [@caius](https://github.com/caius)
 - [@andrew](https://github.com/andrew)
