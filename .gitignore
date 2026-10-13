@@ -28,7 +28,6 @@ deployment/cookbooks
 mise.local.toml
 .ruby-gemset
 .ruby-version
-manifest.yml
 db/schema.rb
 .local/
 /node_modules

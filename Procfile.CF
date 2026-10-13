@@ -1,2 +1,0 @@
-web: bundle exec rake db:migrate && bundle exec puma -C config/puma.rb
-jobs: bundle exec rails runner bin/threaded.rb
