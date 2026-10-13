@@ -76,6 +76,12 @@
       enabled: false,
     },
     {
+      // Keep CI runners on the Ubuntu release the Docker images are based on.
+      matchDatasources: ["github-runners"],
+      matchPackageNames: ["ubuntu"],
+      enabled: false,
+    },
+    {
       // Keep Compose, CI, and the bundled server on the same LTS series.
       matchDatasources: ["docker"],
       matchPackageNames: ["mysql"],

@@ -71,7 +71,7 @@ jobs:
   tag-docker-images:
     name: docker-tag-${{ matrix.docker_image }}
     needs: test-docker-images
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write

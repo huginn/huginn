@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-22.04
+          - ubuntu-24.04
         database_adapter:
           - mysql2
           - postgresql
@@ -101,7 +101,7 @@ jobs:
           - arm64
         include:
           - arch: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
           - arch: arm64
             runner: ubuntu-24.04-arm
     env:
@@ -154,7 +154,7 @@ jobs:
     name: docker-push-${{ matrix.docker_image }}
     if: github.event_name == 'push' && github.ref_name == 'master'
     needs: build-docker-images
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       packages: write
     strategy:
@@ -215,7 +215,7 @@ jobs:
     name: docker-build-huginn/huginn-test
     if: github.event_name == 'push' && github.ref_name == 'master'
     needs: push-docker-images
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
