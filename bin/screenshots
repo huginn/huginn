@@ -1,0 +1,281 @@
+#!/usr/bin/env ruby
+# Regenerate the README screenshots in doc/imgs/ from a seeded test
+# database, so they can be refreshed whenever the UI changes.
+#
+#   bin/screenshots            # writes doc/imgs/*.png
+#   bin/screenshots /tmp/shots # writes somewhere else
+#
+# The test database is emptied, seeded with the default scenario, and
+# filled with sample Events and Peak Detector data.  Chrome runs headless
+# through the same Selenium setup as the feature specs.  Graphviz (`dot`)
+# is needed for the event flow diagram, and oxipng is used when installed.
+
+ENV["RAILS_ENV"] = "test"
+ENV["USE_GRAPHVIZ_DOT"] ||= "dot"
+
+require_relative "../config/environment"
+require "capybara/rails"
+require "selenium-webdriver"
+require_relative "../db/seeds/seeder"
+
+WIDTH = 1200
+SCALE = 2
+
+Capybara.register_driver :screenshots do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.binary = ENV["CHROME_BIN"] if ENV["CHROME_BIN"].present?
+  options.add_argument("--headless=new")
+  options.add_argument("--window-size=#{WIDTH},900")
+  options.add_argument("--force-device-scale-factor=#{SCALE}")
+  options.add_argument("--hide-scrollbars")
+  options.add_argument("--disable-dev-shm-usage")
+  options.add_argument("--no-sandbox")
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options:)
+end
+
+Capybara.server = :puma, { Silent: true }
+Capybara.current_driver = :screenshots
+Capybara.default_max_wait_time = 10
+
+class SampleData
+  attr_reader :user, :peak_detector
+
+  def self.build
+    new.tap(&:build)
+  end
+
+  def build
+    reset_database
+    seed
+    @user = User.first
+    agent("SF Weather Agent").update!(options: agent("SF Weather Agent").options.merge("api_key" => "sample-api-key"))
+    create_events
+    create_peak_detector
+    touch_agents
+  end
+
+  private
+
+  def reset_database
+    connection = ActiveRecord::Base.connection
+    tables = connection.tables - %w[schema_migrations ar_internal_metadata]
+    connection.truncate_tables(*tables)
+  end
+
+  def seed
+    ENV["SEED_PASSWORD"] = "screenshots"
+    silence { Seeder.seed }
+  end
+
+  def silence
+    original = $stdout
+    $stdout = StringIO.new
+    yield
+  ensure
+    $stdout = original
+  end
+
+  def agent(name)
+    user.agents.find_by!(name:)
+  end
+
+  # Make the Agents index look like a running installation.
+  def touch_agents
+    now = Time.now
+    user.agents.find_each do |agent|
+      agent.update_columns(
+        created_at: now - rand(40..400).days,
+        last_check_at: agent.can_be_scheduled? ? now - rand(1..5).hours : nil,
+        last_event_at: agent.events.maximum(:created_at) || now - rand(1..3).days,
+        last_receive_at: agent.sources.any? ? now - rand(1..12).hours : nil,
+      )
+    end
+  end
+
+  def create_events
+    xkcd = agent("XKCD Source")
+    comics = [
+      ["Compiling", "'Are you stealing those LCDs?' 'Yeah, but I'm doing it while it compiles.'"],
+      ["Tar", "I don't know what's worse: the fact that after 15 years of using tar I still can't remember the flags."],
+      ["Automation", "'Automating' comes from the roots 'auto-' meaning 'self-', and 'mating', meaning 'screwing'."],
+      ["Standards", "Fortunately, the charging one has been solved now that we've all standardized on mini-USB."],
+    ]
+    comics.each_with_index do |(title, hovertext), i|
+      url = "https://imgs.xkcd.com/comics/#{title.downcase}.png"
+      emit(xkcd, { "url" => url, "title" => title, "hovertext" => hovertext }, (i + 1).days)
+    end
+
+    weather = agent("SF Weather Agent")
+    forecasts = [
+      ["Partly Cloudy", 61, 53, "Partly cloudy throughout the day."],
+      ["Rain", 58, 51, "Rain in the morning and afternoon."],
+      ["Clear", 66, 54, "Clear throughout the day."],
+    ]
+    forecasts.each_with_index do |(summary, high, low, detail), i|
+      emit(weather, {
+        "location" => "San Francisco, CA",
+        "date" => { "epoch" => (Date.today + 1 - i).to_time.to_i.to_s, "pretty" => (Date.today + 1 - i).strftime("%B %-d, %Y") },
+        "high" => { "fahrenheit" => high.to_s, "celsius" => ((high - 32) * 5 / 9).to_s },
+        "low" => { "fahrenheit" => low.to_s, "celsius" => ((low - 32) * 5 / 9).to_s },
+        "conditions" => summary,
+        "forecast" => detail,
+      }, i.days + 2.hours)
+    end
+
+    emit(agent("Rain Notifier"), { "message" => "Just so you know, it looks like 'Rain' tomorrow in San Francisco, CA" }, 1.day + 1.hour)
+  end
+
+  def emit(agent, payload, age)
+    created_at = Time.now - age
+    agent.events.create!(user:, payload:, created_at:, updated_at: created_at)
+  end
+
+  # A Peak Detector fed by a search Agent, with two weeks of hourly
+  # counts and one clear spike per group, feeding the Afternoon Digest
+  # like the other sources.
+  def create_peak_detector
+    search = user.agents.create!(
+      type: "Agents::WebsiteAgent",
+      name: "Mentions Search",
+      schedule: "every_1h",
+      options: {
+        "expected_update_period_in_days" => "2",
+        "url" => "https://search.example.com/api/counts?q=ruby,huginn",
+        "type" => "json",
+        "mode" => "all",
+        "extract" => {
+          "term" => { "path" => "$.results[*].term" },
+          "count" => { "path" => "$.results[*].count" },
+        },
+      },
+    )
+    @peak_detector = user.agents.create!(
+      type: "Agents::PeakDetectorAgent",
+      name: "Mentions Peak Detector",
+      options: {
+        "expected_receive_period_in_days" => "2",
+        "group_by_path" => "$.term",
+        "value_path" => "$.count",
+        "message" => "A peak of {{count}} mentions of {{term}} was detected",
+        "min_events" => "4",
+      },
+      memory: peak_memory,
+      last_receive_at: Time.now - 2.hours,
+      last_event_at: Time.now - 3.days,
+    )
+    @peak_detector.sources << search
+    [[2318, 1200], [131, 44], [118, 39]].each_with_index do |(ruby, huginn), i|
+      emit(search, { "term" => "ruby", "count" => ruby }, i.hours + 20.minutes)
+      emit(search, { "term" => "huginn", "count" => huginn }, i.hours + 20.minutes)
+    end
+    agent("Afternoon Digest").sources << @peak_detector
+    emit(@peak_detector, {
+      "message" => "A peak of 2318 mentions of ruby was detected",
+      "term" => "ruby",
+      "count" => 2318,
+    }, 3.days)
+  end
+
+  def peak_memory
+    random = Random.new(42)
+    hours = 14 * 24
+    now = Time.now.to_i
+    series = {
+      "ruby" => { base: 120, spike_at: 9 * 24 + 3, spike: 2300 },
+      "huginn" => { base: 40, spike_at: 4 * 24 + 15, spike: 900 },
+    }
+    data = {}
+    peaks = {}
+    series.each do |term, spec|
+      points = Array.new(hours) do |i|
+        time = now - (hours - i) * 3600
+        daily = 1 + 0.4 * Math.sin((i % 24) / 24.0 * 2 * Math::PI)
+        value = spec[:base] * daily * (0.7 + random.rand * 0.6)
+        distance = (i - spec[:spike_at]).abs
+        value += spec[:spike] * Math.exp(-(distance**2) / 8.0)
+        [value.round, time]
+      end
+      data[term] = points
+      peaks[term] = [points[spec[:spike_at]].last]
+    end
+    { "data" => data, "peaks" => peaks }
+  end
+end
+
+class Shooter
+  include Capybara::DSL
+
+  def initialize(output_dir)
+    @output_dir = output_dir
+  end
+
+  def run(data)
+    log_in(data.user)
+
+    visit "/agents"
+    shoot "your-agents"
+
+    visit "/diagram"
+    expect_css "svg"
+    shoot "diagram"
+
+    visit "/events"
+    shoot "events"
+
+    visit "/agents/#{data.peak_detector.id}"
+    expect_css ".chart-container svg"
+    shoot "peaks"
+
+    visit "/agents/new"
+    expect_css "#agent_type"
+    page.execute_script('$("#agent_type").val("Agents::WebsiteAgent").trigger("change").select2("close")')
+    expect_css ".json-editor-shell"
+    expect_css ".well.description > p"
+    shoot "new-agent", max_height: 1300
+  ensure
+    Capybara.reset_sessions!
+  end
+
+  private
+
+  def log_in(user)
+    visit "/users/sign_in"
+    fill_in "user_login", with: user.username
+    fill_in "user_password", with: ENV.fetch("SEED_PASSWORD")
+    click_on "Log in"
+    page.find("a", text: "Agents", wait: 10)
+  rescue Capybara::ElementNotFound
+    abort "login failed: #{page.find(".alert", wait: 0).text rescue page.text[0, 200]}"
+  end
+
+  def expect_css(selector)
+    page.find(selector, match: :first)
+  end
+
+  def oxipng?
+    return @oxipng if defined?(@oxipng)
+
+    @oxipng = system("oxipng", "--version", out: File::NULL, err: File::NULL)
+  end
+
+  def shoot(name, max_height: 4000)
+    # Grow the window to the page height so the whole page is captured.
+    height = [page.evaluate_script("document.documentElement.scrollHeight"), max_height].min
+    page.driver.browser.manage.window.resize_to(WIDTH, height)
+    sleep 0.5
+    path = File.join(@output_dir, "#{name}.png")
+    page.save_screenshot(path)
+    system("oxipng", "--quiet", "--opt", "2", path) if oxipng?
+    puts "#{path} (#{WIDTH * SCALE}x#{height * SCALE})"
+  end
+end
+
+def main
+  output_dir = File.expand_path(ARGV.first || Rails.root.join("doc", "imgs").to_s)
+  FileUtils.mkdir_p(output_dir)
+
+  data = SampleData.build
+  Shooter.new(output_dir).run(data)
+end
+
+main

@@ -44,9 +44,9 @@ And now, some example screenshots.  Below them are instructions to get you start
 
 ![Event flow diagram](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/diagram.png)
 
-![Detecting peaks in Twitter](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/peaks.png)
+![Detecting peaks in a stream of events](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/peaks.png)
 
-![Logging your location over time](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/my-locations.png)
+![Browsing the Events your Agents created](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/events.png)
 
 ![Making a new agent](https://raw.githubusercontent.com/huginn/huginn/master/doc/imgs/new-agent.png)
 
@@ -86,6 +86,7 @@ All Agents have specs, and there are acceptance tests that run Huginn in a headl
 
 * Install Google Chrome and ChromeDriver for local feature specs, or use the Docker-based test environment in [`docker/test/README.md`](docker/test/README.md).
 * Run all specs with `bundle exec rspec`, or a single file with `bundle exec rspec path/to/specific/test_spec.rb`.
+* Regenerate the screenshots above with `bin/screenshots` after UI changes.
 
 ## Deployment
 
