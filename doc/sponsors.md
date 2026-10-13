@@ -1,6 +1,6 @@
 # Sponsors
 
-Huginn is maintained in the maintainer's spare time.  If Huginn is useful to you or your company, please consider [sponsoring the maintainer](https://github.com/sponsors/knu).
+Huginn is maintained by [Akinori Musha (@knu)](https://github.com/knu) in spare time.  If Huginn is useful to you or your company, please consider [sponsoring the maintainer](https://github.com/sponsors/knu).
 
 ## Company sponsors
 
@@ -26,6 +26,8 @@ Thanks to everyone sponsoring at any amount.  Sponsorships support the maintaine
 - [@andrew](https://github.com/andrew)
 - [@flavorjones](https://github.com/flavorjones)
 - [@virtadpt](https://github.com/virtadpt)
+
+Support through [thanks.dev](https://thanks.dev/u/gh/knu) or [Ko-fi](https://ko-fi.com/amusha) is just as welcome, but is not listed here.
 
 ## Listing policy
 

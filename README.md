@@ -2,7 +2,7 @@
 
 -----
 
-[![CI](https://github.com/huginn/huginn/actions/workflows/ci.yml/badge.svg)](https://github.com/huginn/huginn/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/huginn/huginn/badge.svg)](https://coveralls.io/r/huginn/huginn)
+[![CI](https://github.com/huginn/huginn/actions/workflows/ci.yml/badge.svg)](https://github.com/huginn/huginn/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/huginn/huginn/badge.svg)](https://coveralls.io/r/huginn/huginn) [![Sponsor](https://img.shields.io/github/sponsors/knu?label=Sponsor&logo=GitHub)](https://github.com/sponsors/knu)
 
 ## What is Huginn?
 
@@ -128,7 +128,7 @@ Our general intention is to encourage complex and specific Agents to be written 
 
 ## Sponsors
 
-Huginn is maintained in the maintainer's spare time.  You can support its development by [sponsoring the maintainer](https://github.com/sponsors/knu).  Company sponsors and sponsored hosting providers are listed in [doc/sponsors.md](doc/sponsors.md), along with the listing policy.
+Huginn is maintained by [Akinori Musha (@knu)](https://github.com/knu) in spare time.  You can support its development by [sponsoring the maintainer](https://github.com/sponsors/knu).  Company sponsors and sponsored hosting providers are listed in [doc/sponsors.md](doc/sponsors.md), along with the listing policy.
 
 ## License
 
