@@ -4,9 +4,39 @@ This guide covers changes that may require configuration or data migration when 
 
 Before a database upgrade or column conversion, back up the database and plan a maintenance window with Huginn's web, scheduler, and worker processes stopped.  Keep the previous application version and a restorable database backup together.
 
+## Moving Heroku deployments to heroku-24
+
+Introduced on `master` on 2026-10-14; included in v2026.10.14.
+
+Heroku deprecated the `heroku-22` stack and rejects builds on it from November 2026.  New apps created from `app.json` or `bin/setup_heroku` now use `heroku-24` and Heroku's native multi-buildpack support instead of `heroku-buildpack-multi`.
+
+Existing apps keep their stack and the `BUILDPACK_URL` setting when Huginn is updated, so move them yourself.  Set the new stack, replace `BUILDPACK_URL` with the buildpacks listed in `.buildpacks`, and then deploy as described in the [Heroku update guide](doc/heroku/update.md):
+
+```sh
+heroku stack:set heroku-24
+heroku config:unset BUILDPACK_URL
+heroku buildpacks:clear
+heroku buildpacks:add https://github.com/cantino/heroku-selectable-procfile.git
+heroku buildpacks:add https://github.com/heroku/heroku-buildpack-ruby.git
+heroku buildpacks:add https://github.com/weibeld/heroku-buildpack-graphviz.git
+heroku buildpacks:add https://github.com/chrismytton/heroku-buildpack-jq.git
+```
+
+The new stack and buildpacks take effect on the next deploy.
+
+## Moving the PostgreSQL Compose example to PostgreSQL 18
+
+Introduced on `master` on 2026-10-14; included in v2026.10.14.
+
+The supplied `docker/single-process/postgresql.yml` pinned `postgres:9.5`, which reached end of life in 2021.  It now uses `postgres:18`.
+
+This affects only installations started from that Compose file.  A separately managed PostgreSQL server is not touched by updating the Huginn image.  PostgreSQL does not upgrade a data directory in place across major versions: a `postgres:18` container refuses to start on a 9.5 data directory, so the data must be dumped with the old server and restored into the new one.  Until you do that, keep the `postgres` and `postgresdata` images at `postgres:9.5` in your copy of the file.
+
+Follow the [dump and restore procedure](docker/single-process/README.md#upgrading-postgresql) in the single-process Docker guide, and keep the dump until Huginn has been verified against the new server.
+
 ## Stricter JSON parsing with json 3
 
-Introduced on `master` on 2026-10-04.
+Introduced on `master` on 2026-10-04; included in v2026.10.04.
 
 The json 3 parser rejects duplicate object keys and JavaScript-style comments by default.  Agents reading such input may now fail; remove duplicate keys and comments at the source.
 
@@ -115,14 +145,6 @@ Keep the pre-upgrade backup until the new database and Huginn have been verified
 MySQL 5.7 cannot be upgraded directly to 8.4.  Back up the volume, stop Huginn's writers, set `innodb_fast_shutdown = 0` on the running 5.7 server, and shut it down cleanly.  Upgrade to MySQL 8.0 first.  For Compose, temporarily set both `mysql` and `mysqldata` images to `mysql:8.0` and let the server complete that upgrade.  Then follow the 8.0-to-8.4 procedure above, changing both images to `mysql:8.4`.
 
 The new multi-process image refuses detected MySQL 5.7 data before starting the bundled server.  Use the previous Huginn image containing MySQL 8.0 for the intermediate upgrade.  That image's recovery helper downloads and verifies a MySQL 5.7 rescue binary and performs a clean shutdown before starting 8.0.  This recovery step requires amd64 and access to the download server; it is not available on arm64 and is not a general migration path for MariaDB or arbitrary older versions.
-
-## Moving the PostgreSQL Compose example to PostgreSQL 18
-
-The supplied `docker/single-process/postgresql.yml` pinned `postgres:9.5`, which reached end of life in 2021.  It now uses `postgres:18`.
-
-This affects only installations started from that Compose file.  A separately managed PostgreSQL server is not touched by updating the Huginn image.  PostgreSQL does not upgrade a data directory in place across major versions: a `postgres:18` container refuses to start on a 9.5 data directory, so the data must be dumped with the old server and restored into the new one.  Until you do that, keep the `postgres` and `postgresdata` images at `postgres:9.5` in your copy of the file.
-
-Follow the [dump and restore procedure](docker/single-process/README.md#upgrading-postgresql) in the single-process Docker guide, and keep the dump until Huginn has been verified against the new server.
 
 ## Opting in to native JSON columns
 

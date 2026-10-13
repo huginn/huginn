@@ -2,6 +2,13 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Oct 14, 2026   | Show maps of location Events with OpenStreetMap and Leaflet when UserLocationAgent has no Google Maps `api_key`, instead of showing no map. [#3791](https://github.com/huginn/huginn/pull/3791) |
+| Oct 14, 2026   | Upgrade the PostgreSQL Docker Compose example from PostgreSQL 9.5 to 18.  See the [upgrade guide](UPGRADING.md#moving-the-postgresql-compose-example-to-postgresql-18) before using it with an existing database. [#3789](https://github.com/huginn/huginn/pull/3789) |
+| Oct 14, 2026   | Move the Heroku setup to the `heroku-24` stack and Heroku's native multi-buildpack support.  Existing apps must be moved by hand; see the [upgrade guide](UPGRADING.md#moving-heroku-deployments-to-heroku-24). [#3788](https://github.com/huginn/huginn/pull/3788) |
+| Oct 14, 2026   | Remove the OpenShift and Cloud Foundry deployment files, whose platforms are no longer available. [#3788](https://github.com/huginn/huginn/pull/3788) |
+| Oct 14, 2026   | Rewrite the README and deployment documentation around Docker, and add a [security policy](SECURITY.md), a [contributing guide](CONTRIBUTING.md), and a [sponsors page](doc/sponsors.md). [#3788](https://github.com/huginn/huginn/pull/3788) |
+| Oct 11, 2026   | Stop the bundled MySQL server in the multi-process image together with its child processes, so that leftover socket locks no longer prevent the next start. |
+| Oct 11, 2026   | Run the Docker specs against a release's images before tagging them with the release version. |
 | Oct 04, 2026   | Upgrade to json 3.0.2, which rejects duplicate object keys and JavaScript-style comments by default.  See the [upgrade guide](UPGRADING.md#stricter-json-parsing-with-json-3) for input and custom Agent compatibility notes. |
 | Oct 04, 2026   | Translate navigation labels through locale keys while preserving the existing English text. [#3763](https://github.com/huginn/huginn/pull/3763) |
 | Oct 04, 2026   | Deduplicate automatic Agent checks from schedules and controller Agents while a check is queued, running, or awaiting retry. [#3767](https://github.com/huginn/huginn/pull/3767) |
