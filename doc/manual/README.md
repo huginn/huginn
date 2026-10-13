@@ -4,3 +4,4 @@
 - [Install](installation.md) Installation guide for Ubuntu/Debian
 - [Update](update.md) Update an existing Huginn installation
 - Deploy updates via [Capistrano](capistrano.md)
+- [Optional configuration](configuration.md) Settings that are not needed for a basic installation
