@@ -1,0 +1,45 @@
+name: Bug report
+description: Report something in Huginn that does not work as documented.
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened
+      description: Describe the problem, what you expected instead, and any error messages or Agent logs.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the Agent options involved, with secrets removed.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Huginn version
+      description: A release tag such as v2026.10.04, a commit, or the Docker image tag.
+    validations:
+      required: true
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: How do you run Huginn?
+      options:
+        - Docker (ghcr.io/huginn/huginn)
+        - Docker (ghcr.io/huginn/huginn-single-process)
+        - Manual installation
+        - Heroku
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: database
+    attributes:
+      label: Database
+      options:
+        - MySQL or MariaDB
+        - PostgreSQL
+    validations:
+      required: true

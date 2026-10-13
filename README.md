@@ -2,7 +2,7 @@
 
 -----
 
-[![CI](https://github.com/huginn/huginn/actions/workflows/ci.yml/badge.svg)](https://github.com/huginn/huginn/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/huginn/huginn/badge.svg)](https://coveralls.io/r/huginn/huginn) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/huginn/huginn)
+[![CI](https://github.com/huginn/huginn/actions/workflows/ci.yml/badge.svg)](https://github.com/huginn/huginn/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/huginn/huginn/badge.svg)](https://coveralls.io/r/huginn/huginn)
 
 ## What is Huginn?
 
@@ -26,11 +26,11 @@ Huginn is a system for building agents that perform automated tasks for you onli
 * Track your location over time
 * Send and receive webhooks to connect Huginn with anything else
 
-Join us in our [Gitter room](https://gitter.im/huginn/huginn) to discuss the project.
+Ask questions and share your ideas in [GitHub Discussions](https://github.com/huginn/huginn/discussions).
 
 ### Join us!
 
-Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, [add new Agents](https://github.com/huginn/huginn/wiki/Creating-a-new-agent), write [documentation and tutorials](https://github.com/huginn/huginn/wiki), or try tackling [issues tagged with "help wanted"](https://github.com/huginn/huginn/issues?direction=desc&labels=help+wanted&page=1&sort=created&state=open).  Please fork, add specs, and send pull requests!
+Want to help with Huginn?  All contributions are encouraged!  You could make UI improvements, [add new Agents](https://github.com/huginn/huginn/wiki/Creating-a-new-agent), write [documentation and tutorials](https://github.com/huginn/huginn/wiki), or try tackling [issues tagged with "help wanted"](https://github.com/huginn/huginn/issues?direction=desc&labels=help+wanted&page=1&sort=created&state=open).  See [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
 
 Have an awesome idea but not feeling quite up to contributing yet?  Head over to our [official 'suggest an agent' thread](https://github.com/huginn/huginn/issues/353) and tell us!
 

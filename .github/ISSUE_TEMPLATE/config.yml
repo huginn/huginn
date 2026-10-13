@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/huginn/huginn/discussions
+    about: Ask usage questions and discuss ideas in GitHub Discussions.
+  - name: Security vulnerability
+    url: https://github.com/huginn/huginn/security/advisories/new
+    about: Report vulnerabilities privately.  Do not open a public issue.
+  - name: Hosting provider listing
+    url: https://github.com/huginn/huginn/blob/master/doc/sponsors.md#listing-policy
+    about: Hosting providers are listed as sponsors.  Read the listing policy before opening an issue or pull request.
