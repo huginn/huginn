@@ -2,9 +2,9 @@
 
 ## Installation and upgrading
 
-### Docker (not recommended for production)
+### Docker (recommended)
 
-- [Check out Huginn with Docker](docker/install.md) Run a local Huginn installation using Docker
+- [Run Huginn with Docker](docker/install.md) Try Huginn in one container, or run it in production with Docker Compose
 
 ### Manual installation
 
@@ -13,6 +13,7 @@ Manual installation instructions which will guide through the steps to install H
 - [Install](manual/README.md) Requirements, directory structures and installation from source.
 - [Update](manual/update.md) Update your installation.
 - Deploy updates via [Capistrano](manual/capistrano.md).
+- [Optional configuration](manual/configuration.md) Outbound request restrictions, WeatherAgent API key, running without SSL, private development
 
 ### Heroku
 

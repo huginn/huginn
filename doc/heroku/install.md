@@ -1,17 +1,12 @@
 ## Deploy to Heroku
 
-Huginn works very well on the cheapest Heroku paid plan. This is what we recommend if you want to use Huginn on Heroku.
+Huginn runs on Heroku, but Heroku no longer has a free plan, and since 2026 the platform is in maintenance mode with no new features.  For most people the [Docker images](../docker/install.md) on a small server or a container platform are cheaper and simpler.  If you still prefer Heroku, read on.
 
 Notes for any Heroku plan:
 
+* Huginn needs a web dyno and a worker dyno that stays awake, plus a Postgres add-on.  Eco dynos share a monthly pool of hours and the worker drains it quickly, so use Basic or larger dynos for anything beyond a short trial.  Expect about US$19/month for two Basic dynos and the smallest Postgres plan; check the [current pricing](https://www.heroku.com/pricing) before deploying.
 * The `setup_heroku` command points Heroku at a special Procfile (`deployment/heroku/Procfile.heroku`) that is designed to be run on only one Heroku web worker.  If you want to run multiple workers, change the Heroku config variable `PROCFILE_PATH` with `heroku config:set PROCFILE_PATH=./Procfile` and switch back to the standard Huginn Procfile configuration.
-
-If you still wish to use the Heroku free plan (which won't work very well), please understand the following:
-
-* Heroku's [free plan](https://www.heroku.com/pricing) limits total runtime per day to 18 hours. This means that Huginn must sleep some of the time, and so recurring tasks will only run if their recurrence frequency fits within the free plan's awake time, which is 30 minutes. Therefore, we recommend that you only use the every 1 minute, every 2 minute, and every 5 minute Agent scheduling options.
-* If you're using the free plan, you need to signup for a free [uptimerobot](https://uptimerobot.com) account and have it ping your Huginn URL on Heroku once every 70 minutes.  If you still receive warnings from Heroku, try a longer interval. 
-* Another way if you're using the free plan, you can create a Http Status Agent on your Heroku Huginn instance itself and ping your own domain at huginn-example.herokuapp.com every 10 minutes.
-* Heroku's free Postgres plan limits the number of database rows that you can have to 10,000, so you should be sure to set a low event retention schedule for your agents and set `AGENT_LOG_LENGTH`, the number of log lines kept in the DB per Agent, to something small: `heroku config:set AGENT_LOG_LENGTH=20`.
+* Keep the app on a supported stack (`heroku stack:set heroku-24`); builds on deprecated stacks such as `heroku-22` fail after their end-of-life date.
 * 512MB of RAM may not be enough for Huginn and it may stop working as RAM usage increases over time.
 
 ## Instructions
@@ -56,8 +51,7 @@ http://radiant-forest-1519.herokuapp.com/ | git@heroku.com:radiant-forest-1519.g
 Git remote heroku added
 Your Heroku app name is radiant-forest-1519.  Is this correct? (y/n) y
 Setting up APP_SECRET_TOKEN...
-Setting BUILDPACK_URL to https://github.com/ddollar/heroku-buildpack-multi.git
-BUILDPACK_URL: https://github.com/ddollar/heroku-buildpack-multi.git
+Setting buildpacks to https://github.com/cantino/heroku-selectable-procfile.git, https://github.com/heroku/heroku-buildpack-ruby.git, https://github.com/weibeld/heroku-buildpack-graphviz.git, https://github.com/chrismytton/heroku-buildpack-jq.git
 Setting PROCFILE_PATH to deployment/heroku/Procfile.heroku
 PROCFILE_PATH: deployment/heroku/Procfile.heroku
 Setting ON_HEROKU to true
