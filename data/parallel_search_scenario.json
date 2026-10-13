@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "name": "Parallel Search MCP",
+  "description": "Manually search the web or fetch a page with free, keyless Parallel Search MCP. Uses existing Agents and JSON responses over Streamable HTTP. See doc/parallel-search-mcp.md for setup and response handling.",
+  "source_url": false,
+  "guid": "4b679fb283d145e48a5514d5231f7172",
+  "tag_fg_color": "#ffffff",
+  "tag_bg_color": "#5bc0de",
+  "agents": [
+    {
+      "type": "Agents::ManualEventAgent",
+      "name": "Parallel request",
+      "disabled": false,
+      "guid": "55db46ad59404abd92b6cb003b93b070",
+      "options": {
+        "payload": {
+          "operation": "search",
+          "objective": "Find the official Huginn documentation for creating Agents.",
+          "query": "Huginn creating new agent documentation",
+          "url": "https://github.com/huginn/huginn"
+        }
+      },
+      "keep_events_for": 604800,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::PostAgent",
+      "name": "Initialize Parallel MCP",
+      "disabled": false,
+      "guid": "3cbab5761ba64d4688b5631e9a2b0a74",
+      "options": {
+        "post_url": "https://search.parallel.ai/mcp",
+        "method": "post",
+        "content_type": "json",
+        "payload": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "initialize",
+          "params": {
+            "protocolVersion": "2025-03-26",
+            "capabilities": {},
+            "clientInfo": {
+              "name": "huginn",
+              "version": "1.0"
+            }
+          }
+        },
+        "headers": {
+          "Accept": "application/json, text/event-stream"
+        },
+        "user_agent": "Huginn Parallel Search scenario",
+        "emit_events": true,
+        "parse_body": true,
+        "no_merge": true,
+        "output_mode": "merge",
+        "event_headers_style": "snakecased",
+        "expected_receive_period_in_days": "7"
+      },
+      "keep_events_for": 604800,
+      "propagate_immediately": false,
+      "schedule": "never"
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "Require initialized session",
+      "disabled": false,
+      "guid": "b7561bb95a164dd3a9ea1535acebab2d",
+      "options": {
+        "expected_receive_period_in_days": "7",
+        "keep_event": true,
+        "rules": [
+          {
+            "path": "$.status",
+            "type": "field==value",
+            "value": "200"
+          },
+          {
+            "path": "$.body.result.protocolVersion",
+            "type": "field==value",
+            "value": "2025-03-26"
+          },
+          {
+            "path": "$.headers.mcp_session_id",
+            "type": "regex",
+            "value": "\\S+"
+          }
+        ]
+      },
+      "keep_events_for": 604800,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::EventFormattingAgent",
+      "name": "Remember MCP session",
+      "disabled": false,
+      "guid": "d2e7b090dc7e4d91a3f8fcb7c6438fa3",
+      "options": {
+        "mode": "merge",
+        "instructions": {
+          "mcp_session_id": "{{ headers.mcp_session_id }}"
+        }
+      },
+      "keep_events_for": 604800,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::PostAgent",
+      "name": "Notify Parallel initialized",
+      "disabled": false,
+      "guid": "c89e8afb63854070a670b10cc7de4844",
+      "options": {
+        "post_url": "https://search.parallel.ai/mcp",
+        "method": "post",
+        "content_type": "json",
+        "payload": {
+          "jsonrpc": "2.0",
+          "method": "notifications/initialized"
+        },
+        "headers": {
+          "Accept": "application/json, text/event-stream",
+          "Mcp-Session-Id": "{{ mcp_session_id }}",
+          "MCP-Protocol-Version": "2025-03-26"
+        },
+        "user_agent": "Huginn Parallel Search scenario",
+        "emit_events": true,
+        "parse_body": true,
+        "no_merge": true,
+        "output_mode": "merge",
+        "event_headers_style": "snakecased",
+        "expected_receive_period_in_days": "7"
+      },
+      "keep_events_for": 604800,
+      "propagate_immediately": false,
+      "schedule": "never"
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "Select web search",
+      "disabled": false,
+      "guid": "790f2e6aa55f4bcfa26b7d9b16597621",
+      "options": {
+        "expected_receive_period_in_days": "7",
+        "keep_event": true,
+        "rules": [
+          {
+            "path": "$.status",
+            "type": "field==value",
+            "value": "202"
+          },
+          {
+            "path": "$.operation",
+            "type": "field==value",
+            "value": "search"
+          }
+        ]
+      },
+      "keep_events_for": 604800,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "Select page fetch",
+      "disabled": false,
+      "guid": "656daad021cf4708bc645660dca03ea4",
+      "options": {
+        "expected_receive_period_in_days": "7",
+        "keep_event": true,
+        "rules": [
+          {
+            "path": "$.status",
+            "type": "field==value",
+            "value": "202"
+          },
+          {
+            "path": "$.operation",
+            "type": "field==value",
+            "value": "fetch"
+          }
+        ]
+      },
+      "keep_events_for": 604800,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::PostAgent",
+      "name": "Parallel web search",
+      "disabled": false,
+      "guid": "0e66fcdef39c4693b85255d2408e5e79",
+      "options": {
+        "post_url": "https://search.parallel.ai/mcp",
+        "method": "post",
+        "content_type": "json",
+        "payload": {
+          "jsonrpc": "2.0",
+          "id": 2,
+          "method": "tools/call",
+          "params": {
+            "name": "web_search",
+            "arguments": {
+              "objective": "{{ objective }}",
+              "search_queries": [
+                "{{ query }}"
+              ],
+              "session_id": "{{ mcp_session_id }}"
+            }
+          }
+        },
+        "headers": {
+          "Accept": "application/json, text/event-stream",
+          "Mcp-Session-Id": "{{ mcp_session_id }}",
+          "MCP-Protocol-Version": "2025-03-26"
+        },
+        "user_agent": "Huginn Parallel Search scenario",
+        "emit_events": true,
+        "parse_body": true,
+        "no_merge": true,
+        "output_mode": "merge",
+        "event_headers_style": "snakecased",
+        "expected_receive_period_in_days": "7"
+      },
+      "keep_events_for": 604800,
+      "propagate_immediately": false,
+      "schedule": "never"
+    },
+    {
+      "type": "Agents::PostAgent",
+      "name": "Parallel page fetch",
+      "disabled": false,
+      "guid": "e729f34940aa4785b82b5ab7f059786a",
+      "options": {
+        "post_url": "https://search.parallel.ai/mcp",
+        "method": "post",
+        "content_type": "json",
+        "payload": {
+          "jsonrpc": "2.0",
+          "id": 3,
+          "method": "tools/call",
+          "params": {
+            "name": "web_fetch",
+            "arguments": {
+              "urls": [
+                "{{ url }}"
+              ],
+              "session_id": "{{ mcp_session_id }}"
+            }
+          }
+        },
+        "headers": {
+          "Accept": "application/json, text/event-stream",
+          "Mcp-Session-Id": "{{ mcp_session_id }}",
+          "MCP-Protocol-Version": "2025-03-26"
+        },
+        "user_agent": "Huginn Parallel Search scenario",
+        "emit_events": true,
+        "parse_body": true,
+        "no_merge": true,
+        "output_mode": "merge",
+        "event_headers_style": "snakecased",
+        "expected_receive_period_in_days": "7"
+      },
+      "keep_events_for": 604800,
+      "propagate_immediately": false,
+      "schedule": "never"
+    }
+  ],
+  "links": [
+    {
+      "source": 0,
+      "receiver": 1
+    },
+    {
+      "source": 1,
+      "receiver": 2
+    },
+    {
+      "source": 2,
+      "receiver": 3
+    },
+    {
+      "source": 3,
+      "receiver": 4
+    },
+    {
+      "source": 4,
+      "receiver": 5
+    },
+    {
+      "source": 4,
+      "receiver": 6
+    },
+    {
+      "source": 5,
+      "receiver": 7
+    },
+    {
+      "source": 6,
+      "receiver": 8
+    }
+  ],
+  "control_links": []
+}
