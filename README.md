@@ -69,7 +69,7 @@ If you want to hack on Huginn, fork this repository and then:
 * Run `git remote add upstream https://github.com/huginn/huginn.git` to add the main repository as a remote for your fork.
 * Copy `.env.example` to `.env` (`cp .env.example .env`) and edit `.env`, at least updating the `APP_SECRET_TOKEN` variable.
 * Make sure that you have MySQL or PostgreSQL installed.  (On a Mac, the easiest way is with [Homebrew](http://brew.sh/).  If you're going to use PostgreSQL, you'll need to prepend all commands below with `DATABASE_ADAPTER=postgresql`.)
-* Run `bundle` to install dependencies.
+* Run `bundle` and `npm install` to install dependencies.  Node.js is needed for frontend libraries such as Font Awesome.
 * Run `bundle exec rake db:create`, `bundle exec rake db:migrate`, and then `bundle exec rake db:seed` to create a development database with some example Agents.
 * Run `bundle exec foreman start`, visit [http://localhost:3000/](http://localhost:3000/), and log in with the username `admin` and the password printed by `rake db:seed` (or set `SEED_PASSWORD` to choose one).
 * Set up some Agents!
