@@ -105,6 +105,10 @@ Please see [the Huginn Wiki](https://github.com/huginn/huginn/wiki#deploying-hug
 
 Try Huginn on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) (Takes a few minutes to setup. Read the [documentation](https://github.com/huginn/huginn/blob/master/doc/heroku/install.md) while you are waiting and be sure to click 'View it' after launch!) Huginn launches only on a paid subscription plan for Heroku. For non-experimental use, we strongly recommend Heroku's 1GB paid plan or our Docker container.
 
+### ZopDay
+
+Deploy Huginn with ZopDay: [![Deploy to ZopDay](https://zop.dev/deploytozopday-inkhard.svg)](https://zop.dev/zopday/app/deploy?image=ghcr.io/huginn/huginn:latest&port=3000&name=huginn&utm_source=github&utm_medium=one_click&utm_content=huginn) (Opens a deploy screen with the `ghcr.io/huginn/huginn` image and port 3000 already set. Run it on managed ZopCloud or in an AWS or GCP account you already own. Set `SEED_USERNAME` and `SEED_PASSWORD` to choose the admin login, and for non-experimental use connect an external MySQL or PostgreSQL database as described in the [Docker documentation](doc/docker/install.md). More about [ZopDay](https://zop.dev/zopday/oss?utm_source=github&utm_medium=one_click&utm_content=huginn).)
+
 ### OpenShift
 
 #### OpenShift Online
