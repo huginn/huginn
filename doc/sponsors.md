@@ -39,7 +39,7 @@ A hosting provider is listed on this page while all of the following hold:
 - The service page states that it runs Huginn, links to this repository, and keeps the MIT license notice.
 - The provider has an identifiable legal entity and a contact address.
 
-Each entry consists of a logo linked to the Huginn page on the provider's site, the service name, and an optional short description of up to about 15 words.  The link may point to the provider's one-click deploy page for Huginn, but no separate deploy buttons, badges, or promotional wording.
+Each entry consists of a logo linked to the Huginn page on the provider's site, the service name, an optional short description of up to about 15 words, and optionally a plain text link to the provider's one-click deploy page for Huginn.  No deploy buttons, badges, or other images besides the logo, and no promotional wording.
 
 ### Company sponsors
 
