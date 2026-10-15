@@ -10,6 +10,10 @@ class AgentsController < ApplicationController
     @service = current_user.services.find(params[:service_id]) if params[:service_id].present?
     @agents = @agents.where(service: @service) if @service
 
+    if params[:without_scenario].present?
+      @agents = @agents.where.missing(:scenario_memberships)
+    end
+
     if show_only_enabled_agents?
       @agents = @agents.where(disabled: false)
     end
