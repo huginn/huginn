@@ -1,8 +1,9 @@
 name: Tag Docker images
 
-# Tags the Docker images built for a release commit with the release version.
+# Tags the Docker images built for a release commit with the release version
+# and latest.
 # The images themselves are built and pushed by the CI workflow on every push
-# to master, tagged with the commit SHA; this only adds the version tag to
+# to master, tagged with master and the commit SHA; this adds release tags to
 # those manifests after the Docker specs pass, without rebuilding anything.
 # Push a release tag only after the CI run for its commit has published the
 # images, or dispatch this workflow with the tag name afterwards.
@@ -112,5 +113,8 @@ jobs:
           DOCKERHUB_IMAGE: ${{ matrix.docker_image }}
         run: |
           for image in "$GHCR_IMAGE" "$DOCKERHUB_IMAGE"; do
-            docker buildx imagetools create -t "$image:$TAG" "$image:$SHA"
+            docker buildx imagetools create \
+              -t "$image:$TAG" \
+              -t "$image:latest" \
+              "$image:$SHA"
           done

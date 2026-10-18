@@ -1,4 +1,5 @@
-FROM ghcr.io/huginn/huginn-single-process
+ARG HUGINN_IMAGE=ghcr.io/huginn/huginn-single-process:master
+FROM ${HUGINN_IMAGE}
 
 USER 0
 
