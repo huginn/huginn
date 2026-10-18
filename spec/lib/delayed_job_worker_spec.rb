@@ -7,11 +7,6 @@ describe DelayedJobWorker do
     allow(Delayed::Worker).to receive(:new).and_return(@worker)
   end
 
-  it "should run" do
-    expect(@worker).to receive(:start)
-    @djw.run
-  end
-
   it "should stop" do
     expect(@worker).to receive(:start)
     @djw.run

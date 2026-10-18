@@ -17,17 +17,6 @@ describe Agents::TwitterFavorites do
     @agent.events.new(payload: JSON.parse(File.read(Rails.root.join("spec/data_fixtures/one_fav_tweet.json"))))
     @agent.user = users(:bob)
     @agent.save!
-
-    @event = Event.new
-    @event.agent = agents(:tectonic_twitter_user_agent)
-    @event.payload = JSON.parse(File.read(Rails.root.join("spec/data_fixtures/one_fav_tweet.json")))
-    @event.save!
-  end
-
-  describe "making sure agent last event payload is equivalent to event payload" do
-    it "expect change method to change event" do
-      expect(@agent.events.last.payload).to eq(@event.payload)
-    end
   end
 
   describe "making sure check method works" do

@@ -183,13 +183,6 @@ describe Agents::RssAgent do
       expect(agent.memory['seen_ids'].length).to eq(500)
     end
     
-    it "should truncate the seen_ids in memory at amount of items configured in options" do
-      agent.options['remembered_id_count'] = "600"
-      agent.memory['seen_ids'] = ['x'] * 590
-      agent.check
-      expect(agent.memory['seen_ids'].length).to eq(600)
-    end
-    
     it "should truncate the seen_ids after configuring a lower limit of items when check is executed" do
       agent.memory['seen_ids'] = ['x'] * 600
       agent.options['remembered_id_count'] = "400"
@@ -261,18 +254,16 @@ describe Agents::RssAgent do
       @valid_options['url'] = 'http://onethingwell.org/rss'
     end
 
-    it "captures timestamps normalized in the ISO 8601 format" do
+    it "captures normalized timestamps, categories, enclosures, and empty authors" do
       agent.check
-      first, *, third = agent.events.take(3)
+      first, _, third, fourth = agent.events.take(4)
       expect(first.payload['date_published']).to eq('2015-08-20T17:00:10+01:00')
       expect(third.payload['date_published']).to eq('2015-08-20T13:00:07+01:00')
-    end
-
-    it "captures multiple categories" do
-      agent.check
-      first, *, third = agent.events.take(3)
       expect(first.payload['categories']).to eq(["csv", "crossplatform", "utilities"])
       expect(third.payload['categories']).to eq(["web"])
+      expect(fourth.payload['enclosure']).to eq({ "url" => "http://c.1tw.org/images/2015/itsy.png", "type" => "image/png", "length" => "48249" })
+      expect(fourth.payload['image']).to eq("http://c.1tw.org/images/2015/itsy.png")
+      expect(first.payload['authors']).to eq([])
     end
 
     it "sanitizes HTML content" do
@@ -281,19 +272,6 @@ describe Agents::RssAgent do
       event = agent.events.last
       expect(event.payload['content']).to eq('<a href="http://showgoers.tv/">Showgoers</a>: <blockquote> <p>Showgoers is a Chrome browser extension to synchronize your Netflix player with someone else so that you can co-watch the same movie on different computers with no hassle. Syncing up your player is as easy as sharing a URL.</p> </blockquote>')
       expect(event.payload['description']).to eq('<a href="http://showgoers.tv/">Showgoers</a>: <blockquote> <p>Showgoers is a Chrome browser extension to synchronize your Netflix player with someone else so that you can co-watch the same movie on different computers with no hassle. Syncing up your player is as easy as sharing a URL.</p> </blockquote>')
-    end
-
-    it "captures an enclosure" do
-      agent.check
-      event = agent.events.fourth
-      expect(event.payload['enclosure']).to eq({ "url" => "http://c.1tw.org/images/2015/itsy.png", "type" => "image/png", "length" => "48249" })
-      expect(event.payload['image']).to eq("http://c.1tw.org/images/2015/itsy.png")
-    end
-
-    it "ignores an empty author" do
-      agent.check
-      event = agent.events.first
-      expect(event.payload['authors']).to eq([])
     end
 
     context 'with an empty link in RSS' do

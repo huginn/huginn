@@ -91,16 +91,8 @@ describe LiquidInterpolatable::Filters do
       expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
-    it 'should parse an absolute URI with a base URI specified' do
-      expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
-    end
-
     it 'should parse a relative URI with a base URI specified' do
       expect(@filter.to_uri('foo/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.com/dir/foo/index.html'))
-    end
-
-    it 'should parse an absolute URI with a base URI specified' do
-      expect(@filter.to_uri('http://example.net/index.html', 'http://example.com/dir/1')).to eq(URI('http://example.net/index.html'))
     end
 
     it 'should stringify a non-string operand' do

@@ -90,25 +90,17 @@ describe Agents::OpenaiLlmAgent do
   end
 
   describe '#receive' do
-    it 'creates an event with the LLM response' do
+    it 'sends an authenticated request and emits the LLM response' do
       expect {
         @checker.receive([@event])
       }.to change { Event.count }.by(1)
-    end
 
-    it 'includes the assistant message in the event payload' do
-      @checker.receive([@event])
       event = Event.last
       expect(event.payload['message']).to include('San Francisco')
       expect(event.payload['finish_reason']).to eq('stop')
       expect(event.payload['model']).to eq('gpt-4o-mini')
       expect(event.payload['usage']).to be_a(Hash)
       expect(event.payload['usage']['total_tokens']).to eq(43)
-    end
-
-    it 'sends the correct request body' do
-      @checker.receive([@event])
-
       expect(WebMock).to have_requested(:post, 'https://api.openai.com/v1/chat/completions')
         .with { |req|
           body = JSON.parse(req.body)
@@ -118,11 +110,6 @@ describe Agents::OpenaiLlmAgent do
             body['messages'][1]['role'] == 'user' &&
             body['messages'][1]['content'] == 'What is the weather like in San Francisco?'
         }
-    end
-
-    it 'sends authorization header' do
-      @checker.receive([@event])
-
       expect(WebMock).to have_requested(:post, 'https://api.openai.com/v1/chat/completions')
         .with(headers: { 'Authorization' => 'Bearer test-api-key' })
     end

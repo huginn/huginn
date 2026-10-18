@@ -310,27 +310,21 @@ describe Agents::EvernoteAgent do
 
     describe "#create_note" do
       it "creates a note with given params in evernote note store" do
-        note_store.create_note(title: "third note")
+        note = note_store.create_note(title: "third note")
 
         expect(en_note_store.notes.size).to eq(3)
         expect(en_note_store.notes.last.title).to eq("third note")
-      end
-
-      it "returns a note" do
-        expect(note_store.create_note(title: "third note")).to be_a(Agents::EvernoteAgent::Note)
+        expect(note).to be_a(Agents::EvernoteAgent::Note)
       end
     end
 
     describe "#update_note" do
       it "updates an existing note with given params" do
-        note_store.update_note(guid: 1, content: "some words")
+        note = note_store.update_note(guid: 1, content: "some words")
 
         expect(en_note_store.notes.first.content).not_to be_nil
         expect(en_note_store.notes.size).to eq(2)
-      end
-
-      it "returns a note" do
-        expect(note_store.update_note(guid: 1, content: "some words")).to be_a(Agents::EvernoteAgent::Note)
+        expect(note).to be_a(Agents::EvernoteAgent::Note)
       end
     end
 

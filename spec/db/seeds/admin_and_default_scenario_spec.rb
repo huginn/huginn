@@ -12,12 +12,8 @@ describe Seeder do
       expect(User.count).to eq(0)
     end
 
-    it 'imports a default scenario' do
-      expect { Seeder.seed }.to change(Agent, :count).by(7)
-    end
-
-    it 'creates an admin' do
-      expect { Seeder.seed }.to change(User, :count).by(1)
+    it 'creates an admin and imports its default scenario' do
+      expect { Seeder.seed }.to change(Agent, :count).by(7).and change(User, :count).by(1)
       expect(User.last).to be_admin
     end
 

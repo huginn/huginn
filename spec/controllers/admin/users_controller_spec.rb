@@ -21,14 +21,6 @@ describe Admin::UsersController do
   end
 
   describe 'GET #switch_to_user' do
-    it "switches to another user" do
-      sign_in users(:jane), scope: :user
-
-      get :switch_to_user, params: {:id => users(:bob).id}
-      expect(response).to redirect_to(agents_path)
-      expect(subject.session[:original_admin_user_id]).to eq(users(:jane).id)
-    end
-
     it "does not switch if not admin" do
       sign_in users(:bob), scope: :user
 

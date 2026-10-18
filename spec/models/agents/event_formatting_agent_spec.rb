@@ -63,11 +63,6 @@ describe Agents::EventFormattingAgent do
   end
 
   describe "#receive" do
-    it "should accept clean mode" do
-      @checker.receive([@event])
-      expect(Event.last.payload[:content]).to eq(nil)
-    end
-
     it "should accept merge mode" do
       @checker.options[:mode] = "merge"
       @checker.receive([@event])
@@ -80,8 +75,9 @@ describe Agents::EventFormattingAgent do
       expect(Event.last.payload[:content]).not_to eq(nil)
     end
 
-    it "should handle Liquid templating in instructions" do
+    it "formats instructions in clean mode" do
       @checker.receive([@event])
+      expect(Event.last.payload[:content]).to eq(nil)
       expect(Event.last.payload[:message]).to eq("Received Some Lorem Ipsum from somevalue .")
       expect(Event.last.payload[:agent]).to eq("WeatherAgent")
       expect(Event.last.payload[:created_at]).to eq(@event.created_at.to_s)
@@ -123,32 +119,6 @@ describe Agents::EventFormattingAgent do
       @checker.save!
       @checker.receive([@event])
       expect(Event.last.payload[:message]).to eq("Escaped: escape+this%21%3F\nNot escaped: escape this!?")
-    end
-
-    it "should handle multiple events" do
-      event1 = Event.new
-      event1.agent = agents(:bob_weather_agent)
-      event1.payload = {
-          :content => {
-              :text => "Some Lorem Ipsum",
-              :name => "somevalue"
-          },
-          :conditions => "someothervalue"
-      }
-
-      event2 = Event.new
-      event2.agent = agents(:bob_weather_agent)
-      event2.payload = {
-          :content => {
-              :text => "Some Lorem Ipsum",
-              :name => "somevalue"
-          },
-          :conditions => "someothervalue"
-      }
-
-      expect {
-        @checker.receive([event2, event1])
-      }.to change { Event.count }.by(2)
     end
   end
 

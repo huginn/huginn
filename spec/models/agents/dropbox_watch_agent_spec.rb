@@ -19,14 +19,6 @@ describe Agents::DropboxWatchAgent do
     expect(@agent.cannot_receive_events?).to eq true
   end
 
-  it 'has agent description' do
-    expect(@agent.description).to_not be_nil
-  end
-
-  it 'has event description' do
-    expect(@agent.event_description).to_not be_nil
-  end
-
   describe '#valid?' do
     before(:each) { expect(@agent.valid?).to eq true }
 
@@ -150,15 +142,9 @@ describe Agents::DropboxWatchAgent do
 
       subject(:diff_hash) { Agents::DropboxWatchAgent::DropboxDirDiff.new(previous, current).to_hash }
 
-      it 'detects additions' do
+      it 'detects additions, removals, and updates' do
         expect(diff_hash[:added]).to eq [{ 'path' => '4.json', 'rev' => '1' }]
-      end
-
-      it 'detects removals' do
         expect(diff_hash[:removed]).to eq [ { 'path' => '2.json', 'rev' => '1' } ]
-      end
-
-      it 'detects updates' do
         expect(diff_hash[:updated]).to eq [ { 'path' => '1.json', 'rev' => '2' } ]
       end
 

@@ -1479,49 +1479,18 @@ describe Agents::WebsiteAgent do
     end
 
     describe "#check" do
-      before do
+      it "preserves and escapes hostname, query, Unicode and bracketed URL components" do
         expect { @checker.check }.to change { Event.count }.by(8)
-        @events = Event.last(8)
-      end
-
-      it "should check hostname" do
-        event = @events[0]
-        expect(event.payload['url']).to eq("http://google.com")
-      end
-
-      it "should check unescaped query" do
-        event = @events[1]
-        expect(event.payload['url']).to eq("https://www.google.ca/search?q=some%20query")
-      end
-
-      it "should check properly escaped query" do
-        event = @events[2]
-        expect(event.payload['url']).to eq("https://www.google.ca/search?q=some%20query")
-      end
-
-      it "should check unescaped unicode url" do
-        event = @events[3]
-        expect(event.payload['url']).to eq("http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
-      end
-
-      it "should check unescaped unicode query" do
-        event = @events[4]
-        expect(event.payload['url']).to eq("https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
-      end
-
-      it "should check properly escaped unicode url" do
-        event = @events[5]
-        expect(event.payload['url']).to eq("http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
-      end
-
-      it "should check properly escaped unicode query" do
-        event = @events[6]
-        expect(event.payload['url']).to eq("https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8")
-      end
-
-      it "should check url with unescaped brackets in the path component" do
-        event = @events[7]
-        expect(event.payload['url']).to eq("http://[::1]/path%5B%5D?query[]=foo")
+        expect(Event.last(8).map { |event| event.payload['url'] }).to eq([
+          "http://google.com",
+          "https://www.google.ca/search?q=some%20query",
+          "https://www.google.ca/search?q=some%20query",
+          "http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8",
+          "https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8",
+          "http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8",
+          "https://www.google.ca/search?q=%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8",
+          "http://[::1]/path%5B%5D?query[]=foo",
+        ])
       end
     end
   end

@@ -57,14 +57,10 @@ describe Agents::WitaiAgent do
   end
 
   describe '#receive' do
-    it 'checks that a new event is created after receiving one' do
+    it 'creates an event with the received message' do
       expect {
         @checker.receive([@event])
       }.to change { Event.count }.by(1)
-    end
-
-    it 'checks the integrity of new event' do
-      @checker.receive([@event])
       expect(Event.last.payload[:outcomes][0][:_text]).to eq(@event.payload[:message][:content])
     end
   end

@@ -26,14 +26,10 @@ describe Admin::UsersController do
     end
 
     context "creating new users" do
-      it "follow the 'new user' link" do
+      it "creates a new user through the user list" do
         visit admin_users_path
         click_on('New User')
         expect(page).to have_text('Create new User')
-      end
-
-      it "creates a new user" do
-        visit new_admin_user_path
         fill_in 'Email', with: 'test@test.com'
         fill_in 'Username', with: 'usertest'
         fill_in 'Password', with: '12345678'
@@ -55,14 +51,10 @@ describe Admin::UsersController do
     end
 
     context "updating existing users" do
-      it "follows the edit link" do
+      it "updates an existing user through the user list" do
         visit admin_users_path
         click_on('bob')
         expect(page).to have_text('Edit User')
-      end
-
-      it "updates an existing user" do
-        visit edit_admin_user_path(users(:bob))
         check 'Admin'
         click_on 'Update User'
         expect(page).to have_text("User 'bob' was successfully updated.")

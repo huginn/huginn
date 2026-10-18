@@ -48,7 +48,7 @@ describe LongRunnable do
       @agent = double('agent')
       @stoppable_worker = TestWorker.new(agent: @agent, id: 'test1234')
       @worker = LongRunnable::Worker.new(agent: @agent, id: 'test1234')
-      @scheduler = Rufus::Scheduler.new
+      @scheduler = Rufus::Scheduler.new(frequency: 0.01)
       @worker.setup!(@scheduler, Mutex.new)
       @stoppable_worker.setup!(@scheduler, Mutex.new)
     end

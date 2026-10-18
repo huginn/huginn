@@ -21,10 +21,6 @@ describe Agents::PublicTransportAgent do
          to_return(:status => 200, :body => File.read(Rails.root.join("spec/data_fixtures/public_transport_agent.xml")), :headers => {})
     end
 
-    it "should create 4 events" do
-      expect { @agent.check }.to change {@agent.events.count}.by(4)
-    end
-
     it "should add 4 items to memory" do
       travel_to Time.parse("2014-01-14 20:21:30 +0500") do
         expect(@agent.memory).to eq({})

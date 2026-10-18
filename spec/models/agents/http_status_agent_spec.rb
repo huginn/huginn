@@ -96,34 +96,17 @@ describe 'HttpStatusAgent' do
         [event_with_a_successful_ping]
       end
 
-      it "should create one event" do
+      it "records a successful response, timing, URLs, and status" do
         agent.receive events
         expect(created_events.count).to eq(1)
-      end
-
-      it "should note that the successful response succeeded" do
-        agent.receive events
         expect(created_events.last[:payload]['response_received']).to eq(true)
-      end
-
-      it "should return the status code" do
-        agent.receive events
         expect(created_events.last[:payload]['status']).to eq('200')
-      end
-
-      it "should remember the status" do
-        agent.receive events
         expect(agent.memory['last_status']).to eq('200')
-      end
-
-      it "should record the time spent waiting for the reply" do
-        agent.receive events
         expect(created_events.last[:payload]['elapsed_time']).not_to be_nil
-      end
-
-      it "should not return a header" do
-        agent.receive events
         expect(created_events.last[:payload]['headers']).to be_nil
+        expect(created_events.last[:payload]['url']).to eq(successful_url)
+        expect(created_events.last[:payload]['final_url']).to eq(successful_url)
+        expect(created_events.last[:payload]['redirected']).to eq(false)
       end
 
       describe "but the last status code was 200" do
@@ -188,30 +171,11 @@ describe 'HttpStatusAgent' do
       describe "but the status code is not 200" do
         let(:status_code) { 500 }
 
-        it "should return the status code" do
+        it "returns and remembers an unsuccessful HTTP status" do
           agent.receive events
           expect(created_events.last[:payload]['status']).to eq('500')
-        end
-
-        it "should remember the status" do
-          agent.receive events
           expect(agent.memory['last_status']).to eq('500')
         end
-      end
-
-      it "should return the original url" do
-        agent.receive events
-        expect(created_events.last[:payload]['url']).to eq(successful_url)
-      end
-
-      it "should return the final url" do
-        agent.receive events
-        expect(created_events.last[:payload]['final_url']).to eq(successful_url)
-      end
-
-      it "should return whether the url redirected" do
-        agent.receive events
-        expect(created_events.last[:payload]['redirected']).to eq(false)
       end
 
       describe "but the ping returns a status code of 0" do
@@ -223,24 +187,12 @@ describe 'HttpStatusAgent' do
           Event.new(payload: { url: successful_url, headers_to_save: "" })
         end
 
-        it "should create one event" do
-          agent.receive events
-          expect(created_events.count).to eq(1)
-        end
-
-        it "should note that no response was received" do
-          agent.receive events
-          expect(created_events.last[:payload]['response_received']).to eq(false)
-        end
-
-        it "should return the original url" do
-          agent.receive events
-          expect(created_events.last[:payload]['url']).to eq(successful_url)
-        end
-
-        it "should remember no status" do
+        it "records a missing response and clears the previous status" do
           agent.memory['last_status'] = '200'
           agent.receive events
+          expect(created_events.count).to eq(1)
+          expect(created_events.last[:payload]['response_received']).to eq(false)
+          expect(created_events.last[:payload]['url']).to eq(successful_url)
           expect(agent.memory['last_status']).to be_nil
         end
 
@@ -255,18 +207,10 @@ describe 'HttpStatusAgent' do
           Event.new(payload: { url: successful_url, headers_to_save: "" })
         end
 
-        it "should create one event" do
+        it "records a negative status as a missing response" do
           agent.receive events
           expect(created_events.count).to eq(1)
-        end
-
-        it "should note that no response was received" do
-          agent.receive events
           expect(created_events.last[:payload]['response_received']).to eq(false)
-        end
-
-        it "should return the original url" do
-          agent.receive events
           expect(created_events.last[:payload]['url']).to eq(successful_url)
         end
 
@@ -286,29 +230,13 @@ describe 'HttpStatusAgent' do
           stub_request(:get, failing_url).to_raise(RuntimeError) #to_return(status: 500)
         end
 
-        it "should create two events" do
+        it "records successful and failed responses in event order" do
           agent.receive events
           expect(created_events.count).to eq(2)
-        end
-
-        it "should note that the failed response failed" do
-          agent.receive events
           expect(created_events[1][:payload]['response_received']).to eq(false)
-        end
-
-        it "should note that the successful response succeeded" do
-          agent.receive events
           expect(created_events[0][:payload]['response_received']).to eq(true)
-        end
-
-        it "should return the original url on both events" do
-          agent.receive events
           expect(created_events[0][:payload]['url']).to eq(successful_url)
           expect(created_events[1][:payload]['url']).to eq(failing_url)
-        end
-
-        it "should record the time spent waiting for the reply" do
-          agent.receive events
           expect(created_events[0][:payload]['elapsed_time']).not_to be_nil
           expect(created_events[1][:payload]['elapsed_time']).not_to be_nil
         end
@@ -367,13 +295,9 @@ describe 'HttpStatusAgent' do
                     })
         end
 
-        it "should return the existing header's value" do
+        it "returns existing headers and nil for missing headers" do
           agent.receive events
           expect(created_events.last[:payload]['headers'][header]).to eq(header_value)
-        end
-
-        it "should return nil for the nonexistant header" do
-          agent.receive events
           expect(created_events.last[:payload]['headers'][nonexistant_header]).to be_nil
         end
 

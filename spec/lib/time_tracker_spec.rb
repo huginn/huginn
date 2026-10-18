@@ -7,13 +7,9 @@ describe TimeTracker do
       expect(tracked_result.elapsed_time).to satisfy {|v| v > 0.01 && v < 0.1}
     end
 
-    it "returns the proc return value" do
+    it "returns the proc result and delegates its methods" do
       tracked_result = TimeTracker.track { 42 }
       expect(tracked_result.result).to eq(42)
-    end
-
-    it "returns an object that behaves like the proc result" do
-      tracked_result = TimeTracker.track { 42 }
       expect(tracked_result.to_i).to eq(42)
       expect(tracked_result + 1).to eq(43)
     end

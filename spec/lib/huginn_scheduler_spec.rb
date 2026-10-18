@@ -3,7 +3,7 @@ require 'huginn_scheduler'
 
 describe HuginnScheduler do
   before(:each) do
-    @rufus_scheduler = Rufus::Scheduler.new
+    @rufus_scheduler = Rufus::Scheduler.new(frequency: 0.01)
     @scheduler = HuginnScheduler.new
     allow(@scheduler).to receive(:setup)
     @scheduler.setup!(@rufus_scheduler, Mutex.new)
@@ -102,7 +102,9 @@ describe Rufus::Scheduler do
     @taoe, Thread.abort_on_exception = Thread.abort_on_exception, false
     @oso, @ose, $stdout, $stderr = $stdout, $stderr, StringIO.new, StringIO.new
 
-    @scheduler = Rufus::Scheduler.new
+    @scheduler = Rufus::Scheduler.new(frequency: 0.01)
+    # Inspect registration without executing scheduled Agent jobs.
+    @scheduler.pause
 
     allow_any_instance_of(Agents::SchedulerAgent).to receive(:second_precision_enabled) { true }
 

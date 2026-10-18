@@ -287,16 +287,13 @@ describe Agents::PostAgent do
           @checker.save!
         end
 
-        it "emits the response status" do
+        it "emits the response status, body and capitalized headers by default" do
           expect {
             @checker.check
           }.to change { @checker.events.count }.by(1)
           expect(@checker.events.last.payload['status']).to eq 200
-        end
-
-        it "emits the body" do
-          @checker.check
           expect(@checker.events.last.payload['body']).to eq '<html>a webpage!</html>'
+          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html', 'X-Foo-Bar' => 'baz' })
         end
 
         context "and the response is in JSON" do
@@ -325,11 +322,6 @@ describe Agents::PostAgent do
             @checker.check
             expect(@checker.events.last.payload['body']).to eq json_data
           end
-        end
-
-        it "emits the response headers capitalized by default" do
-          @checker.check
-          expect(@checker.events.last.payload['headers']).to eq({ 'Content-Type' => 'text/html', 'X-Foo-Bar' => 'baz' })
         end
 
         it "emits the response headers capitalized" do

@@ -100,31 +100,18 @@ describe Agents::OpenaiImageGenerationAgent do
   end
 
   describe '#receive' do
-    it 'creates an event with image data from incoming event' do
+    it 'creates an event using the incoming prompt and API authorization' do
       @checker.options['prompt'] = '{{ prompt }}'
       @checker.save!
 
       expect {
         @checker.receive([@event])
       }.to change { Event.count }.by(1)
-    end
-
-    it 'sends the correct prompt from the event' do
-      @checker.options['prompt'] = '{{ prompt }}'
-      @checker.save!
-
-      @checker.receive([@event])
-
       expect(WebMock).to have_requested(:post, 'https://api.openai.com/v1/images/generations')
         .with { |req|
           body = JSON.parse(req.body)
           body['prompt'] == 'A cat wearing a top hat'
         }
-    end
-
-    it 'sends authorization header' do
-      @checker.receive([@event])
-
       expect(WebMock).to have_requested(:post, 'https://api.openai.com/v1/images/generations')
         .with(headers: { 'Authorization' => 'Bearer test-api-key' })
     end

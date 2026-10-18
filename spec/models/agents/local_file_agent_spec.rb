@@ -27,8 +27,6 @@ describe Agents::LocalFileAgent do
     it "requires mode to be either 'read' or 'write'" do
       @checker.options['mode'] = 'write'
       expect(@checker).to be_valid
-      @checker.options['mode'] = 'write'
-      expect(@checker).to be_valid
       @checker.options['mode'] = 'test'
       expect(@checker).not_to be_valid
     end
@@ -182,13 +180,6 @@ describe Agents::LocalFileAgent do
       @checker.options['mode'] = 'write'
       @checker.options['data'] = '{{ data }}'
       @file_mock = double()
-    end
-
-    it "writes the data at data into a file" do
-      expect(@file_mock).to receive(:write).with('hello world')
-      event = Event.new(payload: {'data' => 'hello world'})
-      expect(File).to receive(:open).with(File.join(Rails.root, 'tmp', 'spec'), 'w').and_yield(@file_mock)
-      @checker.receive([event])
     end
 
     it "appends the data at data onto a file" do

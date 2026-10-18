@@ -89,7 +89,6 @@ describe Utils do
     it "returns arrays of matching values" do
       expect(Utils.values_at({ :foo => { :bar => :baz }}, "$.foo.bar")).to eq(%w[baz])
       expect(Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "$.foo[*].bar")).to eq(%w[baz bing])
-      expect(Utils.values_at({ :foo => [ { :bar => :baz }, { :bar => :bing } ]}, "$.foo[*].bar")).to eq(%w[baz bing])
     end
 
     it "should allow escaping" do

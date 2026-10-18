@@ -187,22 +187,6 @@ describe Agents::WebhookAgent do
           expect(out).to eq(['Please use POST requests only', 401])
         end
 
-        it "should accept POST" do
-          webpayload = ActionDispatch::Request.new({
-              'action_dispatch.request.request_parameters' => { 'some_key' => payload },
-              'action_dispatch.request.path_parameters' => { secret: 'foobar' },
-              'REQUEST_METHOD' => "POST",
-              'HTTP_ACCEPT' => 'application/xml',
-              'HTTP_X_HELLO_WORLD' => "Hello Huginn"
-            })
-
-          out = nil
-          expect {
-            out = agent.receive_web_request(webpayload)
-          }.to change { Event.count }.by(1)
-          expect(out).to eq(['Event Created', 201])
-        end
-
       end
 
       context "accepting get and post" do

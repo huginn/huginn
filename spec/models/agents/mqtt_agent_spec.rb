@@ -33,10 +33,6 @@ describe Agents::MqttAgent do
   end
 
   describe "#check" do
-    it "should create events in the initial run" do
-      expect { @checker.check }.to change { Event.count }.by(2)
-    end
-
     it "should ignore retained messages that are previously received" do
       expect { @checker.check }.to change { Event.count }.by(2)
       expect { @checker.check }.to change { Event.count }.by(1)

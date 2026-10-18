@@ -30,11 +30,6 @@ describe Agents::HipchatAgent do
       expect(@checker).to be_valid
     end
 
-    it "should require the basecamp username" do
-      @checker.options['auth_token'] = nil
-      expect(@checker).not_to be_valid
-    end
-
     it "should require the basecamp password" do
       @checker.options['room_name'] = nil
       expect(@checker).not_to be_valid

@@ -22,26 +22,6 @@ describe SortableEvents do
   end
 
   describe 'validations' do
-    let(:agent_class) {
-      Class.new(Agent) do
-        include SortableEvents
-
-        default_schedule 'never'
-
-        def self.valid_type?(name)
-          true
-        end
-      end
-    }
-
-    def new_agent(events_order = nil)
-      options = {}
-      options['events_order'] = events_order if events_order
-      agent_class.new(name: 'test', options: options) { |agent|
-        agent.user = users(:bob)
-      }
-    end
-
     it 'should allow events_order to be unspecified, null or an empty array' do
       expect(new_agent()).to be_valid
       expect(new_agent(nil)).to be_valid

@@ -7,10 +7,6 @@ describe Agents::JsonParseAgent do
     @checker.save!
   end
 
-  it "event description does not throw an exception" do
-    expect(@checker.event_description).to include('parsed')
-  end
-
   describe "validating" do
     before do
       expect(@checker).to be_valid

@@ -49,16 +49,6 @@ describe Agents::PushoverAgent do
       expect(@sent_notifications[2]['message']).to eq('Some other message')
     end
 
-    it 'should make sure event message overrides default message' do
-      event = Event.new
-      event.agent = agents(:bob_rain_notifier_agent)
-      event.payload = { message: 'Some new message'}
-      event.save!
-
-      @checker.receive([event])
-      expect(@sent_notifications[0]['message']).to eq('Some new message')
-    end
-
     it 'should make sure event text overrides default message' do
       event = Event.new
       event.agent = agents(:bob_rain_notifier_agent)

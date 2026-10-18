@@ -31,12 +31,9 @@ describe Agents::StubhubAgent do
 
   describe "#check" do
 
-    it 'should create an event' do
-      expect { @stubhub_agent.check }.to change { Event.count }.by(1)
-    end
-
-    it 'should properly parse the response' do
-      event = @stubhub_agent.check
+    it 'creates an event with the parsed response' do
+      event = nil
+      expect { event = @stubhub_agent.check }.to change { Event.count }.by(1)
       expect(event.payload).to eq(response_payload)
     end
   end
