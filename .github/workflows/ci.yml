@@ -195,7 +195,7 @@ jobs:
           DOCKER_IMAGE: ghcr.io/${{ matrix.docker_image }}
         run: |
           docker buildx imagetools create \
-            -t "$DOCKER_IMAGE" \
+            -t "$DOCKER_IMAGE:$GITHUB_REF_NAME" \
             -t "$DOCKER_IMAGE:$GITHUB_SHA" \
             $(printf "$DOCKER_IMAGE@sha256:%s " *)
 
@@ -204,10 +204,10 @@ jobs:
           GHCR_IMAGE: ghcr.io/${{ matrix.docker_image }}
           DOCKERHUB_IMAGE: ${{ matrix.docker_image }}
         run: |
-          printf 'FROM %s\nENV OUTDATED_DOCKER_REGISTRY=true\n' "$GHCR_IMAGE" | \
+          printf 'FROM %s\nENV OUTDATED_DOCKER_REGISTRY=true\n' "$GHCR_IMAGE:$GITHUB_SHA" | \
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            -t "$DOCKERHUB_IMAGE" \
+            -t "$DOCKERHUB_IMAGE:$GITHUB_REF_NAME" \
             -t "$DOCKERHUB_IMAGE:$GITHUB_SHA" \
             --push -
 
@@ -237,6 +237,7 @@ jobs:
         with:
           context: .
           file: docker/test/Dockerfile
+          build-args: HUGINN_IMAGE=ghcr.io/huginn/huginn-single-process:${{ github.sha }}
           platforms: linux/amd64
           push: true
           tags: |
