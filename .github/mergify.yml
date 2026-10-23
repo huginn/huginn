@@ -1,0 +1,23 @@
+extends: .github
+
+queue_rules:
+  - name: dependency-updates
+    queue_conditions:
+      - base = master
+      - author = renovate[bot]
+      - -draft
+      - -conflict
+      - "#approved-reviews-by >= 1"
+      - check-success = CI gate
+    merge_conditions:
+      - "#approved-reviews-by >= 1"
+      - check-success = CI gate
+
+merge_protections_settings:
+  auto_merge_conditions:
+    - base = master
+    - author = renovate[bot]
+    - -draft
+    - -conflict
+    - "#approved-reviews-by >= 1"
+    - check-success = CI gate

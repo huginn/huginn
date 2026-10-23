@@ -150,6 +150,23 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  ci-gate:
+    name: CI gate
+    if: always()
+    needs:
+      - run-tests
+      - build-docker-images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check test and Docker build results
+        env:
+          TEST_RESULT: ${{ needs.run-tests.result }}
+          BUILD_RESULT: ${{ needs.build-docker-images.result }}
+        run: |
+          test "$TEST_RESULT" = success
+          test "$BUILD_RESULT" = success
+
   push-docker-images:
     name: docker-push-${{ matrix.docker_image }}
     if: github.event_name == 'push' && github.ref_name == 'master'
