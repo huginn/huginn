@@ -9,7 +9,7 @@ apt-get install -y gnupg python3-pip supervisor libaio1t64 libnuma1 libncurses6 
 
 # Oracle's APT repository does not provide arm64 packages.  Use the signed
 # generic distribution on both architectures instead.
-MYSQL_VERSION=8.4.11
+MYSQL_VERSION=8.4.13
 case "$(dpkg --print-architecture)" in
   amd64) mysql_arch=x86_64 ;;
   arm64) mysql_arch=aarch64 ;;
