@@ -55,7 +55,7 @@ gem 'omniauth-google-oauth2', '~> 1.2.3'
 gem 'xmpp4r'
 
 # JavaScriptAgent
-gem 'mini_racer', '~> 0.22.1'
+gem 'mini_racer', '~> 0.22.2'
 
 # LocalFileAgent (watch functionality)
 gem 'listen', require: false
@@ -67,13 +67,13 @@ gem 'mqtt'
 gem 'pdf-reader'
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.233.2'
+gem 'aws-sdk-s3', '~> 1', '>= 1.235.0'
 
 # SlackAgent
 gem 'slack-notifier'
 
 # Tumblr Agents
-gem 'omniauth-oauth', '~> 1.2', '>= 1.2.1'
+gem 'omniauth-oauth', '~> 1.3'
 gem 'simple_oauth'
 
 # TwilioAgent
@@ -116,8 +116,8 @@ gem 'huginn_agent'
 gem 'jquery-rails'
 gem 'json', '< 4'
 gem 'jsonpath'
-gem "janeway-jsonpath", "~> 1.1", require: "janeway"
-gem 'kaminari', '~> 1.2', '>= 1.2.2'
+gem "janeway-jsonpath", "~> 1.2", require: "janeway"
+gem 'kaminari', '~> 1.3'
 gem 'kramdown'
 gem 'liquid', '~> 5.14'
 gem 'logger'
