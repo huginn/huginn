@@ -52,7 +52,7 @@ sudo -u huginn -H cp Procfile.bak Procfile
 
 ### 4. Update ruby version
 
-Ensure you have Ruby 4.0.7 installed:
+Ensure you have Ruby 4.0.9 installed:
 
 ```
 ruby -v
@@ -62,8 +62,8 @@ Upgrade when required:
 
 ```
 mkdir /tmp/ruby && cd /tmp/ruby
-curl -L --progress https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.7.tar.xz | tar xJ
-cd ruby-4.0.7
+curl -L --progress https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.9.tar.xz | tar xJ
+cd ruby-4.0.9
 ./configure --disable-install-rdoc
 make -j`nproc`
 sudo make install
