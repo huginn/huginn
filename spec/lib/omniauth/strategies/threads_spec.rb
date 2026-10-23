@@ -27,6 +27,7 @@ describe OmniAuth::Strategies::Threads do
 
   describe "#build_access_token" do
     before do
+      allow(strategy).to receive(:session).and_return({})
       allow(strategy).to receive(:request).and_return(request)
       allow(strategy).to receive(:full_host).and_return("https://agents.akinori.org")
       allow(strategy).to receive(:callback_path).and_return("/auth/threads/callback")
