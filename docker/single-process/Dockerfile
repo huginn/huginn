@@ -2,7 +2,7 @@
 # link-local addresses.  It is started inside the container when
 # ENABLE_SMOKESCREEN=true; see doc/manual/outbound-requests.md.
 # renovate: datasource=git-refs depName=https://github.com/stripe/smokescreen branch=master
-ARG SMOKESCREEN_COMMIT=bc3bf31dc7ebe28ae2582a1a06cb96bcb57db78a
+ARG SMOKESCREEN_COMMIT=68e7b8218e226bc47d09ce705fdb8fed82145ceb
 
 FROM golang:1.27-alpine AS smokescreen
 ARG SMOKESCREEN_COMMIT
