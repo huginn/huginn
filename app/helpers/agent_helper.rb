@@ -1,5 +1,17 @@
 module AgentHelper
 
+  def agent_filter_option(text, value, label, count = nil)
+    content_tag :option, text, value: value,
+      selected: value.to_s == (params[:without_scenario].present? ? "none" : params[:scenario_id].to_s),
+      data: { label: String.new(label), count: count }
+  end
+
+  def agent_filter_service_label(service)
+    content_tag :span, class: "agent-filter-service btn-service service-#{service.provider}" do
+      safe_join([omniauth_provider_icon(service.provider), content_tag(:span, service.name)])
+    end
+  end
+
   def agent_show_view(agent)
     path = File.join('agents', 'agent_views', @agent.short_type.underscore, 'show')
     return self.controller.template_exists?(path, [], true) ? path : nil
