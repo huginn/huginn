@@ -1,15 +1,13 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:recommended"],
+  extends: ["config:recommended", "helpers:pinGitHubActionDigests"],
   labels: ["dependencies", "automerge"],
+  minimumReleaseAge: "3 days",
   prHourlyLimit: 0,
   prConcurrentLimit: 10,
   timezone: "Asia/Tokyo",
   schedule: ["after 9am and before 1pm on Saturday"],
-  lockFileMaintenance: {
-    enabled: true,
-    schedule: ["after 9am and before 1pm on Friday"],
-  },
+  lockFileMaintenance: { enabled: false },
   customManagers: [
     {
       customType: "regex",
@@ -65,6 +63,10 @@
     },
   ],
   packageRules: [
+    {
+      matchManagers: ["github-actions"],
+      groupName: "github actions",
+    },
     {
       groupName: "Ruby",
       matchDatasources: ["ruby-version"],

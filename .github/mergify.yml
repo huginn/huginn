@@ -4,7 +4,7 @@ queue_rules:
   - name: dependency-updates
     queue_conditions:
       - base = master
-      - author = renovate[bot]
+      - author ~= ^(dependabot|renovate|lockfile-maintenance)\[bot\]$
       - -draft
       - -conflict
       - "#approved-reviews-by >= 1"
@@ -16,7 +16,7 @@ queue_rules:
 merge_protections_settings:
   auto_merge_conditions:
     - base = master
-    - author = renovate[bot]
+    - author ~= ^(dependabot|renovate|lockfile-maintenance)\[bot\]$
     - -draft
     - -conflict
     - "#approved-reviews-by >= 1"
