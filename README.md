@@ -98,6 +98,10 @@ This is the recommended way to run Huginn in production.  The official images ar
 
 The same Compose files work on self-hosted platforms that deploy from Compose, such as [Coolify](https://coolify.io/) and [Dokploy](https://dokploy.com/).
 
+### Dokku on your own server
+
+For [Dokku](https://dokku.com/), we recommend the official single-process Docker image with separate web and worker containers.  See the [Dokku deployment instructions](doc/docker/install.md#deploying-with-dokku) for a minimal Dockerfile and Procfile, database configuration, and explicit Dockerfile builder selection.
+
 ### Managed platforms
 
 Any platform that runs a public Docker image with an always-on worker and a managed database can host Huginn.  Create a web service and a worker service from the single-process image (the worker runs `/scripts/init bin/threaded.rb`), attach a PostgreSQL or MySQL database, and set the environment variables described in the [Docker documentation](doc/docker/install.md).  Platforms known to fit this shape include [Render](https://render.com/docs/deploying-an-image), [Fly.io](https://docs.fly.io/launch/processes), [Railway](https://docs.railway.com/services), and [DigitalOcean App Platform](https://docs.digitalocean.com/products/app-platform/how-to/deploy-from-container-images/).  None of them keeps a worker running on a free tier, so expect a small monthly bill.

@@ -6,6 +6,10 @@
 
 - [Run Huginn with Docker](docker/install.md) Try Huginn in one container, or run it in production with Docker Compose
 
+### Dokku
+
+- [Deploy with Dokku](docker/install.md#deploying-with-dokku) Use the recommended official Docker image with separate web and worker processes
+
 ### Manual installation
 
 Step-by-step instructions to install Huginn from source on a Debian or Ubuntu server.  This guide is maintained on a best-effort basis; Docker is recommended.
