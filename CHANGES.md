@@ -2,6 +2,10 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Oct 24, 2026   | Upgrade Ruby to 4.0.9 and the bundled MySQL server to 8.4.13. [#3805](https://github.com/huginn/huginn/pull/3805) [#3809](https://github.com/huginn/huginn/pull/3809) |
+| Oct 24, 2026   | Select the web interface language with `LOCALE`, using translations from an additional gem and falling back to English for missing translations. [#3781](https://github.com/huginn/huginn/pull/3781) |
+| Oct 24, 2026   | Update Docker `latest` tags only when a release passes the Docker specs.  Use the `master` image tag for builds from the development branch. [#3802](https://github.com/huginn/huginn/pull/3802) |
+| Oct 24, 2026   | Refresh Smokescreen, Ruby gems, and npm dependencies. |
 | Oct 14, 2026   | Show maps of location Events with OpenStreetMap and Leaflet when UserLocationAgent has no Google Maps `api_key`, instead of showing no map. [#3791](https://github.com/huginn/huginn/pull/3791) |
 | Oct 14, 2026   | Upgrade the PostgreSQL Docker Compose example from PostgreSQL 9.5 to 18.  See the [upgrade guide](UPGRADING.md#moving-the-postgresql-compose-example-to-postgresql-18) before using it with an existing database. [#3789](https://github.com/huginn/huginn/pull/3789) |
 | Oct 14, 2026   | Move the Heroku setup to the `heroku-24` stack and Heroku's native multi-buildpack support.  Existing apps must be moved by hand; see the [upgrade guide](UPGRADING.md#moving-heroku-deployments-to-heroku-24). [#3788](https://github.com/huginn/huginn/pull/3788) |
