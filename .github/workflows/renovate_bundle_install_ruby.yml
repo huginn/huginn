@@ -5,20 +5,28 @@ on:
     paths:
       - "mise.toml"
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   bundle-install:
-    if: github.actor == 'renovate[bot]' && github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      github.event.pull_request.user.login == 'renovate[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v7
+      - name: Harden Runner
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: false
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
 
       - name: Update bundle
         run: |
@@ -26,11 +34,13 @@ jobs:
           bundle update --ruby
 
       - name: Commit and push
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
           git diff --staged --quiet || {
             git commit -m 'Update bundle for Ruby version'
-            git push
+            git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push
           }
