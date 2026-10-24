@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require "json"
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'setup_tools'))
 include SetupTools
 
@@ -81,7 +82,8 @@ unless $config['DOMAIN']
   first_time = true
 end
 
-buildpacks = File.readlines(File.expand_path('../.buildpacks', __dir__), chomp: true).reject(&:empty?)
+app_config = JSON.parse(File.read(File.expand_path("../app.json", __dir__)))
+buildpacks = app_config.fetch("buildpacks").map { |buildpack| buildpack.fetch("url") }
 puts "Setting buildpacks to #{buildpacks.join(', ')}"
 capture("heroku buildpacks:clear")
 buildpacks.each { |url| capture("heroku buildpacks:add #{url}") }

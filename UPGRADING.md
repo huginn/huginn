@@ -10,19 +10,27 @@ Introduced on `master` on 2026-10-14; included in v2026.10.14.
 
 Heroku deprecated the `heroku-22` stack and rejects builds on it from November 2026.  New apps created from `app.json` or `bin/setup_heroku` now use `heroku-24` and Heroku's native multi-buildpack support instead of `heroku-buildpack-multi`.
 
-Existing apps keep their stack and the `BUILDPACK_URL` setting when Huginn is updated, so move them yourself.  Set the new stack, replace `BUILDPACK_URL` with the buildpacks listed in `.buildpacks`, and then deploy as described in the [Heroku update guide](doc/heroku/update.md):
+Existing apps keep their stack and the `BUILDPACK_URL` setting when Huginn is updated, so move them yourself.  Set the new stack, replace `BUILDPACK_URL` with the buildpacks listed in `app.json`, and then deploy as described in the [Heroku update guide](doc/heroku/update.md):
 
 ```sh
 heroku stack:set heroku-24
 heroku config:unset BUILDPACK_URL
 heroku buildpacks:clear
+heroku buildpacks:add https://github.com/heroku/heroku-buildpack-apt.git
 heroku buildpacks:add https://github.com/cantino/heroku-selectable-procfile.git
+heroku buildpacks:add https://github.com/heroku/heroku-buildpack-nodejs.git
 heroku buildpacks:add https://github.com/heroku/heroku-buildpack-ruby.git
-heroku buildpacks:add https://github.com/weibeld/heroku-buildpack-graphviz.git
-heroku buildpacks:add https://github.com/chrismytton/heroku-buildpack-jq.git
 ```
 
 The new stack and buildpacks take effect on the next deploy.
+
+If you already use `heroku-24`, update the buildpack list as shown above before deploying.  Graphviz now comes from the APT buildpack; jq is included in the stack.
+
+Dokku 0.38 and later also read the buildpacks listed in `app.json`.  If your Dokku app uses a Dockerfile, explicitly select the Dockerfile builder to prevent automatic selection of herokuish.  Replace `your-app` with your Dokku app name:
+
+```sh
+dokku builder:set your-app selected dockerfile
+```
 
 ## Moving the PostgreSQL Compose example to PostgreSQL 18
 

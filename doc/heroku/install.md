@@ -51,7 +51,7 @@ http://radiant-forest-1519.herokuapp.com/ | git@heroku.com:radiant-forest-1519.g
 Git remote heroku added
 Your Heroku app name is radiant-forest-1519.  Is this correct? (y/n) y
 Setting up APP_SECRET_TOKEN...
-Setting buildpacks to https://github.com/cantino/heroku-selectable-procfile.git, https://github.com/heroku/heroku-buildpack-ruby.git, https://github.com/weibeld/heroku-buildpack-graphviz.git, https://github.com/chrismytton/heroku-buildpack-jq.git
+Setting buildpacks to https://github.com/heroku/heroku-buildpack-apt.git, https://github.com/cantino/heroku-selectable-procfile.git, https://github.com/heroku/heroku-buildpack-nodejs.git, https://github.com/heroku/heroku-buildpack-ruby.git
 Setting PROCFILE_PATH to deployment/heroku/Procfile.heroku
 PROCFILE_PATH: deployment/heroku/Procfile.heroku
 Setting ON_HEROKU to true

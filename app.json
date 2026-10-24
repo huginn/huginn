@@ -5,10 +5,10 @@
     "repository": "https://github.com/huginn/huginn",
     "logo": "https://raw.githubusercontent.com/huginn/huginn/master/media/huginn-icon-64.png",
     "buildpacks": [
+        { "url": "https://github.com/heroku/heroku-buildpack-apt.git" },
         { "url": "https://github.com/cantino/heroku-selectable-procfile.git" },
-        { "url": "https://github.com/heroku/heroku-buildpack-ruby.git" },
-        { "url": "https://github.com/weibeld/heroku-buildpack-graphviz.git" },
-        { "url": "https://github.com/chrismytton/heroku-buildpack-jq.git" }
+        { "url": "https://github.com/heroku/heroku-buildpack-nodejs.git" },
+        { "url": "https://github.com/heroku/heroku-buildpack-ruby.git" }
     ],
     "env": {
         "APP_SECRET_TOKEN": {
