@@ -6,7 +6,7 @@ module Agents
     description <<~MD
       The De-duplication Agent receives a stream of events and remits the event if it is not a duplicate.
 
-      `property` the value that should be used to determine the uniqueness of the event (empty to use the whole payload)
+      `property` the value that should be used to determine the uniqueness of the event (empty to use the whole payload).  Events for which `property` renders to an empty string, such as when the referenced key is missing, are always remitted and not remembered.
 
       `lookback` amount of past Events to compare the value to (0 for unlimited)
 
@@ -54,7 +54,21 @@ module Agents
     private
 
     def handle(opts, event = nil)
-      property = get_hash(options['property'].blank? ? Utils.stable_json(event.payload) : opts['property'])
+      if options['property'].blank?
+        property = get_hash(Utils.stable_json(event.payload))
+      elsif opts['property'].to_s.empty?
+        outbound_event = create_event payload: event.payload
+
+        log(
+          "Propagating new event as its property is empty.",
+          inbound_event: event,
+          outbound_event:
+        )
+        return
+      else
+        property = get_hash(opts['property'])
+      end
+
       if is_unique?(property)
         outbound_event = create_event payload: event.payload
 

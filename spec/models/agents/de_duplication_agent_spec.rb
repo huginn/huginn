@@ -152,6 +152,20 @@ describe Agents::DeDuplicationAgent do
       }.not_to change(Event, :count)
     end
 
+    it "propagates events whose property renders empty without remembering them" do
+      first_event = Event.create!(agent: agents(:jane_weather_agent), payload: { 'other' => 'a' })
+      second_event = Event.create!(agent: agents(:jane_weather_agent), payload: { 'other' => 'b' })
+
+      expect {
+        @checker.receive([first_event, second_event])
+      }.to change(Event, :count).by(2)
+      expect(@checker.memory['properties']).to eq([])
+
+      expect {
+        @checker.receive([first_event])
+      }.to change(Event, :count).by(1)
+    end
+
     it "should still work after the memory was cleared" do
       @checker.memory = {}
       @checker.save
