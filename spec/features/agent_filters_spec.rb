@@ -25,11 +25,17 @@ describe "Agent filters", js: true do
     expect(page).to have_checked_field("Enabled only")
     expect(page).to have_current_path(/without_scenario=1/)
 
-    page.driver.browser.manage.window.resize_to(1280, 900)
-    expect(page.evaluate_script('getComputedStyle(document.querySelector(".agents-index-layout")).display')).to eq("grid")
-    page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 375, height: 800, deviceScaleFactor: 1, mobile: false)
-    expect(page.evaluate_script('innerWidth')).to eq(375)
-    expect(page.evaluate_script('getComputedStyle(document.querySelector(".agents-index-layout")).display')).to eq("block")
-    expect(page.evaluate_script('document.documentElement.scrollWidth <= innerWidth')).to be(true)
+    window_size = page.current_window.size
+    begin
+      page.current_window.resize_to(1280, 900)
+      expect(page.evaluate_script('getComputedStyle(document.querySelector(".agents-index-layout")).display')).to eq("grid")
+      page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 375, height: 800, deviceScaleFactor: 1, mobile: false)
+      expect(page.evaluate_script('innerWidth')).to eq(375)
+      expect(page.evaluate_script('getComputedStyle(document.querySelector(".agents-index-layout")).display')).to eq("block")
+      expect(page.evaluate_script('document.documentElement.scrollWidth <= innerWidth')).to be(true)
+    ensure
+      page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+      page.current_window.resize_to(*window_size)
+    end
   end
 end
