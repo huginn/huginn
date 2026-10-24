@@ -30,6 +30,34 @@ describe Agents::WebhookAgent do
       expect(Event.last.payload).to eq( {"people"=>[{"name"=>"bob"}, {"name"=>"jon"}], "X-HTTP-HEADERS"=>{"Accept"=>"application/xml", "X-Hello-World"=>"Hello Huginn"}})
     end
 
+    it 'should create an event from payload JSON when a file upload is also present' do
+      Tempfile.create(['thumb', '.jpg']) do |file|
+        file.write('fake-image')
+        file.rewind
+
+        thumb = ActionDispatch::Http::UploadedFile.new(
+          tempfile: file,
+          filename: 'thumb.jpg',
+          type: 'image/jpeg'
+        )
+        webpayload = ActionDispatch::Request.new({
+            'action_dispatch.request.request_parameters' => { 'payload' => payload, 'thumb' => thumb },
+            'action_dispatch.request.path_parameters' => { secret: 'foobar' },
+            'REQUEST_METHOD' => "POST",
+            'HTTP_ACCEPT' => 'application/xml'
+          })
+
+        agent.options['payload_path'] = '$.payload'
+
+        out = nil
+        expect {
+          out = agent.receive_web_request(webpayload)
+        }.to change { Event.count }.by(1)
+        expect(out).to eq(['Event Created', 201])
+        expect(Event.last.payload).to eq(payload)
+      end
+    end
+
     it 'should be able to create multiple events when given an array' do
       webpayload = ActionDispatch::Request.new({
           'action_dispatch.request.request_parameters' => { 'some_key' => payload },
