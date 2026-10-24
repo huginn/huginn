@@ -2,21 +2,38 @@ class AgentsController < ApplicationController
   include DotHelper
   include ActionView::Helpers::TextHelper
   include SortableTable
+  helper_method :agent_filter_params
 
   def index
     set_table_sort sorts: %w[name created_at last_check_at last_event_at last_receive_at], default: { created_at: :desc }
 
-    @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort).page(params[:page])
+    if params[:enabled] == "1"
+      set_only_enabled_agents_as_viewable
+    elsif params[:enabled] == "0"
+      mark_all_agents_viewable
+    end
+
+    @agents = current_user.agents.preload(:scenarios, :controllers).reorder(table_sort)
     @service = current_user.services.find(params[:service_id]) if params[:service_id].present?
     @agents = @agents.where(service: @service) if @service
-
-    if params[:without_scenario].present?
-      @agents = @agents.where.missing(:scenario_memberships)
-    end
 
     if show_only_enabled_agents?
       @agents = @agents.where(disabled: false)
     end
+
+    @filter_scenarios = current_user.scenarios.order(:name)
+    @filter_services = current_user.services.order(:name)
+    @scenario_counts = @agents.reorder(nil).joins(:scenario_memberships).group("scenario_memberships.scenario_id").count
+    @all_agents_count = @agents.count
+    @unassigned_agents_count = @agents.where.missing(:scenario_memberships).count
+
+    if params[:without_scenario].present? || params[:scenario_id] == "none"
+      @agents = @agents.where.missing(:scenario_memberships)
+    elsif params[:scenario_id].present?
+      @scenario = current_user.scenarios.find(params[:scenario_id])
+      @agents = @agents.where(id: @scenario.agents.select(:id))
+    end
+    @agents = @agents.page(params[:page])
 
     respond_to do |format|
       format.html
@@ -31,7 +48,7 @@ class AgentsController < ApplicationController
       set_only_enabled_agents_as_viewable
     end
 
-    redirect_to agents_path
+    redirect_to agents_path(agent_filter_params)
   end
 
   def handle_details_post
@@ -259,6 +276,10 @@ class AgentsController < ApplicationController
   end
 
   private
+  def agent_filter_params
+    params.slice(:scenario_id, :without_scenario, :service_id, :sort).permit!
+  end
+
   def show_only_enabled_agents?
     !!cookies[:huginn_view_only_enabled_agents]
   end

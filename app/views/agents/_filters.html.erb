@@ -1,0 +1,34 @@
+<aside class="agent-filters" aria-label="Agent filters">
+  <%= form_tag agents_path, method: :get, class: "agent-filter-form" do %>
+    <%= hidden_field_tag :sort, params[:sort] if params[:sort].present? %>
+    <div class="agent-filter-field">
+      <%= label_tag :agent_scenario_filter, 'Scenario' %>
+      <select id="agent_scenario_filter" name="scenario_id" class="agent-filter-select">
+        <%= agent_filter_option('All', '', content_tag(:span, 'All'), @all_agents_count) %>
+        <optgroup label="Scenarios">
+          <% @filter_scenarios.each do |scenario| %>
+            <%= agent_filter_option(scenario.name, scenario.id, scenario_label(scenario), @scenario_counts.fetch(scenario.id, 0)) %>
+          <% end %>
+        </optgroup>
+        <%= agent_filter_option('No scenario', 'none', content_tag(:span, 'No scenario', class: 'label label-warning'), @unassigned_agents_count) %>
+      </select>
+    </div>
+    <div class="agent-filter-field">
+      <%= label_tag :agent_service_filter, 'Service' %>
+      <select id="agent_service_filter" name="service_id" class="agent-filter-select">
+        <option value="">All services</option>
+        <% @filter_services.each do |service| %>
+          <%= content_tag :option, service.name, value: service.id, selected: @service == service, data: { label: String.new(agent_filter_service_label(service)) } %>
+        <% end %>
+      </select>
+    </div>
+    <div class="agent-filter-enabled">
+      <%= hidden_field_tag :enabled, '0' %>
+      <label><%= check_box_tag :enabled, '1', cookies[:huginn_view_only_enabled_agents].present? %> Enabled only</label>
+    </div>
+    <% if @service || @scenario || params[:without_scenario].present? || params[:scenario_id] == 'none' || cookies[:huginn_view_only_enabled_agents].present? %>
+      <%= link_to 'Clear filters', agents_path(enabled: '0', sort: params[:sort]), class: 'agent-filter-clear' %>
+    <% end %>
+    <noscript><%= submit_tag 'Apply filters', class: 'btn btn-default btn-sm' %></noscript>
+  <% end %>
+</aside>
