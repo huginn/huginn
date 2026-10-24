@@ -61,6 +61,16 @@ class WebRequestsController < ApplicationController
     end
   end
 
+  # Browser CORS preflight. Answer without authenticating or creating events so
+  # the subsequent GET/POST/PUT/DELETE can proceed.
+  def handle_request_options
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'POST, PUT, GET, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = '*'
+    response.headers['Access-Control-Max-Age'] = '1728000'
+    render plain: 'OK'
+  end
+
   # legacy
   def update_location
     if user = User.find_by_id(params[:user_id])
