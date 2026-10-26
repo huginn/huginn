@@ -67,6 +67,7 @@ module Agents
         params.update(request.request_parameters)
       rescue EOFError
       end
+      params = params_without_uploaded_files(params)
 
       method = request.method_symbol.to_s
       headers = request.headers.each_with_object({}) { |(name, value), hash|
@@ -156,6 +157,29 @@ module Agents
 
     def payload_for(params)
       value_at(params, interpolated['payload_path']) || {}
+    end
+
+    private
+
+    def params_without_uploaded_files(value)
+      case value
+      when ActionDispatch::Http::UploadedFile
+        nil
+      when Hash
+        value.each_with_object(value.class.new) do |(key, nested), filtered|
+          next if nested.is_a?(ActionDispatch::Http::UploadedFile)
+
+          filtered[key] = params_without_uploaded_files(nested)
+        end
+      when Array
+        value.each_with_object([]) do |nested, filtered|
+          next if nested.is_a?(ActionDispatch::Http::UploadedFile)
+
+          filtered << params_without_uploaded_files(nested)
+        end
+      else
+        value
+      end
     end
   end
 end
