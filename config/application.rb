@@ -16,6 +16,8 @@ require 'rails/test_unit/railtie'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
+# gRPC otherwise prefers its bundled roots.pem over the OS trust store.
+ENV["GRPC_USE_SYSTEM_ROOTS_OVER_LANGUAGE_CALLBACK"] ||= "true"
 Bundler.require(*Rails.groups)
 
 module Huginn
