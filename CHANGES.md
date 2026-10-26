@@ -2,6 +2,13 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Oct 26, 2026   | Require the eMudhra CA distrust update in Docker images and prefer the OS CA store for gRPC connections. |
+| Oct 26, 2026   | Use Active Record validation for service-name sort directions. [#3759](https://github.com/huginn/huginn/pull/3759) |
+| Oct 26, 2026   | Add responsive scenario and service filters to the Agents page, including agents without a scenario. [#3776](https://github.com/huginn/huginn/pull/3776) |
+| Oct 26, 2026   | Pass through events when DeDuplicationAgent's configured property renders to an empty string, without remembering them as duplicates. [#3793](https://github.com/huginn/huginn/pull/3793) |
+| Oct 26, 2026   | Interpolate Basic Authentication values during web request validation. [#3769](https://github.com/huginn/huginn/pull/3769) |
+| Oct 26, 2026   | Link the failed-jobs toolbar icon to the last jobs page, enlarge the New Agent type list, and enable Graphviz rendering by default. [#3775](https://github.com/huginn/huginn/pull/3775) [#3772](https://github.com/huginn/huginn/pull/3772) [#3771](https://github.com/huginn/huginn/pull/3771) |
+| Oct 26, 2026   | Fix buildpack selection and Graphviz installation on Heroku, and document Docker-based Dokku deployment. |
 | Oct 24, 2026   | Upgrade Ruby to 4.0.9 and the bundled MySQL server to 8.4.13. [#3805](https://github.com/huginn/huginn/pull/3805) [#3809](https://github.com/huginn/huginn/pull/3809) |
 | Oct 24, 2026   | Select the web interface language with `LOCALE`, using translations from an additional gem and falling back to English for missing translations. [#3781](https://github.com/huginn/huginn/pull/3781) |
 | Oct 24, 2026   | Update Docker `latest` tags only when a release passes the Docker specs.  Use the `master` image tag for builds from the development branch. [#3802](https://github.com/huginn/huginn/pull/3802) |
