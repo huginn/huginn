@@ -11,7 +11,11 @@ RUN CGO_ENABLED=0 go install "github.com/stripe/smokescreen@${SMOKESCREEN_COMMIT
 FROM rubylang/ruby:4.0.9-noble
 
 COPY docker/scripts/prepare /scripts/
-RUN /scripts/prepare
+# Require the eMudhra CA distrust update (Ubuntu USN-8944-1).
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    dpkg --compare-versions "$(dpkg-query -W -f='${Version}' ca-certificates)" ge 20260816ubuntu0.24.04.1 && \
+    /scripts/prepare
 
 COPY --from=smokescreen /go/bin/smokescreen /usr/local/bin/smokescreen
 
