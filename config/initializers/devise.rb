@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'utils'
+require 'ldap_settings'
 require Rails.root.join("lib/omniauth/strategies/tumblr").to_s
 require Rails.root.join("lib/omniauth/strategies/threads").to_s
 require Rails.root.join("lib/omniauth/strategies/raindrop").to_s
@@ -309,6 +310,13 @@ Devise.setup do |config|
      (key = ENV["RAINDROP_CLIENT_ID"]).present? &&
      (secret = ENV["RAINDROP_CLIENT_SECRET"]).present?
     config.omniauth :raindrop, key, secret
+  end
+
+  # LDAP login (optional, off by default). Registered only when LDAP_HOST is
+  # set; see lib/ldap_settings.rb for the environment contract. Encryption is on
+  # by default (StartTLS); clear text requires LDAP_METHOD=plain explicitly.
+  if defined?(OmniAuth::Strategies::LDAP) && LdapSettings.enabled?
+    config.omniauth :ldap, **LdapSettings.omniauth_options
   end
 
   # ==> Warden configuration
