@@ -116,7 +116,7 @@ GEM
     bcrypt (3.1.22)
     benchmark (0.5.0)
     bigdecimal (3.3.1)
-    bootsnap (1.26.0)
+    bootsnap (1.26.1)
       msgpack (~> 1.5)
     bootstrap-kaminari-views (0.0.5)
       kaminari (>= 0.13)
@@ -205,7 +205,7 @@ GEM
       oauth (>= 0.4.1)
     execjs (2.10.2)
       json (>= 2)
-    faraday (2.15.0)
+    faraday (2.15.1)
       faraday-net_http (>= 2.0, < 3.6)
       json
       logger
@@ -221,7 +221,7 @@ GEM
     faraday-typhoeus (2.0.0)
       faraday (~> 2.0)
       typhoeus (~> 1.4)
-    feedjira (4.0.2)
+    feedjira (4.0.3)
       logger (>= 1.0, < 2)
       loofah (>= 2.3.1, < 3)
       sax-machine (>= 1.0, < 2)
@@ -351,18 +351,18 @@ GEM
       multi_json
     jwt (3.3.0)
       base64
-    kaminari (1.3.0)
+    kaminari (1.3.2)
       activesupport (>= 4.1.0)
-      kaminari-actionview (= 1.3.0)
-      kaminari-activerecord (= 1.3.0)
-      kaminari-core (= 1.3.0)
-    kaminari-actionview (1.3.0)
+      kaminari-actionview (= 1.3.2)
+      kaminari-activerecord (= 1.3.2)
+      kaminari-core (= 1.3.2)
+    kaminari-actionview (1.3.2)
       actionview
-      kaminari-core (= 1.3.0)
-    kaminari-activerecord (1.3.0)
+      kaminari-core (= 1.3.2)
+    kaminari-activerecord (1.3.2)
       activerecord
-      kaminari-core (= 1.3.0)
-    kaminari-core (1.3.0)
+      kaminari-core (= 1.3.2)
+    kaminari-core (1.3.2)
     kramdown (2.5.2)
       rexml (>= 3.4.4)
     language_server-protocol (3.17.0.6)
@@ -809,7 +809,7 @@ DEPENDENCIES
   faraday-gzip
   faraday-multipart
   faraday-typhoeus
-  feedjira (~> 4.0, >= 4.0.2)
+  feedjira (~> 4.0, >= 4.0.3)
   foreman
   geokit
   geokit-rails
@@ -825,7 +825,7 @@ DEPENDENCIES
   jquery-rails
   json (< 4)
   jsonpath
-  kaminari (~> 1.3)
+  kaminari (~> 1.3, >= 1.3.1)
   kramdown
   letter_opener_web
   liquid (~> 5.14)
