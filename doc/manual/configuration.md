@@ -26,4 +26,6 @@ Set at least `LDAP_HOST` and `LDAP_BASE`; see the `LDAP login (optional)` block 
 - **Restricting who may log in.**  Use `LDAP_FILTER` with `%{username}` (for example to require membership of a group); the value is placed into the directory filter with escaping.
 - A "Log in with LDAP" form appears on the sign-in page only while the feature is enabled.
 
+For **Active Directory**, set `LDAP_UID=sAMAccountName`, use `LDAP_METHOD=ssl` (LDAPS; AD normally rejects unencrypted binds), point `LDAP_HOST` at a name that matches the domain controller's certificate and `LDAP_CA_FILE` at that CA, and supply a read-only service account via `LDAP_BIND_DN`/`LDAP_BIND_PW`. To restrict login to a group and include **nested** group members, use the matching-rule-in-chain filter, e.g. `LDAP_FILTER=(&(sAMAccountName=%{username})(memberOf:1.2.840.113556.1.4.1941:=CN=huginn-users,CN=Users,dc=ad,dc=example,dc=org))`. Disabled AD accounts are rejected by the directory at bind time.
+
 Signing in with LDAP is separate from connecting an external *service* to an Agent on the Services page; the two do not share credentials or accounts.
