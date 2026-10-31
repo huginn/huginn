@@ -1,0 +1,27 @@
+<% if LdapSettings.enabled? %>
+  <hr>
+
+  <h2><%= LdapSettings.title %> log in</h2>
+
+  <%= form_tag(user_ldap_omniauth_callback_path, method: :post, class: 'form-horizontal', role: 'form') do %>
+    <div class="form-group">
+      <label class="col-md-2 col-md-offset-2 control-label" for="ldap_username">Username</label>
+      <div class="col-md-6">
+        <%= text_field_tag :username, nil, id: 'ldap_username', class: 'form-control', autocomplete: 'username' %>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-md-2 col-md-offset-2 control-label" for="ldap_password">Password</label>
+      <div class="col-md-6">
+        <%= password_field_tag :password, nil, id: 'ldap_password', class: 'form-control', autocomplete: 'current-password' %>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-md-offset-4 col-md-10">
+        <%= submit_tag "Log in with #{LdapSettings.title}", class: 'btn btn-default' %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
