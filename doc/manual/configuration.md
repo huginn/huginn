@@ -22,7 +22,7 @@ Set at least `LDAP_HOST` and `LDAP_BASE`; see the `LDAP login (optional)` block 
 
 - **Encryption is on by default.**  `LDAP_METHOD` defaults to `tls` (StartTLS); use `ssl` for LDAPS.  `plain` is unencrypted and has to be selected explicitly.
 - **Certificates are verified by default.**  For a self-signed server, point `LDAP_CA_FILE` at its CA rather than turning verification off.
-- **Users are matched by username only.**  An LDAP email address is never used to adopt an existing local account.  New local accounts are created from LDAP only when `LDAP_AUTO_CREATE=true`.
+- **Users are matched by username only.**  An LDAP email address is never used to adopt an existing local account.  New local accounts are created from LDAP only when `LDAP_AUTO_CREATE=true`.  Be aware of what username matching implies: once LDAP is enabled, Huginn trusts the directory for **every** local account whose username also exists in the directory — including privileged ones such as `admin`.  Anyone who can authenticate as that name in the directory can sign into the matching Huginn account.  Restrict who may log in with `LDAP_FILTER` (for example to members of a dedicated group), and make sure directory usernames do not unintentionally overlap with sensitive local accounts.
 - **Restricting who may log in.**  Use `LDAP_FILTER` with `%{username}` (for example to require membership of a group); the value is placed into the directory filter with escaping.
 - A "Log in with LDAP" form appears on the sign-in page only while the feature is enabled.
 
