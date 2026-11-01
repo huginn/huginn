@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+source 'https://rubygems.org', cooldown: 3
 
 ruby '>=3.4.0'
 
@@ -67,7 +67,7 @@ gem 'mqtt'
 gem 'pdf-reader'
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.235.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.236.0'
 
 # SlackAgent
 gem 'slack-notifier'
@@ -106,7 +106,7 @@ gem 'faraday-gzip'
 # gem 'faraday-httpclient'
 gem 'faraday-multipart'
 gem 'faraday-typhoeus'
-gem 'feedjira', '~> 4.0', '>= 4.0.2'
+gem 'feedjira', '~> 4.0', '>= 4.0.3'
 gem 'foreman'
 gem 'geokit'
 gem 'geokit-rails'
@@ -117,7 +117,7 @@ gem 'jquery-rails'
 gem 'json', '< 4'
 gem 'jsonpath'
 gem "janeway-jsonpath", "~> 1.2", require: "janeway"
-gem 'kaminari', '~> 1.3'
+gem 'kaminari', '~> 1.3', '>= 1.3.1'
 gem 'kramdown'
 gem 'liquid', '~> 5.14'
 gem 'logger'
