@@ -64,6 +64,22 @@
   ],
   packageRules: [
     {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchDepTypes": [
+        "action"
+      ],
+      "matchFileNames": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/docker-tag.yml",
+        ".github/workflows/lockfile-maintenance.yml",
+        ".github/workflows/renovate_bundle_install_ruby.yml",
+        ".github/workflows/actions-lock.yml"
+      ],
+      "pinDigests": false
+    },
+    {
       matchManagers: ["github-actions"],
       groupName: "github actions",
     },
