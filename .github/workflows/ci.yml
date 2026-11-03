@@ -189,10 +189,13 @@ jobs:
           test "$BUILD_RESULT" = success
 
   push-docker-images:
-    name: docker-push-${{ matrix.docker_image }}
+    name: docker-push-ghcr-${{ matrix.docker_image }}
     if: github.event_name == 'push' && github.ref_name == 'master'
     needs: build-docker-images
     runs-on: ubuntu-24.04
+    environment:
+      name: ghcr/${{ matrix.docker_image }}/master
+      url: https://github.com/huginn/huginn/pkgs/container/${{ matrix.docker_image == 'huginn/huginn' && 'huginn' || 'huginn-single-process' }}
     permissions:
       packages: write
     strategy:
@@ -226,12 +229,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v4.7.0
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Create manifest list and push to GHCR
         working-directory: /tmp/digests
         env:
@@ -243,6 +240,45 @@ jobs:
             -t "$DOCKER_IMAGE:$GITHUB_REF_NAME" \
             -t "$DOCKER_IMAGE:$GITHUB_SHA" \
             "${digests[@]}"
+
+  push-dockerhub-images:
+    name: docker-push-dockerhub-${{ matrix.docker_image }}
+    if: github.event_name == 'push' && github.ref_name == 'master'
+    needs: push-docker-images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment:
+      name: docker-hub/${{ matrix.docker_image }}/master
+      url: https://hub.docker.com/r/${{ matrix.docker_image }}/tags
+    permissions:
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix:
+        docker_image:
+          - huginn/huginn
+          - huginn/huginn-single-process
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4.4.1
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v4.7.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Push to DockerHub with OUTDATED_DOCKER_REGISTRY flag
         env:
@@ -259,8 +295,13 @@ jobs:
   build-test-image:
     name: docker-build-huginn/huginn-test
     if: github.event_name == 'push' && github.ref_name == 'master'
-    needs: push-docker-images
+    needs:
+      - push-docker-images
+      - push-dockerhub-images
     runs-on: ubuntu-24.04
+    environment:
+      name: ghcr/huginn/huginn-test/master
+      url: https://github.com/huginn/huginn/pkgs/container/huginn-test
     permissions:
       contents: read
       packages: write

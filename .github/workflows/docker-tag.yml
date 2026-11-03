@@ -29,6 +29,7 @@ jobs:
     timeout-minutes: 30
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
+      tag: ${{ inputs.tag || github.ref_name }}
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@v2.22.3
@@ -70,30 +71,62 @@ jobs:
         run: bundle exec rake
 
   tag-docker-images:
-    name: docker-tag-${{ matrix.docker_image }}
+    name: docker-tag-${{ matrix.registry }}-${{ matrix.docker_image }}
     needs: test-docker-images
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: ${{ matrix.registry }}/${{ matrix.docker_image }}/release
+      deployment: false
     permissions:
       contents: read
       packages: write
+      deployments: write
     strategy:
       fail-fast: false
       matrix:
         docker_image:
           - huginn/huginn
           - huginn/huginn-single-process
+        registry:
+          - ghcr
+          - docker-hub
     env:
-      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.test-docker-images.outputs.tag }}
+      SHA: ${{ needs.test-docker-images.outputs.sha }}
+      IMAGE: ${{ matrix.registry == 'ghcr' && format('ghcr.io/{0}', matrix.docker_image) || matrix.docker_image }}
+      DEPLOYMENT_ENVIRONMENT: ${{ matrix.registry }}/${{ matrix.docker_image }}/release
+      DEPLOYMENT_URL: ${{ matrix.registry == 'ghcr' && format('https://github.com/huginn/huginn/pkgs/container/{0}', matrix.docker_image == 'huginn/huginn' && 'huginn' || 'huginn-single-process') || format('https://hub.docker.com/r/{0}/tags', matrix.docker_image) }}
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@v2.22.3
         with:
           egress-policy: audit
 
+      # A manual dispatch's workflow SHA may differ from the tested release commit.
+      - name: Record deployment start
+        id: deployment
+        run: |
+          set -euo pipefail
+          deployment_id="$(gh api --method POST "repos/${GITHUB_REPOSITORY}/deployments" \
+            --raw-field "ref=$SHA" \
+            --raw-field "environment=$DEPLOYMENT_ENVIRONMENT" \
+            --raw-field "description=Tag $IMAGE with $TAG and latest" \
+            --field auto_merge=false \
+            --field 'required_contexts[]' \
+            --jq '.id')"
+          echo "id=$deployment_id" >> "$GITHUB_OUTPUT"
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/deployments/${deployment_id}/statuses" \
+            --raw-field state=in_progress \
+            --raw-field "log_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            --raw-field "environment_url=$DEPLOYMENT_URL" > /dev/null
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.4.1
 
       - name: Log in to GHCR
+        if: matrix.registry == 'ghcr'
         uses: docker/login-action@v4.7.0
         with:
           registry: ghcr.io
@@ -101,20 +134,33 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log in to DockerHub
+        if: matrix.registry == 'docker-hub'
         uses: docker/login-action@v4.7.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Tag the images built for the release commit
-        env:
-          SHA: ${{ needs.test-docker-images.outputs.sha }}
-          GHCR_IMAGE: ghcr.io/${{ matrix.docker_image }}
-          DOCKERHUB_IMAGE: ${{ matrix.docker_image }}
         run: |
-          for image in "$GHCR_IMAGE" "$DOCKERHUB_IMAGE"; do
-            docker buildx imagetools create \
-              -t "$image:$TAG" \
-              -t "$image:latest" \
-              "$image:$SHA"
-          done
+          docker buildx imagetools create \
+            -t "$IMAGE:$TAG" \
+            -t "$IMAGE:latest" \
+            "$IMAGE:$SHA"
+
+      - name: Record deployment result
+        if: ${{ always() && steps.deployment.outputs.id != '' }}
+        env:
+          DEPLOYMENT_ID: ${{ steps.deployment.outputs.id }}
+          RESULT: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          case "$RESULT" in
+            success) state=success ;;
+            cancelled) state=error ;;
+            *) state=failure ;;
+          esac
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/deployments/${DEPLOYMENT_ID}/statuses" \
+            --raw-field "state=$state" \
+            --raw-field "description=Image tagging: $RESULT" \
+            --raw-field "environment_url=$DEPLOYMENT_URL" \
+            --raw-field "log_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" > /dev/null
