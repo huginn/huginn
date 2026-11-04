@@ -86,8 +86,24 @@ module Agents
 
     private
 
-    def request_url(jql, start_at)
-      "#{interpolated[:jira_url]}/rest/api/2/search?jql=#{CGI.escape(jql)}&fields=*all&startAt=#{start_at}"
+    # Jira Cloud removed /rest/api/2/search in favor of /rest/api/2/search/jql,
+    # which pages with nextPageToken; Server and Data Center keep the old endpoint.
+    def cloud?
+      uri = URI.parse(interpolated[:jira_url].to_s)
+      host = uri.host.to_s.downcase
+      host.end_with?('.atlassian.net') || (host == 'api.atlassian.com' && uri.path.to_s.start_with?('/ex/jira'))
+    rescue URI::InvalidURIError
+      false
+    end
+
+    def request_url(jql, start_at, next_page_token = nil)
+      if cloud?
+        url = "#{interpolated[:jira_url]}/rest/api/2/search/jql?jql=#{CGI.escape(jql)}&fields=*all"
+        url += "&nextPageToken=#{CGI.escape(next_page_token)}" if next_page_token
+        url
+      else
+        "#{interpolated[:jira_url]}/rest/api/2/search?jql=#{CGI.escape(jql)}&fields=*all&startAt=#{start_at}"
+      end
     end
 
     def request_options
@@ -124,6 +140,7 @@ module Agents
 
     def get_issues(since)
       startAt = 0
+      next_page_token = nil
       issues = []
 
       # JQL doesn't have an ability to specify timezones
@@ -146,7 +163,7 @@ module Agents
 
       request_limit = 0
       loop do
-        response = get(request_url(jql, startAt), request_options)
+        response = get(request_url(jql, startAt, next_page_token), request_options)
 
         if response['issues'].length == 0
           request_limit += 1
@@ -161,9 +178,15 @@ module Agents
         end
 
         issues += response['issues']
-        startAt += response['issues'].length
 
-        break if startAt >= response['total']
+        if cloud?
+          next_page_token = response['nextPageToken']
+          break if response['isLast'] || next_page_token.nil?
+        else
+          startAt += response['issues'].length
+
+          break if startAt >= response['total']
+        end
       end
 
       issues
