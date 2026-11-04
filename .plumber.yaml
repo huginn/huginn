@@ -1,0 +1,18 @@
+# Plumber overlay: inherits every control from the CLI's built-in
+# baseline, only the differences for this repository are written here.
+# Run 'plumber config resolve' to see the full effective config.
+extends: plumber:default
+version: '2.0'
+
+github:
+  controls:
+    githubActionMustComeFromAuthorizedSources:
+      # Keep the curated default list and trust the actions this
+      # repository uses on top of it, all pinned by commit SHA: the
+      # coverage upload, the runner hardening, and the maintainer's own
+      # lockfile maintenance workflow.
+      includePlumberDefaults: true
+      trustedGithubActions:
+        - coverallsapp/github-action
+        - knu/lockfile-maintenance-action
+        - step-security/harden-runner
