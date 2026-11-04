@@ -86,10 +86,10 @@ Rails.application.routes.draw do
       member do
         put :deactivate
         put :activate
-        get :switch_to_user
+        post :switch_to_user
       end
       collection do
-        get :switch_back
+        post :switch_back
       end
     end
   end

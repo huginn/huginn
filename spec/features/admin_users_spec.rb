@@ -18,6 +18,20 @@ describe Admin::UsersController do
       expect(page).to have_text('jane')
     end
 
+    it "switches users and returns to the admin through POST links", js: true do
+      visit edit_admin_user_path(users(:bob))
+      accept_confirm do
+        click_on 'Become User'
+      end
+      expect(page).to have_current_path(agents_path)
+      find('.dropdown-toggle', text: 'Account').click
+      expect(page).to have_link('Switch Back to Admin User')
+
+      click_on 'Switch Back to Admin User'
+      expect(page).to have_current_path(admin_users_path)
+      expect(page).to have_css('h2', text: 'Users')
+    end
+
     it "allows to delete a user" do
       visit admin_users_path
       find(:css, "a[href='/admin/users/#{users(:bob).id}']").click

@@ -55,5 +55,7 @@ describe 'layouts/navigation', type: :helper do
     expect(html).to include(I18n.t('layouts.navigation.job_management'))
     expect(html).to include(I18n.t('layouts.navigation.user_management'))
     expect(html).to include(users(:jane).username)
+    link = Nokogiri::HTML.fragment(html).at_css("a[href='#{switch_back_admin_users_path}']")
+    expect(link['data-method']).to eq('post')
   end
 end

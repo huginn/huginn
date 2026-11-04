@@ -68,7 +68,7 @@
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
         <% if user_signed_in? && session[:original_admin_user_id].present? %>
           <li>
-            <%= link_to t('.switch_back_to_admin_user'), switch_back_admin_users_path, tabindex: '-1' %>
+            <%= link_to t('.switch_back_to_admin_user'), switch_back_admin_users_path, method: :post, tabindex: '-1' %>
           </li>
         <% end %>
         <li>
