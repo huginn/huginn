@@ -7,6 +7,38 @@ describe Agents::ManualEventAgent do
     @checker.save!
   end
 
+  it "can be scheduled" do
+    expect(@checker.can_be_scheduled?).to eq(true)
+  end
+
+  describe "#check" do
+    it "emits the default payload" do
+      @checker.options['payload'] = { 'foo' => 'bar' }
+      expect {
+        @checker.check
+      }.to change { @checker.events.count }.by(1)
+      expect(@checker.events.last.payload).to eq({ 'foo' => 'bar' })
+    end
+
+    it "emits multiple events from payloads" do
+      @checker.options['payload'] = { 'payloads' => [{ 'key' => 'value1' }, { 'key' => 'value2' }] }
+      expect {
+        @checker.check
+      }.to change { @checker.events.count }.by(2)
+      events = @checker.events.order('id desc')
+      expect(events[0].payload).to eq({ 'key' => 'value2' })
+      expect(events[1].payload).to eq({ 'key' => 'value1' })
+    end
+
+    it "emits an empty payload when none is configured" do
+      @checker.options['payload'] = {}
+      expect {
+        @checker.check
+      }.to change { @checker.events.count }.by(1)
+      expect(@checker.events.last.payload).to eq({})
+    end
+  end
+
   describe "#handle_details_post" do
     it "emits an event with the given payload" do
       expect {
