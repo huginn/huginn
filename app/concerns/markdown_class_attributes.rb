@@ -6,7 +6,10 @@ module MarkdownClassAttributes
       attributes.each do |attribute|
         class_eval <<-RUBY
           def html_#{attribute}
-            Kramdown::Document.new(#{attribute}, auto_ids: false).to_html.html_safe
+            html = Kramdown::Document.new(#{attribute}, auto_ids: false).to_html
+            tags = Rails::HTML5::SafeListSanitizer.allowed_tags + %w[table thead tbody tr th td]
+            attributes = Rails::HTML5::SafeListSanitizer.allowed_attributes + %w[class]
+            Rails::HTML5::SafeListSanitizer.new.sanitize(html, tags: tags, attributes: attributes).html_safe
           end
 
           def #{attribute}

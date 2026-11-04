@@ -235,6 +235,22 @@ describe AgentsController do
   end
 
   describe "GET show" do
+    it "escapes a global service name owned by another user" do
+      sign_in users(:bob), scope: :user
+      name = %q{Account <img src=x onerror="alert(1)">}
+      service = services(:global)
+      service.update!(provider: 'twitter', name: name)
+      agent = agents(:bob_twitter_user_agent)
+      agent.update_column(:service_id, service.id)
+
+      get :show, params: { id: agent.id }
+
+      label = Nokogiri::HTML(response.body).at_css('.label-service.service-twitter')
+      expect(label.text).to eq("Twitter - #{name}")
+      expect(label.at_css('i.fa-twitter')).to be_present
+      expect(label.css('img')).to be_empty
+    end
+
     it "only shows Agents for the current user" do
       sign_in users(:bob), scope: :user
       get :show, params: {:id => agents(:bob_website_agent).to_param}

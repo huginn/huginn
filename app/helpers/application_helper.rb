@@ -68,10 +68,10 @@ module ApplicationHelper
   end
 
   def omniauth_button(provider)
-    link_to [
+    link_to safe_join([
       omniauth_provider_icon(provider),
       content_tag(:span, "Authenticate with #{omniauth_provider_name(provider)}")
-    ].join.html_safe, user_omniauth_authorize_path(provider), class: "btn btn-default btn-service service-#{provider}"
+    ]), user_omniauth_authorize_path(provider), class: "btn btn-default btn-service service-#{provider}"
   end
 
   def service_label_text(service)
@@ -80,10 +80,10 @@ module ApplicationHelper
 
   def service_label(service)
     return if service.nil?
-    content_tag :span, [
+    content_tag :span, safe_join([
       omniauth_provider_icon(service.provider),
       service_label_text(service)
-    ].join.html_safe, class: "label label-default label-service service-#{service.provider}"
+    ]), class: "label label-default label-service service-#{service.provider}"
   end
 
   def load_ace_editor!

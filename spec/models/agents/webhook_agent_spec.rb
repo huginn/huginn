@@ -10,6 +10,30 @@ describe Agents::WebhookAgent do
   end
   let(:payload) { {'people' => [{ 'name' => 'bob' }, { 'name' => 'jon' }] } }
 
+  describe 'HTML descriptions' do
+    it 'preserves safe HTML tables and CSS classes' do
+      allow(agent).to receive(:description).and_return('<table class="table"><tr><td>Value</td></tr></table>')
+
+      fragment = Nokogiri::HTML.fragment(agent.html_description)
+      expect(fragment.at_css('table.table td').text).to eq('Value')
+    end
+
+    it 'removes active HTML injected through the webhook secret' do
+      agent.options['secret'] = "value\n```\n\n<img src=x onerror='alert(1)'>\n\n```"
+
+      fragment = Nokogiri::HTML.fragment(agent.html_description)
+      expect(fragment.css('[onerror]')).to be_empty
+      expect(fragment.text).to include('The Webhook Agent will create events')
+    end
+
+    it 'removes active HTML injected through the payload path' do
+      agent.options['payload_path'] = "` <img src=x onerror='alert(1)'> `"
+
+      fragment = Nokogiri::HTML.fragment(agent.html_event_description)
+      expect(fragment.css('[onerror]')).to be_empty
+    end
+  end
+
   describe 'receive_web_request' do
     it 'should create event if secret matches' do
       webpayload = ActionDispatch::Request.new({

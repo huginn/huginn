@@ -174,6 +174,24 @@ describe ApplicationHelper do
     end
   end
 
+  describe '#service_label' do
+    it 'escapes service names while preserving the provider icon' do
+      name = %q{Account <img src=x onerror="alert(1)"> & <account@example.com>}
+      service = Service.new(provider: 'github', name: name)
+      label = service_label(service)
+      fragment = Nokogiri::HTML.fragment(label)
+
+      expect(label).to be_html_safe
+      expect(fragment.at_css('span.label-service.service-github').text).to eq("GitHub - #{name}")
+      expect(fragment.at_css('i.fa-brands.fa-github')).to be_present
+      expect(fragment.css('img')).to be_empty
+    end
+
+    it 'returns nil without a service' do
+      expect(service_label(nil)).to be_nil
+    end
+  end
+
   describe '#highlighted?' do
     it 'understands hl=6-8' do
       allow(params).to receive(:[]).with(:hl) { '6-8' }
