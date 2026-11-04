@@ -128,6 +128,8 @@ gem 'mini_magick', '>= 5.4.0'
 gem 'multi_xml'
 gem 'nokogiri', '>= 1.19.4'
 gem 'omniauth'
+gem 'omniauth-ldap', '~> 3.0', '>= 3.0.2' # optional LDAP login, inactive unless LDAP_HOST is set
+gem 'nkf', '~> 0.1' # required by omniauth-ldap's adaptor (`require "nkf"`) on Ruby >= 3.4
 gem 'ostruct'
 gem 'puma'
 gem 'rails', '~> 8.1.4'
