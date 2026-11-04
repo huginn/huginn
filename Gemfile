@@ -130,7 +130,7 @@ gem 'nokogiri', '>= 1.19.4'
 gem 'omniauth'
 gem 'ostruct'
 gem 'puma'
-gem 'rails', '~> 8.1.4'
+gem "rails", "~> 8.1.4", ">= 8.1.4.1"
 gem 'rails-html-sanitizer', '~> 1.7', '>= 1.7.1'
 gem 'rufus-scheduler', '~> 3.9', '>= 3.9.2', require: false
 gem 'sassc-rails'
