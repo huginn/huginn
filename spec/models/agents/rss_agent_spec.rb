@@ -26,6 +26,34 @@ describe Agents::RssAgent do
 
   it_behaves_like WebRequestConcern
 
+  it "can receive events" do
+    expect(agent.can_receive_events?).to eq true
+  end
+
+  describe "#receive" do
+    it "interpolates url and headers from the event and fetches the feed" do
+      agent.options['url'] = '{{ url }}'
+      agent.options['headers'] = { 'Authorization' => 'Bearer {{ jwt }}' }
+      agent.save!
+
+      event = Event.new
+      event.agent = agents(:bob_weather_agent)
+      event.payload = {
+        'url' => 'https://github.com/cantino/huginn/commits/master.atom',
+        'jwt' => 'event-token'
+      }
+
+      expect {
+        agent.receive([event])
+      }.to change { agent.events.count }.by(20)
+
+      expect(
+        a_request(:get, "https://github.com/cantino/huginn/commits/master.atom")
+          .with(headers: { 'Authorization' => 'Bearer event-token' })
+      ).to have_been_made
+    end
+  end
+
   describe "validations" do
     it "should validate the presence of url" do
       agent.options['url'] = "http://google.com"
