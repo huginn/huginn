@@ -27,9 +27,18 @@ module Liquid
         break unless byte_a
 
         # Skip over quoted strings so that } inside them is ignored.
+        # skip_until does not advance when the closer is missing, which
+        # would leave this loop spinning.  An unescaped quote inside a
+        # single-quoted path must also not hang parsing.
         if byte_a == SINGLE_QUOTE || byte_a == DOUBLE_QUOTE
-          @ss.skip_until(byte_a == SINGLE_QUOTE ? /'/ : /"/)
-          byte_a = @ss.scan_byte
+          quote = byte_a == SINGLE_QUOTE ? /'/ : /"/
+          pos = @ss.pos
+          if @ss.skip_until(quote) && @ss.pos > pos
+            byte_a = @ss.scan_byte
+          else
+            byte_a = @ss.scan_byte
+            break unless byte_a
+          end
           next
         end
 
