@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Nov 05, 2026   | Fix stored XSS in shared OAuth service names and Agent descriptions, and require POST with CSRF protection for user switching.  Thanks to [@leediay153](https://github.com/leediay153) for reporting the service-name issue. [GHSA-rjw9-xx87-f2ww](https://github.com/huginn/huginn/security/advisories/GHSA-rjw9-xx87-f2ww) |
 | Oct 26, 2026   | Require the eMudhra CA distrust update in Docker images and prefer the OS CA store for gRPC connections. |
 | Oct 26, 2026   | Use Active Record validation for service-name sort directions. [#3759](https://github.com/huginn/huginn/pull/3759) |
 | Oct 26, 2026   | Add responsive scenario and service filters to the Agents page, including agents without a scenario. [#3776](https://github.com/huginn/huginn/pull/3776) |
