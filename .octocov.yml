@@ -1,0 +1,14 @@
+coverage:
+  paths:
+    - coverage-reports/*/lcov.info
+comment:
+  if: is_pull_request
+  deletePrevious: true
+summary:
+  if: true
+report:
+  datastores:
+    - artifact://${GITHUB_REPOSITORY}
+diff:
+  datastores:
+    - artifact://${GITHUB_REPOSITORY}

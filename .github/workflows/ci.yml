@@ -85,10 +85,41 @@ jobs:
       - name: Run tests
         run: bundle exec rake
 
-      - name: Coveralls
-        uses: coverallsapp/github-action@v2.3.8
+      - name: Upload coverage
+        uses: actions/upload-artifact@v7.0.2
         with:
-          fail-on-error: false
+          name: coverage-${{ matrix.os }}-${{ matrix.database_adapter }}-${{ matrix.native_json_columns }}
+          path: coverage/lcov.info
+          if-no-files-found: error
+          retention-days: 1
+
+  coverage:
+    name: Coverage
+    needs: run-tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.22.3
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v8.0.2
+        with:
+          pattern: coverage-*
+          path: coverage-reports
+
+      - name: Report coverage
+        uses: k1LoW/octocov-action@v1.5.2
 
   build-docker-images:
     name: docker-build-${{ matrix.docker_image }}-${{ matrix.arch }}

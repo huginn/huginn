@@ -2,7 +2,7 @@
 
 -----
 
-[![CI](https://github.com/huginn/huginn/actions/workflows/ci.yml/badge.svg)](https://github.com/huginn/huginn/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/huginn/huginn/badge.svg)](https://coveralls.io/r/huginn/huginn) [![Sponsor](https://img.shields.io/github/sponsors/knu?label=Sponsor&logo=GitHub)](https://github.com/sponsors/knu)
+[![CI](https://github.com/huginn/huginn/actions/workflows/ci.yml/badge.svg)](https://github.com/huginn/huginn/actions/workflows/ci.yml) [Coverage](https://octocov.dev/huginn/huginn) [![Sponsor](https://img.shields.io/github/sponsors/knu?label=Sponsor&logo=GitHub)](https://github.com/sponsors/knu)
 
 ## What is Huginn?
 
