@@ -14,18 +14,18 @@ workflows:
         - 'docker/login-action@v4.7.0'
         - 'docker/setup-buildx-action@v4.4.1'
         - 'k1low/octocov-action@v1.5.2'
-        - 'ruby/setup-ruby@v1.335.0'
+        - 'ruby/setup-ruby@v1.336.0'
         - 'step-security/harden-runner@v2.22.3'
     '.github/workflows/docker-tag.yml':
         - 'actions/checkout@v7.0.1'
         - 'docker/login-action@v4.7.0'
         - 'docker/setup-buildx-action@v4.4.1'
-        - 'ruby/setup-ruby@v1.335.0'
+        - 'ruby/setup-ruby@v1.336.0'
         - 'step-security/harden-runner@v2.22.3'
     '.github/workflows/lockfile-maintenance.yml': []
     '.github/workflows/renovate_bundle_install_ruby.yml':
         - 'actions/checkout@v7.0.1'
-        - 'ruby/setup-ruby@v1.335.0'
+        - 'ruby/setup-ruby@v1.336.0'
         - 'step-security/harden-runner@v2.22.3'
 dependencies:
     'actions/checkout@v7.0.1':
@@ -76,9 +76,9 @@ dependencies:
         uses:
             - 'actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3'
             - 'k1low/gh-setup@5fb38d34ea857e5a942b6fe10f1723e55055f6c0'
-    'ruby/setup-ruby@v1.335.0':
-        ref: 'v1.335.0'
-        commit: 'sha1-7f797815d8adceb1c412e7abefdd1ab4abc47a5f'
+    'ruby/setup-ruby@v1.336.0':
+        ref: 'v1.336.0'
+        commit: 'sha1-de492cf36cbab201753d720ce4f4e336cd688c94'
         owner_id: 210414
         repo_id: 231208785
     'step-security/harden-runner@v2.22.3':
