@@ -75,6 +75,28 @@ describe Agents::JiraAgent do
       expect(@checker).to receive(:get).with(/\d+-\d+-\d+\+\d+%3A\d+/, expected_headers).and_return(reply)
       @checker.check
     end
+
+    context "on Jira Cloud" do
+      before do
+        @checker.options['jira_url'] = 'https://example.atlassian.net'
+      end
+
+      it "should generate a search/jql request url" do
+        expect(@checker.send(:request_url, 'foo=bar', 0)).to eq("https://example.atlassian.net/rest/api/2/search/jql?jql=foo%3Dbar&fields=*all")
+        expect(@checker.send(:request_url, 'foo=bar', 0, 'abc=')).to eq("https://example.atlassian.net/rest/api/2/search/jql?jql=foo%3Dbar&fields=*all&nextPageToken=abc%3D")
+      end
+
+      it "pages with nextPageToken until isLast" do
+        reply = JSON.parse(File.read(Rails.root.join("spec/data_fixtures/jira.json"))).except('startAt', 'total', 'maxResults')
+        first_page = reply.merge('nextPageToken' => 'token1', 'isLast' => false)
+        last_page = reply.merge('isLast' => true)
+
+        expect(@checker).to receive(:get).with("https://example.atlassian.net/rest/api/2/search/jql?jql=resolution+%3D+unresolved&fields=*all", anything).and_return(first_page)
+        expect(@checker).to receive(:get).with("https://example.atlassian.net/rest/api/2/search/jql?jql=resolution+%3D+unresolved&fields=*all&nextPageToken=token1", anything).and_return(last_page)
+
+        expect { @checker.check }.to change { Event.count }.by(100)
+      end
+    end
   end
   describe "#check" do
     it "should be able to retrieve issues" do
