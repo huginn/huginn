@@ -12,7 +12,7 @@ class DefaultScenarioImporter
     begin
       uri = URI(scenario_file)
       scenario_import.file = if uri.is_a?(URI::HTTP)
-                               uri.open(**NetworkTimeout.open_uri_options)
+                               uri.open(**NetworkTimeout.open_uri_options, **OutboundProxy.open_uri_options)
                              else
                                open(scenario_file)
                              end

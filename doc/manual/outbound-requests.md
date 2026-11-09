@@ -29,6 +29,8 @@ Any HTTP proxy that supports `CONNECT` and validates the resolved address works.
 
 When `OUTBOUND_PROXY` is set, Huginn routes every HTTP client it builds through it and refuses the per-Agent `proxy` option, so a user cannot pick a different proxy to get around it.  A malformed value stops Huginn from starting.  Setting `http_proxy` and `https_proxy` in the environment as well catches third-party code that does not go through Huginn's clients; do not set `no_proxy` for internal hosts, since that bypasses the proxy.
 
+Use an `http://` proxy URL for compatibility with Agents that use open-uri.  HTTPS destinations still use a CONNECT tunnel through that proxy.
+
 ## Using a proxy only for selected Agents
 
 Even trusted users may process events containing URLs from external sources.  An Agent that uses such a URL can unintentionally access an internal service or a metadata endpoint.  Opt-in proxy routing lets users protect those Agents with Smokescreen, or another proxy that rejects internal destinations, while retaining direct access for other Agents.

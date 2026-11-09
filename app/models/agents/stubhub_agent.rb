@@ -72,7 +72,8 @@ module Agents
 
       def response
         uri = URI(build_url)
-        http = NetworkTimeout.configure_net_http(Net::HTTP.new(uri.host, uri.port))
+        http = OutboundProxy.configure_net_http(Net::HTTP.new(uri.host, uri.port))
+        NetworkTimeout.configure_net_http(http)
         http.use_ssl = uri.scheme == "https"
         http.get(uri.request_uri).body
       end
