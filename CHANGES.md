@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Nov 09, 2026   | Prevent JqAgent filters from reading the server environment, and enforce `OUTBOUND_PROXY` for HTTParty, open-uri and direct Net::HTTP requests.  Thanks to [@akash111-hue](https://github.com/akash111-hue) for reporting both issues.  See the [upgrade notes](UPGRADING.md#jqagent-environment-isolation-and-outbound-proxy-enforcement) for secret rotation and proxy compatibility guidance. |
 | Nov 05, 2026   | Fix stored XSS in shared OAuth service names and Agent descriptions, and require POST with CSRF protection for user switching.  Thanks to [@leediay153](https://github.com/leediay153) for reporting the service-name issue. [GHSA-rjw9-xx87-f2ww](https://github.com/huginn/huginn/security/advisories/GHSA-rjw9-xx87-f2ww) |
 | Oct 26, 2026   | Require the eMudhra CA distrust update in Docker images and prefer the OS CA store for gRPC connections. |
 | Oct 26, 2026   | Use Active Record validation for service-name sort directions. [#3759](https://github.com/huginn/huginn/pull/3759) |

@@ -4,6 +4,16 @@ This guide covers changes that may require configuration or data migration when 
 
 Before a database upgrade or column conversion, back up the database and plan a maintenance window with Huginn's web, scheduler, and worker processes stopped.  Keep the previous application version and a restorable database backup together.
 
+## JqAgent environment isolation and outbound proxy enforcement
+
+Introduced on `master` on 2026-11-09; included in v2026.11.09.
+
+No database migration is required.  JqAgent now runs with an empty environment, and `OUTBOUND_PROXY` also covers HTTParty, open-uri and direct Net::HTTP requests.
+
+If `USE_JQ` was enabled for untrusted users, rotate secrets supplied through Huginn's environment, including `APP_SECRET_TOKEN`.  Filters using `env` or `$ENV` now see an empty object; pass intended inputs through `variables`.
+
+Use an `http://` proxy URL for compatibility with open-uri clients.  See [outbound request configuration](doc/manual/outbound-requests.md) if a request now fails under the proxy's destination policy.
+
 ## Moving Heroku deployments to heroku-24
 
 Introduced on `master` on 2026-10-14; included in v2026.10.14.
