@@ -45,6 +45,21 @@ class Agent < ActiveRecord::Base
     )
   ]
 
+  def self.default_keep_events_for
+    raw = ENV['DEFAULT_KEEP_EVENTS_FOR']
+    return 0 if raw.blank?
+
+    value = Integer(raw)
+    allowed = EVENT_RETENTION_SCHEDULES.map { |_, seconds| seconds.to_i }
+    return value if allowed.include?(value)
+
+    Rails.logger.warn("DEFAULT_KEEP_EVENTS_FOR=#{raw.inspect} is not a valid Keep events option; using Forever (0)")
+    0
+  rescue ArgumentError, TypeError
+    Rails.logger.warn("DEFAULT_KEEP_EVENTS_FOR=#{raw.inspect} is not a valid integer; using Forever (0)")
+    0
+  end
+
   json_serialize :options, :memory
 
   validates_presence_of :name, :user
@@ -59,6 +74,7 @@ class Agent < ActiveRecord::Base
   validate :validate_options
 
   after_initialize :set_default_schedule
+  after_initialize :set_default_keep_events_for
   before_validation :set_default_schedule
   before_validation :unschedule_if_cannot_schedule
   before_save :unschedule_if_cannot_schedule
@@ -293,6 +309,14 @@ class Agent < ActiveRecord::Base
 
   def set_default_schedule
     self.schedule = default_schedule unless schedule.present? || cannot_be_scheduled?
+  end
+
+  def set_default_keep_events_for
+    return unless new_record?
+    return if keep_events_for_changed?
+    return unless keep_events_for.nil? || keep_events_for == 0
+
+    self.keep_events_for = self.class.default_keep_events_for
   end
 
   def unschedule_if_cannot_schedule
