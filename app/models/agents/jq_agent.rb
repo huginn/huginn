@@ -163,7 +163,7 @@ module Agents
           *variables.map { |name, json| "variable: #{name} = #{json}" }
         ].join("\n")
 
-        Open3.popen3(*command_args) do |stdin, stdout, stderr, wait_thread|
+        Open3.popen3(*command_args, unsetenv_others: true) do |stdin, stdout, stderr, wait_thread|
           stderr_reader = Thread.new { stderr.read }
           stdout_reader = Thread.new { stdout.each_line.flat_map { |line| JSON.parse(line) } }
 

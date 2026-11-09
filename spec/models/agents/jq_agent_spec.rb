@@ -74,6 +74,21 @@ describe Agents::JqAgent do
   describe '#receive' do
     let!(:event) { create_event({ name: 'foo', numbers: [1, 2, 3, 4] }) }
 
+    ['env', '$ENV'].each do |filter|
+      it "does not expose the server environment through #{filter}" do
+        original = ENV['JQ_AGENT_TEST_SECRET']
+        begin
+          ENV['JQ_AGENT_TEST_SECRET'] = 'test-secret'
+          agent.update!(options: { filter: })
+
+          expect { agent.receive([event]) }.to change(Event, :count).by(1)
+          expect(agent.events.last.payload).to eq({})
+        ensure
+          original.nil? ? ENV.delete('JQ_AGENT_TEST_SECRET') : ENV['JQ_AGENT_TEST_SECRET'] = original
+        end
+      end
+    end
+
     it 'should filter an event and create a single event if the result is an object' do
       expect {
         agent.receive([event])
