@@ -2,7 +2,6 @@ module Agents
   class RssAgent < Agent
     include WebRequestConcern
 
-    cannot_receive_events!
     can_dry_run!
     default_schedule "every_1d"
 
@@ -17,6 +16,8 @@ module Agents
         This agent, using [Feedjira](https://github.com/feedjira/feedjira) as a base, can parse various types of RSS and Atom feeds and has some special handlers for FeedBurner, iTunes RSS, and so on.  However, supported fields are limited by its general and abstract nature.  For complex feeds with additional field types, we recommend using a WebsiteAgent.  See [this example](https://github.com/huginn/huginn/wiki/Agent-configuration-examples#itunes-trailers).
 
         If you want to *output* an RSS feed, use the DataOutputAgent.
+
+        This Agent can also fetch a feed when it receives an event.  Incoming events interpolate the options, then the feed is fetched.  Use this to supply a dynamic `url`, HTTP `headers` (for example a JWT produced by another Agent), or `basic_auth`.
 
         Options:
 
@@ -154,6 +155,12 @@ module Agents
 
     def check
       check_urls(Array(interpolated['url']))
+    end
+
+    def receive(incoming_events)
+      interpolate_with_each(incoming_events) do |_event|
+        check_urls(Array(interpolated['url']))
+      end
     end
 
     protected
