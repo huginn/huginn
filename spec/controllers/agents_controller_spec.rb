@@ -446,6 +446,28 @@ describe AgentsController do
       expect(response).to render_template("edit")
     end
 
+    it "disables an Agent whose options are invalid" do
+      agent = agents(:bob_website_agent)
+      agent.update_column(:options, agent.options.except('url'))
+      sign_in users(:bob)
+
+      post :update, params: { id: agent.to_param, agent: { disabled: 'true' } }
+
+      expect(response).to redirect_to(agents_path)
+      expect(agent.reload).to be_disabled
+    end
+
+    it "does not enable an Agent whose options are invalid" do
+      agent = agents(:bob_website_agent)
+      agent.update_columns(disabled: true, options: agent.options.except('url'))
+      sign_in users(:bob)
+
+      post :update, params: { id: agent.to_param, agent: { disabled: 'false' } }
+
+      expect(response).to render_template("edit")
+      expect(agent.reload).to be_disabled
+    end
+
     it 'does not allow to modify the agents user_id' do
       sign_in users(:bob)
       expect {

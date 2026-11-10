@@ -73,7 +73,7 @@ module AgentControllerConcern
           when target.disabled?
             log "Agent '#{target.name}' is alread disabled"
           else
-            target.update!(disabled: true)
+            target.disable!
             log "Agent '#{target.name}' is disabled"
           end
         when 'configure'
