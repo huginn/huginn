@@ -62,4 +62,21 @@ describe UserCredential do
       expect(user_credential.credential_value).to eq("new value")
     end
   end
+
+  describe "credential_value" do
+    it "keeps 4-byte characters such as emoji" do
+      connection = ActiveRecord::Base.connection
+      if connection.adapter_name =~ /\Amysql/i &&
+         connection.select_value('SELECT @@character_set_connection') != 'utf8mb4'
+        # A 3-byte utf8 connection (DATABASE_ENCODING=utf8) cannot carry them,
+        # so check that the column can store them.
+        expect(described_class.columns_hash['credential_value'].collation).to start_with('utf8mb4')
+      else
+        user_credential.credential_value = "🐪🐐🐏🐑"
+        user_credential.save!
+
+        expect(user_credential.reload.credential_value).to eq("🐪🐐🐏🐑")
+      end
+    end
+  end
 end
