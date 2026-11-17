@@ -189,17 +189,27 @@ module ContainerDownloads
   end
 
   def self.badge(total, timestamp)
-    label = "container downloads"
+    label = "downloads"
     value = total.to_s.reverse.scan(/.{1,3}/).join(",").reverse
-    left_width = label.length * 7 + 12
+    left_width = 68
     right_width = value.length * 7 + 12
     width = left_width + right_width
     Nokogiri::XML::Builder.new do |xml|
       xml.svg(xmlns: "http://www.w3.org/2000/svg", width: width, height: 20, role: "img", "aria-label": "#{label}: #{value}") do
         xml.title "#{label}: #{value} (#{timestamp})"
-        xml.rect(width: left_width, height: 20, fill: "#555")
-        xml.rect(x: left_width, width: right_width, height: 20, fill: "#007ec6")
-        xml.g(fill: "#fff", "text-anchor": "middle", "font-family": "Verdana,DejaVu Sans,sans-serif", "font-size": 11) do
+        xml.defs do
+          xml.linearGradient(id: "shade", x2: 0, y2: "100%") do
+            xml.stop(offset: 0, "stop-color": "#fff", "stop-opacity": 0.1)
+            xml.stop(offset: 1, "stop-opacity": 0.1)
+          end
+          xml.clipPath(id: "rounding") { xml.rect(width: width, height: 20, rx: 3) }
+        end
+        xml.g("clip-path": "url(#rounding)") do
+          xml.rect(width: left_width, height: 20, fill: "#555")
+          xml.rect(x: left_width, width: right_width, height: 20, fill: "#007ec6")
+          xml.rect(width: width, height: 20, fill: "url(#shade)")
+        end
+        xml.g(fill: "#fff", "text-anchor": "middle", "font-family": "Verdana,Geneva,DejaVu Sans,sans-serif", "font-size": 11) do
           xml.text_(label, x: left_width / 2, y: 14)
           xml.text_(value, x: left_width + right_width / 2, y: 14)
         end

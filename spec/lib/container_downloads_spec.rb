@@ -195,7 +195,7 @@ describe ContainerDownloads do
         expect(JSON.parse(File.read(File.join(directory, "summary.json")))["total"]).to eq(550)
         svg = Nokogiri::XML(File.read(File.join(directory, "badge.svg"))) { |config| config.strict }
         expect(svg.at_css("svg")["aria-label"]).to include("550")
-        expect(svg.css("text").map(&:text)).to eq(["container downloads", "550"])
+        expect(svg.css("text").map(&:text)).to eq(["downloads", "550"])
       end
     end
 

@@ -2,9 +2,7 @@
 
 -----
 
-[![CI](https://github.com/huginn/huginn/actions/workflows/ci.yml/badge.svg)](https://github.com/huginn/huginn/actions/workflows/ci.yml) [Coverage](https://octocov.dev/huginn/huginn) [![Sponsor](https://img.shields.io/github/sponsors/knu?label=Sponsor&logo=GitHub)](https://github.com/sponsors/knu)
-
-[![Container downloads](https://raw.githubusercontent.com/huginn/huginn/container-stats/badge.svg)](doc/container-downloads.md)
+[![CI](https://github.com/huginn/huginn/actions/workflows/ci.yml/badge.svg)](https://github.com/huginn/huginn/actions/workflows/ci.yml) [![Coverage](https://img.shields.io/badge/coverage-octocov-blue)](https://octocov.dev/huginn/huginn) [![Container downloads](https://raw.githubusercontent.com/huginn/huginn/container-stats/badge.svg)](doc/container-downloads.md) [![Sponsor](https://img.shields.io/github/sponsors/knu?label=Sponsor&logo=GitHub)](https://github.com/sponsors/knu)
 
 ## What is Huginn?
 
