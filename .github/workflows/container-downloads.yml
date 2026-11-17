@@ -2,7 +2,7 @@ name: Container downloads
 
 on:
   schedule:
-    - cron: "23 2 * * *" # Daily at 02:23 UTC
+    - cron: "50 17 * * *" # Daily at 02:50 JST (17:50 UTC)
   workflow_dispatch:
   pull_request:
     paths:
@@ -94,7 +94,7 @@ jobs:
           bundle exec rake "stats:containers:record[$RUNNER_TEMP/container-downloads.json,$stats_dir]"
           git -C "$stats_dir" config user.name 'github-actions[bot]'
           git -C "$stats_dir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git -C "$stats_dir" add records latest.json summary.json badge.svg
+          git -C "$stats_dir" add records daily latest.json summary.json badge.svg
           git -C "$stats_dir" commit -m 'Record container download statistics'
           # A concurrent external writer causes a rejected push, never a lost update.
           git -C "$stats_dir" push "$remote_url" HEAD:refs/heads/container-stats

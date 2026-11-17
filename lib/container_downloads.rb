@@ -75,11 +75,47 @@ module ContainerDownloads
     raise Error, "Docker Hub returned invalid JSON for #{image}"
   end
 
+  def self.validate_daily(counts)
+    unless counts.is_a?(Hash) && counts.size.between?(1, 30)
+      raise Error, "GHCR daily download counts are missing or invalid"
+    end
+    dates = counts.map do |date, count|
+      unless date.is_a?(String) && Date.iso8601(date).iso8601 == date && count.is_a?(Integer) && count >= 0
+        raise Error, "Invalid GHCR daily download count"
+      end
+      Date.iso8601(date)
+    end.sort
+    unless dates.each_cons(2).all? { |a, b| b == a + 1 }
+      raise Error, "GHCR daily download dates are not consecutive"
+    end
+    counts
+  rescue ArgumentError
+    raise Error, "Invalid GHCR daily download date"
+  end
+
+  def self.ghcr_daily(html)
+    charts = Nokogiri::HTML(html).css('[aria-label="Downloads for the last 30 days"]')
+    raise Error, "GHCR page has no unique daily download chart" unless charts.one?
+
+    counts = {}
+    charts.first.css("rect").each do |bar|
+      date = bar["data-date"]
+      count = bar["data-merge-count"]
+      unless count&.match?(/\A\d+\z/) && !counts.key?(date)
+        raise Error, "Invalid or duplicate GHCR daily download bar"
+      end
+      counts[date] = Integer(count, 10)
+    end
+    validate_daily(counts).sort.to_h
+  end
+
   def self.collect(client: Client.new, clock: -> { Time.now.utc })
     images = IMAGES.to_h do |image, url|
       body = client.get(url)
       count = image.start_with?("ghcr.io/") ? ghcr_count(body) : docker_count(body, image)
-      [image, { "count" => count, "source" => url }]
+      value = { "count" => count, "source" => url }
+      value["daily_downloads"] = ghcr_daily(body) if image.start_with?("ghcr.io/")
+      [image, value]
     rescue Error => e
       raise Error, "#{image}: #{e.message}"
     end
@@ -97,6 +133,11 @@ module ContainerDownloads
       unless value.is_a?(Hash) && value["count"].is_a?(Integer) && value["count"] >= 0 && value["source"] == IMAGES.fetch(image)
         raise Error, "Invalid counter for #{image}"
       end
+      if value.key?("daily_downloads")
+        raise Error, "Daily counts are only supported for GHCR images" unless image.start_with?("ghcr.io/")
+
+        validate_daily(value.fetch("daily_downloads"))
+      end
     end
     record
   rescue ArgumentError
@@ -104,7 +145,7 @@ module ContainerDownloads
   end
 
   def self.history(directory)
-    Dir.glob(File.join(directory, "records", "*.json")).map do |path|
+    Dir.glob(File.join(directory, "records", "**", "*.json")).map do |path|
       validate(JSON.parse(File.read(path)))
     end.sort_by { |record| Time.iso8601(record.fetch("collected_at")) }
   end
@@ -170,6 +211,26 @@ module ContainerDownloads
     File.write(path, "#{JSON.pretty_generate(data)}\n")
   end
 
+  def self.store_daily(record, directory)
+    record.fetch("images").each do |image, value|
+      counts = value["daily_downloads"]
+      next unless counts
+
+      counts.sort.each do |date, count|
+        path = File.join(directory, "daily", image, Date.iso8601(date).strftime("%Y/%m"))
+        FileUtils.mkdir_p(path)
+        write_json(File.join(path, "#{date}.json"), {
+          "image" => image,
+          "date" => date,
+          "downloads" => count,
+          "source" => value.fetch("source"),
+          "observed_at" => record.fetch("collected_at"),
+          "provisional" => date == counts.keys.max
+        })
+      end
+    end
+  end
+
   def self.store(record, directory)
     validate(record)
     records = history(directory)
@@ -179,12 +240,13 @@ module ContainerDownloads
     records << record
     report = summary(records)
     svg = badge(report.fetch("total"), report.fetch("collected_at"))
-    FileUtils.mkdir_p(File.join(directory, "records"))
-    filename = Time.iso8601(record.fetch("collected_at")).utc.strftime("%Y-%m-%dT%H%M%S%6NZ.json")
+    filename = Time.iso8601(record.fetch("collected_at")).utc.strftime("%Y/%m/%Y-%m-%dT%H%M%S%6NZ.json")
     path = File.join(directory, "records", filename)
+    FileUtils.mkdir_p(File.dirname(path))
     File.open(path, File::WRONLY | File::CREAT | File::EXCL) { |file| file.write("#{JSON.pretty_generate(record)}\n") }
     write_json(File.join(directory, "latest.json"), record)
     write_json(File.join(directory, "summary.json"), report)
     File.write(File.join(directory, "badge.svg"), svg)
+    store_daily(record, directory)
   end
 end

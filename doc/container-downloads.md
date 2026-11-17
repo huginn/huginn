@@ -1,6 +1,6 @@
 # Container download statistics
 
-The **Container downloads** workflow collects public cumulative counters daily at 02:23 UTC.  It tracks these five images:
+The **Container downloads** workflow collects public cumulative counters daily at 17:50 UTC (02:50 JST).  It tracks these five images:
 
 - `ghcr.io/huginn/huginn`
 - `ghcr.io/huginn/huginn-single-process`
@@ -22,7 +22,8 @@ Both sources are public and need no registry credentials.  The tasks use Ruby, i
 
 The workflow creates the [`container-stats` branch](https://github.com/huginn/huginn/tree/container-stats) on its first successful scheduled or manual collection.  That branch contains:
 
-- `records/*.json`: immutable snapshots, one per successful execution, including UTC collection time, exact counters, and source URLs.  Multiple manual runs on one day remain separate records.
+- `records/YYYY/MM/*.json`: immutable snapshots, one per successful execution, including UTC collection time, exact counters, and source URLs.  Multiple manual runs on one day remain separate records.
+- `daily/ghcr.io/huginn/IMAGE/YYYY/MM/YYYY-MM-DD.json`: GHCR's reported daily download counts, backfilled from the page's recent-day chart and refreshed on every collection.  These are separate from cumulative snapshots.
 - `latest.json`: the most recent complete snapshot.
 - `summary.json`: current counts, their combined total, and per-image differences for the last 1, 7, and 30 days.
 - `badge.svg`: a static badge showing the combined current total for all five images.  It is served directly from GitHub, without a badge service.
@@ -56,8 +57,18 @@ bundle exec rake 'stats:containers:record[.tmp/container-downloads.json,.tmp/con
 
 For existing history, use a local checkout of `container-stats` as the output directory.  The recording task rejects duplicate or older timestamps.  Review `summary.json` to compare image and period counts.
 
+## Historical daily data
+
+Each GHCR page also embeds dates and integer counts in its last-30-days chart, as `data-date` and `data-merge-count` attributes.  Collection reads those values alongside the cumulative total, without extra HTTP requests.  Recording backfills missing daily files and updates dates still present in the source window.  Dates outside the rolling window remain stored.  Missing, malformed, duplicate, or nonconsecutive dates fail collection rather than becoming zero.  Older cumulative snapshots without daily data or stored directly under `records/` remain readable.
+
+Each daily file includes the source URL and UTC `observed_at` timestamp.  The newest date in each source chart is marked `provisional: true`, since its count can still be growing.  A later observation can update that count and clear the flag when a newer date appears.  Earlier dates can also be corrected upstream; the immutable snapshots retain all observations, while daily files show the latest reported value.  Source dates are preserved as reported by GitHub; the HTML does not document their timezone or finalization policy.
+
+Daily values are not used to invent past cumulative totals or mixed with the cumulative differences in `summary.json`.  The total badge continues to use only the latest cumulative counters.  The initial collection can backfill only the daily dates exposed by GHCR, normally the recent 30 days.
+
+Docker Hub's public repository API exposes only the current cumulative pull count.  Its [Insights and analytics](https://docs.docker.com/docker-hub/repos/manage/trusted-content/insights-analytics/) offers historical reports for DVP/DSOS publishers with authenticated access.  This collector does not use those reports or assume the Huginn organization has access.
+
 ## Counter limitations
 
 These are registry-reported downloads/pulls, not unique users, installations, or active deployments.  Automated builds, tests, repeated pulls, and registry-specific counting rules contribute.  GHCR and Docker Hub need not count equivalent operations in the same way; their sum is a combined registry counter, not a deduplicated audience measure.  The test image is included in that total.
 
-Registry counters can be delayed, corrected, reset, or affected by package/version deletion.  GHCR's HTML structure is not an API contract.  Daily history starts with the first successful collection; it cannot reconstruct earlier daily usage.  The snapshots preserve observations even when the upstream counters later change.
+Registry counters can be delayed, corrected, reset, or affected by package/version deletion.  GHCR's HTML structure is not an API contract.  Cumulative snapshots start with the first successful collection; daily backfill is limited to the dates provided by the source.  The snapshots preserve observations even when the upstream counters later change.
