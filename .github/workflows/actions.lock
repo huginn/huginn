@@ -16,6 +16,10 @@ workflows:
         - 'k1low/octocov-action@v1.5.2'
         - 'ruby/setup-ruby@v1.336.0'
         - 'step-security/harden-runner@v2.22.3'
+    '.github/workflows/container-downloads.yml':
+        - 'actions/checkout@v7.0.1'
+        - 'ruby/setup-ruby@v1.336.0'
+        - 'step-security/harden-runner@v2.22.3'
     '.github/workflows/docker-tag.yml':
         - 'actions/checkout@v7.0.1'
         - 'docker/login-action@v4.7.0'

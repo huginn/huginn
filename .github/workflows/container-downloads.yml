@@ -1,0 +1,100 @@
+name: Container downloads
+
+on:
+  schedule:
+    - cron: "23 2 * * *" # Daily at 02:23 UTC
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/container-downloads.yml
+      - lib/tasks/stats.rake
+      - lib/container_downloads.rb
+      - Gemfile
+      - Gemfile.lock
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/container-downloads.yml
+      - lib/tasks/stats.rake
+      - lib/container_downloads.rb
+      - Gemfile
+      - Gemfile.lock
+
+concurrency:
+  group: container-downloads-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.22.3
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@v1.336.0
+        with:
+          ruby-version: "4.0.9"
+          bundler-cache: true
+      - name: Test statistics collection
+        run: bundle exec rspec spec/lib/container_downloads_spec.rb
+
+  collect:
+    if: >-
+      github.repository == 'huginn/huginn' &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/master'
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.22.3
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@v1.336.0
+        with:
+          ruby-version: "4.0.9"
+          bundler-cache: true
+      - name: Collect all counters
+        run: bundle exec rake "stats:containers:collect[$RUNNER_TEMP/container-downloads.json]"
+      - name: Append history and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          stats_dir="$RUNNER_TEMP/container-stats"
+          remote_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          git init "$stats_dir"
+          if git ls-remote --exit-code "$remote_url" refs/heads/container-stats; then
+            git -C "$stats_dir" fetch --depth=1 "$remote_url" refs/heads/container-stats
+            git -C "$stats_dir" checkout --detach FETCH_HEAD
+          else
+            status=$?
+            if [ "$status" -ne 2 ]; then
+              echo "Cannot read container-stats branch (exit $status)" >&2
+              exit "$status"
+            fi
+            git -C "$stats_dir" symbolic-ref HEAD refs/heads/container-stats
+          fi
+          bundle exec rake "stats:containers:record[$RUNNER_TEMP/container-downloads.json,$stats_dir]"
+          git -C "$stats_dir" config user.name 'github-actions[bot]'
+          git -C "$stats_dir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$stats_dir" add records latest.json summary.json badge.svg
+          git -C "$stats_dir" commit -m 'Record container download statistics'
+          # A concurrent external writer causes a rejected push, never a lost update.
+          git -C "$stats_dir" push "$remote_url" HEAD:refs/heads/container-stats
