@@ -1,22 +1,26 @@
 <?xml version="1.0"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="150" height="20" role="img" aria-label="downloads: 34,673,868">
+<svg xmlns="http://www.w3.org/2000/svg" width="134" height="20" role="img" aria-label="downloads: 34,673,868">
   <title>downloads: 34,673,868 (2026-11-17T18:07:13.646185Z)</title>
   <defs>
+    <linearGradient id="label-fill" x2="0" y2="100%">
+      <stop offset="0" stop-color="#444d56"/>
+      <stop offset="1" stop-color="#24292e"/>
+    </linearGradient>
     <linearGradient id="shade" x2="0" y2="100%">
       <stop offset="0" stop-color="#fff" stop-opacity="0.1"/>
       <stop offset="1" stop-opacity="0.1"/>
     </linearGradient>
     <clipPath id="rounding">
-      <rect width="150" height="20" rx="3"/>
+      <rect width="134" height="20" rx="3"/>
     </clipPath>
   </defs>
   <g clip-path="url(#rounding)">
-    <rect width="68" height="20" fill="#555"/>
-    <rect x="68" width="82" height="20" fill="#007ec6"/>
-    <rect width="150" height="20" fill="url(#shade)"/>
+    <rect width="62" height="20" fill="url(#label-fill)"/>
+    <rect x="62" width="72" height="20" fill="#007ec6"/>
+    <rect x="62" width="72" height="20" fill="url(#shade)"/>
   </g>
-  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
-    <text x="34" y="14">downloads</text>
-    <text x="109" y="14">34,673,868</text>
+  <g fill="#fff" stroke="#000" stroke-opacity="0.4" stroke-width="1" stroke-linejoin="round" paint-order="stroke" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
+    <text x="31" y="14">downloads</text>
+    <text x="98" y="14">34,673,868</text>
   </g>
 </svg>

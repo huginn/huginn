@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="133.5" height="20" role="img" aria-label="octocov::badge">
+    <title>octocov::badge</title>
+    <linearGradient id="s" x2="0" y2="100%">
+        <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+        <stop offset="1" stop-opacity=".1"/>
+    </linearGradient>
+    <clipPath id="r">
+        <rect width="133.5" height="20" rx="3" fill="#fff"/>
+    </clipPath>
+    <g clip-path="url(#r)">
+        <rect width="83.5" height="20" fill="#24292E"/>
+        <rect x="83.5" width="50" height="20" fill="#97CA00"/>
+        <rect width="133.5" height="20" fill="url(#s)"/>
+    </g>
+    <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
+        
+        <image x="5" y="3" width="14" height="14" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWw6c3BhY2U9InByZXNlcnZlIiB4bWxuczpzZXJpZj0iaHR0cDovL3d3dy5zZXJpZi5jb20vIiBzdHlsZT0iZmlsbC1ydWxlOmV2ZW5vZGQ7Y2xpcC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjI7Ij4KICAgIDxwYXRoIGQ9Ik05NS44ODEsMzAuODk5TDY5LjEwMSw0LjExOUwzMC44OTksNC4xMTlMNC4xMTksMzAuODk5TDQuMTE5LDY5LjEwMUwzMC44OTksOTUuODgxTDY5LjEwMSw5NS44ODFMOTUuODgxLDY5LjEwMUw5NS44ODEsMzAuODk5Wk02My4xMTQsMTguNTYzTDgxLjQzNywzNi44ODZMODEuNDM3LDYzLjExNEw2My4xMTQsODEuNDM3TDM2Ljg4Niw4MS40MzdMMTguNTYzLDYzLjExNEwxOC41NjMsMzYuODg2TDM2Ljg4NiwxOC41NjNMNjMuMTE0LDE4LjU2M1oiIHN0eWxlPSJmaWxsOnJnYigxNDksMTU3LDE2NSk7Ij48L3BhdGg+Cjwvc3ZnPg=="/>
+        
+        <text aria-hidden="true" x="495" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)">coverage</text>
+        <text x="495" y="140" transform="scale(.1)" fill="#fff">coverage</text>
+        <text aria-hidden="true" x="1085" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)">89.1%</text>
+        <text x="1085" y="140" transform="scale(.1)" fill="#fff">89.1%</text>
+    </g>
+</svg>
