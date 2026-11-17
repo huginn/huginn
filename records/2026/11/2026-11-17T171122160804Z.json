@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "collected_at": "2026-11-17T17:11:22.160804Z",
+  "images": {
+    "ghcr.io/huginn/huginn": {
+      "count": 1231133,
+      "source": "https://github.com/huginn/huginn/pkgs/container/huginn"
+    },
+    "ghcr.io/huginn/huginn-single-process": {
+      "count": 143907,
+      "source": "https://github.com/huginn/huginn/pkgs/container/huginn-single-process"
+    },
+    "ghcr.io/huginn/huginn-test": {
+      "count": 2770,
+      "source": "https://github.com/huginn/huginn/pkgs/container/huginn-test"
+    },
+    "docker.io/huginn/huginn": {
+      "count": 20448584,
+      "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn"
+    },
+    "docker.io/huginn/huginn-single-process": {
+      "count": 12847245,
+      "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn-single-process"
+    }
+  }
+}
