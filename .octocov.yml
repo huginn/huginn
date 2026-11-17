@@ -1,6 +1,8 @@
 coverage:
   paths:
     - coverage-reports/*/lcov.info
+  badge:
+    path: coverage.svg
 comment:
   if: is_pull_request
   deletePrevious: true

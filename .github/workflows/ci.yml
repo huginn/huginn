@@ -121,6 +121,58 @@ jobs:
       - name: Report coverage
         uses: k1LoW/octocov-action@v1.5.2
 
+      - name: Upload coverage badge
+        if: github.repository == 'huginn/huginn' && github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: octocov-coverage-badge
+          path: coverage.svg
+          if-no-files-found: error
+          retention-days: 7
+
+  publish-coverage-badge:
+    name: Publish coverage badge
+    if: github.repository == 'huginn/huginn' && github.ref == 'refs/heads/master'
+    needs: coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: container-stats
+      cancel-in-progress: false
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: Download coverage badge
+        uses: actions/download-artifact@v8.0.2
+        with:
+          name: octocov-coverage-badge
+          path: ${{ runner.temp }}/coverage-badge
+
+      - name: Publish coverage badge
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          stats_dir="$RUNNER_TEMP/container-stats"
+          remote_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          git clone --depth=1 --branch container-stats "$remote_url" "$stats_dir"
+          cp "$RUNNER_TEMP/coverage-badge/coverage.svg" "$stats_dir/coverage.svg"
+          git -C "$stats_dir" config user.name 'github-actions[bot]'
+          git -C "$stats_dir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$stats_dir" add coverage.svg
+          if git -C "$stats_dir" diff --cached --quiet; then
+            echo "Coverage badge unchanged"
+            exit 0
+          fi
+          git -C "$stats_dir" commit -m 'Update coverage badge'
+          git -C "$stats_dir" push "$remote_url" HEAD:refs/heads/container-stats
+
   build-docker-images:
     name: docker-build-${{ matrix.docker_image }}-${{ matrix.arch }}
     needs: run-tests
