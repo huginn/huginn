@@ -1,10 +1,22 @@
 <?xml version="1.0"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="227" height="20" role="img" aria-label="container downloads: 34,673,694">
-  <title>container downloads: 34,673,694 (2026-11-17T17:54:52.658818Z)</title>
-  <rect width="145" height="20" fill="#555"/>
-  <rect x="145" width="82" height="20" fill="#007ec6"/>
-  <g fill="#fff" text-anchor="middle" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11">
-    <text x="72" y="14">container downloads</text>
-    <text x="186" y="14">34,673,694</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="20" role="img" aria-label="downloads: 34,673,868">
+  <title>downloads: 34,673,868 (2026-11-17T18:07:13.646185Z)</title>
+  <defs>
+    <linearGradient id="shade" x2="0" y2="100%">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.1"/>
+      <stop offset="1" stop-opacity="0.1"/>
+    </linearGradient>
+    <clipPath id="rounding">
+      <rect width="150" height="20" rx="3"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#rounding)">
+    <rect width="68" height="20" fill="#555"/>
+    <rect x="68" width="82" height="20" fill="#007ec6"/>
+    <rect width="150" height="20" fill="url(#shade)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
+    <text x="34" y="14">downloads</text>
+    <text x="109" y="14">34,673,868</text>
   </g>
 </svg>
