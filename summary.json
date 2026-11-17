@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "collected_at": "2026-11-17T18:07:13.646185Z",
-  "total": 34673868,
+  "collected_at": "2026-11-17T18:42:49.408505Z",
+  "total": 34674066,
   "images": {
     "ghcr.io/huginn/huginn": {
-      "count": 1231204,
+      "count": 1231226,
       "periods": {
         "1": null,
         "7": null,
@@ -12,7 +12,7 @@
       }
     },
     "ghcr.io/huginn/huginn-single-process": {
-      "count": 143927,
+      "count": 143938,
       "periods": {
         "1": null,
         "7": null,
@@ -28,7 +28,7 @@
       }
     },
     "docker.io/huginn/huginn": {
-      "count": 20448663,
+      "count": 20448747,
       "periods": {
         "1": null,
         "7": null,
@@ -36,7 +36,7 @@
       }
     },
     "docker.io/huginn/huginn-single-process": {
-      "count": 12847304,
+      "count": 12847385,
       "periods": {
         "1": null,
         "7": null,
