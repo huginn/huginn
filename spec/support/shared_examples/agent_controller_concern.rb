@@ -108,6 +108,16 @@ shared_examples_for AgentControllerConcern do
       expect(agent.control_targets.reload).to all(be_disabled)
     end
 
+    it "should disable targets whose options are invalid" do
+      agent.options['action'] = 'disable'
+      agent.save!
+      target = agents(:bob_website_agent)
+      target.update_columns(disabled: false, options: target.options.except('url'))
+
+      agent.control!
+      expect(target.reload).to be_disabled
+    end
+
     it "should enable targets" do
       agent.options['action'] = 'enable'
       agent.save!

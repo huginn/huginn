@@ -198,7 +198,7 @@ class AgentsController < ApplicationController
     @agent = current_user.agents.find(params[:id])
 
     respond_to do |format|
-      if @agent.update(agent_params)
+      if update_agent
         format.html { redirect_back "'#{@agent.name}' was successfully updated.", return: agents_path }
         format.json { render json: @agent, status: :ok, location: agent_path(@agent) }
       else
@@ -260,6 +260,16 @@ class AgentsController < ApplicationController
       redirect_to path, notice: message
     else
       super agents_path, notice: message
+    end
+  end
+
+  def update_agent
+    # The Disable action only sends `disabled`.  Let it through even when the
+    # Agent's options no longer pass validation, so that it can be turned off.
+    if agent_params.keys == ['disabled'] && ActiveModel::Type::Boolean.new.cast(agent_params[:disabled])
+      @agent.disable!
+    else
+      @agent.update(agent_params)
     end
   end
 

@@ -281,6 +281,13 @@ class Agent < ActiveRecord::Base
     update_column :last_error_log_at, nil
   end
 
+  # Skips validations so that an Agent whose options have become invalid, e.g.
+  # after the Agent's requirements changed, can still be disabled.
+  def disable!
+    self.disabled = true
+    save!(validate: false)
+  end
+
   def drop_pending_events
     false
   end
