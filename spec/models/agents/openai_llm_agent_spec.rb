@@ -136,10 +136,88 @@ describe Agents::OpenaiLlmAgent do
         .to_return(body: @response_body, status: 200, headers: { 'Content-Type' => 'application/json' })
     end
 
-    it 'uses the custom base URL' do
+    it 'sends the agent key to the custom base URL' do
       @checker.receive([@event])
 
       expect(WebMock).to have_requested(:post, 'http://localhost:11434/v1/chat/completions')
+        .with(headers: { 'Authorization' => 'Bearer test-api-key' })
+    end
+  end
+
+  describe 'instance API key' do
+    before do
+      @checker.options.delete('api_key')
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with('OPENAI_API_KEY').and_return('instance-key')
+      allow(ENV).to receive(:[]).with('OPENAI_BASE_URL').and_return(nil)
+    end
+
+    it 'authenticates requests to the default API' do
+      @checker.receive([@event])
+
+      expect(WebMock).to have_requested(:post, 'https://api.openai.com/v1/chat/completions')
+        .with(headers: { 'Authorization' => 'Bearer instance-key' })
+    end
+
+    it 'authenticates requests to the instance-configured origin' do
+      allow(ENV).to receive(:[]).with('OPENAI_BASE_URL').and_return('https://llm.example.test/v1')
+      @checker.options['base_url'] = 'https://llm.example.test:443/v2'
+      request = stub_request(:post, 'https://llm.example.test/v2/chat/completions')
+                .with(headers: { 'Authorization' => 'Bearer instance-key' })
+                .to_return(body: @response_body, headers: { 'Content-Type' => 'application/json' })
+
+      @checker.receive([@event])
+
+      expect(request).to have_been_requested
+    end
+
+    ['https://llm.example.test/v1', 'http://api.openai.com/v1', 'https://api.openai.com:8443/v1'].each do |base_url|
+      it "omits Authorization for #{base_url}" do
+        @checker.options['base_url'] = base_url
+        request = stub_request(:post, "#{base_url}/chat/completions")
+                  .with { |req| !req.headers.key?('Authorization') }
+                  .to_return(body: @response_body, headers: { 'Content-Type' => 'application/json' })
+
+        @checker.receive([@event])
+
+        expect(request).to have_been_requested
+      end
+    end
+
+    it 'omits Authorization when TLS verification is disabled' do
+      @checker.options['disable_ssl_verification'] = 'true'
+
+      @checker.receive([@event])
+
+      expect(WebMock).to have_requested(:post, 'https://api.openai.com/v1/chat/completions')
+        .with { |req| !req.headers.key?('Authorization') }
+    end
+
+    it 'omits Authorization over HTTP when the agent supplies a proxy' do
+      allow(ENV).to receive(:[]).with('OPENAI_BASE_URL').and_return('http://llm.example.test/v1')
+      allow(OutboundProxy).to receive(:url).and_return(nil)
+      @checker.options['proxy'] = 'http://proxy.example.test:8080'
+      request = stub_request(:post, 'http://llm.example.test/v1/chat/completions')
+                .with { |req| !req.headers.key?('Authorization') }
+                .to_return(body: @response_body, headers: { 'Content-Type' => 'application/json' })
+
+      @checker.receive([@event])
+
+      expect(request).to have_been_requested
+    end
+
+    it 'strips Authorization on a redirect to another origin' do
+      redirect = stub_request(:post, 'https://api.openai.com/v1/chat/completions')
+                 .with(headers: { 'Authorization' => 'Bearer instance-key' })
+                 .to_return(status: 302, headers: { 'Location' => '//llm.example.test/chat/completions' })
+      destination = stub_request(:get, 'https://llm.example.test/chat/completions')
+                    .with { |req| !req.headers.key?('Authorization') }
+                    .to_return(body: @response_body, headers: { 'Content-Type' => 'application/json' })
+
+      @checker.receive([@event])
+
+      expect(redirect).to have_been_requested
+      expect(destination).to have_been_requested
     end
   end
 

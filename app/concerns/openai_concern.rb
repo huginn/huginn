@@ -9,31 +9,15 @@ module OpenaiConcern
   DEFAULT_OPENAI_TIMEOUT = 60 # seconds
 
   def openai_base_uri
-    url = interpolated['base_url'].presence ||
-          ENV['OPENAI_BASE_URL'].presence
-    return OPENAI_BASE_URI unless url
+    url = interpolated['base_url'].presence
+    return instance_openai_base_uri unless url
 
     URI(url.sub(%r{/?\z}, "/"))
-  end
-
-  def openai_api_key
-    interpolated['api_key'].presence ||
-      ENV['OPENAI_API_KEY'].presence
   end
 
   def openai_timeout
     timeout = interpolated['request_timeout'].presence
     NetworkTimeout.timeout(timeout ? timeout.to_i : DEFAULT_OPENAI_TIMEOUT)
-  end
-
-  def openai_headers
-    headers = {
-      'Authorization' => "Bearer #{openai_api_key}"
-    }
-    if interpolated['organization'].present?
-      headers['OpenAI-Organization'] = interpolated['organization']
-    end
-    headers
   end
 
   # JSON-parsing request — used for most OpenAI API calls.
@@ -42,7 +26,7 @@ module OpenaiConcern
   def openai_request(method, path, body = nil)
     url = openai_base_uri + path
     conn = build_openai_connection
-    response = conn.run_request(method, url, body, openai_headers)
+    response = conn.run_request(method, url, body, openai_headers(url))
     return nil if handle_openai_error(response)
 
     response.body
@@ -61,7 +45,7 @@ module OpenaiConcern
     conn = build_openai_connection(multipart: true)
 
     response = conn.post(url) do |req|
-      req.headers.update(openai_headers)
+      req.headers.update(openai_headers(url))
       req.body = form_data
     end
 
@@ -80,7 +64,7 @@ module OpenaiConcern
   def openai_raw_request(method, path, body = nil)
     url = openai_base_uri + path
     conn = build_openai_connection
-    response = conn.run_request(method, url, body, openai_headers)
+    response = conn.run_request(method, url, body, openai_headers(url))
     return nil if handle_openai_error(response)
 
     response
@@ -96,6 +80,48 @@ module OpenaiConcern
   end
 
   private
+
+  def instance_openai_base_uri
+    url = ENV['OPENAI_BASE_URL'].presence
+    return OPENAI_BASE_URI unless url
+
+    URI(url.sub(%r{/?\z}, "/"))
+  end
+
+  def same_openai_origin?(first, second)
+    first.is_a?(URI::HTTP) && second.is_a?(URI::HTTP) &&
+      first.host.present? && first.origin.casecmp?(second.origin)
+  end
+
+  def instance_openai_api_key(url)
+    key = ENV['OPENAI_API_KEY'].presence
+    return unless key && same_openai_origin?(url, instance_openai_base_uri)
+
+    if url.is_a?(URI::HTTPS)
+      return if boolify(options['disable_ssl_verification'])
+    elsif !OutboundProxy.enforced? && boolify(options['use_agent_proxy']) != true
+      return if interpolated['proxy'].present?
+    end
+
+    key
+  end
+
+  def openai_headers(url)
+    headers = {}
+    if (key = interpolated['api_key'].presence || instance_openai_api_key(url))
+      headers['Authorization'] = "Bearer #{key}"
+    end
+    if (organization = interpolated['organization'].presence)
+      headers['OpenAI-Organization'] = organization
+    end
+    headers
+  end
+
+  def strip_openai_authorization_on_cross_origin_redirect(from, to)
+    return if same_openai_origin?(from.url, to.url)
+
+    to.request_headers.delete('Authorization')
+  end
 
   # Builds a Faraday connection with shared SSL, timeout, proxy, user-agent,
   # and adapter configuration.  All OpenAI request helpers delegate here.
@@ -122,7 +148,7 @@ module OpenaiConcern
       end
 
       unless boolify(interpolated['disable_redirect_follow'])
-        builder.response :follow_redirects
+        builder.response :follow_redirects, callback: method(:strip_openai_authorization_on_cross_origin_redirect)
       end
 
       if multipart

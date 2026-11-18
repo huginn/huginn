@@ -13,8 +13,8 @@ module Agents
 
       ### Configuration
 
-      * `api_key` - Your API key (use `{% credential openai_api_key %}`). Falls back to the `OPENAI_API_KEY` environment variable.
-      * `base_url` - The API base URL. Defaults to `https://api.openai.com/v1`. Falls back to the `OPENAI_BASE_URL` environment variable. Set to `http://localhost:11434/v1` for Ollama, etc.
+      * `api_key` - Your API key (use `{% credential openai_api_key %}`). The instance key (`OPENAI_API_KEY`) is used only for requests to the origin of the instance base URL. For other providers that require authentication, set an agent key.
+      * `base_url` - The API base URL. The instance base URL is set by `OPENAI_BASE_URL` and defaults to `https://api.openai.com/v1`. Set to `http://localhost:11434/v1` for Ollama, etc.
       * `organization` - (Optional) OpenAI organization ID.
       * `model` - The model to use (e.g. `gpt-4o`, `gpt-4o-mini`, `llama3`).
       * `system_message` - (Optional) A system prompt to set the assistant's behavior.

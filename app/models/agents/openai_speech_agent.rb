@@ -24,8 +24,8 @@ module Agents
 
       ### Configuration
 
-      * `api_key` - Your API key (use `{% credential openai_api_key %}`). Falls back to the `OPENAI_API_KEY` environment variable.
-      * `base_url` - The API base URL. Defaults to `https://api.openai.com/v1`. Falls back to the `OPENAI_BASE_URL` environment variable.
+      * `api_key` - Your API key (use `{% credential openai_api_key %}`). The instance key (`OPENAI_API_KEY`) is used only for requests to the origin of the instance base URL. For other providers that require authentication, set an agent key.
+      * `base_url` - The API base URL. The instance base URL is set by `OPENAI_BASE_URL` and defaults to `https://api.openai.com/v1`.
       * `organization` - (Optional) OpenAI organization ID.
       * `mode` - One of `transcribe`, `translate`, or `speak`.
       * `model` - The model to use. For transcription/translation: `whisper-1`. For TTS: `tts-1` or `tts-1-hd`.
