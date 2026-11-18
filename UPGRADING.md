@@ -4,6 +4,27 @@ This guide covers changes that may require configuration or data migration when 
 
 Before a database upgrade or column conversion, back up the database and plan a maintenance window with Huginn's web, scheduler, and worker processes stopped.  Keep the previous application version and a restorable database backup together.
 
+## Google Calendar Publish Agent credentials
+
+Google Calendar Publish Agents now require their own service account credentials.  Update any Agent that relied on credentials from the Huginn worker's environment.  If an Agent uses `google.key_file`, it also needs to migrate unless `ENABLE_INSECURE_AGENTS=true` is already set.  Agents with both `google.key` and `google.service_account_email` already configured can keep those settings.  This change requires no database migration.
+
+For each Agent that needs to migrate:
+
+1. Obtain the JSON key file for a Google service account with permission to create events on the target calendar.
+2. In Huginn, open **Credentials** and save the value of `private_key` from the JSON key file as a credential named `google_calendar_key`.  If your Agents use different keys, give each credential a distinct name.
+3. Edit the Agent and replace its `google` options with the settings below.  Replace the sample email with the `client_email` value from the same JSON key file.  Set the credential tag to the name you chose in step 2.  Keep the Agent's existing `calendar_id` and other top-level options.
+
+   ```json
+   {
+     "google": {
+       "key": "{% credential google_calendar_key %}",
+       "service_account_email": "calendar@example.test"
+     }
+   }
+   ```
+
+4. After upgrading, send the Agent a test event.  Confirm it reports success and the event appears on the intended calendar.
+
 ## JqAgent environment isolation and outbound proxy enforcement
 
 Introduced on `master` on 2026-11-09; included in v2026.11.09.

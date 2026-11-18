@@ -21,7 +21,7 @@ module Agents
       2. New project -> Huginn
       3. APIs & Auth -> Enable google calendar
       4. Credentials -> Create new Client ID -> Service Account
-      5. Download the JSON keyfile and save it to a path, ie: `/home/huginn/Huginn-5d12345678cd.json`. Or open that file and copy the `private_key`.
+      5. Download the JSON key file.  Use its `private_key` and `client_email` in the Agent configuration.
       6. Grant access via google calendar UI to the service account email address for each calendar you wish to manage. For a whole google apps domain, you can [delegate authority](https://developers.google.com/+/domains/authentication/delegation)
 
       An earlier version of Huginn used PKCS12 key files to authenticate. This will no longer work, you should generate a new JSON format keyfile, that will look something like:
@@ -47,7 +47,9 @@ module Agents
 
       `google` `service_account_email` - The authorised service account email address.
 
-      `google` `key_file` OR `google` `key` - The path to the JSON key file above, or the key itself (the value of `private_key`).  [Liquid](https://github.com/huginn/huginn/wiki/Formatting-Events-using-Liquid) formatting is supported if you want to use a Credential.  (E.g., `{% credential google_key %}`)
+      `google` `key` - The `private_key` from the JSON key file.  You can store the key in a Huginn Credential and reference it with `{% credential google_key %}`.
+
+      `google` `key_file` - An alternative to `key` and `service_account_email` on instances with `ENABLE_INSECURE_AGENTS` enabled.  Set it to the path of a JSON service account key file on the Huginn server.
 
       Set `expected_update_period_in_days` to the maximum amount of time that you'd expect to pass between Events being created by this Agent.
 
@@ -100,7 +102,6 @@ module Agents
         'expected_update_period_in_days' => "10",
         'calendar_id' => 'you@email.com',
         'google' => {
-          'key_file' => '/path/to/private.key',
           'key' => '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n',
           'service_account_email' => ''
         }
@@ -110,27 +111,26 @@ module Agents
     def receive(incoming_events)
       require 'google_calendar'
       incoming_events.each do |event|
-        GoogleCalendar.open(interpolate_options(options, event), Rails.logger) do |calendar|
-          cal_message = event.payload["message"]
-          if cal_message["start"].present? && cal_message["start"]["dateTime"].present? && !cal_message["start"]["date_time"].present?
-            cal_message["start"]["date_time"] = cal_message["start"].delete "dateTime"
-          end
-          if cal_message["end"].present? && cal_message["end"]["dateTime"].present? && !cal_message["end"]["date_time"].present?
-            cal_message["end"]["date_time"] = cal_message["end"].delete "dateTime"
-          end
-
-          calendar_event = calendar.publish_as(
-            interpolated(event)['calendar_id'],
-            cal_message
-          )
-
-          create_event payload: {
-            'success' => true,
-            'published_calendar_event' => calendar_event,
-            'agent_id' => event.agent_id,
-            'event_id' => event.id
-          }
+        calendar = GoogleCalendar.new(interpolate_options(options, event), Rails.logger)
+        cal_message = event.payload["message"]
+        if cal_message["start"].present? && cal_message["start"]["dateTime"].present? && !cal_message["start"]["date_time"].present?
+          cal_message["start"]["date_time"] = cal_message["start"].delete "dateTime"
         end
+        if cal_message["end"].present? && cal_message["end"]["dateTime"].present? && !cal_message["end"]["date_time"].present?
+          cal_message["end"]["date_time"] = cal_message["end"].delete "dateTime"
+        end
+
+        calendar_event = calendar.publish_as(
+          interpolated(event)['calendar_id'],
+          cal_message
+        )
+
+        create_event payload: {
+          'success' => true,
+          'published_calendar_event' => calendar_event,
+          'agent_id' => event.agent_id,
+          'event_id' => event.id
+        }
       end
     end
   end

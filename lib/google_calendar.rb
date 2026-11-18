@@ -1,39 +1,13 @@
 require 'googleauth'
 require 'google/apis/calendar_v3'
+require 'json'
+require 'stringio'
 
 class GoogleCalendar
   def initialize(config, logger)
-    @config = config
-
-    if @config['google']['key'].present?
-      # https://github.com/google/google-auth-library-ruby/issues/65
-      # https://github.com/google/google-api-ruby-client/issues/370
-      ENV['GOOGLE_PRIVATE_KEY'] = @config['google']['key']
-      ENV['GOOGLE_CLIENT_EMAIL'] = @config['google']['service_account_email']
-      ENV['GOOGLE_ACCOUNT_TYPE'] = 'service_account'
-    elsif @config['google']['key_file'].present?
-      ENV['GOOGLE_APPLICATION_CREDENTIALS'] = @config['google']['key_file']
-    end
-
-    @logger ||= logger
-
-    # https://github.com/google/google-api-ruby-client/blob/master/MIGRATING.md
+    @logger = logger
+    @authorization = service_account_credentials(config['google'])
     @calendar = Google::Apis::CalendarV3::CalendarService.new
-
-    # https://developers.google.com/api-client-library/ruby/auth/service-accounts
-    # https://developers.google.com/identity/protocols/application-default-credentials
-    scopes = [Google::Apis::CalendarV3::AUTH_CALENDAR]
-    @authorization = Google::Auth.get_application_default(scopes)
-
-    @logger.info("Setup")
-    @logger.debug @calendar.inspect
-  end
-
-  def self.open(*args, &block)
-    instance = new(*args)
-    block.call(instance)
-  ensure
-    instance&.cleanup!
   end
 
   def auth_as
@@ -73,13 +47,39 @@ class GoogleCalendar
       )
 
     @logger.debug ret.to_yaml
-    ret.to_h  
+    ret.to_h
   end
 
-  def cleanup!
-    ENV.delete('GOOGLE_PRIVATE_KEY')
-    ENV.delete('GOOGLE_CLIENT_EMAIL')
-    ENV.delete('GOOGLE_ACCOUNT_TYPE')
-    ENV.delete('GOOGLE_APPLICATION_CREDENTIALS')
+  private
+
+  def service_account_credentials(google_options)
+    unless google_options.is_a?(Hash)
+      raise ArgumentError, "Google Calendar requires agent service account credentials"
+    end
+
+    scope = Google::Apis::CalendarV3::AUTH_CALENDAR
+    if (key = google_options['key']).present?
+      email = google_options['service_account_email']
+      unless key.is_a?(String) && email.is_a?(String) && email.present?
+        raise ArgumentError, "Google Calendar requires a private key and service account email"
+      end
+
+      json = JSON.generate(
+        type: 'service_account',
+        client_email: email,
+        private_key: Google::Auth::ServiceAccountCredentials.unescape(key)
+      )
+      Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: StringIO.new(json), scope:)
+    elsif (path = google_options['key_file']).is_a?(String) && path.present?
+      unless ENV['ENABLE_INSECURE_AGENTS'] == 'true'
+        raise ArgumentError, "Google Calendar key_file is disabled. Set key and service_account_email instead."
+      end
+
+      File.open(path, 'r') do |file|
+        Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: file, scope:)
+      end
+    else
+      raise ArgumentError, "Google Calendar requires agent service account credentials"
+    end
   end
 end
