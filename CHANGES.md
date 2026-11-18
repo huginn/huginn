@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Nov 18, 2026   | Restrict the shared `OPENAI_API_KEY` to the origin configured by `OPENAI_BASE_URL`, which defaults to the OpenAI API.  Set an Agent-specific `api_key` for other origins that require authentication. |
 | Nov 18, 2026   | Require explicit service account credentials for Google Calendar Publish Agents.  Server-side key files require `ENABLE_INSECURE_AGENTS=true`.  See the [upgrade guide](UPGRADING.md#google-calendar-publish-agent-credentials) for migration steps. |
 | Nov 09, 2026   | Prevent JqAgent filters from reading the server environment, and enforce `OUTBOUND_PROXY` for HTTParty, open-uri and direct Net::HTTP requests.  Thanks to [@akash111-hue](https://github.com/akash111-hue) for reporting both issues.  See the [upgrade notes](UPGRADING.md#jqagent-environment-isolation-and-outbound-proxy-enforcement) for secret rotation and proxy compatibility guidance. |
 | Nov 05, 2026   | Fix stored XSS in shared OAuth service names and Agent descriptions, and require POST with CSRF protection for user switching.  Thanks to [@leediay153](https://github.com/leediay153) for reporting the service-name issue. [GHSA-rjw9-xx87-f2ww](https://github.com/huginn/huginn/security/advisories/GHSA-rjw9-xx87-f2ww) |
