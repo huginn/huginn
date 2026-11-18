@@ -98,6 +98,16 @@ describe Agents::CommanderAgent do
           target.options
         }
       end
+
+      it "preserves Liquid syntax in event values passed through liquid_escape" do
+        valid_params[:options]['configure_options']['rules'][0]['value'] = '{{ price | liquid_escape }}'
+        value = '{{- 200 | plus: 1 -}}{%- echo 42 -%}'
+        event = Event.new(agent: agents(:bob_website_agent), payload: { price: value, agent_id: real_target.id })
+
+        agent.receive([event])
+
+        expect(real_target.reload.interpolated['rules'][0]['value']).to eq(value)
+      end
     end
   end
 end

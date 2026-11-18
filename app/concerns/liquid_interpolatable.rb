@@ -133,6 +133,11 @@ module LiquidInterpolatable
 
   require 'uri'
   module Filters
+    # Quote Liquid's opening delimiters so the next render preserves them as text.
+    def liquid_escape(input)
+      input.to_s.gsub(/\{[{%]/) { |delimiter| "{{ '#{delimiter}' }}" }
+    end
+
     # Percent encoding for URI conforming to RFC 3986.
     # Ref: http://tools.ietf.org/html/rfc3986#page-12
     def uri_escape(string)

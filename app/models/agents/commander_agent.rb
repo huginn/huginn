@@ -28,6 +28,8 @@ module Agents
 
       - If you want to update a WeatherAgent based on a UserLocationAgent, you could use `'action': 'configure'` and set 'configure_options' to `{ 'location': '{{_location_.latlng}}' }`.
 
+      - When a target option should display an event value as literal text, use `{{ value | liquid_escape }}` in `configure_options`.  The filter preserves any Liquid syntax in the value as text when the target renders the option.
+
       - In templating, you can use the variable `target` to refer to each target agent, which has the following attributes: #{Agent::Drop.instance_methods(false).map { |m| "`#{m}`" }.to_sentence}.
 
       # Targets

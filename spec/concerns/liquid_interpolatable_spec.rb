@@ -18,6 +18,33 @@ describe LiquidInterpolatable::Filters do
     end
   end
 
+  describe 'liquid_escape' do
+    it 'leaves ordinary braces unchanged' do
+      text = '{"name":"雪"}'
+      expect(@filter.liquid_escape(text)).to eq(text)
+    end
+
+    let(:filter) { Liquid::Template.parse('{{ value | liquid_escape }}') }
+
+    {
+      'an output expression' => '{{ name }}',
+      'an assignment followed by an expression' => "{% assign name = 'other' %}{{ name }}",
+      'whitespace control and line breaks' => "  {{- name -}}\n{%- echo name -%}  ",
+      'raw tags' => '{% raw %}{{ name }}{%- endraw -%}',
+      'adjacent opening delimiters' => '{{{{{%{{%',
+      'an incomplete expression' => '{{ name',
+      'an incomplete tag' => '{% echo name',
+      'a trailing brace after an expression' => '{{ name }}{',
+      'a nil value' => nil,
+      'a number' => 42
+    }.each do |example, value|
+      it "preserves #{example} through a second render" do
+        escaped = filter.render!('value' => value)
+        expect(Liquid::Template.parse(escaped, error_mode: :strict).render!('name' => 'world')).to eq(value.to_s)
+      end
+    end
+  end
+
   describe 'validations' do
     class Agents::InterpolatableAgent < Agent
       include LiquidInterpolatable
