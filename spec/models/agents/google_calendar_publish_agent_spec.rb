@@ -6,9 +6,8 @@ describe Agents::GoogleCalendarPublishAgent do
       'expected_update_period_in_days' => '10',
       'calendar_id' => calendar_id,
       'google' => {
-        'key_file' => File.dirname(__FILE__) + '/../../data_fixtures/private.key',
-        'key_secret' => 'notasecret',
-        'service_account_email' => '1029936966326-ncjd7776pcspc98hsg82gsb56t3217ef@developer.gserviceaccount.com'
+        'key' => 'sample-private-key',
+        'service_account_email' => 'calendar@example.test'
       }
     }
   end
@@ -77,7 +76,6 @@ describe Agents::GoogleCalendarPublishAgent do
                                   fake_interface
                                 }
       expect(fake_interface).to receive(:publish_as).with(calendar_id, message) { response_hash }
-      expect(fake_interface).to receive(:cleanup!)
     end
 
     describe 'when the calendar_id is in the options' do
@@ -111,7 +109,6 @@ describe Agents::GoogleCalendarPublishAgent do
       end
 
       it 'should allow Liquid in the key' do
-        agent.options['google'].delete('key_file')
         agent.options['google']['key'] = '{% credential google_key %}'
         agent.save!
 
@@ -194,7 +191,6 @@ describe Agents::GoogleCalendarPublishAgent do
                                   fake_interface
                                 }
       allow(fake_interface).to receive(:publish_as).with(calendar_id, message) { response_hash }
-      expect(fake_interface).to receive(:cleanup!)
     end
 
     describe 'when the calendar_id is in the options' do
