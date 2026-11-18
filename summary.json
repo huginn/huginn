@@ -1,44 +1,84 @@
 {
   "schema_version": 1,
-  "collected_at": "2026-11-17T18:42:49.408505Z",
-  "total": 34674066,
+  "collected_at": "2026-11-18T17:52:04.911427Z",
+  "total": 34678333,
   "images": {
     "ghcr.io/huginn/huginn": {
-      "count": 1231226,
+      "count": 1233392,
       "periods": {
-        "1": null,
+        "1": {
+          "requested_days": 1,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-18T17:52:04.911427Z",
+          "elapsed_seconds": 87675,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 2253
+        },
         "7": null,
         "30": null
       }
     },
     "ghcr.io/huginn/huginn-single-process": {
-      "count": 143938,
+      "count": 144407,
       "periods": {
-        "1": null,
+        "1": {
+          "requested_days": 1,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-18T17:52:04.911427Z",
+          "elapsed_seconds": 87675,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 500
+        },
         "7": null,
         "30": null
       }
     },
     "ghcr.io/huginn/huginn-test": {
-      "count": 2770,
+      "count": 2799,
       "periods": {
-        "1": null,
+        "1": {
+          "requested_days": 1,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-18T17:52:04.911427Z",
+          "elapsed_seconds": 87675,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 29
+        },
         "7": null,
         "30": null
       }
     },
     "docker.io/huginn/huginn": {
-      "count": 20448747,
+      "count": 20449805,
       "periods": {
-        "1": null,
+        "1": {
+          "requested_days": 1,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-18T17:52:04.911427Z",
+          "elapsed_seconds": 87675,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 1211
+        },
         "7": null,
         "30": null
       }
     },
     "docker.io/huginn/huginn-single-process": {
-      "count": 12847385,
+      "count": 12847930,
       "periods": {
-        "1": null,
+        "1": {
+          "requested_days": 1,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-18T17:52:04.911427Z",
+          "elapsed_seconds": 87675,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 685
+        },
         "7": null,
         "30": null
       }

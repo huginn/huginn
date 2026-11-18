@@ -1,12 +1,11 @@
 {
   "schema_version": 1,
-  "collected_at": "2026-11-17T18:42:49.408505Z",
+  "collected_at": "2026-11-18T17:52:04.911427Z",
   "images": {
     "ghcr.io/huginn/huginn": {
-      "count": 1231226,
+      "count": 1233392,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn",
       "daily_downloads": {
-        "2026-10-19": 1559,
         "2026-10-20": 2627,
         "2026-10-21": 3385,
         "2026-10-22": 3539,
@@ -35,14 +34,14 @@
         "2026-11-14": 4785,
         "2026-11-15": 3551,
         "2026-11-16": 2321,
-        "2026-11-17": 1322
+        "2026-11-17": 1757,
+        "2026-11-18": 1731
       }
     },
     "ghcr.io/huginn/huginn-single-process": {
-      "count": 143938,
+      "count": 144407,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn-single-process",
       "daily_downloads": {
-        "2026-10-19": 411,
         "2026-10-20": 416,
         "2026-10-21": 465,
         "2026-10-22": 594,
@@ -71,14 +70,14 @@
         "2026-11-14": 501,
         "2026-11-15": 329,
         "2026-11-16": 299,
-        "2026-11-17": 277
+        "2026-11-17": 359,
+        "2026-11-18": 387
       }
     },
     "ghcr.io/huginn/huginn-test": {
-      "count": 2770,
+      "count": 2799,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn-test",
       "daily_downloads": {
-        "2026-10-19": 0,
         "2026-10-20": 0,
         "2026-10-21": 0,
         "2026-10-22": 0,
@@ -107,15 +106,16 @@
         "2026-11-14": 0,
         "2026-11-15": 0,
         "2026-11-16": 0,
-        "2026-11-17": 0
+        "2026-11-17": 0,
+        "2026-11-18": 29
       }
     },
     "docker.io/huginn/huginn": {
-      "count": 20448747,
+      "count": 20449805,
       "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn"
     },
     "docker.io/huginn/huginn-single-process": {
-      "count": 12847385,
+      "count": 12847930,
       "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn-single-process"
     }
   }
