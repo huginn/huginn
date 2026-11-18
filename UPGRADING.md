@@ -4,6 +4,14 @@ This guide covers changes that may require configuration or data migration when 
 
 Before a database upgrade or column conversion, back up the database and plan a maintenance window with Huginn's web, scheduler, and worker processes stopped.  Keep the previous application version and a restorable database backup together.
 
+## Web responses from Agents owned by non-admin users
+
+By default, only Agents owned by administrators can serve active content such as HTML, use the `Refresh` header, or redirect to another origin.  The policy applies to Agent web endpoints, including Webhook and Liquid Output Agents, and uses the Agent owner's role even for requests made without a login.
+
+For a non-admin Agent, HTML and other unsupported content types are served as plain text.  JSON stays available, and RSS, Atom, and XML responses keep their media types and are served as attachments.  A redirect outside the instance's origin is rejected with HTTP 403.  A `Refresh` header from an Agent is dropped.
+
+Review existing Agents that publish HTML or redirect to external sites.  On instances where everyone who can edit Agents is trusted to publish active content and redirect visitors from the Huginn domain, set `ALLOW_UNRESTRICTED_AGENT_WEB_RESPONSES=true` in the web process environment and restart it.  The default applies to the official containers and other installations.  No database migration is required.
+
 ## Google Calendar Publish Agent credentials
 
 Google Calendar Publish Agents now require their own service account credentials.  Update any Agent that relied on credentials from the Huginn worker's environment.  If an Agent uses `google.key_file`, it also needs to migrate unless `ENABLE_INSECURE_AGENTS=true` is already set.  Agents with both `google.key` and `google.service_account_email` already configured can keep those settings.  This change requires no database migration.

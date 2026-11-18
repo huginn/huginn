@@ -27,37 +27,57 @@ class WebRequestsController < ApplicationController
   # runs in an opaque origin, without access to the viewer's session or to
   # the application as the same origin.
   CONTENT_SECURITY_POLICY = 'sandbox allow-scripts allow-forms allow-popups'.freeze
+  RESTRICTED_CONTENT_SECURITY_POLICY = "default-src 'none'; sandbox".freeze
+  INLINE_CONTENT_TYPES = %w[application/json text/plain].freeze
+  XML_CONTENT_TYPES = %w[application/atom+xml application/rss+xml application/xml text/xml].freeze
 
   def handle_request
     user = User.find_by_id(params[:user_id])
-    if user
-      agent = user.agents.find_by_id(params[:agent_id])
-      if agent
-        content, status, content_type, headers = agent.trigger_web_request(request)
+    return render plain: 'user not found', status: 404 unless user
 
-        if headers.present?
-          headers.each do |k, v|
-            response.headers[k] = v
-          end
-        end
-        response.headers['Content-Security-Policy'] = CONTENT_SECURITY_POLICY
+    agent = user.agents.find_by_id(params[:agent_id])
+    return render plain: 'agent not found', status: 404 unless agent
 
-        status ||= 200
+    content, status, content_type, headers = agent.trigger_web_request(request)
+    headers.each { |name, value| response.headers[name] = value } if headers.present?
+    status ||= 200
 
-        if status.to_s.in?(%w[301 302])
-          redirect_to(normalize_redirect_target(content), allow_other_host: true, status:)
-        elsif content.is_a?(String)
-          render plain: content, status:, content_type: content_type || 'text/plain'
-        elsif content.is_a?(Hash)
-          render(json: content, status:)
-        else
-          head(status)
-        end
-      else
-        render plain: 'agent not found', status: 404
-      end
+    unrestricted = user.admin? || ENV['ALLOW_UNRESTRICTED_AGENT_WEB_RESPONSES'] == 'true'
+    response.headers['Referrer-Policy'] = 'no-referrer'
+
+    if unrestricted
+      response.headers['Content-Security-Policy'] = CONTENT_SECURITY_POLICY
     else
-      render plain: 'user not found', status: 404
+      response.headers['Content-Security-Policy'] = RESTRICTED_CONTENT_SECURITY_POLICY
+      response.delete_header('Refresh')
+      response.delete_header('Content-Type')
+      response.headers['X-Content-Type-Options'] = 'nosniff'
+      content_type = restricted_content_type(content_type) if content.is_a?(String)
+    end
+
+    if status.to_s.in?(%w[301 302])
+      if (location = redirect_location(content, unrestricted:))
+        return redirect_to(location, allow_other_host: unrestricted, status:)
+      else
+        return reject_redirect
+      end
+    end
+
+    if !unrestricted && response.has_header?('Location')
+      if (location = redirect_location(response.headers['Location'], unrestricted: false))
+        response.headers['Location'] = location
+      else
+        return reject_redirect
+      end
+    end
+
+    case content
+    when String
+      render plain: content, status:, content_type: content_type || 'text/plain'
+    when Hash
+      render(json: content, status:)
+    else
+      head(status)
     end
   end
 
@@ -76,7 +96,31 @@ class WebRequestsController < ApplicationController
 
   private
 
-  def normalize_redirect_target(target)
-    URI(request.original_url).merge(target.to_s).to_s
+  def redirect_location(target, unrestricted:)
+    base = URI(request.original_url)
+    location = base.merge(target.to_s)
+    return location.to_s if unrestricted
+    return unless location.is_a?(URI::HTTP) && !location.userinfo && location.origin.casecmp?(base.origin)
+
+    location.to_s
+  rescue URI::Error
+    nil
+  end
+
+  def reject_redirect
+    response.delete_header('Location')
+    head :forbidden
+  end
+
+  def restricted_content_type(content_type)
+    mime_type = content_type.to_s[/\A\s*([^;\s]+)\s*(?:;|\z)/, 1]&.downcase
+    if XML_CONTENT_TYPES.include?(mime_type)
+      response.headers['Content-Disposition'] = 'attachment'
+      mime_type
+    elsif INLINE_CONTENT_TYPES.include?(mime_type)
+      mime_type
+    else
+      'text/plain'
+    end
   end
 end
