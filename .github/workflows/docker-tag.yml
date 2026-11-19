@@ -54,9 +54,9 @@ jobs:
           persist-credentials: false
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1.336.0
+        uses: ruby/setup-ruby@v1.342.0
         with:
-          ruby-version: "4.0.9"
+          ruby-version: "4.0.10"
           working-directory: docker-specs
 
       - name: Install spec dependencies

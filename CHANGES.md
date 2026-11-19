@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Nov 19, 2026   | Upgrade to Ruby 4.0.10 for security fixes in Regexp and String case conversion. [Ruby release notes](https://www.ruby-lang.org/en/news/2026/11/18/ruby-4-0-10-released/) |
 | Nov 18, 2026   | Restrict active content and cross-origin redirects from Agent web responses to administrator-owned Agents by default.  See the [upgrade guide](UPGRADING.md#web-responses-from-agents-owned-by-non-admin-users) for compatibility settings. |
 | Nov 18, 2026   | Restrict the shared `OPENAI_API_KEY` to the origin configured by `OPENAI_BASE_URL`, which defaults to the OpenAI API.  Set an Agent-specific `api_key` for other origins that require authentication. |
 | Nov 18, 2026   | Require explicit service account credentials for Google Calendar Publish Agents.  Server-side key files require `ENABLE_INSECURE_AGENTS=true`.  See the [upgrade guide](UPGRADING.md#google-calendar-publish-agent-credentials) for migration steps. |

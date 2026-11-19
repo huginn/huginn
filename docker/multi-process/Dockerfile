@@ -8,7 +8,7 @@ FROM golang:1.27-alpine AS smokescreen
 ARG SMOKESCREEN_COMMIT
 RUN CGO_ENABLED=0 go install "github.com/stripe/smokescreen@${SMOKESCREEN_COMMIT}"
 
-FROM rubylang/ruby:4.0.9-noble
+FROM rubylang/ruby:4.0.10-noble
 
 COPY docker/scripts/prepare /scripts/
 # Require the eMudhra CA distrust update (Ubuntu USN-8944-1).
