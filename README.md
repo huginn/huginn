@@ -1,5 +1,7 @@
 ![Huginn](https://raw.github.com/huginn/huginn/master/media/huginn-logo.png "Your agents are standing by.")
 
+[![Plumber Score](https://score.getplumber.io/github.com/huginn/huginn.svg)](https://score.getplumber.io/github.com/huginn/huginn)
+
 -----
 
 [![CI](https://github.com/huginn/huginn/actions/workflows/ci.yml/badge.svg)](https://github.com/huginn/huginn/actions/workflows/ci.yml) [![Coverage](https://raw.githubusercontent.com/huginn/huginn/container-stats/coverage.svg)](https://octocov.dev/huginn/huginn) [![Container downloads](https://raw.githubusercontent.com/huginn/huginn/container-stats/badge.svg)](doc/container-downloads.md) [![Sponsor](https://img.shields.io/github/sponsors/knu?label=Sponsor&logo=GitHub)](https://github.com/sponsors/knu)
