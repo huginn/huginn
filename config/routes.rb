@@ -97,6 +97,7 @@ Rails.application.routes.draw do
   get "/worker_status" => "worker_status#show"
 
   match "/users/:user_id/web_requests/:agent_id/:secret" => "web_requests#handle_request", :as => :web_requests, :via => [:get, :post, :put, :delete]
+  match "/users/:user_id/web_requests/:agent_id/:secret" => "web_requests#handle_request_options", via: :options
   post  "/users/:user_id/webhooks/:agent_id/:secret" => "web_requests#handle_request" # legacy
   post  "/users/:user_id/update_location/:secret" => "web_requests#update_location" # legacy
 
