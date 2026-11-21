@@ -1,12 +1,11 @@
 {
   "schema_version": 1,
-  "collected_at": "2026-11-20T17:52:37.901515Z",
+  "collected_at": "2026-11-21T17:51:49.726566Z",
   "images": {
     "ghcr.io/huginn/huginn": {
-      "count": 1238166,
+      "count": 1239987,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn",
       "daily_downloads": {
-        "2026-10-22": 3539,
         "2026-10-23": 3456,
         "2026-10-24": 3850,
         "2026-10-25": 3612,
@@ -35,14 +34,14 @@
         "2026-11-17": 1757,
         "2026-11-18": 2300,
         "2026-11-19": 2519,
-        "2026-11-20": 1686
+        "2026-11-20": 2147,
+        "2026-11-21": 1360
       }
     },
     "ghcr.io/huginn/huginn-single-process": {
-      "count": 145347,
+      "count": 145828,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn-single-process",
       "daily_downloads": {
-        "2026-10-22": 594,
         "2026-10-23": 627,
         "2026-10-24": 765,
         "2026-10-25": 559,
@@ -71,14 +70,14 @@
         "2026-11-17": 359,
         "2026-11-18": 511,
         "2026-11-19": 551,
-        "2026-11-20": 265
+        "2026-11-20": 346,
+        "2026-11-21": 400
       }
     },
     "ghcr.io/huginn/huginn-test": {
-      "count": 2811,
+      "count": 2839,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn-test",
       "daily_downloads": {
-        "2026-10-22": 0,
         "2026-10-23": 0,
         "2026-10-24": 0,
         "2026-10-25": 0,
@@ -107,15 +106,16 @@
         "2026-11-17": 0,
         "2026-11-18": 35,
         "2026-11-19": 6,
-        "2026-11-20": 0
+        "2026-11-20": 0,
+        "2026-11-21": 28
       }
     },
     "docker.io/huginn/huginn": {
-      "count": 20451971,
+      "count": 20453135,
       "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn"
     },
     "docker.io/huginn/huginn-single-process": {
-      "count": 12848638,
+      "count": 12849339,
       "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn-single-process"
     }
   }

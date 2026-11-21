@@ -1,0 +1,8 @@
+{
+  "image": "ghcr.io/huginn/huginn-single-process",
+  "date": "2026-11-21",
+  "downloads": 400,
+  "source": "https://github.com/huginn/huginn/pkgs/container/huginn-single-process",
+  "observed_at": "2026-11-21T17:51:49.726566Z",
+  "provisional": true
+}
