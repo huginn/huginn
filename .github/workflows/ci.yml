@@ -77,7 +77,7 @@ jobs:
           bundler-cache: true
 
       - name: Install npm packages
-        run: npm install
+        run: npm exec --yes --package=npm@11.19.1 -- npm ci
 
       - name: Set up database
         run: bundle exec rake db:create db:migrate
