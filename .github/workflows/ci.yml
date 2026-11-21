@@ -61,7 +61,7 @@ jobs:
           --health-retries 3
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.22.3
+        uses: step-security/harden-runner@v2.23.0
         with:
           egress-policy: audit
 
@@ -104,7 +104,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.22.3
+        uses: step-security/harden-runner@v2.23.0
         with:
           egress-policy: audit
 
@@ -143,7 +143,7 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.22.3
+        uses: step-security/harden-runner@v2.23.0
         with:
           egress-policy: audit
 
@@ -200,7 +200,7 @@ jobs:
       DOCKERFILE: docker/${{ contains(matrix.docker_image, 'single-process') && 'single-process' || 'multi-process' }}/Dockerfile
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.22.3
+        uses: step-security/harden-runner@v2.23.0
         with:
           egress-policy: audit
 
@@ -213,7 +213,7 @@ jobs:
 
       - name: Log in to GHCR
         if: github.event_name == 'push' && github.ref_name == 'master'
-        uses: docker/login-action@v4.7.0
+        uses: docker/login-action@v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -259,7 +259,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.22.3
+        uses: step-security/harden-runner@v2.23.0
         with:
           egress-policy: audit
 
@@ -291,7 +291,7 @@ jobs:
       DOCKER_ARTIFACT_BASENAME: ${{ matrix.docker_image == 'huginn/huginn' && 'huginn' || 'huginn-single-process' }}
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.22.3
+        uses: step-security/harden-runner@v2.23.0
         with:
           egress-policy: audit
 
@@ -306,7 +306,7 @@ jobs:
         uses: docker/setup-buildx-action@v4.4.1
 
       - name: Log in to GHCR
-        uses: docker/login-action@v4.7.0
+        uses: docker/login-action@v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -343,7 +343,7 @@ jobs:
           - huginn/huginn-single-process
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.22.3
+        uses: step-security/harden-runner@v2.23.0
         with:
           egress-policy: audit
 
@@ -351,14 +351,14 @@ jobs:
         uses: docker/setup-buildx-action@v4.4.1
 
       - name: Log in to GHCR
-        uses: docker/login-action@v4.7.0
+        uses: docker/login-action@v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log in to DockerHub
-        uses: docker/login-action@v4.7.0
+        uses: docker/login-action@v4.8.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -390,7 +390,7 @@ jobs:
       packages: write
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.22.3
+        uses: step-security/harden-runner@v2.23.0
         with:
           egress-policy: audit
 
@@ -402,7 +402,7 @@ jobs:
         uses: docker/setup-buildx-action@v4.4.1
 
       - name: Log in to GHCR
-        uses: docker/login-action@v4.7.0
+        uses: docker/login-action@v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

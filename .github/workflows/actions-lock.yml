@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.22.3
+        uses: step-security/harden-runner@v2.23.0
         with:
           egress-policy: audit
       - uses: actions/checkout@v7.0.1

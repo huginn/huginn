@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   maintenance:
-    uses: knu/lockfile-maintenance-action/.github/workflows/maintenance.yml@bfe008c400f3507b5e60a6090038d5cfb72261c8 # v2.2.0
+    uses: knu/lockfile-maintenance-action/.github/workflows/maintenance.yml@6d70a096b0fc8ffc81fd5fe958966c168523a5b6 # v2.3.0
     with:
       auth: oidc
       files: |
