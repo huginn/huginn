@@ -1,37 +1,53 @@
 {
   "schema_version": 1,
-  "collected_at": "2026-11-23T17:52:50.177288Z",
-  "total": 34696528,
+  "collected_at": "2026-11-24T17:52:19.813085Z",
+  "total": 34699742,
   "images": {
     "ghcr.io/huginn/huginn": {
-      "count": 1243356,
+      "count": 1245515,
       "periods": {
         "1": {
           "requested_days": 1,
           "from": "2026-11-22T17:51:58.460470Z",
-          "to": "2026-11-23T17:52:50.177288Z",
-          "elapsed_seconds": 86451,
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 172821,
           "missing_days": 0,
           "counter_decreased": false,
-          "downloads": 1625
+          "downloads": 3784
         },
-        "7": null,
+        "7": {
+          "requested_days": 7,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 606090,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 14376
+        },
         "30": null
       }
     },
     "ghcr.io/huginn/huginn-single-process": {
-      "count": 146581,
+      "count": 146943,
       "periods": {
         "1": {
           "requested_days": 1,
           "from": "2026-11-22T17:51:58.460470Z",
-          "to": "2026-11-23T17:52:50.177288Z",
-          "elapsed_seconds": 86451,
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 172821,
           "missing_days": 0,
           "counter_decreased": false,
-          "downloads": 348
+          "downloads": 710
         },
-        "7": null,
+        "7": {
+          "requested_days": 7,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 606090,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 3036
+        },
         "30": null
       }
     },
@@ -41,45 +57,69 @@
         "1": {
           "requested_days": 1,
           "from": "2026-11-22T17:51:58.460470Z",
-          "to": "2026-11-23T17:52:50.177288Z",
-          "elapsed_seconds": 86451,
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 172821,
           "missing_days": 0,
           "counter_decreased": false,
           "downloads": 0
         },
-        "7": null,
+        "7": {
+          "requested_days": 7,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 606090,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 69
+        },
         "30": null
       }
     },
     "docker.io/huginn/huginn": {
-      "count": 20454263,
+      "count": 20454896,
       "periods": {
         "1": {
           "requested_days": 1,
           "from": "2026-11-22T17:51:58.460470Z",
-          "to": "2026-11-23T17:52:50.177288Z",
-          "elapsed_seconds": 86451,
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 172821,
           "missing_days": 0,
           "counter_decreased": false,
-          "downloads": 602
+          "downloads": 1235
         },
-        "7": null,
+        "7": {
+          "requested_days": 7,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 606090,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 6302
+        },
         "30": null
       }
     },
     "docker.io/huginn/huginn-single-process": {
-      "count": 12849489,
+      "count": 12849549,
       "periods": {
         "1": {
           "requested_days": 1,
           "from": "2026-11-22T17:51:58.460470Z",
-          "to": "2026-11-23T17:52:50.177288Z",
-          "elapsed_seconds": 86451,
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 172821,
           "missing_days": 0,
           "counter_decreased": false,
-          "downloads": 66
+          "downloads": 126
         },
-        "7": null,
+        "7": {
+          "requested_days": 7,
+          "from": "2026-11-17T17:30:49.065004Z",
+          "to": "2026-11-24T17:52:19.813085Z",
+          "elapsed_seconds": 606090,
+          "missing_days": 0,
+          "counter_decreased": false,
+          "downloads": 2304
+        },
         "30": null
       }
     }
