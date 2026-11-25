@@ -1,12 +1,11 @@
 {
   "schema_version": 1,
-  "collected_at": "2026-11-24T17:52:19.813085Z",
+  "collected_at": "2026-11-25T17:52:52.802918Z",
   "images": {
     "ghcr.io/huginn/huginn": {
-      "count": 1245515,
+      "count": 1247404,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn",
       "daily_downloads": {
-        "2026-10-26": 3692,
         "2026-10-27": 3536,
         "2026-10-28": 0,
         "2026-10-29": 760,
@@ -35,14 +34,14 @@
         "2026-11-21": 1746,
         "2026-11-22": 1756,
         "2026-11-23": 1675,
-        "2026-11-24": 1711
+        "2026-11-24": 2105,
+        "2026-11-25": 1495
       }
     },
     "ghcr.io/huginn/huginn-single-process": {
-      "count": 146943,
+      "count": 147317,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn-single-process",
       "daily_downloads": {
-        "2026-10-26": 660,
         "2026-10-27": 567,
         "2026-10-28": 0,
         "2026-10-29": 139,
@@ -71,14 +70,14 @@
         "2026-11-21": 485,
         "2026-11-22": 394,
         "2026-11-23": 341,
-        "2026-11-24": 295
+        "2026-11-24": 384,
+        "2026-11-25": 285
       }
     },
     "ghcr.io/huginn/huginn-test": {
-      "count": 2839,
+      "count": 2846,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn-test",
       "daily_downloads": {
-        "2026-10-26": 0,
         "2026-10-27": 0,
         "2026-10-28": 0,
         "2026-10-29": 0,
@@ -107,15 +106,16 @@
         "2026-11-21": 28,
         "2026-11-22": 0,
         "2026-11-23": 0,
-        "2026-11-24": 0
+        "2026-11-24": 7,
+        "2026-11-25": 0
       }
     },
     "docker.io/huginn/huginn": {
-      "count": 20454896,
+      "count": 20455287,
       "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn"
     },
     "docker.io/huginn/huginn-single-process": {
-      "count": 12849549,
+      "count": 12849747,
       "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn-single-process"
     }
   }
