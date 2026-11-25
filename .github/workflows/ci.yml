@@ -227,6 +227,7 @@ jobs:
           file: ${{ env.DOCKERFILE }}
           platforms: linux/${{ matrix.arch }}
           push: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+          sbom: true
           outputs: ${{ github.event_name == 'push' && github.ref_name == 'master' && format('type=image,name={0},push-by-digest=true,name-canonical=true', env.DOCKER_IMAGE) || '' }}
           cache-from: type=gha,scope=${{ matrix.docker_image }}-${{ matrix.arch }}
           cache-to: type=gha,mode=max,scope=${{ matrix.docker_image }}-${{ matrix.arch }}
@@ -371,6 +372,7 @@ jobs:
           printf 'FROM %s\nENV OUTDATED_DOCKER_REGISTRY=true\n' "$GHCR_IMAGE:$GITHUB_SHA" | \
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
+            --sbom=true \
             -t "$DOCKERHUB_IMAGE:$GITHUB_REF_NAME" \
             -t "$DOCKERHUB_IMAGE:$GITHUB_SHA" \
             --push -
