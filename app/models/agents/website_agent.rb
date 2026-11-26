@@ -418,7 +418,12 @@ module Agents
       end
       uri = Utils.normalize_uri(url)
       log "Fetching #{uri}"
-      response = faraday.get(uri)
+      response = faraday.get(uri) do |request|
+        # normalize_uri has already escaped the URL; keep its query intact.
+        request.options.params_encoder ||= DoNotEncoder
+        request.params.clear
+        request.url(uri)
+      end
 
       raise "Failed: #{response.inspect}" unless consider_response_successful?(response)
 
