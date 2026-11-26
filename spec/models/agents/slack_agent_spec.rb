@@ -68,6 +68,24 @@ describe Agents::SlackAgent do
 
       expect { @checker.receive([@event]) }.not_to raise_error
     end
+
+    it "sends notifications through OUTBOUND_PROXY when configured" do
+      allow(OutboundProxy).to receive(:url).and_return("https://proxy.example:3128")
+      http = Net::HTTP.new("hooks.slack.com", 443)
+      allow(Net::HTTP).to receive(:new).with("hooks.slack.com", 443).and_return(http)
+      expect(http).to receive(:proxy_use_ssl=).with(true).and_call_original
+
+      expect(http).to receive(:request) do |request|
+        expect(request).to be_a(Net::HTTP::Post)
+        expect(http).not_to be_proxy_from_env
+        expect(http.proxy_address).to eq("proxy.example")
+        expect(http.proxy_port).to eq(3128)
+        expect(http.use_ssl?).to be(true)
+        Net::HTTPOK.new("1.1", "200", "OK")
+      end
+
+      @checker.receive([@event])
+    end
   end
 
   describe "#working?" do

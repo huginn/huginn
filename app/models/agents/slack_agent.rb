@@ -68,7 +68,7 @@ module Agents
       @slack_notifier ||= Slack::Notifier.new(
         webhook_url,
         username:,
-        http_options: NetworkTimeout.http_options
+        http_options: NetworkTimeout.http_options.merge(OutboundProxy.net_http_options)
       )
     end
 

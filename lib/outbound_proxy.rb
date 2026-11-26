@@ -58,16 +58,21 @@ module OutboundProxy
   end
 
   def configure_net_http(http)
-    if (proxy = url)
-      uri = URI.parse(proxy)
-      http.proxy_from_env = false
-      http.proxy_address = uri.hostname
-      http.proxy_port = uri.port
-      http.proxy_user = uri.user && URI::DEFAULT_PARSER.unescape(uri.user)
-      http.proxy_pass = uri.password && URI::DEFAULT_PARSER.unescape(uri.password)
-      http.proxy_use_ssl = uri.scheme == "https"
-    end
+    net_http_options.each { |option, value| http.public_send("#{option}=", value) }
     http
+  end
+
+  def net_http_options
+    proxy = url or return {}
+    uri = URI.parse(proxy)
+    {
+      proxy_from_env: false,
+      proxy_address: uri.hostname,
+      proxy_port: uri.port,
+      proxy_user: uri.user && URI::DEFAULT_PARSER.unescape(uri.user),
+      proxy_pass: uri.password && URI::DEFAULT_PARSER.unescape(uri.password),
+      proxy_use_ssl: uri.scheme == "https",
+    }
   end
 
   def open_uri_options
