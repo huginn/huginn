@@ -195,7 +195,7 @@ module LiquidInterpolatable
 
             response = http.head(uri)
             case response.status
-            when 301, 302, 303, 307
+            when 301, 302, 303, 307, 308
               if location = response['location']
                 uri += Utils.normalize_uri(location)
                 next

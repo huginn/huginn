@@ -185,6 +185,15 @@ describe LiquidInterpolatable::Filters do
       expect(@filter.uri_expand('https://t.co.x/aaaa')).to eq('http://www.example.com/welcome')
     end
 
+    it 'should follow a 308 Permanent Redirect' do
+      stub_request(:head, 'https://moved.x/aaaa')
+        .to_return(status: 308, headers: { Location: 'https://moved.x/bbbb' })
+      stub_request(:head, 'https://moved.x/bbbb')
+        .to_return(status: 200)
+
+      expect(@filter.uri_expand('https://moved.x/aaaa')).to eq('https://moved.x/bbbb')
+    end
+
     it 'should respect the limit for the number of redirects' do
       expect(@filter.uri_expand('http://2many.x/1')).to eq('http://2many.x/1')
       expect(@filter.uri_expand('http://2many.x/1', 6)).to eq('http://2many.x/6')
