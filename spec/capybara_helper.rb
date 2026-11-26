@@ -5,6 +5,19 @@ require 'rspec/retry'
 
 CAPYBARA_TIMEOUT = ENV['CI'] == 'true' ? 60 : 5
 
+module ChromeStorageReset
+  def reset!
+    super
+  rescue Selenium::WebDriver::Error::InvalidArgumentError => error
+    raise unless error.message.include?("* is not a valid URL")
+
+    # Chrome 158 rejects Capybara's wildcard origin when clearing storage.
+    quit
+  end
+end
+
+Capybara::Selenium::Driver::ChromeDriver.prepend(ChromeStorageReset)
+
 def chrome_options(headless:)
   Selenium::WebDriver::Chrome::Options.new.tap do |options|
     options.binary = ENV["CHROME_BIN"] if ENV["CHROME_BIN"].present?
