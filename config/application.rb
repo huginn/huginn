@@ -58,7 +58,7 @@ module Huginn
     config.time_zone = ENV['TIMEZONE'].presence || 'Pacific Time (US & Canada)'
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
+    config.i18n.load_path += GemfileHelper.additional_gem_locale_paths
     # Set LOCALE to use another locale provided by a translation gem.
     config.i18n.default_locale = ENV['LOCALE'].presence || :en
 

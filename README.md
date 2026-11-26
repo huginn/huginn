@@ -128,6 +128,21 @@ If you'd like to write your own Huginn Agent gem, please see [huginn_agent](http
 
 Our general intention is to encourage complex and specific Agents to be written as gems, while continuing to add new general-purpose Agents to the core Huginn repository.
 
+## Translation gems
+
+Translations can be distributed as gems installed through `ADDITIONAL_GEMS`. Include Ruby or YAML translation files under `config/locales/` in the gem package; nested directories are supported. Huginn loads these files automatically, so a translation-only gem does not need a Railtie.
+
+For example, a gem named `huginn_locale_ko` can provide `config/locales/ko.yml`:
+
+```yaml
+ko:
+  layouts:
+    navigation:
+      agents: "에이전트"
+```
+
+Add `huginn_locale_ko` to `ADDITIONAL_GEMS`, set `LOCALE=ko` in `.env`, run `bundle install`, and restart Huginn. Preserve any other gems already listed in `ADDITIONAL_GEMS`. In production, keys missing from a partial translation fall back to English. Only UI text that already uses locale keys can be translated; see [#3748](https://github.com/huginn/huginn/issues/3748) for the remaining views.
+
 ## Sponsors
 
 Huginn is maintained by [Akinori Musha (@knu)](https://github.com/knu) in spare time.  You can support its development by [sponsoring the maintainer](https://github.com/sponsors/knu).  Company sponsors and sponsored hosting providers are listed in [doc/sponsors.md](doc/sponsors.md), along with the listing policy.

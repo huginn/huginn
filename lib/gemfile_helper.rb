@@ -46,6 +46,17 @@ class GemfileHelper
       end
     end
 
+    def additional_gem_locale_paths(string = ENV['ADDITIONAL_GEMS'])
+      paths = []
+      parse_each_agent_gem(string) do |name, *|
+        spec = Gem.loaded_specs[name]
+        next unless spec
+
+        paths.concat Dir[File.join(spec.full_gem_path, 'config', 'locales', '**', '*.{rb,yml}')]
+      end
+      paths.uniq
+    end
+
     private
 
     def vendored_dotenv_dir(root = Pathname.new(__dir__).parent)
