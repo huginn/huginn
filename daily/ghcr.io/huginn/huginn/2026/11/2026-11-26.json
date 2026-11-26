@@ -1,0 +1,8 @@
+{
+  "image": "ghcr.io/huginn/huginn",
+  "date": "2026-11-26",
+  "downloads": 1496,
+  "source": "https://github.com/huginn/huginn/pkgs/container/huginn",
+  "observed_at": "2026-11-26T17:52:28.872239Z",
+  "provisional": true
+}
