@@ -2,6 +2,7 @@
 
 | DateOfChange   | Changes                                                                                                      |
 |----------------|--------------------------------------------------------------------------------------------------------------|
+| Nov 27, 2026   | Apply `OUTBOUND_PROXY` to SlackAgent webhook requests so they pass through the configured egress proxy. |
 | Nov 19, 2026   | Upgrade to Ruby 4.0.10 for security fixes in Regexp and String case conversion. [Ruby release notes](https://www.ruby-lang.org/en/news/2026/11/18/ruby-4-0-10-released/) |
 | Nov 18, 2026   | Restrict active content and cross-origin redirects from Agent web responses to administrator-owned Agents by default.  See the [upgrade guide](UPGRADING.md#web-responses-from-agents-owned-by-non-admin-users) for compatibility settings. |
 | Nov 18, 2026   | Restrict the shared `OPENAI_API_KEY` to the origin configured by `OPENAI_BASE_URL`, which defaults to the OpenAI API.  Set an Agent-specific `api_key` for other origins that require authentication. |
