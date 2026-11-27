@@ -1,12 +1,11 @@
 {
   "schema_version": 1,
-  "collected_at": "2026-11-26T17:52:28.872239Z",
+  "collected_at": "2026-11-27T17:52:39.343423Z",
   "images": {
     "ghcr.io/huginn/huginn": {
-      "count": 1249313,
+      "count": 1251898,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn",
       "daily_downloads": {
-        "2026-10-28": 0,
         "2026-10-29": 760,
         "2026-10-30": 3318,
         "2026-10-31": 3519,
@@ -35,14 +34,14 @@
         "2026-11-23": 1675,
         "2026-11-24": 2105,
         "2026-11-25": 1908,
-        "2026-11-26": 1496
+        "2026-11-26": 2255,
+        "2026-11-27": 1826
       }
     },
     "ghcr.io/huginn/huginn-single-process": {
-      "count": 148215,
+      "count": 148736,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn-single-process",
       "daily_downloads": {
-        "2026-10-28": 0,
         "2026-10-29": 139,
         "2026-10-30": 573,
         "2026-10-31": 573,
@@ -71,14 +70,14 @@
         "2026-11-23": 341,
         "2026-11-24": 384,
         "2026-11-25": 881,
-        "2026-11-26": 302
+        "2026-11-26": 458,
+        "2026-11-27": 365
       }
     },
     "ghcr.io/huginn/huginn-test": {
       "count": 2846,
       "source": "https://github.com/huginn/huginn/pkgs/container/huginn-test",
       "daily_downloads": {
-        "2026-10-28": 0,
         "2026-10-29": 0,
         "2026-10-30": 0,
         "2026-10-31": 0,
@@ -107,15 +106,16 @@
         "2026-11-23": 0,
         "2026-11-24": 7,
         "2026-11-25": 0,
-        "2026-11-26": 0
+        "2026-11-26": 0,
+        "2026-11-27": 0
       }
     },
     "docker.io/huginn/huginn": {
-      "count": 20455835,
+      "count": 20457078,
       "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn"
     },
     "docker.io/huginn/huginn-single-process": {
-      "count": 12849830,
+      "count": 12850764,
       "source": "https://hub.docker.com/v2/namespaces/huginn/repositories/huginn-single-process"
     }
   }
