@@ -26,7 +26,7 @@ module Agents
       * If you would like to send messages to a group:
         * Add the bot to the group
       * If you would like to send messages privately to yourself:
-        * Open a conservation with the bot by visiting https://telegram.me/YourHuginnBot
+        * Open Telegram, search for the bot username you chose in BotFather, and press **Start** in that private chat.
       * Send a message to the bot, group or channel.
       * Select the `chat_id` from the dropdown.
 
