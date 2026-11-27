@@ -16,6 +16,8 @@ module Agents
 
         #{'The placeholder symbols above will be replaced by their values once the agent is saved.' unless id}
 
+        Browser clients that POST from another origin first send an OPTIONS preflight, which Huginn answers with CORS headers so the subsequent request can proceed.
+
         Options:
 
         * `use_legacy_jsonpath` - Set to `true` to retain legacy JSONPath syntax and behavior.  Otherwise, JSONPath expressions use RFC 9535.
