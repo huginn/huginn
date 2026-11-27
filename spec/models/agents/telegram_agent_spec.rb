@@ -96,6 +96,16 @@ describe Agents::TelegramAgent do
                                    ])
     end
 
+    it 'preserves long runs of punctuation in split messages and captions' do
+      @checker.receive [event_with_payload(text: '!' * 4097, long: 'split')]
+      expect(@sent_messages.map { |m| m[:text][:text] }).to eq(['!' * 4096, '!'])
+
+      @sent_messages.clear
+      @checker.receive [event_with_payload(photo: 'photo-id', caption: '!' * 1025, long: 'split')]
+      expect(@sent_messages[0][:photo][:caption]).to eq('!' * 1024)
+      expect(@sent_messages[1][:text][:text]).to eq('!')
+    end
+
     it 'accepts audio key and uses :send_audio to send the file with truncated caption' do
       event = event_with_payload audio: 'https://example.com/sound.mp3', caption: 'a' * 1025
       @checker.receive [event]
