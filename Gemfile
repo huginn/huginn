@@ -67,7 +67,7 @@ gem 'mqtt'
 gem 'pdf-reader'
 
 # S3Agent
-gem 'aws-sdk-s3', '~> 1', '>= 1.244.0'
+gem 'aws-sdk-s3', '~> 1', '>= 1.245.2'
 
 # SlackAgent
 gem 'slack-notifier'
@@ -106,7 +106,7 @@ gem 'faraday-gzip'
 # gem 'faraday-httpclient'
 gem 'faraday-multipart'
 gem 'faraday-typhoeus'
-gem 'feedjira', '~> 4.0', '>= 4.0.3'
+gem 'feedjira', '~> 4.0', '>= 4.0.4'
 gem 'foreman'
 gem 'geokit'
 gem 'geokit-rails'
